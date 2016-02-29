@@ -1,0 +1,18 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+個人資料
+{% endblock %}
+{% block content %}
+	{% if request.user.is_authenticated %}
+	<ul>
+		<li>使用者名稱：{{ user.username}}</li>
+		<li>電子郵件：{{ user.email }}</li>
+		<li>first name：{{ user.first_name }}</li>
+		<li>last name：{{ user.last_name }}</li>
+	</ul>
+	<a href="{% url 'django.contrib.auth.views.password_change' %}" >修改密碼</a>
+	<a href="{% url 'account:info_change' %}" >修改資料</a>
+	{% else %}
+	<h5>您尚未登錄</h5>
+	{% endif %}
+{% endblock %}

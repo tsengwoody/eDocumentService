@@ -1,0 +1,15 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+修改資料
+{% endblock %}
+{% block content %}
+<form method="post" action="{% url 'account:info_change' %}">
+{% csrf_token %}
+<table>
+<tr><th>username:</th><td>{{ user.username }}</td></tr>
+{{ editorform.as_table }}
+</table>
+<input type="submit" value="change info" />
+</form>
+
+{% endblock %}

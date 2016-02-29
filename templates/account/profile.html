@@ -1,0 +1,69 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+個人首頁
+{% endblock %}
+{% block header %}
+個人首頁
+{% endblock %}
+{% block content %}
+	{% if request.user.is_authenticated %}
+		<form action="" method="post">
+		{% csrf_token %}
+		<input type="submit" id="getPart_id" name="getPart" value="領文件" />
+
+		<h5>正校對文件</h5>
+		<table>
+		<tr>
+		<th>文件</th>
+		<th>edit page</th>
+		<th>完成</th>
+		<th>最後編輯日</th>
+		<th>送件日</th>
+		<th colspan="2">動作</th>
+		</tr>
+		{% for part in editingPartList %}
+		<tr>
+		<td>{{part.book.bookname}}-part{{part.part}}</td>
+		<td>{{part.edited_page}}</td>
+		<td>{{part.is_finish}}</td>
+		<td>{{part.edit_date}}</td>
+		<td>{{part.scan_date}}</td>
+		<td><a href = /ebookSystem/edit/{{part.book.id}}/{{part.part}} >編輯</a></td>
+		<td><input type="submit" id="rebackPart_id" name={{part.book.ISBN}}-{{part.part}} value="還文件" /></td>
+		</tr>
+		{% endfor %}
+		</table>
+		</form>
+
+		<h5>完成校對記錄</h5>
+		<table>
+		<tr>
+		<th>part</th>
+		<th>begin page</th>
+		<th>end page</th>
+		<th>edit page</th>
+		<th>正編輯</th>
+		<th>完成</th>
+		<th>編輯者</th>
+		<th>最後編輯日</th>
+		<th>送件日</th>
+		</tr>
+		{% for part in finishPartList %}
+		<tr>
+		<td>{{part.part}}</td>
+		<td>{{part.begin_page}}</td>
+		<td>{{part.end_page}}</td>
+		<td>{{part.edited_page}}</td>
+		<td>{{part.is_edited}}</td>
+		<td>{{part.is_finish}}</td>
+		<td>{{part.editor}}</td>
+		<td>{{part.edit_date}}</td>
+		<td>{{part.scan_date}}</td>
+		</tr>
+		{% endfor %}
+		</table>
+
+	{% else %}
+		<h5>您尚未登錄</h5>
+	{% endif %}
+{% endblock %}

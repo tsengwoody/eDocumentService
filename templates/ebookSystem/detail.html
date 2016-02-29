@@ -1,0 +1,44 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+{{ book.bookname }}資訊
+{% endblock %}
+{% block header %}
+<h1>{{ book.bookname }}資訊
+{% endblock %}
+{% block content %}
+<ul>
+	<li>作者：{{ book.author }}</li>
+	<li>譯者{{ book.translator }}</li>
+	<li>ISBN{{ book.ISBN }}</li>
+</ul>
+
+<table>
+<tr>
+<th>part</th>
+<th>begin page</th>
+<th>end page</th>
+<th>edit page</th>
+<th>正編輯</th>
+<th>完成</th>
+<th>編輯者</th>
+<th>最後編輯日</th>
+<th>建立日</th>
+<th>編輯</th>
+</tr>
+{% for part in partList %}
+<tr>
+<td>{{part.part}}</td>
+<td>{{part.beginPage}}</td>
+<td>{{part.endPage}}</td>
+<td>{{part.editedPage}}</td>
+<td>{{part.is_edited}}</td>
+<td>{{part.is_finish}}</td>
+<td>{{part.editor}}</td>
+<td>{{part.edit_date}}</td>
+<td>{{part.scan_date}}</td>
+<td><a href=/ebookSystem/edit/{{part.book.id}}/{{part.part}} >編輯</a></td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}
