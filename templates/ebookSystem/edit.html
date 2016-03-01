@@ -7,7 +7,7 @@
 {{ book.bookname }}-part{{part.part}}
 {% endblock %}
 {% block content %}
-<script language="javascript" src="{% static 'ebookSystem/edit.js' %}"></script>
+<script language="javascript" src="{% static 'ebookSystem/js/edit.js' %}"></script>
 {{ message }}
 <form action="" method="post">
 	{% csrf_token %}

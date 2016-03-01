@@ -91,7 +91,7 @@ class EBook(models.Model):
 def post_init_Book(**kwargs):
 	book = kwargs.get('instance')
 	if book.page_count == None or book.part_count == None:
-		book.path = u'static/ebookSystem/{0}'.format(book.bookname)
+		book.path = u'static/ebookSystem/document/{0}'.format(book.bookname)
 		book.page_count=0
 		try:
 			fileList=os.listdir(book.path+u'/source')
