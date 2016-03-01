@@ -1,5 +1,7 @@
 ﻿# coding: utf-8
 from django import forms
+from django.forms import ModelForm
+from .models import *
 
 class EditForm(forms.Form):
 	content = forms.CharField(widget=forms.Textarea(attrs={'rows': 200, 'cols':60}), label=u'內容')

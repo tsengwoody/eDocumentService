@@ -5,7 +5,6 @@ from django.utils import timezone
 
 # Create your models here.
 from django.contrib.auth.models import AbstractUser
-from django.forms import ModelForm
 import os
 import datetime
 
