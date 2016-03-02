@@ -16,11 +16,13 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from . import views
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 	url(r'^account/', include('account.urls', namespace="account")),
 	url(r'^ebookSystem/', include('ebookSystem.urls', namespace="ebookSystem")),
-	url('^auth/password_change/$', auth_views.password_change),
-	url('^auth/', include('django.contrib.auth.urls',)),
+	url(r'^auth/password_change/$', auth_views.password_change, name='password_change'),
+	url(r'^auth/register/$', views.register, name='register'),
+	url(r'^auth/', include('django.contrib.auth.urls',)),
 ]

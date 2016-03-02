@@ -1,6 +1,5 @@
 ﻿# coding: utf-8
 from django import forms
-from django.forms import ModelForm
 from .models import *
 
 class EditForm(forms.Form):
@@ -13,7 +12,12 @@ class EditForm(forms.Form):
 #			raise forms.ValidationError("無法儲存檔案，您傳的資料無特殊標記無法得知校對完成位置")
 #		return data
 
-class EditorForm(ModelForm):
+class RegisterUserForm(forms.ModelForm):
+	class Meta:
+		model = User
+		fields = ['email', 'first_name', 'last_name', 'phone', 'birthday', 'education' ]
+
+class EditorForm(forms.ModelForm):
 	class Meta:
 		model = User
 		fields = ['email', 'first_name', 'last_name']

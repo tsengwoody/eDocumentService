@@ -1,0 +1,18 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+註冊
+{% endblock %}
+{% block content %}
+<form method="post" action="{% url 'register' %}">
+{% csrf_token %}
+<table>
+<tr><th><label for="id_username">username:</label></th><td><input id="id_username" maxlength="30" name="username" type="text"></td></tr>
+<tr><th><label for="id_password">password:</label></th><td><input id="id_password" maxlength="30" name="password" type="password"></td></tr>
+<tr><th><label for="id_confirm_password">confirm password:</label></th><td><input id="id_confirm_password" maxlength="30" name="confirm_password" type="password"></td></tr>
+{{ registerUserForm.as_table }}
+<tr><th><label for="id_professional_field">professional field:</label></th><td><input id="id_professional_field" maxlength="30" name="professional_field" type="text"></td></tr>
+</table>
+<input type="submit" value="register" />
+</form>
+
+{% endblock %}
