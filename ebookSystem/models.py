@@ -8,10 +8,15 @@ from django.contrib.auth.models import AbstractUser
 import os
 import datetime
 
+EDU = (
+	(u'高中' , u'高中'),
+	(u'學士' , u'學士'),
+	(u'碩士' , u'碩士'),
+)
 class User(AbstractUser):
 	phone = models.CharField(max_length=30)
 	birthday = models.DateField()
-	education = models.CharField(max_length=30)
+	education = models.CharField(max_length=30, choices=EDU)
 
 	def __unicode__(self):
 		return self.username
