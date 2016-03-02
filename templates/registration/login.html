@@ -1,12 +1,14 @@
 ﻿{% extends "base.html" %}
+{% block resource %}
+    {% load staticfiles %}
+    <link href="{% static "ebookSystem/css/bootstrap/signin.css" %}" rel="stylesheet" >
+{% endblock%}
+
 {% block title %}
 登錄login page
 {% endblock %}
-{% block content %}
 
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
+{% block content %}
 
 {% if next %}
     {% if user.is_authenticated %}
@@ -16,25 +18,32 @@
     <p>Please login to see this page.</p>
     {% endif %}
 {% endif %}
+<div class="form-signin" >
+    <form class="form-signin" role="form" method="post" action="{% url 'django.contrib.auth.views.login' %}">
+    <h2 class="form-signin-heading">Sign in</h2>
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+        </div>
+        <div class="form-group">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+        </div>
+     
+        <!--<input type="submit" value="login" /> -->
 
-<form method="post" action="{% url 'django.contrib.auth.views.login' %}">
-{% csrf_token %}
-<table>
-<tr>
-    <td>{{ form.username.label_tag }}</td>
-    <td>{{ form.username }}</td>
-</tr>
-<tr>
-    <td>{{ form.password.label_tag }}</td>
-    <td>{{ form.password }}</td>
-</tr>
-</table>
-
-<input type="submit" value="login" />
-<input type="hidden" name="next" value="{{ next }}" />
-</form>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+    {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+            <p>Your username and password didn't match. Please try again.</p>
+        </div>
+    {% endif %}
+    <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+</div>
 
 {# Assumes you setup the password_reset view in your URLconf #}
-<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
-
 {% endblock %}
+{% block footer %}{% endblock %}
