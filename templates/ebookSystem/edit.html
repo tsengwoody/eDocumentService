@@ -7,35 +7,43 @@
 {{ book.bookname }}-part{{part.part}}
 {% endblock %}
 {% block content %}
-<script language="javascript" src="{% static 'ebookSystem/js/edit.js' %}"></script>
-{{ message }}
-<form action="" method="post">
-	{% csrf_token %}
-	<input type="submit" id="save_id" name="save" value="save" />
-	<input type="submit" id="finish_id" name="finish" value="finish" />
-	<input type="submit" id="close_id" name="close" value="close" />
-	<hr>
-	{{ editForm.content.errors }}
-	<!--		{{ editForm.content.label_tag }}-->
-	{{ editForm.content }}
-	{{ editForm.page.errors }}
-	{{ editForm.page.label_tag }}
-	{{ editForm.page }}
-</form>
+<div class="row">
+	
 
-<input type="button" id="prePage" name="prePage" value="上一頁" onclick="changePage(-1)">
+		<script language="javascript" src="{% static 'ebookSystem/js/edit.js' %}"></script>
+		{{ message }}
+		<form action="" method="post">
+			{% csrf_token %}
+			<input type="submit" id="save_id" name="save" value="save" />
+			<input type="submit" id="finish_id" name="finish" value="finish" />
+			<input type="submit" id="close_id" name="close" value="close" />
+			<hr>
+			<div class="col-md-6">
+				{{ editForm.content.errors }}
+				<!--		{{ editForm.content.label_tag }}-->
+				{{ editForm.content }}
+				{{ editForm.page.errors }}
+				{{ editForm.page.label_tag }}
+				{{ editForm.page }}
+			</div>
+		</form>
+	
+	<div class="col-md-6">
+		<input type="button" id="prePage" name="prePage" value="上一頁" onclick="changePage(-1)">
 
-<select name="scanPageList" id="scanPageList" onchange="changePageSelect()">
-	{% for scanPage in scanPageList %}
-	{% ifequal scanPage defaultPage %}
-	<option value="{{ scanPage }}" selected>{{ scanPage }}-上次校對頁數</option>
-	{% else %}
-	<option value="{{ scanPage }}">{{ scanPage }}</option>
-	{% endifequal %}
-	{% endfor %}
-</select>
+		<select name="scanPageList" id="scanPageList" onchange="changePageSelect()">
+			{% for scanPage in scanPageList %}
+			{% ifequal scanPage defaultPage %}
+			<option value="{{ scanPage }}" selected>{{ scanPage }}-上次校對頁數</option>
+			{% else %}
+			<option value="{{ scanPage }}">{{ scanPage }}</option>
+			{% endifequal %}
+			{% endfor %}
+		</select>
 
-<input type="button" id="nextPage" name="nextPage" value="下一頁" onclick="changePage(1)">
-<iframe src="{% static defaultPageURL %}" name="scanPage" height="600" width="500">文件掃描原檔</iframe>
+		<input type="button" id="nextPage" name="nextPage" value="下一頁" onclick="changePage(1)">
+		<iframe src="{% static defaultPageURL %}" name="scanPage" height="600" width="100%">文件掃描原檔</iframe>
+	</div>
+
 </div>
 {% endblock %}
