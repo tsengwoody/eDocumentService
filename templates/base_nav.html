@@ -17,16 +17,18 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="#">Project name</a>
+              <a class="navbar-brand" href="#">eDocumentService</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class='inline'><a href="{% url 'account:profile' %}">個人首頁</a></li>
-                <li class='inline'><a href="{% url 'account:info' %}">個人資料</a></li>
+                <li class='inline'><a href="{% url 'account:profile' %}">服務</a></li>
+                <li class='inline'><a href="{% url 'account:info' %}">會員</a></li>
                 {% if request.user.is_authenticated %}
                     <li class='inline'><a href="{% url 'logout' %}">登出</a></li>
+
                 {% else %}
                     <li class='inline'><a href="{% url 'login' %}">登入</a></li>
+                    <li class='inline'><a href="{% url 'register' %}">註冊</a></li>
                 {% endif %}
             </ul>
         </div>
