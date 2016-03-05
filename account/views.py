@@ -8,6 +8,7 @@ from django.contrib.auth import (REDIRECT_FIELD_NAME)
 from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm,
 )
+from django.db.models import F
 from django.views import generic
 from ebookSystem.models import *
 from ebookSystem.forms import *
@@ -51,17 +52,48 @@ class profileView(generic.View):
 		template_name='account/profile.html'
 		user=request.user
 		if request.POST.has_key('getPart'):
-			getPart = EBook.objects.filter(is_finish=False, editor=None).order_by('scan_date', 'part')[0]
+			try:
+				partialBook = Book.objects.exclude(get_count=0).exclude(get_count = F('part_count')).order_by('get_count')[0]
+			except IndexError:
+				print 'not partial book'
+				try:
+					partialBook = Book.objects.filter(get_count=0).order_by('upload_date')[0]
+				except IndexError:
+					error_message = u'無文件'
+					print 'not book'
+					editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
+					finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
+					return render(request, template_name, locals())
+			getPart = partialBook.ebook_set.filter(is_finish=False, editor=None)[0]
+			print 'get part'+getPart.__unicode__()
 			getPart.editor = request.user.editor
+			getPart.book.get_count = getPart.book.get_count+1
 			getPart.save()
+			getPart.book.save()
+		elif request.POST.has_key('getCompleteBook'):
+			try:
+				completeBook = Book.objects.filter(get_count=0).order_by('upload_date')[0]
+			except IndexError:
+				error_message = u'目前無完整書文件，請先領部份文件'
+				print 'not Complete book'
+				editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
+				finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
+				return render(request, template_name, locals())
+			for getPart in completeBook.ebook_set.all():
+				print 'get part'+getPart.__unicode__()
+				getPart.editor = request.user.editor
+				getPart.book.get_count = getPart.book.get_count+1
+				getPart.save()
+				getPart.book.save()
 		elif u'還文件' in request.POST.values():
-			print request.POST.keys()
 			book_ISBN = request.POST.keys()[request.POST.values().index(u'還文件')].split('-')[0]
 			part_part = request.POST.keys()[request.POST.values().index(u'還文件')].split('-')[1]
 			rebackPart=EBook.objects.get(part=part_part, book__ISBN = book_ISBN)
-			print rebackPart
+			print 'reback'+rebackPart.__unicode__()
 			rebackPart.editor=None
+			rebackPart.book.get_count = rebackPart.book.get_count-1
 			rebackPart.save()
+			rebackPart.book.save()
 		editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
 		finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
 		return render(request, template_name, locals())

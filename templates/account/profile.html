@@ -7,10 +7,14 @@
 {% endblock %}
 {% block content %}
 	{% if request.user.is_authenticated %}
+	{% if error_message %}
+	{{error_message}}
+	{% endif %}
 		<form action="" method="post">
 		{% csrf_token %}
-		<input type="submit" id="getPart_id" name="getPart" value="領文件" />
+		<input type="submit" id="getPart_id" name="getPart" value="領部份文件" />
 		<!--<button class="btn btn-lg btn-default" type="submit" id="getPart_id" btn btn-lg btn-defaultname="getPart">領文件</button> -->
+		<input type="submit" id="getCompleteBook_id" name="getCompleteBook" value="領完整文件" />
 
 		<h4 class="page-header">正校對文件</h4>
 		<table class="table table-striped table-hover">

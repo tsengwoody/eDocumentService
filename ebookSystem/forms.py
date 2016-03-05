@@ -16,3 +16,10 @@ class RegisterUserForm(forms.ModelForm):
 	class Meta:
 		model = User
 		fields = '__all__'
+
+class ContactUsForm(forms.Form):
+	name = forms.CharField()
+	email = forms.EmailField()
+	kind = forms.ChoiceField()
+	subject = forms.CharField()
+	content = forms.CharField()

@@ -67,6 +67,8 @@ class Book(models.Model):
 	page_count = models.IntegerField(blank=True, null=True)
 	part_count = models.IntegerField(blank=True, null=True)
 	page_per_part = models.IntegerField(default=50)
+	get_count = models.IntegerField(default=0)
+	upload_date = models.DateField(default = timezone.now().date())
 	remark = models.CharField(max_length=255, blank=True, null=True)
 	def __unicode__(self):
 		return self.bookname
@@ -81,9 +83,10 @@ class EBook(models.Model):
 	guest = models.ForeignKey(Guest,blank=True, null=True, on_delete=models.SET_NULL)
 	is_finish = models.BooleanField(default=False)
 	is_edited = models.BooleanField(default=False)
-	scan_date = models.DateField(default = timezone.now().date())
 	edit_date = models.DateTimeField(blank=True, null=True)
 	finish_date = models.DateField(blank=True, null=True)
+	deadline = models.DateField(blank=True, null=True)
+	get_date = models.DateTimeField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
 	remark = models.CharField(max_length=255, blank=True, null=True)
 
