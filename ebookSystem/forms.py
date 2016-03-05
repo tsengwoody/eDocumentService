@@ -3,8 +3,8 @@ from django import forms
 from .models import *
 
 class EditForm(forms.Form):
-	content = forms.CharField(widget=forms.Textarea(attrs={'rows': 200, 'cols':60}), label=u'內容')
-	page = forms.IntegerField(label=u'頁數')
+	content = forms.CharField()
+	page = forms.IntegerField()
 
 #	def clean_content(self):
 #		data = self.cleaned_data['content']
@@ -15,9 +15,4 @@ class EditForm(forms.Form):
 class RegisterUserForm(forms.ModelForm):
 	class Meta:
 		model = User
-		fields = ['email', 'first_name', 'last_name', 'phone', 'birthday', 'education' ]
-
-class EditorForm(forms.ModelForm):
-	class Meta:
-		model = User
-		fields = ['email', 'first_name', 'last_name']
+		fields = '__all__'

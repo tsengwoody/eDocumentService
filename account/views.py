@@ -19,12 +19,12 @@ def info(request,template_name='account/info.html'):
 def info_change(request,template_name='account/info_change.html'):
 	user = request.user
 	if request.method == 'POST':
-		editorform = EditorForm(request.POST, instance = user)
-		editorform.save()
+		registerUserForm = registerUserForm(request.POST, instance = user)
+		registerUserForm.save()
 		redirect_to = '/account/info'
 		return HttpResponseRedirect(redirect_to)
 	if request.method == 'GET':
-		editorform = EditorForm(instance = user)
+		registerUserForm = RegisterUserForm(instance = user)
 		return render(request, template_name, locals())
 
 def login(request, template_name='registration/login.html',
@@ -36,12 +36,6 @@ def login(request, template_name='registration/login.html',
 		return HttpResponseRedirect(redirect_to)
 	else:
 		return auth_login(request, template_name, redirect_field_name, authentication_form, current_app)
-
-def profile(request,template_name='account/profile.html'):
-	user=request.user
-#	finishPart=EBook.objects.filter(editor__username=user.username,is_finish=True)
-#	editingPart=EBook.objects.filter(editor__username=user.username,is_finish=False)
-	return render(request, template_name, locals())
 
 class profileView(generic.View):
 	template_name=''

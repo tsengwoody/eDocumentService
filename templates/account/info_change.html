@@ -7,7 +7,7 @@
 {% csrf_token %}
 <table>
 <tr><th>username:</th><td>{{ user.username }}</td></tr>
-{{ editorform.as_table }}
+{{ registerUserForm.as_table }}
 </table>
 <input type="submit" value="change info" />
 </form>

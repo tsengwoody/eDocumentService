@@ -67,7 +67,7 @@ class editView(generic.View):
 		finishFilePath=book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
 		filePath=book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
 		if request.POST.has_key('save'):
-			if editForm.is_valid() and editForm.cleaned_data['content'].find('|----------|') != -1:
+			if editForm.is_valid():
 				editContent=editForm.cleaned_data['content']
 				with codecs.open(finishFilePath, 'r', encoding='utf-16le') as fileRead:
 					finishContent=fileRead.read()
@@ -88,7 +88,7 @@ class editView(generic.View):
 				message=u'您上次儲存時間為：{0}，請定時存檔喔~'.format(editTime)
 				return render(request, template_name, locals())
 			else:
-				message=u'未save成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下finish按紐'
+				message=u'表單驗證失敗'
 				return render(request, template_name, locals())
 		elif request.POST.has_key('close'):
 			return HttpResponseRedirect(reverse('account:profile'))
@@ -106,7 +106,7 @@ class editView(generic.View):
 				part.save()
 				return HttpResponseRedirect(reverse('account:profile'))
 			else:
-				message=u'未finish成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下save按紐'
+				message=u'表單驗證失敗'
 				return render(request, template_name, locals())
 
 def editVarInit(book, part):
