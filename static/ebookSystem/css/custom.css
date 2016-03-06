@@ -4,14 +4,18 @@
 }
 */
 *{
-         -webkit-box-sizing: border-box;
-       -moz-box-sizing: border-box;
-            box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .scrollbarDiv{
     overflow: auto;
+    height:782px;
 }
 textarea
 {
     width:100%;
+}
+#buttonGroup{
+    text-align:center;
 }

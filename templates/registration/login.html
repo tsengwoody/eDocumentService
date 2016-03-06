@@ -12,10 +12,14 @@
 
 {% if next %}
     {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
+    <div class="alert alert-warning">
+        <p>Your account doesn't have access to this page. To proceed,
+        please login with an account that has access.</p>
+    </div>
     {% else %}
-    <p>Please login to see this page.</p>
+    <div class="alert alert-info">
+        <p>Please login to see this page.</p>
+    </div>
     {% endif %}
 {% endif %}
 <div class="form-signin" >

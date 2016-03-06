@@ -17,6 +17,7 @@
 		scanPageList.selectedIndex=scanPageList.selectedIndex+offset;
 		page.value=scanPageList.selectedIndex;
 		imgScanPage.src=dirname+scanPageList.options[scanPageList.selectedIndex].value;
+        //alert(imgScanPage.src);
 	} else {
 		alert('超過頁數範圍惹~');
 	}
@@ -39,9 +40,30 @@ function changePageSelect() {
 	scanPageList=document.getElementById("scanPageList");
 	page.value=scanPageList.selectedIndex;
 	imgScanPage.src=dirname+scanPageList.options[scanPageList.selectedIndex].value;
+ //   alert(imgScanPage.src);
 }
 $( document ).ready(function() {
     console.log( "ready!" );
+
+    //$('#nextPage').click(changePage(1));
+    //$('#prePage').click(chagePage(-1));
+
+    $('#zoomIN').click(function(){
+
+        imgSize.value=(parseInt(imgSize.value)-10).toString()+'%';
+       // alert(imgSize.value);
+        $('#scanPage').css('width',imgSize.value);
+
+    });
+    $('#zoomOUT').click(function(){
+
+        imgSize.value=(parseInt(imgSize.value)+10).toString()+'%';
+        $('#scanPage').css('width',imgSize.value);
+
+    });
+
+
+
     $('#chagePost').click(function(){
     	if($('#imagePage').hasClass('col-md-6'))
     	{
