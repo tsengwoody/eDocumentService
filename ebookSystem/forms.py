@@ -17,6 +17,11 @@ class RegisterUserForm(forms.ModelForm):
 		model = User
 		fields = '__all__'
 
+class BookForm(forms.ModelForm):
+	class Meta:
+		model = Book
+		fields = '__all__'
+
 class ContactUsForm(forms.ModelForm):
 	class Meta:
 		model = ContactUs

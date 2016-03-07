@@ -1,16 +1,16 @@
 ﻿{% extends "base_nav.html" %}
 {% block title %}
-聯絡我們
+上傳文件
 {% endblock %}
 {% block header %}
-聯絡我們
+上傳文件
 {% endblock %}
 {% block content %}
 <form action="" method="post">
 {% csrf_token %}
-	{{ contactUsForm.errors }}
+	{{ bookForm.errors }}
 	<table>
-	{{ contactUsForm.as_table }}
+	{{ bookForm.as_table }}
 	</table>
 	<button class="btn btn-lg btn-default" type="submit" id="send_id" name="send">傳送</button>
 </form>

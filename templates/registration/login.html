@@ -23,16 +23,18 @@
     {% endif %}
 {% endif %}
 <div class="form-signin" >
-    <form class="form-signin" role="form" method="post" action="{% url 'django.contrib.auth.views.login' %}">
+    <form class="form-signin" role="form" method="post" action="">
     <h2 class="form-signin-heading">Sign in</h2>
         {% csrf_token %}
         <div class="form-group">
-            {{ form.username.label_tag }}
-            {{ form.username }}
+            {{ error_message }}
+            {{ loginForm.errors }}
+            {{ loginForm.username.label_tag }}
+            {{ loginForm.username }}
         </div>
         <div class="form-group">
-            {{ form.password.label_tag }}
-            {{ form.password }}
+            {{ loginForm.password.label_tag }}
+            {{ loginForm.password }}
         </div>
      
         <!--<input type="submit" value="login" /> -->
@@ -40,7 +42,7 @@
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
         <input type="hidden" name="next" value="{{ next }}" />
     </form>
-    {% if form.errors %}
+    {% if loginForm.errors %}
         <div class="alert alert-danger" role="alert">
             <p>Your username and password didn't match. Please try again.</p>
         </div>
