@@ -8,10 +8,16 @@ from django.contrib.auth import (REDIRECT_FIELD_NAME)
 from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm,
 )
+from django.core.mail import EmailMessage
+from django.core.urlresolvers import reverse
 from django.db.models import F
+from django.utils import timezone
 from django.views import generic
 from ebookSystem.models import *
 from ebookSystem.forms import *
+
+MANAGER = ['tsengwoody@yahoo.com.tw']
+SERVICE = 'tsengwoody.tw@gmail.com'
 
 def info(request,template_name='account/info.html'):
 	user = request.user
@@ -21,22 +27,40 @@ def info_change(request,template_name='account/info_change.html'):
 	user = request.user
 	if request.method == 'POST':
 		registerUserForm = registerUserForm(request.POST, instance = user)
-		registerUserForm.save()
-		redirect_to = '/account/info'
-		return HttpResponseRedirect(redirect_to)
+		if registerUserForm.is_valid():
+			registerUserForm.save()
+			redirect_to = reverse('account:info')
+			return HttpResponseRedirect(redirect_to)
 	if request.method == 'GET':
 		registerUserForm = RegisterUserForm(instance = user)
-		return render(request, template_name, locals())
+	return render(request, template_name, locals())
 
 def login(request, template_name='registration/login.html',
 		redirect_field_name=REDIRECT_FIELD_NAME,
 		authentication_form=AuthenticationForm,
 		current_app=None, extra_context=None):
 	if request.user.is_authenticated():
-		redirect_to = '/accounts/profile'
+		redirect_to = reverse('account:profile')
 		return HttpResponseRedirect(redirect_to)
 	else:
 		return auth_login(request, template_name, redirect_field_name, authentication_form, current_app)
+
+def contact_us(request,template_name='account/contact_us.html'):
+	if request.method == 'GET':
+		contactUsForm = ContactUsForm()
+	if request.method == 'POST':
+		contactUsForm = ContactUsForm(request.POST)
+		if contactUsForm.is_valid():
+			contactUs = contactUsForm.save(commit=False)
+			contactUs.message_datetime = timezone.now()
+			subject = u'[{}] {}'.format (contactUs.kind, contactUs.subject)
+			body = u'姓名:'+ contactUs.name+ u'\nemail:'+ contactUs.email+ u'\n內容：'+ contactUs.content
+			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=MANAGER)
+			email.send(fail_silently=False)
+			contactUs.save()
+			redirect_to = reverse('account:profile')
+			return HttpResponseRedirect(redirect_to)
+	return render(request, template_name, locals())
 
 class profileView(generic.View):
 	template_name=''

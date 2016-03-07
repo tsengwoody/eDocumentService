@@ -25,6 +25,7 @@
             <ul class="nav navbar-nav">
                 <li class='inline'><a href="{% url 'account:profile' %}">服務</a></li>
                 <li class='inline'><a href="{% url 'account:info' %}">會員</a></li>
+                <li class='inline'><a href="{% url 'account:contact_us' %}">聯絡我們</a></li>
                 {% if request.user.is_authenticated %}
                     <li class='inline'><a href="{% url 'logout' %}">登出</a></li>
 

@@ -13,6 +13,15 @@ EDU = (
 	(u'學士' , u'學士'),
 	(u'碩士' , u'碩士'),
 )
+
+ContactUsKIND = (
+	(u'校對問題' , u'校對問題'),
+	(u'系統問題' , u'系統問題'),
+	(u'營運建議' , u'營運建議'),
+	(u'加入我們' , u'加入我們'),
+	(u'其他' , u'其他'),
+)
+
 class User(AbstractUser):
 	phone = models.CharField(max_length=30)
 	birthday = models.DateField()
@@ -113,17 +122,18 @@ def post_init_Book(**kwargs):
 
 def post_save_Book(**kwargs):
 	book = kwargs.get('instance')
-	if book.page_count != None or book.part_count != None:
+	if len(book.ebook_set.all()) == 0:
 		createEBookBatch(book)
+	else:
+		print 'The ebook is already exist'
 
 post_init.connect(post_init_Book, Book)
 post_save.connect(post_save_Book, Book)
 
 def createEBookBatch(book):
-	part_set = EBook.objects.filter(book=book)
-	if len(part_set) != 0:
-		print 'The ebook is already exist'
-		return 0
+#	if len(book.ebook_set.all()) != 0:
+#		print 'The ebook is already exist'
+#		return 0
 	print u'create ebook batch {0}'.format(book.bookname)
 	for i in range(book.part_count):
 		begin_page = i*book.page_per_part
@@ -133,3 +143,20 @@ def createEBookBatch(book):
 		part = EBook(book=book, part=i+1, begin_page=begin_page, end_page=end_page)
 		part.save()
 	return 1
+
+class ContactUs(models.Model):
+	name = models.CharField(max_length=10)
+	email = models.EmailField()
+	message_datetime = models.DateField(default = timezone.now())
+	kind = models.CharField(max_length=10, choices=ContactUsKIND)
+	subject = models.CharField(max_length=50)
+	content = models.CharField(max_length=1000)
+	def __unicode__(self):
+		return self.subject
+
+class Reply(models.Model):
+	contact_us = models.ForeignKey(ContactUs)
+	message_datetime = models.DateField(default = timezone.now())
+	content = models.CharField(max_length=1000)
+	def __unicode__(self):
+		return self.message_datetime

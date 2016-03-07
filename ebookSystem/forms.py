@@ -17,9 +17,7 @@ class RegisterUserForm(forms.ModelForm):
 		model = User
 		fields = '__all__'
 
-class ContactUsForm(forms.Form):
-	name = forms.CharField()
-	email = forms.EmailField()
-	kind = forms.ChoiceField()
-	subject = forms.CharField()
-	content = forms.CharField()
+class ContactUsForm(forms.ModelForm):
+	class Meta:
+		model = ContactUs
+		fields = '__all__'
