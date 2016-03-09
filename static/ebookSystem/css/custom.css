@@ -19,3 +19,7 @@ textarea
 #buttonGroup{
     text-align:center;
 }
+.centered{
+    display: inline-block;
+    float:none;
+}

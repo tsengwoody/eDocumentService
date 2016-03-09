@@ -1,6 +1,10 @@
 ﻿{% extends "base_nav.html" %}
+{% load staticfiles %}
 {% block title %}
 個人首頁
+{% endblock %}
+{% block style %}
+<link href="{% static "ebookSystem/css/custom.css" %}" rel="stylesheet" > 
 {% endblock %}
 {% block header %}
 個人首頁
@@ -8,62 +12,69 @@
 {% block content %}
 	{% if request.user.is_authenticated %}
 	{% if error_message %}
-	{{error_message}}
+		<div id="infoForm" class="alert alert-warning" role="alert">
+			{{error_message}}
+		</div>
 	{% endif %}
+
 		<form action="" method="post">
 		{% csrf_token %}
-
-		<button class="btn btn-lg btn-default" type="submit" id="getPart_id" name="getPart">領部份文件</button>
-		<button class="btn btn-lg btn-default" type="submit" id="getCompleteBook_id" name="getCompleteBook">領完整文件</button>
+		<div id="buttonGroup">
+			<button class="btn btn-lg btn-default" type="submit" id="getPart_id" name="getPart">領部份文件</button>
+			<button class="btn btn-lg btn-default" type="submit" id="getCompleteBook_id" name="getCompleteBook">領完整文件</button>
+		</div>
 		<hr />
 		<h4 class="page-header">正校對文件</h4>
 		<table class="table table-striped table-hover">
-		<tr>
-		<th>文件</th>
-		<th>edit page</th>
-		<th>完成</th>
-		<th>最後編輯日</th>
-		<th>送件日</th>
-		<th colspan="2">動作</th>
-		</tr>
-		{% for part in editingPartList %}
-		<tr>
-		<td>{{part.book.bookname}}-part{{part.part}}</td>
-		<td>{{part.edited_page}}</td>
-		<td>{{part.is_finish}}</td>
-		<td>{{part.edit_date}}</td>
-		<td>{{part.scan_date}}</td>
-		<td><a href = /ebookSystem/edit/{{part.book.id}}/{{part.part}} >編輯</a></td>
-		<td><input type="submit" id="rebackPart_id" name={{part.book.ISBN}}-{{part.part}} value="還文件" /></td>
-		</tr>
-		{% endfor %}
+			<tr>
+				<th>文件</th>
+				<th>edit page</th>
+				<th>完成</th>
+				<th>最後編輯日</th>
+				<th>送件日</th>
+				<th colspan="2">動作</th>
+			</tr>
+			{% for part in editingPartList %}
+			<tr>
+				<td>{{part.book.bookname}}-part{{part.part}}</td>
+				<td>{{part.edited_page}}</td>
+				<td>{{part.is_finish}}</td>
+				<td>{{part.edit_date}}</td>
+				<td>{{part.scan_date}}</td>
+				<td><a href = /ebookSystem/edit/{{part.book.id}}/{{part.part}} >編輯</a></td>
+				<td>
+					<!--<input type="submit" id="rebackPart_id" name={{part.book.ISBN}}-{{part.part}} value="還文件" />-->
+					<button type="submit" class="btn btn-default" id="rebackPart_id" name={{part.book.ISBN}}-{{part.part}} value="還文件">還文件</button>
+				</td>
+			</tr>
+			{% endfor %}
 		</table>
 		</form>
 
 		<h4 class="page-header">完成校對記錄</h4>
 		<table class="table table-striped table-hover">
 		<tr>
-		<th>part</th>
-		<th>begin page</th>
-		<th>end page</th>
-		<th>edit page</th>
-		<th>正編輯</th>
-		<th>完成</th>
-		<th>編輯者</th>
-		<th>最後編輯日</th>
-		<th>送件日</th>
+			<th>part</th>
+			<th>begin page</th>
+			<th>end page</th>
+			<th>edit page</th>
+			<th>正編輯</th>
+			<th>完成</th>
+			<th>編輯者</th>
+			<th>最後編輯日</th>
+			<th>送件日</th>
 		</tr>
 		{% for part in finishPartList %}
 		<tr>
-		<td>{{part.part}}</td>
-		<td>{{part.begin_page}}</td>
-		<td>{{part.end_page}}</td>
-		<td>{{part.edited_page}}</td>
-		<td>{{part.is_edited}}</td>
-		<td>{{part.is_finish}}</td>
-		<td>{{part.editor}}</td>
-		<td>{{part.edit_date}}</td>
-		<td>{{part.scan_date}}</td>
+			<td>{{part.part}}</td>
+			<td>{{part.begin_page}}</td>
+			<td>{{part.end_page}}</td>
+			<td>{{part.edited_page}}</td>
+			<td>{{part.is_edited}}</td>
+			<td>{{part.is_finish}}</td>
+			<td>{{part.editor}}</td>
+			<td>{{part.edit_date}}</td>
+			<td>{{part.scan_date}}</td>
 		</tr>
 		{% endfor %}
 		</table>
