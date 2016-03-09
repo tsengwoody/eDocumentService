@@ -1,11 +1,7 @@
 ﻿function changePage(offset){
-	//alert("changePage");
 	page=document.getElementById("id_page");
-	//console.log(page);
-	//imgScanPage=document.getElementsByName("scanPage");
 	imgScanPage=$('#scanPage')[0];
 	src=imgScanPage.src;
-
 	src=src.split('/');
 	dirname=''
 	for (i = 0;i < src.length-1; i++) dirname=dirname+src[i]+'/';
@@ -17,20 +13,16 @@
 		scanPageList.selectedIndex=scanPageList.selectedIndex+offset;
 		page.value=scanPageList.selectedIndex;
 		imgScanPage.src=dirname+scanPageList.options[scanPageList.selectedIndex].value;
-        //alert(imgScanPage.src);
 	} else {
 		alert('超過頁數範圍惹~');
 	}
 }
 function changePageSelect() {
-	//alert("changePageSelect");
 	page=document.getElementById("id_page");
-	//iframeList=document.getElementsByName("scanPage");
 	imgScanPage=$('#scanPage')[0];
 	src=imgScanPage.src;
 	console.log(src);
 	src=src.split('/');
-	//alert(src);
 	dirname=''
 	for (i = 0;i < src.length-1; i++) 
 		dirname=dirname+src[i]+'/';
@@ -40,18 +32,44 @@ function changePageSelect() {
 	scanPageList=document.getElementById("scanPageList");
 	page.value=scanPageList.selectedIndex;
 	imgScanPage.src=dirname+scanPageList.options[scanPageList.selectedIndex].value;
- //   alert(imgScanPage.src);
 }
+function saveSubmit(event)
+{
+    if(typeof $('textarea').val()=='undefined')
+    {
+        event.preventDefault();
+        alert("not contain keyword");
+    }
+    var str=$('textarea').val();
+    if(str.indexOf("|----------|")<0)
+    {
+        event.preventDefault();
+        alert("not contain keyword");
+    }
+}
+function finishSubmit(event)
+{
+    if(typeof $('textarea').val()=='undefined')
+    {
+        event.preventDefault();
+        alert("not contain keyword");
+    }
+    var str=$('textarea').val();
+    if(str.indexOf("|----------|")>0)
+    {
+        event.preventDefault();
+        alert("can not contain keyword");
+    }
+}
+
 $( document ).ready(function() {
     console.log( "ready!" );
+    $('#save_id').click(saveSubmit);
+    $('#finish_id').click(finishSubmit);
 
-    //$('#nextPage').click(changePage(1));
-    //$('#prePage').click(chagePage(-1));
 
     $('#zoomIN').click(function(){
-
         imgSize.value=(parseInt(imgSize.value)-10).toString()+'%';
-       // alert(imgSize.value);
         $('#scanPage').css('width',imgSize.value);
 
     });

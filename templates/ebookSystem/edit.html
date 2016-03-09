@@ -18,17 +18,14 @@
 <div class="row">
 
 		{% if message %}
-			<div id="alertForm" class="alert alert-danger" role="alert">
+			<div id="infoForm" class="alert alert-info" role="alert">
 				{{ message }}
 			</div>
 		{% endif %}
+	 
 
-		<form action="" method="post">
+		<form action="" method="post" id="currentForm">
 			{% csrf_token %}
-			<!-- save on submit find content area ('|----------|')  
-			var str=$('textarea').html();console.log(str.indexOf("|----------|")>0)-->
-			
-			<!-- finish on submit find content area -->
 			<div id="buttonGroup">
 				<button class="btn btn-lg btn-default" type="submit" id="save_id" name="save">save</button>
 				<button class="btn btn-lg btn-default" type="submit" id="finish_id" name="finish">finish</button>
@@ -39,7 +36,7 @@
 
 			<div id="imagePage" class="col-md-6">
 				<div class="row">
-					<div class="col-md-8">
+					<div class="col-md-12">
 						<input type="button" id="prePage" name="prePage" value="上一頁" onclick="changePage(-1)">
 						<select  name="scanPageList" id="scanPageList" onchange="changePageSelect()">
 							{% for scanPage in scanPageList %}
@@ -52,32 +49,24 @@
 						</select>
 						<input type="button" id="nextPage" name="nextPage" value="下一頁" onclick="changePage(1)">
 					</div>
-					
-					<div class="col-md-4" >
-						<label for="id_page">頁數:</label>		
-						<input id="id_page" name="page" type="text" size="4"  value="{{ editForm.page.value }}">
-					</div>
-
-				</div>
-				<!--<div id="slider"></div>-->
-				<div class="row">
-					<div class="col-md-offset-8">
-						<div class="input-group col-md-7">
-							<span class="input-group-btn">
-						        <button id="zoomIN" class="btn btn-default btn-sm" type="button">-</button>
-						    </span>
-						     
-						    <input type="text" id="imgSize" class="form-control input-sm" size="2" value="100%">
- 							<span class="input-group-btn">
-						    	<button id="zoomOUT" class="btn btn-default btn-sm" type="button">+</button>
-						    </span>
-					    </div><!-- /input-group -->
-					</div>
 				</div>
 				<div class="scrollbarDiv">
 				   <img src="{% static defaultPageURL %}" alt="文件掃描原檔" id="scanPage" name="scanPage" width="100%" >
 				</div>
-				<p></p>
+				<div class="col-md-4" style="float:left;">
+						<label for="id_page">頁數:</label>		
+						<input id="id_page" name="page" type="text" size="4" readonly="true"  value="{{ editForm.page.value }}">
+				</div>
+				<div class="input-group col-md-3" style="float:right;">
+					<span class="input-group-btn">
+				        <button id="zoomIN" class="btn btn-default btn-sm" type="button">-</button>
+				    </span>
+				     
+				    <input type="text" id="imgSize" class="form-control input-sm" size="2" value="100%" readonly="true">
+						<span class="input-group-btn">
+				    	<button id="zoomOUT" class="btn btn-default btn-sm" type="button">+</button>
+				    </span>
+			    </div><!-- /input-group -->
 				
 			</div>
 			
@@ -89,7 +78,7 @@
 						{{ editForm.page.errors }}
 					</div>
 				{% else %}
-					<textarea id="id_content" name="content" rows="40">{{ editForm.content.value }}</textarea>
+					<textarea id="id_content" name="content" rows="42">{{ editForm.content.value }}</textarea>
 				{% endif %}
 				
 				<br />
