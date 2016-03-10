@@ -105,7 +105,7 @@ class EBook(models.Model):
 	def __unicode__(self):
 		return self.book.bookname+u'-part'+str(self.part)
 
-def post_init_Book(**kwargs):
+def pre_save_Book(**kwargs):
 	book = kwargs.get('instance')
 	if book.page_count == None or book.part_count == None:
 		book.path = u'static/ebookSystem/document/{0}'.format(book.bookname)
@@ -127,7 +127,7 @@ def post_save_Book(**kwargs):
 	else:
 		print 'The ebook is already exist'
 
-post_init.connect(post_init_Book, Book)
+pre_save.connect(pre_save_Book, Book)
 post_save.connect(post_save_Book, Book)
 
 def createEBookBatch(book):
