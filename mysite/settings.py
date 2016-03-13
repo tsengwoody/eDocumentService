@@ -116,3 +116,5 @@ EMAIL_HOST_USER = 'tsengwoody.tw@gmail.com'
 EMAIL_HOST_PASSWORD = 'kpqwkpssgwiwbwix'
 EMAIL_USE_TLS = True
 #smtp.mail.yahoo.com
+
+PREFIX_PATH = '/django/eDocumentService/'

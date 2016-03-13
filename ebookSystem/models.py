@@ -1,4 +1,5 @@
 ﻿# coding: utf-8
+from mysite import settings
 from django.db import models
 from django.db.models.signals import *
 from django.utils import timezone
@@ -77,7 +78,7 @@ class Book(models.Model):
 	part_count = models.IntegerField(blank=True, null=True)
 	page_per_part = models.IntegerField(default=50)
 	get_count = models.IntegerField(default=0)
-	upload_date = models.DateField(default = timezone.now().date())
+	upload_date = models.DateField(default = timezone.now())
 	remark = models.CharField(max_length=255, blank=True, null=True)
 	def __unicode__(self):
 		return self.bookname
@@ -108,7 +109,7 @@ class EBook(models.Model):
 def pre_save_Book(**kwargs):
 	book = kwargs.get('instance')
 	if book.page_count == None or book.part_count == None:
-		book.path = u'static/ebookSystem/document/{0}'.format(book.bookname)
+		book.path = settings.PREFIX_PATH + u'static/ebookSystem/document/{0}'.format(book.bookname)
 		book.page_count=0
 		try:
 			fileList=os.listdir(book.path+u'/source')

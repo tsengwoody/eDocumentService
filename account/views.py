@@ -45,7 +45,7 @@ def login(request, template_name='registration/login.html',
 	else:
 		return auth_login(request, template_name, redirect_field_name, authentication_form, current_app)
 
-def contact_us(request,template_name='account/contact_us.html'):
+def contact_us(request, template_name):
 	if request.method == 'GET':
 		contactUsForm = ContactUsForm()
 	if request.method == 'POST':
