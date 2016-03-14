@@ -9,7 +9,7 @@
     box-sizing: border-box;
 }
 .scrollbarDiv{
-    overflow: auto;
+    overflow: scroll;
     /*height:800px;*/
     height:100%;
 }
@@ -17,7 +17,7 @@ textarea
 {
     width:100%;
     resize:both;
-
+/*margin-bottom: 40px;*/
    /* height:100vh;*/
 }
 #buttonGroup{

@@ -74,6 +74,7 @@ $(document).ready(function() {
         $(this).parent().fadeOut('slow');
     });
 
+    console.log(window.innerHeight);
 
     $("textarea").height($('.footer').position().top-$("textarea").offset().top-60);
     $(".scrollbarDiv").height(window.innerHeight-$('.footer').height()-$(".scrollbarDiv").offset().top-80);
@@ -108,10 +109,10 @@ $(document).ready(function() {
             $('#imagePage').addClass("col-md-12");
             $(".scrollbarDiv").height((window.innerHeight-$('.footer').height()-$(".scrollbarDiv").offset().top-80)/2);
              
-        } else {
+        } else {//左右
             $('#imagePage').removeClass("col-md-12");
             $('#imagePage').addClass("col-md-6");
-            $(".scrollbarDiv").height(window.innerHeight-$('.footer').height()-$(".scrollbarDiv").offset().top-45);
+            $(".scrollbarDiv").height(window.innerHeight-$('.footer').height()-$(".scrollbarDiv").offset().top-120);
 
         }
 
@@ -120,14 +121,28 @@ $(document).ready(function() {
             $('#textPage').addClass("col-md-12");
             $("textarea").height($('.footer').position().top-$("textarea").offset().top-20);
 
-        } else {
+        } else { //左右
             $('#textPage').removeClass("col-md-12");
             $('#textPage').addClass("col-md-6");
-            $("textarea").height($('.footer').position().top-$("textarea").offset().top-25);
+            $("textarea").height($('.footer').position().top-$("textarea").offset().top-100);
 
         }
-        console.log(window.innerHeight);
+        if($('#buttonGroup').hasClass("col-md-12")){
+            $('#buttonGroup').removeClass("col-md-12");
+            $('#buttonGroup').addClass("col-md-2");
+            $('#dataContent').removeClass("col-md-12");
+            $('#dataContent').addClass("col-md-10");
+            $('#buttonGroup>div').removeClass("btn-group");
+            $('#buttonGroup>div').addClass("btn-group-vertical");
+        }else{
+            $('#buttonGroup').removeClass("col-md-2");
+            $('#buttonGroup').addClass("col-md-12");
+            $('#dataContent').removeClass("col-md-10");
+            $('#dataContent').addClass("col-md-12");
+            $('#buttonGroup>div').removeClass("btn-group-vertical");
+            $('#buttonGroup>div').addClass("btn-group");
+        }
        
-
+        console.log(window.innerHeight);
     });
 });

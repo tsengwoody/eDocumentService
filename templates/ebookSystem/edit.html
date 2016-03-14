@@ -15,89 +15,84 @@
 {{ book.bookname }}-part{{part.part}}
 {% endblock %}
 {% block content %}
-
-
-		{% if message %}
-			<div id="infoForm" class="alert alert-info alert-dismissable" role="alert">
-				<button type="button" class="close" aria-hidden="true">&times;</button>
-				{{ message }}
+{% if message %}
+	<div id="infoForm" class="alert alert-info alert-dismissable" role="alert">
+		<button type="button" class="close" aria-hidden="true">&times;</button>
+		{{ message }}
+	</div>
+{% endif %}
+<div class="alert alert-danger" id="danger-alert" style="display:none;">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <strong>Error!!</strong>
+    <span id="alertMessage"></span>
+</div>
+<form action="" method="post" id="currentForm">
+	{% csrf_token %}
+	<div class="row">
+		<div id="buttonGroup" class="col-md-12">
+			<div class="btn-group">
+				<button class="btn btn-md btn-default" type="submit" id="save_id" name="save">save</button>
+				<button class="btn btn-md btn-default" type="submit" id="finish_id" name="finish">finish</button>
+				<button class="btn btn-md btn-default" type="submit" id="close_id" name="close">close</button>
+				<button class="btn btn-md btn-default" type="button" id="chagePost" >Orientation</button>  
 			</div>
-		{% endif %}
-		<div class="alert alert-danger" id="danger-alert" style="display:none;">
-		    <button type="button" class="close" data-dismiss="alert">&times;</button>
-		    <strong>Error!!</strong>
-		    <span id="alertMessage"></span>
+		<hr>
 		</div>
-		<form action="" method="post" id="currentForm">
-			{% csrf_token %}
-			<div id="buttonGroup">
-				<button class="btn btn-lg btn-default" type="submit" id="save_id" name="save">save</button>
-				<button class="btn btn-lg btn-default" type="submit" id="finish_id" name="finish">finish</button>
-				<button class="btn btn-lg btn-default" type="submit" id="close_id" name="close">close</button>
-				<button class="btn btn-lg btn-default" type="button" id="chagePost" >Orientation</button>  
-			</div>
-			<hr>
-		<div class="row">
-			<div id="imagePage" class="col-md-6">
-			
-				<nav>
-					<ul class="pager">
-						<li class="previous"><a id="prePage" href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
-						<li>
-						<div class="col-xs-5 centered">
-							<select class="form-control" name="scanPageList" id="scanPageList" onchange="changePageSelect()">
-								{% for scanPage in scanPageList %}
-									{% ifequal scanPage defaultPage %}
-										<option value="{{ scanPage }}" selected>{{ scanPage }}-上次校對頁數</option>
-									{% else %}
-										<option value="{{ scanPage }}">{{ scanPage }}</option>
-									{% endifequal %}
-								{% endfor %}
-							</select>
+		<div  id="dataContent" class="col-md-12">
+			<div class="row">
+				<div id="imagePage" class="col-md-6">
+					<nav>
+						<ul class="pager">
+							<li class="previous"><a id="prePage" href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
+							<li>
+							<div class="col-xs-5 centered">
+								<select class="form-control" name="scanPageList" id="scanPageList" onchange="changePageSelect()">
+									{% for scanPage in scanPageList %}
+										{% ifequal scanPage defaultPage %}
+											<option value="{{ scanPage }}" selected>{{ scanPage }}-上次校對頁數</option>
+										{% else %}
+											<option value="{{ scanPage }}">{{ scanPage }}</option>
+										{% endifequal %}
+									{% endfor %}
+								</select>
+							</div>
+							</li>
+							<li class="next"><a id="nextPage" href="#" >Newer <span aria-hidden="true">&rarr;</span></a></li>
+						</ul>
+					</nav>
+					<div class="scrollbarDiv">
+					   <img src="{% static defaultPageURL %}" alt="文件掃描原檔" id="scanPage" name="scanPage" width="100%" >
+					</div>
+					<div class="row" id="sizeControl">
+						<div class="col-md-4" style="float:left;">
+								<label for="id_page">頁數:</label>		
+								<input id="id_page" name="page" type="text" size="4" readonly="true"  value="{{ editForm.page.value }}">
 						</div>
-						</li>
-						<li class="next"><a id="nextPage" href="#" >Newer <span aria-hidden="true">&rarr;</span></a></li>
-					</ul>
-				</nav>
-				<div class="scrollbarDiv">
-				   <img src="{% static defaultPageURL %}" alt="文件掃描原檔" id="scanPage" name="scanPage" width="100%" >
-				</div>
-				<div class="row" id="sizeControl">
-					<div class="col-md-4" style="float:left;">
-							<label for="id_page">頁數:</label>		
-							<input id="id_page" name="page" type="text" size="4" readonly="true"  value="{{ editForm.page.value }}">
-					</div>
-					<div class="input-group col-md-3" style="float:right;">
-						<span class="input-group-btn">
-					        <button id="zoomIN" class="btn btn-default btn-sm" type="button">-</button>
-					    </span>
-					     
-					    <input type="text" id="imgSize" class="form-control input-sm" size="2" value="100%" readonly="true">
+						<div class="input-group col-md-3" style="float:right;">
 							<span class="input-group-btn">
-					    	<button id="zoomOUT" class="btn btn-default btn-sm" type="button">+</button>
-					    </span>
-				    </div><!-- /input-group --> 
-				</div>
-			</div>
-			
-			<div id="textPage"class="col-md-6">
-				
-				{% if editForm.content.errors or editForm.page.errors %}
-					<div id="alertForm" class="alert alert-danger" role="alert">
-						{{ editForm.content.errors }}
-						{{ editForm.page.errors }}
+						        <button id="zoomIN" class="btn btn-default btn-sm" type="button">-</button>
+						    </span>
+						     
+						    <input type="text" id="imgSize" class="form-control input-sm" size="2" value="100%" readonly="true">
+								<span class="input-group-btn">
+						    	<button id="zoomOUT" class="btn btn-default btn-sm" type="button">+</button>
+						    </span>
+					    </div><!-- /input-group --> 
 					</div>
-				{% else %}
-					<textarea id="id_content" name="content" >{{ editForm.content.value }}</textarea>
-				{% endif %}
+				</div>
 				
-				<br />
-				
-				
+				<div id="textPage"class="col-md-6">
+					{% if editForm.content.errors or editForm.page.errors %}
+						<div id="alertForm" class="alert alert-danger" role="alert">
+							{{ editForm.content.errors }}
+							{{ editForm.page.errors }}
+						</div>
+					{% else %}
+						<textarea id="id_content" name="content" >{{ editForm.content.value }}</textarea>
+					{% endif %}
+				</div>
 			</div>
 		</div>
-		</form>
-	
-
-
+	</div>
+</form>
 {% endblock %}
