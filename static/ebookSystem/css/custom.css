@@ -10,11 +10,15 @@
 }
 .scrollbarDiv{
     overflow: auto;
-    height:800px;
+    /*height:800px;*/
+    height:100%;
 }
 textarea
 {
     width:100%;
+    resize:both;
+
+   /* height:100vh;*/
 }
 #buttonGroup{
     text-align:center;
@@ -22,4 +26,11 @@ textarea
 .centered{
     display: inline-block;
     float:none;
+}
+.pager{
+    margin:0px;
+}
+#sizeControl{
+    margin-top:10px;
+    margin-bottom:10px;
 }

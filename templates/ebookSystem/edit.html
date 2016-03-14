@@ -15,7 +15,7 @@
 {{ book.bookname }}-part{{part.part}}
 {% endblock %}
 {% block content %}
-<div class="row">
+
 
 		{% if message %}
 			<div id="infoForm" class="alert alert-info alert-dismissable" role="alert">
@@ -37,8 +37,9 @@
 				<button class="btn btn-lg btn-default" type="button" id="chagePost" >Orientation</button>  
 			</div>
 			<hr>
-
+		<div class="row">
 			<div id="imagePage" class="col-md-6">
+			
 				<nav>
 					<ul class="pager">
 						<li class="previous"><a id="prePage" href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
@@ -61,21 +62,22 @@
 				<div class="scrollbarDiv">
 				   <img src="{% static defaultPageURL %}" alt="文件掃描原檔" id="scanPage" name="scanPage" width="100%" >
 				</div>
-				<div class="col-md-4" style="float:left;">
-						<label for="id_page">頁數:</label>		
-						<input id="id_page" name="page" type="text" size="4" readonly="true"  value="{{ editForm.page.value }}">
-				</div>
-				<div class="input-group col-md-3" style="float:right;">
-					<span class="input-group-btn">
-				        <button id="zoomIN" class="btn btn-default btn-sm" type="button">-</button>
-				    </span>
-				     
-				    <input type="text" id="imgSize" class="form-control input-sm" size="2" value="100%" readonly="true">
+				<div class="row" id="sizeControl">
+					<div class="col-md-4" style="float:left;">
+							<label for="id_page">頁數:</label>		
+							<input id="id_page" name="page" type="text" size="4" readonly="true"  value="{{ editForm.page.value }}">
+					</div>
+					<div class="input-group col-md-3" style="float:right;">
 						<span class="input-group-btn">
-				    	<button id="zoomOUT" class="btn btn-default btn-sm" type="button">+</button>
-				    </span>
-			    </div><!-- /input-group -->
-				
+					        <button id="zoomIN" class="btn btn-default btn-sm" type="button">-</button>
+					    </span>
+					     
+					    <input type="text" id="imgSize" class="form-control input-sm" size="2" value="100%" readonly="true">
+							<span class="input-group-btn">
+					    	<button id="zoomOUT" class="btn btn-default btn-sm" type="button">+</button>
+					    </span>
+				    </div><!-- /input-group --> 
+				</div>
 			</div>
 			
 			<div id="textPage"class="col-md-6">
@@ -86,15 +88,16 @@
 						{{ editForm.page.errors }}
 					</div>
 				{% else %}
-					<textarea id="id_content" name="content" rows="42">{{ editForm.content.value }}</textarea>
+					<textarea id="id_content" name="content" >{{ editForm.content.value }}</textarea>
 				{% endif %}
 				
 				<br />
 				
 				
 			</div>
+		</div>
 		</form>
 	
 
-</div>
+
 {% endblock %}

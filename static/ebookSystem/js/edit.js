@@ -69,13 +69,15 @@ function finishSubmit(event) {
 
 $(document).ready(function() {
     console.log("ready!");
+
     $(".alert button.close").click(function (e) {
         $(this).parent().fadeOut('slow');
     });
 
 
-
-
+    $("textarea").height($('.footer').position().top-$("textarea").offset().top-60);
+    $(".scrollbarDiv").height(window.innerHeight-$('.footer').height()-$(".scrollbarDiv").offset().top-80);
+   
     $('#prePage').on("click", function() {
         changePage(-1);
     });
@@ -94,30 +96,38 @@ $(document).ready(function() {
 
     });
     $('#zoomOUT').click(function() {
-
         imgSize.value = (parseInt(imgSize.value) + 10).toString() + '%';
         $('#scanPage').css('width', imgSize.value);
-
     });
 
 
 
     $('#chagePost').click(function() {
-        if ($('#imagePage').hasClass('col-md-6')) {
+        if ($('#imagePage').hasClass('col-md-6')) { //改上下
             $('#imagePage').removeClass("col-md-6");
             $('#imagePage').addClass("col-md-12");
+            $(".scrollbarDiv").height((window.innerHeight-$('.footer').height()-$(".scrollbarDiv").offset().top-80)/2);
+             
         } else {
             $('#imagePage').removeClass("col-md-12");
             $('#imagePage').addClass("col-md-6");
+            $(".scrollbarDiv").height(window.innerHeight-$('.footer').height()-$(".scrollbarDiv").offset().top-45);
+
         }
 
-        if ($('#textPage').hasClass('col-md-6')) {
+        if ($('#textPage').hasClass('col-md-6')) { //改上下
             $('#textPage').removeClass("col-md-6");
             $('#textPage').addClass("col-md-12");
+            $("textarea").height($('.footer').position().top-$("textarea").offset().top-20);
+
         } else {
             $('#textPage').removeClass("col-md-12");
             $('#textPage').addClass("col-md-6");
+            $("textarea").height($('.footer').position().top-$("textarea").offset().top-25);
+
         }
+        console.log(window.innerHeight);
+       
 
     });
 });
