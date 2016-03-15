@@ -2,5 +2,5 @@
 from django import forms
 
 class UploadForm(forms.Form):
-	filename = forms.CharField()
+	path = forms.CharField()
 	fileObject = forms.FileField()

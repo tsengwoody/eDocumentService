@@ -10,6 +10,7 @@ from django.views import generic
 from .models import *
 from .forms import *
 import os
+import mysite
 
 class book_list(generic.ListView):
 	model = Book
@@ -45,8 +46,10 @@ class editView(generic.View):
 		editContent=''
 		fileHead=''
 		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
-		finishFilePath=book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
-		filePath=book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
+		finishFilePath = mysite.settings.PREFIX_PATH +book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
+#		finishFilePath = finishFilePath.encode('utf-8')
+		filePath = mysite.settings.PREFIX_PATH +book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
+#		filePath = filePath.encode('utf-8')
 		[finishContent, editContent, fileHead] = getContent(filePath)
 		with codecs.open(finishFilePath, 'w', encoding='utf-16le') as fileWrite:
 			if finishContent!=[]:
@@ -64,8 +67,10 @@ class editView(generic.View):
 			raise Http404("book or part does not exist")
 		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
 		editForm = EditForm(request.POST)
-		finishFilePath=book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
-		filePath=book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
+		finishFilePath = mysite.settings.PREFIX_PATH +book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
+#		finishFilePath = finishFilePath.encode('utf-8')
+		filePath = mysite.settings.PREFIX_PATH +book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
+#		filePath = filePath.encode('utf-8')
 		if request.POST.has_key('save'):
 			if editForm.is_valid():
 				editContent=editForm.cleaned_data['content']
@@ -110,7 +115,9 @@ class editView(generic.View):
 				return render(request, template_name, locals())
 
 def editVarInit(book, part):
-	fileList=os.listdir(book.path+u'/source')
+	sourcePath = mysite.settings.PREFIX_PATH +book.path +u'/source'
+#	sourcePath = sourcePath.encode('utf-8')
+	fileList=os.listdir(sourcePath)
 	scanPageList=[]
 	for scanPage in fileList:
 		if scanPage.split('.')[-1]=='jpg':
@@ -118,8 +125,8 @@ def editVarInit(book, part):
 	scanPageList = scanPageList[part.begin_page:part.end_page+1]
 	defaultPageIndex=part.edited_page
 	defaultPage=scanPageList[defaultPageIndex]
-	defaultPageURL = book.path+u'/source/'+defaultPage
-	defaultPageURL=defaultPageURL.lstrip('static/')
+	defaultPageURL = sourcePath +u'/' +defaultPage
+	defaultPageURL=defaultPageURL.replace(mysite.settings.PREFIX_PATH +'static/', '')
 	return [scanPageList, defaultPageIndex, defaultPage, defaultPageURL]
 
 def getContent(contentPath, encoding='utf-16le'):

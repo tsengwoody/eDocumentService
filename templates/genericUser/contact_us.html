@@ -1,0 +1,18 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+聯絡我們
+{% endblock %}
+{% block header %}
+聯絡我們
+{% endblock %}
+{% block content %}
+<form action="" method="post">
+{% csrf_token %}
+	{{ contactUsForm.errors }}
+	<table>
+	{{ contactUsForm.as_table }}
+	</table>
+	<button class="btn btn-lg btn-default" type="submit" id="send_id" name="send">傳送</button>
+</form>
+
+{% endblock %}

@@ -6,6 +6,7 @@
 上傳文件測試
 {% endblock %}
 {% block content %}
+{{ w }}
 <form action="" method="post" enctype="multipart/form-data">
 {% csrf_token %}
 	{{ uploadForm.errors }}

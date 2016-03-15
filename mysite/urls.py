@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 	url(r'^account/', include('account.urls', namespace="account")),
 	url(r'^ebookSystem/', include('ebookSystem.urls', namespace="ebookSystem")),
+	url(r'^genericUser/', include('genericUser.urls', namespace="genericUser")),
 	url(r'^guest/', include('guest.urls', namespace="guest")),
 	url(r'^auth/password_change/$', auth_views.password_change, name='password_change'),
 	url(r'^auth/register/$', views.register, name='register'),

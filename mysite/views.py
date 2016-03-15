@@ -52,4 +52,4 @@ def redirect_user(user):
 	if user.is_editor():
 		return reverse('account:profile')
 	if user.is_guest():
-		return reverse('account:profile')
+		return reverse('guest:create_document')
