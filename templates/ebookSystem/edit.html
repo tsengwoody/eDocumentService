@@ -40,7 +40,8 @@
 		</div>
 		<div  id="dataContent" class="col-md-12">
 			<div class="row">
-				<div id="imagePage" class="col-md-6">
+				<div id="imagePage" class="col-md-6 towColumn">
+				
 					<nav>
 						<ul class="pager">
 							<li class="previous"><a id="prePage" href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
@@ -77,22 +78,25 @@
 								<span class="input-group-btn">
 						    	<button id="zoomOUT" class="btn btn-default btn-sm" type="button">+</button>
 						    </span>
-					    </div><!-- /input-group --> 
+					    </div>
 					</div>
 				</div>
 				
-				<div id="textPage"class="col-md-6">
+				<div id="textPage"class="col-md-6 towColumn">
 					{% if editForm.content.errors or editForm.page.errors %}
 						<div id="alertForm" class="alert alert-danger" role="alert">
 							{{ editForm.content.errors }}
 							{{ editForm.page.errors }}
 						</div>
 					{% else %}
-						<textarea id="id_content" name="content" >{{ editForm.content.value }}</textarea>
+						<textarea id="id_content" name="content" class="form-control" >{{ editForm.content.value }}</textarea>
 					{% endif %}
 				</div>
 			</div>
 		</div>
 	</div>
 </form>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}

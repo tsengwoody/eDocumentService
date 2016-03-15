@@ -76,8 +76,8 @@ $(document).ready(function() {
 
     console.log(window.innerHeight);
 
-    $("textarea").height($('.footer').position().top-$("textarea").offset().top-60);
-    $(".scrollbarDiv").height(window.innerHeight-$('.footer').height()-$(".scrollbarDiv").offset().top-80);
+    //$("textarea").height($('.footer').position().top-$("textarea").offset().top-60);
+    //$(".scrollbarDiv").height(window.innerHeight-$('.footer').height()-$(".scrollbarDiv").offset().top-80);
    
     $('#prePage').on("click", function() {
         changePage(-1);
@@ -107,25 +107,24 @@ $(document).ready(function() {
         if ($('#imagePage').hasClass('col-md-6')) { //改上下
             $('#imagePage').removeClass("col-md-6");
             $('#imagePage').addClass("col-md-12");
-            $(".scrollbarDiv").height((window.innerHeight-$('.footer').height()-$(".scrollbarDiv").offset().top-80)/2);
+            $('#imagePage').removeClass("twoColumn");
+            $('#imagePage').addClass("oneColumn");
+            $('#textPage').removeClass("col-md-6");
+            $('#textPage').addClass("col-md-12");
+            //$('#textPage').removeClass("twoColumn");
+            //$('#textPage').addClass("oneColumn");
+
              
         } else {//左右
             $('#imagePage').removeClass("col-md-12");
             $('#imagePage').addClass("col-md-6");
-            $(".scrollbarDiv").height(window.innerHeight-$('.footer').height()-$(".scrollbarDiv").offset().top-120);
-
-        }
-
-        if ($('#textPage').hasClass('col-md-6')) { //改上下
-            $('#textPage').removeClass("col-md-6");
-            $('#textPage').addClass("col-md-12");
-            $("textarea").height($('.footer').position().top-$("textarea").offset().top-20);
-
-        } else { //左右
             $('#textPage').removeClass("col-md-12");
             $('#textPage').addClass("col-md-6");
-            $("textarea").height($('.footer').position().top-$("textarea").offset().top-100);
 
+            $('#textPage').removeClass("oneColumn");
+            $('#textPage').addClass("twoColumn");
+           // $('#imagePage').removeClass("oneColumn");
+           // $('#imagePage').addClass("twoColumn");
         }
         if($('#buttonGroup').hasClass("col-md-12")){
             $('#buttonGroup').removeClass("col-md-12");

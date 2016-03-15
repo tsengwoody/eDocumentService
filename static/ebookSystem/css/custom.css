@@ -8,21 +8,34 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.scrollbarDiv{
-    overflow: scroll;
-    /*height:800px;*/
-    height:100%;
-}
-textarea
-{
-    width:100%;
-    resize:both;
-/*margin-bottom: 40px;*/
-   /* height:100vh;*/
+html, body, .container, .row{
+  height: 100%;
 }
 #buttonGroup{
     text-align:center;
+    height:10%;
 }
+#dataContent,.towColumn{
+    height: 90%;
+    margin:0px;
+}
+
+textarea.form-control {
+   height: 100%;
+   width:100%;
+}
+
+#imagePage > nav{
+    height:10%;
+}
+#imagePage > .row{
+    height:10%;
+}
+.scrollbarDiv{
+   overflow: scroll;
+   height:80%;
+}
+
 .centered{
     display: inline-block;
     float:none;
