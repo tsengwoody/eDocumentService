@@ -23,9 +23,14 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
+                {% if request.user.is_guest %}
+                <li class='inline'><a href="{% url 'guest:create_document' %}">上傳文件</a></li>
+                {% endif %}
+                {% if request.user.is_editor %}
                 <li class='inline'><a href="{% url 'account:profile' %}">服務</a></li>
+                {% endif %}
                 <li class='inline'><a href="{% url 'account:info' %}">會員</a></li>
-                <li class='inline'><a href="{% url 'account:contact_us' %}">聯絡我們</a></li>
+                <li class='inline'><a href="{% url 'genericUser:contact_us' %}">聯絡我們</a></li>
                 {% if request.user.is_authenticated %}
                     <li class='inline'><a href="{% url 'logout' %}">登出</a></li>
 

@@ -47,9 +47,9 @@ class editView(generic.View):
 		fileHead=''
 		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
 		finishFilePath = mysite.settings.PREFIX_PATH +book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
-		finishFilePath = finishFilePath.encode('utf-8')
+#		finishFilePath = finishFilePath.encode('utf-8')
 		filePath = mysite.settings.PREFIX_PATH +book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
-		filePath = filePath.encode('utf-8')
+#		filePath = filePath.encode('utf-8')
 		[finishContent, editContent, fileHead] = getContent(filePath)
 		with codecs.open(finishFilePath, 'w', encoding='utf-16le') as fileWrite:
 			if finishContent!=[]:
@@ -68,9 +68,9 @@ class editView(generic.View):
 		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
 		editForm = EditForm(request.POST)
 		finishFilePath = mysite.settings.PREFIX_PATH +book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
-		finishFilePath = finishFilePath.encode('utf-8')
+#		finishFilePath = finishFilePath.encode('utf-8')
 		filePath = mysite.settings.PREFIX_PATH +book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
-		filePath = filePath.encode('utf-8')
+#		filePath = filePath.encode('utf-8')
 		if request.POST.has_key('save'):
 			if editForm.is_valid():
 				editContent=editForm.cleaned_data['content']
@@ -116,7 +116,8 @@ class editView(generic.View):
 
 def editVarInit(book, part):
 	sourcePath = mysite.settings.PREFIX_PATH +book.path +u'/source'
-	fileList=os.listdir(sourcePath.encode('utf-8'))
+#	sourcePath = sourcePath.encode('utf-8')
+	fileList=os.listdir(sourcePath)
 	scanPageList=[]
 	for scanPage in fileList:
 		if scanPage.split('.')[-1]=='jpg':

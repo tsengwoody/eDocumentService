@@ -4,10 +4,6 @@ from django.shortcuts import render
 # Create your views here.
 from django.http import HttpResponse,HttpResponseRedirect
 from django.contrib.auth.views import login as auth_login
-from django.contrib.auth import (REDIRECT_FIELD_NAME)
-from django.contrib.auth.forms import (
-    AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm,
-)
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.db.models import F
@@ -15,14 +11,17 @@ from django.utils import timezone
 from django.views import generic
 from ebookSystem.models import *
 from ebookSystem.forms import *
+from mysite.decorator import *
 
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'tsengwoody.tw@gmail.com'
 
+@user_category_check('editor')
 def info(request,template_name='account/info.html'):
 	user = request.user
 	return render(request, template_name, locals())
 
+@user_category_check('editor')
 def info_change(request,template_name='account/info_change.html'):
 	user = request.user
 	if request.method == 'POST':
@@ -35,16 +34,7 @@ def info_change(request,template_name='account/info_change.html'):
 		registerUserForm = RegisterUserForm(instance = user)
 	return render(request, template_name, locals())
 
-def login(request, template_name='registration/login.html',
-		redirect_field_name=REDIRECT_FIELD_NAME,
-		authentication_form=AuthenticationForm,
-		current_app=None, extra_context=None):
-	if request.user.is_authenticated():
-		redirect_to = reverse('account:profile')
-		return HttpResponseRedirect(redirect_to)
-	else:
-		return auth_login(request, template_name, redirect_field_name, authentication_form, current_app)
-
+@user_category_check('editor')
 def contact_us(request, template_name):
 	if request.method == 'GET':
 		contactUsForm = ContactUsForm()
@@ -64,16 +54,18 @@ def contact_us(request, template_name):
 
 class profileView(generic.View):
 	template_name=''
+
+#	@user_category_check('editor')
 	def get(self, request, *args, **kwargs):
 		template_name=self.template_name
-		if request.user.is_authenticated():
-			user=request.user
-			editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
-			finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
+		user=request.user
+		editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
+		finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
 		return render(request, template_name, locals())
 
+#	@user_category_check('editor')
 	def post(self, request, *args, **kwargs):
-		template_name='account/profile.html'
+		template_name=self.template_name
 		user=request.user
 		if request.POST.has_key('getPart'):
 			try:

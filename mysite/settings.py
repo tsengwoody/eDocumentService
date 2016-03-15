@@ -117,4 +117,4 @@ EMAIL_HOST_PASSWORD = 'kpqwkpssgwiwbwix'
 EMAIL_USE_TLS = True
 #smtp.mail.yahoo.com
 
-PREFIX_PATH = '/django/eDocumentService/'
+PREFIX_PATH = ''

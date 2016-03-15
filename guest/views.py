@@ -7,7 +7,9 @@ from ebookSystem.models import *
 from ebookSystem.forms import *
 from .forms import *
 from .zip import *
+from mysite.decorator import *
 
+@user_category_check('guest')
 def create_document(request, template_name='guest/create_document.html'):
 	if request.method == 'POST':
 		bookForm = BookForm(request.POST)
