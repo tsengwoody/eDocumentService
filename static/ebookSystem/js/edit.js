@@ -65,10 +65,6 @@ function finishSubmit(event) {
         dangerAlert("未finish成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下save按紐");
     }
 }
-
-
-
-
 $(document).ready(function() {
     console.log("ready!");
 
@@ -80,11 +76,8 @@ $(document).ready(function() {
     $('#nextPage').on("click", function() {
         changePage(1);
     });
-
     $('#save_id').click(saveSubmit);
     $('#finish_id').click(finishSubmit);
-
-
     $('.close').click(function() {
         $(this).parent().hide();
         $(this).parent().removeClass('in'); // hides alert with Bootstrap CSS3 implem
@@ -108,12 +101,18 @@ $(document).ready(function() {
             $('#textPage').removeClass("col-md-6");
             $('#textPage').addClass("col-md-12");
 
+            $('#textPage').removeClass("towColumn");
+            $('#textPage').addClass("oneColumn");
+
 
         } else { //左右
             $('#imagePage').removeClass("col-md-12");
             $('#imagePage').addClass("col-md-6");
             $('#textPage').removeClass("col-md-12");
             $('#textPage').addClass("col-md-6");
+
+            $('#textPage').removeClass("oneColumn");
+            $('#textPage').addClass("towColumn");
 
         }
         if ($('#buttonGroup').hasClass("col-md-12")) {
