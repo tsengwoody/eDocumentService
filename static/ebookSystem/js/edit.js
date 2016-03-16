@@ -34,16 +34,15 @@ function changePageSelect() {
     page.value = scanPageList.selectedIndex;
     imgScanPage.src = dirname + scanPageList.options[scanPageList.selectedIndex].value;
 }
-function dangerAlert(message)
-{
+
+function dangerAlert(message) {
     $("#alertMessage").html(message);
-    $("#danger-alert").alert();
-    $("#danger-alert").fadeTo(2000, 500).slideUp(500, function() {
-        $("#danger-alert").hide();
-    });
+    $("#danger-alert").show();
+    $("#danger-alert").addClass('in');
 }
 
 function saveSubmit(event) {
+    console.log($("#danger-alert"));
     if (typeof $('textarea').val() == 'undefined') {
         event.preventDefault();
         dangerAlert("textarea not found")
@@ -51,7 +50,7 @@ function saveSubmit(event) {
     var str = $('textarea').val();
     if (str.indexOf("|----------|") < 0) {
         event.preventDefault();
-        dangerAlert("not contain the keyword");
+        dangerAlert("未save成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下finish按紐");
     }
 }
 
@@ -63,22 +62,13 @@ function finishSubmit(event) {
     var str = $('textarea').val();
     if (str.indexOf("|----------|") > 0) {
         event.preventDefault();
-        dangerAlert("can't contain the keyword");
+        dangerAlert("未finish成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下save按紐");
     }
 }
-
 $(document).ready(function() {
     console.log("ready!");
 
-    $(".alert button.close").click(function (e) {
-        $(this).parent().fadeOut('slow');
-    });
 
-    console.log(window.innerHeight);
-
-    //$("textarea").height($('.footer').position().top-$("textarea").offset().top-60);
-    //$(".scrollbarDiv").height(window.innerHeight-$('.footer').height()-$(".scrollbarDiv").offset().top-80);
-   
     $('#prePage').on("click", function() {
         changePage(-1);
     });
@@ -86,10 +76,13 @@ $(document).ready(function() {
     $('#nextPage').on("click", function() {
         changePage(1);
     });
-
     $('#save_id').click(saveSubmit);
     $('#finish_id').click(finishSubmit);
+    $('.close').click(function() {
+        $(this).parent().hide();
+        $(this).parent().removeClass('in'); // hides alert with Bootstrap CSS3 implem
 
+    });
 
     $('#zoomIN').click(function() {
         imgSize.value = (parseInt(imgSize.value) - 10).toString() + '%';
@@ -100,40 +93,36 @@ $(document).ready(function() {
         imgSize.value = (parseInt(imgSize.value) + 10).toString() + '%';
         $('#scanPage').css('width', imgSize.value);
     });
-
-
-
     $('#chagePost').click(function() {
+        $('#id_content').removeAttr('style');
         if ($('#imagePage').hasClass('col-md-6')) { //改上下
             $('#imagePage').removeClass("col-md-6");
             $('#imagePage').addClass("col-md-12");
-            $('#imagePage').removeClass("twoColumn");
-            $('#imagePage').addClass("oneColumn");
             $('#textPage').removeClass("col-md-6");
             $('#textPage').addClass("col-md-12");
-            //$('#textPage').removeClass("twoColumn");
-            //$('#textPage').addClass("oneColumn");
 
-             
-        } else {//左右
+            $('#textPage').removeClass("towColumn");
+            $('#textPage').addClass("oneColumn");
+
+
+        } else { //左右
             $('#imagePage').removeClass("col-md-12");
             $('#imagePage').addClass("col-md-6");
             $('#textPage').removeClass("col-md-12");
             $('#textPage').addClass("col-md-6");
 
             $('#textPage').removeClass("oneColumn");
-            $('#textPage').addClass("twoColumn");
-           // $('#imagePage').removeClass("oneColumn");
-           // $('#imagePage').addClass("twoColumn");
+            $('#textPage').addClass("towColumn");
+
         }
-        if($('#buttonGroup').hasClass("col-md-12")){
+        if ($('#buttonGroup').hasClass("col-md-12")) {
             $('#buttonGroup').removeClass("col-md-12");
             $('#buttonGroup').addClass("col-md-2");
             $('#dataContent').removeClass("col-md-12");
             $('#dataContent').addClass("col-md-10");
             $('#buttonGroup>div').removeClass("btn-group");
             $('#buttonGroup>div').addClass("btn-group-vertical");
-        }else{
+        } else {
             $('#buttonGroup').removeClass("col-md-2");
             $('#buttonGroup').addClass("col-md-12");
             $('#dataContent').removeClass("col-md-10");
@@ -141,7 +130,6 @@ $(document).ready(function() {
             $('#buttonGroup>div').removeClass("btn-group-vertical");
             $('#buttonGroup>div').addClass("btn-group");
         }
-       
-        console.log(window.innerHeight);
+
     });
 });

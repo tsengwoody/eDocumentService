@@ -17,12 +17,12 @@
 {% block content %}
 {% if message %}
 	<div id="infoForm" class="alert alert-info alert-dismissable" role="alert">
-		<button type="button" class="close" aria-hidden="true">&times;</button>
+		<button href="#" type="button" class="close">&times;</button>
 		{{ message }}
 	</div>
 {% endif %}
-<div class="alert alert-danger" id="danger-alert" style="display:none;">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
+<div class="alert alert-danger fade" id="danger-alert" style="display:none;">
+   <button href="#" type="button" class="close">&times;</button>
     <strong>Error!!</strong>
     <span id="alertMessage"></span>
 </div>
@@ -97,6 +97,5 @@
 	</div>
 </form>
 {% endblock %}
-
 {% block footer %}
 {% endblock %}
