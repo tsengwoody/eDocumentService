@@ -50,7 +50,7 @@ class Editor(models.Model):
 	service_hours = models.IntegerField(default=0)
 	professional_field = models.CharField(max_length=30, blank=True, null=True)
 	is_book = models.BooleanField(default=False)
-
+	is_editing = models.BooleanField(default=False)
 #	class Meta:
 #		db_table = 'editor'
 
@@ -78,6 +78,9 @@ class Book(models.Model):
 	part_count = models.IntegerField(blank=True, null=True)
 	page_per_part = models.IntegerField(default=50)
 	get_count = models.IntegerField(default=0)
+	finish_count = models.IntegerField(default=0)
+	guest = models.ForeignKey(Guest,blank=True, null=True, on_delete=models.SET_NULL)
+	is_active = models.BooleanField(default=False)
 	upload_date = models.DateField(default = timezone.now())
 	remark = models.CharField(max_length=255, blank=True, null=True)
 	def __unicode__(self):
@@ -93,10 +96,12 @@ class EBook(models.Model):
 	guest = models.ForeignKey(Guest,blank=True, null=True, on_delete=models.SET_NULL)
 	is_finish = models.BooleanField(default=False)
 	is_edited = models.BooleanField(default=False)
+	is_exchange = models.BooleanField(default=False)
+	is_active = models.BooleanField(default=False)
 	edit_date = models.DateTimeField(blank=True, null=True)
 	finish_date = models.DateField(blank=True, null=True)
 	deadline = models.DateField(blank=True, null=True)
-	get_date = models.DateTimeField(blank=True, null=True)
+	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
 	remark = models.CharField(max_length=255, blank=True, null=True)
 

@@ -52,7 +52,7 @@ class editView(generic.View):
 #		filePath = filePath.encode('utf-8')
 		[finishContent, editContent, fileHead] = getContent(filePath)
 		with codecs.open(finishFilePath, 'w', encoding='utf-16le') as fileWrite:
-			if finishContent!=[]:
+			if finishContent!='':
 				fileWrite.write(fileHead+finishContent)
 			else:
 				fileWrite.write(fileHead)
@@ -84,7 +84,7 @@ class editView(generic.View):
 				[finishContent, editContent, fileHead] = getContent(filePath)
 				[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
 				with codecs.open(finishFilePath, 'w', encoding='utf-16le') as fileWrite:
-					if finishContent!=[]:
+					if finishContent!='':
 						fileWrite.write(fileHead+finishContent)
 					else:
 						fileWrite.write(fileHead)
@@ -138,18 +138,20 @@ def getContent(contentPath, encoding='utf-16le'):
 		finishContent=firstLine[1:]
 		finishFlag=False
 		if finishContent=='|----------|\r\n':
-			finishContent=[]
+			finishContent=''
 			finishFlag=True
 		finishCount=1
-		if finishContent!=[]:
+		if not finishFlag:
 			for i in fileRead:
 				finishCount=finishCount+1
 				if i=='|----------|\r\n':
 					finishFlag=True
 					break
-				finishContent=finishContent+i
+				finishContent = finishContent+i
 		editCount=0
 		for i in fileRead:
-			editCount=editCount+1
-			editContent=editContent+i
+			editCount = editCount+1
+			editContent = editContent+i
+		if editContent == '':
+			editContent = finishContent
 	return [finishContent, editContent, fileHead]

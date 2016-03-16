@@ -8,10 +8,12 @@ from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.db.models import F
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views import generic
 from ebookSystem.models import *
 from ebookSystem.forms import *
 from mysite.decorator import *
+import datetime
 
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'tsengwoody.tw@gmail.com'
@@ -55,34 +57,38 @@ def contact_us(request, template_name):
 class profileView(generic.View):
 	template_name=''
 
-#	@user_category_check('editor')
+	@method_decorator(user_category_check('editor'))
 	def get(self, request, *args, **kwargs):
 		template_name=self.template_name
 		user=request.user
 		editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
-		finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
+		finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True, is_exchange=False)
+		exchangedPartList=EBook.objects.filter(editor=user.editor,is_finish=True, is_exchange=True)
 		return render(request, template_name, locals())
 
-#	@user_category_check('editor')
+	@method_decorator(user_category_check('editor'))
 	def post(self, request, *args, **kwargs):
 		template_name=self.template_name
 		user=request.user
 		if request.POST.has_key('getPart'):
 			try:
-				partialBook = Book.objects.exclude(get_count=0).exclude(get_count = F('part_count')).order_by('get_count')[0]
+				partialBook = Book.objects.exclude(get_count=0).exclude(get_count = F('part_count')).filter(is_active = True).order_by('get_count')[0]
 			except IndexError:
 				print 'not partial book'
 				try:
-					partialBook = Book.objects.filter(get_count=0).order_by('upload_date')[0]
+					partialBook = Book.objects.filter(get_count=0, is_active=True).order_by('upload_date')[0]
 				except IndexError:
 					error_message = u'無文件'
 					print 'not book'
 					editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
 					finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
+					exchangedPartList=EBook.objects.filter(editor=user.editor,is_finish=True, is_exchange=True)
 					return render(request, template_name, locals())
 			getPart = partialBook.ebook_set.filter(is_finish=False, editor=None)[0]
 			print 'get part'+getPart.__unicode__()
 			getPart.editor = request.user.editor
+			getPart.get_date = timezone.now()
+			getPart.deadline = getPart.get_date + datetime.timedelta(days=3)
 			getPart.book.get_count = getPart.book.get_count+1
 			getPart.save()
 			getPart.book.save()
@@ -94,22 +100,48 @@ class profileView(generic.View):
 				print 'not Complete book'
 				editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
 				finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
+				exchangedPartList=EBook.objects.filter(editor=user.editor,is_finish=True, is_exchange=True)
 				return render(request, template_name, locals())
 			for getPart in completeBook.ebook_set.all():
 				print 'get part'+getPart.__unicode__()
 				getPart.editor = request.user.editor
+				getPart.get_date = timezone.now()
+				getPart.deadline = getPart.get_date + datetime.timedelta(days=3)
 				getPart.book.get_count = getPart.book.get_count+1
 				getPart.save()
 				getPart.book.save()
-		elif u'還文件' in request.POST.values():
-			book_ISBN = request.POST.keys()[request.POST.values().index(u'還文件')].split('-')[0]
-			part_part = request.POST.keys()[request.POST.values().index(u'還文件')].split('-')[1]
+		elif request.POST.has_key('rebackPart'):
+			book_ISBN = request.POST.get('rebackPart').split('-')[0]
+#			book_ISBN = request.POST.keys()[request.POST.values().index(u'還文件')].split('-')[0]
+			part_part = request.POST.get('rebackPart').split('-')[1]
+#			part_part = request.POST.keys()[request.POST.values().index(u'還文件')].split('-')[1]
 			rebackPart=EBook.objects.get(part=part_part, book__ISBN = book_ISBN)
 			print 'reback'+rebackPart.__unicode__()
 			rebackPart.editor=None
+			rebackPart.get_date = None
+			rebackPart.deadline = None
 			rebackPart.book.get_count = rebackPart.book.get_count-1
 			rebackPart.save()
 			rebackPart.book.save()
+		elif request.POST.has_key('delay'):
+			book_ISBN = request.POST.get('delay').split('-')[0]
+			part_part = request.POST.get('delay').split('-')[1]
+			delayPart = EBook.objects.get(part=part_part, book__ISBN = book_ISBN)
+			delayPart.deadline = delayPart.deadline + datetime.timedelta(days=2)
+			delayPart.save()
+		elif request.POST.has_key('reEditPart'):
+			book_ISBN = request.POST.get('reEditPart').split('-')[0]
+			part_part = request.POST.get('reEditPart').split('-')[1]
+			reEditPart = EBook.objects.get(part=part_part, book__ISBN = book_ISBN)
+			reEditPart.is_finish = False
+			reEditPart.save()
+		elif request.POST.has_key('exchange'):
+			book_ISBN = request.POST.get('exchange').split('-')[0]
+			part_part = request.POST.get('exchange').split('-')[1]
+			exchangePart = EBook.objects.get(part=part_part, book__ISBN = book_ISBN)
+			exchangePart.is_exchange = True
+			exchangePart.save()
 		editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
 		finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
+		exchangedPartList=EBook.objects.filter(editor=user.editor,is_finish=True, is_exchange=True)
 		return render(request, template_name, locals())
