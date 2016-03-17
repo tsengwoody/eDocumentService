@@ -1,13 +1,19 @@
 ﻿# coding: utf-8
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.utils.decorators import method_decorator
+from django.views import generic
 from ebookSystem.models import *
 from ebookSystem.forms import *
 from .forms import *
 from .zip import *
 from mysite.decorator import *
+import mysite
+
+MANAGER = ['tsengwoody@yahoo.com.tw']
+SERVICE = 'tsengwoody.tw@gmail.com'
 
 @user_category_check('guest')
 def create_document(request, template_name='guest/create_document.html'):
@@ -44,3 +50,31 @@ def handle_uploaded_file(dirname, file):
 		for chunk in file.chunks():
 			destination.write(chunk)
 	return fullpath
+
+class profileView(generic.View):
+	template_name=''
+
+	@method_decorator(user_category_check('guest'))
+	def get(self, request, *args, **kwargs):
+		template_name=self.template_name
+		user=request.user
+		book_list = Book.objects.filter(guest=user.guest)
+		return render(request, template_name, locals())
+
+	@method_decorator(user_category_check('guest'))
+	def post(self, request, *args, **kwargs):
+		template_name=self.template_name
+		user=request.user
+		book_list = Book.objects.filter(guest=user.guest)
+		if request.POST.has_key('emailBook'):
+			book_ISBN = request.POST.get('emailBook')
+			emailBook = Book.objects.get(ISBN = book_ISBN)
+			subject = u'[文件] {}'.format(emailBook.bookname)
+			body = u'新愛的{0}您好：\n'.format(user.username)
+			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[user.email])
+			for part in emailBook.ebook_set.all():
+				attach_file_path = mysite.settings.PREFIX_PATH +emailBook.path +u'/OCR/part{0}.txt'.format(part.part)
+				email.attach_file(attach_file_path)
+			email.send(fail_silently=False)
+			print 'send email'
+		return render(request, template_name, locals())

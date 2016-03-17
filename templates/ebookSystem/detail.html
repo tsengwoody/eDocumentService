@@ -12,33 +12,30 @@
 	<li>ISBN{{ book.ISBN }}</li>
 </ul>
 
-<table>
-<tr>
-<th>part</th>
-<th>begin page</th>
-<th>end page</th>
-<th>edit page</th>
-<th>正編輯</th>
-<th>完成</th>
-<th>編輯者</th>
-<th>最後編輯日</th>
-<th>建立日</th>
-<th>編輯</th>
-</tr>
-{% for part in partList %}
-<tr>
-<td>{{part.part}}</td>
-<td>{{part.beginPage}}</td>
-<td>{{part.endPage}}</td>
-<td>{{part.editedPage}}</td>
-<td>{{part.is_edited}}</td>
-<td>{{part.is_finish}}</td>
-<td>{{part.editor}}</td>
-<td>{{part.edit_date}}</td>
-<td>{{part.scan_date}}</td>
-<td><a href=/ebookSystem/edit/{{part.book.id}}/{{part.part}} >編輯</a></td>
-</tr>
-{% endfor %}
-</table>
-
+<form action="" method="post">
+	<table class="table table-striped table-hover">
+		<tr>
+			<th>文件</th>
+			<th>狀態</th>
+			<th>頁數</th>
+			<th>時數</th>
+			<th>預計完成日期</th>
+			<th>動作</th>
+		</tr>
+		{% for part in book.ebook_set.all %}
+		<tr>
+			<td>{{part.book.bookname}}-part{{part.part}}</td>
+			<td>{{part.is_finish}}</td>
+			<td>{{part.edited_page}}</td>
+			<td>{{part.service_hours}}</td>
+			<td>{{part.deadline}}</td>
+			<td>
+				{% if part.is_finish %}
+				<button type="submit" class="btn btn-default" id="emailPart_id" name="emailPart" value={{part.book.ISBN}}-{{part.part}}>傳送email</button>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+</form>
 {% endblock %}

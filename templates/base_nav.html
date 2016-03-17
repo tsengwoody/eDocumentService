@@ -25,6 +25,7 @@
             <ul class="nav navbar-nav">
                 {% if request.user.is_guest %}
                 <li class='inline'><a href="{% url 'guest:create_document' %}">上傳文件</a></li>
+                <li class='inline'><a href="{% url 'guest:profile' %}">進度</a></li>
                 {% endif %}
                 {% if request.user.is_editor %}
                 <li class='inline'><a href="{% url 'account:profile' %}">服務</a></li>

@@ -77,14 +77,42 @@ class Book(models.Model):
 	page_count = models.IntegerField(blank=True, null=True)
 	part_count = models.IntegerField(blank=True, null=True)
 	page_per_part = models.IntegerField(default=50)
-	get_count = models.IntegerField(default=0)
-	finish_count = models.IntegerField(default=0)
 	guest = models.ForeignKey(Guest,blank=True, null=True, on_delete=models.SET_NULL)
 	is_active = models.BooleanField(default=False)
 	upload_date = models.DateField(default = timezone.now())
 	remark = models.CharField(max_length=255, blank=True, null=True)
 	def __unicode__(self):
 		return self.bookname
+
+	def collect_is_finish(self):
+		is_finish = True
+		for part in self.ebook_set.all():
+			is_finish = is_finish and part.is_finish
+		return is_finish
+
+	def collect_finish_page_count(self):
+		finish_page_count = 0
+		for part in self.ebook_set.all():
+			finish_page_count = finish_page_count + part.edited_page + part.is_finish
+		return finish_page_count
+
+	def collect_finish_part_count(self):
+		finish_part_count = 0
+		for part in self.ebook_set.all():
+			finish_part_count = finish_part_count + part.is_finish
+		return finish_part_count
+
+	def collect_get_count(self):
+		get_count = 0
+		for part in self.ebook_set.all():
+			if part.editor:get_count = get_count +1
+		return get_count
+
+	def collect_service_hours(self):
+		service_hours = 0
+		for part in self.ebook_set.all():
+			service_hours = service_hours + part.service_hours
+		return 		service_hours
 
 class EBook(models.Model):
 	book = models.ForeignKey(Book)
@@ -93,11 +121,9 @@ class EBook(models.Model):
 	end_page = models.IntegerField()
 	edited_page = models.IntegerField(default=0)
 	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL)
-	guest = models.ForeignKey(Guest,blank=True, null=True, on_delete=models.SET_NULL)
 	is_finish = models.BooleanField(default=False)
 	is_edited = models.BooleanField(default=False)
 	is_exchange = models.BooleanField(default=False)
-	is_active = models.BooleanField(default=False)
 	edit_date = models.DateTimeField(blank=True, null=True)
 	finish_date = models.DateField(blank=True, null=True)
 	deadline = models.DateField(blank=True, null=True)

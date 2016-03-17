@@ -1,0 +1,52 @@
+﻿{% extends "base_nav.html" %}
+{% load staticfiles %}
+{% block title %}
+進度
+{% endblock %}
+{% block style %}
+<link href="{% static "ebookSystem/css/custom.css" %}" rel="stylesheet" > 
+{% endblock %}
+{% block header %}
+進度
+{% endblock %}
+{% block content %}
+{% if error_message %}
+	<div id="infoForm" class="alert alert-warning" role="alert">
+	{{error_message}}
+	</div>
+{% endif %}
+
+<form action="" method="post">
+{% csrf_token %}
+	<div id="buttonGroup">
+		<button class="btn btn-lg btn-default" type="submit" id="getPart_id" name="getPart">領部份文件</button>
+		<button class="btn btn-lg btn-default" type="submit" id="getCompleteBook_id" name="getCompleteBook">領完整文件</button>
+	</div>
+	<hr />
+	<h4 class="page-header">校對文件進度</h4>
+	<table class="table table-striped table-hover">
+		<tr>
+			<th>文件</th>
+			<th>狀態</th>
+			<th>頁數</th>
+			<th>時數</th>
+			<th>資訊</th>
+			<th>動作</th>
+		</tr>
+		{% for book in book_list %}
+		<tr>
+			<td>{{book.bookname}}</td>
+			<td>{{book.collect_is_finish}}</td>
+			<td>{{book.collect_finish_page_count}}/{{book.page_count}}</td>
+			<td>{{book.collect_service_hours}}</td>
+			<td><a href = /ebookSystem/detail/{{book.id}}/>詳細資訊</a></td>
+			<td>
+
+				<button type="submit" class="btn btn-default" id="emailBook_id" name="emailBook" value={{book.ISBN}}>傳送email</button>
+
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+</form>
+{% endblock %}

@@ -27,7 +27,7 @@ def info(request,template_name='account/info.html'):
 def info_change(request,template_name='account/info_change.html'):
 	user = request.user
 	if request.method == 'POST':
-		registerUserForm = registerUserForm(request.POST, instance = user)
+		registerUserForm = RegisterUserForm(request.POST, instance = user)
 		if registerUserForm.is_valid():
 			registerUserForm.save()
 			redirect_to = reverse('account:info')
@@ -71,31 +71,39 @@ class profileView(generic.View):
 		template_name=self.template_name
 		user=request.user
 		if request.POST.has_key('getPart'):
-			try:
-				partialBook = Book.objects.exclude(get_count=0).exclude(get_count = F('part_count')).filter(is_active = True).order_by('get_count')[0]
-			except IndexError:
+			activeBook = Book.objects.filter(is_active = True).order_by('upload_date')
+			partialBook = None
+			for book in activeBook:
+				if 0 < book.collect_get_count() < book.part_count:
+					partialBook = book
+					break
+			if not partialBook:
 				print 'not partial book'
-				try:
-					partialBook = Book.objects.filter(get_count=0, is_active=True).order_by('upload_date')[0]
-				except IndexError:
-					error_message = u'無文件'
-					print 'not book'
-					editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
-					finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
-					exchangedPartList=EBook.objects.filter(editor=user.editor,is_finish=True, is_exchange=True)
-					return render(request, template_name, locals())
+				for book in activeBook:
+					if book.collect_get_count() == 0:
+						partialBook = book
+						break
+			if not partialBook:
+				error_message = u'無文件'
+				print 'not book'
+				editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
+				finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
+				exchangedPartList=EBook.objects.filter(editor=user.editor,is_finish=True, is_exchange=True)
+				return render(request, template_name, locals())
 			getPart = partialBook.ebook_set.filter(is_finish=False, editor=None)[0]
 			print 'get part'+getPart.__unicode__()
 			getPart.editor = request.user.editor
 			getPart.get_date = timezone.now()
 			getPart.deadline = getPart.get_date + datetime.timedelta(days=3)
-			getPart.book.get_count = getPart.book.get_count+1
 			getPart.save()
-			getPart.book.save()
 		elif request.POST.has_key('getCompleteBook'):
-			try:
-				completeBook = Book.objects.filter(get_count=0).order_by('upload_date')[0]
-			except IndexError:
+			activeBook = Book.objects.filter(is_active = True).order_by('upload_date')
+			completeBook = None
+			for book in activeBook:
+				if book.collect_get_count() == 0:
+					completeBook = book
+					break
+			if not completeBook:
 				error_message = u'目前無完整書文件，請先領部份文件'
 				print 'not Complete book'
 				editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
@@ -107,9 +115,7 @@ class profileView(generic.View):
 				getPart.editor = request.user.editor
 				getPart.get_date = timezone.now()
 				getPart.deadline = getPart.get_date + datetime.timedelta(days=3)
-				getPart.book.get_count = getPart.book.get_count+1
 				getPart.save()
-				getPart.book.save()
 		elif request.POST.has_key('rebackPart'):
 			book_ISBN = request.POST.get('rebackPart').split('-')[0]
 #			book_ISBN = request.POST.keys()[request.POST.values().index(u'還文件')].split('-')[0]
