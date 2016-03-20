@@ -1,6 +1,10 @@
 ﻿# coding: utf-8
 from django import forms
+from account.models import *
+from genericUser.models import *
+from guest.models import *
 from .models import *
+
 
 class EditForm(forms.Form):
 	content = forms.CharField()

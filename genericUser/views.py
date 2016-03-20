@@ -4,8 +4,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse,HttpResponseRedirect
 from django.utils import timezone
 from django.shortcuts import render
-from ebookSystem.models import *
-from ebookSystem.forms import *
+from .forms import *
 
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'tsengwoody.tw@gmail.com'
