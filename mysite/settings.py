@@ -40,6 +40,8 @@ INSTALLED_APPS = (
 #    'ebook',
     'account',
     'ebookSystem',
+    'genericUser',
+    'guest',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -107,7 +109,7 @@ LOGOUT_URL = '/account/profile'
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 FILE_CHARSET='utf-8'
-AUTH_USER_MODEL = 'ebookSystem.User'
+AUTH_USER_MODEL = 'genericUser.User'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST='smtp.gmail.com'
@@ -117,4 +119,4 @@ EMAIL_HOST_PASSWORD = 'kpqwkpssgwiwbwix'
 EMAIL_USE_TLS = True
 #smtp.mail.yahoo.com
 
-PREFIX_PATH = ''
+PREFIX_PATH = BASE_DIR +'/'

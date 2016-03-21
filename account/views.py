@@ -126,9 +126,7 @@ class profileView(generic.View):
 			rebackPart.editor=None
 			rebackPart.get_date = None
 			rebackPart.deadline = None
-			rebackPart.book.get_count = rebackPart.book.get_count-1
 			rebackPart.save()
-			rebackPart.book.save()
 		elif request.POST.has_key('delay'):
 			book_ISBN = request.POST.get('delay').split('-')[0]
 			part_part = request.POST.get('delay').split('-')[1]

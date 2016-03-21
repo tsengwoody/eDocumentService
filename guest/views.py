@@ -7,6 +7,9 @@ from django.utils.decorators import method_decorator
 from django.views import generic
 from ebookSystem.models import *
 from ebookSystem.forms import *
+from account.models import *
+from account.forms import *
+from .models import *
 from .forms import *
 from .zip import *
 from mysite.decorator import *
