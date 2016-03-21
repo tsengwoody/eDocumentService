@@ -36,9 +36,10 @@ function changePageSelect() {
 }
 
 function dangerAlert(message) {
-    $("#alertMessage").html(message);
-    $("#danger-alert").show();
-    $("#danger-alert").addClass('in');
+    //$("#alertMessage").html(message);
+    //$("#danger-alert").show();
+    //$("#danger-alert").addClass('in');
+    alert(message);
 }
 
 function saveSubmit(event) {

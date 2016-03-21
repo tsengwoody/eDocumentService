@@ -26,15 +26,15 @@
     <form class="form-signin" role="form" method="post" action="">
     <h2 class="form-signin-heading">Sign in</h2>
         {% csrf_token %}
+
+
         <div class="form-group">
-            {{ error_message }}
-            {{ loginForm.errors }}
-            {{ loginForm.username.label_tag }}
-            {{ loginForm.username }}
+            <label for="id_username">{{ loginForm.username.label_tag.value }}</label>
+            <input id="id_username" name="username" type="text" placeholder="username" class="form-control" required />
         </div>
         <div class="form-group">
-            {{ loginForm.password.label_tag }}
-            {{ loginForm.password }}
+            <label for="id_password">{{ loginForm.password.label_tag.value }}</label>
+            <input id="id_password" name="password" type="text" placeholder="password" class="form-control" required />
         </div>
      
         <!--<input type="submit" value="login" /> -->
@@ -42,6 +42,12 @@
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
         <input type="hidden" name="next" value="{{ next }}" />
     </form>
+    {% if error_message %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_message }}
+        </div>
+    {% endif %}
+
     {% if loginForm.errors %}
         <div class="alert alert-danger" role="alert">
             <p>Your username and password didn't match. Please try again.</p>

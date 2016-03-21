@@ -4,7 +4,7 @@
 個人首頁
 {% endblock %}
 {% block style %}
-<link href="{% static "ebookSystem/css/custom.css" %}" rel="stylesheet" > 
+
 {% endblock %}
 {% block header %}
 個人首頁
@@ -19,9 +19,11 @@
 
 		<form action="" method="post">
 		{% csrf_token %}
-		<div id="buttonGroup">
-			<button class="btn btn-lg btn-default" type="submit" id="getPart_id" name="getPart">領部份文件</button>
-			<button class="btn btn-lg btn-default" type="submit" id="getCompleteBook_id" name="getCompleteBook">領完整文件</button>
+		<div class="row">
+			<div id="buttonGroup"  style="text-align: center;">
+				<button class="btn btn-lg btn-default" type="submit" id="getPart_id" name="getPart">領部份文件</button>
+				<button class="btn btn-lg btn-default" type="submit" id="getCompleteBook_id" name="getCompleteBook">領完整文件</button>
+			</div>
 		</div>
 		<hr />
 		<h4 class="page-header">正校對文件</h4>
