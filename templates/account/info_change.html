@@ -3,13 +3,53 @@
 修改資料
 {% endblock %}
 {% block content %}
-<form method="post" action="{% url 'account:info_change' %}">
-{% csrf_token %}
+<h3>修改資料</h3>
+<form method="post" action="{% url 'account:info_change' %}" class="form-horizontal" role="form">
+    {% csrf_token %}
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4>username: {{ user.username }}</h4></div>
+        <div class="panel-body">
+            <div class="form-group">
+                <label for="id_first_name" class="control-label col-sm-2">First name:</label>
+                <div class="col-sm-3">
+                    <input id="id_first_name" class="form-control" name="first_name" type="text" placeholder="FirstName" required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="id_last_name" class="control-label col-sm-2">Last name:</label>
+                <div class="col-sm-3">
+                    <input id="id_last_name" class="form-control" name="last_name" type="text" placeholder="LastName" required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="id_email" class="control-label col-sm-2">Email address:</label>
+                <div class="col-sm-3">
+                    <input id="id_email" class="form-control" name="email" type="email" placeholder="Email" required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="id_phone" class="control-label col-sm-2">Phone:</label>
+                <div class="col-sm-3">
+                    <input id="id_phone" class="form-control" name="phone" placeholder="Phone" type="text" required />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button class="btn btn-default" type="submit" value="change info">修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--
 <table>
 <tr><th>username:</th><td>{{ user.username }}</td></tr>
 {{ registerUserForm.as_table }}
 </table>
 <input type="submit" value="change info" />
+-->
 </form>
-
 {% endblock %}

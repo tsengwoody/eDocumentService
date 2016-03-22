@@ -8,6 +8,12 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+body > .container {
+  padding: 30px 15px 0;
+}
+body{
+  margin-bottom: auto;
+}
 html, body, .container, .row{
   height: 100%;
 }

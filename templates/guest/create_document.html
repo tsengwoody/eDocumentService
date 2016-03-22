@@ -16,18 +16,19 @@
 {% block content %}
 <form action="" method="post" class="form-horizontal" role="form">
 {% csrf_token %}
-	{{ bookForm.errors }}
+    {% if bookForm.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ bookForm.errors }}
+        </div>
+    {% endif %}
 
     <h3>上傳文件</h3>
- <!--   {{ bookForm.bookname }}-->
-   <!-- <label for="id_bookname">Bookname:</label>{{ bookForm.bookname }} -->
     <div class="form-group">
         <label class="control-label col-sm-2" for="id_bookname">Bookname:</label>
         <div class="col-sm-3">
           <input type="text" class="form-control" id="id_bookname" name="bookname" placeholder="Enter Bookname" required>
         </div>
     </div>
-
     <div class="form-group">
         <label class="control-label col-sm-2" for="id_author">Author:</label>
         <div class="col-sm-3">
@@ -55,9 +56,24 @@
     <div class="form-group">
         <label class="control-label col-sm-2" for="id_ISBN">ISBN:</label>
         <div class="col-sm-3">
-          <input type="text" class="form-control" id="id_ISBN" name="ISBN" placeholder="10或13位數字" required>
+          <input type="text" class="form-control" id="id_ISBN" name="ISBN" placeholder="10或13位數字" title="10或13位數字" pattern="\d{10}|\d{13}" required>
         </div>
     </div> 
+<!--
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="id_page_per_part">Page per part:</label>
+        <div class="col-sm-3">
+            <input class="form-control-file" id="id_page_per_part" name="page_per_part" type="number"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="id_upload_date">Upload Date:</label>
+        <div class="col-sm-3">
+          <input type="text" class="form-control datepicker" id="id_upload_date" name="upload_date" required>
+        </div>
+    </div> 
+-->
     <div class="form-group">
         <label class="control-label col-sm-2" for="id_fileObject">Fileobject:</label>
         <div class="col-sm-3">
@@ -70,5 +86,21 @@
         </div>
     </div>
 </form>
+
+<!--
+<table>
+    {{ bookForm.as_table }}
+    <tr>
+        <th>
+            <label for="id_fileObject">Fileobject:</label>
+        </th>
+        <td>
+            <input id="id_fileObject" name="fileObject" type="file" />
+        </td>
+    </tr>
+</table>
+<button class="btn btn-default" type="submit" id="send_id" name="send">傳送</button>
+-->
+
 
 {% endblock %}
