@@ -14,7 +14,8 @@
 上傳文件
 {% endblock %}
 {% block content %}
-<form action="" method="post" class="form-horizontal" role="form">
+{{errors_message}}
+<form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
 {% csrf_token %}
     {% if bookForm.errors %}
         <div class="alert alert-danger" role="alert">
@@ -77,7 +78,8 @@
     <div class="form-group">
         <label class="control-label col-sm-2" for="id_fileObject">Fileobject:</label>
         <div class="col-sm-3">
-          <input class="form-control-file" id="id_fileObject" name="fileObject" type="file" required />
+<input id="id_fileObject" name="fileObject" type="file" />          
+		  <!--<input class="form-control-file" id="id_fileObject" name="fileObject" type="file" required />-->
         </div>
     </div> 
     <div class="form-group row">

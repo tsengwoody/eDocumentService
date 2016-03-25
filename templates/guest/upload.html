@@ -11,7 +11,7 @@
 {% csrf_token %}
 	{{ uploadForm.errors }}
 	<table>
-	{{ uploadForm.as_table }}
+	{{ bookForm.as_table }}
 	</table>
 	<button class="btn btn-lg btn-default" type="submit" id="send_id" name="upload">上傳</button>
 </form>

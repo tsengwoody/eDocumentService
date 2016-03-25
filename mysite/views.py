@@ -5,7 +5,7 @@ from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
 from .forms import *
 from ebookSystem.models import *
-from ebookSystem.forms import *
+from genericUser.forms import *
 
 def register(request, template_name='registration/register.html'):
 	if request.method == 'POST':
@@ -13,7 +13,7 @@ def register(request, template_name='registration/register.html'):
 		newUser = registerUserForm.save(commit=False)
 		newUser.username = request.POST.get('username')
 		newUser.set_password(request.POST.get('password'))
-		newUser.is_active = False
+		newUser.is_active = True
 		newUser.save()
 		newEditor = Editor(user=newUser, service_hours=0)
 		newEditor.save()

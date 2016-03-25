@@ -5,9 +5,9 @@ from .models import *
 class RegisterUserForm(forms.ModelForm):
 	class Meta:
 		model = User
-		fields = '__all__'
+		fields = ['username', 'password', 'email', 'phone', 'birthday']
 
 class ContactUsForm(forms.ModelForm):
 	class Meta:
 		model = ContactUs
-		fields = '__all__'
+		exclude = ['message_datetime']

@@ -20,13 +20,3 @@ class RegisterUserForm(forms.ModelForm):
 	class Meta:
 		model = User
 		fields = '__all__'
-
-class BookForm(forms.ModelForm):
-	class Meta:
-		model = Book
-		fields = '__all__'
-
-class ContactUsForm(forms.ModelForm):
-	class Meta:
-		model = ContactUs
-		fields = '__all__'

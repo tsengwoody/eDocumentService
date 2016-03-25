@@ -7,6 +7,7 @@ from mysite import settings
 from genericUser.models import User
 from guest.models import Guest
 from account.models import Editor
+from utils.vaildate import *
 import os
 import datetime
 
@@ -99,21 +100,9 @@ class EBook(models.Model):
 
 def pre_save_Book(**kwargs):
 	book = kwargs.get('instance')
-	if book.page_count == None or book.part_count == None:
+	if book.page_count == None or book.part_count == None or book.path == None:
 		book.path = settings.PREFIX_PATH + u'static/ebookSystem/document/{0}'.format(book.bookname)
-		try:
-			fileList=os.listdir(book.path+u'/source')
-		except:
-			print 'not folder'
-			return -1
-		book.page_count=0
-		for scanPage in fileList:
-			if scanPage.split('.')[-1]=='jpg':
-				book.page_count = book.page_count+1
-		print 'set page_count and part_count'
-		book.part_count = book.page_count/book.page_per_part+1
-		return 1
-	return 0
+		[result, book.page_count, book.part_count] = vaildate_folder(book.path+u'/OCR', book.path+u'/source', book.page_per_part)
 
 def post_save_Book(**kwargs):
 	book = kwargs.get('instance')

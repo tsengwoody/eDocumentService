@@ -11,8 +11,8 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import generic
 from ebookSystem.models import *
-from ebookSystem.forms import *
-from mysite.decorator import *
+from .forms import *
+from utils.decorator import *
 import datetime
 
 MANAGER = ['tsengwoody@yahoo.com.tw']
@@ -27,13 +27,13 @@ def info(request,template_name='account/info.html'):
 def info_change(request,template_name='account/info_change.html'):
 	user = request.user
 	if request.method == 'POST':
-		registerUserForm = RegisterUserForm(request.POST, instance = user)
-		if registerUserForm.is_valid():
-			registerUserForm.save()
+		infoChangeUserForm = InfoChangeUserForm(request.POST, instance = user)
+		if infoChangeUserForm.is_valid():
+			infoChangeUserForm.save()
 			redirect_to = reverse('account:info')
 			return HttpResponseRedirect(redirect_to)
 	if request.method == 'GET':
-		registerUserForm = RegisterUserForm(instance = user)
+		infoChangeUserForm = InfoChangeUserForm(instance = user)
 	return render(request, template_name, locals())
 
 @user_category_check('editor')

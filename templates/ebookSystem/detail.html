@@ -7,9 +7,11 @@
 {% endblock %}
 {% block content %}
 <ul>
+	<li>書名：{{ book.bookname }}</li>
 	<li>作者：{{ book.author }}</li>
-	<li>譯者{{ book.translator }}</li>
-	<li>ISBN{{ book.ISBN }}</li>
+	<li>譯者：{{ book.translator }}</li>
+	<li>出版社：{{ book.house }}</li>
+	<li>ISBN：{{ book.ISBN }}</li>
 </ul>
 
 <form action="" method="post">

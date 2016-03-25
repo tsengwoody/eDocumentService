@@ -6,13 +6,12 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import generic
 from ebookSystem.models import *
-from ebookSystem.forms import *
 from account.models import *
-from account.forms import *
 from .models import *
 from .forms import *
-from .zip import *
-from mysite.decorator import *
+from utils.decorator import *
+from utils.vaildate import *
+from utils.zip import *
 import mysite
 
 MANAGER = ['tsengwoody@yahoo.com.tw']
@@ -21,26 +20,31 @@ SERVICE = 'tsengwoody.tw@gmail.com'
 @user_category_check('guest')
 def create_document(request, template_name='guest/create_document.html'):
 	if request.method == 'POST':
-		bookForm = BookForm(request.POST)
+		bookForm = BookForm(request.POST, request.FILES)
 		if bookForm.is_valid():
 			uploadPath = u'static/ebookSystem/document/{0}'.format(bookForm.cleaned_data['bookname'])
-			uploadFilePath = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
-			unzip_file(uploadFilePath, newBook.path)
-			newBook = bookForm.save()
+			if not os.path.exists(uploadPath):
+				uploadFilePath = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
+				unzip_file(uploadFilePath, uploadPath)
+				if vaildate_folder(uploadPath+u'/OCR', uploadPath+u'/source', 50)[0]:
+					bookForm.save()
+			else:
+				errors_message = u'文件已存在'
 	if request.method == 'GET':
 		bookForm = BookForm()
 	return render(request, template_name, locals())
 
+
 def upload(request, template_name='guest/upload.html'):
 	if request.method == 'POST':
-		uploadForm = UploadForm(request.POST, request.FILES)
-		if uploadForm.is_valid():
-			uploadFilePath = handle_uploaded_file(request.POST['path'], request.FILES['fileObject'])
-			unzip_file(uploadFilePath, request.POST['path'])
-			uploadForm = UploadForm()
+		bookForm = BookForm(request.POST, request.FILES)
+		if bookForm.is_valid():
+			uploadPath = u'static/ebookSystem/document/{0}'.format(bookForm.cleaned_data['bookname'])
+			uploadFilePath = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
+			unzip_file(uploadFilePath, uploadPath)
+			bookForm = BookForm(request.POST, request.FILES)
 	if request.method == 'GET':
-		w=		os.listdir('.')
-		uploadForm = UploadForm()
+		bookForm = BookForm(request.POST, request.FILES)
 	return render(request, template_name, locals())
 
 def handle_uploaded_file(dirname, file):
