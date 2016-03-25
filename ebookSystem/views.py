@@ -19,10 +19,10 @@ class book_list(generic.ListView):
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
-	except book.DoesNotExist:
+	except Book.DoesNotExist:
 		raise Http404("book does not exist")
-	partList = book.ebook_set.all()
 	return render(request, template_name, locals())
+
 class editView(generic.View):
 	def get(self, request, *args, **kwargs):
 		template_name='ebookSystem/edit.html'

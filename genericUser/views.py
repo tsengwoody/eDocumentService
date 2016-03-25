@@ -4,10 +4,30 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse,HttpResponseRedirect
 from django.utils import timezone
 from django.shortcuts import render
+
+from utils.decorator import *
 from .forms import *
 
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'tsengwoody.tw@gmail.com'
+
+@user_category_check('editor')
+def info(request, template_name):
+	user = request.user
+	return render(request, template_name, locals())
+
+@user_category_check('editor')
+def info_change(request,template_name):
+	user = request.user
+	if request.method == 'POST':
+		infoChangeUserForm = InfoChangeUserForm(request.POST, instance = user)
+		if infoChangeUserForm.is_valid():
+			infoChangeUserForm.save()
+			redirect_to = reverse('genericUser:info')
+			return HttpResponseRedirect(redirect_to)
+	if request.method == 'GET':
+		infoChangeUserForm = InfoChangeUserForm(instance = user)
+	return render(request, template_name, locals())
 
 def contact_us(request, template_name):
 	if request.method == 'GET':

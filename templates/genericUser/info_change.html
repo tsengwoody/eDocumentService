@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
 <!--<h3>修改資料</h3>-->
-<form method="post" action="{% url 'account:info_change' %}" class="form-horizontal" role="form">
+<form method="post" action="" class="form-horizontal" role="form">
     {% csrf_token %}
 
 <div class="row">
@@ -16,25 +16,25 @@
                 <div class="form-group">
                     <label for="id_first_name" class="control-label col-sm-2">First name:</label>
                     <div class="col-sm-5">
-                        <input id="id_first_name" class="form-control" name="first_name" type="text" placeholder="FirstName" required />
+                        <input id="id_first_name" class="form-control" name="first_name" type="text" placeholder="FirstName" value={{ infoChangeUserForm.first_name.value }} required />
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="id_last_name" class="control-label col-sm-2">Last name:</label>
                     <div class="col-sm-5">
-                        <input id="id_last_name" class="form-control" name="last_name" type="text" placeholder="LastName" required />
+                        <input id="id_last_name" class="form-control" name="last_name" type="text" placeholder="LastName" value={{ infoChangeUserForm.last_name.value }} required />
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="id_email" class="control-label col-sm-2">Email address:</label>
                     <div class="col-sm-5">
-                        <input id="id_email" class="form-control" name="email" type="email" placeholder="Email" required />
+                        <input id="id_email" class="form-control" name="email" type="email" placeholder="Email" value={{ infoChangeUserForm.email.value }} required />
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="id_phone" class="control-label col-sm-2">Phone:</label>
                     <div class="col-sm-5">
-                        <input id="id_phone" class="form-control" name="phone" placeholder="Phone" type="phone" required />
+                        <input id="id_phone" class="form-control" name="phone" placeholder="Phone" type="phone" value={{ infoChangeUserForm.phone.value }} required />
                     </div>
                 </div>
                 <div class="form-group row">

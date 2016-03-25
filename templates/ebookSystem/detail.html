@@ -34,7 +34,7 @@
 			<td>{{part.service_hours}}</td>
 			<td>{{part.deadline}}</td>
 			<td>
-				{% if part.is_finish %}
+				{% if user.is_staff %}
 				<button type="submit" class="btn btn-default" id="emailPart_id" name="emailPart" value={{part.book.ISBN}}-{{part.part}}>傳送email</button>
 				{% endif %}
 			</td>

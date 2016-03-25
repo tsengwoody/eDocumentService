@@ -2,10 +2,10 @@
 from django import forms
 from .models import *
 
-class RegisterUserForm(forms.ModelForm):
+class InfoChangeUserForm(forms.ModelForm):
 	class Meta:
 		model = User
-		fields = ['username', 'password', 'email', 'phone', 'birthday']
+		fields = ['first_name', 'last_name', 'email', 'phone']
 
 class ContactUsForm(forms.ModelForm):
 	class Meta:
