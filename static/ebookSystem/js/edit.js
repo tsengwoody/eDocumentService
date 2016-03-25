@@ -79,6 +79,7 @@ $(document).ready(function() {
     });
     $('#save_id').click(saveSubmit);
     $('#finish_id').click(finishSubmit);
+    
     $('.close').click(function() {
         $(this).parent().hide();
         $(this).parent().removeClass('in'); // hides alert with Bootstrap CSS3 implem

@@ -26,7 +26,7 @@ body > .container {
                         <label for="id_username">username:</label>
                     </th>
                     <td class="col-md-8">
-                        <input id="id_username" maxlength="30" name="username" type="text" placeholder="username" required>
+                        <input id="id_username" maxlength="30" name="username" type="text" placeholder="username" autofocus required>
                     </td>
                 </tr>
                 <tr>
@@ -100,6 +100,17 @@ body > .container {
                 </tr>
                 <tr>
                     <th class="col-md-4" scope="row">
+                        <label for="id_role">role</label>
+                    </th>
+                    <td>
+                        <label class="radio-inline">
+                            <input  type="radio" name="role" id="id_role" checked="true" value="Editor">Editor</input></label>
+                        <label class="radio-inline">
+                            <input type="radio" name="role" id="id_role" value="Guest">Guest</input></label>
+                    </td>
+                </tr>
+                <tr id="editor_only">
+                    <th class="col-md-4" scope="row">
                         <label for="id_professional_field">professional field:</label>
                     </th>
                     <td>
@@ -115,6 +126,5 @@ body > .container {
             </div>
         </div>
     </div>
-    <!--<input type="submit" value="register" />-->
 </form>
 {% endblock %}
