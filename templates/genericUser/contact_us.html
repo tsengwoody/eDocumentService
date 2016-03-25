@@ -4,10 +4,16 @@
 {% endblock %}
 {% block style %}
 <style>
-    body > .container {
+body > .container {
       padding: 30px 15px 0;
-    }
+}
+::-webkit-validation-bubble-icon {}
+::-webkit-validation-bubble-body {}
+::-webkit-validation-bubble-text-block {}
+::-webkit-validation-bubble-arrow-heading {}
 </style>
+{% load staticfiles %}
+<script language="javascript" src="{% static 'ebookSystem/js/form.js' %}"></script>
 {% endblock %}
 {% block content %}
 <form action="" method="post">
