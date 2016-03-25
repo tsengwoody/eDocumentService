@@ -3,9 +3,11 @@
 {{ book.bookname }}資訊
 {% endblock %}
 {% block header %}
-<h1>{{ book.bookname }}資訊
+<!--<h1>{{ book.bookname }}資訊 -->
 {% endblock %}
 {% block content %}
+
+<legend><h3>{{ book.bookname }}資訊</h3></legend>
 <ul>
 	<li>書名：{{ book.bookname }}</li>
 	<li>作者：{{ book.author }}</li>

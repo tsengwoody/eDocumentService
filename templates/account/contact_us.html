@@ -8,8 +8,11 @@
 {% block content %}
 <form action="" method="post">
 {% csrf_token %}
-	{{ contactUsForm.errors }}
-	
+    {% if contactUsForm.errors %}
+        <div class="alert alert-danger" role="alert">
+	       {{ contactUsForm.errors }}
+        </div>
+	{% endif %}
     <table>
 	{{ contactUsForm.as_table }}
 	</table>

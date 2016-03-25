@@ -2,17 +2,81 @@
 {% block title %}
 聯絡我們
 {% endblock %}
-{% block header %}
-聯絡我們
+{% block style %}
+<style>
+    body > .container {
+      padding: 30px 15px 0;
+    }
+</style>
 {% endblock %}
 {% block content %}
 <form action="" method="post">
-{% csrf_token %}
-	{{ contactUsForm.errors }}
-	<table>
-	{{ contactUsForm.as_table }}
-	</table>
-	<button class="btn btn-lg btn-default" type="submit" id="send_id" name="send">傳送</button>
+     <h3>聯絡我們</h3>
+    {% csrf_token %} {% if contactUsForm.errors %}
+    <div class="alert alert-danger" role="alert">
+        {{ contactUsForm.errors }}
+    </div>
+    {% endif %}
+   
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <table class="table table-hover table-reflow">
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_name">Name:</label>
+                    </th>
+                    <td class="col-md-8">
+                        <input id="id_name" maxlength="10" name="name" type="text" placeholder="name" required />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_email">Email:</label>
+                    </th>
+                    <td class="col-md-8">
+                        <input id="id_email" maxlength="254" name="email" type="email" placeholder="email" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_name">Kind:</label>
+                    </th>
+                    <td class="col-md-8">
+                        <select id="id_kind" name="kind">
+                            <option value="" selected="selected">---------</option>
+                            <option value="校對問題">校對問題</option>
+                            <option value="系統問題">系統問題</option>
+                            <option value="營運建議">營運建議</option>
+                            <option value="加入我們">加入我們</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_subject">Subject:</label>
+                    </th>
+                    <td class="col-md-8">
+                        <input id="id_subject" maxlength="50" name="subject" type="text" placeholder="subject" required />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_name">Content:</label>
+                    </th>
+                    <td class="col-md-8">
+                        <textarea id="id_content" maxlength="1000" name="content" type="text"></textarea>
+                    </td>
+                </tr>
+            </table>
+            <div class="form-group row">
+                <div class="col-sm-offset-4 col-sm-6">
+                    <input type="submit" class="btn btn-primary" value="send" id="send_id">
+                    <input type="reset" class="btn btn-danger" value="reset">
+                </div>
+            </div>
+        </div>
+    </div>
 </form>
 
 {% endblock %}

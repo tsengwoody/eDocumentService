@@ -2,17 +2,119 @@
 {% block title %}
 註冊
 {% endblock %}
+{% block style %}
+{% load staticfiles %}
+<link href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script language="javascript" src="{% static 'ebookSystem/js/datepicker.js' %}"></script>
+<script language="javascript" src="{% static 'ebookSystem/js/register.js' %}"></script>
+<style>
+body > .container {
+  padding: 20px 15px 0;
+}
+</style>
+{% endblock %}
 {% block content %}
 <form method="post" action="{% url 'register' %}">
-{% csrf_token %}
-<table>
-<tr><th><label for="id_username">username:</label></th><td><input id="id_username" maxlength="30" name="username" type="text"></td></tr>
-<tr><th><label for="id_password">password:</label></th><td><input id="id_password" maxlength="30" name="password" type="password"></td></tr>
-<tr><th><label for="id_confirm_password">confirm password:</label></th><td><input id="id_confirm_password" maxlength="30" name="confirm_password" type="password"></td></tr>
-{{ registerUserForm.as_table }}
-<tr><th><label for="id_professional_field">professional field:</label></th><td><input id="id_professional_field" maxlength="30" name="professional_field" type="text"></td></tr>
-</table>
-<input type="submit" value="register" />
+    {% csrf_token %}
+    <h3>註冊</h3> 
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <table class="table table-hover table-reflow">
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_username">username:</label>
+                    </th>
+                    <td class="col-md-8">
+                        <input id="id_username" maxlength="30" name="username" type="text" placeholder="username" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_password">password:</label>
+                    </th>
+                    <td>
+                        <input id="id_password" maxlength="30" name="password" type="password" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_confirm_password">confirm password:</label>
+                    </th>
+                    <td>
+                        <input id="id_confirm_password" maxlength="30" name="confirm_password" type="password" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_first_name">First name:</label>
+                    </th>
+                    <td>
+                        <input id="id_first_name" name="first_name" type="text" placeholder="First name" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_last_name">Last name:</label>
+                    </th>
+                    <td>
+                        <input id="id_last_name" name="last_name" type="text" placeholder="Last name" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_email">Email address:</label>
+                    </th>
+                    <td>
+                        <input id="id_email" name="email" type="email" placeholder="Email" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_phone">Phone:</label>
+                    </th>
+                    <td>
+                        <input id="id_phone" name="phone" type="phone" placeholder="Phone" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_birthday">Birthday:</label>
+                    </th>
+                    <td>
+                        <input id="id_birthday" name="birthday" type="text" class="datepicker">
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_last_name">Education:</label>
+                    </th>
+                    <td>
+                        <select id="id_education" name="education">
+                            <option value="" selected="selected">---------</option>
+                            <option value="高中">高中</option>
+                            <option value="學士">學士</option>
+                            <option value="碩士">碩士</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_professional_field">professional field:</label>
+                    </th>
+                    <td>
+                        <input id="id_professional_field" maxlength="30" name="professional_field" type="text">
+                    </td>
+                </tr>
+            </table>
+            <div class="form-group row">
+                <div class="col-sm-offset-4 col-sm-6">
+                    <input type="submit" class="btn btn-primary" value="register" id="id_register">
+                    <input type="reset" class="btn btn-danger" value="reset">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--<input type="submit" value="register" />-->
 </form>
-
 {% endblock %}
