@@ -1,15 +1,24 @@
-function replaceValidationUI()
+function resetValidationUI()
 {
-    $(".help-inline").remove();
-    $(".danger").removeClass("danger");
-    //$('input:valid').parent().parent().addClass("success");
+    console.log("resetValidationUI");
+    if($(".invalidSpan").length)
+    {
+        $(".invalidSpan").remove();
+    }
+    if($(".danger").length)
+        $(".danger").removeClass("danger");
 }
 $(document).ready(function() {
     console.log("ready!");
-    $('input[type="submit"]').click(replaceValidationUI);
+    if($('.datepicker').length)
+        $('.datepicker').datepicker({dateFormat:"yy-mm-dd"});
+    if($('input[type="submit"]').length)
+        $('input[type="submit"]').click(resetValidationUI);
+    if($('input[type="reset"]').length)
+        $('input[type="reset"]').click(resetValidationUI);
     $('input, select').on("invalid", function(e) {
         $(this).parent().parent().addClass("danger");
-        $(this).parent().append("<span class='help-inline alert-danger'>"+e.target.validationMessage+"</span>");
+        $(this).parent().append("<span class='help-inline alert-danger invalidSpan'>"+e.target.validationMessage+"</span>");
         e.preventDefault();
     });
 });

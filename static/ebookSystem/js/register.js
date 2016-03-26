@@ -6,8 +6,14 @@ function checkRegister()
 {
     if($("#id_confirm_password").val()!=$("#id_password").val())
     {
-        event.preventDefault();
-        alertError("密碼不一致")
+        $('#id_confirm_password, #id_password').each(function() {
+            this.setCustomValidity("Password Must be Matching.");
+        });
+
+    }else{
+        $('#id_confirm_password, #id_password').each(function() {
+            this.setCustomValidity("");
+        });
     }
 }
 function optradioChange()
