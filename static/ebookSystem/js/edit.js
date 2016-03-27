@@ -82,6 +82,8 @@ $(document).ready(function() {
     $('#save_id').click(saveSubmit);
     $('#finish_id').click(finishSubmit);
     
+
+
     $('#zoomIN').click(function() {
         imgSize.value = (parseInt(imgSize.value) - 10).toString() + '%';
         $('#scanPage').css('width', imgSize.value);
