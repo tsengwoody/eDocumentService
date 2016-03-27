@@ -41,16 +41,15 @@ function dangerAlert(message) {
     //$("#danger-alert").show();
     //$("#danger-alert").addClass('in');
     //alert(message);
-     
 }
 
 function saveSubmit(event) {
     //console.log($("#danger-alert"));
-    if (typeof $('textarea').val() == 'undefined') {
+    if (typeof $('#id_content').val() == 'undefined') {
         event.preventDefault();
         dangerAlert("textarea not found")
     }
-    var str = $('textarea').val();
+    var str = $('#id_content').val();
     if (str.indexOf("|----------|") < 0) {
         event.preventDefault();
         dangerAlert("未save成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下finish按紐");
@@ -58,20 +57,29 @@ function saveSubmit(event) {
 }
 
 function finishSubmit(event) {
-    if (typeof $('textarea').val() == 'undefined') {
+    if (typeof $('#id_content').val() == 'undefined') {
         event.preventDefault();
         dangerAlert("textarea not found");
     }
-    var str = $('textarea').val();
+    var str = $('#id_content').val();
     if (str.indexOf("|----------|") > 0) {
         event.preventDefault();
         dangerAlert("未finish成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下save按紐");
     }
 }
+function adjZoom(value) {
+    imgSize.value = (parseInt(imgSize.value)+ parseInt(value)).toString() + '%';
+    $('#scanPage').css('width', imgSize.value);
+}
+function addMark() {
+    var caretPos = document.getElementById("id_content").selectionStart;
+    var textAreaTxt = $("#id_content").val();
+    var txtToAdd = "|----------|\n";
+    $("#id_content").val(textAreaTxt.substring(0, caretPos) + txtToAdd + textAreaTxt.substring(caretPos));
+}
+
 $(document).ready(function() {
     console.log("ready!");
-
-
     $('#prePage').on("click", function() {
         changePage(-1);
     });
@@ -81,17 +89,12 @@ $(document).ready(function() {
     });
     $('#save_id').click(saveSubmit);
     $('#finish_id').click(finishSubmit);
-    
-
-
-    $('#zoomIN').click(function() {
-        imgSize.value = (parseInt(imgSize.value) - 10).toString() + '%';
-        $('#scanPage').css('width', imgSize.value);
-
+    $('#mark_id').click(addMark);
+    $('#zoomIN').on("click",function(){
+        adjZoom(-10);
     });
-    $('#zoomOUT').click(function() {
-        imgSize.value = (parseInt(imgSize.value) + 10).toString() + '%';
-        $('#scanPage').css('width', imgSize.value);
+    $('#zoomOUT').on("click",function(){
+        adjZoom(10);
     });
     $('#chagePost').click(function() {
         $('#id_content').removeAttr('style');
@@ -100,17 +103,13 @@ $(document).ready(function() {
             $('#imagePage').addClass("col-md-12");
             $('#textPage').removeClass("col-md-6");
             $('#textPage').addClass("col-md-12");
-
             $('#textPage').removeClass("towColumn");
             $('#textPage').addClass("oneColumn");
-
-
         } else { //左右
             $('#imagePage').removeClass("col-md-12");
             $('#imagePage').addClass("col-md-6");
             $('#textPage').removeClass("col-md-12");
             $('#textPage').addClass("col-md-6");
-
             $('#textPage').removeClass("oneColumn");
             $('#textPage').addClass("towColumn");
 
