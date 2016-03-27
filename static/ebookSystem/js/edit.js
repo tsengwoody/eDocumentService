@@ -14,7 +14,7 @@
         page.value = scanPageList.selectedIndex;
         imgScanPage.src = dirname + scanPageList.options[scanPageList.selectedIndex].value;
     } else {
-        alert('超過頁數範圍惹~');
+        dangerAlert('超過頁數範圍惹~');
     }
 }
 
@@ -36,14 +36,16 @@ function changePageSelect() {
 }
 
 function dangerAlert(message) {
-    //$("#alertMessage").html(message);
+    $("#alertMessage").html(message);
+    $("#alertDialog").modal();
     //$("#danger-alert").show();
     //$("#danger-alert").addClass('in');
-    alert(message);
+    //alert(message);
+     
 }
 
 function saveSubmit(event) {
-    console.log($("#danger-alert"));
+    //console.log($("#danger-alert"));
     if (typeof $('textarea').val() == 'undefined') {
         event.preventDefault();
         dangerAlert("textarea not found")
@@ -80,12 +82,6 @@ $(document).ready(function() {
     $('#save_id').click(saveSubmit);
     $('#finish_id').click(finishSubmit);
     
-    $('.close').click(function() {
-        $(this).parent().hide();
-        $(this).parent().removeClass('in'); // hides alert with Bootstrap CSS3 implem
-
-    });
-
     $('#zoomIN').click(function() {
         imgSize.value = (parseInt(imgSize.value) - 10).toString() + '%';
         $('#scanPage').css('width', imgSize.value);
