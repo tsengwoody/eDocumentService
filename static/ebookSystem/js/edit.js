@@ -77,6 +77,9 @@ function addMark() {
     var lastLinePos=textAreaTxt.substring(0, caretPos).lastIndexOf("\n");
     var txtToAdd = "\n|----------|";
     $("#id_content").val(textAreaTxt.substring(0, lastLinePos) + txtToAdd + textAreaTxt.substring(lastLinePos));
+    document.getElementById("id_content").selectionStart=lastLinePos+1;
+    document.getElementById("id_content").selectionEnd=lastLinePos+txtToAdd.length;
+    
 }
 
 $(document).ready(function() {
