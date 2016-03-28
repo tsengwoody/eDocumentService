@@ -74,8 +74,9 @@ function adjZoom(value) {
 function addMark() {
     var caretPos = document.getElementById("id_content").selectionStart;
     var textAreaTxt = $("#id_content").val();
-    var txtToAdd = "|----------|\n";
-    $("#id_content").val(textAreaTxt.substring(0, caretPos) + txtToAdd + textAreaTxt.substring(caretPos));
+    var lastLinePos=textAreaTxt.substring(0, caretPos).lastIndexOf("\n");
+    var txtToAdd = "\n|----------|";
+    $("#id_content").val(textAreaTxt.substring(0, lastLinePos) + txtToAdd + textAreaTxt.substring(lastLinePos));
 }
 
 $(document).ready(function() {
