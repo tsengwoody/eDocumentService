@@ -17,6 +17,15 @@ import mysite
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'tsengwoody.tw@gmail.com'
 
+def book_save_test(request, template_name='guest/book_save_test.html'):
+	if request.method == 'POST':
+		bookForm = BookFormTest(request.POST)
+		if bookForm.is_valid():
+			bookForm.save()
+	if request.method == 'GET':
+		bookForm = BookFormTest()
+	return render(request, template_name, locals())
+
 @user_category_check('guest')
 def create_document(request, template_name='guest/create_document.html'):
 	if request.method == 'POST':
@@ -37,6 +46,7 @@ def create_document(request, template_name='guest/create_document.html'):
 
 def upload(request, template_name='guest/upload.html'):
 	if request.method == 'POST':
+		print type(request.FILES)
 		bookForm = BookForm(request.POST, request.FILES)
 		if bookForm.is_valid():
 			uploadPath = u'static/ebookSystem/document/{0}'.format(bookForm.cleaned_data['bookname'])

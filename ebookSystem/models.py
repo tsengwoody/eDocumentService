@@ -100,7 +100,7 @@ class EBook(models.Model):
 
 def pre_save_Book(**kwargs):
 	book = kwargs.get('instance')
-	if book.page_count == None or book.part_count == None or book.path == None:
+	if book.page_count == None or book.part_count == None:
 		book.path = settings.PREFIX_PATH + u'static/ebookSystem/document/{0}'.format(book.bookname)
 		[result, book.page_count, book.part_count] = vaildate_folder(book.path+u'/OCR', book.path+u'/source', book.page_per_part)
 

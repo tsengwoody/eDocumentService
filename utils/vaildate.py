@@ -8,7 +8,7 @@ def vaildate_folder(OCR, source, page_per_part):
 		OCRFileList = os.listdir(OCR)
 		sourceFileList=os.listdir(source)
 	except:
-		return False
+		return [False, None, None]
 	page_count = 0
 	for scanPage in sourceFileList:
 		if scanPage.split('.')[-1].lower() == 'jpg':
