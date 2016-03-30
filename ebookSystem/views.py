@@ -24,7 +24,7 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	return render(request, template_name, locals())
 
 class editView(generic.View):
-	def get(self, request, *args, **kwargs):
+	def get(self, request, encoding='utf-8', *args, **kwargs):
 		template_name='ebookSystem/edit.html'
 		try:
 			book = Book.objects.get(ISBN=kwargs['book_ISBN'])
@@ -35,19 +35,19 @@ class editView(generic.View):
 		editContent=''
 		fileHead=''
 		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
-		finishFilePath = mysite.settings.PREFIX_PATH +book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
+		finishFilePath = book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
 #		finishFilePath = finishFilePath.encode('utf-8')
-		filePath = mysite.settings.PREFIX_PATH +book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
+		filePath = book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
 #		filePath = filePath.encode('utf-8')
 		[finishContent, editContent, fileHead] = getContent(filePath)
-		with codecs.open(finishFilePath, 'w', encoding='utf-16le') as fileWrite:
+		with codecs.open(finishFilePath, 'w', encoding=encoding) as fileWrite:
 			if finishContent!='':
 				fileWrite.write(fileHead+finishContent)
 			else:
 				fileWrite.write(fileHead)
 		editForm = EditForm({'content':editContent,'page':defaultPageIndex})
 		return render(request, template_name, locals())
-	def post(self, request, *args, **kwargs):
+	def post(self, request, encoding='utf-8', *args, **kwargs):
 		template_name='ebookSystem/edit.html'
 		try:
 			book = Book.objects.get(ISBN=kwargs['book_ISBN'])
@@ -56,23 +56,23 @@ class editView(generic.View):
 			raise Http404("book or part does not exist")
 		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
 		editForm = EditForm(request.POST)
-		finishFilePath = mysite.settings.PREFIX_PATH +book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
+		finishFilePath = book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
 #		finishFilePath = finishFilePath.encode('utf-8')
-		filePath = mysite.settings.PREFIX_PATH +book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
+		filePath = book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
 #		filePath = filePath.encode('utf-8')
 		if request.POST.has_key('save'):
 			if editForm.is_valid():
 				editContent=editForm.cleaned_data['content']
-				with codecs.open(finishFilePath, 'r', encoding='utf-16le') as fileRead:
+				with codecs.open(finishFilePath, 'r', encoding=encoding) as fileRead:
 					finishContent=fileRead.read()
-				with codecs.open(filePath, 'w', encoding='utf-16le') as fileWrite:
+				with codecs.open(filePath, 'w', encoding=encoding) as fileWrite:
 					fileWrite.write(finishContent+editContent)
 				part.edited_page=editForm.cleaned_data['page']
 				part.edit_date = timezone.now()
 				part.save()
 				[finishContent, editContent, fileHead] = getContent(filePath)
 				[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
-				with codecs.open(finishFilePath, 'w', encoding='utf-16le') as fileWrite:
+				with codecs.open(finishFilePath, 'w', encoding=encoding) as fileWrite:
 					if finishContent!='':
 						fileWrite.write(fileHead+finishContent)
 					else:
@@ -88,9 +88,9 @@ class editView(generic.View):
 		elif request.POST.has_key('finish'):
 			if editForm.is_valid() and editForm.cleaned_data['content'].find('|----------|') == -1:
 				editContent=editForm.cleaned_data['content']
-				with codecs.open(finishFilePath, 'r', encoding='utf-16le') as fileRead:
+				with codecs.open(finishFilePath, 'r', encoding=encoding) as fileRead:
 					finishContent=fileRead.read()
-				with codecs.open(filePath, 'w', encoding='utf-16le') as fileWrite:
+				with codecs.open(filePath, 'w', encoding=encoding) as fileWrite:
 					fileWrite.write(finishContent+editContent)
 				part.edited_page=editForm.cleaned_data['page']
 				part.is_finish = True
@@ -104,7 +104,7 @@ class editView(generic.View):
 				return render(request, template_name, locals())
 
 def editVarInit(book, part):
-	sourcePath = mysite.settings.PREFIX_PATH +book.path +u'/source'
+	sourcePath = book.path +u'/source'
 #	sourcePath = sourcePath.encode('utf-8')
 	fileList=os.listdir(sourcePath)
 	scanPageList=[]
@@ -118,7 +118,7 @@ def editVarInit(book, part):
 	defaultPageURL=defaultPageURL.replace(mysite.settings.PREFIX_PATH +'static/', '')
 	return [scanPageList, defaultPageIndex, defaultPage, defaultPageURL]
 
-def getContent(contentPath, encoding='utf-16le'):
+def getContent(contentPath, encoding='utf-8'):
 	finishContent=''
 	editContent=''
 	with codecs.open(contentPath, 'r', encoding=encoding) as fileRead:
