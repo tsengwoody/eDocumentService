@@ -29,7 +29,7 @@ def info_change(request,template_name):
 		infoChangeUserForm = InfoChangeUserForm(instance = user)
 	return render(request, template_name, locals())
 
-def contact_us(request, template_name):
+def contact_us(request, template_name='genericUser/contact_us.html'):
 	if request.method == 'GET':
 		contactUsForm = ContactUsForm()
 	if request.method == 'POST':
@@ -38,7 +38,7 @@ def contact_us(request, template_name):
 			contactUs = contactUsForm.save(commit=False)
 			contactUs.message_datetime = timezone.now()
 			subject = u'[{}] {}'.format (contactUs.kind, contactUs.subject)
-			body = u'姓名:'+ contactUs.name+ u'\nemail:'+ contactUs.email+ u'\n內容：'+ contactUs.content
+			body = u'姓名:'+ contactUs.name+ u'\nemail:'+ contactUs.email+ u'\n內容：\n'+ contactUs.content
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=MANAGER)
 			email.send(fail_silently=False)
 			contactUs.save()

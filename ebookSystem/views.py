@@ -143,4 +143,5 @@ def getContent(contentPath, encoding='utf-8'):
 			editContent = editContent+i
 		if editContent == '':
 			editContent = finishContent
+			finishContent = ''
 	return [finishContent, editContent, fileHead]
