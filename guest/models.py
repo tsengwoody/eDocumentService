@@ -5,9 +5,16 @@ from mysite import settings
 
 class Guest(models.Model):
 	user = models.OneToOneField(User, primary_key=True)
+#	ID_card_number = models.CharField(max_length=10)
+#	disability_card_front = models.ImageField(upload_to='disability_card')
+#	disability_card_back = models.ImageField(upload_to='disability_card')
 
 	class Meta:
 		db_table = 'guest'
 
 	def __unicode__(self):
 		return self.user.username
+
+class UploadFile(models.Model):
+	username = models.CharField(max_length=10)
+	file_object = models.FileField(upload_to='disability_card')

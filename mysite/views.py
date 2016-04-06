@@ -14,8 +14,12 @@ def register(request, template_name='registration/register.html'):
 			newUser.set_password(request.POST.get('password'))
 			newUser.is_active = True
 			newUser.save()
-			newEditor = Editor(user=newUser, service_hours=0)
-			newEditor.save()
+			if request.POST['role'] == 'Editor':
+				newEditor = Editor(user=newUser, service_hours=0)
+				newEditor.save()
+			elif request.POST['role'] == 'Guest':
+				newGuest = Guest(user=newUser)
+				newGuest.save()
 			redirect_to = reverse('login')
 			return HttpResponseRedirect(redirect_to)
 	if request.method == 'GET':

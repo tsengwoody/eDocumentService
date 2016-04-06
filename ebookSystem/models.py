@@ -17,7 +17,7 @@ class Book(models.Model):
 	translator = models.CharField(max_length=50, blank=True, null=True)
 	house = models.CharField(max_length=30)
 	date = models.DateField()
-	ISBN = models.CharField(max_length=20)
+	ISBN = models.CharField(max_length=20, primary_key=True)
 	path = models.CharField(max_length=255, blank=True, null=True)
 	page_count = models.IntegerField(blank=True, null=True)
 	part_count = models.IntegerField(blank=True, null=True)
@@ -78,6 +78,7 @@ class Book(models.Model):
 class EBook(models.Model):
 	book = models.ForeignKey(Book)
 	part = models.IntegerField()
+	ISBN_part = models.CharField(max_length=23, primary_key=True)
 	begin_page = models.IntegerField()
 	end_page = models.IntegerField()
 	edited_page = models.IntegerField(default=0)
@@ -100,8 +101,8 @@ class EBook(models.Model):
 
 def pre_save_Book(**kwargs):
 	book = kwargs.get('instance')
-	if book.page_count == None or book.part_count == None or book.path == None:
-		book.path = settings.PREFIX_PATH + u'static/ebookSystem/document/{0}'.format(book.bookname)
+	if book.page_count == None or book.part_count == None:
+		book.path = settings.PREFIX_PATH + u'static/ebookSystem/document/{0}'.format(book.ISBN)
 		[result, book.page_count, book.part_count] = vaildate_folder(book.path+u'/OCR', book.path+u'/source', book.page_per_part)
 
 def post_save_Book(**kwargs):
@@ -121,6 +122,7 @@ def createEBookBatch(book):
 		end_page = (i+1)*book.page_per_part-1
 		if end_page >= book.page_count:
 			end_page = book.page_count-1
-		part = EBook(book=book, part=i+1, begin_page=begin_page, end_page=end_page)
+		ISBN_part = book.ISBN + '-{0}'.format(i+1)
+		part = EBook(book=book, part=i+1, ISBN_part=ISBN_part, begin_page=begin_page, end_page=end_page)
 		part.save()
 	return 1
