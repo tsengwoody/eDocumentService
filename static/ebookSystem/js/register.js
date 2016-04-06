@@ -1,7 +1,3 @@
-function alertError(message)
-{
-    alert(message);
-}
 function checkRegister()
 {
     if($("#id_confirm_password").val()!=$("#id_password").val())

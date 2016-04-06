@@ -118,7 +118,7 @@ $(document).ready(function() {
             $('#textPage').addClass("towColumn");
 
         }
-        if ($('#buttonGroup').hasClass("col-md-12")) {
+        if ($('#buttonGroup').hasClass("col-md-12")) { //改上下
             $('#buttonGroup').removeClass("col-md-12");
             $('#buttonGroup').addClass("col-md-2");
             $('#dataContent').removeClass("col-md-12");
