@@ -38,6 +38,8 @@ function changePageSelect() {
 function dangerAlert(message) {
     $("#alertMessage").html(message);
     $("#alertDialog").modal();
+    $('#alertDialog .close').focus();
+    $('#alertDialog .close').attr('autofocus',true);
     //$("#danger-alert").show();
     //$("#danger-alert").addClass('in');
     //alert(message);
