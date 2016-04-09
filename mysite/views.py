@@ -5,6 +5,8 @@ from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
 from .forms import *
 from ebookSystem.models import *
+import json
+
 
 def register(request, template_name='registration/register.html'):
 	if request.method == 'POST':
@@ -27,6 +29,7 @@ def register(request, template_name='registration/register.html'):
 		return render(request, template_name, locals())
 
 def login_user(request, template_name='registration/login.html'):
+	error_message='';
 	if request.method == 'GET':
 		loginForm = LoginForm()
 	if request.method == 'POST':
@@ -39,11 +42,22 @@ def login_user(request, template_name='registration/login.html'):
 				if user.is_active:
 					login(request, user)
 					redirect_to = redirect_user(user)
-					return HttpResponseRedirect(redirect_to)
+					if request.is_ajax():
+						resp={};
+						resp['status']='success';
+						resp['message']=redirect_to;
+						return HttpResponse(json.dumps(resp), content_type="application/json");
+					else:
+						return HttpResponseRedirect(redirect_to); 
 				else:
 					error_message = u'您的帳號非啟用'
 			else:
 				error_message = u'您的帳號或密碼錯誤'
+	if request.is_ajax():
+		resp={};
+		resp['status']='error';
+		resp['message']=error_message;
+		return HttpResponse(json.dumps(resp), content_type="application/json");
 	return render(request, template_name, locals())
 
 def logout_user(request, template_name='registration/logged_out.html'):

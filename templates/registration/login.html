@@ -2,6 +2,8 @@
 {% block resource %}
     {% load staticfiles %}
     <link href="{% static "ebookSystem/css/signin.css" %}" rel="stylesheet" >
+    <script language="javascript" src="{% static 'ebookSystem/js/ajax.js' %}"></script>
+    <script language="javascript" src="{% static 'ebookSystem/js/login.js' %}"></script>
 {% endblock%}
 
 {% block title %}
@@ -9,6 +11,17 @@
 {% endblock %}
 
 {% block content %}
+<div class="modal fade" id="alertDialog" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content alert-danger">
+            <div class="modal-header alert-danger" role="alert">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <strong>Error!!</strong>
+                <div id="alertMessage"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% if next %}
     {% if user.is_authenticated %}
