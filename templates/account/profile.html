@@ -11,9 +11,9 @@
 {% endblock %}
 {% block content %}
 	{% if request.user.is_authenticated %}
-	{% if error_message %}
+	{% if message %}
 		<div id="infoForm" class="alert alert-warning" role="alert">
-			{{error_message}}
+			{{message}}
 		</div>
 	{% endif %}
 

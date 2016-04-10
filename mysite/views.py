@@ -10,6 +10,7 @@ import json
 def register(request, template_name='registration/register.html'):
 	if request.method == 'POST':
 		response = {}
+		redirect_to = None
 		registerUserForm = RegisterUserForm(request.POST)
 		if registerUserForm.is_valid():
 			newUser = registerUserForm.save(commit=False)
@@ -29,8 +30,10 @@ def register(request, template_name='registration/register.html'):
 		else :
 			response['status'] = 'error'
 			response['message'] = u'表單驗證失敗，請確認必填欄位已填寫'
+		status = response['status']
+		message = response['message']
 		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json");
+			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
 			if redirect_to:
 				return HttpResponseRedirect(redirect_to)
@@ -46,6 +49,7 @@ def login_user(request, template_name='registration/login.html'):
 		return render(request, template_name, locals())
 	if request.method == 'POST':
 		response = {}
+		redirect_to = None
 		loginForm = LoginForm(request.POST)
 		if loginForm.is_valid():
 			username = loginForm.cleaned_data['username']
@@ -67,8 +71,10 @@ def login_user(request, template_name='registration/login.html'):
 		else :
 			response['status'] = 'error'
 			response['message'] = u'表單驗證失敗，請確認帳號或密碼已填寫'
+		status = response['status']
+		message = response['message']
 		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json");
+			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
 			if redirect_to:
 				return HttpResponseRedirect(redirect_to)

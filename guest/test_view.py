@@ -16,8 +16,8 @@ class create_documentTestCase(TransactionTestCase):
 	@classmethod
 	def setUpClass(cls):
 		super(create_documentTestCase, cls).setUpClass()
-		user = User(username='testcase', is_active=True, phone='1234567890', birthday='2016-01-01')
-		user.set_password('root')
+		user = User(username='test-guest', is_active=True, phone='1234567890', birthday='2016-01-01')
+		user.set_password('test-guest')
 		user.save()
 		guest = Guest(user=user)
 		guest.save()
@@ -37,14 +37,17 @@ class create_documentTestCase(TransactionTestCase):
 		shutil.rmtree(book.path)
 
 	def test_create_document_repeat(self):
+#		c = self.client.login(username='test-guest', password='test-guest')
+#		self.assertTrue(c)
 		with open('temp/uploadTestFile.zip') as fileObject:
 			request = self.factory.post(reverse('guest:create_document'), {'bookname':u'遠山的回音test','author':u'Khaled Hosseini','translator':u'李靜宜','house':u'木馬文化','ISBN':u'9789865829810','date':u'2014-01-22', 'fileObject': fileObject})
 		request.user = self.user
 		response = create_document(request)
-		with open('temp/uploadTestFile.zip') as fileObject:
-			request = self.factory.post(reverse('guest:create_document'), {'bookname':u'遠山的回音test','author':u'Khaled Hosseini','translator':u'李靜宜','house':u'木馬文化','ISBN':u'9789865829810','date':u'2014-01-22', 'fileObject': fileObject})
-		request.user = self.user
-		response = create_document(request)
+#			response = self.client.post(reverse('guest:create_document'), {'bookname':u'遠山的回音test','author':u'Khaled Hosseini','translator':u'李靜宜','house':u'木馬文化','ISBN':u'9789865829810','date':u'2014-01-22', 'fileObject': fileObject})
+#		with open('temp/uploadTestFile.zip') as fileObject:
+#			request = self.factory.post(reverse('guest:create_document'), {'bookname':u'遠山的回音test','author':u'Khaled Hosseini','translator':u'李靜宜','house':u'木馬文化','ISBN':u'9789865829810','date':u'2014-01-22', 'fileObject': fileObject})
+#		request.user = self.user
+#		response = create_document(request)
 		self.assertEqual(response.status_code,200)
 		self.assertEqual(len(Book.objects.all()),1)
 		self.assertEqual(len(EBook.objects.all()),4)
@@ -87,7 +90,8 @@ class profileTestCase(TransactionTestCase):
 		cls.factory = RequestFactory()
 
 	def test_profile_normal(self):
-		self.client.login(username='test-guest', password='test-guest')
+		c = self.client.login(username='test-guest', password='test-guest')
+		self.assertTrue(c)
 #		request = self.factory.post(reverse('genericUser:contact_us'), {'name':u'曾奕勳', 'email':'tsengwoody@yahoo.com.tw', 'kind':u'校對問題', 'subject':u'請問流程圖輸入', 'content':u'你好：\n\n想請問\n\n以上'})
 #		request.user = self.user
 #		response = contact_us(request, )

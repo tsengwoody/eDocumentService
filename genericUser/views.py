@@ -33,6 +33,8 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 	if request.method == 'GET':
 		contactUsForm = ContactUsForm()
 	if request.method == 'POST':
+		response = {}
+		redirect_to = None
 		contactUsForm = ContactUsForm(request.POST)
 		if contactUsForm.is_valid():
 			contactUs = contactUsForm.save(commit=False)
@@ -43,5 +45,17 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 			email.send(fail_silently=False)
 			contactUs.save()
 			redirect_to = reverse('account:profile')
-			return HttpResponseRedirect(redirect_to)
-	return render(request, template_name, locals())
+			response['status'] = 'success'
+			response['message'] = u'成功寄送內容，我們將盡速回復'
+		else:
+			response['status'] = 'error'
+			response['message'] = u'表單驗證失敗，請確認必填欄位已填寫'
+		status = response['status']
+		message = response['message']
+		if request.is_ajax():
+			return HttpResponse(json.dumps(response), content_type="application/json")
+		else:
+			if redirect_to:
+				return HttpResponseRedirect(redirect_to)
+			else:
+				return render(request, template_name, locals())
