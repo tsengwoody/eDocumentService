@@ -15,6 +15,7 @@ from utils.decorator import *
 from utils.vaildate import *
 from utils.zip import *
 import mysite
+import json
 
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'tsengwoody.tw@gmail.com'
@@ -22,6 +23,7 @@ SERVICE = 'tsengwoody.tw@gmail.com'
 @user_category_check('guest')
 def create_document(request, template_name='guest/create_document.html'):
 	if request.method == 'POST':
+		response = {}
 		bookForm = BookForm(request.POST, request.FILES)
 		if bookForm.is_valid():
 			uploadPath = u'static/ebookSystem/document/{0}'.format(bookForm.cleaned_data['ISBN'])
@@ -32,8 +34,26 @@ def create_document(request, template_name='guest/create_document.html'):
 				unzip_file(uploadFilePath, uploadPath)
 				if vaildate_folder(uploadPath+u'/OCR', uploadPath+u'/source', 50)[0]:
 					bookForm.save()
+					redirect_to = reverse('guest:profile')
+					response['status'] = 'success'
+					response['message'] = u'成功建立並上傳文件'
+					response['redirect_to'] = redirect_to
+				else:
+					response['status'] = 'error'
+					response['message'] = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			else:
-				errors_message = u'文件已存在'
+				response['status'] = 'error'
+				response['message'] = u'文件已存在'
+		else:
+			response['status'] = 'error'
+			response['message'] = u'表單驗證失敗，請確認必填欄位已填寫'
+		if request.is_ajax():
+			return HttpResponse(json.dumps(response), content_type="application/json");
+		else:
+			if redirect_to:
+				return HttpResponseRedirect(redirect_to)
+			else:
+				return render(request, template_name, locals())
 	if request.method == 'GET':
 		bookForm = BookForm()
 	return render(request, template_name, locals())
@@ -48,10 +68,9 @@ def upload_progress(request):
 	elif 'X-Progress-ID' in request.META:
 		progress_id = request.META['X-Progress-ID']
 	if progress_id:
-		from django.utils import simplejson
 		cache_key = "%s_%s" % (request.META['REMOTE_ADDR'], progress_id)
 		data = cache.get(cache_key)
-		return HttpResponse(simplejson.dumps(data))
+		return HttpResponse(json.dumps(data), content_type="application/json");
 	else:
 		return HttpResponseServerError('Server Error: You must provide X-Progress-ID header or query param.')
 
