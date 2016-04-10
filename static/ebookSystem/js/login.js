@@ -1,9 +1,14 @@
-function dangerAlert(message) {
-    $("#alertMessage").html(message);
-    $("#alertDialog").modal();
-    $('#alertDialog .close').focus();
-    $('#alertDialog .close').attr('autofocus',true);
+function alertDialog(status,message) {
+    var str=(status=='error')?'danger':'success'
+    var dialog='#'+str+'Dialog';
+    console.log(dialog);
+    $(dialog+" .alertMessage").html(message);
+    $(dialog).modal();
+    $(dialog+' .close').focus();
+    $(dialog+' .close').attr('autofocus',true);
+
 }
+
 function catchErrorHandling()
 {
     $.ajax({
@@ -14,13 +19,14 @@ function catchErrorHandling()
         success: function(json){
             $("input[name='username']").val('');
             $("input[name='password']").val('');
-           // $("#result").append("<a href=/article/"+json.id+">"+json.title+"</a>");
-            if(json.status=='success')
+
+            alertDialog(json.status,json.message);
+           if(json.hasOwnProperty('redirect_to'))
             {
-                window.location.href = json.message;
-                return;
-            }else if(json.status=='error')
-                dangerAlert(json.message);
+                $('.close').click(function() {
+                    window.location.href = json.redirect_to;
+                }); 
+            }
         },
         error:function(xhr,errmsg,err){
             console.log(xhr.status + ": " + xhr.responseText);
@@ -30,6 +36,10 @@ function catchErrorHandling()
 }
 $( document ).ready(function() {
     console.log( "login ready!" );
+ //   $('.close').click(function() {
+  //      $(this).parent().hide();
+  //      $(this).parent().removeClass('in'); // hides alert with Bootstrap CSS3 implem
+  //  });
     $('form').on('submit',function(event){
         event.preventDefault();
         console.log("form submitted!");  // sanity check
