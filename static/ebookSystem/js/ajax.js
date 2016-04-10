@@ -1,3 +1,35 @@
+function catchErrorHandling()
+{
+    $.ajax({
+        url:".",
+        type: "POST",
+        data: getJson(),
+        success: function(json){
+            alertDialog(json);
+
+        },
+        error:function(xhr,errmsg,err){
+            console.log(xhr.status + ": " + xhr.responseText);
+        }
+    });
+
+}
+function alertDialog(json) {
+    var str=(json.status=='error')?'danger':'success'
+    var dialog='#'+str+'Dialog';
+    console.log(dialog);
+    $(dialog+" .alertMessage").html(json.message);
+    $(dialog).on('shown.bs.modal', function () {
+        $(dialog+" .close").focus();
+    });
+    $(dialog).modal();
+    $(dialog).on('hide.bs.modal', function () {
+        if(json.hasOwnProperty('redirect_to'))
+        {
+            window.location.href = json.redirect_to; 
+        }
+    });
+}
 // This function gets cookie with a given name
 function getCookie(name) {
     var cookieValue = null;
@@ -47,6 +79,11 @@ $( document ).ready(function() {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }
         }
+    });
+    $('form').on('submit',function(event){
+        event.preventDefault();
+        console.log("form submitted!");  // sanity check
+        catchErrorHandling();
     });
 
 });
