@@ -14,6 +14,7 @@ from ebookSystem.models import *
 from .forms import *
 from utils.decorator import *
 import datetime
+import json
 
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'tsengwoody.tw@gmail.com'
@@ -33,6 +34,8 @@ class profileView(generic.View):
 	@method_decorator(user_category_check('editor'))
 	def post(self, request, *args, **kwargs):
 		template_name=self.template_name
+		response = {}
+		redirect_to = None
 		user=request.user
 		if request.POST.has_key('getPart'):
 			activeBook = Book.objects.filter(is_active = True).order_by('upload_date')
@@ -48,18 +51,24 @@ class profileView(generic.View):
 						partialBook = book
 						break
 			if not partialBook:
-				error_message = u'無文件'
-				print 'not book'
+				response['status'] = 'error'
+				response['message'] = u'無文件'
 				editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
 				finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
 				exchangedPartList=EBook.objects.filter(editor=user.editor,is_finish=True, is_exchange=True)
-				return render(request, template_name, locals())
+				status = response['status']
+				message = response['message']
+				if request.is_ajax():
+					return HttpResponse(json.dumps(response), content_type="application/json")
+				else:
+					return render(request, template_name, locals())
 			getPart = partialBook.ebook_set.filter(is_finish=False, editor=None)[0]
-			print 'get part'+getPart.__unicode__()
 			getPart.editor = request.user.editor
 			getPart.get_date = timezone.now()
 			getPart.deadline = getPart.get_date + datetime.timedelta(days=3)
 			getPart.save()
+			response['status'] = 'success'
+			response['message'] = u'成功取得文件{}'.format(getPart.__unicode__())
 		elif request.POST.has_key('getCompleteBook'):
 			activeBook = Book.objects.filter(is_active = True).order_by('upload_date')
 			completeBook = None
@@ -68,35 +77,44 @@ class profileView(generic.View):
 					completeBook = book
 					break
 			if not completeBook:
-				error_message = u'目前無完整書文件，請先領部份文件'
-				print 'not Complete book'
+				response['status'] = 'error'
+				response['message'] = u'目前無完整文件，請先領部份文件'
 				editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
 				finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
 				exchangedPartList=EBook.objects.filter(editor=user.editor,is_finish=True, is_exchange=True)
-				return render(request, template_name, locals())
+				status = response['status']
+				message = response['message']
+				if request.is_ajax():
+					return HttpResponse(json.dumps(response), content_type="application/json")
+				else:
+					return render(request, template_name, locals())
 			for getPart in completeBook.ebook_set.all():
-				print 'get part'+getPart.__unicode__()
 				getPart.editor = request.user.editor
 				getPart.get_date = timezone.now()
 				getPart.deadline = getPart.get_date + datetime.timedelta(days=3)
 				getPart.save()
+			response['status'] = 'success'
+			response['message'] = u'成功取得完整文件{}'.format(getPart.book.__unicode__())
 		elif request.POST.has_key('rebackPart'):
 			book_ISBN = request.POST.get('rebackPart').split('-')[0]
 #			book_ISBN = request.POST.keys()[request.POST.values().index(u'還文件')].split('-')[0]
 			part_part = request.POST.get('rebackPart').split('-')[1]
 #			part_part = request.POST.keys()[request.POST.values().index(u'還文件')].split('-')[1]
 			rebackPart=EBook.objects.get(part=part_part, book__ISBN = book_ISBN)
-			print 'reback'+rebackPart.__unicode__()
 			rebackPart.editor=None
 			rebackPart.get_date = None
 			rebackPart.deadline = None
 			rebackPart.save()
+			response['status'] = 'success'
+			response['message'] = u'成功歸還文件{}'.format(rebackPart.__unicode__())
 		elif request.POST.has_key('delay'):
 			book_ISBN = request.POST.get('delay').split('-')[0]
 			part_part = request.POST.get('delay').split('-')[1]
 			delayPart = EBook.objects.get(part=part_part, book__ISBN = book_ISBN)
 			delayPart.deadline = delayPart.deadline + datetime.timedelta(days=2)
 			delayPart.save()
+			response['status'] = 'success'
+			response['message'] = u'成功延期文件{}'.format(delayPart.__unicode__())
 		elif request.POST.has_key('reEditPart'):
 			book_ISBN = request.POST.get('reEditPart').split('-')[0]
 			part_part = request.POST.get('reEditPart').split('-')[1]
@@ -109,7 +127,14 @@ class profileView(generic.View):
 			exchangePart = EBook.objects.get(part=part_part, book__ISBN = book_ISBN)
 			exchangePart.is_exchange = True
 			exchangePart.save()
+			response['status'] = 'success'
+			response['message'] = u'已對換時數{}'.format(exchangePart.service_hours)
 		editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
 		finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
 		exchangedPartList=EBook.objects.filter(editor=user.editor,is_finish=True, is_exchange=True)
-		return render(request, template_name, locals())
+		status = response['status']
+		message = response['message']
+		if request.is_ajax():
+			return HttpResponse(json.dumps(response), content_type="application/json")
+		else:
+			return render(request, template_name, locals())

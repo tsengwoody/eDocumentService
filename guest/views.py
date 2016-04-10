@@ -24,6 +24,7 @@ SERVICE = 'tsengwoody.tw@gmail.com'
 def create_document(request, template_name='guest/create_document.html'):
 	if request.method == 'POST':
 		response = {}
+		redirect_to = None
 		bookForm = BookForm(request.POST, request.FILES)
 		if bookForm.is_valid():
 			uploadPath = u'static/ebookSystem/document/{0}'.format(bookForm.cleaned_data['ISBN'])
@@ -34,7 +35,7 @@ def create_document(request, template_name='guest/create_document.html'):
 				unzip_file(uploadFilePath, uploadPath)
 				if vaildate_folder(uploadPath+u'/OCR', uploadPath+u'/source', 50)[0]:
 					bookForm.save()
-					redirect_to = reverse('guest:profile')
+#					redirect_to = reverse('guest:profile')
 					response['status'] = 'success'
 					response['message'] = u'成功建立並上傳文件'
 					response['redirect_to'] = redirect_to
@@ -47,8 +48,10 @@ def create_document(request, template_name='guest/create_document.html'):
 		else:
 			response['status'] = 'error'
 			response['message'] = u'表單驗證失敗，請確認必填欄位已填寫'
+		status = response['status']
+		message = response['message']
 		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json");
+			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
 			if redirect_to:
 				return HttpResponseRedirect(redirect_to)
@@ -70,7 +73,7 @@ def upload_progress(request):
 	if progress_id:
 		cache_key = "%s_%s" % (request.META['REMOTE_ADDR'], progress_id)
 		data = cache.get(cache_key)
-		return HttpResponse(json.dumps(data), content_type="application/json");
+		return HttpResponse(json.dumps(data), content_type="application/json")
 	else:
 		return HttpResponseServerError('Server Error: You must provide X-Progress-ID header or query param.')
 
@@ -107,6 +110,7 @@ class profileView(generic.View):
 	def post(self, request, *args, **kwargs):
 		template_name=self.template_name
 		response = {}
+		redirect_to = None
 		user=request.user
 		book_list = Book.objects.filter(guest=user.guest)
 		if request.POST.has_key('emailBook'):
@@ -121,8 +125,10 @@ class profileView(generic.View):
 			email.send(fail_silently=False)
 			response['status'] = 'success'
 			response['message'] = u'已寄送到您的電子信箱'
+		status = response['status']
+		message = response['message']
 		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json");
+			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
 			if redirect_to:
 				return HttpResponseRedirect(redirect_to)
