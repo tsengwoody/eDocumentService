@@ -57,11 +57,10 @@ def upload_progress(request):
 
 def upload(request, template_name='guest/upload.html'):
 	if request.method == 'POST':
-		uploadFileForm = UploadFileForm(request.POST, request.FILES)
-		if uploadFileForm.is_valid():
-			uploadFileForm.save()
-	if request.method == 'GET':
-		uploadFileForm = UploadFileForm()
+#		if request.is_ajax():
+		data = 'ajax_test'
+		return HttpResponse(simplejson.dumps(data), content_type="application/ajax")
+#	if request.method == 'GET':
 	return render(request, template_name, locals())
 
 def handle_uploaded_file(dirname, file):

@@ -7,9 +7,9 @@ from .forms import *
 from ebookSystem.models import *
 import json
 
-
 def register(request, template_name='registration/register.html'):
 	if request.method == 'POST':
+		response = {}
 		registerUserForm = RegisterUserForm(request.POST)
 		if registerUserForm.is_valid():
 			newUser = registerUserForm.save(commit=False)
@@ -23,16 +23,29 @@ def register(request, template_name='registration/register.html'):
 				newGuest = Guest(user=newUser)
 				newGuest.save()
 			redirect_to = reverse('login')
-			return HttpResponseRedirect(redirect_to)
+			response['status'] = 'success'
+			response['message'] = u'註冊成功，請等待帳號審核'
+			response['redirect_to'] = redirect_to
+		else :
+			response['status'] = 'error'
+			response['message'] = u'表單驗證失敗，請確認必填欄位已填寫'
+		if request.is_ajax():
+			return HttpResponse(json.dumps(response), content_type="application/json");
+		else:
+			if redirect_to:
+				return HttpResponseRedirect(redirect_to)
+			else:
+				return render(request, template_name, locals())
 	if request.method == 'GET':
 		registerUserForm = RegisterUserForm()
 		return render(request, template_name, locals())
 
 def login_user(request, template_name='registration/login.html'):
-	error_message='';
 	if request.method == 'GET':
 		loginForm = LoginForm()
+		return render(request, template_name, locals())
 	if request.method == 'POST':
+		response = {}
 		loginForm = LoginForm(request.POST)
 		if loginForm.is_valid():
 			username = loginForm.cleaned_data['username']
@@ -42,23 +55,25 @@ def login_user(request, template_name='registration/login.html'):
 				if user.is_active:
 					login(request, user)
 					redirect_to = redirect_user(user)
-					if request.is_ajax():
-						resp={};
-						resp['status']='success';
-						resp['message']=redirect_to;
-						return HttpResponse(json.dumps(resp), content_type="application/json");
-					else:
-						return HttpResponseRedirect(redirect_to); 
+					response['status'] = 'success'
+					response['message'] = u'登錄成功'
+					response['redirect_to'] = redirect_to
 				else:
-					error_message = u'您的帳號非啟用'
+					response['status'] = 'error'
+					response['message'] = u'您的帳號尚未啟用，管理員審核中，若超過3日未啟用或未收到管理員身份認證，請利用聯絡我們進行反應'
 			else:
-				error_message = u'您的帳號或密碼錯誤'
-	if request.is_ajax():
-		resp={};
-		resp['status']='error';
-		resp['message']=error_message;
-		return HttpResponse(json.dumps(resp), content_type="application/json");
-	return render(request, template_name, locals())
+				response['status'] = 'error'
+				response['message'] = u'您的帳號或密碼錯誤'
+		else :
+			response['status'] = 'error'
+			response['message'] = u'表單驗證失敗，請確認帳號或密碼已填寫'
+		if request.is_ajax():
+			return HttpResponse(json.dumps(response), content_type="application/json");
+		else:
+			if redirect_to:
+				return HttpResponseRedirect(redirect_to)
+			else:
+				return render(request, template_name, locals())
 
 def logout_user(request, template_name='registration/logged_out.html'):
 	logout(request)
