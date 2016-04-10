@@ -41,9 +41,10 @@ function alertDialog(status,message) {
     var dialog='#'+str+'Dialog';
     console.log(dialog);
     $(dialog+" .alertMessage").html(message);
+    $(dialog).on('shown.bs.modal', function () {
+        $(dialog+" .close").focus();
+    });
     $(dialog).modal();
-    $(dialog+' .close').focus();
-    $(dialog+' .close').attr('autofocus',true);
 
 }
 

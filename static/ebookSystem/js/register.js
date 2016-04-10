@@ -23,6 +23,10 @@ function optradioChange()
 }
 $(document).ready(function() {
     console.log("ready!");
+    $(document).ready(function() {
+    if($('.datepicker').length)
+        $('.datepicker').datepicker({dateFormat:"yy-mm-dd"});
+    });
     $('#id_register').click(checkRegister);
     $('input[type=radio][name=role]').change(optradioChange);
 });

@@ -6,7 +6,13 @@
 {% load staticfiles %}
 <link href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-<script language="javascript" src="{% static 'ebookSystem/js/form.js' %}"></script>
+<script language="javascript">
+    $(document).ready(function() {
+    if($('.datepicker').length)
+        $('.datepicker').datepicker({dateFormat:"yy-mm-dd"});
+    });
+</script>
+<script language="javascript" src="{% static 'ebookSystem/js/ajax.js' %}"></script>
 {% endblock %}
 
 {% block header %}
@@ -61,9 +67,9 @@
         </div>
     </div> 
     <div class="form-group">
-        <label class="control-label col-sm-2" for="id_fileObject">Fileobject:</label>
+        <label class="control-label col-sm-2" for="id_fileObject"><font style="color:red">*</font>Fileobject:</label>
         <div class="col-sm-3">
-            <input id="id_fileObject" name="fileObject" type="file" />          
+            <input id="id_fileObject" name="fileObject" type="file" required />          
 		  <!--<input class="form-control-file" id="id_fileObject" name="fileObject" type="file" required />-->
         </div>
     </div> 
