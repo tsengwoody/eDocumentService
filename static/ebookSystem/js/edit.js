@@ -14,7 +14,8 @@
         page.value = scanPageList.selectedIndex;
         imgScanPage.src = dirname + scanPageList.options[scanPageList.selectedIndex].value;
     } else {
-        dangerAlert('超過頁數範圍惹~');
+        //dangerAlert('超過頁數範圍惹~');
+        alertDialog('error','超過頁數範圍惹~');
     }
 }
 
@@ -35,26 +36,29 @@ function changePageSelect() {
     imgScanPage.src = dirname + scanPageList.options[scanPageList.selectedIndex].value;
 }
 
-function dangerAlert(message) {
-    $("#alertMessage").html(message);
-    $("#alertDialog").modal();
-    $('#alertDialog .close').focus();
-    $('#alertDialog .close').attr('autofocus',true);
-    //$("#danger-alert").show();
-    //$("#danger-alert").addClass('in');
-    //alert(message);
+function alertDialog(status,message) {
+    var str=(status=='error')?'danger':'success'
+    var dialog='#'+str+'Dialog';
+    console.log(dialog);
+    $(dialog+" .alertMessage").html(message);
+    $(dialog).modal();
+    $(dialog+' .close').focus();
+    $(dialog+' .close').attr('autofocus',true);
+
 }
 
 function saveSubmit(event) {
     //console.log($("#danger-alert"));
     if (typeof $('#id_content').val() == 'undefined') {
         event.preventDefault();
-        dangerAlert("textarea not found")
+        //dangerAlert("textarea not found")
+        alertDialog('error',"textarea not found");
     }
     var str = $('#id_content').val();
     if (str.indexOf("|----------|") < 0) {
         event.preventDefault();
-        dangerAlert("未save成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下finish按紐");
+        //dangerAlert("未save成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下finish按紐");
+        alertDialog('error',"未save成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下finish按紐");
     }
 }
 
@@ -66,7 +70,8 @@ function finishSubmit(event) {
     var str = $('#id_content').val();
     if (str.indexOf("|----------|") > 0) {
         event.preventDefault();
-        dangerAlert("未finish成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下save按紐");
+        //dangerAlert("未finish成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下save按紐");
+        alertDialog('error',"未finish成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下save按紐");
     }
 }
 function adjZoom(value) {
