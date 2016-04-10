@@ -2,13 +2,6 @@
 {% block resource %}
     {% load staticfiles %}
     <link href="{% static "ebookSystem/css/signin.css" %}" rel="stylesheet" >
-    <script language="javascript">
-    function getJson()
-    {
-        //JSON.stringify
-        return {username:$("input[name='username']").val(),password:$("input[name='password']").val()};
-    }
-    </script>
     <script language="javascript" src="{% static 'ebookSystem/js/ajax.js' %}"></script>
     <!--<script language="javascript" src="{% static 'ebookSystem/js/login.js' %}"></script>-->
 {% endblock%}
