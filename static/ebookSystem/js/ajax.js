@@ -3,10 +3,9 @@ function catchErrorHandling()
     $.ajax({
         url:".",
         type: "POST",
-        data: getJson(),
+        data: $("form").serialize(),
         success: function(json){
             alertDialog(json);
-
         },
         error:function(xhr,errmsg,err){
             console.log(xhr.status + ": " + xhr.responseText);
@@ -17,7 +16,6 @@ function catchErrorHandling()
 function alertDialog(json) {
     var str=(json.status=='error')?'danger':'success'
     var dialog='#'+str+'Dialog';
-    console.log(dialog);
     $(dialog+" .alertMessage").html(json.message);
     $(dialog).on('shown.bs.modal', function () {
         $(dialog+" .close").focus();
@@ -25,9 +23,9 @@ function alertDialog(json) {
     $(dialog).modal();
     $(dialog).on('hide.bs.modal', function () {
         if(json.hasOwnProperty('redirect_to'))
-        {
             window.location.href = json.redirect_to; 
-        }
+        else
+            location.reload();
     });
 }
 // This function gets cookie with a given name
