@@ -106,6 +106,7 @@ class profileView(generic.View):
 	@method_decorator(user_category_check('guest'))
 	def post(self, request, *args, **kwargs):
 		template_name=self.template_name
+		response = {}
 		user=request.user
 		book_list = Book.objects.filter(guest=user.guest)
 		if request.POST.has_key('emailBook'):
@@ -118,4 +119,12 @@ class profileView(generic.View):
 				attach_file_path = emailBook.path +u'/OCR/part{0}.txt'.format(part.part)
 				email.attach_file(attach_file_path)
 			email.send(fail_silently=False)
-		return render(request, template_name, locals())
+			response['status'] = 'success'
+			response['message'] = u'已寄送到您的電子信箱'
+		if request.is_ajax():
+			return HttpResponse(json.dumps(response), content_type="application/json");
+		else:
+			if redirect_to:
+				return HttpResponseRedirect(redirect_to)
+			else:
+				return render(request, template_name, locals())
