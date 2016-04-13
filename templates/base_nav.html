@@ -31,13 +31,18 @@
                 {% endif %}
                 <li class='inline'><a href="{% url 'genericUser:info' %}">會員</a></li>
                 <li class='inline'><a href="{% url 'genericUser:contact_us' %}">聯絡我們</a></li>
-                {% if request.user.is_authenticated %}
-                    <li class='inline'><a href="{% url 'logout' %}">登出</a></li>
 
+                {% if request.user.is_authenticated %}
+                <li class='inline'><a href="{% url 'logout' %}">登出</a></li>
                 {% else %}
-                    <li class='inline'><a href="{% url 'login' %}">登入</a></li>
-                    <li class='inline'><a href="{% url 'register' %}">註冊</a></li>
+                <li class='inline'><a href="{% url 'login' %}">登入</a></li>
+                <li class='inline'><a href="{% url 'register' %}">註冊</a></li>
                 {% endif %}
+
+                {% if readmeUrl %}
+                <li class='inline'><a href={{ readmeUrl }}>說明</a></li>
+                {% endif %}
+
             </ul>
         </div>
     </div>

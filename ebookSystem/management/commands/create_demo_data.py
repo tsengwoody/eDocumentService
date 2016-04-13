@@ -35,7 +35,7 @@ class Command(BaseCommand):
 		guestGuest = Guest.objects.create(user=guest)
 		factory = RequestFactory()
 		with open(u'temp/藍色駭客.zip') as fileObject:
-			request = factory.post(reverse('guest:create_document'), {'bookname':u'藍色駭客', 'author':u'傑佛瑞．迪佛', 'translator':u'宋瑛堂', 'house':u'皇冠', 'ISBN':u'9573321564', 'date':u'2013-07-11', 'fileObject':fileObject})
+			request = factory.post(reverse('guest:create_document'), {'bookname':u'藍色駭客', 'author':u'傑佛瑞．迪佛', 'translator':u'宋瑛堂', 'house':u'皇冠', 'ISBN':u'9573321564', 'date':u'2013-07-11', 'fileObject':fileObject, 'guest':'root'})
 		request.user = guest
 		response = create_document(request)
 		assert response.status_code == 200, 'response.status_code!=200'

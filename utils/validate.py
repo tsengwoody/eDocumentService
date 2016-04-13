@@ -1,11 +1,17 @@
 ﻿# coding: utf-8
 import os
-def vaildate_folder(OCR, source, page_per_part):
+import codecs
+
+def validate_folder(OCR, source, page_per_part):
 	partList = []
 	OCRFileList = []
 	sourceFileList = []
 	try:
 		OCRFileList = os.listdir(OCR)
+		for file in OCRFileList:
+			print file
+			with codecs.open(os.path.join(OCR, file), 'r', encoding='utf-8') as fileRead:
+				content=fileRead.read()
 		sourceFileList=os.listdir(source)
 	except:
 		return [False, None, None]
@@ -13,7 +19,7 @@ def vaildate_folder(OCR, source, page_per_part):
 	for scanPage in sourceFileList:
 		if scanPage.split('.')[-1].lower() == 'jpg':
 			page_count = page_count + 1
-	part_count = page_count/page_per_part+1
+	part_count = (page_count-1)/page_per_part+1
 	for i in range(part_count):
 		partList.append('part{}.{}'.format(i+1, 'txt'))
 	partSet = set(partList)
@@ -23,7 +29,4 @@ def vaildate_folder(OCR, source, page_per_part):
 	return [partSet.issubset(OCRFileSet), page_count, part_count]
 
 if __name__ == '__main__':
-	print '遠山的回音'
-	print vaildate_folder(u'/django/eDocumentService/static/ebookSystem/document/遠山的回音/OCR', u'/django/eDocumentService/static/ebookSystem/document/遠山的回音/source', 50)
-	print '藍色駭客'
-	print vaildate_folder(u'/django/eDocumentService/static/ebookSystem/document/藍色駭客/OCR', u'/django/eDocumentService/static/ebookSystem/document/藍色駭客/source', 50)
+	print vaildate_folder('OCR', 'source', page_per_part=50)

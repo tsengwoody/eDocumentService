@@ -43,15 +43,39 @@
 	    </div>
 	</div>
 	</div>
+	{% block message %}
+
+	{% if status %}
+		<div id="infoForm" class="alert alert-warning" role="alert">
+			{{status}}
+		</div>
+	{% endif %}
+
+	{% if message %}
+		<div id="infoForm" class="alert alert-warning" role="alert">
+			{{message}}
+		</div>
+	{% endif %}
+
+	{% if direct_to %}
+		<div id="infoForm" class="alert alert-warning" role="alert">
+			{{redirect_to}}
+		</div>
+	{% endif %}
+	{% endblock %}
 		{% block content %}{% endblock %}
 	</div>
 	
 	{% block footer %}
 	<footer class="footer">
       <div class="container">
+	{% if readmeUrl %}
+	<p class='inline'><a href={{ readmeUrl }}>說明</a></p>
+	{% endif %}
         <p class="text-muted">© Company 2016</p>
       </div>
     </footer>
+
 	{% endblock %}
 	<script src="{% static "ebookSystem/js/bootstrap/bootstrap.min.js" %}" type="text/javascript"></script>
 	<script src="{% static "ebookSystem/js/bootstrap/ie10-viewport-bug-workaround.js" %}" type="text/javascript"></script>

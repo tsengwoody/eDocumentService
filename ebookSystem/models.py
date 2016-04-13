@@ -7,7 +7,7 @@ from mysite import settings
 from genericUser.models import User
 from guest.models import Guest
 from account.models import Editor
-from utils.vaildate import *
+from utils.validate import *
 import os
 import datetime
 
@@ -29,7 +29,7 @@ class Book(models.Model):
 	def __unicode__(self):
 		return self.bookname
 
-	def vaildate_folder(self):
+	def validate_folder(self):
 		source = self.path + u'/source'
 		OCR = self.path + u'/OCR'
 		try:
@@ -103,7 +103,7 @@ def pre_save_Book(**kwargs):
 	book = kwargs.get('instance')
 	if book.page_count == None or book.part_count == None:
 		book.path = settings.PREFIX_PATH + u'static/ebookSystem/document/{0}'.format(book.ISBN)
-		[result, book.page_count, book.part_count] = vaildate_folder(book.path+u'/OCR', book.path+u'/source', book.page_per_part)
+		[result, book.page_count, book.part_count] = validate_folder(book.path+u'/OCR', book.path+u'/source', book.page_per_part)
 
 def post_save_Book(**kwargs):
 	book = kwargs.get('instance')

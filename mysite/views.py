@@ -29,16 +29,16 @@ def register(request, template_name='registration/register.html'):
 			response['redirect_to'] = redirect_to
 		else :
 			response['status'] = 'error'
-			response['message'] = u'表單驗證失敗，請確認必填欄位已填寫'
+			response['message'] = u'表單驗證失敗'
 		status = response['status']
 		message = response['message']
 		if request.is_ajax():
 			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
-			if redirect_to:
-				return HttpResponseRedirect(redirect_to)
-			else:
-				return render(request, template_name, locals())
+#			if redirect_to:
+#				return HttpResponseRedirect(redirect_to)
+#			else:
+			return render(request, template_name, locals())
 	if request.method == 'GET':
 		registerUserForm = RegisterUserForm()
 		return render(request, template_name, locals())
@@ -70,16 +70,16 @@ def login_user(request, template_name='registration/login.html'):
 				response['message'] = u'您的帳號或密碼錯誤'
 		else :
 			response['status'] = 'error'
-			response['message'] = u'表單驗證失敗，請確認帳號或密碼已填寫'
+			response['message'] = u'表單驗證失敗'
 		status = response['status']
 		message = response['message']
 		if request.is_ajax():
 			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
-			if redirect_to:
-				return HttpResponseRedirect(redirect_to)
-			else:
-				return render(request, template_name, locals())
+#			if redirect_to:
+#				return HttpResponseRedirect(redirect_to)
+#			else:
+			return render(request, template_name, locals())
 
 def logout_user(request, template_name='registration/logged_out.html'):
 	logout(request)

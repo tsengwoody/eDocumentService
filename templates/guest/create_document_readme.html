@@ -1,0 +1,16 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+上傳文件readme
+{% endblock %}
+{% block content %}
+<h3>文件結構</h3>
+<ul>
+	<li>上傳之文件需為zip之文件格式</li>
+	<li>zip內需有以下兩個資料夾<//li>
+	<ul>
+		<li>OCR：存放辨識完成之txt格式文件，文件名以part+分段數命名。例如：part1.txt(表為第一個分段。)</li>
+		<li>source：存放原始掃描影像之jpg格式文件，文件名以頁數命名。</li>
+		<li>辨識文件txt文字文件編碼請使用utf-8。</li>
+	</ul>
+</ul>
+{% endblock %}

@@ -12,16 +12,18 @@ from account.models import *
 from .models import *
 from .forms import *
 from utils.decorator import *
-from utils.vaildate import *
+from utils.validate import *
 from utils.zip import *
 import mysite
 import json
+import shutil
 
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'tsengwoody.tw@gmail.com'
 
 @user_category_check('guest')
 def create_document(request, template_name='guest/create_document.html'):
+	readmeUrl = reverse('guest:create_document') +'readme/'
 	if request.method == 'POST':
 		response = {}
 		redirect_to = None
@@ -33,13 +35,24 @@ def create_document(request, template_name='guest/create_document.html'):
 				with ZipFile(uploadFilePath, 'r') as uploadFile:
 					ZipFile.testzip(uploadFile)
 				unzip_file(uploadFilePath, uploadPath)
-				if vaildate_folder(uploadPath+u'/OCR', uploadPath+u'/source', 50)[0]:
-					bookForm.save()
-#					redirect_to = reverse('guest:profile')
+				if validate_folder(uploadPath+u'/OCR', uploadPath+u'/source', 50)[0]:
+					newBook = bookForm.save(commit=False)
+					if request.POST.has_key('guest'):
+						try:
+							user = User.objects.get(username=request.POST['guest'])
+						except:
+							user = request.user
+					else:
+						user = request.user
+					newBook.is_active = True
+					newBook.guest = user.guest
+					newBook.save()
+					redirect_to = reverse('guest:profile')
 					response['status'] = 'success'
 					response['message'] = u'成功建立並上傳文件'
 					response['redirect_to'] = redirect_to
 				else:
+					shutil.rmtree(uploadPath)
 					response['status'] = 'error'
 					response['message'] = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			else:
@@ -47,16 +60,16 @@ def create_document(request, template_name='guest/create_document.html'):
 				response['message'] = u'文件已存在'
 		else:
 			response['status'] = 'error'
-			response['message'] = u'表單驗證失敗，請確認必填欄位已填寫'
+			response['message'] = u'表單驗證失敗'
 		status = response['status']
 		message = response['message']
 		if request.is_ajax():
 			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
-			if redirect_to:
-				return HttpResponseRedirect(redirect_to)
-			else:
-				return render(request, template_name, locals())
+#			if redirect_to:
+#				return HttpResponseRedirect(redirect_to)
+#			else:
+			return render(request, template_name, locals())
 	if request.method == 'GET':
 		bookForm = BookForm()
 	return render(request, template_name, locals())
@@ -77,18 +90,10 @@ def upload_progress(request):
 	else:
 		return HttpResponseServerError('Server Error: You must provide X-Progress-ID header or query param.')
 
-def upload(request, template_name='guest/upload.html'):
-	if request.method == 'POST':
-#		if request.is_ajax():
-		data = 'ajax_test'
-		return HttpResponse(simplejson.dumps(data), content_type="application/ajax")
-#	if request.method == 'GET':
-	return render(request, template_name, locals())
-
 def handle_uploaded_file(dirname, file):
 	if not os.path.exists(dirname):
 		os.makedirs(dirname, 0777)
-	fullpath = dirname +u'/' +file.name
+	fullpath = os.path.join(dirname, file.name)
 	if os.path.exists(fullpath):
 		return -1
 	with open(fullpath, 'wb+') as destination:
@@ -101,6 +106,7 @@ class profileView(generic.View):
 
 	@method_decorator(user_category_check('guest'))
 	def get(self, request, *args, **kwargs):
+		readmeUrl = reverse('guest:profile') +'readme/'
 		template_name=self.template_name
 		user=request.user
 		book_list = Book.objects.filter(guest=user.guest)
@@ -108,6 +114,7 @@ class profileView(generic.View):
 
 	@method_decorator(user_category_check('guest'))
 	def post(self, request, *args, **kwargs):
+		readmeUrl = reverse('guest:profile') +'readme/'
 		template_name=self.template_name
 		response = {}
 		redirect_to = None
@@ -130,7 +137,11 @@ class profileView(generic.View):
 		if request.is_ajax():
 			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
-			if redirect_to:
-				return HttpResponseRedirect(redirect_to)
-			else:
-				return render(request, template_name, locals())
+#			if redirect_to:
+#				return HttpResponseRedirect(redirect_to)
+#			else:
+			return render(request, template_name, locals())
+
+def readme(request, template_name):
+	template_name = 'guest/' +template_name +'_readme.html'
+	return render(request, template_name, locals())

@@ -24,15 +24,17 @@ class profileView(generic.View):
 
 	@method_decorator(user_category_check('editor'))
 	def get(self, request, *args, **kwargs):
+		readmeUrl = reverse('account:profile') +'readme/'
 		template_name=self.template_name
 		user=request.user
 		editingPartList=EBook.objects.filter(editor=user.editor, is_finish=False)
-		finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True, is_exchange=False)
-		exchangedPartList=EBook.objects.filter(editor=user.editor,is_finish=True, is_exchange=True)
+		finishPartList=EBook.objects.filter(editor=user.editor,is_finish=True)
+#		exchangedPartList=EBook.objects.filter(editor=user.editor,is_finish=True, is_exchange=True)
 		return render(request, template_name, locals())
 
 	@method_decorator(user_category_check('editor'))
 	def post(self, request, *args, **kwargs):
+		readmeUrl = reverse('account:profile') +'readme/'
 		template_name=self.template_name
 		response = {}
 		redirect_to = None
@@ -121,6 +123,8 @@ class profileView(generic.View):
 			reEditPart = EBook.objects.get(part=part_part, book__ISBN = book_ISBN)
 			reEditPart.is_finish = False
 			reEditPart.save()
+			response['status'] = 'success'
+			response['message'] = u'再編輯文件{}'.format(delayPart.__unicode__())
 		elif request.POST.has_key('exchange'):
 			book_ISBN = request.POST.get('exchange').split('-')[0]
 			part_part = request.POST.get('exchange').split('-')[1]
@@ -138,3 +142,7 @@ class profileView(generic.View):
 			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
 			return render(request, template_name, locals())
+
+def readme(request, template_name):
+	template_name = 'account/' +template_name +'_readme.html'
+	return render(request, template_name, locals())
