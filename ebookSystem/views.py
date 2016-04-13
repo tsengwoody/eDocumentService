@@ -10,6 +10,7 @@ from .models import *
 from .forms import *
 import os
 import mysite
+import json
 
 class book_list(generic.ListView):
 	model = Book
@@ -22,6 +23,27 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	except Book.DoesNotExist:
 		raise Http404("book does not exist")
 	return render(request, template_name, locals())
+
+def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
+	editor = request.user.editor
+	book = Book.objects.get(ISBN=book_ISBN)
+	part = EBook.objects.get(part=part_part,book=book)
+	if 'online' in request.POST:
+		part.service_hours = part.service_hours+1
+		part.save()
+#		editor.service_hours = editor.service_hours + 1
+#		editor.save()
+		response['status'] = 'success'
+		response['message'] = part.service_hours
+	elif 'user_status' in request.POST and request.POST['user_status'] == 'edit':
+		editor.is_editing = True
+		response['status'] = 'success'
+	elif 'user_status' in request.POST and request.POST['user_status'] == 'profile':
+		editor.is_editing = False
+		response['status'] = 'success'
+	else:
+		response['status'] = 'error'
+	return HttpResponse(json.dumps(response), content_type="application/json")
 
 class editView(generic.View):
 	def get(self, request, encoding='utf-8', *args, **kwargs):

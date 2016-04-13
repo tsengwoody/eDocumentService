@@ -1,7 +1,7 @@
 ﻿{% extends "base_nav.html" %}
 {% load staticfiles %}
 {% block title %}
-個人首頁
+服務
 {% endblock %}
 {% block style %}
 
@@ -10,51 +10,44 @@
 個人首頁
 {% endblock %}
 {% block content %}
-	{% if request.user.is_authenticated %}
-	{% if message %}
-		<div id="infoForm" class="alert alert-warning" role="alert">
-			{{message}}
-		</div>
-	{% endif %}
 
-		<form action="" method="post">
-		{% csrf_token %}
-		<div id="buttonGroup" style="text-align: center;">
-		    <button class="btn btn-lg btn-default" type="submit" id="getPart_id" name="getPart">領部份文件</button>
-		    <button class="btn btn-lg btn-default" type="submit" id="getCompleteBook_id" name="getCompleteBook">領完整文件</button>
-		</div>
-		<hr />
-		<h4 class="page-header">正校對文件</h4>
-		<table class="table table-striped table-hover">
-			<tr>
-				<th>文件</th>
-				<th>頁數</th>
-				<th>時數</th>
-				<th>領取日期</th>
-				<th>期限</th>
-				<th colspan="3">動作</th>
-			</tr>
-			{% for part in editingPartList %}
-			<tr>
-				<td>{{part.book.bookname}}-part{{part.part}}</td>
-				<td>{{part.edited_page}}</td>
-				<td>{{part.service_hours}}</td>
-				<td>{{part.get_date}}</td>
-				<td>{{part.deadline}}</td>
-				<td><a class="btn btn-link" role="button" href = /ebookSystem/edit/{{part.book.ISBN}}/{{part.part}} >編輯</a></td>
-				<td>
-					<button type="submit" class="btn btn-default" id="delay_id" name="delay" value={{part.book.ISBN}}-{{part.part}}>延期</button>
-				</td>
-				<td>
-					<!--<input type="submit" id="rebackPart_id" name={{part.book.ISBN}}-{{part.part}} value="還文件" />-->
-					<button type="submit" class="btn btn-default" id="rebackPart_id" name="rebackPart" value={{part.book.ISBN}}-{{part.part}}>還文件</button>
-				</td>
-			</tr>
-			{% endfor %}
-		</table>
+<form action="" method="post">
+{% csrf_token %}
+	<div id="buttonGroup" style="text-align: center;">
+		<button class="btn btn-lg btn-default" type="submit" id="getPart_id" name="getPart">領部份文件</button>
+		<button class="btn btn-lg btn-default" type="submit" id="getCompleteBook_id" name="getCompleteBook">領完整文件</button>
+	</div>
+	<hr />
+	<h4 class="page-header">正校對文件</h4>
+	<table class="table table-striped table-hover">
+		<tr>
+			<th>文件</th>
+			<th>頁數</th>
+			<th>時數</th>
+			<th>領取日期</th>
+			<th>期限</th>
+			<th colspan="3">動作</th>
+		</tr>
+		{% for part in editingPartList %}
+		<tr>
+			<td>{{part.book.bookname}}-part{{part.part}}</td>
+			<td>{{part.edited_page}}</td>
+			<td>{{part.service_hours}}</td>
+			<td>{{part.get_date}}</td>
+			<td>{{part.deadline}}</td>
+			<td><a class="btn btn-link" role="button" href = /ebookSystem/edit/{{part.book.ISBN}}/{{part.part}} >編輯</a></td>
+			<td>
+				<button type="submit" class="btn btn-default" id="delay_id" name="delay" value={{part.book.ISBN}}-{{part.part}}>延期</button>
+			</td>
+			<td>
+				<button type="submit" class="btn btn-default" id="rebackPart_id" name="rebackPart" value={{part.book.ISBN}}-{{part.part}}>還文件</button>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
 
-		<h4 class="page-header">完成校對記錄</h4>
-		<table class="table table-striped table-hover">
+	<h4 class="page-header">完成校對記錄</h4>
+	<table class="table table-striped table-hover">
 		<tr>
 			<th>文件</th>
 			<th>時數</th>
@@ -69,36 +62,36 @@
 			<td>{{part.get_date}}</td>
 			<td>{{part.finish_date}}</td>
 			<td>
+				{% if not part.is_exchange %}
 				<button type="submit" class="btn btn-default" id="reEditPart_id" name="reEditPart" value={{part.book.ISBN}}-{{part.part}}>再編輯</button>
+				{% endif %}
 			</td>
 			<td>
+				{% if not part.is_exchange %}
 				<button type="submit" class="btn btn-default" id="exchange_id" name="exchange" value={{part.book.ISBN}}-{{part.part}}>兌換時數</button>
+				{% endif %}
 			</td>
 		</tr>
 		{% endfor %}
-		</table>
+	</table>
 
-		<h4 class="page-header">已兌換志工時數</h4>
-		<table class="table table-striped table-hover">
-			<tr>
+<!--	<h4 class="page-header">已兌換志工時數</h4>
+	<table class="table table-striped table-hover">
+		<tr>
 			<th>文件</th>
 			<th>時數</th>
 			<th>領取日期</th>
 			<th>完成日期</th>
-			</tr>
-			{% for part in exchangedPartList %}
-			<tr>
-				<td>{{part.book.bookname}}-part{{part.part}}</td>
-				<td>{{part.service_hours}}</td>
-				<td>{{part.get_date}}</td>
-				<td>{{part.finish_date}}</td>
-			</tr>
-			{% endfor %}
-		</table>
-		</form>
+		</tr>
+		{% for part in exchangedPartList %}
+		<tr>
+			<td>{{part.book.bookname}}-part{{part.part}}</td>
+			<td>{{part.service_hours}}</td>
+			<td>{{part.get_date}}</td>
+			<td>{{part.finish_date}}</td>
+		</tr>
+		{% endfor %}
+	</table>-->
+</form>
 
-
-	{% else %}
-		<h5>您尚未登錄</h5>
-	{% endif %}
 {% endblock %}

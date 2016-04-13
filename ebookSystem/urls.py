@@ -6,4 +6,5 @@ urlpatterns = [
 	url(r'^book_list/$', views.book_list.as_view(), name='book_list'),
 	url(r'^detail/(?P<book_ISBN>[0-9]+)/$', views.detail, name='detail'),
 	url(r'^edit/(?P<book_ISBN>[0-9]+)/(?P<part_part>[0-9]+)/$', views.editView.as_view(), name='edit'),
+	url(r'^edit_ajax/(?P<book_ISBN>[0-9]+)/(?P<part_part>[0-9]+)/$', views.edit_ajax, name='edit_ajax'),
 ]

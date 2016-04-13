@@ -32,6 +32,7 @@ def info_change(request,template_name):
 def contact_us(request, template_name='genericUser/contact_us.html'):
 	if request.method == 'GET':
 		contactUsForm = ContactUsForm()
+		return render(request, template_name, locals())
 	if request.method == 'POST':
 		response = {}
 		redirect_to = None
@@ -49,13 +50,17 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 			response['message'] = u'成功寄送內容，我們將盡速回復'
 		else:
 			response['status'] = 'error'
-			response['message'] = u'表單驗證失敗，請確認必填欄位已填寫'
+			response['message'] = u'表單驗證失敗'
 		status = response['status']
 		message = response['message']
 		if request.is_ajax():
 			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
-			if redirect_to:
-				return HttpResponseRedirect(redirect_to)
-			else:
-				return render(request, template_name, locals())
+#			if redirect_to:
+#				return HttpResponseRedirect(redirect_to)
+#			else:
+			return render(request, template_name, locals())
+
+def readme(request, template_name):
+	template_name = 'account/' +template_name +'_readme.html'
+	return render(request, template_name, locals())
