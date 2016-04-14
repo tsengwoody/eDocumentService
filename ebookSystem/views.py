@@ -117,7 +117,6 @@ class editView(generic.View):
 				part.edited_page=editForm.cleaned_data['page']
 				part.is_finish = True
 				part.finish_date = timezone.now()
-				part.is_edited = False
 				part.edit_date = timezone.now()
 				part.save()
 				return HttpResponseRedirect(reverse('account:profile'))

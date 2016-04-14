@@ -132,6 +132,14 @@ class profileView(generic.View):
 			email.send(fail_silently=False)
 			response['status'] = 'success'
 			response['message'] = u'已寄送到您的電子信箱'
+		if request.POST.has_key('delete'):
+			book_ISBN = request.POST.get('delete')
+			deleteBook = Book.objects.get(ISBN = book_ISBN)
+			deleteBook.delete()
+			shutil.rmtree(deleteBook.path)
+			response['status'] = 'success'
+			response['message'] = u'成功刪除文件'
+		book_list = Book.objects.filter(guest=user.guest)
 		status = response['status']
 		message = response['message']
 		if request.is_ajax():
