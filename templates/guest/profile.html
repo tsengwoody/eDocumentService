@@ -21,7 +21,7 @@
 			<th>頁數</th>
 			<th>時數</th>
 			<th>資訊</th>
-			<th>動作</th>
+			<th colspan="2">動作</th>
 		</tr>
 		{% for book in book_list %}
 		<tr>
@@ -32,6 +32,9 @@
 			<td><a href = /ebookSystem/detail/{{book.ISBN}}/>詳細資訊</a></td>
 			<td>
 				<button type="submit" class="btn btn-default" id="emailBook_id" name="emailBook" value={{book.ISBN}}>傳送email</button>
+			</td>
+			<td>
+				<button type="submit" class="btn btn-default" id="delete_id" name="delete" value={{book.ISBN}}>刪除</button>
 			</td>
 		</tr>
 		{% endfor %}

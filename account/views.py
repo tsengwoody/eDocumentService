@@ -36,7 +36,9 @@ class profileView(generic.View):
 	def post(self, request, *args, **kwargs):
 		readmeUrl = reverse('account:profile') +'readme/'
 		template_name=self.template_name
-		response = {}
+		print 'POST dict'
+		print request.POST
+		response = {'status':'', 'message':''}
 		redirect_to = None
 		print request;
 		user=request.user
