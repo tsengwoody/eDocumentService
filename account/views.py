@@ -36,11 +36,8 @@ class profileView(generic.View):
 	def post(self, request, *args, **kwargs):
 		readmeUrl = reverse('account:profile') +'readme/'
 		template_name=self.template_name
-		print 'POST dict'
-		print request.POST
-		response = {'status':'', 'message':''}
+		response = {}
 		redirect_to = None
-		print request;
 		user=request.user
 		if request.POST.has_key('getPart'):
 			activeBook = Book.objects.filter(is_active = True).order_by('upload_date')

@@ -3,7 +3,7 @@ function buttonClick(buttonKey,buttonValue)
     
     var transferData={};
     transferData[buttonKey]=buttonValue;
-    alert(buttonKey);
+    //alert(buttonKey);
     $.ajax({
         url:".",
         type: "POST",
