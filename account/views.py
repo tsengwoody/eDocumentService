@@ -38,6 +38,7 @@ class profileView(generic.View):
 		template_name=self.template_name
 		response = {}
 		redirect_to = None
+		print request;
 		user=request.user
 		if request.POST.has_key('getPart'):
 			activeBook = Book.objects.filter(is_active = True).order_by('upload_date')
