@@ -89,9 +89,35 @@ function addMark() {
     document.getElementById("id_content").selectionEnd=lastLinePos+txtToAdd.length;
     
 }
+function calSeconds()
+{
+    var url=window.location.pathname;
+    var newUrl="/"+url.split('/')[1]+"/"+"edit_ajax"+"/"+url.split('/')[3]+"/"+url.split('/')[4]+"/";
+    var transferData={};
+    transferData["online"]="0";
+    //transferData["user_status"]="edit";
+    console.log(newUrl);
+    $.ajax({
+        url: newUrl,
+        type: "POST",
+        data: transferData,
+        success: function(json){
+           console.log(json);
+        },
+        error:function(xhr,errmsg,err){
+            alert(xhr.status+" "+xhr.responseText);
+            console.log(xhr.status + ": " + xhr.responseText);
+        }
+    });
+}
 
 $(document).ready(function() {
     console.log("ready!");
+    calSeconds();
+    setInterval(function(){ 
+        calSeconds();
+    }, 60000);
+
     $('#prePage').on("click", function() {
         changePage(-1);
     });
@@ -99,6 +125,7 @@ $(document).ready(function() {
     $('#nextPage').on("click", function() {
         changePage(1);
     });
+    
     $('#save_id').click(saveSubmit);
     $('#finish_id').click(finishSubmit);
     $('#mark_id').click(addMark);

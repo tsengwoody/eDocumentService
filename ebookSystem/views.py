@@ -2,7 +2,7 @@
 import codecs
 import datetime
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect,HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 from django.views import generic
@@ -26,6 +26,7 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 
 def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 	editor = request.user.editor
+	response={}
 	book = Book.objects.get(ISBN=book_ISBN)
 	part = EBook.objects.get(part=part_part,book=book)
 	if 'online' in request.POST:
