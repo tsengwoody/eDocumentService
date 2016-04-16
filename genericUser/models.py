@@ -2,7 +2,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
-
+#from ebookSystem.models import Book
 from mysite import settings
 import os
 import datetime
@@ -25,6 +25,8 @@ class User(AbstractUser):
 	phone = models.CharField(max_length=30)
 	birthday = models.DateField()
 	education = models.CharField(max_length=30, choices=EDU)
+	online = models.DateTimeField(blank=True, null=True)
+	is_reviewer = models.BooleanField(default=False)
 
 	def __unicode__(self):
 		return self.username

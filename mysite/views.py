@@ -56,15 +56,15 @@ def login_user(request, template_name='registration/login.html'):
 			password = loginForm.cleaned_data['password']
 			user = authenticate(username=username, password=password)
 			if user is not None:
-				if user.is_active:
-					login(request, user)
-					redirect_to = redirect_user(user)
-					response['status'] = 'success'
-					response['message'] = u'登錄成功'
-					response['redirect_to'] = redirect_to
-				else:
-					response['status'] = 'error'
-					response['message'] = u'您的帳號尚未啟用，管理員審核中，若超過3日未啟用或未收到管理員身份認證，請利用聯絡我們進行反應'
+#				if user.is_active:
+				login(request, user)
+				redirect_to = redirect_user(user)
+				response['status'] = 'success'
+				response['message'] = u'登錄成功'
+				response['redirect_to'] = redirect_to
+#				else:
+#					response['status'] = 'error'
+#					response['message'] = u'您的帳號尚未啟用，管理員審核中，若超過3日未啟用或未收到管理員身份認證，請利用聯絡我們進行反應'
 			else:
 				response['status'] = 'error'
 				response['message'] = u'您的帳號或密碼錯誤'

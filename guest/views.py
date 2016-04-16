@@ -45,7 +45,7 @@ def create_document(request, template_name='guest/create_document.html'):
 					else:
 						user = request.user
 					newBook.is_active = True
-					newBook.guest = user.guest
+					newBook.scaner = user
 					newBook.save()
 					redirect_to = reverse('guest:profile')
 					response['status'] = 'success'
@@ -152,4 +152,8 @@ class profileView(generic.View):
 
 def readme(request, template_name):
 	template_name = 'guest/' +template_name +'_readme.html'
+	return render(request, template_name, locals())
+
+def static(request, template_name):
+	template_name = 'guest/' +template_name +'.html'
 	return render(request, template_name, locals())

@@ -124,7 +124,7 @@ class profileView(generic.View):
 			reEditPart.is_finish = False
 			reEditPart.save()
 			response['status'] = 'success'
-			response['message'] = u'再編輯文件{}'.format(delayPart.__unicode__())
+			response['message'] = u'再編輯文件{}'.format(reEditPart.__unicode__())
 		elif request.POST.has_key('exchange'):
 			book_ISBN = request.POST.get('exchange').split('-')[0]
 			part_part = request.POST.get('exchange').split('-')[1]
@@ -145,4 +145,8 @@ class profileView(generic.View):
 
 def readme(request, template_name):
 	template_name = 'account/' +template_name +'_readme.html'
+	return render(request, template_name, locals())
+
+def static(request, template_name):
+	template_name = 'account/' +template_name +'.html'
 	return render(request, template_name, locals())
