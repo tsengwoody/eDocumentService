@@ -16,6 +16,10 @@ def user_category_check(category):
 				return view(request, *args, **kwargs)
 			elif category == 'guest' and request.user.is_guest():
 				return view(request, *args, **kwargs)
+			if category == 'scaner' and request.user.is_scaner:
+				return view(request, *args, **kwargs)
+			if category == 'manager' and request.user.is_manager:
+				return view(request, *args, **kwargs)
 			else:
 				template_name = 'user_category_check.html'
 				redirect_to = reverse('login')

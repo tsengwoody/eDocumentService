@@ -11,16 +11,16 @@ from ebookSystem.models import *
 from genericUser.models import *
 
 #@user_category_check('editor')
-def review_user_list(request, template_name):
-	user = User.objects.filter(is_active = False)
+def review_user_list(request, template_name='manager/review_user_list.html'):
+	user_list = User.objects.filter(is_review = False)
 	return render(request, template_name, locals())
 
-def review_book_list(request, template_name):
-	book = Book.objects.filter(is_active = False)
+def review_document_list(request, template_name='manager/review_document_list.html'):
+	book_list = Book.objects.filter(is_active = False)
 	return render(request, template_name, locals())
 
 def readme(request, template_name):
-	template_name = 'account/' +template_name +'_readme.html'
+	template_name = 'manager/' +template_name +'_readme.html'
 	return render(request, template_name, locals())
 
 def static(request, template_name):

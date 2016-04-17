@@ -26,7 +26,10 @@ class User(AbstractUser):
 	birthday = models.DateField()
 	education = models.CharField(max_length=30, choices=EDU)
 	online = models.DateTimeField(blank=True, null=True)
-	is_reviewer = models.BooleanField(default=False)
+	is_manager = models.BooleanField(default=False)
+	is_review = models.BooleanField(default=False)
+	is_scaner = models.BooleanField(default=False)
+
 
 	def __unicode__(self):
 		return self.username

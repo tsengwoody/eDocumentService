@@ -9,7 +9,6 @@ def validate_folder(OCR, source, page_per_part):
 	try:
 		OCRFileList = os.listdir(OCR)
 		for file in OCRFileList:
-			print file
 			with codecs.open(os.path.join(OCR, file), 'r', encoding='utf-8') as fileRead:
 				content=fileRead.read()
 		sourceFileList=os.listdir(source)

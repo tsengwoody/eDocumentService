@@ -21,7 +21,7 @@ import shutil
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'tsengwoody.tw@gmail.com'
 
-@user_category_check('guest')
+@user_category_check('scaner')
 def create_document(request, template_name='guest/create_document.html'):
 	readmeUrl = reverse('guest:create_document') +'readme/'
 	if request.method == 'POST':
@@ -37,16 +37,18 @@ def create_document(request, template_name='guest/create_document.html'):
 				unzip_file(uploadFilePath, uploadPath)
 				if validate_folder(uploadPath+u'/OCR', uploadPath+u'/source', 50)[0]:
 					newBook = bookForm.save(commit=False)
-					if request.POST.has_key('guest'):
-						try:
-							user = User.objects.get(username=request.POST['guest'])
-						except:
-							user = request.user
-					else:
-						user = request.user
+					user = request.user
 					newBook.is_active = True
 					newBook.scaner = user
 					newBook.save()
+					if request.POST.has_key('guest'):
+						try:
+							guest = Guest.objects.get(user__username=request.POST['guest'])
+							newBook.guests.add(guest)
+						except:
+							guest = None
+					else:
+						guest = None
 					redirect_to = reverse('guest:profile')
 					response['status'] = 'success'
 					response['message'] = u'成功建立並上傳文件'
@@ -109,7 +111,7 @@ class profileView(generic.View):
 		readmeUrl = reverse('guest:profile') +'readme/'
 		template_name=self.template_name
 		user=request.user
-		book_list = Book.objects.filter(guest=user.guest)
+		book_list = user.guest.book_set.all()
 		return render(request, template_name, locals())
 
 	@method_decorator(user_category_check('guest'))
@@ -119,7 +121,7 @@ class profileView(generic.View):
 		response = {}
 		redirect_to = None
 		user=request.user
-		book_list = Book.objects.filter(guest=user.guest)
+		book_list = user.book_set.all()
 		if request.POST.has_key('emailBook'):
 			book_ISBN = request.POST.get('emailBook')
 			emailBook = Book.objects.get(ISBN = book_ISBN)
@@ -139,7 +141,7 @@ class profileView(generic.View):
 			shutil.rmtree(deleteBook.path)
 			response['status'] = 'success'
 			response['message'] = u'成功刪除文件'
-		book_list = Book.objects.filter(guest=user.guest)
+		book_list = user.book_set.all()
 		status = response['status']
 		message = response['message']
 		if request.is_ajax():

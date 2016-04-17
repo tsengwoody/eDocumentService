@@ -12,6 +12,13 @@ from .forms import *
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'tsengwoody.tw@gmail.com'
 
+def review_user(request, username, template_name='genericUser/review_user.html'):
+	try:
+		user = User.objects.get(username=username)
+	except:
+		raise Http404("book does not exist")
+	return render(request, template_name, locals())
+
 @user_category_check('editor')
 def info(request, template_name):
 	user = request.user

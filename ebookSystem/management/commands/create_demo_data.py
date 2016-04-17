@@ -20,13 +20,13 @@ class Command(BaseCommand):
 		parser.add_argument('create_demo_data', nargs='*')
 
 	def handle(self, *args, **options):
-		root = User(username='root', email='tsengwoody.tw@gmail.com', first_name = 'demo root firstname', last_name = 'demo root lastname', is_active=True, is_superuser=True, is_staff=True, phone='1234567890', birthday='2016-01-01')
+		root = User(username='root', email='tsengwoody.tw@gmail.com', first_name = 'demo root firstname', last_name = 'demo root lastname', is_active=True, is_superuser=True, is_staff=True, phone='1234567890', birthday='2016-01-01', is_scaner=True, is_manager=True, is_review=True)
 		root.set_password('root')
 		root.save()
 		editor = User(username='demo-editor', email='tsengwoody.tw@gmail.com', first_name = 'demo editor firstname', last_name = 'demo editor lastname', is_active=True, phone='1234567890', birthday='2016-01-01')
 		editor.set_password('demo-editor')
 		editor.save()
-		guest = User(username='demo-guest', email='tsengwoody.tw@gmail.com', first_name = 'demo guest firstname', last_name = 'demo guest lastname', is_active=True, phone='1234567890', birthday='2016-01-01')
+		guest = User(username='demo-guest', email='tsengwoody.tw@gmail.com', first_name = 'demo guest firstname', last_name = 'demo guest lastname', is_active=True, phone='1234567890', birthday='2016-01-01', is_scaner=True)
 		guest.set_password('demo-guest')
 		guest.save()
 		rootEditor = Editor.objects.create(user=root)
@@ -35,8 +35,8 @@ class Command(BaseCommand):
 		guestGuest = Guest.objects.create(user=guest)
 		factory = RequestFactory()
 		with open(u'temp/藍色駭客.zip') as fileObject:
-			request = factory.post(reverse('guest:create_document'), {'bookname':u'藍色駭客', 'author':u'傑佛瑞．迪佛', 'translator':u'宋瑛堂', 'house':u'皇冠', 'ISBN':u'9573321564', 'date':u'2013-07-11', 'fileObject':fileObject, 'guest':'root'})
-		request.user = guest
+			request = factory.post(reverse('guest:create_document'), {'bookname':u'藍色駭客', 'author':u'傑佛瑞．迪佛', 'translator':u'宋瑛堂', 'house':u'皇冠', 'ISBN':u'9573321564', 'date':u'2013-07-11', 'fileObject':fileObject, 'guest':'demo-guest'})
+		request.user = root
 		response = create_document(request)
 		assert response.status_code == 200, 'response.status_code!=200'
 		assert len(Book.objects.all())==1, 'create book fail'

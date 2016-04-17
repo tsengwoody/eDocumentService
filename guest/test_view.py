@@ -25,16 +25,23 @@ class create_documentTestCase(TransactionTestCase):
 		user.save()
 		guest = Guest(user=user)
 		guest.save()
-		c = self.client.login(username='test-guest', password='test-guest')
+		user = User(username='test-manager', is_active=True, phone='1234567890', birthday='2016-01-01')
+		user.set_password('test-manager')
+		user.save()
+		c = self.client.login(username='test-manager', password='test-manager')
 		self.assertTrue(c)
+#		with open('temp/uploadTestFile.zip') as fileObject:
+#			request = self.factory.post(reverse('guest:create_document'), {'bookname':u'遠山的回音test','author':u'Khaled Hosseini','translator':u'李靜宜','house':u'木馬文化','ISBN':u'9789865829810','date':u'2014-01-22', 'fileObject': fileObject, 'guest':'test-guest'})
+#		request.user = user
+#		response = create_document(request)
 		with open('temp/uploadTestFile.zip') as fileObject:
-			request = self.factory.post(reverse('guest:create_document'), {'bookname':u'遠山的回音test','author':u'Khaled Hosseini','translator':u'李靜宜','house':u'木馬文化','ISBN':u'9789865829810','date':u'2014-01-22', 'fileObject': fileObject})
-		request.user = user
-		response = create_document(request)
+			response = self.client.post(reverse('guest:create_document'), {'bookname':u'遠山的回音test','author':u'Khaled Hosseini','translator':u'李靜宜','house':u'木馬文化','ISBN':u'9789865829810','date':u'2014-01-22', 'fileObject': fileObject, 'guest':'test-guest'})
 		self.assertEqual(response.status_code,200)
+		print response.context['message']
 		self.assertEqual(len(Book.objects.all()),1)
 		self.assertEqual(len(EBook.objects.all()),4)
 		book =Book.objects.first()
+		print book.guests.all()
 		self.assertTrue(os.path.exists(book.path))
 		shutil.rmtree(book.path)
 
@@ -66,8 +73,8 @@ class create_documentTestCase(TransactionTestCase):
 	def tearDownClass(cls):
 		super(create_documentTestCase, cls).tearDownClass()
 
-class cacheTestCase(TestCase):
-	@classmethod
+"""class cacheTestCase(TestCase):
+	@classmethod'''
 	def setUpClass(cls):
 		super(cacheTestCase, cls).setUpClass()
 
@@ -95,7 +102,7 @@ class profileTestCase(TransactionTestCase):
 		user.set_password('test-guest')
 		user.save()
 		guest = Guest.objects.create(user=user)
-		Book.objects.create(bookname=u'藍色駭客', author=u'傑佛瑞．迪佛', translator=u'宋瑛堂', house=u'皇冠', ISBN=u'9573321564', date=u'2013-07-11', guest=guest)
+		Book.objects.create(bookname=u'藍色駭客', author=u'傑佛瑞．迪佛', translator=u'宋瑛堂', house=u'皇冠', ISBN=u'9573321564', date=u'2013-07-11')
 		c = self.client.login(username='test-guest', password='test-guest')
 		self.assertTrue(c)
 		response = self.client.get(reverse('guest:profile'))
@@ -109,4 +116,4 @@ class profileTestCase(TransactionTestCase):
 
 	@classmethod
 	def tearDownClass(cls):
-		super(profileTestCase, cls).tearDownClass()
+		super(profileTestCase, cls).tearDownClass()"""

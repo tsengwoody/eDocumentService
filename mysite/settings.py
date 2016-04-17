@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'ebookSystem',
     'genericUser',
     'guest',
+    'manager',
 )
 
 MIDDLEWARE_CLASSES = (

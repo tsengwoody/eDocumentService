@@ -17,10 +17,24 @@ class book_list(generic.ListView):
 	def get_queryset(self):
 		return Book.objects.order_by('-bookname')
 
+def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
+	try:
+		book = Book.objects.get(ISBN=book_ISBN)
+	except:
+		raise Http404("book does not exist")
+	sourcePath = book.path +u'/source'
+#	sourcePath = sourcePath.encode('utf-8')
+	fileList=os.listdir(sourcePath)
+	scanPageList=[]
+	for scanPage in fileList:
+		if scanPage.split('.')[-1]=='jpg':
+			scanPageList.append(scanPage)
+	return render(request, template_name, locals())
+
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
-	except Book.DoesNotExist:
+	except:
 		raise Http404("book does not exist")
 	return render(request, template_name, locals())
 
