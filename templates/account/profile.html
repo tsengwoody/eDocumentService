@@ -53,6 +53,7 @@
 			<th>時數</th>
 			<th>領取日期</th>
 			<th>完成日期</th>
+			<th>狀態</th>
 			<th colspan="2">動作</th>
 		</tr>
 		{% for part in finishPartList %}
@@ -61,6 +62,7 @@
 			<td>{{part.service_hours}}</td>
 			<td>{{part.get_date}}</td>
 			<td>{{part.finish_date}}</td>
+			<td>{{part.status}}</td>
 			<td>
 				{% if not part.is_exchange %}
 				<button type="submit" class="btn btn-default" id="reEditPart_id" name="reEditPart" value={{part.book.ISBN}}-{{part.part}}>再編輯</button>

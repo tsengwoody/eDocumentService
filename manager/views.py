@@ -9,14 +9,19 @@ import json
 from utils.decorator import *
 from ebookSystem.models import *
 from genericUser.models import *
+from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REEDIT, FINISH
 
-#@user_category_check('editor')
+#@user_category_check(['manager'])
 def review_user_list(request, template_name='manager/review_user_list.html'):
 	user_list = User.objects.filter(is_review = False)
 	return render(request, template_name, locals())
 
 def review_document_list(request, template_name='manager/review_document_list.html'):
 	book_list = Book.objects.filter(is_active = False)
+	return render(request, template_name, locals())
+
+def review_part_list(request, template_name='manager/review_part_list.html'):
+	part_list = EBook.objects.filter(status = REVIEW)
 	return render(request, template_name, locals())
 
 def readme(request, template_name):

@@ -21,7 +21,7 @@
 		<tr>
 			<th>文件</th>
 			<th>狀態</th>
-			<th>頁數</th>
+			<th>校對頁數</th>
 			<th>時數</th>
 			<th>預計完成日期</th>
 			<th>動作</th>
@@ -29,14 +29,14 @@
 		{% for part in book.ebook_set.all %}
 		<tr>
 			<td>{{part.book.bookname}}-part{{part.part}}</td>
-			<td>{{part.is_finish}}</td>
+			<td>{{part.status}}</td>
 			<td>{{part.edited_page}}</td>
 			<td>{{part.service_hours}}</td>
 			<td>{{part.deadline}}</td>
 			<td>
-				{% if user.is_staff %}
+				{% ifequal part.status FINISH %}
 				<button type="submit" class="btn btn-default" id="emailPart_id" name="emailPart" value={{part.book.ISBN}}-{{part.part}}>傳送email</button>
-				{% endif %}
+				{% endifequal %}
 			</td>
 		</tr>
 		{% endfor %}

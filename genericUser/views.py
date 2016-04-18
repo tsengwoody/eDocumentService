@@ -19,12 +19,12 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 		raise Http404("book does not exist")
 	return render(request, template_name, locals())
 
-@user_category_check('editor')
+@user_category_check(['editor', 'guest'])
 def info(request, template_name):
 	user = request.user
 	return render(request, template_name, locals())
 
-@user_category_check('editor')
+@user_category_check(['editor', 'guest'])
 def info_change(request,template_name):
 	user = request.user
 	if request.method == 'POST':
@@ -36,6 +36,13 @@ def info_change(request,template_name):
 	if request.method == 'GET':
 		infoChangeUserForm = InfoChangeUserForm(instance = user)
 	return render(request, template_name, locals())
+
+def set_role(request,template_name='genericUser/set_role.html'):
+#	if request.method == 'POST':
+#		request.POST
+	if request.method == 'GET':
+		return render(request, template_name, locals())
+
 
 def contact_us(request, template_name='genericUser/contact_us.html'):
 	if request.method == 'GET':

@@ -12,13 +12,13 @@ def user_category_check(category):
 				redirect_to = reverse('login')
 				message = u'您尚未登錄'
 				return render(request, template_name, locals())
-			if category == 'editor' and request.user.is_editor():
+			if 'editor' in category and request.user.is_editor():
 				return view(request, *args, **kwargs)
-			elif category == 'guest' and request.user.is_guest():
+			elif 'guest' in category and request.user.is_guest():
 				return view(request, *args, **kwargs)
-			if category == 'scaner' and request.user.is_scaner:
+			elif 'scaner' in category and request.user.is_scaner:
 				return view(request, *args, **kwargs)
-			if category == 'manager' and request.user.is_manager:
+			elif 'manager' in category and request.user.is_manager:
 				return view(request, *args, **kwargs)
 			else:
 				template_name = 'user_category_check.html'

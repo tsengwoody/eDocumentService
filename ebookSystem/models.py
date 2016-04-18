@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models.signals import *
 from django.utils import timezone
 
-from mysite import settings
+from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REEDIT, FINISH
 from genericUser.models import User
 from guest.models import Guest
 from account.models import Editor
@@ -50,19 +50,19 @@ class Book(models.Model):
 	def collect_is_finish(self):
 		is_finish = True
 		for part in self.ebook_set.all():
-			is_finish = is_finish and part.is_finish
+			is_finish = is_finish and part.status == FINISH
 		return is_finish
 
 	def collect_finish_page_count(self):
 		finish_page_count = 0
 		for part in self.ebook_set.all():
-			finish_page_count = finish_page_count + part.edited_page + part.is_finish
+			finish_page_count = finish_page_count + part.edited_page + (part.status==FINISH)
 		return finish_page_count
 
 	def collect_finish_part_count(self):
 		finish_part_count = 0
 		for part in self.ebook_set.all():
-			finish_part_count = finish_part_count + part.is_finish
+			finish_part_count = finish_part_count + (part.status==FINISH)
 		return finish_part_count
 
 	def collect_get_count(self):
@@ -85,10 +85,8 @@ class EBook(models.Model):
 	end_page = models.IntegerField()
 	edited_page = models.IntegerField(default=0)
 	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL)
-	is_finish = models.BooleanField(default=False)
-	is_edited = models.BooleanField(default=False)
+	status = models.IntegerField(default=ACTIVE)
 	is_exchange = models.BooleanField(default=False)
-	edit_date = models.DateTimeField(blank=True, null=True)
 	finish_date = models.DateField(blank=True, null=True)
 	deadline = models.DateField(blank=True, null=True)
 	get_date = models.DateField(blank=True, null=True)
@@ -104,7 +102,7 @@ class EBook(models.Model):
 def pre_save_Book(**kwargs):
 	book = kwargs.get('instance')
 	if book.page_count == None or book.part_count == None:
-		book.path = settings.PREFIX_PATH + u'static/ebookSystem/document/{0}'.format(book.ISBN)
+		book.path = PREFIX_PATH + u'static/ebookSystem/document/{0}'.format(book.ISBN)
 		[result, book.page_count, book.part_count] = validate_folder(book.path+u'/OCR', book.path+u'/source', book.page_per_part)
 
 def post_save_Book(**kwargs):

@@ -64,7 +64,7 @@
 					<div class="row" id="sizeControl">
 						<div class="col-md-4" style="float:left;">
 								<label for="id_page">頁數:</label>		
-								<input id="id_page" name="page" type="text" size="4" readonly="true"  value="{{ editForm.page.value }}">
+								<input id="id_page" name="page" type="text" size="4" readonly="true"  value="{{ part.edited_page }}">
 						</div>
 						<div class="input-group col-md-3" style="float:right;">
 							<span class="input-group-btn">
@@ -79,20 +79,13 @@
 					</div>
 				</div>
 				
-				<div id="textPage" class="col-md-6 towColumn">
-					{% if editForm.content.errors or editForm.page.errors %}
-						<div id="alertForm" class="alert alert-danger" role="alert">
-							{{ editForm.content.errors }}
-							{{ editForm.page.errors }}
-						</div>
-					{% else %}
-						<textarea id="id_content" name="content" class="form-control" >{{ editForm.content.value }}</textarea>
-					{% endif %}
+				<div id="textPage"class="col-md-6 towColumn">
+					<textarea id="id_content" name="content" class="form-control" >{{ editContent }}</textarea>
 				</div>
 			</div>
 		</div>
 	</div>
-	<hidden id="stereotype_id" name="stereotype" value="L"></hidden>
+</form>
 {% endblock %}
 {% block footer %}
 {% endblock %}
