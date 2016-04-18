@@ -8,7 +8,7 @@ function catchErrorHandling()
             alertDialog(json);
         },
         error:function(xhr,errmsg,err){
-           // alert(xhr.status+" "+xhr.responseText);
+            alert(xhr.status+" "+xhr.responseText);
             console.log(xhr.status + ": " + xhr.responseText);
         }
     });

@@ -125,7 +125,7 @@ $(document).ready(function() {
     $('#nextPage').on("click", function() {
         changePage(1);
     });
-    
+
     $('#save_id').click(saveSubmit);
     $('#finish_id').click(finishSubmit);
     $('#mark_id').click(addMark);
@@ -135,6 +135,7 @@ $(document).ready(function() {
     $('#zoomOUT').on("click",function(){
         adjZoom(10);
     });
+    console.log($('#stereotype_id').attr("value"));
     $('#chagePost').click(function() {
         $('#id_content').removeAttr('style');
         if ($('#imagePage').hasClass('col-md-6')) { //改上下

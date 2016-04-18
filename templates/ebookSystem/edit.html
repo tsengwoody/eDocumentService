@@ -79,7 +79,7 @@
 					</div>
 				</div>
 				
-				<div id="textPage"class="col-md-6 towColumn">
+				<div id="textPage" class="col-md-6 towColumn">
 					{% if editForm.content.errors or editForm.page.errors %}
 						<div id="alertForm" class="alert alert-danger" role="alert">
 							{{ editForm.content.errors }}
@@ -92,7 +92,7 @@
 			</div>
 		</div>
 	</div>
-</form>
+	<hidden id="stereotype_id" name="stereotype" value="L"></hidden>
 {% endblock %}
 {% block footer %}
 {% endblock %}
