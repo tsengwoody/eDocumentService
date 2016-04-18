@@ -114,7 +114,7 @@ class editView(generic.View):
 					fileWrite.write(fileHead)
 			response['status'] = 'success'
 			response['message'] = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
-			response['redirect_to'] = reverse('account:profile')
+		
 		elif request.POST.has_key('close'):
 			response['status'] = 'success'
 			response['message'] = u'close'
@@ -139,6 +139,7 @@ class editView(generic.View):
 					fileWrite.write(fileHead)
 			response['status'] = 'success'
 			response['message'] = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
+			response['redirect_to'] = reverse('account:profile')
 		status = response['status']
 		message = response['message']
 		if request.is_ajax():
