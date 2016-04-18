@@ -103,18 +103,34 @@ body > .container {
                         <label for="id_role">role</label>
                     </th>
                     <td>
-                        <label class="radio-inline">
-                            <input  type="radio" name="role" id="id_role" checked="true" value="Editor">Editor</input></label>
-                        <label class="radio-inline">
-                            <input type="radio" name="role" id="id_role" value="Guest">Guest</input></label>
+                        <label class="checkbox-inline">
+                            <input  type="checkbox" name="role" id="id_role" checked="true" value="Editor">Editor</input></label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="role" id="id_role" value="Guest">Guest</input></label>
                     </td>
                 </tr>
-                <tr id="editor_only">
+                <tr class="editor_mode">
                     <th class="col-md-4" scope="row">
                         <label for="id_professional_field">professional field:</label>
                     </th>
                     <td>
                         <input id="id_professional_field" maxlength="30" name="professional_field" type="text">
+                    </td>
+                </tr>
+                <tr class="guest_mode">
+                    <th class="col-md-4" scope="row">
+                        <label for="id_disability_card_front">disability_card_front field:</label>
+                    </th>
+                    <td>
+                        <input id="id_disability_card_front" maxlength="30" name="disability_card_front" type="file" accept="image/*">
+                    </td>
+                </tr>
+                <tr class="guest_mode">
+                    <th class="col-md-4" scope="row">
+                        <label for="id_disability_card_back">disability_card_back field:</label>
+                    </th>
+                    <td>
+                        <input id="id_disability_card_back" maxlength="30" name="disability_card_back" type="file" accept="image/*">
                     </td>
                 </tr>
             </table>

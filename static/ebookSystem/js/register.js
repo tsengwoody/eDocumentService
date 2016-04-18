@@ -14,12 +14,16 @@ function checkRegister()
 }
 function optradioChange()
 {
-    if(this.value=="Editor")
-    {
-        $('#editor_only').show();
-    }else{
-        $('#editor_only').hide();
-    }
+    $('.guest_mode').hide();
+    $('.editor_mode').hide();
+    $('input[type=checkbox][name=role]:checked').each(function(){
+        console.log($(this).val());
+        if($(this).val()=='Editor')
+            $('.editor_mode').show();
+        if($(this).val()=='Guest')
+            $('.guest_mode').show();
+
+    });
 }
 $(document).ready(function() {
     console.log("ready!");
@@ -28,5 +32,6 @@ $(document).ready(function() {
         $('.datepicker').datepicker({dateFormat:"yy-mm-dd"});
     });
     $('#id_register').click(checkRegister);
-    $('input[type=radio][name=role]').change(optradioChange);
+    optradioChange();
+    $('input[type=checkbox][name=role]').change(optradioChange);
 });
