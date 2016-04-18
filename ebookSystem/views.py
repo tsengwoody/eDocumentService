@@ -11,6 +11,7 @@ from .forms import *
 import os
 import mysite
 import json
+import shutil
 
 class book_list(generic.ListView):
 	model = Book
@@ -29,6 +30,9 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 	for scanPage in fileList:
 		if scanPage.split('.')[-1]=='jpg':
 			scanPageList.append(scanPage)
+	defaultPage=scanPageList[0]
+	defaultPageURL = sourcePath +u'/' +defaultPage
+	defaultPageURL=defaultPageURL.replace(mysite.settings.PREFIX_PATH +'static/', '')
 	return render(request, template_name, locals())
 
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
@@ -76,10 +80,11 @@ class editView(generic.View):
 				fileWrite.write(fileHead+finishContent)
 			else:
 				fileWrite.write(fileHead)
-		editForm = EditForm({'content':editContent,'page':defaultPageIndex})
 		return render(request, template_name, locals())
+
 	def post(self, request, encoding='utf-8', *args, **kwargs):
 		template_name='ebookSystem/edit.html'
+		response = {}
 		try:
 			book = Book.objects.get(ISBN=kwargs['book_ISBN'])
 			part = EBook.objects.get(part=kwargs['part_part'],book=book)
@@ -91,47 +96,54 @@ class editView(generic.View):
 #		finishFilePath = finishFilePath.encode('utf-8')
 		filePath = book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
 #		filePath = filePath.encode('utf-8')
+		print request.POST
 		if request.POST.has_key('save'):
-			if editForm.is_valid():
-				editContent=editForm.cleaned_data['content']
-				with codecs.open(finishFilePath, 'r', encoding=encoding) as fileRead:
-					finishContent=fileRead.read()
-				with codecs.open(filePath, 'w', encoding=encoding) as fileWrite:
-					fileWrite.write(finishContent+editContent)
-				part.edited_page=editForm.cleaned_data['page']
-				part.edit_date = timezone.now()
-				part.save()
-				[finishContent, editContent, fileHead] = getContent(filePath)
-				[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
-				with codecs.open(finishFilePath, 'w', encoding=encoding) as fileWrite:
-					if finishContent!='':
-						fileWrite.write(fileHead+finishContent)
-					else:
-						fileWrite.write(fileHead)
-				editForm = EditForm({'content':editContent,'page':part.edited_page})
-				message=u'您上次儲存時間為：{0}，請定時存檔喔~'.format(part.edit_date)
-				return render(request, template_name, locals())
-			else:
-				message=u'表單驗證失敗'
-				return render(request, template_name, locals())
+			editContent = request.POST['content']
+			with codecs.open(finishFilePath, 'r', encoding=encoding) as fileRead:
+				finishContent=fileRead.read()
+			with codecs.open(filePath, 'w', encoding=encoding) as fileWrite:
+				fileWrite.write(finishContent+editContent)
+			part.edited_page=int(request.POST['page'])
+			part.save()
+			[finishContent, editContent, fileHead] = getContent(filePath)
+			[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
+			with codecs.open(finishFilePath, 'w', encoding=encoding) as fileWrite:
+				if finishContent!='':
+					fileWrite.write(fileHead+finishContent)
+				else:
+					fileWrite.write(fileHead)
+			response['status'] = 'success'
+			response['message'] = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
 		elif request.POST.has_key('close'):
-			return HttpResponseRedirect(reverse('account:profile'))
+			response['status'] = 'success'
+			response['message'] = u'close'
+			response['redirect_to'] = reverse('account:profile')
+			redirect_to = response['redirect_to']
 		elif request.POST.has_key('finish'):
-			if editForm.is_valid() and editForm.cleaned_data['content'].find('|----------|') == -1:
-				editContent=editForm.cleaned_data['content']
-				with codecs.open(finishFilePath, 'r', encoding=encoding) as fileRead:
-					finishContent=fileRead.read()
-				with codecs.open(filePath, 'w', encoding=encoding) as fileWrite:
-					fileWrite.write(finishContent+editContent)
-				part.edited_page=editForm.cleaned_data['page']
-				part.is_finish = True
-				part.finish_date = timezone.now()
-				part.edit_date = timezone.now()
-				part.save()
-				return HttpResponseRedirect(reverse('account:profile'))
-			else:
-				message=u'表單驗證失敗'
-				return render(request, template_name, locals())
+			editContent = request.POST['content']
+			with codecs.open(finishFilePath, 'r', encoding=encoding) as fileRead:
+				finishContent=fileRead.read()
+			with codecs.open(filePath, 'w', encoding=encoding) as fileWrite:
+				fileWrite.write(finishContent+editContent)
+			part.edited_page = int(request.POST['page'])
+			part.status = REVIEW
+			part.finish_date = timezone.now()
+			part.save()
+			[finishContent, editContent, fileHead] = getContent(filePath)
+			[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
+			with codecs.open(finishFilePath, 'w', encoding=encoding) as fileWrite:
+				if finishContent!='':
+					fileWrite.write(fileHead+finishContent)
+				else:
+					fileWrite.write(fileHead)
+			response['status'] = 'success'
+			response['message'] = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
+		status = response['status']
+		message = response['message']
+		if request.is_ajax():
+			return HttpResponse(json.dumps(response), content_type="application/json")
+		else:
+			return render(request, template_name, locals())
 
 def editVarInit(book, part):
 	sourcePath = book.path +u'/source'

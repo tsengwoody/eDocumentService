@@ -132,4 +132,11 @@ EMAIL_HOST_PASSWORD = 'kpqwkpssgwiwbwix'
 EMAIL_USE_TLS = True
 #smtp.mail.yahoo.com
 
+#special define
+INACTIVE = 0
+ACTIVE =1
+EDIT =2
+REVIEW =3
+REEDIT = 4
+FINISH = 5
 PREFIX_PATH = BASE_DIR +'/'

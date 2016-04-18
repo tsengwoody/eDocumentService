@@ -21,7 +21,7 @@ import shutil
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'tsengwoody.tw@gmail.com'
 
-@user_category_check('scaner')
+@user_category_check(['scaner'])
 def create_document(request, template_name='guest/create_document.html'):
 	readmeUrl = reverse('guest:create_document') +'readme/'
 	if request.method == 'POST':
@@ -106,7 +106,7 @@ def handle_uploaded_file(dirname, file):
 class profileView(generic.View):
 	template_name=''
 
-	@method_decorator(user_category_check('guest'))
+	@method_decorator(user_category_check(['guest']))
 	def get(self, request, *args, **kwargs):
 		readmeUrl = reverse('guest:profile') +'readme/'
 		template_name=self.template_name
@@ -114,7 +114,7 @@ class profileView(generic.View):
 		book_list = user.guest.book_set.all()
 		return render(request, template_name, locals())
 
-	@method_decorator(user_category_check('guest'))
+	@method_decorator(user_category_check(['guest']))
 	def post(self, request, *args, **kwargs):
 		readmeUrl = reverse('guest:profile') +'readme/'
 		template_name=self.template_name
