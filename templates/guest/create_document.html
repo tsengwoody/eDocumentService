@@ -6,8 +6,7 @@
 {% load staticfiles %}
 <link href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-<script language="javascript" src="{% static 'ebookSystem/js/form.js' %}"></script>
-<script language="javascript" src="{% static 'ebookSystem/js/ajax.js' %}"></script>
+<script language="javascript" src="{% static 'ebookSystem/js/create_document.js' %}"></script>
 {% endblock %}
 
 {% block header %}
@@ -64,7 +63,7 @@
     <div class="form-group">
         <label class="control-label col-sm-2" for="id_guest">Guest:</label>
         <div class="col-sm-3">
-<!--          <input type="text" class="form-control" id="id_guest" name="guest" >-->
+             <input type="text" class="form-control" id="id_guest" name="guest" >
         </div>
     </div>  
     <div class="form-group">
