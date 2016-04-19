@@ -9,11 +9,11 @@ import json
 from utils.decorator import *
 from ebookSystem.models import *
 from genericUser.models import *
-from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REEDIT, FINISH
+from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 
 #@user_category_check(['manager'])
 def review_user_list(request, template_name='manager/review_user_list.html'):
-	user_list = User.objects.filter(is_review = False)
+	user_list = User.objects.filter(status=REVIEW)
 	return render(request, template_name, locals())
 
 def review_document_list(request, template_name='manager/review_document_list.html'):

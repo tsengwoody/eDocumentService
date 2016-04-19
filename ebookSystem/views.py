@@ -96,7 +96,6 @@ class editView(generic.View):
 #		finishFilePath = finishFilePath.encode('utf-8')
 		filePath = book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
 #		filePath = filePath.encode('utf-8')
-		print request.POST
 		if request.POST.has_key('save'):
 			editContent = request.POST['content']
 			with codecs.open(finishFilePath, 'r', encoding=encoding) as fileRead:

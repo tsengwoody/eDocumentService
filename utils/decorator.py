@@ -6,12 +6,19 @@ from django.shortcuts import render
 def user_category_check(category):
 	def user_category_out(view):
 		def user_category_in(request, *args, **kwargs):
-			redirect_to = None
+			response = {}
 			if not request.user.is_authenticated():
 				template_name = 'user_category_check.html'
 				redirect_to = reverse('login')
+				status = 'error'
 				message = u'您尚未登錄'
-				return render(request, template_name, locals())
+				response['redirect_to'] = redirect_to
+				response['status'] = status
+				response['message'] = message
+				if request.is_ajax():
+					return HttpResponse(json.dumps(response), content_type="application/json")
+				else:
+					return render(request, template_name, locals())
 			if 'editor' in category and request.user.is_editor():
 				return view(request, *args, **kwargs)
 			elif 'guest' in category and request.user.is_guest():
@@ -23,7 +30,14 @@ def user_category_check(category):
 			else:
 				template_name = 'user_category_check.html'
 				redirect_to = reverse('login')
+				status = 'error'
 				message = u'帳號無權限'
-				return render(request, template_name, locals())
+				response['redirect_to'] = redirect_to
+				response['status'] = status
+				response['message'] = message
+				if request.is_ajax():
+					return HttpResponse(json.dumps(response), content_type="application/json")
+				else:
+					return render(request, template_name, locals())
 		return user_category_in
 	return user_category_out

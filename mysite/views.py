@@ -5,6 +5,8 @@ from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
 from .forms import *
 from ebookSystem.models import *
+from utils.uploadFile import *
+from mysite.settings import PREFIX_PATH
 import json
 
 def register(request, template_name='registration/register.html'):
@@ -17,16 +19,22 @@ def register(request, template_name='registration/register.html'):
 			newUser.set_password(request.POST.get('password'))
 			newUser.is_active = True
 			newUser.save()
-			if request.POST['role'] == 'Editor':
-				newEditor = Editor(user=newUser, service_hours=0)
-				newEditor.save()
-			elif request.POST['role'] == 'Guest':
-				newGuest = Guest(user=newUser)
-				newGuest.save()
 			redirect_to = reverse('login')
 			response['status'] = 'success'
 			response['message'] = u'註冊成功，請等待帳號審核'
 			response['redirect_to'] = redirect_to
+			if request.POST.has_key('editor'):
+				newEditor = Editor(user=newUser, service_hours=0)
+				newEditor.save()
+			if request.POST.has_key('guest'):
+
+				uploadDir = PREFIX_PATH +'static/ebookSystem/disability_card'
+				request.FILES['disability_card_front'].name = request.POST['username']+'_front.jpg'
+				response = handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])
+				request.FILES['disability_card_back'].name = request.POST['username']+'_back.jpg'
+				response = handle_uploaded_file(uploadDir, request.FILES['disability_card_back'])
+					newGuest = Guest(user=newUser)
+				newGuest.save()
 		else :
 			response['status'] = 'error'
 			response['message'] = u'表單驗證失敗'
@@ -48,6 +56,8 @@ def login_user(request, template_name='registration/login.html'):
 		loginForm = LoginForm()
 		return render(request, template_name, locals())
 	if request.method == 'POST':
+		print 'login:csrf'
+		print request.POST
 		response = {}
 		redirect_to = None
 		loginForm = LoginForm(request.POST)

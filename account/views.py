@@ -6,13 +6,13 @@ from django.http import HttpResponse,HttpResponseRedirect
 from django.contrib.auth.views import login as auth_login
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
-from django.db.models import F
+from django.db.models import F,Q
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import generic
 from ebookSystem.models import *
 from .forms import *
-from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REEDIT, FINISH
+from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 from utils.decorator import *
 import datetime
 import json
@@ -29,7 +29,7 @@ class profileView(generic.View):
 		template_name=self.template_name
 		user=request.user
 		editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
-		finishPartList=EBook.objects.filter(editor=user.editor, status=FINISH)
+		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
 #		exchangedPartList=EBook.objects.filter(editor=user.editor, is_exchange=True)
 		return render(request, template_name, locals())
 
@@ -38,6 +38,7 @@ class profileView(generic.View):
 		readmeUrl = reverse('account:profile') +'readme/'
 		template_name=self.template_name
 		response = {}
+		print request.POST
 		redirect_to = None
 		user=request.user
 		if request.POST.has_key('getPart'):
@@ -57,7 +58,7 @@ class profileView(generic.View):
 				response['status'] = 'error'
 				response['message'] = u'無文件'
 				editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
-				finishPartList=EBook.objects.filter(editor=user.editor, status=FINISH)
+				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
 #				exchangedPartList=EBook.objects.filter(editor=user.editor, is_exchange=True)
 				status = response['status']
 				message = response['message']
@@ -84,7 +85,7 @@ class profileView(generic.View):
 				response['status'] = 'error'
 				response['message'] = u'目前無完整文件，請先領部份文件'
 				editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
-				finishPartList=EBook.objects.filter(editor=user.editor, status=FINISH)
+				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
 #				exchangedPartList=EBook.objects.filter(editor=user.editor, is_exchange=True)
 				status = response['status']
 				message = response['message']
@@ -124,7 +125,6 @@ class profileView(generic.View):
 		elif request.POST.has_key('reEditPart'):
 			ISBN_part = request.POST.get('reEditPart')
 			reEditPart = EBook.objects.get(ISBN_part = ISBN_part)
-			reEditPart = EBook.objects.get(part=part_part, book__ISBN = book_ISBN)
 			reEditPart.status = EDIT
 			reEditPart.save()
 			response['status'] = 'success'
@@ -137,7 +137,7 @@ class profileView(generic.View):
 			response['status'] = 'success'
 			response['message'] = u'已對換時數{}'.format(exchangePart.service_hours)
 			editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
-			finishPartList=EBook.objects.filter(editor=user.editor, status=FINISH)
+			finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
 #			exchangedPartList=EBook.objects.filter(editor=user.editor, is_exchange=True)
 		status = response['status']
 		message = response['message']

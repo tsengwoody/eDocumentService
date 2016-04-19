@@ -62,7 +62,7 @@ def create_document(request, template_name='guest/create_document.html'):
 				response['message'] = u'文件已存在'
 		else:
 			response['status'] = 'error'
-			response['message'] = u'表單驗證失敗'
+			response['message'] = u'表單驗證失敗' +str(bookForm.errors)
 		status = response['status']
 		message = response['message']
 		if request.is_ajax():

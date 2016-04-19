@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models.signals import *
 from django.utils import timezone
 
-from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REEDIT, FINISH
+from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 from genericUser.models import User
 from guest.models import Guest
 from account.models import Editor

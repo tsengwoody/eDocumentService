@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 #from ebookSystem.models import Book
-from mysite import settings
+from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 import os
 import datetime
 
@@ -27,9 +27,8 @@ class User(AbstractUser):
 	education = models.CharField(max_length=30, choices=EDU)
 	online = models.DateTimeField(blank=True, null=True)
 	is_manager = models.BooleanField(default=False)
-	is_review = models.BooleanField(default=False)
 	is_scaner = models.BooleanField(default=False)
-
+	status = models.IntegerField(default=REVIEW)
 
 	def __unicode__(self):
 		return self.username
