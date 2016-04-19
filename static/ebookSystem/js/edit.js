@@ -3,8 +3,6 @@
     
     var transferData={};
     transferData[buttonKey]=buttonValue;
-    //console.log(buttonKey+'='+buttonValue);
-   // console.log($.extend($("form"),transferData).serialize());
     $.ajax({
         url:".",
         type: "POST",

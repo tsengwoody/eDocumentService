@@ -2,8 +2,13 @@
 {% block resource %}
     {% load staticfiles %}
     <link href="{% static "ebookSystem/css/signin.css" %}" rel="stylesheet" >
-    <script language="javascript" src="{% static 'ebookSystem/js/ajax.js' %}"></script>
-    <!--<script language="javascript" src="{% static 'ebookSystem/js/login.js' %}"></script>-->
+    <script language="javascript">
+        $(document).ready(function() {
+            setTimeout(function(){
+                window.location.href = "{% url 'login' %}";
+            },10000);
+        });
+    </script>
 {% endblock%}
 
 {% block title %}
@@ -11,9 +16,11 @@
 {% endblock %}
 
 {% block content %}
-
-<h1>權限異常，您無此頁面之訪問權限，將於10秒後自動跳轉頁面</h1>
-<p>原因：{{ message }}</p>
+<div id="infoForm" class="alert alert-warning" role="alert">
+    <h1>權限異常，您無此頁面之訪問權限，將於10秒後自動跳轉頁面</h1>
+    <p class="text-danger"><strong>原因：{{ message }}</strong></p>
+    
+</div>
 <a href="{% url 'login' %}">跳轉頁面地址</a>
-
 {% endblock %}
+{% block footer %}{% endblock %}
