@@ -17,7 +17,29 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 		user = User.objects.get(username=username)
 	except:
 		raise Http404("book does not exist")
-	return render(request, template_name, locals())
+	if request.method == 'GET':
+		return render(request, template_name, locals())
+	if request.method == 'POST':
+		response = {}
+		if request.POST['review'] == 'success':
+			user.status = ACTIVE
+			response['status'] = 'success'
+			response['message'] = u'審核通過會員'
+			response['redirect_to'] = reverse('manager:review_user_list')
+		if request.POST['review'] == 'error':
+			user.status = REVISE
+			response['status'] = 'error'
+			response['message'] = u'審核退回會員'
+			response['redirect_to'] = reverse('manager:review_user')
+		status = response['status']
+		message = response['message']
+		redirect_to = response['redirect_to']
+		if request.is_ajax():
+			return HttpResponse(json.dumps(response), content_type="application/json")
+		else:
+			return render(request, template_name, locals())
+
+
 
 @user_category_check(['editor', 'guest'])
 def info(request, template_name):

@@ -33,7 +33,7 @@ def register(request, template_name='registration/register.html'):
 				response = handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])
 				request.FILES['disability_card_back'].name = request.POST['username']+'_back.jpg'
 				response = handle_uploaded_file(uploadDir, request.FILES['disability_card_back'])
-					newGuest = Guest(user=newUser)
+				newGuest = Guest(user=newUser)
 				newGuest.save()
 		else :
 			response['status'] = 'error'

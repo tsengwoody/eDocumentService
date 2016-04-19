@@ -23,17 +23,39 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		book = Book.objects.get(ISBN=book_ISBN)
 	except:
 		raise Http404("book does not exist")
-	sourcePath = book.path +u'/source'
-#	sourcePath = sourcePath.encode('utf-8')
-	fileList=os.listdir(sourcePath)
-	scanPageList=[]
-	for scanPage in fileList:
-		if scanPage.split('.')[-1]=='jpg':
-			scanPageList.append(scanPage)
-	defaultPage=scanPageList[0]
-	defaultPageURL = sourcePath +u'/' +defaultPage
-	defaultPageURL=defaultPageURL.replace(mysite.settings.PREFIX_PATH +'static/', '')
-	return render(request, template_name, locals())
+	if request.method == 'GET':
+		sourcePath = book.path +u'/source'
+#		sourcePath = sourcePath.encode('utf-8')
+		fileList=os.listdir(sourcePath)
+		scanPageList=[]
+		for scanPage in fileList:
+			if scanPage.split('.')[-1]=='jpg':
+				scanPageList.append(scanPage)
+		defaultPage=scanPageList[0]
+		defaultPageURL = sourcePath +u'/' +defaultPage
+		defaultPageURL=defaultPageURL.replace(mysite.settings.PREFIX_PATH +'static/', '')
+		return render(request, template_name, locals())
+	if request.method == 'POST':
+		response = {}
+		if request.POST['review'] == 'success':
+			book.is_active = True
+			response['status'] = 'success'
+			response['message'] = u'審核通過文件'
+			response['redirect_to'] = reverse('manager:review_user')
+		if request.POST['review'] == 'error':
+			shutil.rmtree(book.path)
+			book.delete()
+			book.is_active = True
+			response['status'] = 'error'
+			response['message'] = u'審核退回文件'
+			response['redirect_to'] = reverse('manager:review_book_list')
+		status = response['status']
+		message = response['message']
+		redirect_to = response['redirect_to']
+		if request.is_ajax():
+			return HttpResponse(json.dumps(response), content_type="application/json")
+		else:
+			return render(request, template_name, locals())
 
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	try:
