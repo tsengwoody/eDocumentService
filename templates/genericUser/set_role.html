@@ -2,9 +2,66 @@
 {% block title %}
 {{ user.username }}角色
 {% endblock %}
-
+{% block style %}
+{% load staticfiles %}
+<script language="javascript" src="{% static 'ebookSystem/js/register.js' %}"></script>
+<script language="javascript" src="{% static 'ebookSystem/js/ajax.js' %}"></script>
+<style>
+body > .container {
+  padding: 20px 15px 0;
+}
+</style>
+{% endblock %}
 {% block content %}
-
 <h3>角色設定</h3>
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <table class="table table-hover table-reflow">
+            <tr>
+                <th class="col-md-4" scope="row">
+                    <label for="id_role">role</label>
+                </th>
+                <td>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="editor" id="id_editor" checked="true" value="Editor">Editor</input>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="guest" id="id_guest" value="Guest">Guest</input>
+                    </label>
+                </td>
+            </tr>
+            <tr class="editor_mode">
+                <th class="col-md-4" scope="row">
+                    <label for="id_professional_field">professional field:</label>
+                </th>
+                <td>
+                    <input id="id_professional_field" maxlength="30" name="professional_field" type="text">
+                </td>
+            </tr>
+            <tr class="guest_mode">
+                <th class="col-md-4" scope="row">
+                    <label for="id_disability_card_front">disability_card_front field:</label>
+                </th>
+                <td>
+                    <input id="id_disability_card_front" maxlength="30" name="disability_card_front" type="file" accept="image/*">
+                </td>
+            </tr>
+            <tr class="guest_mode">
+                <th class="col-md-4" scope="row">
+                    <label for="id_disability_card_back">disability_card_back field:</label>
+                </th>
+                <td>
+                    <input id="id_disability_card_back" maxlength="30" name="disability_card_back" type="file" accept="image/*">
+                </td>
+            </tr>
+        </table>
+        <div class="form-group row">
+            <div class="col-sm-offset-4 col-sm-6">
+                <input type="submit" class="btn btn-primary" value="send" id="id_send">
+                <input type="reset" class="btn btn-danger" value="reset">
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

@@ -16,7 +16,7 @@ function optradioChange()
 {
     $('.guest_mode').hide();
     $('.editor_mode').hide();
-    $('input[type=checkbox][name=role]:checked').each(function(){
+    $('input[type=checkbox]:checked').each(function(){
         console.log($(this).val());
         if($(this).val()=='Editor')
             $('.editor_mode').show();
@@ -33,5 +33,5 @@ $(document).ready(function() {
     });
     $('#id_register').click(checkRegister);
     optradioChange();
-    $('input[type=checkbox][name=role]').change(optradioChange);
+    $('input[type=checkbox]').change(optradioChange);
 });
