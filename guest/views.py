@@ -15,6 +15,7 @@ from utils.validate import *
 from utils.uploadFile import handle_uploaded_file
 from utils.zip import *
 from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
+import zipfile
 import mysite
 import json
 import shutil
@@ -35,8 +36,8 @@ def create_document(request, template_name='guest/create_document.html'):
 			if not os.path.exists(uploadPath):
 				response = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
 				uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
-				with ZipFile(uploadFilePath, 'r') as uploadFile:
-					ZipFile.testzip(uploadFile)
+#				with ZipFile(uploadFilePath, 'r') as uploadFile:
+#					ZipFile.testzip(uploadFile)
 				unzip_file(uploadFilePath, uploadPath)
 				if validate_folder(uploadPath+u'/OCR', uploadPath+u'/source', 50)[0]:
 					newBook = bookForm.save(commit=False)
