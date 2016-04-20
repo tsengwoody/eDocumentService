@@ -15,6 +15,7 @@ body > .container {
 {% block content %}
 <h3>角色設定</h3>
 <div class="row">
+<form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
     <div class="col-md-8 col-md-offset-2">
         <table class="table table-hover table-reflow">
             <tr>
@@ -35,7 +36,8 @@ body > .container {
                     <label for="id_professional_field">professional field:</label>
                 </th>
                 <td>
-                    <input id="id_professional_field" maxlength="30" name="professional_field" type="text">
+                    <input id="id_professional_field" maxlength="30" name="professional_field" value={{ user.editor.professional_field }} type="text">
+                    <input type='hidden' name='service_hours' value='{{ user.editor.service_hours }}' />
                 </td>
             </tr>
             <tr class="guest_mode">
@@ -62,6 +64,7 @@ body > .container {
             </div>
         </div>
     </div>
+</form>
 </div>
 
 {% endblock %}

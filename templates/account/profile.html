@@ -26,6 +26,7 @@
 			<th>時數</th>
 			<th>領取日期</th>
 			<th>期限</th>
+			<th>狀態</th>
 			<th colspan="3">動作</th>
 		</tr>
 		{% for part in editingPartList %}
@@ -35,12 +36,13 @@
 			<td>{{part.service_hours}}</td>
 			<td>{{part.get_date}}</td>
 			<td>{{part.deadline}}</td>
+			<td>{{part.status}}</td>
 			<td><a class="btn btn-link" role="button" href = /ebookSystem/edit/{{part.book.ISBN}}/{{part.part}} >編輯</a></td>
 			<td>
-				<button type="submit" class="btn btn-default" id="delay_id" name="delay" value={{part.book.ISBN}}-{{part.part}}>延期</button>
+				<button type="submit" class="btn btn-default" id="delay_id" name="delay" value={{part.ISBN_part}}>延期</button>
 			</td>
 			<td>
-				<button type="submit" class="btn btn-default" id="rebackPart_id" name="rebackPart" value={{part.book.ISBN}}-{{part.part}}>還文件</button>
+				<button type="submit" class="btn btn-default" id="rebackPart_id" name="rebackPart" value={{part.ISBN_part}}>還文件</button>
 			</td>
 		</tr>
 		{% endfor %}

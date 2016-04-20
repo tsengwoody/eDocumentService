@@ -8,7 +8,7 @@ from account.models import *
 from genericUser.models import *
 from guest.models import *
 
-admin.site.register(User, UserAdmin)
+admin.site.register(User)
 admin.site.register(Editor)
 admin.site.register(Guest)
 admin.site.register(Book)
