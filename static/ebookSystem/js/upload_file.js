@@ -1,9 +1,14 @@
+function gen_uuid() {
+    var uuid = ""
+    for (var i=0; i < 32; i++) {
+        uuid += Math.floor(Math.random() * 16).toString(16); 
+    }
+    return uuid
+}
 function catchErrorHandling()
 {
-    console.log($("form").serialize());
-    console.log("===============");
     var formData = new FormData($('form').get(0));
-    console.log(formData);
+    console.log(formData)
     $.ajax({
         url:".",
         type: "POST",
@@ -11,15 +16,43 @@ function catchErrorHandling()
         cache: false,
         contentType: false,
         processData: false,
+        beforeSend:function(){
+            $('#pleaseWaitDialog').modal('show');
+        },
         success: function(json){
+            $('#pleaseWaitDialog').modal('hide');
             alertDialog(json);
         },
         error:function(xhr,errmsg,err){
+            $('#pleaseWaitDialog').modal('hide');
             alert(xhr.status+" "+xhr.responseText);
             console.log(xhr.status + ": " + xhr.responseText);
         }
     });
+    var uuid=gen_uuid();
+    $('#X-Progress-ID').val(uuid);
+    showProgress(uuid);
+}
+function showProgress(uuid)
+{
+    console.log(uuid);
+    $.getJSON('/guest/upload_progress', {'X-Progress-ID': uuid},function(data,status,xhr){
+        console.log(data);
+        console.log(status);
+        console.log(xhr.responseText);
 
+        if(data){
+            var progress = (parseInt(data.uploaded) / parseInt(data.length))*100;
+            $('#uploadProgressBar').css('width', progress+'%').attr('aria-valuenow', progress);
+            $('#uploadProgressText').text(progress+'% Complete (success)');
+            window.setTimeout(function() {
+                showProgress(uuid);
+            }, 1000);
+        }else{
+            return;
+        }
+
+    });
 }
 function alertDialog(json) {
     var str=(json.status=='error')?'danger':'success'
@@ -73,8 +106,11 @@ function sameOrigin(url) {
         // or any other URL that isn't scheme relative or absolute i.e relative.
         !(/^(\/\/|http:|https:).*/.test(url));
 }
+
 $( document ).ready(function() {
     console.log( "document ready!" );
+    //showProgress();
+   // $('#pleaseWaitDialog').modal('show');
     var csrftoken = getCookie('csrftoken');
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {

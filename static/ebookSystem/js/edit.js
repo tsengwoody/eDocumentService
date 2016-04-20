@@ -124,7 +124,6 @@ function alertMessageDialog(status,message) {
 }
 
 function saveSubmit() {
-    //console.log($("#danger-alert"));
     if (typeof $('#id_content').val() == 'undefined') {
         alertMessageDialog('error',"textarea not found");
         return false;
@@ -223,8 +222,6 @@ $(document).ready(function() {
         changePage(1);
     });
 
-    //$('#save_id').click(saveSubmit);
-    //$('#finish_id').click(finishSubmit);
     $('#mark_id').click(addMark);
 
     $('#zoomIN').on("click",function(){
