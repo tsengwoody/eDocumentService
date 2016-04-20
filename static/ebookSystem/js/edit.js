@@ -123,32 +123,31 @@ function alertMessageDialog(status,message) {
 
 }
 
-function saveSubmit(event) {
+function saveSubmit() {
     //console.log($("#danger-alert"));
     if (typeof $('#id_content').val() == 'undefined') {
-        event.preventDefault();
-        //dangerAlert("textarea not found")
         alertMessageDialog('error',"textarea not found");
+        return false;
     }
     var str = $('#id_content').val();
-    if (str.indexOf("|----------|") < 0) {
-        event.preventDefault();
-        //dangerAlert("未save成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下finish按紐");
+    if (str.indexOf("\n|----------|\n") < 0) {
         alertMessageDialog('error',"未save成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下finish按紐");
+        return false;
     }
+    return true;
 }
 
-function finishSubmit(event) {
+function finishSubmit() {
     if (typeof $('#id_content').val() == 'undefined') {
-        event.preventDefault();
         alertMessageDialog("error","textarea not found");
+        return false;
     }
     var str = $('#id_content').val();
     if (str.indexOf("|----------|") > 0) {
-        event.preventDefault();
-        //dangerAlert("未finish成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下save按紐");
         alertMessageDialog('error',"未finish成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下save按紐");
+        return false;
     }
+    return true;
 }
 function adjZoom(value) {
     imgSize.value = (parseInt(imgSize.value)+ parseInt(value)).toString() + '%';
@@ -162,7 +161,6 @@ function addMark() {
     $("#id_content").val(textAreaTxt.substring(0, lastLinePos) + txtToAdd + textAreaTxt.substring(lastLinePos));
     document.getElementById("id_content").selectionStart=lastLinePos+1;
     document.getElementById("id_content").selectionEnd=lastLinePos+txtToAdd.length;
-    
 }
 function calSeconds()
 {
@@ -185,7 +183,14 @@ function calSeconds()
         }
     });
 }
-
+function getIsVaild(obj)
+{
+    if(obj.attr('name')=="save")
+        return saveSubmit();
+    else
+        return finishSubmit();
+    return true;
+}
 $(document).ready(function() {
     console.log("ready!");
     var csrftoken = getCookie('csrftoken');
@@ -202,7 +207,8 @@ $(document).ready(function() {
     $('button:submit').on('click',function(event){
         event.preventDefault();
         console.log("form submitted!");  // sanity check
-        catchErrorHandling($(this).attr('name'),$(this).val());
+        if(getIsVaild($(this))==true)
+            catchErrorHandling($(this).attr('name'),$(this).val());
     });
     calSeconds();
     setInterval(function(){ 
@@ -217,15 +223,17 @@ $(document).ready(function() {
         changePage(1);
     });
 
-    $('#save_id').click(saveSubmit);
-    $('#finish_id').click(finishSubmit);
+    //$('#save_id').click(saveSubmit);
+    //$('#finish_id').click(finishSubmit);
     $('#mark_id').click(addMark);
+
     $('#zoomIN').on("click",function(){
         adjZoom(-10);
     });
     $('#zoomOUT').on("click",function(){
         adjZoom(10);
     });
+
     console.log($('#stereotype_id').attr("value"));
     $('#chagePost').click(function() {
         $('#id_content').removeAttr('style');
