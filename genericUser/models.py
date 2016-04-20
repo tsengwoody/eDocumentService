@@ -26,6 +26,9 @@ class User(AbstractUser):
 	birthday = models.DateField()
 	education = models.CharField(max_length=30, choices=EDU)
 	online = models.DateTimeField(blank=True, null=True)
+	is_book = models.BooleanField(default=False)
+	is_editor = models.BooleanField(default=False)
+	is_guest = models.BooleanField(default=False)
 	is_manager = models.BooleanField(default=False)
 	is_scaner = models.BooleanField(default=False)
 	status = models.IntegerField(default=REVIEW)
@@ -33,14 +36,14 @@ class User(AbstractUser):
 	def __unicode__(self):
 		return self.username
 
-	def is_editor(self):
+	def has_editor(self):
 		try:
 			self.editor
 			return True
 		except:
 			return False
 
-	def is_guest(self):
+	def has_guest(self):
 		try:
 			self.guest
 			return True

@@ -8,8 +8,8 @@ from django.utils import timezone
 from django.views import generic
 from .models import *
 from .forms import *
+from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 import os
-import mysite
 import json
 import shutil
 
@@ -33,7 +33,7 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 				scanPageList.append(scanPage)
 		defaultPage=scanPageList[0]
 		defaultPageURL = sourcePath +u'/' +defaultPage
-		defaultPageURL=defaultPageURL.replace(mysite.settings.PREFIX_PATH +'static/', '')
+		defaultPageURL=defaultPageURL.replace(PREFIX_PATH +'static/', '')
 		return render(request, template_name, locals())
 	if request.method == 'POST':
 		response = {}
@@ -137,8 +137,8 @@ class editView(generic.View):
 			response['message'] = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
 		
 		elif request.POST.has_key('close'):
-			response['status'] = 'success'
-			response['message'] = u'close'
+			response['status'] = ['success',u'error']
+			response['message'] = [u'close', u'error message']
 			response['redirect_to'] = reverse('account:profile')
 			redirect_to = response['redirect_to']
 		elif request.POST.has_key('finish'):
@@ -180,7 +180,7 @@ def editVarInit(book, part):
 	defaultPageIndex=part.edited_page
 	defaultPage=scanPageList[defaultPageIndex]
 	defaultPageURL = sourcePath +u'/' +defaultPage
-	defaultPageURL=defaultPageURL.replace(mysite.settings.PREFIX_PATH +'static/', '')
+	defaultPageURL=defaultPageURL.replace(PREFIX_PATH +'static/', '')
 	return [scanPageList, defaultPageIndex, defaultPage, defaultPageURL]
 
 def getContent(contentPath, encoding='utf-8'):

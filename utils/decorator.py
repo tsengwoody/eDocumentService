@@ -19,9 +19,11 @@ def user_category_check(category):
 					return HttpResponse(json.dumps(response), content_type="application/json")
 				else:
 					return render(request, template_name, locals())
-			if 'editor' in category and request.user.is_editor():
+			if 'user' in category and request.user.is_authenticated():
 				return view(request, *args, **kwargs)
-			elif 'guest' in category and request.user.is_guest():
+			elif 'editor' in category and request.user.is_editor:
+				return view(request, *args, **kwargs)
+			elif 'guest' in category and request.user.is_guest:
 				return view(request, *args, **kwargs)
 			elif 'scaner' in category and request.user.is_scaner:
 				return view(request, *args, **kwargs)
