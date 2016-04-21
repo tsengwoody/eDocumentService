@@ -7,8 +7,11 @@ function gen_uuid() {
 }
 function catchErrorHandling()
 {
+    var uuid=gen_uuid();
+    $('#X-Progress-ID').val(uuid);
+    console.log( $('#X-Progress-ID').val());
     var formData = new FormData($('form').get(0));
-    console.log(formData)
+    
     $.ajax({
         url:".",
         type: "POST",
@@ -29,9 +32,11 @@ function catchErrorHandling()
             console.log(xhr.status + ": " + xhr.responseText);
         }
     });
-    var uuid=gen_uuid();
-    $('#X-Progress-ID').val(uuid);
-    showProgress(uuid);
+        window.setTimeout(function() {
+                showProgress(uuid);
+            }, 1000);
+
+    
 }
 function showProgress(uuid)
 {
@@ -45,12 +50,14 @@ function showProgress(uuid)
             var progress = (parseInt(data.uploaded) / parseInt(data.length))*100;
             $('#uploadProgressBar').css('width', progress+'%').attr('aria-valuenow', progress);
             $('#uploadProgressText').text(progress+'% Complete (success)');
-            window.setTimeout(function() {
-                showProgress(uuid);
-            }, 1000);
+           
         }else{
+            
             return;
         }
+         window.setTimeout(function() {
+                showProgress(uuid);
+            }, 1000);
 
     });
 }
