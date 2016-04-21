@@ -13,7 +13,10 @@ from .models import *
 from .forms import *
 from utils.decorator import *
 from utils.validate import *
+from utils.uploadFile import handle_uploaded_file
 from utils.zip import *
+from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
+import zipfile
 import mysite
 import json
 import shutil
@@ -24,21 +27,22 @@ SERVICE = 'tsengwoody.tw@gmail.com'
 @user_category_check(['scaner'])
 def create_document(request, template_name='guest/create_document.html'):
 	readmeUrl = reverse('guest:create_document') +'readme/'
+	user = request.user
 	if request.method == 'POST':
 		response = {}
 		redirect_to = None
 		bookForm = BookForm(request.POST, request.FILES)
 		if bookForm.is_valid():
-			uploadPath = u'static/ebookSystem/document/{0}'.format(bookForm.cleaned_data['ISBN'])
+			uploadPath = PREFIX_PATH +u'static/ebookSystem/document/{0}'.format(bookForm.cleaned_data['ISBN'])
 			if not os.path.exists(uploadPath):
-				uploadFilePath = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
+				response = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
+				uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
 				with ZipFile(uploadFilePath, 'r') as uploadFile:
 					ZipFile.testzip(uploadFile)
 				unzip_file(uploadFilePath, uploadPath)
 				if validate_folder(uploadPath+u'/OCR', uploadPath+u'/source', 50)[0]:
 					newBook = bookForm.save(commit=False)
-					user = request.user
-					newBook.is_active = True
+#					newBook.is_active = True
 					newBook.scaner = user
 					newBook.save()
 					if request.POST.has_key('guest'):
@@ -92,7 +96,7 @@ def upload_progress(request):
 	else:
 		return HttpResponseServerError('Server Error: You must provide X-Progress-ID header or query param.')
 
-def handle_uploaded_file(dirname, file):
+def handle_uploaded_file2(dirname, file):
 	if not os.path.exists(dirname):
 		os.makedirs(dirname, 0777)
 	fullpath = os.path.join(dirname, file.name)

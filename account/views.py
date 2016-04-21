@@ -37,11 +37,23 @@ class profileView(generic.View):
 	def post(self, request, *args, **kwargs):
 		readmeUrl = reverse('account:profile') +'readme/'
 		template_name=self.template_name
-		response = {}
-		print request.POST
-		redirect_to = None
 		user=request.user
+		editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
+		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
+		response = {}
+		redirect_to = None
 		if request.POST.has_key('getPart'):
+			if len(editingPartList)>3:
+				response['status'] = 'error'
+				response['message'] = u'您已有超過3段文件，請先校對完成再領取'
+				editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
+				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
+				status = response['status']
+				message = response['message']
+				if request.is_ajax():
+					return HttpResponse(json.dumps(response), content_type="application/json")
+				else:
+					return render(request, template_name, locals())
 			activeBook = Book.objects.filter(is_active = True).order_by('upload_date')
 			partialBook = None
 			for book in activeBook:
@@ -59,7 +71,6 @@ class profileView(generic.View):
 				response['message'] = u'無文件'
 				editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
 				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
-#				exchangedPartList=EBook.objects.filter(editor=user.editor, is_exchange=True)
 				status = response['status']
 				message = response['message']
 				if request.is_ajax():
@@ -75,6 +86,17 @@ class profileView(generic.View):
 			response['status'] = 'success'
 			response['message'] = u'成功取得文件{}'.format(getPart.__unicode__())
 		elif request.POST.has_key('getCompleteBook'):
+			if len(editingPartList)>3:
+				response['status'] = 'error'
+				response['message'] = u'您已有超過3段文件，請先校對完成再領取'
+				editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
+				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
+				status = response['status']
+				message = response['message']
+				if request.is_ajax():
+					return HttpResponse(json.dumps(response), content_type="application/json")
+				else:
+					return render(request, template_name, locals())
 			activeBook = Book.objects.filter(is_active = True).order_by('upload_date')
 			completeBook = None
 			for book in activeBook:

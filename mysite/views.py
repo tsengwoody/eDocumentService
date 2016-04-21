@@ -24,20 +24,27 @@ def register(request, template_name='registration/register.html'):
 			response['message'] = u'註冊成功，請等待帳號審核'
 			response['redirect_to'] = redirect_to
 			if request.POST.has_key('editor'):
-				newEditor = Editor(user=newUser, service_hours=0)
-				newEditor.save()
+				try:
+					newEditor = Editor(user=newUser, service_hours=0)
+					newEditor.save()
+				except:
+					response['status'] = 'error'
+					response['message'] = u'editor申請失敗'
 			if request.POST.has_key('guest'):
-
-				uploadDir = PREFIX_PATH +'static/ebookSystem/disability_card'
-				request.FILES['disability_card_front'].name = request.POST['username']+'_front.jpg'
+				uploadDir = PREFIX_PATH +'static/ebookSystem/disability_card/{0}'.format(newUser.username)
+				request.FILES['disability_card_front'].name = request.POST['username'] +'_front.jpg'
 				response = handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])
-				request.FILES['disability_card_back'].name = request.POST['username']+'_back.jpg'
+				request.FILES['disability_card_back'].name = request.POST['username'] +'_back.jpg'
 				response = handle_uploaded_file(uploadDir, request.FILES['disability_card_back'])
-				newGuest = Guest(user=newUser)
-				newGuest.save()
+				try:
+					newGuest = Guest(user=newUser)
+					newGuest.save()
+				except:
+					response['status'] = 'error'
+					response['message'] = u'guest申請失敗'
 		else :
 			response['status'] = 'error'
-			response['message'] = u'表單驗證失敗'
+			response['message'] = u'表單驗證失敗' +str(bookForm.errors)
 		status = response['status']
 		message = response['message']
 		if request.is_ajax():
@@ -56,8 +63,6 @@ def login_user(request, template_name='registration/login.html'):
 		loginForm = LoginForm()
 		return render(request, template_name, locals())
 	if request.method == 'POST':
-		print 'login:csrf'
-		print request.POST
 		response = {}
 		redirect_to = None
 		loginForm = LoginForm(request.POST)
@@ -96,7 +101,8 @@ def logout_user(request, template_name='registration/logged_out.html'):
 	return render(request, template_name, locals())
 
 def redirect_user(user):
-	if user.is_editor():
+	if user.is_editor:
 		return reverse('account:profile')
-	if user.is_guest():
+	if user.is_guest:
 		return reverse('guest:profile')
+	return reverse('genericUser:info')

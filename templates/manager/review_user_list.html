@@ -20,7 +20,7 @@
 	<tr>
 		<td>{{user.username}}</td>
 		<td>{{user.date_joined}}</td>
-			<td><a href = "/genericUser/review_user/{{ user.username }}/">審核</a></td>
+			<td><a class="btn btn-link" role="button" href = "/genericUser/review_user/{{ user.username }}/" >審核</a></td>
 		</tr>
 		{% endfor %}
 	</table>

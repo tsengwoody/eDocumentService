@@ -1,13 +1,144 @@
 ﻿{% extends "base_nav.html" %}
+{% load staticfiles %}
 {% block title %}
 {{ user.username }}審核
 {% endblock %}
 {% block header %}
 {% endblock %}
 {% block content %}
-
 <legend><h3>{{ user.username }}審核</h3></legend>
-
-
+<form action="" method="post">
+	{% csrf_token %}
+	<table class="table table-hover table-reflow">
+		<tr>
+			<th class="col-md-4" scope="row">
+				<label for="id_username">username:</label>
+			</th>
+			<td class="col-md-8">
+				<p>{{ user.username }}</p>
+			</td>
+		</tr>
+		<tr>
+			<th class="col-md-4" scope="row">
+				<label for="id_first_name">First name:</label>
+			</th>
+			<td>
+				<p>{{ user.first_name }}</p>
+			</td>
+		</tr>
+		<tr>
+			<th class="col-md-4" scope="row">
+				<label for="id_last_name">Last name:</label>
+			</th>
+			<td>
+				<p>{{ user.last_name }}</p>
+			</td>
+		</tr>
+		<tr>
+			<th class="col-md-4" scope="row">
+				<label for="id_email">Email address:</label>
+			</th>
+			<td>
+				<p>{{ user.email }}</p>
+			</td>
+		</tr>
+		<tr>
+			<th class="col-md-4" scope="row">
+				<label for="id_phone">Phone:</label>
+			</th>
+			<td>
+				<p>{{ user.phone }}</p>
+			</td>
+		</tr>
+		<tr>
+			<th class="col-md-4" scope="row">
+				<label for="id_birthday">Birthday:</label>
+			</th>
+			<td>
+				<p>{{ user.birthday }}</p>
+			</td>
+		</tr>
+		<tr>
+			<th class="col-md-4" scope="row">
+				<label for="id_last_name">Education:</label>
+			</th>
+			<td>
+				<p>{{ user.education }}</p>
+			</td>
+		</tr>
+		{% if user.has_editor %}
+		<tr>
+			<td colspan=2>校對</td>
+		</tr>
+		<tr class="editor_mode">
+			<th class="col-md-4" scope="row">
+				<label for="id_professional_field">professional field:</label>
+			</th>
+			<td>
+				<p>{{ user.editor.professional_field }}</p>
+			</td>
+		</tr>
+		{% endif %}
+		{% if user.has_guest %}
+		<tr>
+			<td colspan=2>來賓</td>
+		</tr>
+		<tr class="guest_mode">
+			<th class="col-md-4" scope="row">
+				<label for="id_disability_card_front">disability_card_front field:</label>
+			</th>
+			<td>
+				<img src="{% static frontPageURL %}" alt="手冊正" id="id_frontPage" name="frontPage" width="100%" >
+			</td>
+		</tr>
+		<tr class="guest_mode">
+			<th class="col-md-4" scope="row">
+				<label for="id_disability_card_back">disability_card_back field:</label>
+			</th>
+			<td>
+				<img src="{% static backPageURL %}" alt="手冊反" id="id_backPage" name="backPage" width="100%" >
+			</td>
+		</tr>
+		{% endif %}
+		<tr>
+			<th>登錄權限</th>
+			{%if not user.is_active %}
+			<td><button type="submit" class="btn btn-default" id="active_editor_id" name="active_editor">啟用</button></td>
+			{% else %}
+			<td><button type="submit" class="btn btn-default" id="inactive_editor_id" name="inactive_editor">停用</button></td>
+			{% endif %}
+		</tr>
+		{% if user.has_editor %}
+		<tr>
+			<th>校對權限</th>
+			{%if not user.is_editor %}
+			<td><button type="submit" class="btn btn-default" id="active_editor_id" name="active_editor">啟用</button></td>
+			{% else %}
+			<td><button type="submit" class="btn btn-default" id="inactive_editor_id" name="inactive_editor">停用</button></td>
+			{% endif %}
+		</tr>
+		{% endif %}
+		{% if user.has_guest %}
+		<tr>
+			<th>來賓權限</th>
+			{%if not user.is_guest %}
+			<td><button type="submit" class="btn btn-default" id="active_guest_id" name="active_guest">啟用</button></td>
+			{% else %}
+			<td><button type="submit" class="btn btn-default" id="inactive_guest_id" name="inactive_guest">停用</button></td>
+			{% endif %}
+		</tr>
+		{% endif %}
+		<tr>
+			<th>上傳權限</th>
+			{%if not user.is_scaner %}
+			<td><button type="submit" class="btn btn-default" id="active_scaner_id" name="active_scaner">啟用</button></td>
+			{% else %}
+			<td><button type="submit" class="btn btn-default" id="inactive_scaner_id" name="inactive_scaner">停用</button></td>
+			{% endif %}
+		</tr>
+	</table>
+	<button type="submit" class="btn btn-default" id="finish_id" name="finish">完成</button>
+	<button type="submit" class="btn btn-default" id="error_id" name="error">退回</button>
+</form>
 
 {% endblock %}

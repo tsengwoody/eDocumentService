@@ -2,4 +2,5 @@
 */migrations/
 db.sqlite3
 static/ebookSystem/document/
+static/ebookSystem/disability_card/
 temp/
