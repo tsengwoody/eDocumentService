@@ -18,18 +18,8 @@
 </ul>
 
 <form action="" method="post">
-	<table class="table table-striped table-hover">
-		<tr>
-			<th>文件</th>
-			<th>編輯</th>
-		</tr>
-		{% for part in book.ebook_set.all %}
-		<tr>
-			<td>{{part.book.bookname}}-part{{part.part}}</td>
-			<td><a class="btn btn-link" role="button" href = /ebookSystem/edit/{{part.book.ISBN}}/{{part.part}} >編輯</a></td>
-		</tr>
-		{% endfor %}
-	</table>
+	{% csrf_token %}
+
 
 <!--將js加入讓下段程式能和edit頁一樣使用-->
 					<nav>

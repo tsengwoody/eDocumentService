@@ -10,47 +10,19 @@
 
 <legend><h3>{{ book.bookname }}審核</h3></legend>
 <ul>
-	<li>書名：{{ book.bookname }}</li>
-	<li>作者：{{ book.author }}</li>
-	<li>譯者：{{ book.translator }}</li>
-	<li>出版社：{{ book.house }}</li>
-	<li>ISBN：{{ book.ISBN }}</li>
+	<li>書名：{{ part.book.bookname }}</li>
+	<li>段數：{{ part.part }}</li>
+	<li>編輯者：{{ part.editor }}</li>
+	<li>時數：{{ part.service_hours }}</li>
+	<li>領取日期：{{ part.get_date }}</li>
+	<li>完成日期：{{ part.finish_date }}</li>
 </ul>
+<hr>
+<pre>{{ content }}</pre>
+<hr>
 
 <form action="" method="post">
-	<table class="table table-striped table-hover">
-		<tr>
-			<th>文件</th>
-			<th>編輯</th>
-		</tr>
-		{% for part in book.ebook_set.all %}
-		<tr>
-			<td>{{part.book.bookname}}-part{{part.part}}</td>
-			<td><a class="btn btn-link" role="button" href = /ebookSystem/edit/{{part.book.ISBN}}/{{part.part}} >編輯</a></td>
-		</tr>
-		{% endfor %}
-	</table>
-
-<!--將js加入讓下段程式能和edit頁一樣使用-->
-					<nav>
-						<ul class="pager">
-							<li class="previous"><a id="prePage" href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
-							<li>
-							<div class="col-xs-5 centered">
-								<select class="form-control" name="scanPageList" id="scanPageList" onchange="changePageSelect()">
-									{% for scanPage in scanPageList %}
-											<option value="{{ scanPage }}">{{ scanPage }}</option>
-									{% endfor %}
-								</select>
-							</div>
-							</li>
-							<li class="next"><a id="nextPage" href="#" >Newer <span aria-hidden="true">&rarr;</span></a></li>
-						</ul>
-					</nav>
-					<div class="scrollbarDiv">
-					   <img src="{% static defaultPageURL %}" alt="文件掃描原檔" id="scanPage" name="scanPage" width="100%" >
-					</div>
-
+{% csrf_token %}
 	<label class="radio-inline">
 		<input  type="radio" name="review" id="id_review" checked="true" value="success">通過</input>
 	</label>
@@ -59,7 +31,5 @@
 	</label>
 	<input id="id_reason" maxlength="30" name="reason" type="text"><!--勾退件顯示-->
 	<button class="btn btn-md btn-default" type="submit" id="send_id" name="send">送出</button>
-
-
 </form>
 {% endblock %}

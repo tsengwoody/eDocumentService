@@ -3,7 +3,7 @@ from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse,HttpResponseRedirect
 from django.utils import timezone
-from django.shortcuts import render
+from django.shortcuts import render, get_list_or_404
 import json
 
 from utils.decorator import *
@@ -21,7 +21,7 @@ def review_document_list(request, template_name='manager/review_document_list.ht
 	return render(request, template_name, locals())
 
 def review_part_list(request, template_name='manager/review_part_list.html'):
-	part_list = EBook.objects.filter(status = REVIEW)
+	part_list = EBook.objects.filter(status=REVIEW)
 	return render(request, template_name, locals())
 
 def readme(request, template_name):

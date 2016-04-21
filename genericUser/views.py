@@ -3,7 +3,7 @@ from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse,HttpResponseRedirect
 from django.utils import timezone
-from django.shortcuts import render
+from django.shortcuts import render, get_list_or_404
 import json
 
 from account.models import Editor
@@ -19,14 +19,14 @@ MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'tsengwoody.tw@gmail.com'
 
 def review_user(request, username, template_name='genericUser/review_user.html'):
-	try:
-		user = User.objects.get(username=username)
-	except:
-		raise Http404("book does not exist")
+	user = get_list_or_404(User, username=username)[0]
 	sourcePath = PREFIX_PATH +'static/ebookSystem/disability_card/{0}'.format(user.username)
 	frontPage = user.username +'_front.jpg'
 	frontPageURL = sourcePath +u'/' +frontPage
 	frontPageURL = frontPageURL.replace(PREFIX_PATH +'static/', '')
+	backPage = user.username +'_back.jpg'
+	backPageURL = sourcePath +u'/' +backPage
+	backPageURL = backPageURL.replace(PREFIX_PATH +'static/', '')
 	if request.method == 'GET':
 		return render(request, template_name, locals())
 	if request.method == 'POST':
@@ -76,7 +76,6 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 				return HttpResponseRedirect(redirect_to)
 			else:
 				return render(request, template_name, locals())
-
 
 @user_category_check(['user'])
 def info(request, template_name):
@@ -133,7 +132,6 @@ def set_role(request,template_name='genericUser/set_role.html'):
 			return render(request, template_name, locals())
 	if request.method == 'GET':
 		return render(request, template_name, locals())
-
 
 def contact_us(request, template_name='genericUser/contact_us.html'):
 	if request.method == 'GET':

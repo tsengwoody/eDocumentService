@@ -2,7 +2,7 @@
 import codecs
 import datetime
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect,HttpResponse
+from django.http import HttpResponseRedirect,HttpResponse, Http404
 from django.shortcuts import render
 from django.utils import timezone
 from django.views import generic
@@ -23,39 +23,80 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		book = Book.objects.get(ISBN=book_ISBN)
 	except:
 		raise Http404("book does not exist")
-	if request.method == 'GET':
-		sourcePath = book.path +u'/source'
+	sourcePath = book.path +u'/source'
 #		sourcePath = sourcePath.encode('utf-8')
-		fileList=os.listdir(sourcePath)
-		scanPageList=[]
-		for scanPage in fileList:
-			if scanPage.split('.')[-1]=='jpg':
-				scanPageList.append(scanPage)
-		defaultPage=scanPageList[0]
-		defaultPageURL = sourcePath +u'/' +defaultPage
-		defaultPageURL=defaultPageURL.replace(PREFIX_PATH +'static/', '')
+	fileList=os.listdir(sourcePath)
+	scanPageList=[]
+	for scanPage in fileList:
+		if scanPage.split('.')[-1].lower() == 'jpg':
+			scanPageList.append(scanPage)
+	defaultPage=scanPageList[0]
+	defaultPageURL = sourcePath +u'/' +defaultPage
+	defaultPageURL=defaultPageURL.replace(PREFIX_PATH +'static/', '')
+	if request.method == 'GET':
 		return render(request, template_name, locals())
 	if request.method == 'POST':
 		response = {}
+		redirect_to = None
 		if request.POST['review'] == 'success':
 			book.is_active = True
+			book.save()
 			response['status'] = 'success'
 			response['message'] = u'審核通過文件'
-			response['redirect_to'] = reverse('manager:review_user')
+			response['redirect_to'] = reverse('manager:review_document_list')
 		if request.POST['review'] == 'error':
 			shutil.rmtree(book.path)
 			book.delete()
-			book.is_active = True
-			response['status'] = 'error'
+			response['status'] = 'success'
 			response['message'] = u'審核退回文件'
-			response['redirect_to'] = reverse('manager:review_book_list')
+			response['redirect_to'] = reverse('manager:review_document_list')
 		status = response['status']
 		message = response['message']
 		redirect_to = response['redirect_to']
 		if request.is_ajax():
 			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
-			return render(request, template_name, locals())
+			if redirect_to:
+				return HttpResponseRedirect(redirect_to)
+			else:
+				return render(request, template_name, locals())
+
+def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'):
+	try:
+		part = EBook.objects.get(ISBN_part=ISBN_part)
+	except:
+		raise Http404("book does not exist")
+	finishFilePath = part.book.path +'/OCR/part{}.txt'.format(part.part)
+	content =''
+	with codecs.open(finishFilePath, 'r', encoding='utf-8') as fileRead:
+		content = fileRead.read()
+	if request.method == 'GET':
+		return render(request, template_name, locals())
+	if request.method == 'POST':
+		response = {}
+		redirect_to = None
+		if request.POST['review'] == 'success':
+			part.status = FINISH
+			part.save()
+			response['status'] = 'success'
+			response['message'] = u'審核通過文件'
+			response['redirect_to'] = reverse('manager:review_part_list')
+		if request.POST['review'] == 'error':
+			part.status = REVISE
+			part.save()
+			response['status'] = 'success'
+			response['message'] = u'審核退回文件'
+			response['redirect_to'] = reverse('manager:review_part_list')
+		status = response['status']
+		message = response['message']
+		redirect_to = response['redirect_to']
+		if request.is_ajax():
+			return HttpResponse(json.dumps(response), content_type="application/json")
+		else:
+			if redirect_to:
+				return HttpResponseRedirect(redirect_to)
+			else:
+				return render(request, template_name, locals())
 
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	try:
@@ -86,12 +127,12 @@ class editView(generic.View):
 		try:
 			book = Book.objects.get(ISBN=kwargs['book_ISBN'])
 			part = EBook.objects.get(part=kwargs['part_part'],book=book)
-		except book.DoesNotExist:
+		except: 
 			raise Http404("book or part does not exist")
 		finishContent=''
 		editContent=''
 		fileHead=''
-		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
+		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(part)
 		finishFilePath = book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
 #		finishFilePath = finishFilePath.encode('utf-8')
 		filePath = book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
@@ -110,9 +151,9 @@ class editView(generic.View):
 		try:
 			book = Book.objects.get(ISBN=kwargs['book_ISBN'])
 			part = EBook.objects.get(part=kwargs['part_part'],book=book)
-		except book.DoesNotExist:
+		except:
 			raise Http404("book or part does not exist")
-		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
+		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(part)
 		editForm = EditForm(request.POST)
 		finishFilePath = book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
 #		finishFilePath = finishFilePath.encode('utf-8')
@@ -127,7 +168,7 @@ class editView(generic.View):
 			part.edited_page=int(request.POST['page'])
 			part.save()
 			[finishContent, editContent, fileHead] = getContent(filePath)
-			[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
+			[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(part)
 			with codecs.open(finishFilePath, 'w', encoding=encoding) as fileWrite:
 				if finishContent!='':
 					fileWrite.write(fileHead+finishContent)
@@ -152,7 +193,7 @@ class editView(generic.View):
 			part.finish_date = timezone.now()
 			part.save()
 			[finishContent, editContent, fileHead] = getContent(filePath)
-			[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(book, part)
+			[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(part)
 			with codecs.open(finishFilePath, 'w', encoding=encoding) as fileWrite:
 				if finishContent!='':
 					fileWrite.write(fileHead+finishContent)
@@ -168,13 +209,13 @@ class editView(generic.View):
 		else:
 			return render(request, template_name, locals())
 
-def editVarInit(book, part):
-	sourcePath = book.path +u'/source'
+def editVarInit(part):
+	sourcePath = part.book.path +u'/source'
 #	sourcePath = sourcePath.encode('utf-8')
 	fileList=os.listdir(sourcePath)
 	scanPageList=[]
 	for scanPage in fileList:
-		if scanPage.split('.')[-1]=='jpg':
+		if scanPage.split('.')[-1].lower() == 'jpg':
 			scanPageList.append(scanPage)
 	scanPageList = scanPageList[part.begin_page:part.end_page+1]
 	defaultPageIndex=part.edited_page

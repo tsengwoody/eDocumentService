@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseServerEr
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import generic
+from zipfile import ZipFile
 from ebookSystem.models import *
 from account.models import *
 from .models import *
@@ -36,12 +37,12 @@ def create_document(request, template_name='guest/create_document.html'):
 			if not os.path.exists(uploadPath):
 				response = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
 				uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
-#				with ZipFile(uploadFilePath, 'r') as uploadFile:
-#					ZipFile.testzip(uploadFile)
+				with ZipFile(uploadFilePath, 'r') as uploadFile:
+					ZipFile.testzip(uploadFile)
 				unzip_file(uploadFilePath, uploadPath)
 				if validate_folder(uploadPath+u'/OCR', uploadPath+u'/source', 50)[0]:
 					newBook = bookForm.save(commit=False)
-					newBook.is_active = True
+#					newBook.is_active = True
 					newBook.scaner = user
 					newBook.save()
 					if request.POST.has_key('guest'):
