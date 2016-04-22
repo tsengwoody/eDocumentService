@@ -16,9 +16,11 @@ function catchErrorHandling()
         data: formData,
         contentType: false,
         processData: false,
+        cache:false,
         headers: { 'X-Progress-ID': uuid },
         beforeSend:function(){
             $('#pleaseWaitDialog').modal('show');
+
         },
         success: function(json){
             $('#pleaseWaitDialog').modal('hide');
@@ -34,6 +36,7 @@ function catchErrorHandling()
             console.log(xhr.status + ": " + xhr.responseText);
         }
     });
+    showProgress(uuid)
     refreshIntervalId=setInterval(function()
     {
          showProgress(uuid);
