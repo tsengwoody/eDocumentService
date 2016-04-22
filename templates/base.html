@@ -56,13 +56,13 @@
 	<footer class="footer">
       <div class="container">
 		{% if readmeUrl %}
-		<p class='inline'><a href={{ readmeUrl }}>說明</a></p>
+		<p><a href={{ readmeUrl }}>說明</a></p>
 		{% endif %}
 		{% if request.user.is_editor %}
-		<p class='inline'><a href="/account/license/" >志工會員使用者條款</a></p>
+		<p><a href="/account/license/" >志工會員使用者條款</a></p>
 		{% endif %}
 		{% if request.user.is_guest %}
-		<p class='inline'><a href="/guest/license/" >來賓會員使用者條款</a></p>
+		<p><a href="/guest/license/" >來賓會員使用者條款</a></p>
 		{% endif %}
         <p class="text-muted">© Company 2016</p>
       </div>

@@ -20,6 +20,9 @@ html, body, .container, .row{
     height: 90%;
     margin:0px;
 }
+.inline {
+    display: inline
+}
 .oneColumn{
     height: 12%;
     margin:0px;

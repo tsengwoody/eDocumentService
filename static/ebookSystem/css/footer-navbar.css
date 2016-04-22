@@ -18,7 +18,9 @@ body {
   background-color: #ffffff;
 }
 
-
+.footer p{
+  margin:0;
+}
 
 /* Custom page CSS
 -------------------------------------------------- */
