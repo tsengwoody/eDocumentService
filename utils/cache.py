@@ -18,14 +18,15 @@ class UploadProgressCachedHandler(FileUploadHandler):
         self.content_length = content_length
         if 'X-Progress-ID' in self.request.GET :
             self.progress_id = self.request.GET['X-Progress-ID']
-        elif 'X-Progress-ID' in self.request.META:
-            self.progress_id = self.request.META['X-Progress-ID']
+        elif 'HTTP_X_PROGRESS_ID' in self.request.META:
+            self.progress_id = self.request.META['HTTP_X_PROGRESS_ID']
+        
         if self.progress_id:
-            self.cache_key = "%s_%s" % (self.request.META['REMOTE_ADDR'], self.progress_id )
+            self.cache_key = "%s_%s" % (self.request.META['REMOTE_ADDR'], self.progress_id)
             cache.set(self.cache_key, {
                 'length': self.content_length,
                 'uploaded' : 0
-            })
+            },30)
 
     def receive_data_chunk(self, raw_data, start):
         if self.cache_key:

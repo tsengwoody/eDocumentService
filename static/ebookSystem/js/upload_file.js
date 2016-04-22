@@ -8,57 +8,48 @@ function gen_uuid() {
 function catchErrorHandling()
 {
     var uuid=gen_uuid();
-    $('#X-Progress-ID').val(uuid);
-    console.log( $('#X-Progress-ID').val());
-    var formData = new FormData($('form').get(0));
-    
+    var formData = new FormData($('form').get(0));   
+    var refreshIntervalId="";
     $.ajax({
         url:".",
         type: "POST",
         data: formData,
-        cache: false,
         contentType: false,
         processData: false,
+        headers: { 'X-Progress-ID': uuid },
         beforeSend:function(){
             $('#pleaseWaitDialog').modal('show');
         },
         success: function(json){
             $('#pleaseWaitDialog').modal('hide');
+            if(refreshIntervalId!="")
+                clearInterval(refreshIntervalId);
             alertDialog(json);
         },
         error:function(xhr,errmsg,err){
             $('#pleaseWaitDialog').modal('hide');
+            if(refreshIntervalId!="")
+                clearInterval(refreshIntervalId);
             alert(xhr.status+" "+xhr.responseText);
             console.log(xhr.status + ": " + xhr.responseText);
         }
     });
-        window.setTimeout(function() {
-                showProgress(uuid);
-            }, 1000);
-
-    
+    refreshIntervalId=setInterval(function()
+    {
+         showProgress(uuid);
+    },1000);
 }
 function showProgress(uuid)
 {
-    console.log(uuid);
     $.getJSON('/guest/upload_progress', {'X-Progress-ID': uuid},function(data,status,xhr){
-        console.log(data);
-        console.log(status);
-        console.log(xhr.responseText);
-
         if(data){
-            var progress = (parseInt(data.uploaded) / parseInt(data.length))*100;
+            var progress =parseInt((parseInt(data.uploaded) / parseInt(data.length))*100);
+            console.log(progress);
             $('#uploadProgressBar').css('width', progress+'%').attr('aria-valuenow', progress);
             $('#uploadProgressText').text(progress+'% Complete (success)');
-           
         }else{
-            
             return;
         }
-         window.setTimeout(function() {
-                showProgress(uuid);
-            }, 1000);
-
     });
 }
 function alertDialog(json) {
