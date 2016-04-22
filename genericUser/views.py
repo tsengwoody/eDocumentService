@@ -32,7 +32,11 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 	if request.method == 'POST':
 		response = {}
 		redirect_to = None
-		if request.POST.has_key('active_editor'):
+		if request.POST.has_key('active_login'):
+			user.is_active = True
+			response['status'] = 'success'
+			response['message'] = u'已啟用登錄權限'
+		elif request.POST.has_key('active_editor'):
 			user.is_editor = True
 			response['status'] = 'success'
 			response['message'] = u'已啟用editor權限'
@@ -44,6 +48,11 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 			user.is_scaner = True
 			response['status'] = 'success'
 			response['message'] = u'已啟用scaner權限'
+		elif request.POST.has_key('inactive_login'):
+			print 'inactive_login'
+			user.is_active = False
+			response['status'] = 'success'
+			response['message'] = u'停用用登錄權限'
 		elif request.POST.has_key('inactive_editor'):
 			user.is_editor = False
 			response['status'] = 'success'

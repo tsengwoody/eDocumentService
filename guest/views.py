@@ -116,6 +116,13 @@ class profileView(generic.View):
 		template_name=self.template_name
 		user=request.user
 		book_list = user.guest.book_set.all()
+		edit_book_list = []
+		finish_book_list = []
+		for book in book_list:
+			if book.collect_is_finish():
+				finish_book_list.append(book)
+			else:
+				edit_book_list.append(book)
 		return render(request, template_name, locals())
 
 	@method_decorator(user_category_check(['guest']))
@@ -125,7 +132,14 @@ class profileView(generic.View):
 		response = {}
 		redirect_to = None
 		user=request.user
-		book_list = user.book_set.all()
+		book_list = user.guest.book_set.all()
+		edit_book_list = []
+		finish_book_list = []
+		for book in book_list:
+			if book.collect_is_finish():
+				finish_book_list.append(book)
+			else:
+				edit_book_list.append(book)
 		if request.POST.has_key('emailBook'):
 			book_ISBN = request.POST.get('emailBook')
 			emailBook = Book.objects.get(ISBN = book_ISBN)
@@ -151,10 +165,10 @@ class profileView(generic.View):
 		if request.is_ajax():
 			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
-#			if redirect_to:
-#				return HttpResponseRedirect(redirect_to)
-#			else:
-			return render(request, template_name, locals())
+			if redirect_to:
+				return HttpResponseRedirect(redirect_to)
+			else:
+				return render(request, template_name, locals())
 
 def readme(request, template_name):
 	template_name = 'guest/' +template_name +'_readme.html'

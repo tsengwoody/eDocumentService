@@ -34,7 +34,7 @@ class Command(BaseCommand):
 				request = factory.post(reverse('register'), {'username':'demo-manager', 'password':'demo-manager', 'email':'tsengwoody.tw@gmail.com', 'first_name':'demo manager firstname', 'last_name':'demo manager lastname', 'is_active':True, 'phone':'1234567890', 'birthday':'2016-01-01', 'editor':'Editor', 'guest':'Guest', 'disability_card_front':dcf_file, 'disability_card_back':dcb_file})
 				response = register(request)
 		manager = User.objects.get(username='demo-manager')
-		manager.status = 1
+		manager.status = ACTIVE
 		manager.is_editor=True
 		manager.is_guest=True
 		manager.is_manager=True
@@ -44,7 +44,7 @@ class Command(BaseCommand):
 		rootGuest = Guest.objects.create(user=root)
 		with open(u'temp/藍色駭客.zip') as fileObject:
 			request = factory.post(reverse('guest:create_document'), {'bookname':u'藍色駭客', 'author':u'傑佛瑞．迪佛', 'translator':u'宋瑛堂', 'house':u'皇冠', 'ISBN':u'9573321564', 'date':u'2013-07-11', 'fileObject':fileObject, 'guest':'demo-guest'})
-		request.user = root
+		request.user = manager
 		response = create_document(request)
 		assert response.status_code == 200, 'response.status_code!=200'
 		assert len(Book.objects.all())==1, 'create book fail'

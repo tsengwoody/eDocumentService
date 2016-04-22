@@ -18,6 +18,40 @@ class book_list(generic.ListView):
 	def get_queryset(self):
 		return Book.objects.order_by('-bookname')
 
+def search_book(request, template_name='ebookSystem/search_book.html'):
+	if request.method == 'GET':
+		return render(request, template_name, locals())
+	if request.method == 'POST':
+		response = {}
+		redirect_to = None
+		if request.POST.has_key('book_ISBN'):
+			book_ISBN = request.POST['book_ISBN']
+			book_list = Book.objects.filter(ISBN=book_ISBN)
+			if len(book_list) > 0:
+				response['status'] = 'success'
+				response['message'] = u'成功查詢資料'
+			else:
+				response['status'] = 'error'
+				response['message'] = u'查無資料'
+		elif request.POST.has_key('get_book'):
+			book_ISBN = request.POST['get_book']
+			book = Book.objects.get(ISBN=book_ISBN)
+			guest = Guest.objects.get(user=request.user)
+			book.guests.add(guest)
+			response['status'] = 'success'
+			response['message'] = u'獲取成功請到個人頁面進行email傳送'
+		status = response['status']
+		message = response['message']
+		if request.is_ajax():
+			return HttpResponse(json.dumps(response), content_type="application/json")
+		else:
+#			if redirect_to:
+#				return HttpResponseRedirect(redirect_to)
+#			else:
+			return render(request, template_name, locals())
+
+
+
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)

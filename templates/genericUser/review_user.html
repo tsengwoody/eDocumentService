@@ -103,9 +103,9 @@
 		<tr>
 			<th>登錄權限</th>
 			{%if not user.is_active %}
-			<td><button type="submit" class="btn btn-default" id="active_editor_id" name="active_editor">啟用</button></td>
+			<td><button type="submit" class="btn btn-default" id="active_login_id" name="active_login">啟用</button></td>
 			{% else %}
-			<td><button type="submit" class="btn btn-default" id="inactive_editor_id" name="inactive_editor">停用</button></td>
+			<td><button type="submit" class="btn btn-default" id="inactive_login_id" name="inactive_login">停用</button></td>
 			{% endif %}
 		</tr>
 		{% if user.has_editor %}
