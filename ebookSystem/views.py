@@ -144,13 +144,22 @@ def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 	response={}
 	book = Book.objects.get(ISBN=book_ISBN)
 	part = EBook.objects.get(part=part_part,book=book)
+	response = {}
 	if 'online' in request.POST:
-		user.online = timezone.now()
-		user.save()
-		part.service_hours = part.service_hours+1
-		part.save()
-		response['status'] = 'success'
-		response['message'] = part.service_hours
+		if not user.online:
+			user.online = timezone.now()
+			user.save()
+		delta = timezone.now() - user.online
+		if delta.seconds < 50:
+			response['status'] = 'error'
+			response['message'] = u'您有其他編輯正進行'
+		else:
+			user.online = timezone.now()
+			user.save()
+			part.service_hours = part.service_hours+1
+			part.save()
+			response['status'] = 'success'
+			response['message'] = part.service_hours
 	else:
 		response['status'] = 'error'
 	return HttpResponse(json.dumps(response), content_type="application/json")
@@ -158,6 +167,8 @@ def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 class editView(generic.View):
 	def get(self, request, encoding='utf-8', *args, **kwargs):
 		template_name='ebookSystem/edit.html'
+		user = request.user
+		response = {}
 		try:
 			book = Book.objects.get(ISBN=kwargs['book_ISBN'])
 			part = EBook.objects.get(part=kwargs['part_part'],book=book)
@@ -210,7 +221,6 @@ class editView(generic.View):
 					fileWrite.write(fileHead)
 			response['status'] = 'success'
 			response['message'] = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
-		
 		elif request.POST.has_key('close'):
 			response['status'] = ['success',u'error']
 			response['message'] = [u'close', u'error message']

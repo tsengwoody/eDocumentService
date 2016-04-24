@@ -24,7 +24,7 @@
 		<td>{{book.ISBN}}</td>
 		<td>{{book.upload_date}}</td>
 		<td>{{book.scaner.username}}</td>
-			<td><a href = "/ebookSystem/review_document/{{ book.ISBN }}/">審核</a></td>
+			<td><a class="btn btn-link" role="button" href = "/ebookSystem/review_document/{{ book.ISBN }}/" >編輯</a></td>
 		</tr>
 		{% endfor %}
 	</table>

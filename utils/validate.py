@@ -27,5 +27,16 @@ def validate_folder(OCR, source, page_per_part):
 	OCRFileSet = set(OCRFileList)
 	return [partSet.issubset(OCRFileSet), page_count, part_count]
 
+from gtts import gTTS
+def audio_valid(file):
+	import random
+	import string
+	text = string.join(random.sample(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'], 5), ',')
+	tts = gTTS(text=text, lang='en')
+	tts.save(file)
+	return text
+
 if __name__ == '__main__':
-	print vaildate_folder('OCR', 'source', page_per_part=50)
+	text = audio_valid('EF1.mp3')
+	text = text.replace(',', '')
+	print text

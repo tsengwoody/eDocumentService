@@ -25,7 +25,7 @@ def register(request, template_name='registration/register.html'):
 			response['redirect_to'] = redirect_to
 			if request.POST.has_key('editor'):
 				try:
-					newEditor = Editor(user=newUser, service_hours=0)
+					newEditor = Editor(user=newUser, service_hours=0, professional_field=request.POST['professional_field'])
 					newEditor.save()
 				except:
 					response['status'] = 'error'
@@ -72,6 +72,10 @@ def login_user(request, template_name='registration/login.html'):
 			user = authenticate(username=username, password=password)
 			if user is not None:
 				if user.is_active:
+					from django.contrib.sessions.models import Session
+					for session in Session.objects.all():
+						if session.get_decoded().has_key('_auth_user_id') and int(session.get_decoded()['_auth_user_id']) == user.id:
+							session.flush()
 					login(request, user)
 					redirect_to = redirect_user(user)
 					response['status'] = 'success'

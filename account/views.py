@@ -30,7 +30,11 @@ class profileView(generic.View):
 		user=request.user
 		editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
 		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
-#		exchangedPartList=EBook.objects.filter(editor=user.editor, is_exchange=True)
+		editing = False
+		if user.online:
+			delta = timezone.now() - user.online
+			if delta.seconds <50:
+				editing = True
 		return render(request, template_name, locals())
 
 	@method_decorator(user_category_check(['editor']))

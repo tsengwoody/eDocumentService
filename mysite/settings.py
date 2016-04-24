@@ -114,15 +114,23 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 FILE_CHARSET='utf-8'
 AUTH_USER_MODEL = 'genericUser.User'
 
+#CACHES = {
+#    'default': {
+#        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+#        'LOCATION': 'my_cache_table',
+#    }
+#}
+
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'my_cache_table',
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
     }
 }
 
 from django.conf import global_settings
 FILE_UPLOAD_HANDLERS = ('utils.cache.UploadProgressCachedHandler', ) + global_settings.FILE_UPLOAD_HANDLERS
+#FILE_UPLOAD_HANDLERS = ('utils.uploadFile.ProgressUploadSessionHandler', ) + global_settings.FILE_UPLOAD_HANDLERS
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST='smtp.gmail.com'

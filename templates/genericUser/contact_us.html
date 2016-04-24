@@ -25,7 +25,11 @@
                         <label for="id_name"><font style="color:red">*</font>Name:</label>
                     </th>
                     <td class="col-md-8">
+                        {% if request.user.username %}
+                        <input id="id_name" maxlength="10" name="name" value={{ request.user.username }} type="text" placeholder="name" required disabled="disabled"/>
+                        {% else %}
                         <input id="id_name" maxlength="10" name="name" type="text" placeholder="name" required />
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
@@ -33,7 +37,11 @@
                         <label for="id_email"><font style="color:red">*</font>Email:</label>
                     </th>
                     <td class="col-md-8">
-                        <input id="id_email" maxlength="254" name="email" type="email" placeholder="email" required/>
+                                                {% if request.user.email %}
+                        <input id="id_email" maxlength="254" name="email" value={{ request.user.email }} type="email" placeholder="email" required disabled="disabled"/>
+                                                {% else %}
+                        <input id="id_email" maxlength="254" name="email" type="email" placeholder="email" required />
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
