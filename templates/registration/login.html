@@ -37,12 +37,20 @@
             <label for="id_password">{{ loginForm.password.label_tag.value }}</label>
             <input id="id_password" name="password" type="password" placeholder="password" class="form-control" required />
         </div>
-     
+        <div class="form-group">
+            <label for="id_code">語音驗證碼：</label>
+            <input id="id_code" name="code" type="text" class="form-control" required />
+        </div>     
+            <audio id="id_audio_file" src = "/static/{{ UUID }}.mp3" ></audio>
+            <button onclick="document.getElementById('id_audio_file').play();">播放</button>
+            <input type="hidden" name="UUID" value="{{ UUID }}" />
+
         <!--<input type="submit" value="login" /> -->
 
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
         <input type="hidden" name="next" value="{{ next }}" />
     </form>
+
     {% if error_message %}
         <div class="alert alert-danger" role="alert">
             {{ error_message }}

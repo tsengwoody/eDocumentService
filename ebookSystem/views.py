@@ -20,33 +20,27 @@ class book_list(generic.ListView):
 		return Book.objects.order_by('-bookname')
 
 @http_response
-def search_book(request, template_name='ebookSystem/search_book.html'):
+def search_book(request, template_name):
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
-		response = {}
-		redirect_to = None
 		if request.POST.has_key('book_ISBN'):
 			book_ISBN = request.POST['book_ISBN']
 			book_list = Book.objects.filter(ISBN=book_ISBN)
 			if len(book_list) > 0:
-				response['status'] = 'success'
-				response['message'] = u'成功查詢資料'
+				status = 'success'
+				message = u'成功查詢資料'
 			else:
-				response['status'] = 'error'
-				response['message'] = u'查無資料'
+				status = 'error'
+				message = u'查無資料'
 		elif request.POST.has_key('get_book'):
 			book_ISBN = request.POST['get_book']
 			book = Book.objects.get(ISBN=book_ISBN)
 			guest = Guest.objects.get(user=request.user)
 			book.guests.add(guest)
-			response['status'] = 'success'
-			response['message'] = u'獲取成功請到個人頁面進行email傳送'
-		status = response['status']
-		message = response['message']
+			status = 'success'
+			message = u'獲取成功請到個人頁面進行email傳送'
 		return locals()
-
-
 
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
 	try:
