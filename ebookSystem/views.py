@@ -9,6 +9,7 @@ from django.views import generic
 from .models import *
 from .forms import *
 from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
+from utils.decorator import *
 import os
 import json
 import shutil
@@ -18,9 +19,10 @@ class book_list(generic.ListView):
 	def get_queryset(self):
 		return Book.objects.order_by('-bookname')
 
+@http_response
 def search_book(request, template_name='ebookSystem/search_book.html'):
 	if request.method == 'GET':
-		return render(request, template_name, locals())
+		return locals()
 	if request.method == 'POST':
 		response = {}
 		redirect_to = None
@@ -42,13 +44,7 @@ def search_book(request, template_name='ebookSystem/search_book.html'):
 			response['message'] = u'獲取成功請到個人頁面進行email傳送'
 		status = response['status']
 		message = response['message']
-		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json")
-		else:
-#			if redirect_to:
-#				return HttpResponseRedirect(redirect_to)
-#			else:
-			return render(request, template_name, locals())
+		return locals()
 
 
 

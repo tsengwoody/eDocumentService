@@ -75,7 +75,7 @@ def login_user(request, template_name='registration/login.html'):
 					from django.contrib.sessions.models import Session
 					for session in Session.objects.all():
 						if session.get_decoded().has_key('_auth_user_id') and int(session.get_decoded()['_auth_user_id']) == user.id:
-							session.flush()
+							session.delete()
 					login(request, user)
 					redirect_to = redirect_user(user)
 					response['status'] = 'success'

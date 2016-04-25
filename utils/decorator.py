@@ -43,3 +43,10 @@ def user_category_check(category):
 					return render(request, template_name, locals())
 		return user_category_in
 	return user_category_out
+
+def http_response(view):
+	def decorator(request, *args, **kwargs):
+		rend_dict = view(request, *args, **kwargs)
+		print rend_dict
+		return render(request, 'ebookSystem/search_book.html', rend_dict)
+	return decorator
