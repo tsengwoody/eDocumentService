@@ -1,6 +1,8 @@
 *.pyc
+*.mp3
 */migrations/
 db.sqlite3
 static/ebookSystem/document/
 static/ebookSystem/disability_card/
+static/audio_code/
 temp/

@@ -25,7 +25,7 @@ def register(request, template_name='registration/register.html'):
 			response['redirect_to'] = redirect_to
 			if request.POST.has_key('editor'):
 				try:
-					newEditor = Editor(user=newUser, service_hours=0)
+					newEditor = Editor(user=newUser, service_hours=0, professional_field=request.POST['professional_field'])
 					newEditor.save()
 				except:
 					response['status'] = 'error'
@@ -33,9 +33,9 @@ def register(request, template_name='registration/register.html'):
 			if request.POST.has_key('guest'):
 				uploadDir = PREFIX_PATH +'static/ebookSystem/disability_card/{0}'.format(newUser.username)
 				request.FILES['disability_card_front'].name = request.POST['username'] +'_front.jpg'
-				response = handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])
+				[status, message] = handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])
 				request.FILES['disability_card_back'].name = request.POST['username'] +'_back.jpg'
-				response = handle_uploaded_file(uploadDir, request.FILES['disability_card_back'])
+				[status, message] = handle_uploaded_file(uploadDir, request.FILES['disability_card_back'])
 				try:
 					newGuest = Guest(user=newUser)
 					newGuest.save()
@@ -58,7 +58,14 @@ def register(request, template_name='registration/register.html'):
 		registerUserForm = RegisterUserForm()
 		return render(request, template_name, locals())
 
-def login_user(request, template_name='registration/login.html'):
+from utils.decorator import *
+#@audio_code_valid
+def login_user(request, template_name='registration/login.html', *args, **kwargs):
+	try:
+		UUID = locals()['kwargs']['UUID']
+		code = cache.get(UUID)
+	except:
+		pass
 	if request.method == 'GET':
 		loginForm = LoginForm()
 		return render(request, template_name, locals())
@@ -72,6 +79,10 @@ def login_user(request, template_name='registration/login.html'):
 			user = authenticate(username=username, password=password)
 			if user is not None:
 				if user.is_active:
+					from django.contrib.sessions.models import Session
+					for session in Session.objects.all():
+						if session.get_decoded().has_key('_auth_user_id') and int(session.get_decoded()['_auth_user_id']) == user.id:
+							session.delete()
 					login(request, user)
 					redirect_to = redirect_user(user)
 					response['status'] = 'success'

@@ -9,6 +9,7 @@ from django.views import generic
 from .models import *
 from .forms import *
 from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
+from utils.decorator import *
 import os
 import json
 import shutil
@@ -18,39 +19,28 @@ class book_list(generic.ListView):
 	def get_queryset(self):
 		return Book.objects.order_by('-bookname')
 
-def search_book(request, template_name='ebookSystem/search_book.html'):
+@http_response
+def search_book(request, template_name):
 	if request.method == 'GET':
-		return render(request, template_name, locals())
+		return locals()
 	if request.method == 'POST':
-		response = {}
-		redirect_to = None
 		if request.POST.has_key('book_ISBN'):
 			book_ISBN = request.POST['book_ISBN']
 			book_list = Book.objects.filter(ISBN=book_ISBN)
 			if len(book_list) > 0:
-				response['status'] = 'success'
-				response['message'] = u'成功查詢資料'
+				status = 'success'
+				message = u'成功查詢資料'
 			else:
-				response['status'] = 'error'
-				response['message'] = u'查無資料'
+				status = 'error'
+				message = u'查無資料'
 		elif request.POST.has_key('get_book'):
 			book_ISBN = request.POST['get_book']
 			book = Book.objects.get(ISBN=book_ISBN)
 			guest = Guest.objects.get(user=request.user)
 			book.guests.add(guest)
-			response['status'] = 'success'
-			response['message'] = u'獲取成功請到個人頁面進行email傳送'
-		status = response['status']
-		message = response['message']
-		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json")
-		else:
-#			if redirect_to:
-#				return HttpResponseRedirect(redirect_to)
-#			else:
-			return render(request, template_name, locals())
-
-
+			status = 'success'
+			message = u'獲取成功請到個人頁面進行email傳送'
+		return locals()
 
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
 	try:
@@ -144,13 +134,22 @@ def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 	response={}
 	book = Book.objects.get(ISBN=book_ISBN)
 	part = EBook.objects.get(part=part_part,book=book)
+	response = {}
 	if 'online' in request.POST:
-		user.online = timezone.now()
-		user.save()
-		part.service_hours = part.service_hours+1
-		part.save()
-		response['status'] = 'success'
-		response['message'] = part.service_hours
+		if not user.online:
+			user.online = timezone.now()
+			user.save()
+		delta = timezone.now() - user.online
+		if delta.seconds < 50:
+			response['status'] = 'error'
+			response['message'] = u'您有其他編輯正進行'
+		else:
+			user.online = timezone.now()
+			user.save()
+			part.service_hours = part.service_hours+1
+			part.save()
+			response['status'] = 'success'
+			response['message'] = part.service_hours
 	else:
 		response['status'] = 'error'
 	return HttpResponse(json.dumps(response), content_type="application/json")
@@ -158,6 +157,8 @@ def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 class editView(generic.View):
 	def get(self, request, encoding='utf-8', *args, **kwargs):
 		template_name='ebookSystem/edit.html'
+		user = request.user
+		response = {}
 		try:
 			book = Book.objects.get(ISBN=kwargs['book_ISBN'])
 			part = EBook.objects.get(part=kwargs['part_part'],book=book)
@@ -210,7 +211,6 @@ class editView(generic.View):
 					fileWrite.write(fileHead)
 			response['status'] = 'success'
 			response['message'] = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
-		
 		elif request.POST.has_key('close'):
 			response['status'] = ['success',u'error']
 			response['message'] = [u'close', u'error message']

@@ -25,17 +25,16 @@ MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'tsengwoody.tw@gmail.com'
 
 @user_category_check(['scaner'])
+@http_response
 def create_document(request, template_name='guest/create_document.html'):
 	readmeUrl = reverse('guest:create_document') +'readme/'
 	user = request.user
 	if request.method == 'POST':
-		response = {}
-		redirect_to = None
 		bookForm = BookForm(request.POST, request.FILES)
 		if bookForm.is_valid():
 			uploadPath = PREFIX_PATH +u'static/ebookSystem/document/{0}'.format(bookForm.cleaned_data['ISBN'])
 			if not os.path.exists(uploadPath):
-				response = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
+				[status, message] = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
 				uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
 				with ZipFile(uploadFilePath, 'r') as uploadFile:
 					ZipFile.testzip(uploadFile)
@@ -54,31 +53,22 @@ def create_document(request, template_name='guest/create_document.html'):
 					else:
 						guest = None
 					redirect_to = reverse('guest:profile')
-					response['status'] = 'success'
-					response['message'] = u'成功建立並上傳文件'
-					response['redirect_to'] = redirect_to
+					status = 'success'
+					message = u'成功建立並上傳文件'
 				else:
 					shutil.rmtree(uploadPath)
-					response['status'] = 'error'
-					response['message'] = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
+					status = 'error'
+					message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			else:
-				response['status'] = 'error'
-				response['message'] = u'文件已存在'
+				status = 'error'
+				message = u'文件已存在'
 		else:
-			response['status'] = 'error'
-			response['message'] = u'表單驗證失敗' +str(bookForm.errors)
-		status = response['status']
-		message = response['message']
-		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json")
-		else:
-#			if redirect_to:
-#				return HttpResponseRedirect(redirect_to)
-#			else:
-			return render(request, template_name, locals())
+			status = 'error'
+			message = u'表單驗證失敗' +str(bookForm.errors)
+		return locals()
 	if request.method == 'GET':
 		bookForm = BookForm()
-	return render(request, template_name, locals())
+		return locals()
 
 def upload_progress(request):
 	"""
@@ -92,20 +82,11 @@ def upload_progress(request):
 	if progress_id:
 		cache_key = "%s_%s" % (request.META['REMOTE_ADDR'], progress_id)
 		data = cache.get(cache_key)
+#		cache_key = "%s" % (progress_id)
+#		data = request.session.get('upload_progress_%s' % cache_key, None)
 		return HttpResponse(json.dumps(data), content_type="application/json")
 	else:
 		return HttpResponseServerError('Server Error: You must provide X-Progress-ID header or query param.')
-
-def handle_uploaded_file2(dirname, file):
-	if not os.path.exists(dirname):
-		os.makedirs(dirname, 0777)
-	fullpath = os.path.join(dirname, file.name)
-	if os.path.exists(fullpath):
-		return -1
-	with open(fullpath, 'wb+') as destination:
-		for chunk in file.chunks():
-			destination.write(chunk)
-	return fullpath
 
 class profileView(generic.View):
 	template_name=''

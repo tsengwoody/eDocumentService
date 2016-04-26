@@ -62,7 +62,7 @@ class ContactUs(models.Model):
 
 class Reply(models.Model):
 	contact_us = models.ForeignKey(ContactUs)
-	message_datetime = models.DateField(default = timezone.now())
+	message_datetime = models.DateField()
 	content = models.CharField(max_length=1000)
 	def __unicode__(self):
 		return self.message_datetime

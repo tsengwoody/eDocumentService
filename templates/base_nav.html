@@ -39,6 +39,7 @@
 				{% if request.user.is_editor %}
 				<li><a href="{% url 'account:profile' %}">服務</a></li>
 				{% endif %}
+				<li><a href="{% url 'ebookSystem:search_book' %}">查詢</a></li>
 				{% endifequal %}
 				<li><a href="{% url 'genericUser:info' %}">會員</a></li>
 				<li><a href="{% url 'genericUser:contact_us' %}">聯絡我們</a></li>
