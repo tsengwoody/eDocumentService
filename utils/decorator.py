@@ -53,7 +53,7 @@ def http_response(view):
 			response['status'] = rend_dict['status']
 			response['message'] = rend_dict['message']
 			if 'redirect_to' in rend_dict:
-				response['redirect_to'] = redirect_to
+				response['redirect_to'] = rend_dict['redirect_to']
 			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
 			if 'redirect_to' in rend_dict:
@@ -70,7 +70,7 @@ def audio_code_valid(view):
 	def decorator(request, *args, **kwargs):
 		if request.method == 'POST':
 			if request.POST.has_key('code') and request.POST.has_key('UUID') and request.POST['code'] == cache.get(request.POST['UUID']):
-				os.remove(PREFIX_PATH +'static/' +request.POST['UUID'] +'.mp3')
+				os.remove(PREFIX_PATH +'static/audio_code/' +request.POST['UUID'] +'.mp3')
 				return view(request, *args, **kwargs)
 			else:
 				if request.is_ajax():
