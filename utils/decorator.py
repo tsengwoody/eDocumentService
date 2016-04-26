@@ -73,9 +73,14 @@ def audio_code_valid(view):
 				os.remove(PREFIX_PATH +'static/' +request.POST['UUID'] +'.mp3')
 				return view(request, *args, **kwargs)
 			else:
-				os.remove(PREFIX_PATH +'static/' +request.POST['UUID'] +'.mp3')
-				template_name = 'audio_code_error.html'
-				return render(request, template_name, locals())
+				if request.is_ajax():
+					response = {}
+					response['status'] = 'error'
+					response['message'] = u'驗證碼錯誤'
+					return HttpResponse(json.dumps(response), content_type="application/json")
+				else:
+					template_name = 'audio_code_error.html'
+					return render(request, template_name, locals())
 		if request.method == 'GET':
 			[UUID, code] = audio_code()
 			UUIDDict = {'UUID':UUID}

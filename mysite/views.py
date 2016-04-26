@@ -59,10 +59,11 @@ def register(request, template_name='registration/register.html'):
 		return render(request, template_name, locals())
 
 from utils.decorator import *
-@audio_code_valid
+#@audio_code_valid
 def login_user(request, template_name='registration/login.html', *args, **kwargs):
 	try:
 		UUID = locals()['kwargs']['UUID']
+		code = cache.get(UUID)
 	except:
 		pass
 	if request.method == 'GET':
