@@ -43,4 +43,7 @@ code {
   font-size: 80%;
 }
 
+.table tr a{
+  padding-left:0px;
+}
 
