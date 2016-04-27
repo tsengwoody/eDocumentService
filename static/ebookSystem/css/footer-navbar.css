@@ -21,6 +21,9 @@ body {
 .footer p{
   margin:0;
 }
+nav .pager{
+    margin:0px;
+}
 
 /* Custom page CSS
 -------------------------------------------------- */
