@@ -45,7 +45,7 @@ body > .container {
                         <label for="id_professional_field">professional field:</label>
                     </th>
                     <td>
-                        <input id="id_professional_field" maxlength="30" name="professional_field" value={{ user.editor.professional_field }} type="text">
+                        <input id="id_professional_field" maxlength="30" name="professional_field" value="{{ user.editor.professional_field }}" type="text">
                         <input type='hidden' name='service_hours' value='{{ user.editor.service_hours }}' />
                     </td>
                 </tr>

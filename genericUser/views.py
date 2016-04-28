@@ -111,7 +111,11 @@ def set_role(request,template_name='genericUser/set_role.html'):
 	if request.method == 'POST':
 		response = {}
 		if request.POST.has_key('editor'):
-			newEditor = Editor(user=user, professional_field=request.POST['professional_field'], service_hours=request.POST['service_hours'])
+			if user.has_editor():
+#				service_hours=int(request.POST['service_hours'])
+				newEditor = Editor(user=user, professional_field=request.POST['professional_field'], service_hours=request.POST['service_hours'])
+			else:
+				newEditor = Editor(user=user, professional_field=request.POST['professional_field'])
 			newEditor.save()
 			user.status = REVIEW
 			user.save()
@@ -131,8 +135,10 @@ def set_role(request,template_name='genericUser/set_role.html'):
 				response['status'] = 'success'
 				response['message'] = u'guest申請成功'
 			else:
-				response['status'] = 'error'
-				response['message'] = u'guest申請失敗，已有此權限'
+				user.status = REVIEW
+				user.save()
+				response['status'] = 'success'
+				response['message'] = u'guest申請成功'
 		status = response['status']
 		message = response['message']
 		if request.is_ajax():

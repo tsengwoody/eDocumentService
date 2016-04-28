@@ -1,7 +1,7 @@
 ﻿# coding: utf-8
 import codecs
 import datetime
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponseRedirect,HttpResponse, Http404
 from django.shortcuts import render
 from django.utils import timezone
@@ -158,6 +158,7 @@ class editView(generic.View):
 	def get(self, request, encoding='utf-8', *args, **kwargs):
 		template_name='ebookSystem/edit.html'
 		user = request.user
+		readmeUrl = '/ebookSystem/edit/readme/'
 		response = {}
 		try:
 			book = Book.objects.get(ISBN=kwargs['book_ISBN'])
@@ -182,6 +183,8 @@ class editView(generic.View):
 
 	def post(self, request, encoding='utf-8', *args, **kwargs):
 		template_name='ebookSystem/edit.html'
+		user = request.user
+		readmeUrl = '/ebookSystem/edit/readme/'
 		response = {}
 		try:
 			book = Book.objects.get(ISBN=kwargs['book_ISBN'])
@@ -285,3 +288,7 @@ def getContent(contentPath, encoding='utf-8'):
 			editContent = finishContent
 			finishContent = ''
 	return [finishContent, editContent, fileHead]
+
+def readme(request, template_name):
+	template_name = resolve(request.path).namespace +'/' +template_name +'_readme.html'
+	return render(request, template_name, locals())

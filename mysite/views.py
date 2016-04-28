@@ -112,8 +112,8 @@ def logout_user(request, template_name='registration/logged_out.html'):
 	return render(request, template_name, locals())
 
 def redirect_user(user):
-	if user.is_editor:
+	if user.is_editor and user.has_editor():
 		return reverse('account:profile')
-	if user.is_guest:
+	if user.is_guest and user.has_guest():
 		return reverse('guest:profile')
 	return reverse('genericUser:info')
