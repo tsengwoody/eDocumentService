@@ -3,21 +3,18 @@
 {% block title %}
 {{ book.bookname }}審核
 {% endblock %}
-
-{% block header %}
 {% block style %}
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script language="javascript" src="{% static 'ebookSystem/js/review_document.js' %}"></script>
 <link href="{% static "ebookSystem/css/review-document.css" %}" rel="stylesheet" > 
 {% endblock %}
-
-{% endblock %}
 {% block content %}
 
 <legend><h3>{{ book.bookname }}審核</h3></legend>
 <form action="" method="post">
     {% csrf_token %}
+    <input type="hidden" id="id_page" name="page" value="0" />
     <div class="row">
         <div class="col-md-2">
             <ul class="nav nav-pills nav-stacked nav-stacked">
@@ -59,7 +56,7 @@
                         </ul>
                     </nav>
                     <div class="form-group scrollbarDiv">
-                        <img src="{% static defaultPageURL %}" alt="文件掃描原檔" id="scanPage" name="scanPage" style="width: 100%;">
+                        <img src="{% static defaultPageURL %}" alt="文件掃描原檔" id="scanPage" name="scanPage" />
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-offset-10 col-sm-3">
