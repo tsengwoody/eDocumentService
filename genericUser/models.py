@@ -53,7 +53,7 @@ class User(AbstractUser):
 class ContactUs(models.Model):
 	name = models.CharField(max_length=10)
 	email = models.EmailField()
-	message_datetime = models.DateField(default = timezone.now())
+	message_datetime = models.DateField(default = timezone.now)
 	kind = models.CharField(max_length=10, choices=ContactUsKIND)
 	subject = models.CharField(max_length=50)
 	content = models.CharField(max_length=1000)

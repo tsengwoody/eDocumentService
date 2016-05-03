@@ -1,4 +1,5 @@
 ﻿# coding: utf-8
+from django.contrib import messages
 from django.core.cache import cache
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse

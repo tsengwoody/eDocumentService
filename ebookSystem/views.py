@@ -250,10 +250,10 @@ def editVarInit(part):
 	sourcePath = part.book.path +u'/source'
 #	sourcePath = sourcePath.encode('utf-8')
 	fileList=os.listdir(sourcePath)
-	scanPageList=[]
-	for scanPage in fileList:
-		if scanPage.split('.')[-1].lower() == 'jpg':
-			scanPageList.append(scanPage)
+	scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
+#	for scanPage in fileList:
+#		if scanPage.split('.')[-1].lower() == 'jpg':
+#			scanPageList.append(scanPage)
 	scanPageList = scanPageList[part.begin_page:part.end_page+1]
 	defaultPageIndex=part.edited_page
 	defaultPage=scanPageList[defaultPageIndex]

@@ -44,7 +44,7 @@ def register(request, template_name='registration/register.html'):
 					response['message'] = u'guest申請失敗'
 		else :
 			response['status'] = 'error'
-			response['message'] = u'表單驗證失敗' +str(bookForm.errors)
+			response['message'] = u'表單驗證失敗' +str(registerUserForm.errors)
 		status = response['status']
 		message = response['message']
 		if request.is_ajax():

@@ -183,3 +183,12 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 def readme(request, template_name):
 	template_name = 'account/' +template_name +'_readme.html'
 	return render(request, template_name, locals())
+
+from django.contrib import messages
+def test_message(request, template_name):
+	messages.add_message(request, messages.INFO, 'Hello world.')
+	messages.add_message(request, messages.INFO, 'Hello world2.')
+	storage = messages.get_messages(request)
+	for message in storage:
+		print message.tags
+	return render(request, template_name, locals())

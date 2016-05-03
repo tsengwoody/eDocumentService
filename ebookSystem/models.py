@@ -24,9 +24,9 @@ class Book(models.Model):
 	page_per_part = models.IntegerField(default=50)
 #	reviewer = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL)
-	guests = models.ManyToManyField(Guest,blank=True, null=True)
+	guests = models.ManyToManyField(Guest)
 	is_active = models.BooleanField(default=False)
-	upload_date = models.DateField(default = timezone.now())
+	upload_date = models.DateField(default = timezone.now)
 	remark = models.CharField(max_length=255, blank=True, null=True)
 	def __unicode__(self):
 		return self.bookname

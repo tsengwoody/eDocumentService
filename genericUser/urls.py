@@ -9,4 +9,5 @@ urlpatterns = [
 	url(r'^info_change/$', views.info_change, {'template_name': 'genericUser/info_change.html'}, name='info_change'),
 	url(r'^set_role/$', views.set_role, {'template_name': 'genericUser/set_role.html'}, name='set_role'),
 	url(r'^review_user/(?P<username>[\w-]+)/$', views.review_user, name='review_user'),
+	url(r'^test_message/$', views.test_message, {'template_name': 'genericUser/test_message.html'}, name='test_message'),
 ]

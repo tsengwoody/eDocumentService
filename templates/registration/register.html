@@ -17,6 +17,7 @@ body > .container {
 {% block content %}
 <form method="post" action="{% url 'register' %}">
     {% csrf_token %}
+
     <h3>註冊</h3> 
     <div class="modal fade" id="pleaseWaitDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">

@@ -37,7 +37,11 @@
 			<td>{{ book.house }}</td>
 			<td>{{ book.date }}</td>
 			<td>{{ book.collect_finish_page_count }}/{{book.page_count}}</td>
-			<td><button type="submit" class="btn btn-default" id="get_book_id" name="get_book" value={{ book.ISBN }}>獲取</button></td>
+			<td>
+
+				<button type="submit" class="btn btn-default" id="get_book_id" name="get_book" value={{ book.ISBN }}>獲取</button>
+
+			</td>
 		</tr>
 		{% endfor %}
 	</table>

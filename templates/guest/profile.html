@@ -26,7 +26,7 @@
 		{% for book in edit_book_list %}
 		<tr>
 			<td>{{book.bookname}}</td>
-			<td>{{book.collect_is_finish}}</td>
+			<td>{{book.collect_finish_page_count}}/{{book.page_count}}</td>
 			<td>{{book.collect_service_hours}}</td>
 			<td><a href = /ebookSystem/detail/{{book.ISBN}}/>詳細資訊</a></td>
 			<td>
