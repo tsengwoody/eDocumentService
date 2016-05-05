@@ -43,7 +43,7 @@ class Command(BaseCommand):
 		rootEditor = Editor.objects.create(user=root)
 		rootGuest = Guest.objects.create(user=root)
 		with open(u'temp/藍色駭客.zip') as fileObject:
-			request = factory.post(reverse('guest:create_document'), {'bookname':u'藍色駭客', 'author':u'傑佛瑞．迪佛', 'translator':u'宋瑛堂', 'house':u'皇冠', 'ISBN':u'9573321564', 'date':u'2013-07-11', 'fileObject':fileObject, 'guest':'demo-guest'})
+			request = factory.post(reverse('guest:create_document'), {'bookname':u'藍色駭客', 'author':u'傑佛瑞．迪佛', 'house':u'皇冠', 'ISBN':u'9573321564', 'date':u'2013-07-11', 'fileObject':fileObject, 'guest':'demo-guest'})
 		request.user = manager
 		response = create_document(request)
 		assert response.status_code == 302, 'status_code' +str(response.status_code)

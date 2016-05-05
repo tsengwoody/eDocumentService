@@ -32,40 +32,47 @@ def create_document(request, template_name='guest/create_document.html'):
 	user = request.user
 	if request.method == 'POST':
 		bookForm = BookForm(request.POST, request.FILES)
-		if bookForm.is_valid():
-			uploadPath = PREFIX_PATH +u'static/ebookSystem/document/{0}'.format(bookForm.cleaned_data['ISBN'])
-			if not os.path.exists(uploadPath):
-				[status, message] = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
-				uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
-				with ZipFile(uploadFilePath, 'r') as uploadFile:
-					ZipFile.testzip(uploadFile)
-				unzip_file(uploadFilePath, uploadPath)
-				if validate_folder(uploadPath+u'/OCR', uploadPath+u'/source', 50)[0]:
-					newBook = bookForm.save(commit=False)
-#					newBook.is_active = True
-					newBook.scaner = user
-					newBook.save()
-					if request.POST.has_key('guest'):
-						try:
-							guest = Guest.objects.get(user__username=request.POST['guest'])
-							newBook.guests.add(guest)
-						except:
-							guest = None
-					else:
-						guest = None
-					redirect_to = reverse('guest:profile')
-					status = 'success'
-					message = u'成功建立並上傳文件'
-				else:
-					shutil.rmtree(uploadPath)
-					status = 'error'
-					message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
-			else:
-				status = 'error'
-				message = u'文件已存在'
-		else:
+		if not bookForm.is_valid():
 			status = 'error'
 			message = u'表單驗證失敗' +str(bookForm.errors)
+			return locals()
+		uploadPath = PREFIX_PATH +u'static/ebookSystem/document/{0}'.format(bookForm.cleaned_data['ISBN'])
+		if os.path.exists(uploadPath):
+			status = 'error'
+			message = u'文件已存在'
+			return locals()
+		[status, message] = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
+		uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
+#		uploadFilePath = uploadFilePath.encode('utf-8')
+		try:
+			with ZipFile(uploadFilePath, 'r') as uploadFile:
+				ZipFile.testzip(uploadFile)
+		except:
+				shutil.rmtree(uploadPath)
+				status = 'error'
+				message = u'非正確ZIP文件'
+				return locals()
+		unzip_file(uploadFilePath, uploadPath)
+		newBook = bookForm.save(commit=False)
+		newBook.path = uploadPath
+		if not newBook.validate_folder():
+			shutil.rmtree(uploadPath)
+			status = 'error'
+			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
+			return locals()
+		newBook.scaner = user
+		newBook.save()
+		if request.POST.has_key('guest'):
+			try:
+				guest = Guest.objects.get(user__username=request.POST['guest'])
+				newBook.guests.add(guest)
+			except:
+				guest = None
+		else:
+			guest = None
+		redirect_to = reverse('guest:profile')
+		status = 'success'
+		message = u'成功建立並上傳文件'
 		return locals()
 	if request.method == 'GET':
 		bookForm = BookForm()
@@ -97,7 +104,7 @@ class profileView(generic.View):
 		readmeUrl = reverse('guest:profile') +'readme/'
 		template_name=self.template_name
 		user=request.user
-		book_list = user.guest.book_set.all()
+		book_list = user.guest.own_book_set.all()
 		edit_book_list = []
 		finish_book_list = []
 		for book in book_list:
@@ -114,7 +121,7 @@ class profileView(generic.View):
 		response = {}
 		redirect_to = None
 		user=request.user
-		book_list = user.guest.book_set.all()
+		book_list = user.guest.own_book_set.all()
 		edit_book_list = []
 		finish_book_list = []
 		for book in book_list:
@@ -137,11 +144,12 @@ class profileView(generic.View):
 		if request.POST.has_key('delete'):
 			book_ISBN = request.POST.get('delete')
 			deleteBook = Book.objects.get(ISBN = book_ISBN)
+			deletePath = deleteBook.path
+			shutil.rmtree(deletePath)
 			deleteBook.delete()
-			shutil.rmtree(deleteBook.path)
 			response['status'] = 'success'
 			response['message'] = u'成功刪除文件'
-		book_list = user.book_set.all()
+		book_list = user.guest.own_book_set.all()
 		status = response['status']
 		message = response['message']
 		if request.is_ajax():

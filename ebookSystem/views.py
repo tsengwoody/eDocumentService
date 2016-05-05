@@ -48,7 +48,6 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 	except:
 		raise Http404("book does not exist")
 	sourcePath = book.path +u'/source'
-#		sourcePath = sourcePath.encode('utf-8')
 	fileList=os.listdir(sourcePath)
 	scanPageList=[]
 	for scanPage in fileList:
@@ -170,9 +169,7 @@ class editView(generic.View):
 		fileHead=''
 		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(part)
 		finishFilePath = book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
-#		finishFilePath = finishFilePath.encode('utf-8')
 		filePath = book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
-#		filePath = filePath.encode('utf-8')
 		[finishContent, editContent, fileHead] = getContent(filePath)
 		with codecs.open(finishFilePath, 'w', encoding=encoding) as fileWrite:
 			if finishContent!='':
@@ -194,9 +191,7 @@ class editView(generic.View):
 		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(part)
 		editForm = EditForm(request.POST)
 		finishFilePath = book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
-#		finishFilePath = finishFilePath.encode('utf-8')
 		filePath = book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
-#		filePath = filePath.encode('utf-8')
 		if request.POST.has_key('save'):
 			editContent = request.POST['content']
 			with codecs.open(finishFilePath, 'r', encoding=encoding) as fileRead:
@@ -248,7 +243,6 @@ class editView(generic.View):
 
 def editVarInit(part):
 	sourcePath = part.book.path +u'/source'
-#	sourcePath = sourcePath.encode('utf-8')
 	fileList=os.listdir(sourcePath)
 	scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
 #	for scanPage in fileList:

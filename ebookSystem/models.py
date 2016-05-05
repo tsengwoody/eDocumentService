@@ -7,14 +7,13 @@ from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, 
 from genericUser.models import User
 from guest.models import Guest
 from account.models import Editor
-from utils.validate import *
 import os
 import datetime
+import codecs
 
 class Book(models.Model):
 	bookname = models.CharField(max_length=50)
 	author = models.CharField(max_length=50)
-	translator = models.CharField(max_length=50, blank=True, null=True)
 	house = models.CharField(max_length=30)
 	date = models.DateField()
 	ISBN = models.CharField(max_length=20, primary_key=True)
@@ -23,8 +22,8 @@ class Book(models.Model):
 	part_count = models.IntegerField(blank=True, null=True)
 	page_per_part = models.IntegerField(default=50)
 #	reviewer = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL)
-	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL)
-	guests = models.ManyToManyField(Guest)
+	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
+	guests = models.ManyToManyField(Guest, related_name='own_book_set')
 	is_active = models.BooleanField(default=False)
 	upload_date = models.DateField(default = timezone.now)
 	remark = models.CharField(max_length=255, blank=True, null=True)
@@ -34,18 +33,29 @@ class Book(models.Model):
 	def validate_folder(self):
 		source = self.path + u'/source'
 		OCR = self.path + u'/OCR'
-		try:
-			fileList=os.listdir(source)
-			fileList=os.listdir(OCR)
-		except:
-			return False
 		partList = []
-		fileList = []
-		for i in range(self.part_count):
-			partList.append('part{}'.format(i+1))
+		OCRFileList = []
+		sourceFileList = []
+		try:
+			OCRFileList = os.listdir(OCR)
+			for file in OCRFileList:
+				with codecs.open(os.path.join(OCR, file), 'r', encoding='utf-8') as fileRead:
+					content=fileRead.read()
+			sourceFileList=os.listdir(source)
+		except:
+			return [False, None, None]
+		page_count = 0
+		for scanPage in sourceFileList:
+			if scanPage.split('.')[-1].lower() == 'jpg':
+				page_count = page_count + 1
+		part_count = (page_count-1)/self.page_per_part+1
+		for i in range(part_count):
+			partList.append('part{}.{}'.format(i+1, 'txt'))
 		partSet = set(partList)
-		fileSet = set(fileList)
-		return partSet.issubset(fileSet)
+		for i in range(i):
+			OCRFileList[i] = OCRFileList[i].lower()
+		OCRFileSet = set(OCRFileList)
+		return [partSet.issubset(OCRFileSet), page_count, part_count]
 
 	def collect_is_finish(self):
 		is_finish = True
@@ -103,7 +113,7 @@ def pre_save_Book(**kwargs):
 	book = kwargs.get('instance')
 	if book.page_count == None or book.part_count == None:
 		book.path = PREFIX_PATH + u'static/ebookSystem/document/{0}'.format(book.ISBN)
-		[result, book.page_count, book.part_count] = validate_folder(book.path+u'/OCR', book.path+u'/source', book.page_per_part)
+		[result, book.page_count, book.part_count] = book.validate_folder()
 
 def post_save_Book(**kwargs):
 	book = kwargs.get('instance')
