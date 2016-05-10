@@ -157,4 +157,6 @@ EDIT =2
 REVIEW =3
 REVISE = 4
 FINISH = 5
+MANAGER = ['tsengwoody@yahoo.com.tw']
+SERVICE = 'tsengwoody.tw@gmail.com'
 PREFIX_PATH = BASE_DIR +'/'

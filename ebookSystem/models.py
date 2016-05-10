@@ -21,6 +21,7 @@ class Book(models.Model):
 	page_count = models.IntegerField(blank=True, null=True)
 	part_count = models.IntegerField(blank=True, null=True)
 	page_per_part = models.IntegerField(default=50)
+	priority = models.IntegerField(default=0)
 #	reviewer = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
 	guests = models.ManyToManyField(Guest, related_name='own_book_set')

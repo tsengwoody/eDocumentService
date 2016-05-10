@@ -18,12 +18,8 @@ from utils.uploadFile import handle_uploaded_file
 from utils.zip import *
 from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 import zipfile
-import mysite
 import json
 import shutil
-
-MANAGER = ['tsengwoody@yahoo.com.tw']
-SERVICE = 'tsengwoody.tw@gmail.com'
 
 @user_category_check(['scaner'])
 @http_response
@@ -43,7 +39,6 @@ def create_document(request, template_name='guest/create_document.html'):
 			return locals()
 		[status, message] = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
 		uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
-#		uploadFilePath = uploadFilePath.encode('utf-8')
 		try:
 			with ZipFile(uploadFilePath, 'r') as uploadFile:
 				ZipFile.testzip(uploadFile)
@@ -100,6 +95,7 @@ class profileView(generic.View):
 	template_name=''
 
 	@method_decorator(user_category_check(['guest']))
+	@method_decorator(http_response)
 	def get(self, request, *args, **kwargs):
 		readmeUrl = reverse('guest:profile') +'readme/'
 		template_name=self.template_name
@@ -112,23 +108,14 @@ class profileView(generic.View):
 				finish_book_list.append(book)
 			else:
 				edit_book_list.append(book)
-		return render(request, template_name, locals())
+		return locals()
 
 	@method_decorator(user_category_check(['guest']))
+	@method_decorator(http_response)
 	def post(self, request, *args, **kwargs):
 		readmeUrl = reverse('guest:profile') +'readme/'
 		template_name=self.template_name
-		response = {}
-		redirect_to = None
 		user=request.user
-		book_list = user.guest.own_book_set.all()
-		edit_book_list = []
-		finish_book_list = []
-		for book in book_list:
-			if book.collect_is_finish():
-				finish_book_list.append(book)
-			else:
-				edit_book_list.append(book)
 		if request.POST.has_key('emailBook'):
 			book_ISBN = request.POST.get('emailBook')
 			emailBook = Book.objects.get(ISBN = book_ISBN)
@@ -139,26 +126,25 @@ class profileView(generic.View):
 				attach_file_path = emailBook.path +u'/OCR/part{0}.txt'.format(part.part)
 				email.attach_file(attach_file_path)
 			email.send(fail_silently=False)
-			response['status'] = 'success'
-			response['message'] = u'已寄送到您的電子信箱'
+			status = 'success'
+			message = u'已寄送到您的電子信箱'
 		if request.POST.has_key('delete'):
 			book_ISBN = request.POST.get('delete')
 			deleteBook = Book.objects.get(ISBN = book_ISBN)
 			deletePath = deleteBook.path
 			shutil.rmtree(deletePath)
 			deleteBook.delete()
-			response['status'] = 'success'
-			response['message'] = u'成功刪除文件'
+			status = 'success'
+			message = u'成功刪除文件'
 		book_list = user.guest.own_book_set.all()
-		status = response['status']
-		message = response['message']
-		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json")
-		else:
-			if redirect_to:
-				return HttpResponseRedirect(redirect_to)
+		edit_book_list = []
+		finish_book_list = []
+		for book in book_list:
+			if book.collect_is_finish():
+				finish_book_list.append(book)
 			else:
-				return render(request, template_name, locals())
+				edit_book_list.append(book)
+		return locals()
 
 def readme(request, template_name):
 	template_name = 'guest/' +template_name +'_readme.html'

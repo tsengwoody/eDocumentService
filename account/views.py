@@ -131,6 +131,9 @@ class profileView(generic.View):
 			message = u'已對換時數{}'.format(exchangePart.service_hours)
 			editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
 			finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
+		else:
+			status = 'error'
+			message = u'不明的操作'
 		return locals()
 
 def readme(request, template_name):

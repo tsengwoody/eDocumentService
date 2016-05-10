@@ -42,6 +42,7 @@ def search_book(request, template_name):
 			message = u'獲取成功請到個人頁面進行email傳送'
 		return locals()
 
+@user_category_check(['manager'])
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
@@ -84,6 +85,7 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 			else:
 				return render(request, template_name, locals())
 
+@user_category_check(['manager'])
 def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'):
 	try:
 		part = EBook.objects.get(ISBN_part=ISBN_part)

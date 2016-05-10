@@ -3,7 +3,7 @@ import os
 
 def handle_uploaded_file(dirname, file):
 	if not os.path.exists(dirname):
-		os.makedirs(dirname, 0777)
+		os.makedirs(dirname, 0770)
 	fullpath = os.path.join(dirname, file.name)
 	if os.path.exists(fullpath):
 		return ['error', u'檔案已存在']

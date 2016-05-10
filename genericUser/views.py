@@ -12,12 +12,10 @@ from guest.models import Guest
 from genericUser.models import User
 from utils.decorator import *
 from utils.uploadFile import handle_uploaded_file
-from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
+from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH, MANAGER, SERVICE
 from .forms import *
 
-MANAGER = ['tsengwoody@yahoo.com.tw']
-SERVICE = 'tsengwoody.tw@gmail.com'
-
+@user_category_check(['manager'])
 def review_user(request, username, template_name='genericUser/review_user.html'):
 	user = get_list_or_404(User, username=username)[0]
 	sourcePath = PREFIX_PATH +'static/ebookSystem/disability_card/{0}'.format(user.username)
@@ -91,7 +89,7 @@ def info(request, template_name):
 	user = request.user
 	return render(request, template_name, locals())
 
-@user_category_check(['editor', 'guest'])
+@user_category_check(['user'])
 def info_change(request,template_name):
 	user = request.user
 	if request.method == 'POST':
@@ -106,55 +104,53 @@ def info_change(request,template_name):
 		infoChangeUserForm = InfoChangeUserForm(instance = user)
 	return render(request, template_name, locals())
 
+@user_category_check(['user'])
+@http_response
 def set_role(request,template_name='genericUser/set_role.html'):
 	user = request.user
 	if request.method == 'POST':
-		response = {}
 		if request.POST.has_key('editor'):
 			if user.has_editor():
-#				service_hours=int(request.POST['service_hours'])
-				newEditor = Editor(user=user, professional_field=request.POST['professional_field'], service_hours=request.POST['service_hours'])
+				service_hours=int(request.POST['service_hours'])
+				newEditor = Editor(user=user, professional_field=request.POST['professional_field'], service_hours=service_hours)
 			else:
 				newEditor = Editor(user=user, professional_field=request.POST['professional_field'])
 			newEditor.save()
 			user.status = REVIEW
 			user.save()
-			response['status'] = 'success'
-			response['message'] = u'editor申請成功'
+			status = 'success'
+			message = u'editor申請成功'
 		if request.POST.has_key('guest'):
 			uploadDir = PREFIX_PATH +'static/ebookSystem/disability_card/{0}'.format(user.username)
+			if os.path.exists(uploadDir):
+				shutil.rmtree(uploadDir)
 			request.FILES['disability_card_front'].name = user.username +'_front.jpg'
-			response = handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])
+			[status, message] = handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])
 			request.FILES['disability_card_back'].name = user.username +'_back.jpg'
-			response = handle_uploaded_file(uploadDir, request.FILES['disability_card_back'])
+			[status, message] = handle_uploaded_file(uploadDir, request.FILES['disability_card_back'])
 			if not user.has_guest():
 				newGuest = Guest(user=user)
 				newGuest.save()
 				user.status = REVIEW
 				user.save()
-				response['status'] = 'success'
-				response['message'] = u'guest申請成功'
+				status = 'success'
+				message = u'guest申請成功'
 			else:
 				user.status = REVIEW
 				user.save()
-				response['status'] = 'success'
-				response['message'] = u'guest申請成功'
-		status = response['status']
-		message = response['message']
-		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json")
-		else:
-			return render(request, template_name, locals())
+				status = 'success'
+				message = u'guest申請成功'
+		return locals()
 	if request.method == 'GET':
-		return render(request, template_name, locals())
+		return locals()
 
+@http_response
 def contact_us(request, template_name='genericUser/contact_us.html'):
 	if request.method == 'GET':
 		contactUsForm = ContactUsForm()
-		return render(request, template_name, locals())
+		return locals()
 	if request.method == 'POST':
-		response = {}
-		redirect_to = None
+		print request.POST
 		contactUsForm = ContactUsForm(request.POST)
 		if contactUsForm.is_valid():
 			contactUs = contactUsForm.save(commit=False)
@@ -164,21 +160,13 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=MANAGER)
 			email.send(fail_silently=False)
 			contactUs.save()
-			redirect_to = reverse('account:profile')
-			response['status'] = 'success'
-			response['message'] = u'成功寄送內容，我們將盡速回復'
+			if request.user.is_authenticated():redirect_to = reverse('account:profile')
+			status = 'success'
+			message = u'成功寄送內容，我們將盡速回復'
 		else:
-			response['status'] = 'error'
-			response['message'] = u'表單驗證失敗'
-		status = response['status']
-		message = response['message']
-		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json")
-		else:
-#			if redirect_to:
-#				return HttpResponseRedirect(redirect_to)
-#			else:
-			return render(request, template_name, locals())
+			status = 'error'
+			message = u'表單驗證失敗{}'.format(contactUsForm.errors)
+		return locals()
 
 def readme(request, template_name):
 	template_name = 'account/' +template_name +'_readme.html'
