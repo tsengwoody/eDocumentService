@@ -22,12 +22,15 @@
     height:75%;
     overflow: scroll;
 }
+#step2 > pre{
+    height:85%;
+    overflow: scroll;    
+}
 #step2 > .row{
     height:15%;
     min-height:35px;
 }
 .scrollbarDiv > img {
-
     width:90%;
     
 }

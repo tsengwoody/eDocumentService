@@ -4,32 +4,79 @@
 {{ book.bookname }}審核
 {% endblock %}
 
-{% block header %}
+{% block style %}
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<link href="{% static "ebookSystem/css/review-document.css" %}" rel="stylesheet" > 
+<script>
+function activaTab(tab){
+    $('.nav-pills a[href="#' + tab + '"]').tab('show');
+};
+$(document).ready(function() {
+    $('#step1_next_id').click(function(){
+        activaTab('step2');
+    });
+    $('#step2_next_id').click(function(){
+        activaTab('step3');
+    });
+});
+</script>
 {% endblock %}
+
 {% block content %}
-
 <legend><h3>{{ book.bookname }}審核</h3></legend>
-<ul>
-	<li>書名：{{ part.book.bookname }}</li>
-	<li>段數：{{ part.part }}</li>
-	<li>編輯者：{{ part.editor }}</li>
-	<li>時數：{{ part.service_hours }}</li>
-	<li>領取日期：{{ part.get_date }}</li>
-	<li>完成日期：{{ part.finish_date }}</li>
-</ul>
-<hr>
-<pre>{{ content }}</pre>
-<hr>
-
 <form action="" method="post">
-{% csrf_token %}
-	<label class="radio-inline">
-		<input  type="radio" name="review" id="id_review" checked="true" value="success">通過</input>
-	</label>
-	<label class="radio-inline">
-		<input  type="radio" name="review" id="id_review" value="error">退件</input>
-	</label>
-	<input id="id_reason" maxlength="30" name="reason" type="text"><!--勾退件顯示-->
-	<button class="btn btn-md btn-default" type="submit" id="send_id" name="send">送出</button>
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-2">
+            <ul class="nav nav-pills nav-stacked nav-stacked">
+                <li class="active"><a data-toggle="pill" href="#step1">Step1:基本資料</a></li>
+                <li><a data-toggle="pill" href="#step2">Step2:校對內容</a></li>
+                <li><a data-toggle="pill" href="#step3">Step3:審查結果</a></li>
+            </ul>
+        </div>
+        <div class="col-md-10">
+            <div class="tab-content">
+				<div id="step1" class="tab-pane fade in active">
+				    <ul>
+				        <li>書名：{{ part.book.bookname }}</li>
+				        <li>段數：{{ part.part }}</li>
+				        <li>編輯者：{{ part.editor }}</li>
+				        <li>時數：{{ part.service_hours }}</li>
+				        <li>領取日期：{{ part.get_date }}</li>
+				        <li>完成日期：{{ part.finish_date }}</li>
+				    </ul>
+				    <div class="form-group row">
+				        <div class="col-sm-offset-9 col-sm-3">
+				            <button class="btn btn-primary" type="button" id="step1_next_id">Go next</button>
+				        </div>
+				    </div>
+				</div>
+
+                <div id="step2" class="tab-pane fade in active">
+                    <pre>{{ content }}</pre>
+                    <div class="form-group row">
+                        <div class="col-sm-offset-10 col-sm-3">
+                            <button class="btn btn-primary" type="button" id="step2_next_id">Go next</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="step3" class="tab-pane fade">
+                    <div class="form-group">
+                        <label class="radio">
+                            <input type="radio" name="review" id="id_review" checked="true" value="success">通過</input>
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="review" id="id_review" value="error">退件</input>
+                            <input id="id_reason" maxlength="30" name="reason" type="text">
+                            <!--勾退件顯示-->
+                        </label>
+                    </div>
+                    <button class="btn btn-primary" type="submit" id="send_id" name="send">送出</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </form>
+
 {% endblock %}
