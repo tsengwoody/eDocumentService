@@ -18,7 +18,7 @@ def review_user_list(request, template_name='manager/review_user_list.html'):
 
 @user_category_check(['manager'])
 def review_document_list(request, template_name='manager/review_document_list.html'):
-	book_list = Book.objects.filter(is_active = False)
+	book_list = Book.objects.filter(status = INACTIVE)
 	return render(request, template_name, locals())
 
 @user_category_check(['manager'])

@@ -24,10 +24,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'e_#e-byj7#a+$v7#wmocwd8wp)+&wajk0axt70dl@)nsx!*glq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+DEBUG = False
+TEMPLATE_DEBUG = False
+if DEBUG is False:
+    ALLOWED_HOSTS = ['www.edocumentservice.org', '192.168.1.70']
+else:
+    ALLOWED_HOSTS = []
+ADMINS = [
+    ('woody', 'tsengwoody.tw@gmail.com'),
+    ('amy', 't101598002@ntut.edu.tw'),
+    ('eDocumentService', 'edocumentservice@gmail.com'),
+]
 
 # Application definition
 
@@ -82,23 +89,24 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if DEBUG is True:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
-
-'''DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'eDocumentService',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'eDocumentService',
+            'USER': 'root',
+            'PASSWORD': 'root',
+            'HOST': '127.0.0.1',
+            'PORT': '3306',
+        }
     }
-}'''
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -145,8 +153,8 @@ FILE_UPLOAD_HANDLERS = ('utils.cache.UploadProgressCachedHandler', ) + global_se
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST='smtp.gmail.com'
 EMAIL_PORT=587
-EMAIL_HOST_USER = 'tsengwoody.tw@gmail.com'
-EMAIL_HOST_PASSWORD = 'kpqwkpssgwiwbwix'
+EMAIL_HOST_USER = 'edocumentservice@gmail.com'
+EMAIL_HOST_PASSWORD = 'cozpzzyyuetvhxwe'
 EMAIL_USE_TLS = True
 #smtp.mail.yahoo.com
 

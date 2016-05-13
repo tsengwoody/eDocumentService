@@ -10,6 +10,9 @@ from utils.decorator import *
 from mysite.settings import PREFIX_PATH
 import json
 
+def home(request, template_name='home.html'):
+	return render(request, template_name, locals())
+
 @http_response
 def register(request, template_name='registration/register.html'):
 	if request.method == 'POST':
@@ -33,6 +36,13 @@ def register(request, template_name='registration/register.html'):
 				status = 'error'
 				message = u'editor申請失敗'
 		if request.POST.has_key('guest'):
+			try:
+				request.FILES['disability_card_front']
+				request.FILES['disability_card_back']
+			except:
+				status = 'error'
+				message = u'無上傳文件'
+				return locals()
 			uploadDir = PREFIX_PATH +'static/ebookSystem/disability_card/{0}'.format(newUser.username)
 			request.FILES['disability_card_front'].name = request.POST['username'] +'_front.jpg'
 			[status, message] = handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])

@@ -45,7 +45,7 @@ class profileView(generic.View):
 				editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
 				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
 				return locals()
-			activeBook = Book.objects.filter(is_active = True).order_by('upload_date')
+			activeBook = Book.objects.filter(status = ACTIVE).order_by('upload_date')
 			partialBook = None
 			for book in activeBook:
 				if 0 < book.collect_get_count() < book.part_count:
@@ -78,7 +78,7 @@ class profileView(generic.View):
 				editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
 				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
 				return locals()
-			activeBook = Book.objects.filter(is_active = True).order_by('upload_date')
+			activeBook = Book.objects.filter(status = ACTIVE).order_by('upload_date')
 			completeBook = None
 			for book in activeBook:
 				if book.collect_get_count() == 0:

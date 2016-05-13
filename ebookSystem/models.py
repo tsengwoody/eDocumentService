@@ -25,7 +25,8 @@ class Book(models.Model):
 #	reviewer = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
 	guests = models.ManyToManyField(Guest, related_name='own_book_set')
-	is_active = models.BooleanField(default=False)
+#	is_active = models.BooleanField(default=False)
+	status = models.IntegerField(default=INACTIVE)
 	upload_date = models.DateField(default = timezone.now)
 	remark = models.CharField(max_length=255, blank=True, null=True)
 	def __unicode__(self):

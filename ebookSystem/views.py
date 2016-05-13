@@ -63,7 +63,7 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		response = {}
 		redirect_to = None
 		if request.POST['review'] == 'success':
-			book.is_active = True
+			book.status = ACTIVE
 			book.save()
 			response['status'] = 'success'
 			response['message'] = u'審核通過文件'

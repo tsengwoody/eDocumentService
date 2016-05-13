@@ -21,8 +21,8 @@ from django.contrib.sitemaps import GenericSitemap
 from django.contrib.sitemaps.views import sitemap
 
 urlpatterns = [
-#    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
-    url(r'^admin/', include(admin.site.urls)),
+	url(r'^$', views.home, name='home'),
+	url(r'^admin/', include(admin.site.urls)),
 	url(r'^account/', include('account.urls', namespace="account", app_name="account")),
 	url(r'^ebookSystem/', include('ebookSystem.urls', namespace="ebookSystem")),
 	url(r'^genericUser/', include('genericUser.urls', namespace="genericUser")),
