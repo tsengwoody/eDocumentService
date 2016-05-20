@@ -2,6 +2,7 @@
 *.mp3
 */migrations/
 db.sqlite3
+log/
 static/ebookSystem/document/
 static/ebookSystem/disability_card/
 static/audio_code/

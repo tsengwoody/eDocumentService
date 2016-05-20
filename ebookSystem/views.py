@@ -14,6 +14,20 @@ import os
 import json
 import shutil
 
+#logging config
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+# create file handler
+fh = logging.FileHandler(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'log.txt'))
+fh.setLevel(logging.DEBUG)
+# create formatter
+formatter = logging.Formatter('%(asctime)s\t%(name)s\t%(levelname)s\t%(message)s')
+# add formatter to fh
+fh.setFormatter(formatter)
+# add ch to logger
+logger.addHandler(fh)
+
 class book_list(generic.ListView):
 	model = Book
 	def get_queryset(self):
@@ -157,6 +171,7 @@ def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 
 class editView(generic.View):
 	def get(self, request, encoding='utf-8', *args, **kwargs):
+		logger.info('{}/home\t{}'.format(request.user, resolve(request.path).namespace))
 		template_name='ebookSystem/edit.html'
 		user = request.user
 		readmeUrl = '/ebookSystem/edit/readme/'

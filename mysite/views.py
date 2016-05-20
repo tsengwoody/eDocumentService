@@ -1,6 +1,6 @@
 ﻿# coding: utf-8
 from django.contrib.auth import authenticate, login, logout
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
 from .forms import *
@@ -10,7 +10,24 @@ from utils.decorator import *
 from mysite.settings import PREFIX_PATH
 import json
 
+#logging config
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+# create file handler
+log_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'log') +'/' +os.path.basename(os.path.dirname(os.path.abspath(__file__))) +'/log.txt'
+fh = logging.FileHandler(log_path)
+#fh = logging.FileHandler(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'log.txt'))
+fh.setLevel(logging.DEBUG)
+# create formatter
+formatter = logging.Formatter('%(asctime)s\t%(name)s\t%(levelname)s\t%(message)s')
+# add formatter to fh
+fh.setFormatter(formatter)
+# add ch to logger
+logger.addHandler(fh)
+
 def home(request, template_name='home.html'):
+	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
 	return render(request, template_name, locals())
 
 @http_response
