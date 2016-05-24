@@ -36,7 +36,7 @@ class profileView(generic.View):
 		readmeUrl = reverse('account:profile') +'readme/'
 		template_name=self.template_name
 		user=request.user
-		editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
+		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EDIT) | Q(status=REVISE))
 		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
 		if request.POST.has_key('getPart'):
 			if len(editingPartList)>=3:
@@ -60,10 +60,10 @@ class profileView(generic.View):
 			if not partialBook:
 				status = 'error'
 				message = u'無文件'
-				editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
+				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EDIT) | Q(status=REVISE))
 				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
 				return locals()
-			getPart = partialBook.ebook_set.filter(status=ACTIVE, editor=None)[0]
+			getPart = partialBook.ebook_set.filter(status=ACTIVE)[0]
 			getPart.editor = request.user.editor
 			getPart.get_date = timezone.now()
 			getPart.deadline = getPart.get_date + datetime.timedelta(days=3)
@@ -75,7 +75,7 @@ class profileView(generic.View):
 			if len(editingPartList)>3:
 				status = 'error'
 				message = u'您已有超過3段文件，請先校對完成再領取'
-				editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
+				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EDIT) | Q(status=REVISE))
 				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
 				return locals()
 			activeBook = Book.objects.filter(status = ACTIVE).order_by('upload_date')
@@ -87,7 +87,7 @@ class profileView(generic.View):
 			if not completeBook:
 				status = 'error'
 				message = u'目前無完整文件，請先領部份文件'
-				editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
+				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EDIT) | Q(status=REVISE))
 				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
 				return locals()
 			for getPart in completeBook.ebook_set.all():

@@ -9,8 +9,8 @@ import datetime
 
 class Command(BaseCommand):
 	help = 'review part status'
-	def add_arguments(self, parser):
-		parser.add_argument('reviewpart', nargs='*')
+#	def add_arguments(self, parser):
+#		parser.add_argument('reviewpart', nargs='*')
 
 	def handle(self, *args, **options):
 		for part in EBook.objects.all():

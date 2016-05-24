@@ -80,7 +80,7 @@ class Book(models.Model):
 	def collect_get_count(self):
 		get_count = 0
 		for part in self.ebook_set.all():
-			if part.editor:get_count = get_count +1
+			if part.status >= EDIT:get_count = get_count +1
 		return get_count
 
 	def collect_service_hours(self):

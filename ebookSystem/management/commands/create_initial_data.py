@@ -26,15 +26,15 @@ class Command(BaseCommand):
 		root.save()
 		rootEditor = Editor.objects.create(user=root)
 		rootGuest = Guest.objects.create(user=root)
-		factory = RequestFactory()
+'''		factory = RequestFactory()
 		with open('temp/dcf.jpg') as dcf_file:
 			with open('temp/dcb.jpg') as dcb_file:
 				request = factory.post(reverse('register'), {'username':'tony', 'password':'tony', 'email':'tony_tseng@pchome.com.tw', 'first_name':u'曾', 'last_name':u'孟崎', 'is_active':True, 'phone':'0920415077', 'birthday':'1956-02-17', 'education':u'大學', 'editor':'Editor', 'guest':'Guest', 'disability_card_front':dcf_file, 'disability_card_back':dcb_file, 'professional_field':u''})
 				response = register(request)
-		manager = User.objects.get(username='demo-manager')
+		manager = User.objects.get(username='tony')
 		manager.status = ACTIVE
 		manager.is_editor=True
 		manager.is_guest=True
 		manager.is_manager=True
 		manager.is_scaner=True
-		manager.save()
+		manager.save()'''
