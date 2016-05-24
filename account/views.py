@@ -21,7 +21,7 @@ class profileView(generic.View):
 		readmeUrl = reverse('account:profile') +'readme/'
 		template_name=self.template_name
 		user=request.user
-		editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
+		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EDIT) | Q(status=REVISE))
 		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
 		editing = False
 		if user.online:

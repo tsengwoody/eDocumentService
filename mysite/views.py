@@ -15,9 +15,7 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 # create file handler
-log_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'log') +'/' +os.path.basename(os.path.dirname(os.path.abspath(__file__))) +'/log.txt'
-fh = logging.FileHandler(log_path)
-#fh = logging.FileHandler(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'log.txt'))
+fh = logging.FileHandler(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'log') +'/views.log')
 fh.setLevel(logging.DEBUG)
 # create formatter
 formatter = logging.Formatter('%(asctime)s\t%(name)s\t%(levelname)s\t%(message)s')

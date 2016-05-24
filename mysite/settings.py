@@ -24,10 +24,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'e_#e-byj7#a+$v7#wmocwd8wp)+&wajk0axt70dl@)nsx!*glq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-TEMPLATE_DEBUG = False
+DEBUG = True
+TEMPLATE_DEBUG = True
 if DEBUG is False:
-    ALLOWED_HOSTS = ['www.edocumentservice.org', '192.168.1.70']
+    #ALLOWED_HOSTS = ['www.edocumentservice.org', '104.155.204.241']
+    ALLOWED_HOSTS = ['*']
 else:
     ALLOWED_HOSTS = []
 ADMINS = [
@@ -101,8 +102,8 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'eDocumentService',
-            'USER': 'root',
-            'PASSWORD': 'root',
+            'USER': 'eDocDB',
+            'PASSWORD': 'eDocDB!@#',
             'HOST': '127.0.0.1',
             'PORT': '3306',
         }
@@ -158,6 +159,31 @@ EMAIL_HOST_PASSWORD = 'cozpzzyyuetvhxwe'
 EMAIL_USE_TLS = True
 #smtp.mail.yahoo.com
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s\t%(asctime)s\t%(module)s\t%(process)d\t%(thread)d\t%(message)s'
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'formatter': 'verbose',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'log') +'/djangoOS.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
 #special define
 INACTIVE = 0
 ACTIVE =1
@@ -166,5 +192,5 @@ REVIEW =3
 REVISE = 4
 FINISH = 5
 MANAGER = ['tsengwoody@yahoo.com.tw']
-SERVICE = 'tsengwoody.tw@gmail.com'
+SERVICE = 'edocumentservice@gmail.com'
 PREFIX_PATH = BASE_DIR +'/'
