@@ -117,6 +117,9 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 		if request.POST['review'] == 'success':
 			part.status = FINISH
 			part.save()
+			if part.book.collect_finish_part_count() == part.book.part_count:
+				part.book.status = FINISH
+				part.book.save()
 			response['status'] = 'success'
 			response['message'] = u'審核通過文件'
 			response['redirect_to'] = reverse('manager:review_part_list')
