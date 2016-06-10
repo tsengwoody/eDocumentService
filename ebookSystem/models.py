@@ -32,6 +32,18 @@ class Book(models.Model):
 	def __unicode__(self):
 		return self.bookname
 
+	def create_EBook(self):
+		if not (len(self.ebook_set.all()) == 0 and self.part_count and self.page_count):
+			return False
+		for i in range(self.part_count):
+			begin_page = i*self.page_per_part
+			end_page = (i+1)*self.page_per_part-1
+			if end_page >= self.page_count:
+				end_page = self.page_count-1
+			ISBN_part = self.ISBN + '-{0}'.format(i+1)
+			part = EBook.objects.create(book=self, part=i+1, ISBN_part=ISBN_part, begin_page=begin_page, end_page=end_page)
+		return True
+
 	def validate_folder(self):
 		source = self.path + u'/source'
 		OCR = self.path + u'/OCR'
@@ -108,8 +120,79 @@ class EBook(models.Model):
 	class Meta:
 		unique_together = ('book', 'part',)
 
+	class SliceString():
+		def __init__(self, start, end, content):
+			self.start = start
+			self.end = end
+			self.content = content
+
+	def fuzzy_string_search(self, string, length=5, action=''):
+		import re
+		[content, fileHead] = self.get_content(action)
+		headString = string[0:length]
+		tailString = string[-length:]
+		ssl = []
+		for headSearch in re.finditer(headString, content):
+			for tailSearch in re.finditer(tailString, content):
+				[headPosition, tailPosition] = [headSearch.start(),tailSearch.end()]
+				if headPosition <= tailPosition:
+					ss = self.SliceString(start=headPosition, end=tailPosition, content=content[headPosition:tailPosition])
+					ssl.append(ss)
+		return ssl
+
 	def __unicode__(self):
 		return self.book.bookname+u'-part'+str(self.part)
+
+	def get_content(self, action='', encoding='utf-8'):
+		filePath = self.book.path+u'/OCR/part{0}{1}.txt'.format(self.part, action)
+		with codecs.open(filePath, 'r', encoding=encoding) as fileRead:
+			firstLine=fileRead.next()
+			fileHead=firstLine[0]
+			content = firstLine[1:]
+			for i in fileRead:
+				content = content+i
+		return [content,fileHead]
+
+	def set_content(self, finish_content, edit_content, encoding='utf-8', fileHead = u'\ufeff'):
+		finishFilePath = self.book.path+u'/OCR/part{0}-finish.txt'.format(self.part)
+		editFilePath = self.book.path+u'/OCR/part{0}-edit.txt'.format(self.part)
+		with codecs.open(finishFilePath, 'a', encoding=encoding) as fileWrite:
+			fileWrite.write(finish_content)
+		with codecs.open(editFilePath, 'w', encoding=encoding) as fileWrite:
+			fileWrite.write(fileHead+edit_content)
+		return True
+
+	def get_image(self):
+		sourcePath = self.book.path +u'/source'
+		fileList=os.listdir(sourcePath)
+		fileList = sorted(fileList)
+		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
+		scanPageList = scanPageList[self.begin_page:self.end_page+1]
+		defaultPage = scanPageList[self.edited_page]
+		defaultPageURL = sourcePath +u'/' +defaultPage
+		defaultPageURL=defaultPageURL.replace(PREFIX_PATH +'static/', '')
+		return [scanPageList, defaultPage, defaultPageURL]
+
+	def edit_distance(self, action, encoding='utf-8'):
+		import Levenshtein
+		if action == 'origin-finish':
+			source = self.book.path+u'/OCR/part{0}.txt'.format(self.part)
+			destination = self.book.path+u'/OCR/part{0}-finish.txt'.format(self.part)
+		if action == 'finish-final':
+			source = self.book.path+u'/OCR/part{0}-finish.txt'.format(self.part)
+			destination = self.book.path+u'/OCR/part{0}-final.txt'.format(self.part)
+		with codecs.open(source, 'r', encoding=encoding) as sourceFile:
+			sourceContent = sourceFile.read()
+		with codecs.open(destination, 'r', encoding=encoding) as destinationFile:
+			destinationContent = destinationFile.read()
+		return Levenshtein.distance(sourceContent, destinationContent)
+
+	@staticmethod
+	def split_content(content):
+		content = content.split('|----------|\r\n')
+		finish_content = content[0]
+		edit_content = content[1]
+		return [finish_content, edit_content]
 
 def pre_save_Book(**kwargs):
 	book = kwargs.get('instance')
@@ -117,24 +200,4 @@ def pre_save_Book(**kwargs):
 		book.path = PREFIX_PATH + u'static/ebookSystem/document/{0}'.format(book.ISBN)
 		[result, book.page_count, book.part_count] = book.validate_folder()
 
-def post_save_Book(**kwargs):
-	book = kwargs.get('instance')
-	if len(book.ebook_set.all()) == 0 and book.part_count and book.page_count:
-		createEBookBatch(book)
-	else:
-		print 'The ebook is already exist'
-
 pre_save.connect(pre_save_Book, Book)
-post_save.connect(post_save_Book, Book)
-
-def createEBookBatch(book):
-	print u'create ebook batch {0}'.format(book.bookname)
-	for i in range(book.part_count):
-		begin_page = i*book.page_per_part
-		end_page = (i+1)*book.page_per_part-1
-		if end_page >= book.page_count:
-			end_page = book.page_count-1
-		ISBN_part = book.ISBN + '-{0}'.format(i+1)
-		part = EBook(book=book, part=i+1, ISBN_part=ISBN_part, begin_page=begin_page, end_page=end_page)
-		part.save()
-	return 1

@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponseRedirect,HttpResponse, Http404
 from django.shortcuts import render
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views import generic
 from .models import *
 from .forms import *
@@ -64,6 +65,7 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		raise Http404("book does not exist")
 	sourcePath = book.path +u'/source'
 	fileList=os.listdir(sourcePath)
+	fileList = sorted(fileList)
 	scanPageList=[]
 	for scanPage in fileList:
 		if scanPage.split('.')[-1].lower() == 'jpg':
@@ -173,31 +175,23 @@ def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 class editView(generic.View):
+
+	@method_decorator(http_response)
 	def get(self, request, encoding='utf-8', *args, **kwargs):
-		logger.info('{}/home\t{}'.format(request.user, resolve(request.path).namespace))
+		logger.info('{}/edit\t{}'.format(request.user, resolve(request.path).namespace))
 		template_name='ebookSystem/edit.html'
 		user = request.user
 		readmeUrl = '/ebookSystem/edit/readme/'
-		response = {}
 		try:
 			book = Book.objects.get(ISBN=kwargs['book_ISBN'])
 			part = EBook.objects.get(part=kwargs['part_part'],book=book)
 		except: 
 			raise Http404("book or part does not exist")
-		finishContent=''
-		editContent=''
-		fileHead=''
-		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(part)
-		finishFilePath = book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
-		filePath = book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
-		[finishContent, editContent, fileHead] = getContent(filePath)
-		with codecs.open(finishFilePath, 'w', encoding=encoding) as fileWrite:
-			if finishContent!='':
-				fileWrite.write(fileHead+finishContent)
-			else:
-				fileWrite.write(fileHead)
-		return render(request, template_name, locals())
+		[scanPageList, defaultPage, defaultPageURL] = part.get_image()
+		[editContent, fileHead] = part.get_content('-edit')
+		return locals()
 
+	@method_decorator(http_response)
 	def post(self, request, encoding='utf-8', *args, **kwargs):
 		template_name='ebookSystem/edit.html'
 		user = request.user
@@ -208,100 +202,60 @@ class editView(generic.View):
 			part = EBook.objects.get(part=kwargs['part_part'],book=book)
 		except:
 			raise Http404("book or part does not exist")
-		[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(part)
+		[scanPageList, defaultPage, defaultPageURL] = part.get_image()
 		editForm = EditForm(request.POST)
-		finishFilePath = book.path+u'/OCR/part{0}-finish.txt'.format(part.part)
-		filePath = book.path+u'/OCR/part{1}.txt'.format(book.bookname, part.part)
 		if request.POST.has_key('save'):
-			editContent = request.POST['content']
-			with codecs.open(finishFilePath, 'r', encoding=encoding) as fileRead:
-				finishContent=fileRead.read()
-			with codecs.open(filePath, 'w', encoding=encoding) as fileWrite:
-				fileWrite.write(finishContent+editContent)
+			content = request.POST['content']
+			[finishContent, editContent] = part.split_content(content)
+			part.set_content(finish_content=finishContent, edit_content=editContent)
 			part.edited_page=int(request.POST['page'])
 			part.save()
-			[finishContent, editContent, fileHead] = getContent(filePath)
-			[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(part)
-			with codecs.open(finishFilePath, 'w', encoding=encoding) as fileWrite:
-				if finishContent!='':
-					fileWrite.write(fileHead+finishContent)
-				else:
-					fileWrite.write(fileHead)
-			response['status'] = 'success'
-			response['message'] = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
+			[scanPageList, defaultPage, defaultPageURL] = part.get_image()
+			[editContent, fileHead] = part.get_content('-edit')
+			status = 'success'
+			message = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
 		elif request.POST.has_key('close'):
-			response['status'] = ['success',u'error']
-			response['message'] = [u'close', u'error message']
-			response['redirect_to'] = reverse('account:profile')
-			redirect_to = response['redirect_to']
+			status = 'success'
+			message = u'關閉無儲存資料'
+			redirect_to = reverse('account:profile')
 		elif request.POST.has_key('finish'):
-			editContent = request.POST['content']
-			with codecs.open(finishFilePath, 'r', encoding=encoding) as fileRead:
-				finishContent=fileRead.read()
-			with codecs.open(filePath, 'w', encoding=encoding) as fileWrite:
-				fileWrite.write(finishContent+editContent)
+			content = request.POST['content']
+			part.set_content(finish_content=content, edit_content='')
 			part.edited_page = int(request.POST['page'])
 			part.status = REVIEW
 			part.finish_date = timezone.now()
 			part.save()
-			[finishContent, editContent, fileHead] = getContent(filePath)
-			[scanPageList, defaultPageIndex, defaultPage, defaultPageURL] = editVarInit(part)
-			with codecs.open(finishFilePath, 'w', encoding=encoding) as fileWrite:
-				if finishContent!='':
-					fileWrite.write(fileHead+finishContent)
-				else:
-					fileWrite.write(fileHead)
-			response['status'] = 'success'
-			response['message'] = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
-			response['redirect_to'] = reverse('account:profile')
-		status = response['status']
-		message = response['message']
-		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json")
+			redirect_to = reverse('account:profile')
+			status = 'success'
+			message = u'完成文件校對，將進入審核'
+		return locals()
+
+@http_response
+def revise_content(request, template_name='ebookSystem/revise_content.html'):
+	if request.method == 'GET':
+		return locals()
+	if request.method == 'POST':
+#		if request.POST.has_key('fuzzy_search'):
+		if not (request.POST.has_key('book_ISBN') and request.POST.has_key('part') and request.POST.has_key('content')):
+			status = 'error'
+			message = u'表單填寫錯誤'
+			return locals()
+		book_ISBN = request.POST['book_ISBN']
+		part = request.POST['part']
+		content = request.POST['content']
+		book = Book.objects.get(ISBN=book_ISBN)
+		ebook = EBook.objects.get(part=part, book=book)
+		result = ebook.fuzzy_string_search(string = content, length=10, action='-finish')
+		if len(result) == 1:
+			status = 'success'
+			message = u'成功搜尋到修政文字段落'
+		elif len(result) == 0:
+			status = 'error'
+			message = u'搜尋不到修政文字段落，請重新輸入並多傳送些文字'
 		else:
-			return render(request, template_name, locals())
-
-def editVarInit(part):
-	sourcePath = part.book.path +u'/source'
-	fileList=os.listdir(sourcePath)
-	scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
-#	for scanPage in fileList:
-#		if scanPage.split('.')[-1].lower() == 'jpg':
-#			scanPageList.append(scanPage)
-	scanPageList = scanPageList[part.begin_page:part.end_page+1]
-	defaultPageIndex=part.edited_page
-	defaultPage=scanPageList[defaultPageIndex]
-	defaultPageURL = sourcePath +u'/' +defaultPage
-	defaultPageURL=defaultPageURL.replace(PREFIX_PATH +'static/', '')
-	return [scanPageList, defaultPageIndex, defaultPage, defaultPageURL]
-
-def getContent(contentPath, encoding='utf-8'):
-	finishContent=''
-	editContent=''
-	with codecs.open(contentPath, 'r', encoding=encoding) as fileRead:
-		firstLine=fileRead.next()
-		fileHead=firstLine[0]
-		finishContent=firstLine[1:]
-		finishFlag=False
-		if finishContent=='|----------|\r\n':
-			finishContent=''
-			finishFlag=True
-		finishCount=1
-		if not finishFlag:
-			for i in fileRead:
-				finishCount=finishCount+1
-				if i=='|----------|\r\n':
-					finishFlag=True
-					break
-				finishContent = finishContent+i
-		editCount=0
-		for i in fileRead:
-			editCount = editCount+1
-			editContent = editContent+i
-		if editContent == '':
-			editContent = finishContent
-			finishContent = ''
-	return [finishContent, editContent, fileHead]
+			status = 'error'
+			message = u'搜尋到多處修政文字段落，請重新輸入並多傳送些文字'
+		return locals()
 
 def readme(request, template_name):
 	template_name = resolve(request.path).namespace +'/' +template_name +'_readme.html'

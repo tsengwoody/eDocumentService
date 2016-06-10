@@ -22,6 +22,7 @@ from django.contrib.sitemaps.views import sitemap
 
 urlpatterns = [
 	url(r'^$', views.home, name='home'),
+	url(r'^locale$', views.view_locale, name='locale'),
 	url(r'^admin/', include(admin.site.urls)),
 	url(r'^account/', include('account.urls', namespace="account", app_name="account")),
 	url(r'^ebookSystem/', include('ebookSystem.urls', namespace="ebookSystem")),

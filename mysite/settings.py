@@ -25,7 +25,6 @@ SECRET_KEY = 'e_#e-byj7#a+$v7#wmocwd8wp)+&wajk0axt70dl@)nsx!*glq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-TEMPLATE_DEBUG = True
 if DEBUG is False:
     #ALLOWED_HOSTS = ['www.edocumentservice.org', '104.155.204.241']
     ALLOWED_HOSTS = ['*']
@@ -101,9 +100,9 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'eDocumentService',
-            'USER': 'eDocDB',
-            'PASSWORD': 'eDocDB!@#',
+            'NAME': 'eDocumentServiceDev',
+            'USER': 'root',
+            'PASSWORD': 'root',
             'HOST': '127.0.0.1',
             'PORT': '3306',
         }
@@ -164,20 +163,30 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s\t%(asctime)s\t%(module)s\t%(process)d\t%(thread)d\t%(message)s'
+            'format': '%(message)s\t%(levelname)s\t%(asctime)s\t%(module)s\t%(process)d\t%(thread)d'
         },
     },
     'handlers': {
         'file': {
-            'level': 'DEBUG',
+            'level': 'WARNING',
             'formatter': 'verbose',
             'class': 'logging.FileHandler',
             'filename': os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'log') +'/djangoOS.log',
         },
+        'rotating_file':
+        {
+            'level' : 'DEBUG',
+            'formatter' : 'verbose',
+            'class' : 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'log') +'/djangoOS_rotate.log',
+            'when' : 'midnight',
+            'interval' : 1,
+            'backupCount' : 7,
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['file', 'rotating_file'],
             'level': 'DEBUG',
             'propagate': True,
         },

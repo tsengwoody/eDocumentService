@@ -50,13 +50,19 @@ def create_document(request, template_name='guest/create_document.html'):
 		unzip_file(uploadFilePath, uploadPath)
 		newBook = bookForm.save(commit=False)
 		newBook.path = uploadPath
-		if not newBook.validate_folder():
+		if not newBook.validate_folder()[0]:
 			shutil.rmtree(uploadPath)
 			status = 'error'
 			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			return locals()
 		newBook.scaner = user
 		newBook.save()
+		newBook.create_EBook()
+		for i in range(1, newBook.part_count+1):
+			from shutil import copyfile
+			copyfile(newBook.path +'/OCR/part{}.txt'.format(i), newBook.path +'/OCR/part{}-edit.txt'.format(i))
+			with codecs.open(newBook.path +'/OCR/part{}-finish.txt'.format(i), 'w', encoding='utf-8') as createFile:
+				createFile.write(u'\ufeff')
 		if request.POST.has_key('guest'):
 			try:
 				guest = Guest.objects.get(user__username=request.POST['guest'])
