@@ -1,5 +1,6 @@
 ﻿function catchErrorHandling(buttonKey,buttonValue)
 {
+    console.log($("form"));
     
     var transferData={};
     transferData[buttonKey]=buttonValue;
@@ -124,6 +125,7 @@ function alertMessageDialog(status,message) {
 }
 
 function saveSubmit() {
+    //$('#textPage > textarea').val()
     if (typeof $('#id_content').val() == 'undefined') {
         alertMessageDialog('error',"textarea not found");
         return false;
@@ -187,10 +189,10 @@ function calSeconds()
         }
     });
 }
-function skip_mark_click()
+function skip_mark_click(editor)
 {
-    //$('#scanPageList :selected').val()
-    addMark("\n<<<"+$('#scanPageList :selected').val()+">>>")
+    editor.insertContent("\n<<<"+$('#scanPageList :selected').val()+">>>");
+    //addMark("\n<<<"+$('#scanPageList :selected').val()+">>>")
 }
 function getIsVaild(obj)
 {
@@ -199,6 +201,55 @@ function getIsVaild(obj)
     else
         return finishSubmit();
     return true;
+}
+function createHtmlEditor(){
+  tinymce.init({
+  selector: 'textarea',  // change this value according to your HTML
+  toolbar1: 'skip_mark | mark | 存擋',
+  toolbar2: 'undo redo | cut copy paste | bullist numlist | table',
+  menubar: false,
+  setup: function (editor) {
+    editor.addButton('skip_mark', {
+      text: 'skip_mark',
+      icon: false,
+      onclick: function () {
+        var message = '<p>{{{'+$('#scanPageList :selected').val()+'}}}</p>';
+        editor.insertContent(message);
+      }
+    });
+
+    editor.addButton('mark', {
+      text: 'mark',
+      icon: false,
+      onclick: function () {
+        var message = '<p>|----------|</p>';
+        editor.insertContent(message);
+      }
+    });
+
+    editor.addButton('存擋', {
+      text: '存擋',
+      name: 'save',
+      icon: false,
+      onclick: function () {
+        console.log(editor.getContent());
+        console.log(editor.getContent().indexOf('<p>|----------|</p>'));
+        if(editor.getContent().indexOf('<p>|----------|</p>')<0)
+            alertMessageDialog('error',"未save成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下finish按紐");
+        else{
+            editor.save();
+            catchErrorHandling("save","");
+        }
+      }
+    });
+
+
+
+  },
+
+  plugins: [
+  'save table']
+});
 }
 $(document).ready(function() {
     console.log("ready!");
@@ -219,6 +270,7 @@ $(document).ready(function() {
         if(getIsVaild($(this))==true)
             catchErrorHandling($(this).attr('name'),$(this).val());
     });
+    createHtmlEditor();
     calSeconds();
     setInterval(function(){ 
         calSeconds();
