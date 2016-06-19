@@ -208,6 +208,7 @@ class editView(generic.View):
 			content = request.POST['content']
 			[finishContent, editContent] = part.split_content(content)
 			part.set_content(finish_content=finishContent, edit_content=editContent)
+#			part.set_content(finish_content='', edit_content=content)
 			part.edited_page=int(request.POST['page'])
 			part.save()
 			[scanPageList, defaultPage, defaultPageURL] = part.get_image()

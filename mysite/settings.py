@@ -46,12 +46,13 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'django.contrib.sitemaps',
+#    'django.contrib.sitemaps',
     'account',
     'ebookSystem',
     'genericUser',
     'guest',
     'manager',
+    "pinax.notifications",
 )
 
 MIDDLEWARE_CLASSES = (
@@ -203,3 +204,4 @@ FINISH = 5
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'edocumentservice@gmail.com'
 PREFIX_PATH = BASE_DIR +'/'
+SITE_ID = 1

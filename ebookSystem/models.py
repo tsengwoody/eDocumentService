@@ -177,19 +177,25 @@ class EBook(models.Model):
 		import Levenshtein
 		if action == 'origin-finish':
 			source = self.book.path+u'/OCR/part{0}.txt'.format(self.part)
-			destination = self.book.path+u'/OCR/part{0}-finish.txt'.format(self.part)
+			finish = self.book.path+u'/OCR/part{0}-finish.txt'.format(self.part)
+			edit = self.book.path+u'/OCR/part{0}-edit.txt'.format(self.part)
+			with codecs.open(finish, 'r', encoding=encoding) as finishFile:
+				finishContent = finishFile.read()
+			with codecs.open(edit, 'r', encoding=encoding) as editFile:
+				editContent = editFile.read()
+			destinationContent = finishContent+editContent[1:]
 		if action == 'finish-final':
 			source = self.book.path+u'/OCR/part{0}-finish.txt'.format(self.part)
 			destination = self.book.path+u'/OCR/part{0}-final.txt'.format(self.part)
+			with codecs.open(destination, 'r', encoding=encoding) as destinationFile:
+				destinationContent = destinationFile.read()
 		with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 			sourceContent = sourceFile.read()
-		with codecs.open(destination, 'r', encoding=encoding) as destinationFile:
-			destinationContent = destinationFile.read()
 		return Levenshtein.distance(sourceContent, destinationContent)
 
 	@staticmethod
 	def split_content(content):
-		content = content.split('|----------|\r\n')
+		content = content.split('<p>|----------|</p>\r\n')
 		finish_content = content[0]
 		edit_content = content[1]
 		return [finish_content, edit_content]
