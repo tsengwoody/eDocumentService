@@ -154,19 +154,35 @@ function adjZoom(value) {
     imgSize.value = (parseInt(imgSize.value)+ parseInt(value)).toString() + '%';
     $('#scanPage').css('width', imgSize.value);
 }
-function addMark(strValue) {
-    var caretPos = document.getElementById("id_content").selectionStart;
-    var textAreaTxt = $("#id_content").val();
-    var lastLinePos=textAreaTxt.substring(0, caretPos).lastIndexOf("\n");
+function addMark(strValue,editor) {
+    //var caretPos = document.getElementById("id_content").selectionStart;
+    //var textAreaTxt = $("#id_content").val();
+    var bm = editor.selection.getBookmark(0);    
+    var caretPos = getCursorPosition(editor);
+    console.log(caretPos);
+    var textAreaTxt = editor.getContent();
+    console.log(textAreaTxt);
+    var subCarePos = textAreaTxt.substring(0, caretPos);
+    var lastLinePos =-1
+    //lastLinePos= (subCarePos.lastIndexOf("\n") > subCarePos.lastIndexOf("<br />") )?subCarePos.lastIndexOf("<br />"):subCarePos.lastIndexOf("\n");
+    if(subCarePos.lastIndexOf("\n") > subCarePos.lastIndexOf("<br />") && subCarePos.lastIndexOf("<br />") > 0)
+        lastLinePos = subCarePos.lastIndexOf("<br />");
+    else
+        lastLinePos = subCarePos.lastIndexOf("\n");
+    console.log("lastLinePos "+lastLinePos);
+
     var txtToAdd = strValue;
     if(lastLinePos==-1)
     {
-        txtToAdd=txtToAdd+"\n";
+        txtToAdd=txtToAdd;
         lastLinePos=0;
     }
-    $("#id_content").val(textAreaTxt.substring(0, lastLinePos) + txtToAdd + textAreaTxt.substring(lastLinePos));
-    document.getElementById("id_content").selectionStart=lastLinePos+1;
-    document.getElementById("id_content").selectionEnd=lastLinePos+txtToAdd.length;
+    //$("#id_content").val(textAreaTxt.substring(0, lastLinePos) + txtToAdd + textAreaTxt.substring(lastLinePos));
+    editor.setContent(textAreaTxt.substring(0, lastLinePos) + txtToAdd + textAreaTxt.substring(lastLinePos))
+    editor.selection.moveToBookmark(bm);
+    setCursorPosition(editor,lastLinePos+txtToAdd.length);
+    //document.getElementById("id_content").selectionStart=lastLinePos+1;
+    //document.getElementById("id_content").selectionEnd=lastLinePos+txtToAdd.length;
 }
 function calSeconds()
 {
@@ -174,8 +190,6 @@ function calSeconds()
     var newUrl="/"+url.split('/')[1]+"/"+"edit_ajax"+"/"+url.split('/')[3]+"/"+url.split('/')[4]+"/";
     var transferData={};
     transferData["online"]="0";
-    //transferData["user_status"]="edit";
-    //console.log(newUrl);
     $.ajax({
         url: newUrl,
         type: "POST",
@@ -202,10 +216,72 @@ function getIsVaild(obj)
         return finishSubmit();
     return true;
 }
+function setCursorPosition(editor,index)
+{
+    //get the content in the editor before we add the bookmark... 
+    //use the format: html to strip out any existing meta tags
+    var content = editor.getContent({format: "html"});
+
+    //split the content at the given index
+    var part1 = content.substr(0, index);
+    var part2 = content.substr(index);
+
+    //create a bookmark... bookmark is an object with the id of the bookmark
+    var bookmark = editor.selection.getBookmark(0);
+
+    //this is a meta span tag that looks like the one the bookmark added... just make sure the ID is the same
+    var positionString = '<span id="'+bookmark.id+'_start" data-mce-type="bookmark" data-mce-style="overflow:hidden;line-height:0px"></span>';
+    //cram the position string inbetween the two parts of the content we got earlier
+    var contentWithString = part1 + positionString + part2;
+
+    //replace the content of the editor with the content with the special span
+    //use format: raw so that the bookmark meta tag will remain in the content
+    editor.setContent(contentWithString, ({format: "raw"}));
+
+    //move the cursor back to the bookmark
+    //this will also strip out the bookmark metatag from the html
+    editor.selection.moveToBookmark(bookmark);
+
+    //return the bookmark just because
+    return bookmark;
+}
+function getCursorPosition(editor){
+    //set a bookmark so we can return to the current position after we reset the content later
+    var bm = editor.selection.getBookmark(0);    
+
+    //select the bookmark element
+    var selector = "[data-mce-type=bookmark]";
+    var bmElements = editor.dom.select(selector);
+
+    //put the cursor in front of that element
+    editor.selection.select(bmElements[0]);
+    editor.selection.collapse();
+
+    //add in my special span to get the index...
+    //we won't be able to use the bookmark element for this because each browser will put id and class attributes in different orders.
+    var elementID = "######cursor######";
+    var positionString = '<span id="'+elementID+'"></span>';
+    editor.selection.setContent(positionString);
+
+    //get the content with the special span but without the bookmark meta tag
+    var content = editor.getContent({format: "html"});
+    //find the index of the span we placed earlier
+    var index = content.indexOf(positionString);
+
+    //remove my special span from the content
+    editor.dom.remove(elementID, false);            
+
+    //move back to the bookmark
+    editor.selection.moveToBookmark(bm);
+
+    return index;
+}
 function createHtmlEditor(){
+
+//http://blog.squadedit.com/tinymce-and-cursor-position/
   tinymce.init({
   selector: 'textarea',  // change this value according to your HTML
-  toolbar1: 'skip_mark | mark | 存擋',
+  toolbar1: 'skip_mark | mark | 存擋 ',
   toolbar2: 'undo redo | cut copy paste | bullist numlist | table',
   menubar: false,
   setup: function (editor) {
@@ -222,8 +298,10 @@ function createHtmlEditor(){
       text: 'mark',
       icon: false,
       onclick: function () {
+        editor.save();
         var message = '<p>|----------|</p>';
-        editor.insertContent(message);
+        addMark(message,editor);
+        editor.save();
       }
     });
 
@@ -232,8 +310,7 @@ function createHtmlEditor(){
       name: 'save',
       icon: false,
       onclick: function () {
-        console.log(editor.getContent());
-        console.log(editor.getContent().indexOf('<p>|----------|</p>'));
+
         if(editor.getContent().indexOf('<p>|----------|</p>')<0)
             alertMessageDialog('error',"未save成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下finish按紐");
         else{
@@ -242,6 +319,7 @@ function createHtmlEditor(){
         }
       }
     });
+
 
 
 
