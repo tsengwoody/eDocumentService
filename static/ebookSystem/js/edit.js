@@ -158,14 +158,10 @@ function addMark(strValue,editor) {
 
     var bm = editor.selection.getBookmark(0);    
     var caretPos = getCursorPosition(editor);
-
     var textAreaTxt = editor.getContent();
-    
-
     var subCarePos = textAreaTxt.substring(0, caretPos);
     var lastLinePos =-1
-
-    var nextLine = ["\n", "<br />", "<br>"];
+    var nextLine = ["\n", "<br />", "<br>","</p>"];
     lastLinePos = -1;
     lastNextLineIndex=0;
     console.log(textAreaTxt);
@@ -178,7 +174,6 @@ function addMark(strValue,editor) {
         }
         console.log(subCarePos.lastIndexOf(nextLine[index]));
     }
-
     lastLinePos += nextLine[lastNextLineIndex].length;
     console.log("lastLinePos "+lastLinePos);
     setCursorPosition(editor,lastLinePos)
@@ -302,11 +297,9 @@ function createHtmlEditor(){
       text: 'mark',
       icon: false,
       onclick: function () {
-        //editor.save();
         var message = '<p>|----------|</p>';
         addMark(message,editor);
-        //editor.save();
-        //editor.insertContent(message);
+
       }
     });
 
