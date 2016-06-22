@@ -1,6 +1,6 @@
 ﻿function catchErrorHandling(buttonKey,buttonValue)
 {
-    console.log($("form"));
+    console.log($('#id_content').val());
     
     var transferData={};
     transferData[buttonKey]=buttonValue;
@@ -155,34 +155,35 @@ function adjZoom(value) {
     $('#scanPage').css('width', imgSize.value);
 }
 function addMark(strValue,editor) {
-    //var caretPos = document.getElementById("id_content").selectionStart;
-    //var textAreaTxt = $("#id_content").val();
+
     var bm = editor.selection.getBookmark(0);    
     var caretPos = getCursorPosition(editor);
-    console.log(caretPos);
+
     var textAreaTxt = editor.getContent();
-    console.log(textAreaTxt);
+    
+
     var subCarePos = textAreaTxt.substring(0, caretPos);
     var lastLinePos =-1
-    //lastLinePos= (subCarePos.lastIndexOf("\n") > subCarePos.lastIndexOf("<br />") )?subCarePos.lastIndexOf("<br />"):subCarePos.lastIndexOf("\n");
-    if(subCarePos.lastIndexOf("\n") > subCarePos.lastIndexOf("<br />") && subCarePos.lastIndexOf("<br />") > 0)
-        lastLinePos = subCarePos.lastIndexOf("<br />");
-    else
-        lastLinePos = subCarePos.lastIndexOf("\n");
-    console.log("lastLinePos "+lastLinePos);
 
-    var txtToAdd = strValue;
-    if(lastLinePos==-1)
+    var nextLine = ["\n", "<br />", "<br>"];
+    lastLinePos = -1;
+    lastNextLineIndex=0;
+    console.log(textAreaTxt);
+    for(var index in nextLine)
     {
-        txtToAdd=txtToAdd;
-        lastLinePos=0;
+        if(lastLinePos < subCarePos.lastIndexOf(nextLine[index]))
+        {
+            lastLinePos = subCarePos.lastIndexOf(nextLine[index]);
+            lastNextLineIndex=index;
+        }
+        console.log(subCarePos.lastIndexOf(nextLine[index]));
     }
-    //$("#id_content").val(textAreaTxt.substring(0, lastLinePos) + txtToAdd + textAreaTxt.substring(lastLinePos));
-    editor.setContent(textAreaTxt.substring(0, lastLinePos) + txtToAdd + textAreaTxt.substring(lastLinePos))
-    editor.selection.moveToBookmark(bm);
-    setCursorPosition(editor,lastLinePos+txtToAdd.length);
-    //document.getElementById("id_content").selectionStart=lastLinePos+1;
-    //document.getElementById("id_content").selectionEnd=lastLinePos+txtToAdd.length;
+
+    lastLinePos += nextLine[lastNextLineIndex].length;
+    console.log("lastLinePos "+lastLinePos);
+    setCursorPosition(editor,lastLinePos)
+    editor.insertContent(strValue);
+
 }
 function calSeconds()
 {
@@ -280,6 +281,9 @@ function createHtmlEditor(){
 
 //http://blog.squadedit.com/tinymce-and-cursor-position/
   tinymce.init({
+  forced_root_block : "", 
+  force_br_newlines : false,
+  force_p_newlines : false,
   selector: 'textarea',  // change this value according to your HTML
   toolbar1: 'skip_mark | mark | 存擋 ',
   toolbar2: 'undo redo | cut copy paste | bullist numlist | table',
@@ -298,10 +302,11 @@ function createHtmlEditor(){
       text: 'mark',
       icon: false,
       onclick: function () {
-        editor.save();
+        //editor.save();
         var message = '<p>|----------|</p>';
         addMark(message,editor);
-        editor.save();
+        //editor.save();
+        //editor.insertContent(message);
       }
     });
 
@@ -310,11 +315,12 @@ function createHtmlEditor(){
       name: 'save',
       icon: false,
       onclick: function () {
-
         if(editor.getContent().indexOf('<p>|----------|</p>')<0)
             alertMessageDialog('error',"未save成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下finish按紐");
         else{
             editor.save();
+            console.log("-----------------");
+            console.log($("#id_content").val());
             catchErrorHandling("save","");
         }
       }
@@ -374,7 +380,7 @@ $(document).ready(function() {
         adjZoom(10);
     });
 
-    console.log($('#stereotype_id').attr("value"));
+    //console.log($('#stereotype_id').attr("value"));
     $('#chagePost').click(function() {
         $('#id_content').removeAttr('style');
         if ($('#imagePage').hasClass('col-md-6')) { //改上下
