@@ -12,23 +12,26 @@ body{
 html, body, .container, .row{
   height: 100%;
 }
-#buttonGroup{
-    text-align:center;
-    height:10%;
-}
+
 #dataContent,.towColumn{
-    height: 90%;
+    height: 98%;
     margin:0px;
 }
 .inline {
     display: inline
 }
-.oneColumn{
-    height: 12%;
+.oneColumn-text
+{
+    height: 30%;
     margin:0px;
 }
-textarea.form-control {
-   height: 100%;
+.oneColumn-image
+{
+    height: 70%;
+    margin:0px;
+}
+textarea.form-control{
+   height: 75%;
    width:100%;
 }
 
@@ -51,3 +54,4 @@ textarea.form-control {
     margin-top:10px;
     margin-bottom:10px;
 }
+.

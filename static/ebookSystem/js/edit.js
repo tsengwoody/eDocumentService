@@ -124,32 +124,7 @@ function alertMessageDialog(status,message) {
 
 }
 
-function saveSubmit() {
-    //$('#textPage > textarea').val()
-    if (typeof $('#id_content').val() == 'undefined') {
-        alertMessageDialog('error',"textarea not found");
-        return false;
-    }
-    var str = $('#id_content').val();
-    if (str.indexOf("\n|----------|\n") < 0) {
-        alertMessageDialog('error',"未save成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下finish按紐");
-        return false;
-    }
-    return true;
-}
 
-function finishSubmit() {
-    if (typeof $('#id_content').val() == 'undefined') {
-        alertMessageDialog("error","textarea not found");
-        return false;
-    }
-    var str = $('#id_content').val();
-    if (str.indexOf("|----------|") > 0) {
-        alertMessageDialog('error',"未finish成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下save按紐");
-        return false;
-    }
-    return true;
-}
 function adjZoom(value) {
     imgSize.value = (parseInt(imgSize.value)+ parseInt(value)).toString() + '%';
     $('#scanPage').css('width', imgSize.value);
@@ -272,6 +247,36 @@ function getCursorPosition(editor){
 
     return index;
 }
+function rotateFormat()
+{
+    if ($('#imagePage').hasClass('col-md-6')) { //改上下
+        $('#imagePage').removeClass("col-md-6");
+        $('#imagePage').addClass("col-md-12");
+
+
+        $('#textPage').removeClass("col-md-6");
+        $('#textPage').addClass("col-md-12");
+        
+        $('#textPage').removeClass("towColumn");
+        $('#textPage').addClass("oneColumn-text");
+
+        $('#imagePage').removeClass("towColumn");
+        $('#imagePage').addClass("oneColumn-image");
+    } else { //左右
+        $('#imagePage').removeClass("col-md-12");
+        $('#imagePage').addClass("col-md-6");
+        
+        $('#textPage').removeClass("col-md-12");
+        $('#textPage').addClass("col-md-6");
+        
+        $('#textPage').removeClass("oneColumn-text");
+        $('#textPage').addClass("towColumn");
+
+        $('#imagePage').removeClass("oneColumn-image");
+        $('#imagePage').addClass("towColumn");
+    }
+
+}
 function createHtmlEditor(){
 
 //http://blog.squadedit.com/tinymce-and-cursor-position/
@@ -280,7 +285,7 @@ function createHtmlEditor(){
   force_br_newlines : false,
   force_p_newlines : false,
   selector: 'textarea',  // change this value according to your HTML
-  toolbar1: 'skip_mark | mark | 存擋 ',
+  toolbar1: 'skip_mark | mark | 存擋 | 完成 | 關閉 | 切換版型',
   toolbar2: 'undo redo | cut copy paste | bullist numlist | table',
   menubar: false,
   setup: function (editor) {
@@ -289,7 +294,7 @@ function createHtmlEditor(){
       icon: false,
       onclick: function () {
         var message = '<p>{{{'+$('#scanPageList :selected').val()+'}}}</p>';
-        editor.insertContent(message);
+        addMark(message,editor);
       }
     });
 
@@ -309,23 +314,48 @@ function createHtmlEditor(){
       icon: false,
       onclick: function () {
         if(editor.getContent().indexOf('<p>|----------|</p>')<0)
-            alertMessageDialog('error',"未save成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下finish按紐");
+            alertMessageDialog('error',"未存擋成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下完成按紐");
         else{
             editor.save();
-            console.log("-----------------");
-            console.log($("#id_content").val());
             catchErrorHandling("save","");
         }
       }
     });
-
-
-
+    editor.addButton('完成', {
+      text: '完成',
+      name: 'finish',
+      icon: false,
+      onclick: function () {
+        if(editor.getContent().indexOf('<p>|----------|</p>')>0)
+            alertMessageDialog('error',"未存擋成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下存擋按紐");
+        else{
+            editor.save();
+            catchErrorHandling("finish","");
+        }
+      }
+    });
+    editor.addButton('關閉', {
+      text: '關閉',
+      name: 'finish',
+      icon: false,
+      onclick: function () {
+        catchErrorHandling("close","");
+      }
+    });
+    editor.addButton('切換版型', {
+      text: '切換版型',
+      name: 'rotateFormat',
+      icon: false,
+      onclick: function () {
+        rotateFormat();
+      }
+    });
 
   },
-
+  height : $('#textPage').height(),
   plugins: [
-  'save table']
+  'autoresize save table'],
+
 });
 }
 $(document).ready(function() {
@@ -374,39 +404,5 @@ $(document).ready(function() {
     });
 
     //console.log($('#stereotype_id').attr("value"));
-    $('#chagePost').click(function() {
-        $('#id_content').removeAttr('style');
-        if ($('#imagePage').hasClass('col-md-6')) { //改上下
-            $('#imagePage').removeClass("col-md-6");
-            $('#imagePage').addClass("col-md-12");
-            $('#textPage').removeClass("col-md-6");
-            $('#textPage').addClass("col-md-12");
-            $('#textPage').removeClass("towColumn");
-            $('#textPage').addClass("oneColumn");
-        } else { //左右
-            $('#imagePage').removeClass("col-md-12");
-            $('#imagePage').addClass("col-md-6");
-            $('#textPage').removeClass("col-md-12");
-            $('#textPage').addClass("col-md-6");
-            $('#textPage').removeClass("oneColumn");
-            $('#textPage').addClass("towColumn");
-
-        }
-        if ($('#buttonGroup').hasClass("col-md-12")) { //改上下
-            $('#buttonGroup').removeClass("col-md-12");
-            $('#buttonGroup').addClass("col-md-2");
-            $('#dataContent').removeClass("col-md-12");
-            $('#dataContent').addClass("col-md-10");
-            $('#buttonGroup>div').removeClass("btn-group");
-            $('#buttonGroup>div').addClass("btn-group-vertical");
-        } else {
-            $('#buttonGroup').removeClass("col-md-2");
-            $('#buttonGroup').addClass("col-md-12");
-            $('#dataContent').removeClass("col-md-10");
-            $('#dataContent').addClass("col-md-12");
-            $('#buttonGroup>div').removeClass("btn-group-vertical");
-            $('#buttonGroup>div').addClass("btn-group");
-        }
-
-    });
+    $('#chagePost').click(rotateFormat);
 });
