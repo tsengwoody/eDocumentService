@@ -13,33 +13,6 @@
 
 <form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
 {% csrf_token %}
-<table class="table table-hover table-reflow">
-	<tr>
-		<th class="col-md-4" scope="row">
-			<label for="id_book_ISBN">ISBN</label>
-		</th>
-		<td class="col-md-8">
-			<input id="id_book_ISBN" maxlength="15" name="book_ISBN" type="text">
-		</td>
-	</tr>
-	<tr>
-		<th class="col-md-4" scope="row">
-			<label for="id_part">part</label>
-		</th>
-		<td class="col-md-8">
-			<input id="id_part" maxlength="3" name="part" type="text">
-		</td>
-	</tr>
-	<tr>
-		<th class="col-md-4" scope="row">
-			<label for="id_content">content</label>
-		</th>
-		<td class="col-md-8">
-			<textarea id="id_content" name="content" class="form-control" ></textarea>
-		</td>
-	</tr>
-</table>
-	<input type="submit" class="btn btn-primary" value="fuzzy_search" id="id_fuzzy_search">
 	<hr />
 	{{ status }}
 	{{ message }}
@@ -53,7 +26,7 @@
 		{% for sliceString in result %}
 		<tr>
 			<td><pre>{{ sliceString.content }}</pre></td>
-			<td><pre>{{ content }}</pre></td>
+			<td><pre>{{ action.content }}</pre></td>
 			<td>
 				{% ifequal status 'success' %}
 				<button class="btn btn-md btn-default" type="submit" id="id_revise" name="revise">修正</button>

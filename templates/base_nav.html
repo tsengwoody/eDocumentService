@@ -26,6 +26,7 @@
 				    <ul class="dropdown-menu">
 				        <li><a href="{% url 'manager:review_document_list' %}">審核上傳文件</a></li>
 				        <li><a href="{% url 'manager:review_part_list' %}">審核校對文件</a></li>
+				        <li><a href="{% url 'manager:review_ReviseContentAction_list' %}">審核更正事件</a></li>
 				        <li><a href="{% url 'manager:review_user_list' %}">審核會員</a></li>
 				    </ul>
 				</li>
@@ -36,6 +37,7 @@
 				{% endif %}
 				{% if request.user.is_guest %}
 				<li><a href="{% url 'guest:profile' %}">進度</a></li>
+				<li><a href="{% url 'genericUser:revise_content' %}">更正</a></li>
 				{% endif %}
 				{% if request.user.is_editor %}
 				<li><a href="{% url 'account:profile' %}">服務</a></li>

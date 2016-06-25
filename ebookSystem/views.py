@@ -36,6 +36,7 @@ class book_list(generic.ListView):
 
 @http_response
 def search_book(request, template_name):
+	print request.POST
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
@@ -142,6 +143,28 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 			else:
 				return render(request, template_name, locals())
 
+@user_category_check(['manager'])
+@http_response
+def review_ReviseContentAction(request, id, template_name='ebookSystem/review_ReviseContentAction.html'):
+	try:
+		event = Event.objects.get(id=id)
+		action = event.action
+	except:
+		raise Http404("book does not exist")
+	result = action.ebook.fuzzy_string_search(string = action.content, length=10, action='-finish')
+	if request.method == 'GET':
+		if len(result) == 1:
+			status = 'success'
+			message = u'成功搜尋到修政文字段落'
+		elif len(result) == 0:
+			status = 'error'
+			message = u'搜尋不到修政文字段落，請重新輸入並多傳送些文字'
+		else:
+			status = 'error'
+			message = u'搜尋到多處修政文字段落，請重新輸入並多傳送些文字'
+		return locals()
+#	if request.method == 'POST':
+
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
@@ -207,6 +230,10 @@ class editView(generic.View):
 		if request.POST.has_key('save'):
 			content = request.POST['content']
 			[finishContent, editContent] = part.split_content(content)
+			if finishContent == '' or editContent == '':
+				status = 'error'
+				message = u'標記位置不可在首行或末行'
+				return locals()
 			part.set_content(finish_content=finishContent, edit_content=editContent)
 #			part.set_content(finish_content='', edit_content=content)
 			part.edited_page=int(request.POST['page'])
@@ -229,33 +256,6 @@ class editView(generic.View):
 			redirect_to = reverse('account:profile')
 			status = 'success'
 			message = u'完成文件校對，將進入審核'
-		return locals()
-
-@http_response
-def revise_content(request, template_name='ebookSystem/revise_content.html'):
-	if request.method == 'GET':
-		return locals()
-	if request.method == 'POST':
-#		if request.POST.has_key('fuzzy_search'):
-		if not (request.POST.has_key('book_ISBN') and request.POST.has_key('part') and request.POST.has_key('content')):
-			status = 'error'
-			message = u'表單填寫錯誤'
-			return locals()
-		book_ISBN = request.POST['book_ISBN']
-		part = request.POST['part']
-		content = request.POST['content']
-		book = Book.objects.get(ISBN=book_ISBN)
-		ebook = EBook.objects.get(part=part, book=book)
-		result = ebook.fuzzy_string_search(string = content, length=10, action='-finish')
-		if len(result) == 1:
-			status = 'success'
-			message = u'成功搜尋到修政文字段落'
-		elif len(result) == 0:
-			status = 'error'
-			message = u'搜尋不到修政文字段落，請重新輸入並多傳送些文字'
-		else:
-			status = 'error'
-			message = u'搜尋到多處修政文字段落，請重新輸入並多傳送些文字'
 		return locals()
 
 def readme(request, template_name):

@@ -9,7 +9,7 @@ import json
 from account.models import Editor
 from ebookSystem.models import *
 from guest.models import Guest
-from genericUser.models import User
+from genericUser.models import *
 from utils.decorator import *
 from utils.uploadFile import handle_uploaded_file
 from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH, MANAGER, SERVICE
@@ -106,6 +106,34 @@ def info_change(request,template_name):
 
 @user_category_check(['user'])
 @http_response
+def revise_content(request, template_name='genericUser/revise_content.html'):
+	user = request.user
+	if request.method == 'GET':
+		return locals()
+	if request.method == 'POST':
+		if not (request.POST.has_key('book_ISBN') and request.POST.has_key('part') and request.POST.has_key('content')):
+			status = 'error'
+			message = u'表單填寫錯誤'
+			return locals()
+		book_ISBN = request.POST['book_ISBN']
+		part = request.POST['part']
+		content = request.POST['content']
+		book = Book.objects.get(ISBN=book_ISBN)
+		ebook = EBook.objects.get(part=part, book=book)
+		result = ebook.fuzzy_string_search(string = content, length=10, action='-finish')
+		if len(result) == 1:
+			status = 'success'
+			message = u'成功搜尋到修政文字段落'
+			reviseContentAction = ReviseContentAction.objects.create(ebook=ebook, content=content)
+			event = Event.objects.create(creater=user, category=u'更正校對', action=reviseContentAction)
+		elif len(result) == 0:
+			status = 'error'
+			message = u'搜尋不到修政文字段落，請重新輸入並多傳送些文字'
+		else:
+			status = 'error'
+			message = u'搜尋到多處修政文字段落，請重新輸入並多傳送些文字'
+		return locals()
+
 def set_role(request,template_name='genericUser/set_role.html'):
 	user = request.user
 	if request.method == 'POST':

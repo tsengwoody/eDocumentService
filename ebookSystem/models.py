@@ -117,8 +117,8 @@ class EBook(models.Model):
 	service_hours = models.IntegerField(default=0)
 	remark = models.CharField(max_length=255, blank=True, null=True)
 
-	class Meta:
-		unique_together = ('book', 'part',)
+#	class Meta:
+#		unique_together = ('book', 'part',)
 
 	class SliceString():
 		def __init__(self, start, end, content):
@@ -199,6 +199,10 @@ class EBook(models.Model):
 		finish_content = content[0]
 		edit_content = content[1]
 		return [finish_content, edit_content]
+
+class ReviseContentAction(models.Model):
+	ebook = models.ForeignKey('EBook')
+	content = models.CharField(max_length=1000)
 
 def pre_save_Book(**kwargs):
 	book = kwargs.get('instance')
