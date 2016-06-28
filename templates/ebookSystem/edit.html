@@ -7,7 +7,7 @@
 {% block style %}
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-<script src="https://cdn.tinymce.com/4/tinymce.min.js"></script>
+<script language="javascript" src="{% static 'ebookSystem/js/bootstrap/tinymce.min.js' %}"></script>
 <script language="javascript" src="{% static 'ebookSystem/js/edit.js' %}"></script>
 <link href="{% static "ebookSystem/css/edit.css" %}" rel="stylesheet" > 
 {% endblock %}
@@ -25,17 +25,6 @@
 <form action="" method="post" id="currentForm">
 	{% csrf_token %}
 	<div class="row">
-		<!--<div id="buttonGroup" class="col-md-12">
-			<div class="btn-group">
-				<button class="btn btn-md btn-default" type="button" id="skip_mark_id" name="skip_mark">skip_mark</button>
-				<button class="btn btn-md btn-default" type="button" id="mark_id" name="mark">mark</button>
-				<button class="btn btn-md btn-default" type="submit" id="save_id" name="save">save</button>
-				<button class="btn btn-md btn-default" type="submit" id="finish_id" name="finish">finish</button>
-				<button class="btn btn-md btn-default" type="submit" id="close_id" name="close">close</button>
-				<button class="btn btn-md btn-default" type="button" id="chagePost" >Orientation</button>  
-			</div>
-		<hr>
-		</div>-->
 		<div  id="dataContent" class="col-md-12">
 			<div class="row">
 				<div id="imagePage" class="col-md-6 towColumn">

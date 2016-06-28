@@ -1,7 +1,5 @@
 ﻿function catchErrorHandling(buttonKey,buttonValue)
 {
-    console.log($('#id_content').val());
-    
     var transferData={};
     transferData[buttonKey]=buttonValue;
     $.ajax({
@@ -12,14 +10,14 @@
             alertDialog(json);
         },
         error:function(xhr,errmsg,err){
-            alert(xhr.status+" "+xhr.responseText);
+            //alert(xhr.status+" "+xhr.responseText);
             console.log(xhr.status + ": " + xhr.responseText);
         }
     });
 
 }
 function alertDialog(json) {
-    console.log(json);
+    //console.log(json);
     var str=(json.status=='error')?'danger':'success'
     var dialog='#'+str+'Dialog';
     $(dialog+" .alertMessage").html(json.message);
@@ -100,7 +98,7 @@ function changePageSelect() {
     page = document.getElementById("id_page");
     imgScanPage = $('#scanPage')[0];
     src = imgScanPage.src;
-    console.log(src);
+    //console.log(src);
     src = src.split('/');
     dirname = ''
     for (i = 0; i < src.length - 1; i++)
@@ -123,8 +121,6 @@ function alertMessageDialog(status,message) {
     $(dialog).modal();
 
 }
-
-
 function adjZoom(value) {
     imgSize.value = (parseInt(imgSize.value)+ parseInt(value)).toString() + '%';
     $('#scanPage').css('width', imgSize.value);
@@ -139,7 +135,6 @@ function addMark(strValue,editor) {
     var nextLine = ["\n", "<br />", "<br>","</p>"];
     lastLinePos = -1;
     lastNextLineIndex=0;
-    console.log(textAreaTxt);
     for(var index in nextLine)
     {
         if(lastLinePos < subCarePos.lastIndexOf(nextLine[index]))
@@ -147,10 +142,8 @@ function addMark(strValue,editor) {
             lastLinePos = subCarePos.lastIndexOf(nextLine[index]);
             lastNextLineIndex=index;
         }
-        console.log(subCarePos.lastIndexOf(nextLine[index]));
     }
     lastLinePos += nextLine[lastNextLineIndex].length;
-    console.log("lastLinePos "+lastLinePos);
     setCursorPosition(editor,lastLinePos)
     editor.insertContent(strValue);
 
@@ -169,23 +162,10 @@ function calSeconds()
            //console.log(json);
         },
         error:function(xhr,errmsg,err){
-            alert(xhr.status+" "+xhr.responseText);
+            //alert(xhr.status+" "+xhr.responseText);
             console.log(xhr.status + ": " + xhr.responseText);
         }
     });
-}
-function skip_mark_click(editor)
-{
-    editor.insertContent("\n<<<"+$('#scanPageList :selected').val()+">>>");
-    //addMark("\n<<<"+$('#scanPageList :selected').val()+">>>")
-}
-function getIsVaild(obj)
-{
-    if(obj.attr('name')=="save")
-        return saveSubmit();
-    else
-        return finishSubmit();
-    return true;
 }
 function setCursorPosition(editor,index)
 {
@@ -352,7 +332,6 @@ function createHtmlEditor(){
     });
 
   },
-  height : $('#textPage').height(),
   plugins: [
   'autoresize save table'],
 
@@ -371,12 +350,6 @@ $(document).ready(function() {
             }
         }
     });
-    $('button:submit').on('click',function(event){
-        event.preventDefault();
-        console.log("form submitted!");  // sanity check
-        if(getIsVaild($(this))==true)
-            catchErrorHandling($(this).attr('name'),$(this).val());
-    });
     createHtmlEditor();
     calSeconds();
     setInterval(function(){ 
@@ -391,7 +364,6 @@ $(document).ready(function() {
         changePage(1);
     });
 
-    $('#skip_mark_id').click(skip_mark_click);
 
     $('#mark_id').on("click",function(){
         addMark("\n|----------|");
