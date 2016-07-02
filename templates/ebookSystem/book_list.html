@@ -6,9 +6,9 @@
 <h1>書列表
 {% endblock %}
 {% block content %}
-{% if book_list %}
+{% if object_list %}
 	<ul>
-	{% for book in book_list %}
+	{% for book in object_list %}
 		<li><a href="{%url "ebookSystem:detail" book.ISBN %}">{{ book.bookname }}</a></li>
 	{% endfor %}
 	</ul>

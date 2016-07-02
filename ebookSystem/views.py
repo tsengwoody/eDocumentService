@@ -11,6 +11,7 @@ from .models import *
 from .forms import *
 from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 from utils.decorator import *
+from utils.crawler import get_book_info
 import os
 import json
 import shutil
@@ -171,6 +172,17 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	except:
 		raise Http404("book does not exist")
 	return render(request, template_name, locals())
+
+@http_response
+def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
+	[s, bookname, author, house, date] = get_book_info(ISBN)
+	if s:
+		status = u'success'
+		message = u'成功取得資料'
+	else:
+		status = u'error'
+		message = u'查無資料'
+	return locals()
 
 def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 	user = request.user

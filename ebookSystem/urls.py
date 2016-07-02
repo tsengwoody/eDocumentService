@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
 	url(r'^(?P<template_name>\w+)/readme/$', views.readme, name='readme'),
+	url(r'^book_info/(?P<ISBN>[0-9]+)/$', views.book_info, name='book_info'),
 	url(r'^book_list/$', views.book_list.as_view(), name='book_list'),
 	url(r'^detail/(?P<book_ISBN>[0-9]+)/$', views.detail, name='detail'),
 	url(r'^edit/(?P<book_ISBN>[0-9]+)/(?P<part_part>[0-9]+)/$', views.editView.as_view(), name='edit'),

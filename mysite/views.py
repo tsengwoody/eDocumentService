@@ -25,7 +25,8 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 def home(request, template_name='home.html'):
-	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
+#	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
+	print request.GET
 	return render(request, template_name, locals())
 
 @http_response
