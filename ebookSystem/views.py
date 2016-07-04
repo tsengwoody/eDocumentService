@@ -152,7 +152,7 @@ def review_ReviseContentAction(request, id, template_name='ebookSystem/review_Re
 		action = event.action
 	except:
 		raise Http404("book does not exist")
-	result = action.ebook.fuzzy_string_search(string = action.content, length=10, action='-finish')
+	result = action.ebook.fuzzy_string_search(string = action.content, length=10, action='-final')
 	if request.method == 'GET':
 		if len(result) == 1:
 			status = 'success'

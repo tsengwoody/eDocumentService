@@ -120,7 +120,7 @@ def revise_content(request, template_name='genericUser/revise_content.html'):
 		content = request.POST['content']
 		book = Book.objects.get(ISBN=book_ISBN)
 		ebook = EBook.objects.get(part=part, book=book)
-		result = ebook.fuzzy_string_search(string = content, length=10, action='-finish')
+		result = ebook.fuzzy_string_search(string = content, length=10, action='-final')
 		if len(result) == 1:
 			status = 'success'
 			message = u'成功搜尋到修政文字段落'

@@ -110,7 +110,7 @@ class profileView(generic.View):
 		edit_book_list = []
 		finish_book_list = []
 		for book in book_list:
-			if book.collect_is_finish():
+			if book.status == FINISH:
 				finish_book_list.append(book)
 			else:
 				edit_book_list.append(book)
@@ -146,7 +146,7 @@ class profileView(generic.View):
 		edit_book_list = []
 		finish_book_list = []
 		for book in book_list:
-			if book.collect_is_finish():
+			if book.status == FINISH:
 				finish_book_list.append(book)
 			else:
 				edit_book_list.append(book)

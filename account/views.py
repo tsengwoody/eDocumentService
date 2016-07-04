@@ -108,13 +108,13 @@ class profileView(generic.View):
 			rebackPart.save()
 			status = 'success'
 			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
-		elif request.POST.has_key('delay'):
+'''		elif request.POST.has_key('delay'):
 			ISBN_part = request.POST.get('delay')
 			delayPart = EBook.objects.get(ISBN_part = ISBN_part)
 			delayPart.deadline = delayPart.deadline + datetime.timedelta(days=2)
 			delayPart.save()
 			status = 'success'
-			message = u'成功延期文件{}'.format(delayPart.__unicode__())
+			message = u'成功延期文件{}'.format(delayPart.__unicode__())'''
 		elif request.POST.has_key('reEditPart'):
 			ISBN_part = request.POST.get('reEditPart')
 			reEditPart = EBook.objects.get(ISBN_part = ISBN_part)

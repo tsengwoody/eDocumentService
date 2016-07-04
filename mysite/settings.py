@@ -52,7 +52,6 @@ INSTALLED_APPS = (
     'genericUser',
     'guest',
     'manager',
-    "pinax.notifications",
 )
 
 MIDDLEWARE_CLASSES = (

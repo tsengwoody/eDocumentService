@@ -22,17 +22,17 @@
 	<table class="table table-striped table-hover">
 		<tr>
 			<th>文件</th>
-			<th>頁數</th>
+			<th>頁數/總頁數</th>
 			<th>時數</th>
 			<th>領取日期</th>
 			<th>期限</th>
 			<th>狀態</th>
-			<th colspan="3">動作</th>
+			<th colspan="2">動作</th>
 		</tr>
 		{% for part in editingPartList %}
 		<tr>
 			<td>{{part.book.bookname}}-part{{part.part}}</td>
-			<td>{{part.edited_page}}</td>
+			<td>{{part.edited_page}}/{{ part.book.page_per_part }}</td>
 			<td>{{part.service_hours}}</td>
 			<td>{{part.get_date}}</td>
 			<td>{{part.deadline}}</td>
@@ -41,9 +41,6 @@
 				{% if not editing %}
 				<a class="btn btn-link" role="button" href = /ebookSystem/edit/{{part.book.ISBN}}/{{part.part}} >編輯</a>
 				{% endif %}
-			</td>
-			<td>
-				<button type="submit" class="btn btn-default" id="delay_id" name="delay" value={{part.ISBN_part}}>延期</button>
 			</td>
 			<td>
 				<button type="submit" class="btn btn-default" id="rebackPart_id" name="rebackPart" value={{part.ISBN_part}}>還文件</button>

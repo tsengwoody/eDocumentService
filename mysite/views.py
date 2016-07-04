@@ -26,7 +26,6 @@ logger.addHandler(fh)
 
 def home(request, template_name='home.html'):
 #	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
-	print request.GET
 	return render(request, template_name, locals())
 
 @http_response
@@ -109,7 +108,7 @@ def login_user(request, template_name='registration/login.html', *args, **kwargs
 			if session.get_decoded().has_key('_auth_user_id') and int(session.get_decoded()['_auth_user_id']) == user.id:
 				session.delete()
 		login(request, user)
-		redirect_to = redirect_user(user)
+		redirect_to = '/'
 		status = 'success'
 		message = u'登錄成功'
 		return locals()
@@ -117,13 +116,6 @@ def login_user(request, template_name='registration/login.html', *args, **kwargs
 def logout_user(request, template_name='registration/logged_out.html'):
 	logout(request)
 	return render(request, template_name, locals())
-
-def redirect_user(user):
-	if user.is_editor and user.has_editor():
-		return reverse('account:profile')
-	if user.is_guest and user.has_guest():
-		return reverse('guest:profile')
-	return reverse('genericUser:info')
 
 import locale
 import sys
