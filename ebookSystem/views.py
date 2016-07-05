@@ -175,14 +175,16 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 
 @http_response
 def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
-	[s, bookname, author, house, date] = get_book_info(ISBN)
-	if s:
+	result = get_book_info(ISBN)
+	if result[0]:
 		status = u'success'
 		message = u'成功取得資料'
+#		[bookname, author, house, date] = result[1:]
 	else:
 		status = u'error'
 		message = u'查無資料'
-	return locals()
+#	return locals()
+	return HttpResponse(json.dumps(locals()), content_type="application/json")
 
 def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 	user = request.user
