@@ -7,7 +7,7 @@
 <link href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script language="javascript" src="{% static 'ebookSystem/js/upload_file.js' %}"></script>
-
+<script language="javascript" src="{% static 'ebookSystem/js/getISBN.js' %}"></script>
 {% endblock %}
 
 {% block header %}
@@ -23,7 +23,7 @@
         </div>
     {% endif %}
     <legend>上傳文件</legend>
-   <!-- <h3>上傳文件</h3> -->
+
     <div class="modal fade" id="pleaseWaitDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -38,37 +38,40 @@
             </div>
         </div>
     </div>
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="id_ISBN"><font style="color:red">*</font>ISBN:</label>
+        <div class="col-sm-3">
+          <input type="text" class="form-control" id="id_ISBN" name="ISBN" required>
+        </div>
+       <input type="button" class="btn btn-default" value="取得書籍資訊" id="get_isbn">
 
+       <img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_isbn_load_icon" />
+    </div> 
     <div class="form-group">
         <label class="control-label col-sm-2" for="id_bookname"><font style="color:red">*</font>Bookname:</label>
         <div class="col-sm-3">
-          <input type="text" class="form-control" autofocus id="id_bookname" name="bookname" placeholder="Enter Bookname" required>
+          <input type="text" class="form-control" autofocus id="id_bookname" name="bookname" readonly="true" required>
         </div>
     </div>
     <div class="form-group">
         <label class="control-label col-sm-2" for="id_author"><font style="color:red">*</font>Author:</label>
         <div class="col-sm-3">
-          <input type="text" class="form-control" id="id_author" name="author" placeholder="Enter author" required>
+          <input type="text" class="form-control" id="id_author" name="author" readonly="true" required>
         </div>
     </div>  
     <div class="form-group">
         <label class="control-label col-sm-2" for="id_house"><font style="color:red">*</font>House:</label>
         <div class="col-sm-3">
-          <input type="text" class="form-control" id="id_house" name="house" required>
+          <input type="text" class="form-control" id="id_house" name="house" readonly="true" required>
         </div>
     </div>  
     <div class="form-group">
         <label class="control-label col-sm-2" for="id_date"><font style="color:red">*</font>Date:</label>
         <div class="col-sm-3">
-          <input type="text" class="form-control datepicker" id="id_date" name="date" required>
+          <input type="text" class="form-control datepicker" id="id_date" name="date" placeholder="YYYY-mm-dd" required readonly="true">
         </div>
     </div> 
-    <div class="form-group">
-        <label class="control-label col-sm-2" for="id_ISBN"><font style="color:red">*</font>ISBN:</label>
-        <div class="col-sm-3">
-          <input type="text" class="form-control" id="id_ISBN" name="ISBN" placeholder="10或13位數字" title="10或13位數字" pattern="\d{10}|\d{13}" required>
-        </div>
-    </div> 
+
     <div class="form-group">
         <label class="control-label col-sm-2" for="id_guest">Guest:</label>
         <div class="col-sm-3">

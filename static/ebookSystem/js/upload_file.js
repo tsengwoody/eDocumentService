@@ -109,9 +109,7 @@ function sameOrigin(url) {
 }
 
 $( document ).ready(function() {
-    console.log( "document ready!" );
-    //showProgress();
-   // $('#pleaseWaitDialog').modal('show');
+
     var csrftoken = getCookie('csrftoken');
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {

@@ -365,9 +365,6 @@ $(document).ready(function() {
     });
 
 
-    $('#mark_id').on("click",function(){
-        addMark("\n|----------|");
-    });
     $('#zoomIN').on("click",function(){
         adjZoom(-10);
     });
@@ -375,6 +372,4 @@ $(document).ready(function() {
         adjZoom(10);
     });
 
-    //console.log($('#stereotype_id').attr("value"));
-    $('#chagePost').click(rotateFormat);
 });
