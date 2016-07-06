@@ -1,5 +1,6 @@
 ﻿# coding: utf-8
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render

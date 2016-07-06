@@ -173,18 +173,24 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 		raise Http404("book does not exist")
 	return render(request, template_name, locals())
 
-@http_response
 def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
+	response = {}
 	result = get_book_info(ISBN)
 	if result[0]:
 		status = u'success'
 		message = u'成功取得資料'
+		response['bookname'] = result[1]
+		response['author'] = result[2]
+		response['house'] = result[3]
+		response['date'] = result[4]
 #		[bookname, author, house, date] = result[1:]
 	else:
 		status = u'error'
 		message = u'查無資料'
-#	return locals()
-	return HttpResponse(json.dumps(locals()), content_type="application/json")
+	response['status'] = status
+	response['message'] = message
+	return HttpResponse(json.dumps(response), content_type="application/json")
+#	return render(request, template_name, locals())
 
 def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 	user = request.user

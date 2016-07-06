@@ -33,7 +33,7 @@ class Book(models.Model):
 		return self.bookname
 
 	def create_EBook(self):
-		if not (len(self.ebook_set.all()) == 0 and self.part_count and self.page_count):
+		if not (len(self.ebook_set.all()) == 0 and self.part_count and self.page_count and self.path):
 			return False
 		for i in range(self.part_count):
 			begin_page = i*self.page_per_part
@@ -42,6 +42,24 @@ class Book(models.Model):
 				end_page = self.page_count-1
 			ISBN_part = self.ISBN + '-{0}'.format(i+1)
 			part = EBook.objects.create(book=self, part=i+1, ISBN_part=ISBN_part, begin_page=begin_page, end_page=end_page)
+		for i in range(1, self.part_count+1):
+			edit_content = ''
+			source = self.path +'/OCR/part{}.txt'.format(i)
+			destination = self.path +'/OCR/part{}-edit.txt'.format(i)
+			with codecs.open(source, 'r', encoding='utf-8') as sourceFile:
+				for edit in sourceFile:
+					if edit[-2:] == '\r\n':
+						edit = '<p>' +edit[:-2] +'</p>' +edit[-2:]
+					else:
+						edit = '<p>' +edit +'</p>'
+					edit_content = edit_content +edit
+			edit_content = edit_content[0:3] +edit_content[4:]
+			if edit_content[-2:] != '\r\n': edit_content=edit_content +'\r\n'
+			with codecs.open(destination, 'w', encoding='utf-8') as destinationFile:
+				destinationFile.write(edit_content)
+		for i in range(1, self.part_count+1):
+			with codecs.open(self.path +'/OCR/part{}-finish.txt'.format(i), 'w', encoding='utf-8') as finishFile:
+				finishFile.write(u'\ufeff')
 		return True
 
 	def validate_folder(self):
@@ -57,7 +75,9 @@ class Book(models.Model):
 					content=fileRead.read()
 			sourceFileList=os.listdir(source)
 		except:
-			return [False, None, None]
+			self.page_count = None
+			self.part_count = None
+			return False
 		page_count = 0
 		for scanPage in sourceFileList:
 			if scanPage.split('.')[-1].lower() == 'jpg':
@@ -69,7 +89,9 @@ class Book(models.Model):
 		for i in range(i):
 			OCRFileList[i] = OCRFileList[i].lower()
 		OCRFileSet = set(OCRFileList)
-		return [partSet.issubset(OCRFileSet), page_count, part_count]
+		self.page_count = page_count
+		self.part_count = part_count
+		return partSet.issubset(OCRFileSet)
 
 	def collect_is_finish(self):
 		is_finish = True
@@ -206,8 +228,8 @@ class ReviseContentAction(models.Model):
 
 def pre_save_Book(**kwargs):
 	book = kwargs.get('instance')
-	if book.page_count == None or book.part_count == None:
+	if book.page_count == None or book.part_count == None or book.path == None:
 		book.path = PREFIX_PATH + u'static/ebookSystem/document/{0}'.format(book.ISBN)
-		[result, book.page_count, book.part_count] = book.validate_folder()
+		result = book.validate_folder()
 
 pre_save.connect(pre_save_Book, Book)

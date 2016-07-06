@@ -147,7 +147,7 @@ CACHES = {
 }
 
 from django.conf import global_settings
-FILE_UPLOAD_HANDLERS = ('utils.cache.UploadProgressCachedHandler', ) + global_settings.FILE_UPLOAD_HANDLERS
+FILE_UPLOAD_HANDLERS = ['utils.cache.UploadProgressCachedHandler', ] + global_settings.FILE_UPLOAD_HANDLERS
 #FILE_UPLOAD_HANDLERS = ('utils.uploadFile.ProgressUploadSessionHandler', ) + global_settings.FILE_UPLOAD_HANDLERS
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

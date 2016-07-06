@@ -134,6 +134,7 @@ def revise_content(request, template_name='genericUser/revise_content.html'):
 			message = u'搜尋到多處修政文字段落，請重新輸入並多傳送些文字'
 		return locals()
 
+@http_response
 def set_role(request,template_name='genericUser/set_role.html'):
 	user = request.user
 	if request.method == 'POST':
