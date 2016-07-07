@@ -56,7 +56,7 @@ class Book(models.Model):
 			edit_content = edit_content[0:3] +edit_content[4:]
 			if edit_content[-2:] != '\r\n': edit_content=edit_content +'\r\n'
 			with codecs.open(destination, 'w', encoding='utf-8') as destinationFile:
-				destinationFile.write(edit_content)
+				destinationFile.write(u'\ufeff' +edit_content)
 		for i in range(1, self.part_count+1):
 			with codecs.open(self.path +'/OCR/part{}-finish.txt'.format(i), 'w', encoding='utf-8') as finishFile:
 				finishFile.write(u'\ufeff')
@@ -143,22 +143,39 @@ class EBook(models.Model):
 #		unique_together = ('book', 'part',)
 
 	class SliceString():
-		def __init__(self, start, end, content):
+		def __init__(self, start, end, content, source_index, destination_index):
 			self.start = start
 			self.end = end
+			self.source_index = source_index
+			self.destination_index = destination_index
 			self.content = content
 
 	def fuzzy_string_search(self, string, length=5, action=''):
 		import re
+		import difflib
 		[content, fileHead] = self.get_content(action)
 		headString = string[0:length]
 		tailString = string[-length:]
+		destination_content = string
 		ssl = []
 		for headSearch in re.finditer(headString, content):
 			for tailSearch in re.finditer(tailString, content):
-				[headPosition, tailPosition] = [headSearch.start(),tailSearch.end()]
+				[headPosition, tailPosition] = [headSearch.start(), tailSearch.end()]
 				if headPosition <= tailPosition:
-					ss = self.SliceString(start=headPosition, end=tailPosition, content=content[headPosition:tailPosition])
+					source_content = content[headPosition:tailPosition]
+					matchList = difflib.SequenceMatcher(None, source_content, destination_content).get_matching_blocks()
+					source_index = []
+					destination_index = []
+					for match in matchList:
+						if match.size >2:
+							source_index.append(match.a)
+							source_index.append(match.a+match.size)
+							destination_index.append(match.b)
+							destination_index.append(match.b+match.size)
+					source_index = source_index[1:-1]
+					destination_index = destination_index[1:-1]
+					print source_index
+					ss = self.SliceString(start=headPosition, end=tailPosition, content=source_content, source_index=source_index, destination_index=destination_index)
 					ssl.append(ss)
 		return ssl
 

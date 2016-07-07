@@ -19,14 +19,16 @@
 	<h4 class="page-header">修正文字資訊</h4>
 	<table class="table table-striped table-hover">
 		<tr>
-			<th>原始文字</th>
-			<th>修正文字</th>
+			<th colspan="2">原始文字</th>
+			<th colspan="2">修正文字</th>
 			<th>動作</th>
 		</tr>
 		{% for sliceString in result %}
 		<tr>
 			<td><pre>{{ sliceString.content }}</pre></td>
+			<td>{{ sliceString.source_index }}</td>
 			<td><pre>{{ action.content }}</pre></td>
+			<td>{{ sliceString.destination_index }}</td>
 			<td>
 				{% ifequal status 'success' %}
 				<button class="btn btn-md btn-default" type="submit" id="id_revise" name="revise">修正</button>
