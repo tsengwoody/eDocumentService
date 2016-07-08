@@ -33,7 +33,7 @@
 
 				{% endif %}
 				{% if request.user.is_guest or request.user.is_scaner %}
-				<li><a href="{% url 'guest:create_document' %}">上傳文件</a></li>
+				<li><a href="{% url 'genericUser:create_document' %}">上傳文件</a></li>
 				{% endif %}
 				{% if request.user.is_guest %}
 				<li><a href="{% url 'guest:profile' %}">進度</a></li>
@@ -52,8 +52,8 @@
 				<li><a href="{% url 'login' %}">登入</a></li>
 				<li><a href="{% url 'register' %}">註冊</a></li>
 				{% endif %}
-				{% if readmeUrl %}
-				<li><a href={{ readmeUrl }}>說明</a></li>
+				{% if readme_url %}
+				<li><a href={{ readme_url }}>說明</a></li>
 				{% endif %}
 			</ul>
 		</div>

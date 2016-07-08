@@ -4,7 +4,6 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse,HttpResponseRedirect
 from django.utils import timezone
 from django.shortcuts import render, get_list_or_404
-import json
 
 from account.models import Editor
 from ebookSystem.models import *
@@ -12,8 +11,84 @@ from guest.models import Guest
 from genericUser.models import *
 from utils.decorator import *
 from utils.uploadFile import handle_uploaded_file
-from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH, MANAGER, SERVICE
+from utils.zip import *
 from .forms import *
+from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH, MANAGER, SERVICE
+from zipfile import ZipFile
+import json
+import shutil
+
+
+@user_category_check(['scaner'])
+@http_response
+def create_document(request, template_name='genericUser/create_document.html'):
+	readme_url = request.path +'readme/'
+	user = request.user
+	if request.method == 'POST':
+		bookForm = BookForm(request.POST, request.FILES)
+		if not bookForm.is_valid():
+			status = 'error'
+			message = u'表單驗證失敗' +str(bookForm.errors)
+			return locals()
+		uploadPath = PREFIX_PATH +u'static/ebookSystem/document/{0}'.format(bookForm.cleaned_data['ISBN'])
+		if os.path.exists(uploadPath):
+			status = 'error'
+			message = u'文件已存在'
+			return locals()
+		[status, message] = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
+		uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
+		try:
+			with ZipFile(uploadFilePath, 'r') as uploadFile:
+				ZipFile.testzip(uploadFile)
+		except:
+				shutil.rmtree(uploadPath)
+				status = 'error'
+				message = u'非正確ZIP文件'
+				return locals()
+		unzip_file(uploadFilePath, uploadPath)
+		newBook = bookForm.save(commit=False)
+		newBook.path = uploadPath
+		if not newBook.validate_folder():
+			shutil.rmtree(uploadPath)
+			status = 'error'
+			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
+			return locals()
+		newBook.scaner = user
+		newBook.save()
+		newBook.create_EBook()
+		if request.POST.has_key('guest'):
+			try:
+				guest = Guest.objects.get(user__username=request.POST['guest'])
+				newBook.guests.add(guest)
+			except:
+				guest = None
+		else:
+			guest = None
+		redirect_to = reverse('guest:profile')
+		status = 'success'
+		message = u'成功建立並上傳文件'
+		return locals()
+	if request.method == 'GET':
+		bookForm = BookForm()
+		return locals()
+
+def upload_progress(request):
+	"""
+	Return JSON object with information about the progress of an upload.
+	"""
+	progress_id = ''
+	if 'X-Progress-ID' in request.GET:
+		progress_id = request.GET['X-Progress-ID']
+	elif 'X-Progress-ID' in request.META:
+		progress_id = request.META['X-Progress-ID']
+	if progress_id:
+		cache_key = "%s_%s" % (request.META['REMOTE_ADDR'], progress_id)
+		data = cache.get(cache_key)
+#		cache_key = "%s" % (progress_id)
+#		data = request.session.get('upload_progress_%s' % cache_key, None)
+		return HttpResponse(json.dumps(data), content_type="application/json")
+	else:
+		return HttpResponseServerError('Server Error: You must provide X-Progress-ID header or query param.')
 
 @user_category_check(['manager'])
 def review_user(request, username, template_name='genericUser/review_user.html'):
@@ -196,10 +271,6 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 			status = 'error'
 			message = u'表單驗證失敗{}'.format(contactUsForm.errors)
 		return locals()
-
-def readme(request, template_name):
-	template_name = 'account/' +template_name +'_readme.html'
-	return render(request, template_name, locals())
 
 from django.contrib import messages
 def test_message(request, template_name):

@@ -18,7 +18,7 @@ class profileView(generic.View):
 	@method_decorator(user_category_check(['editor']))
 	@method_decorator(http_response)
 	def get(self, request, *args, **kwargs):
-		readmeUrl = reverse('account:profile') +'readme/'
+		readme_url = request.path +'readme/'
 		template_name=self.template_name
 		user=request.user
 		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EDIT) | Q(status=REVISE))
@@ -33,7 +33,7 @@ class profileView(generic.View):
 	@method_decorator(user_category_check(['editor']))
 	@method_decorator(http_response)
 	def post(self, request, *args, **kwargs):
-		readmeUrl = reverse('account:profile') +'readme/'
+		readme_url = request.path +'readme/'
 		template_name=self.template_name
 		user=request.user
 		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EDIT) | Q(status=REVISE))
@@ -131,8 +131,4 @@ class profileView(generic.View):
 
 def readme(request, template_name):
 	template_name = resolve(request.path).namespace +'/' +template_name +'_readme.html'
-	return render(request, template_name, locals())
-
-def static(request, template_name, *args, **kwargs):
-	template_name = resolve(request.path).namespace +'/' +template_name +'.html'
 	return render(request, template_name, locals())

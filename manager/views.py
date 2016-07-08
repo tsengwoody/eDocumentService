@@ -29,11 +29,3 @@ def review_part_list(request, template_name='manager/review_part_list.html'):
 def review_ReviseContentAction_list(request, template_name='manager/review_ReviseContentAction_list.html'):
 	event_list = Event.objects.filter(category=u'更正校對')
 	return render(request, template_name, locals())
-
-def readme(request, template_name):
-	template_name = 'manager/' +template_name +'_readme.html'
-	return render(request, template_name, locals())
-
-def static(request, template_name):
-	template_name = 'account/' +template_name +'.html'
-	return render(request, template_name, locals())

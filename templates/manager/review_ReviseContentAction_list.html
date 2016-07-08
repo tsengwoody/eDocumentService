@@ -24,7 +24,7 @@
 		<td>{{ event.time }}</td>
 		<td>{{ event.category }}</td>
 		<td>{{ event.action }}</td>
-			<td><a class="btn btn-link" role="button" href = "/ebookSystem/review_ReviseContentAction/{{ event.id }}/" >審核</a></td>
+			<td><a class="btn btn-link" role="button" href = "/ebookSystem/review_ReviseContentAction/{{ event.action.id }}/" >審核</a></td>
 		</tr>
 		{% endfor %}
 	</table>

@@ -62,16 +62,23 @@ def get_book_info(ISBN):
 	res = response.read().decode('utf-8')
 	soup = BeautifulSoup(res, 'html5lib')
 	td = soup.find_all('td', class_=u'資料列_1')
-	if not td:
-		return [False]
-	bookname = unicode(td[4].string)
-	author = unicode(td[5].string)
-	house = unicode(td[6].string)
-	date = unicode(td[7].string)
-	year = int(date.split('/')[0]) +1911
-	month = int(date.split('/')[1])
-	date = unicode(datetime.date(year,month,1))
-	return [True, bookname, author, house, date]
+	response = {}
+	try:
+		bookname = unicode(td[4].string)
+		author = unicode(td[5].string)
+		house = unicode(td[6].string)
+		date = unicode(td[7].string)
+		year = int(date.split('/')[0]) +1911
+		month = int(date.split('/')[1])
+		date = unicode(datetime.date(year,month,1))
+		response['status'] = u'success'
+		response['bookname'] = bookname
+		response['author'] = author
+		response['house'] = house
+		response['date'] = date
+	except:
+		response['status'] = u'error'
+	return response
 
 if __name__ == '__main__':
 	book_info = get_book_info('9789573323969')

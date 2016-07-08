@@ -12,20 +12,18 @@ import datetime
 import codecs
 
 class Book(models.Model):
+	ISBN = models.CharField(max_length=20, primary_key=True)
 	bookname = models.CharField(max_length=50)
 	author = models.CharField(max_length=50)
 	house = models.CharField(max_length=30)
 	date = models.DateField()
-	ISBN = models.CharField(max_length=20, primary_key=True)
 	path = models.CharField(max_length=255, blank=True, null=True)
 	page_count = models.IntegerField(blank=True, null=True)
 	part_count = models.IntegerField(blank=True, null=True)
 	page_per_part = models.IntegerField(default=50)
 	priority = models.IntegerField(default=0)
-#	reviewer = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
 	guests = models.ManyToManyField(Guest, related_name='own_book_set')
-#	is_active = models.BooleanField(default=False)
 	status = models.IntegerField(default=INACTIVE)
 	upload_date = models.DateField(default = timezone.now)
 	remark = models.CharField(max_length=255, blank=True, null=True)
@@ -33,7 +31,7 @@ class Book(models.Model):
 		return self.bookname
 
 	def create_EBook(self):
-		if not (len(self.ebook_set.all()) == 0 and self.part_count and self.page_count and self.path):
+		if not (len(self.ebook_set.all()) == 0 and self.validate_folder()):
 			return False
 		for i in range(self.part_count):
 			begin_page = i*self.page_per_part
@@ -139,18 +137,16 @@ class EBook(models.Model):
 	service_hours = models.IntegerField(default=0)
 	remark = models.CharField(max_length=255, blank=True, null=True)
 
-#	class Meta:
-#		unique_together = ('book', 'part',)
 
-	class SliceString():
-		def __init__(self, start, end, content, source_index, destination_index):
-			self.start = start
-			self.end = end
-			self.source_index = source_index
-			self.destination_index = destination_index
-			self.content = content
 
 	def fuzzy_string_search(self, string, length=5, action=''):
+		class SliceString():
+			def __init__(self, start, end, content, source_index, destination_index):
+				self.start = start
+				self.end = end
+				self.source_index = source_index
+				self.destination_index = destination_index
+				self.content = content
 		import re
 		import difflib
 		[content, fileHead] = self.get_content(action)
@@ -175,7 +171,7 @@ class EBook(models.Model):
 					source_index = source_index[1:-1]
 					destination_index = destination_index[1:-1]
 					print source_index
-					ss = self.SliceString(start=headPosition, end=tailPosition, content=source_content, source_index=source_index, destination_index=destination_index)
+					ss = SliceString(start=headPosition, end=tailPosition, content=source_content, source_index=source_index, destination_index=destination_index)
 					ssl.append(ss)
 		return ssl
 

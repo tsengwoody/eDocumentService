@@ -30,11 +30,11 @@
 
 
         <div class="form-group">
-            <label for="id_username">{{ loginForm.username.label_tag.value }}</label>
+            <label for="id_username">{{ form.username.label_tag.value }}</label>
             <input id="id_username" name="username" type="text" placeholder="username" class="form-control" required />
         </div>
         <div class="form-group">
-            <label for="id_password">{{ loginForm.password.label_tag.value }}</label>
+            <label for="id_password">{{ form.password.label_tag.value }}</label>
             <input id="id_password" name="password" type="password" placeholder="password" class="form-control" required />
         </div>
 <!--        <div class="form-group">
@@ -57,7 +57,7 @@
         </div>
     {% endif %}
 
-    {% if loginForm.errors %}
+    {% if form.errors %}
         <div class="alert alert-danger" role="alert">
             <p>Your username and password didn't match. Please try again.</p>
         </div>

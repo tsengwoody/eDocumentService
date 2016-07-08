@@ -44,7 +44,7 @@ function catchErrorHandling()
 }
 function showProgress(uuid)
 {
-    $.getJSON('/guest/upload_progress', {'X-Progress-ID': uuid},function(data,status,xhr){
+    $.getJSON('/genericUser/upload_progress', {'X-Progress-ID': uuid},function(data,status,xhr){
         if(data){
             var progress =parseInt((parseInt(data.uploaded) / parseInt(data.length))*100);
             console.log(progress);

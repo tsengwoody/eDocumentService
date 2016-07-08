@@ -60,48 +60,34 @@ def search_book(request, template_name):
 		return locals()
 
 @user_category_check(['manager'])
+@http_response
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
 	except:
 		raise Http404("book does not exist")
 	sourcePath = book.path +u'/source'
-	fileList=os.listdir(sourcePath)
-	fileList = sorted(fileList)
 	scanPageList=[]
-	for scanPage in fileList:
-		if scanPage.split('.')[-1].lower() == 'jpg':
-			scanPageList.append(scanPage)
+	for ebook in book.ebook_set.all():
+		scanPageList = scanPageList + ebook.get_image()[0]
 	defaultPage=scanPageList[0]
 	defaultPageURL = sourcePath +u'/' +defaultPage
 	defaultPageURL=defaultPageURL.replace(PREFIX_PATH +'static/', '')
 	if request.method == 'GET':
-		return render(request, template_name, locals())
+		return locals()
 	if request.method == 'POST':
-		response = {}
-		redirect_to = None
 		if request.POST['review'] == 'success':
 			book.status = ACTIVE
 			book.save()
-			response['status'] = 'success'
-			response['message'] = u'審核通過文件'
-			response['redirect_to'] = reverse('manager:review_document_list')
+			status = 'success'
+			message = u'審核通過文件'
 		if request.POST['review'] == 'error':
 			shutil.rmtree(book.path)
 			book.delete()
-			response['status'] = 'success'
-			response['message'] = u'審核退回文件'
-			response['redirect_to'] = reverse('manager:review_document_list')
-		status = response['status']
-		message = response['message']
-		redirect_to = response['redirect_to']
-		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json")
-		else:
-			if redirect_to:
-				return HttpResponseRedirect(redirect_to)
-			else:
-				return render(request, template_name, locals())
+			status = 'success'
+			message = u'審核退回文件'
+			redirect_to = reverse('manager:review_document_list')
+		return locals()
 
 @user_category_check(['manager'])
 def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'):
@@ -148,8 +134,7 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 @http_response
 def review_ReviseContentAction(request, id, template_name='ebookSystem/review_ReviseContentAction.html'):
 	try:
-		event = Event.objects.get(id=id)
-		action = event.action
+		action = ReviseContentAction.objects.get(id=id)
 	except:
 		raise Http404("book does not exist")
 	result = action.ebook.fuzzy_string_search(string = action.content, length=10, action='-final')
@@ -175,22 +160,16 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 
 def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 	response = {}
-	result = get_book_info(ISBN)
-	if result[0]:
-		status = u'success'
-		message = u'成功取得資料'
-		response['bookname'] = result[1]
-		response['author'] = result[2]
-		response['house'] = result[3]
-		response['date'] = result[4]
-#		[bookname, author, house, date] = result[1:]
+	if request.is_ajax():
+		response = get_book_info(ISBN)
+		if response['status'] == 'success':
+			response['message'] = u'成功取得資料'
+		else:
+			response['message'] = u'查無資料'
+		return HttpResponse(json.dumps(response), content_type="application/json")
 	else:
-		status = u'error'
-		message = u'查無資料'
-	response['status'] = status
-	response['message'] = message
-	return HttpResponse(json.dumps(response), content_type="application/json")
-#	return render(request, template_name, locals())
+		return HttpResponse(json.dumps(response), content_type="application/json")
+#		return render(request, template_name, locals())
 
 def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 	user = request.user
@@ -198,10 +177,10 @@ def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 	book = Book.objects.get(ISBN=book_ISBN)
 	part = EBook.objects.get(part=part_part,book=book)
 	response = {}
+	if not hasattr(request.user, 'online'):
+		response['status'] = 'error'
+		response['message'] = u'已登出'
 	if 'online' in request.POST:
-		if not user.online:
-			user.online = timezone.now()
-			user.save()
 		delta = timezone.now() - user.online
 		if delta.seconds < 50:
 			response['status'] = 'error'
@@ -224,7 +203,7 @@ class editView(generic.View):
 		logger.info('{}/edit\t{}'.format(request.user, resolve(request.path).namespace))
 		template_name='ebookSystem/edit.html'
 		user = request.user
-		readmeUrl = '/ebookSystem/edit/readme/'
+		readme_url = request.path +'readme/'
 		try:
 			book = Book.objects.get(ISBN=kwargs['book_ISBN'])
 			part = EBook.objects.get(part=kwargs['part_part'],book=book)
@@ -238,7 +217,7 @@ class editView(generic.View):
 	def post(self, request, encoding='utf-8', *args, **kwargs):
 		template_name='ebookSystem/edit.html'
 		user = request.user
-		readmeUrl = '/ebookSystem/edit/readme/'
+		readme_url = request.path +'readme/'
 		response = {}
 		try:
 			book = Book.objects.get(ISBN=kwargs['book_ISBN'])

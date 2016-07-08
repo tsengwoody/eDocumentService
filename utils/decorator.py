@@ -7,6 +7,7 @@ import json
 def user_category_check(category):
 	def user_category_out(view):
 		def user_category_in(request, *args, **kwargs):
+			print request.path
 			response = {}
 			if not request.user.is_authenticated():
 				template_name = 'user_category_check.html'

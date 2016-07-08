@@ -1,5 +1,5 @@
 ﻿# coding: utf-8
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import (login as auth_login, logout as auth_logout,)
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponse,HttpResponseRedirect
@@ -78,44 +78,40 @@ def register(request, template_name='registration/register.html'):
 from utils.decorator import *
 #@audio_code_valid
 @http_response
-def login_user(request, template_name='registration/login.html', *args, **kwargs):
+def login(request, template_name='registration/login.html', authentication_form=AuthenticationForm):
+	"""
+	Displays the login form and handles the login action.
+	"""
 	try:
 		UUID = locals()['kwargs']['UUID']
 		code = cache.get(UUID)
 	except:
 		pass
 	if request.method == 'GET':
-		loginForm = LoginForm()
+		form = authentication_form(request)
 		return locals()
 	if request.method == 'POST':
-		loginForm = LoginForm(request.POST)
-		if not loginForm.is_valid():
+		form = authentication_form(request, data=request.POST)
+		if not form.is_valid():
 			status = 'error'
-			message = u'表單驗證失敗'
-			return locals()
-		username = loginForm.cleaned_data['username']
-		password = loginForm.cleaned_data['password']
-		user = authenticate(username=username, password=password)
-		if user is None:
-			status = 'error'
-			message = u'您的帳號或密碼錯誤'
-			return locals()
-		if not user.is_active:
-			status = 'error'
-			message = u'您的帳號尚未啟用，管理員審核中，若超過3日未啟用或未收到管理員身份認證，請利用聯絡我們進行反應'
+			message = u'表單驗證失敗' +form.errors['__all__']
 			return locals()
 		from django.contrib.sessions.models import Session
 		for session in Session.objects.all():
 			if session.get_decoded().has_key('_auth_user_id') and int(session.get_decoded()['_auth_user_id']) == user.id:
 				session.delete()
-		login(request, user)
+		auth_login(request, form.get_user())
 		redirect_to = '/'
 		status = 'success'
 		message = u'登錄成功'
 		return locals()
 
 def logout_user(request, template_name='registration/logged_out.html'):
-	logout(request)
+	auth_logout(request)
+	return render(request, template_name, locals())
+
+def readme(request, app_name, template_name):
+	template_name = app_name +'/' +template_name +'_readme.html'
 	return render(request, template_name, locals())
 
 import locale

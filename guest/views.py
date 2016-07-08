@@ -24,7 +24,7 @@ import shutil
 @user_category_check(['scaner'])
 @http_response
 def create_document(request, template_name='guest/create_document.html'):
-	readmeUrl = reverse('guest:create_document') +'readme/'
+	readme_url = request.path +'readme/'
 	user = request.user
 	if request.method == 'POST':
 		bookForm = BookForm(request.POST, request.FILES)
@@ -98,7 +98,7 @@ class profileView(generic.View):
 	@method_decorator(user_category_check(['guest']))
 	@method_decorator(http_response)
 	def get(self, request, *args, **kwargs):
-		readmeUrl = reverse('guest:profile') +'readme/'
+		readme_url = request.path +'readme/'
 		template_name=self.template_name
 		user=request.user
 		book_list = user.guest.own_book_set.all()
@@ -114,7 +114,7 @@ class profileView(generic.View):
 	@method_decorator(user_category_check(['guest']))
 	@method_decorator(http_response)
 	def post(self, request, *args, **kwargs):
-		readmeUrl = reverse('guest:profile') +'readme/'
+		readme_url = request.path +'readme/'
 		template_name=self.template_name
 		user=request.user
 		if request.POST.has_key('emailBook'):
@@ -146,11 +146,3 @@ class profileView(generic.View):
 			else:
 				edit_book_list.append(book)
 		return locals()
-
-def readme(request, template_name):
-	template_name = 'guest/' +template_name +'_readme.html'
-	return render(request, template_name, locals())
-
-def static(request, template_name):
-	template_name = 'guest/' +template_name +'.html'
-	return render(request, template_name, locals())
