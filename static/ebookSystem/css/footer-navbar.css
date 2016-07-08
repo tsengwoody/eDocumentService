@@ -49,4 +49,7 @@ code {
 .table tr a{
   padding-left:0px;
 }
+.page-header {
+  margin:20px 0 20px;
+}
 
