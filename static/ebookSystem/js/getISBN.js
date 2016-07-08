@@ -22,7 +22,7 @@ function getBookInfo(ISBN, transferData) {
             $('#id_author').val(json.author);
             $('#id_date').val(json.date);
             $('#id_house').val(json.house);
-             $('#id_get_isbn_load_icon').hide();
+            $('#id_get_isbn_load_icon').hide();
 
         },
         error: function(xhr, errmsg, err) {

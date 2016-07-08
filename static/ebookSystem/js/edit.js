@@ -69,10 +69,6 @@ function sameOrigin(url) {
         // or any other URL that isn't scheme relative or absolute i.e relative.
         !(/^(\/\/|http:|https:).*/.test(url));
 }
-$( document ).ready(function() {
-
-
-});
 function changePage(offset) {
     page = document.getElementById("id_page");
     imgScanPage = $('#scanPage')[0];
