@@ -82,6 +82,7 @@ def login(request, template_name='registration/login.html', authentication_form=
 	"""
 	Displays the login form and handles the login action.
 	"""
+	user = request.user
 	try:
 		UUID = locals()['kwargs']['UUID']
 		code = cache.get(UUID)
