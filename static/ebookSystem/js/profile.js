@@ -82,6 +82,15 @@ $( document ).ready(function() {
             }
         }
     });
+
+    if($('.modal.fade.in').length>0)
+    {
+        $('.modal.fade.in').on('shown.bs.modal', function () {
+            $('.modal.fade.in .close').focus();
+        });
+        $('.modal.fade.in').modal();
+    }
+
     $('button:submit').on('click',function(event)
     {
         event.preventDefault();
