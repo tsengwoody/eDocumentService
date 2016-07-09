@@ -22,20 +22,20 @@
 	<h4 class="page-header">查詢文件資訊</h4>
 	<table class="table table-striped table-hover">
 		<tr>
+			<th>ISBN</th>
 			<th>書名</th>
 			<th>作者</th>
 			<th>出版社</th>
 			<th>出版日期</th>
-			<th>頁數</th>
 			<th colspan="1">動作</th>
 		</tr>
 		{% for book in book_list %}
 		<tr>
+			<td>{{ book.ISBN }}</td>
 			<td>{{ book.bookname }}</td>
 			<td>{{ book.author }}</td>
 			<td>{{ book.house }}</td>
 			<td>{{ book.date }}</td>
-			<td>{{ book.collect_finish_page_count }}/{{book.page_count}}</td>
 			<td>
 
 				<button type="submit" class="btn btn-default" id="get_book_id" name="get_book" value={{ book.ISBN }}>獲取</button>

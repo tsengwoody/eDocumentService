@@ -1,6 +1,6 @@
 ﻿# coding: utf-8
-from django.contrib.auth import (login as auth_login, logout as auth_logout,)
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import (login as auth_login, logout as auth_logout, update_session_auth_hash,)
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
@@ -109,6 +109,25 @@ def login(request, template_name='registration/login.html', authentication_form=
 def logout_user(request, template_name='registration/logged_out.html'):
 	auth_logout(request)
 	return render(request, template_name, locals())
+
+@user_category_check(['user'])
+@http_response
+def password_change(request, template_name='registration/password_change_form.html', password_change_form=PasswordChangeForm):
+	if request.method == "POST":
+		form = password_change_form(user=request.user, data=request.POST)
+		if not form.is_valid():
+			return locals()
+		form.save()
+		# Updating the password logs out all other sessions for the user
+		# except the current one if
+		# django.contrib.auth.middleware.SessionAuthenticationMiddleware
+		# is enabled.
+		update_session_auth_hash(request, form.user)
+		redirect_to = reverse('genericUser:info')
+		return locals()
+	else:
+		form = password_change_form(user=request.user)
+		return locals()
 
 def readme(request, app_name, template_name):
 	template_name = app_name +'/' +template_name +'_readme.html'
