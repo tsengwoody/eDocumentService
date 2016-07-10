@@ -4,7 +4,7 @@
 更正文件
 {% endblock %}
 {% block style %}
- <script language="javascript" src="{% static 'ebookSystem/js/profile.js' %}"></script>
+ <script language="javascript" src="{% static 'ebookSystem/js/review_ReviseContentAction.js' %}"></script>
 {% endblock %}
 {% block header %}
 更正文件
@@ -49,13 +49,13 @@
 	            </tr>
 	            {% for sliceString in result %}
 	            <tr>
-					<td class="col-md-1">
+					<td class="col-md-10">
 						{% for s, d in sliceString.content_diff %}
-						{% if forloop.counter|divisibleby:"2" %}
-						<a href="#" data-toggle="tooltip" data-placement="right" title="{{ s }}">{{ d }}</a>
-						{% else %}
-						{{ d }}
-						{% endif %}
+							{% if forloop.counter|divisibleby:"2" %}
+								<a href="#" data-toggle="tooltip" data-placement="top" title="{{ s }}">{{ d }}</a>
+							{% else %}
+								{{ d }}
+							{% endif %}
 						{% endfor %}
 					</td>
 	                <td class="col-md-2">
