@@ -22,6 +22,8 @@ function getBookInfo(ISBN, transferData) {
             $('#id_author').val(json.author);
             $('#id_date').val(json.date);
             $('#id_house').val(json.house);
+            $('#id_ISBN').val(json.ISBN);
+            //TODO: GET ISBN
             $('#id_get_isbn_load_icon').hide();
 
         },
@@ -36,8 +38,20 @@ function getBookInfo(ISBN, transferData) {
 $( document ).ready(function() {
     console.log( "document ready!" );
 
-    $('#get_isbn').on("click",function(){
-        getBookInfo($('#id_ISBN').val(),$('#id_ISBN').serialize());
+    $('#get_isbn').on("click",function(event){
+        
+        if($('#id_ISBN')[0].checkValidity()){
+            getBookInfo($('#id_ISBN').val(),$('#id_ISBN').serialize());
+        }
+        else
+        {
+            var dialog='#dangerDialog';
+            $(dialog+" .alertMessage").html(document.getElementById("id_ISBN").validationMessage);
+            $(dialog).on('shown.bs.modal', function () {
+                $(dialog+" .close").focus();
+            });
+            $(dialog).modal();   
+        }
     });
 
 

@@ -4,7 +4,7 @@
 服務
 {% endblock %}
 {% block style %}
- <script language="javascript" src="{% static 'ebookSystem/js/profile.js' %}"></script>
+ <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
 {% endblock %}
 {% block header %}
 個人首頁
@@ -14,8 +14,8 @@
 <form action="" method="post">
 {% csrf_token %}
 	<div id="buttonGroup" style="text-align: center;">
-		<button class="btn btn-lg btn-default" type="submit" id="getPart_id" name="getPart">領部份文件</button>
-		<button class="btn btn-lg btn-default" type="submit" id="getCompleteBook_id" name="getCompleteBook">領完整文件</button>
+		<button class="btn btn-lg btn-default send_button" type="submit" id="getPart_id" name="getPart">領部份文件</button>
+		<button class="btn btn-lg btn-default send_button" type="submit" id="getCompleteBook_id" name="getCompleteBook">領完整文件</button>
 	</div>
 	<hr />
 	<h4 class="page-header">正校對文件</h4>
@@ -43,7 +43,7 @@
 				{% endif %}
 			</td>
 			<td>
-				<button type="submit" class="btn btn-default" id="rebackPart_id" name="rebackPart" value={{part.ISBN_part}}>還文件</button>
+				<button type="submit" class="btn btn-default send_button" id="rebackPart_id" name="rebackPart" value={{part.ISBN_part}}>還文件</button>
 			</td>
 		</tr>
 		{% endfor %}
@@ -68,10 +68,10 @@
 			<td>{{part.status}}</td>
 			<td>
 				{% ifequal part.status 3 %}
-				<button type="submit" class="btn btn-default" id="reEditPart_id" name="reEditPart" value={{part.ISBN_part}}>再編輯</button>
+				<button type="submit" class="btn btn-default send_button" id="reEditPart_id" name="reEditPart" value={{part.ISBN_part}}>再編輯</button>
 				{% endifequal %}	
 				{% ifequal part.status 5 %}
-				<button type="submit" class="btn btn-default" id="exchange_id" name="exchange" value={{part.ISBN_part}}>兌換時數</button>
+				<button type="submit" class="btn btn-default send_button" id="exchange_id" name="exchange" value={{part.ISBN_part}}>兌換時數</button>
 				{% endifequal %}
 			</td>
 		</tr>

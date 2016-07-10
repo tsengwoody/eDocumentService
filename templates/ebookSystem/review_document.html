@@ -7,6 +7,7 @@
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script language="javascript" src="{% static 'ebookSystem/js/review_document.js' %}"></script>
+<script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
 <link href="{% static "ebookSystem/css/review-document.css" %}" rel="stylesheet" > 
 {% endblock %}
 {% block content %}
@@ -74,7 +75,7 @@
 				            <!--勾退件顯示-->
 				        </label>
 				    </div>
-				    <button class="btn btn-primary" type="submit" id="send_id" name="send">送出</button>
+				    <button class="btn btn-primary send_form" type="submit" id="send_id" name="send">送出</button>
 				</div>
 
             </div>

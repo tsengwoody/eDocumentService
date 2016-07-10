@@ -5,7 +5,7 @@
 {% block style %}
 {% load staticfiles %}
 
-<script language="javascript" src="{% static 'ebookSystem/js/ajax.js' %}"></script>
+<script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
 {% endblock %}
 {% block content %}
 <form action="" method="post">
@@ -78,7 +78,7 @@
             </table>
             <div class="form-group row">
                 <div class="col-sm-offset-4 col-sm-6">
-                    <input type="submit" class="btn btn-primary" value="send" id="send_id">
+                    <input type="submit" class="btn btn-primary send_form" value="send" id="send_id">
                     <input type="reset" class="btn btn-danger" value="reset">
                 </div>
             </div>

@@ -5,7 +5,7 @@
 
 {% block style %}
 {% load staticfiles %}
-<script language="javascript" src="{% static 'ebookSystem/js/form.js' %}"></script>
+<script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -46,7 +46,7 @@
                 <div class="form-group row">
                     <div class="col-sm-offset-2 col-sm-10">
                         <!--<button class="btn btn-default" type="submit" value="change info">修改</button>-->
-                        <input type="submit" class="btn btn-default" value="修改" id="send_id">
+                        <input type="submit" class="btn btn-default send_form" value="修改" id="send_id">
                     </div>
                 </div>
             </div>

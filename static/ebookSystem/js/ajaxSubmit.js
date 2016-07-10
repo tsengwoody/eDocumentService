@@ -1,4 +1,21 @@
-function buttonClick(buttonKey,buttonValue)
+function formSubmit()
+{
+    $.ajax({
+        url:".",
+        type: "POST",
+        data: $("form").serialize(),
+        success: function(json){
+            console.log(json);
+            alertDialog(json);
+        },
+        error:function(xhr,errmsg,err){
+            alert(xhr.status+" "+xhr.responseText);
+            console.log(xhr.status + ": " + xhr.responseText);
+        }
+    });
+
+}
+function buttonSubmit(buttonKey,buttonValue)
 {
     
     var transferData={};
@@ -16,6 +33,25 @@ function buttonClick(buttonKey,buttonValue)
             console.log(xhr.status + ": " + xhr.responseText);
         }
     });
+}
+function formAndButtonSubmit(buttonKey,buttonValue)
+{
+    var transferData={};
+    transferData[buttonKey]=buttonValue;
+    $.ajax({
+        url:".",
+        type: "POST",
+        data: $("form").serialize()+'&'+buttonKey+'='+buttonValue,
+        success: function(json){
+            console.log(json);
+            alertDialog(json);
+        },
+        error:function(xhr,errmsg,err){
+            //alert(xhr.status+" "+xhr.responseText);
+            console.log(xhr.status + ": " + xhr.responseText);
+        }
+    });
+
 }
 function alertDialog(json) {
     var str=(json.status=='error')?'danger':'success'
@@ -82,11 +118,24 @@ $( document ).ready(function() {
             }
         }
     });
-
-    $('button:submit').on('click',function(event)
+    $('*:submit.send_form').on('click',function(event)
     {
+        console.log("send_form");
         event.preventDefault();
-        buttonClick($(this).attr('name'),$(this).val());
+        formSubmit();
+    });
+    $('*:submit.send_button').on('click',function(event)
+    {
+        console.log("send_button");
+        event.preventDefault();
+        buttonSubmit($(this).attr('name'),$(this).val());
+
+    });
+    $('*:submit.send_form_button').on('click',function(event)
+    {
+        console.log("send_form_button");
+        event.preventDefault();
+        formAndButtonSubmit($(this).attr('name'),$(this).val());
 
     });
 

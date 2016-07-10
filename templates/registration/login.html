@@ -2,7 +2,7 @@
 {% block resource %}
     {% load staticfiles %}
     <link href="{% static "ebookSystem/css/signin.css" %}" rel="stylesheet" >
-    <script language="javascript" src="{% static 'ebookSystem/js/ajax.js' %}"></script>
+    <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
     <!--<script language="javascript" src="{% static 'ebookSystem/js/login.js' %}"></script>-->
 {% endblock%}
 
@@ -47,7 +47,7 @@
 
         <!--<input type="submit" value="login" /> -->
 
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <button class="btn btn-lg btn-primary btn-block send_form" type="submit">Sign in</button>
         <input type="hidden" name="next" value="{{ next }}" />
     </form>
 <!--    <button onclick="document.getElementById('id_audio_file').play();">播放</button>-->

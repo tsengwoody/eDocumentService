@@ -4,7 +4,7 @@
 查詢文件
 {% endblock %}
 {% block style %}
- <script language="javascript" src="{% static 'ebookSystem/js/profile.js' %}"></script>
+ <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
 {% endblock %}
 {% block header %}
 查詢文件
@@ -14,8 +14,7 @@
 <form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
 {% csrf_token %}
 	<input id="id_book_ISBN" maxlength="15" name="book_ISBN" type="text">
-	<button class="btn btn-lg btn-default" type="submit" id="search_id" name="search" value="search_value">search_btn</button>
-	<input type="submit" class="btn btn-primary" name="search_name" value="search_input" id="id_search">
+	<input type="submit" class="btn btn-primary" name="search_name" value="search_input" id="id_search"> 
 	<hr />
 	{{ status }}
 	{{ message }}
@@ -37,9 +36,7 @@
 			<td>{{ book.house }}</td>
 			<td>{{ book.date }}</td>
 			<td>
-
-				<button type="submit" class="btn btn-default" id="get_book_id" name="get_book" value={{ book.ISBN }}>獲取</button>
-
+				<button type="submit" class="btn btn-default send_button" id="get_book_id" name="get_book" value={{ book.ISBN }}>獲取</button>
 			</td>
 		</tr>
 		{% endfor %}

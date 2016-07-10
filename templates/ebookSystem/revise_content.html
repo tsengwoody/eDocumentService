@@ -4,7 +4,7 @@
 更正文件
 {% endblock %}
 {% block style %}
- <script language="javascript" src="{% static 'ebookSystem/js/profile.js' %}"></script>
+ <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
 {% endblock %}
 {% block header %}
 更正文件
@@ -56,7 +56,7 @@
 			<td><pre>{{ content }}</pre></td>
 			<td>
 				{% ifequal status 'success' %}
-				<button class="btn btn-md btn-default" type="submit" id="id_revise" name="revise">修正</button>
+				<button class="btn btn-md btn-default send_button" type="submit" id="id_revise" name="revise">修正</button>
 				{% endifequal %}
 			</td>
 		{% endfor %}

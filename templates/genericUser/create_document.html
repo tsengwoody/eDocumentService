@@ -41,7 +41,7 @@
     <div class="form-group">
         <label class="control-label col-sm-2" for="id_ISBN"><font style="color:red">*</font>ISBN:</label>
         <div class="col-sm-3">
-          <input type="text" class="form-control" id="id_ISBN" name="ISBN" required>
+          <input type="text" class="form-control" id="id_ISBN" name="ISBN"  placeholder="請輸入正確的ISBN(10碼或13碼）" pattern="(ISBN[-]*(1[03])*[ ]*(: ){0,1})*(([0-9Xx][- ]*){13}|([0-9Xx][- ]*){10})" autofocus required>
         </div>
        <input type="button" class="btn btn-default" value="取得書籍資訊" id="get_isbn">
 
