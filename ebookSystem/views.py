@@ -189,19 +189,19 @@ def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 	part = EBook.objects.get(part=part_part,book=book)
 	response = {}
 	if not hasattr(request.user, 'online'):
-		response['status'] = 'error'
+		response['status'] = u'error'
 		response['message'] = u'已登出'
 	if 'online' in request.POST:
 		delta = timezone.now() - user.online
 		if delta.seconds < 50:
-			response['status'] = 'error'
+			response['status'] = u'error'
 			response['message'] = u'您有其他編輯正進行'
 		else:
 			user.online = timezone.now()
 			user.save()
 			part.service_hours = part.service_hours+1
 			part.save()
-			response['status'] = 'success'
+			response['status'] = u'success'
 			response['message'] = part.service_hours
 	else:
 		response['status'] = 'error'

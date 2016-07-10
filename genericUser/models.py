@@ -27,7 +27,7 @@ class User(AbstractUser):
 	phone = models.CharField(max_length=30)
 	birthday = models.DateField()
 	education = models.CharField(max_length=30, choices=EDU)
-	online = models.DateField(default = timezone.now)
+	online = models.DateTimeField(default = timezone.now)
 	is_book = models.BooleanField(default=False)
 	is_editor = models.BooleanField(default=False)
 	is_guest = models.BooleanField(default=False)
