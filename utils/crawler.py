@@ -1,9 +1,9 @@
 ﻿# coding: utf-8
-import requests
 import codecs
-import urllib,urllib2
 import cookielib
 import datetime
+import re
+import urllib,urllib2
 from bs4 import BeautifulSoup
 from mysite.settings import PREFIX_PATH
 
@@ -80,7 +80,37 @@ def get_book_info(ISBN):
 		response['status'] = u'error'
 	return response
 
+def ISBN10_check(ISBN):
+	match = re.search(r'^(\d{9})(\d|X)$', ISBN)
+	if not match:
+		return False
+	digits = match.group(1)
+	check_digit = 10 if match.group(2) == 'X' else int(match.group(2))
+	result = sum((i + 1) * int(digit) for i, digit in enumerate(digits))
+	return (result % 11) == check_digit
+
+def ISBN13_check(ISBN):
+	match = re.search(r'^(\d{12})(\d)$', ISBN)
+	if not match:
+		return False
+	digits = match.group(1)
+	check_digit = int(match.group(2))
+	result = sum((3 * int(digit) if i % 2 == 1 else int(digit) for i, digit in enumerate(digits)))
+	return ((result + check_digit) % 10) == 0
+
+def ISBN10_to_ISBN13(ISBN):
+	match = re.search(r'^(\d{9})(\d|X)$', ISBN)
+	if not match:
+		return False
+	digits = match.group(1)
+	digits = '978' +digits
+	result = sum((3 * int(digit) if i % 2 == 1 else int(digit) for i, digit in enumerate(digits)))
+	check_digit = (10 - (result % 10)) % 10
+	return str(digits +str(check_digit))
+
 if __name__ == '__main__':
 	book_info = get_book_info('9789573323969')
 	for info in book_info:
 		print info
+	print ISBN10_to_ISBN13('957331990X')
+	print ISBN13_check('9789865829810')

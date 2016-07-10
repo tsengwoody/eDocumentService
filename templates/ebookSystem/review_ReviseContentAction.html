@@ -44,16 +44,20 @@
 	    <div class="col-md-12">
 	        <table class="table table-striped table-hover">
 	            <tr>
-	                <th colspan="2">原始文字</th>
-	                <th colspan="2">修正文字</th>
+	                <th colspan="1">修正文字</th>
 	                <th>動作</th>
 	            </tr>
 	            {% for sliceString in result %}
 	            <tr>
-	                <td class="col-md-4">{{ sliceString.content }}</td>
-	                <td class="col-md-1">{{ sliceString.source_index }}</td>
-	                <td class="col-md-4">{{ action.content }}</td>
-	                <td class="col-md-1">{{ sliceString.destination_index }}</td>
+					<td class="col-md-1">
+						{% for s, d in sliceString.content_diff %}
+						{% if forloop.counter|divisibleby:"2" %}
+						<a href="#" data-toggle="tooltip" data-placement="right" title="{{ s }}">{{ d }}</a>
+						{% else %}
+						{{ d }}
+						{% endif %}
+						{% endfor %}
+					</td>
 	                <td class="col-md-2">
 	                    {% ifequal status 'success' %}
 	                    <button class="btn btn-md btn-default" type="submit" id="id_revise" name="revise">修正</button>

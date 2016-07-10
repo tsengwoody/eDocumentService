@@ -11,7 +11,7 @@ from .models import *
 from .forms import *
 from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 from utils.decorator import *
-from utils.crawler import get_book_info
+from utils.crawler import *
 import os
 import json
 import shutil
@@ -161,8 +161,19 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 	response = {}
 	if request.is_ajax():
+		if not (len(ISBN) == 10 and ISBN10_check(ISBN)):
+			response['status'] = u'error'
+			response['message'] = u'ISBN10碼錯誤'
+			return response
+		if not (len(ISBN) == 13 and ISBN13_check(ISBN)):
+			response['status'] = u'error'
+			response['message'] = u'ISBN13碼錯誤'
+			return response
+		if len(ISBN) == 10:
+			ISBN = ISBN10_to_ISBN13(ISBN)
 		response = get_book_info(ISBN)
 		if response['status'] == 'success':
+			response['ISBN'] = ISBN
 			response['message'] = u'成功取得資料'
 		else:
 			response['message'] = u'查無資料'

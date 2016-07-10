@@ -141,12 +141,30 @@ class EBook(models.Model):
 
 	def fuzzy_string_search(self, string, length=5, action=''):
 		class SliceString():
-			def __init__(self, start, end, content, source_index, destination_index):
+			def __init__(self, start, end, source_content, source_index, destination_content, destination_index):
 				self.start = start
 				self.end = end
 				self.source_index = source_index
 				self.destination_index = destination_index
-				self.content = content
+				self.source_content = source_content
+				self.destination_content = destination_content
+			
+			def content_diff(self):
+				temps = []
+				for start, end in self.source_index:
+					temps.append(self.source_content[start:end])
+				for i, s in enumerate(temps):
+					if s == '':
+						temps[i] = u'□'
+				tempd = []
+				for start, end in self.destination_index:
+					tempd.append(self.destination_content[start:end])
+				for i, s in enumerate(tempd):
+					if s == '':
+						tempd[i] = u'□'
+				content_list = zip(temps, tempd)
+				return content_list
+
 		import re
 		import difflib
 		[content, fileHead] = self.get_content(action)
@@ -168,10 +186,15 @@ class EBook(models.Model):
 							source_index.append(match.a+match.size)
 							destination_index.append(match.b)
 							destination_index.append(match.b+match.size)
-					source_index = source_index[1:-1]
-					destination_index = destination_index[1:-1]
-					print source_index
-					ss = SliceString(start=headPosition, end=tailPosition, content=source_content, source_index=source_index, destination_index=destination_index)
+					temp = []
+					for i in range(1, len(source_index)):
+						temp.append([source_index[i-1], source_index[i]])
+					source_index = temp
+					temp = []
+					for i in range(1, len(destination_index)):
+						temp.append([destination_index[i-1], destination_index[i]])
+					destination_index = temp
+					ss = SliceString(start=headPosition, end=tailPosition, source_content=source_content, source_index=source_index, destination_content=destination_content, destination_index=destination_index)
 					ssl.append(ss)
 		return ssl
 
