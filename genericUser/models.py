@@ -1,6 +1,6 @@
 ﻿# coding: utf-8
 from django.contrib.auth.models import AbstractUser
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
@@ -55,21 +55,25 @@ class User(AbstractUser):
 class Event(models.Model):
 	creater = models.ForeignKey(User, related_name='event_creater_set')
 	time = models.DateTimeField(auto_now_add=True)
-#	review_url = models.CharField(max_length=100, blank=True, null=True)
 	reviewer = models.ForeignKey(User, related_name='event_reviewer_set', blank=True, null=True)
-	status = models.IntegerField(default=0)
+	status = models.IntegerField(default=-1)
 	message = models.CharField(max_length=100, blank=True, null=True)
-	event_category = (
-		(u'上傳審核' , u'上傳審核'),
-		(u'校對審核' , u'校對審核'),
-		(u'會員審核' , u'會員審核'),
-		(u'聯絡我們' , u'聯絡我們'),
-		(u'更正校對' , u'更正校對'),
-	)
-	category = models.CharField(max_length=10, choices=event_category)
 	content_type = models.ForeignKey(ContentType)
 	object_id = models.CharField(max_length=30)
 	action = GenericForeignKey('content_type', 'object_id')
+	STATUS = {'success':1, 'error':0}
+
+	def get_url(self):
+		from ebookSystem.models import *
+		from django.core.urlresolvers import reverse
+		if isinstance(self.action, ReviseContentAction):
+			return reverse('ebookSystem:review_ReviseContentAction', kwargs={'id':self.action.id })
+		elif isinstance(self.action, Book):
+			return reverse('ebookSystem:review_document', kwargs={'book_ISBN':self.action.ISBN})
+
+	def event_category(self):
+		if isinstance(self.action, ReviseContentAction):
+			return u'更正事件'
 
 	def __unicode__(self):
 		return self.creater.username

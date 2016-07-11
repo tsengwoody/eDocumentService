@@ -226,10 +226,9 @@ class EBook(models.Model):
 		fileList = sorted(fileList)
 		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
 		scanPageList = scanPageList[self.begin_page:self.end_page+1]
-		defaultPage = scanPageList[self.edited_page]
-		defaultPageURL = sourcePath +u'/' +defaultPage
+		defaultPageURL = sourcePath +u'/' +scanPageList[self.edited_page]
 		defaultPageURL=defaultPageURL.replace(PREFIX_PATH +'static/', '')
-		return [scanPageList, defaultPage, defaultPageURL]
+		return [scanPageList, defaultPageURL]
 
 	def edit_distance(self, action, encoding='utf-8'):
 		import Levenshtein

@@ -62,7 +62,10 @@ def get_book_info(ISBN):
 	res = response.read().decode('utf-8')
 	soup = BeautifulSoup(res, 'html5lib')
 	td = soup.find_all('td', class_=u'資料列_1')
-	response = {}
+	bookname=''
+	author=''
+	house=''
+	date=''
 	try:
 		bookname = unicode(td[4].string)
 		author = unicode(td[5].string)
@@ -71,14 +74,10 @@ def get_book_info(ISBN):
 		year = int(date.split('/')[0]) +1911
 		month = int(date.split('/')[1])
 		date = unicode(datetime.date(year,month,1))
-		response['status'] = u'success'
-		response['bookname'] = bookname
-		response['author'] = author
-		response['house'] = house
-		response['date'] = date
+		status = u'success'
 	except:
-		response['status'] = u'error'
-	return response
+		status = u'error'
+	return [status, bookname, author, house, date]
 
 def ISBN10_check(ISBN):
 	match = re.search(r'^(\d{9})(\d|X)$', ISBN)

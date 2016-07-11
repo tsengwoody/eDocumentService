@@ -64,6 +64,7 @@ def create_document(request, template_name='genericUser/create_document.html'):
 				guest = None
 		else:
 			guest = None
+		event = Event.objects.create(creater=user, action=newBook)
 		redirect_to = reverse('guest:profile')
 		status = 'success'
 		message = u'成功建立並上傳文件'
@@ -200,7 +201,7 @@ def revise_content(request, template_name='genericUser/revise_content.html'):
 			status = 'success'
 			message = u'成功搜尋到修政文字段落'
 			reviseContentAction = ReviseContentAction.objects.create(ebook=ebook, content=content)
-			event = Event.objects.create(creater=user, category=u'更正校對', action=reviseContentAction)
+			event = Event.objects.create(creater=user, action=reviseContentAction)
 		elif len(result) == 0:
 			status = 'error'
 			message = u'搜尋不到修政文字段落，請重新輸入並多傳送些文字'
@@ -254,22 +255,21 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 		contactUsForm = ContactUsForm()
 		return locals()
 	if request.method == 'POST':
-		print request.POST
 		contactUsForm = ContactUsForm(request.POST)
-		if contactUsForm.is_valid():
-			contactUs = contactUsForm.save(commit=False)
-			contactUs.message_datetime = timezone.now()
-			subject = u'[{}] {}'.format (contactUs.kind, contactUs.subject)
-			body = u'姓名:'+ contactUs.name+ u'\nemail:'+ contactUs.email+ u'\n內容：\n'+ contactUs.content
-			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=MANAGER)
-			email.send(fail_silently=False)
-			contactUs.save()
-			if request.user.is_authenticated():redirect_to = reverse('account:profile')
-			status = 'success'
-			message = u'成功寄送內容，我們將盡速回復'
-		else:
+		if not contactUsForm.is_valid():
 			status = 'error'
 			message = u'表單驗證失敗{}'.format(contactUsForm.errors)
+			return locals()
+		contactUs = contactUsForm.save(commit=False)
+		contactUs.message_datetime = timezone.now()
+		subject = u'[{}] {}'.format (contactUs.kind, contactUs.subject)
+		body = u'姓名:'+ contactUs.name+ u'\nemail:'+ contactUs.email+ u'\n內容：\n'+ contactUs.content
+		email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=MANAGER)
+		email.send(fail_silently=False)
+		contactUs.save()
+		if request.user.is_authenticated():redirect_to = reverse('account:profile')
+		status = 'success'
+		message = u'成功寄送內容，我們將盡速回復'
 		return locals()
 
 from django.contrib import messages

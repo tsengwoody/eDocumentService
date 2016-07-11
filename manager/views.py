@@ -26,6 +26,7 @@ def review_part_list(request, template_name='manager/review_part_list.html'):
 	part_list = EBook.objects.filter(status=REVIEW)
 	return render(request, template_name, locals())
 
-def review_ReviseContentAction_list(request, template_name='manager/review_ReviseContentAction_list.html'):
-	event_list = Event.objects.filter(category=u'更正校對')
+def event_list(request, action):
+	event_list = Event.objects.filter(content_type__model=action, status=-1)
+	template_name = 'manager/event_list_' +action +'.html'
 	return render(request, template_name, locals())

@@ -24,9 +24,9 @@
 				    <a class="dropdown-toggle" data-toggle="dropdown" href="#">審核
 				        <span class="caret"></span></a>
 				    <ul class="dropdown-menu">
-				        <li><a href="{% url 'manager:review_document_list' %}">審核上傳文件</a></li>
+				        <li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
 				        <li><a href="{% url 'manager:review_part_list' %}">審核校對文件</a></li>
-				        <li><a href="{% url 'manager:review_ReviseContentAction_list' %}">審核更正事件</a></li>
+				        <li><a href="{% url 'manager:event_list' 'revisecontentaction' %}">審核更正事件</a></li>
 				        <li><a href="{% url 'manager:review_user_list' %}">審核會員</a></li>
 				    </ul>
 				</li>

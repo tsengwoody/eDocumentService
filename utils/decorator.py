@@ -48,13 +48,18 @@ def user_category_check(category):
 
 def http_response(view):
 	def decorator(request, *args, **kwargs):
+		rend_dict = {}
 		rend_dict = view(request, *args, **kwargs)
 		if request.is_ajax():
+			if 'extra_list' not in rend_dict:
+				rend_dict['extra_list'] = []
 			response = {}
 			response['status'] = rend_dict['status']
 			response['message'] = rend_dict['message']
 			if 'redirect_to' in rend_dict:
 				response['redirect_to'] = rend_dict['redirect_to']
+			for key in rend_dict['extra_list']:
+				response[key] = rend_dict[key]
 			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
 			if 'redirect_to' in rend_dict:

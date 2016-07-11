@@ -12,7 +12,7 @@ from account.models import *
 from ebookSystem.models import *
 from genericUser.models import *
 from guest.models import *
-from guest.views import create_document
+from genericUser.views import create_document
 from mysite.views import register
 
 class Command(BaseCommand):

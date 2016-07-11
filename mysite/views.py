@@ -117,6 +117,8 @@ def password_change(request, template_name='registration/password_change_form.ht
 	if request.method == "POST":
 		form = password_change_form(user=request.user, data=request.POST)
 		if not form.is_valid():
+			status = 'error'
+			message = u'表單驗證失敗' +str(bookForm.errors)
 			return locals()
 		form.save()
 		# Updating the password logs out all other sessions for the user
@@ -124,6 +126,8 @@ def password_change(request, template_name='registration/password_change_form.ht
 		# django.contrib.auth.middleware.SessionAuthenticationMiddleware
 		# is enabled.
 		update_session_auth_hash(request, form.user)
+		status = 'success'
+		message = u'成功修改密碼'
 		redirect_to = reverse('genericUser:info')
 		return locals()
 	else:

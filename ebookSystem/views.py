@@ -9,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views import generic
 from .models import *
 from .forms import *
+from genericUser.models import Event
 from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 from utils.decorator import *
 from utils.crawler import *
@@ -37,7 +38,6 @@ class book_list(generic.ListView):
 
 @http_response
 def search_book(request, template_name):
-	print request.POST
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
@@ -57,6 +57,7 @@ def search_book(request, template_name):
 			book.guests.add(guest)
 			status = 'success'
 			message = u'獲取成功請到個人頁面進行email傳送'
+			redirect_to = reverse('guest:profile')
 		return locals()
 
 @user_category_check(['manager'])
@@ -64,14 +65,14 @@ def search_book(request, template_name):
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
+		events = Event.objects.filter(object_id=book.ISBN)
 	except:
 		raise Http404("book does not exist")
 	sourcePath = book.path +u'/source'
 	scanPageList=[]
 	for ebook in book.ebook_set.all():
 		scanPageList = scanPageList + ebook.get_image()[0]
-	defaultPage=scanPageList[0]
-	defaultPageURL = sourcePath +u'/' +defaultPage
+	defaultPageURL = sourcePath +u'/' +scanPageList[0]
 	defaultPageURL=defaultPageURL.replace(PREFIX_PATH +'static/', '')
 	if request.method == 'GET':
 		return locals()
@@ -86,7 +87,12 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 			book.delete()
 			status = 'success'
 			message = u'審核退回文件'
-			redirect_to = reverse('manager:review_document_list')
+		redirect_to = reverse('manager:review_document_list')
+		for event in events:
+			event.reviewer = request.user
+			if status in event.STATUS.keys():
+				event.status = event.STATUS[status]
+			event.message = message
 		return locals()
 
 @user_category_check(['manager'])
@@ -158,29 +164,25 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 		raise Http404("book does not exist")
 	return render(request, template_name, locals())
 
+@http_response
 def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
-	response = {}
-	if request.is_ajax():
-		if not (len(ISBN) == 10 and ISBN10_check(ISBN)):
-			response['status'] = u'error'
-			response['message'] = u'ISBN10碼錯誤'
-			return response
-		if not (len(ISBN) == 13 and ISBN13_check(ISBN)):
-			response['status'] = u'error'
-			response['message'] = u'ISBN13碼錯誤'
-			return response
-		if len(ISBN) == 10:
-			ISBN = ISBN10_to_ISBN13(ISBN)
-		response = get_book_info(ISBN)
-		if response['status'] == 'success':
-			response['ISBN'] = ISBN
-			response['message'] = u'成功取得資料'
-		else:
-			response['message'] = u'查無資料'
-		return HttpResponse(json.dumps(response), content_type="application/json")
+	if len(ISBN) == 10 and not ISBN10_check(ISBN):
+		status = u'error'
+		message = u'ISBN10碼錯誤'
+		return locals()
+	if len(ISBN) == 13 and not ISBN13_check(ISBN):
+		status = u'error'
+		message = u'ISBN13碼錯誤'
+		return locals()
+	if len(ISBN) == 10:
+		ISBN = ISBN10_to_ISBN13(ISBN)
+	[status, bookname, author, house, date] = get_book_info(ISBN)
+	if status == 'success':
+		message = u'成功取得資料'
 	else:
-		return HttpResponse(json.dumps(response), content_type="application/json")
-#		return render(request, template_name, locals())
+		message = u'查無資料'
+	extra_list = ['bookname', 'author', 'house', 'date', 'ISBN']
+	return locals()
 
 def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 	user = request.user
@@ -220,7 +222,7 @@ class editView(generic.View):
 			part = EBook.objects.get(part=kwargs['part_part'],book=book)
 		except: 
 			raise Http404("book or part does not exist")
-		[scanPageList, defaultPage, defaultPageURL] = part.get_image()
+		[scanPageList, defaultPageURL] = part.get_image()
 		[editContent, fileHead] = part.get_content('-edit')
 		return locals()
 
@@ -235,7 +237,7 @@ class editView(generic.View):
 			part = EBook.objects.get(part=kwargs['part_part'],book=book)
 		except:
 			raise Http404("book or part does not exist")
-		[scanPageList, defaultPage, defaultPageURL] = part.get_image()
+		[scanPageList, defaultPageURL] = part.get_image()
 		editForm = EditForm(request.POST)
 		if request.POST.has_key('save'):
 			content = request.POST['content']
@@ -248,7 +250,7 @@ class editView(generic.View):
 #			part.set_content(finish_content='', edit_content=content)
 			part.edited_page=int(request.POST['page'])
 			part.save()
-			[scanPageList, defaultPage, defaultPageURL] = part.get_image()
+			[scanPageList, defaultPageURL] = part.get_image()
 			[editContent, fileHead] = part.get_content('-edit')
 			status = 'success'
 			message = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
