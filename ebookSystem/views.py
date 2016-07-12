@@ -157,6 +157,16 @@ def review_ReviseContentAction(request, id, template_name='ebookSystem/review_Re
 		return locals()
 #	if request.method == 'POST':
 
+@user_category_check(['manager'])
+@http_response
+def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_ApplyDocumentAction.html'):
+	try:
+		action = ApplyDocumentAction.objects.get(id=id)
+	except:
+		raise Http404("ApplyDocumentAction does not exist")
+	if request.method == 'GET':
+		return locals()
+
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)

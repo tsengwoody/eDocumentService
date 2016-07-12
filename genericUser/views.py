@@ -25,7 +25,6 @@ def create_document(request, template_name='genericUser/create_document.html'):
 	readme_url = request.path +'readme/'
 	user = request.user
 	if request.method == 'POST':
-#		bookForm = BookForm(request.POST, request.FILES)
 		bookInfoForm = BookInfoForm(request.POST)
 		if not (bookInfoForm.is_valid()):
 			status = 'error'
@@ -47,8 +46,8 @@ def create_document(request, template_name='genericUser/create_document.html'):
 				message = u'非正確ZIP文件'
 				return locals()
 		unzip_file(uploadFilePath, uploadPath)
-		newBookInfo = bookInfoForm.save()
-		newBook = Book.objects.create(book_info=newBookInfo, ISBN=request.POST['ISBN'])
+		newBookInfo = bookInfoForm.save(commit=False)
+		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'])
 		newBook.path = uploadPath
 		if not newBook.validate_folder():
 			shutil.rmtree(uploadPath)
@@ -56,6 +55,7 @@ def create_document(request, template_name='genericUser/create_document.html'):
 			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			return locals()
 		newBook.scaner = user
+		newBookInfo.save()
 		newBook.save()
 		newBook.create_EBook()
 		if request.POST.has_key('guest'):
@@ -67,12 +67,11 @@ def create_document(request, template_name='genericUser/create_document.html'):
 		else:
 			guest = None
 		event = Event.objects.create(creater=user, action=newBook)
-		redirect_to = reverse('guest:profile')
+		redirect_to = '/'
 		status = 'success'
 		message = u'成功建立並上傳文件'
 		return locals()
 	if request.method == 'GET':
-#		bookForm = BookForm()
 		return locals()
 
 def upload_progress(request):
@@ -92,6 +91,25 @@ def upload_progress(request):
 		return HttpResponse(json.dumps(data), content_type="application/json")
 	else:
 		return HttpResponseServerError('Server Error: You must provide X-Progress-ID header or query param.')
+
+@http_response
+def apply_document(request, template_name='genericUser/apply_document.html'):
+	user = request.user
+	if request.method == 'POST':
+		bookInfoForm = BookInfoForm(request.POST)
+		if not bookInfoForm.is_valid():
+			status = 'error'
+			message = u'表單驗證失敗' +str(bookInfoForm.errors)
+			return locals()
+		newBookInfo = bookInfoForm.save()
+		applyDocumentAction = ApplyDocumentAction.objects.create(book_info=newBookInfo)
+		event = Event.objects.create(creater=user, action=applyDocumentAction)
+		redirect_to = '/'
+		status = 'success'
+		message = u'成功申請代掃描辨識，請將書籍寄至所選之中心'
+		return locals()
+	if request.method == 'GET':
+		return locals()
 
 @user_category_check(['manager'])
 def review_user(request, username, template_name='genericUser/review_user.html'):

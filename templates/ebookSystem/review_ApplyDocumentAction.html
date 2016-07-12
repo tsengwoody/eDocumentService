@@ -1,0 +1,75 @@
+﻿{% extends "base_nav.html" %}
+{% load staticfiles %}
+{% block title %}
+代掃辨識作業
+{% endblock %}
+{% block style %}
+ <script language="javascript" src="{% static 'ebookSystem/js/review_ReviseContentAction.js' %}"></script>
+{% endblock %}
+{% block header %}
+代掃辨識作業
+{% endblock %}
+{% block content %}
+
+<form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
+{% csrf_token %}
+	{% ifequal status 'success' %}
+		<div class="modal fade in" id="Dialog" role="dialog">
+		    <div class="modal-dialog modal-sm">
+		        <div class="modal-content alert-success">
+		            <div class="modal-header alert-success" role="alert">
+		                <button type="button" class="close" data-dismiss="modal">&times;</button>
+		                <strong>{{ status }}</strong>
+		                <div class="alertMessage">{{ message }}</div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+	{% endifequal %}
+	{% ifequal status 'error' %}
+		<div class="modal fade in" id="Dialog" role="dialog">
+		    <div class="modal-dialog modal-sm">
+		        <div class="modal-content alert-danger">
+		            <div class="modal-header alert-danger" role="alert">
+		                <button type="button" class="close" data-dismiss="modal">&times;</button>
+		                <strong>{{ status }}</strong>
+		                <div class="alertMessage">{{ message }}</div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+	{% endifequal %}
+	<h4 class="page-header">代掃辨識申請資訊</h4>
+	<div class="row">
+	    <div class="col-md-12">
+	        <table class="table table-striped table-hover">
+	            <tr>
+	                <th>ISBN</th>
+	                <td>{{ action.book_info.ISBN }}</td>
+	            </tr>
+	            <tr>
+	                <th>書名</th>
+	                <td>{{ action.book_info.bookname }}</td>
+	            </tr>
+	            <tr>
+	                <th>作者</th>
+	                <td>{{ action.book_info.author }}</td>
+	            </tr>
+	            <tr>
+	                <th>出版社</th>
+	                <td>{{ action.book_info.house }}</td>
+	            </tr>
+	            <tr>
+	                <th>出版日</th>
+	                <td>{{ action.book_info.date }}</td>
+	            </tr>
+	            <tr>
+	                <th>上傳文件</th>
+	                <td><input class="form-control-file" id="id_fileObject" name="fileObject" type="file" required />          </td>
+	            </tr>
+	        </table>
+	    </div>
+	</div>
+
+</form>
+{% endblock %}

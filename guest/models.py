@@ -14,7 +14,3 @@ class Guest(models.Model):
 
 	def __unicode__(self):
 		return self.user.username
-
-class UploadFile(models.Model):
-	username = models.CharField(max_length=10)
-	file_object = models.FileField(upload_to='disability_card')

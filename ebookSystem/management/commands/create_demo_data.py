@@ -43,13 +43,12 @@ class Command(BaseCommand):
 		rootEditor = Editor.objects.create(user=root)
 		rootGuest = Guest.objects.create(user=root)
 		with open(u'temp/藍色駭客.zip') as fileObject:
-			request = factory.post(reverse('guest:create_document'), {'bookname':u'藍色駭客', 'author':u'傑佛瑞．迪佛', 'house':u'皇冠', 'ISBN':u'9573321564', 'date':u'2013-07-11', 'fileObject':fileObject})
+			request = factory.post(reverse('genericUser:create_document'), {'bookname':u'藍色駭客', 'author':u'傑佛瑞．迪佛', 'house':u'皇冠', 'ISBN':u'9789573321569', 'date':u'2013-07-11', 'fileObject':fileObject})
 		request.user = manager
 		response = create_document(request)
 		assert response.status_code == 302, 'status_code' +str(response.status_code)
 		assert len(Book.objects.all())==1, 'create book fail'
 		assert len(EBook.objects.all()) == 10, 'create part fail'
-		book = Book.objects.get(ISBN=u'9573321564')
-		book.is_active = True
+		book = Book.objects.get(ISBN=u'9789573321569')
 		book.save()
 		assert os.path.exists(book.path), 'book resource folder not exist'

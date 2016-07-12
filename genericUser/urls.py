@@ -3,6 +3,7 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
+	url(r'^apply_document/$', views.apply_document, name='apply_document'),
 	url(r'^create_document/$', views.create_document, name='create_document'),
 	url(r'^upload_progress/$', views.upload_progress, name='upload_progress'),
 	url(r'^contact_us/$', views.contact_us, {'template_name': 'genericUser/contact_us.html'}, name='contact_us'),

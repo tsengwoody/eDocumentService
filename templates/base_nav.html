@@ -26,7 +26,8 @@
 				    <ul class="dropdown-menu">
 				        <li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
 				        <li><a href="{% url 'manager:review_part_list' %}">審核校對文件</a></li>
-				        <li><a href="{% url 'manager:event_list' 'revisecontentaction' %}">審核更正事件</a></li>
+				        <li><a href="{% url 'manager:event_list' 'applydocumentaction' %}">代掃辨識上傳作業</a></li>
+				        <li><a href="{% url 'manager:event_list' 'revisecontentaction' %}">審核更正作業</a></li>
 				        <li><a href="{% url 'manager:review_user_list' %}">審核會員</a></li>
 				    </ul>
 				</li>
@@ -36,6 +37,7 @@
 				<li><a href="{% url 'genericUser:create_document' %}">上傳文件</a></li>
 				{% endif %}
 				{% if request.user.is_guest %}
+				<li><a href="{% url 'genericUser:apply_document' %}">代掃辨識</a></li>
 				<li><a href="{% url 'guest:profile' %}">進度</a></li>
 				<li><a href="{% url 'genericUser:revise_content' %}">更正</a></li>
 				{% endif %}

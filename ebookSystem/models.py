@@ -1,6 +1,5 @@
 ﻿# coding: utf-8
 from django.db import models
-from django.db.models.signals import *
 from django.utils import timezone
 
 from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
@@ -23,11 +22,6 @@ class BookInfo(models.Model):
 class Book(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
 	book_info = models.OneToOneField(BookInfo, related_name='book')
-#	ISBN = models.CharField(max_length=20, primary_key=True)
-#	bookname = models.CharField(max_length=50)
-#	author = models.CharField(max_length=50)
-#	house = models.CharField(max_length=30)
-#	date = models.DateField()
 	path = models.CharField(max_length=255, blank=True, null=True)
 	page_count = models.IntegerField(blank=True, null=True)
 	part_count = models.IntegerField(blank=True, null=True)
@@ -268,14 +262,20 @@ class EBook(models.Model):
 		edit_content = content[1]
 		return [finish_content, edit_content]
 
+class Center(models.Model):
+	name = models.CharField(max_length=230)
+	address = models.CharField(max_length=100)
+	email = models.EmailField()
+	phone = models.CharField(max_length=30)
+	count = models.IntegerField(default=0)
+
+	def __unicode__(self):
+		return self.name
+
 class ReviseContentAction(models.Model):
 	ebook = models.ForeignKey('EBook')
 	content = models.CharField(max_length=1000)
 
-def pre_save_Book(**kwargs):
-	book = kwargs.get('instance')
-	if book.page_count == None or book.part_count == None or book.path == None:
-		book.path = PREFIX_PATH + u'static/ebookSystem/document/{0}'.format(book.ISBN)
-		result = book.validate_folder()
-
-pre_save.connect(pre_save_Book, Book)
+class ApplyDocumentAction(models.Model):
+	book_info = models.ForeignKey('BookInfo')
+	center = models.ForeignKey(Center, blank=True, null=True)

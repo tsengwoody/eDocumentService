@@ -71,6 +71,8 @@ class Event(models.Model):
 			return reverse('ebookSystem:review_ReviseContentAction', kwargs={'id':self.action.id })
 		elif isinstance(self.action, Book):
 			return reverse('ebookSystem:review_document', kwargs={'book_ISBN':self.action.ISBN})
+		elif isinstance(self.action, ApplyDocumentAction):
+			return reverse('ebookSystem:review_ApplyDocumentAction', kwargs={'id':self.action.id })
 
 	def event_category(self):
 		if isinstance(self.action, ReviseContentAction):
