@@ -56,6 +56,7 @@ class Event(models.Model):
 	creater = models.ForeignKey(User, related_name='event_creater_set')
 	time = models.DateTimeField(auto_now_add=True)
 	reviewer = models.ForeignKey(User, related_name='event_reviewer_set', blank=True, null=True)
+	time_reply = models.DateTimeField(blank=True, null=True)
 	status = models.IntegerField(default=-1)
 	message = models.CharField(max_length=100, blank=True, null=True)
 	content_type = models.ForeignKey(ContentType)

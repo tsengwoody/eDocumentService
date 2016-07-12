@@ -25,12 +25,13 @@ def create_document(request, template_name='genericUser/create_document.html'):
 	readme_url = request.path +'readme/'
 	user = request.user
 	if request.method == 'POST':
-		bookForm = BookForm(request.POST, request.FILES)
-		if not bookForm.is_valid():
+#		bookForm = BookForm(request.POST, request.FILES)
+		bookInfoForm = BookInfoForm(request.POST)
+		if not (bookInfoForm.is_valid()):
 			status = 'error'
-			message = u'表單驗證失敗' +str(bookForm.errors)
+			message = u'表單驗證失敗' +str(bookInfoForm.errors)
 			return locals()
-		uploadPath = PREFIX_PATH +u'static/ebookSystem/document/{0}'.format(bookForm.cleaned_data['ISBN'])
+		uploadPath = PREFIX_PATH +u'static/ebookSystem/document/{0}'.format(bookInfoForm.cleaned_data['ISBN'])
 		if os.path.exists(uploadPath):
 			status = 'error'
 			message = u'文件已存在'
@@ -46,7 +47,8 @@ def create_document(request, template_name='genericUser/create_document.html'):
 				message = u'非正確ZIP文件'
 				return locals()
 		unzip_file(uploadFilePath, uploadPath)
-		newBook = bookForm.save(commit=False)
+		newBookInfo = bookInfoForm.save()
+		newBook = Book.objects.create(book_info=newBookInfo, ISBN=request.POST['ISBN'])
 		newBook.path = uploadPath
 		if not newBook.validate_folder():
 			shutil.rmtree(uploadPath)
@@ -70,7 +72,7 @@ def create_document(request, template_name='genericUser/create_document.html'):
 		message = u'成功建立並上傳文件'
 		return locals()
 	if request.method == 'GET':
-		bookForm = BookForm()
+#		bookForm = BookForm()
 		return locals()
 
 def upload_progress(request):
@@ -123,7 +125,6 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 			response['status'] = 'success'
 			response['message'] = u'已啟用scaner權限'
 		elif request.POST.has_key('inactive_login'):
-			print 'inactive_login'
 			user.is_active = False
 			response['status'] = 'success'
 			response['message'] = u'停用用登錄權限'

@@ -11,12 +11,23 @@ import os
 import datetime
 import codecs
 
-class Book(models.Model):
+class BookInfo(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
 	bookname = models.CharField(max_length=50)
 	author = models.CharField(max_length=50)
 	house = models.CharField(max_length=30)
 	date = models.DateField()
+	def __unicode__(self):
+		return self.bookname
+
+class Book(models.Model):
+	ISBN = models.CharField(max_length=20, primary_key=True)
+	book_info = models.OneToOneField(BookInfo, related_name='book')
+#	ISBN = models.CharField(max_length=20, primary_key=True)
+#	bookname = models.CharField(max_length=50)
+#	author = models.CharField(max_length=50)
+#	house = models.CharField(max_length=30)
+#	date = models.DateField()
 	path = models.CharField(max_length=255, blank=True, null=True)
 	page_count = models.IntegerField(blank=True, null=True)
 	part_count = models.IntegerField(blank=True, null=True)
@@ -28,7 +39,7 @@ class Book(models.Model):
 	upload_date = models.DateField(default = timezone.now)
 	remark = models.CharField(max_length=255, blank=True, null=True)
 	def __unicode__(self):
-		return self.bookname
+		return self.book_info.bookname
 
 	def create_EBook(self):
 		if not (len(self.ebook_set.all()) == 0 and self.validate_folder()):
@@ -199,7 +210,7 @@ class EBook(models.Model):
 		return ssl
 
 	def __unicode__(self):
-		return self.book.bookname+u'-part'+str(self.part)
+		return self.book.book_info.bookname+u'-part'+str(self.part)
 
 	def get_content(self, action='', encoding='utf-8'):
 		filePath = self.book.path+u'/OCR/part{0}{1}.txt'.format(self.part, action)

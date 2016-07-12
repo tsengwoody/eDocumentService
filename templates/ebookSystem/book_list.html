@@ -9,7 +9,7 @@
 {% if object_list %}
 	<ul>
 	{% for book in object_list %}
-		<li><a href="{%url "ebookSystem:detail" book.ISBN %}">{{ book.bookname }}</a></li>
+		<li><a href="{%url "ebookSystem:detail" book.ISBN %}">{{ book.book_info.bookname }}</a></li>
 	{% endfor %}
 	</ul>
 {% else %}

@@ -31,7 +31,7 @@
 		</tr>
 		{% for part in editingPartList %}
 		<tr>
-			<td>{{part.book.bookname}}-part{{part.part}}</td>
+			<td>{{part.book.book_info.bookname}}-part{{part.part}}</td>
 			<td>{{part.edited_page}}/{{ part.book.page_per_part }}</td>
 			<td>{{part.service_hours}}</td>
 			<td>{{part.get_date}}</td>
@@ -39,7 +39,7 @@
 			<td>{{part.status}}</td>
 			<td>
 				{% if not editing %}
-				<a class="btn btn-link" role="button" href = /ebookSystem/edit/{{part.book.ISBN}}/{{part.part}} >編輯</a>
+				<a class="btn btn-link" role="button" href = {% url 'ebookSystem:edit' part.ISBN_part %}>編輯</a>
 				{% endif %}
 			</td>
 			<td>
@@ -61,7 +61,7 @@
 		</tr>
 		{% for part in finishPartList %}
 		<tr>
-			<td>{{part.book.bookname}}-part{{part.part}}</td>
+			<td>{{part.book.book_info.bookname}}-part{{part.part}}</td>
 			<td>{{part.service_hours}}</td>
 			<td>{{part.get_date}}</td>
 			<td>{{part.finish_date}}</td>
@@ -88,7 +88,7 @@
 		</tr>
 		{% for part in exchangedPartList %}
 		<tr>
-			<td>{{part.book.bookname}}-part{{part.part}}</td>
+			<td>{{part.book.book_info.bookname}}-part{{part.part}}</td>
 			<td>{{part.service_hours}}</td>
 			<td>{{part.get_date}}</td>
 			<td>{{part.finish_date}}</td>

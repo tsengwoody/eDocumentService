@@ -31,10 +31,10 @@
 		{% for book in book_list %}
 		<tr>
 			<td>{{ book.ISBN }}</td>
-			<td>{{ book.bookname }}</td>
-			<td>{{ book.author }}</td>
-			<td>{{ book.house }}</td>
-			<td>{{ book.date }}</td>
+			<td>{{ book.book_info.bookname }}</td>
+			<td>{{ book.book_info.author }}</td>
+			<td>{{ book.book_info.house }}</td>
+			<td>{{ book.book_info.date }}</td>
 			<td>
 				<button type="submit" class="btn btn-default send_button" id="get_book_id" name="get_book" value={{ book.ISBN }}>獲取</button>
 			</td>

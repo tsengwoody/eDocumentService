@@ -1,7 +1,7 @@
 ﻿{% extends "base_nav.html" %}
 {% load staticfiles %}
 {% block title %}
-{{ book.bookname }}審核
+{{ book.book_info.bookname }}審核
 {% endblock %}
 {% block style %}
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
@@ -12,7 +12,7 @@
 {% endblock %}
 {% block content %}
 
-<legend><h3>{{ book.bookname }}審核</h3></legend>
+<legend><h3>{{ book.book_info.bookname }}審核</h3></legend>
 <form action="" method="post">
     {% csrf_token %}
     <input type="hidden" id="id_page" name="page" value="0" />
@@ -28,9 +28,10 @@
             <div class="tab-content">
                 <div id="step1" class="tab-pane fade in active">
                     <ul>
-                        <li>書名：{{ book.bookname }}</li>
-                        <li>作者：{{ book.author }}</li>
-                        <li>出版社：{{ book.house }}</li>
+                        <li>書名：{{ book.book_info.bookname }}</li>
+                        <li>作者：{{ book.book_info.author }}</li>
+                        <li>出版社：{{ book.book_info.house }}</li>
+                        <li>出版日：{{ book.book_info.date }}</li>
                         <li>ISBN：{{ book.ISBN }}</li>
                     </ul>
                     <div class="form-group row">

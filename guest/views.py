@@ -120,7 +120,7 @@ class profileView(generic.View):
 		if request.POST.has_key('emailBook'):
 			book_ISBN = request.POST.get('emailBook')
 			emailBook = Book.objects.get(ISBN = book_ISBN)
-			subject = u'[文件] {}'.format(emailBook.bookname)
+			subject = u'[文件] {}'.format(emailBook.book_info.bookname)
 			body = u'新愛的{0}您好：\n'.format(user.username)
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[user.email])
 			for part in emailBook.ebook_set.all():

@@ -1,19 +1,19 @@
 ﻿{% extends "base_nav.html" %}
 {% block title %}
-{{ book.bookname }}資訊
+{{ book.book_info.bookname }}資訊
 {% endblock %}
 {% block header %}
-<!--<h1>{{ book.bookname }}資訊 -->
+<!--<h1>{{ book.book_info.bookname }}資訊 -->
 {% endblock %}
 {% block content %}
 
-<legend><h3>{{ book.bookname }}資訊</h3></legend>
+<legend><h3>{{ book.book_info.bookname }}資訊</h3></legend>
 <ul>
 	<li>ISBN：{{ book.ISBN }}</li>
-	<li>書名：{{ book.bookname }}</li>
-	<li>作者：{{ book.author }}</li>
-	<li>出版社：{{ book.house }}</li>
-	<li>出版日：{{ book.date }}</li>
+	<li>書名：{{ book.book_info.bookname }}</li>
+	<li>作者：{{ book.book_info.author }}</li>
+	<li>出版社：{{ book.book_info.house }}</li>
+	<li>出版日：{{ book.book_info.date }}</li>
 </ul>
 
 <form action="" method="post">
@@ -28,7 +28,7 @@
 		</tr>
 		{% for part in book.ebook_set.all %}
 		<tr>
-			<td>{{part.book.bookname}}-part{{part.part}}</td>
+			<td>{{part.book.book_info.bookname}}-part{{part.part}}</td>
 			<td>{{part.status}}</td>
 			<td>{{part.edited_page}}</td>
 			<td>{{part.service_hours}}</td>

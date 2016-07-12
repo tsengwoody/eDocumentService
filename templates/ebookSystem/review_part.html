@@ -1,7 +1,7 @@
 ﻿{% extends "base_nav.html" %}
 {% load staticfiles %}
 {% block title %}
-{{ book.bookname }}審核
+{{ part.book.book_info.bookname }}{{ part.part }}審核
 {% endblock %}
 
 {% block style %}
@@ -24,7 +24,7 @@ $(document).ready(function() {
 {% endblock %}
 
 {% block content %}
-<legend><h3>{{ book.bookname }}審核</h3></legend>
+<legend><h3>{{ part.book.book_info.bookname }}{{ part.part }}審核</h3></legend>
 <form action="" method="post">
     {% csrf_token %}
     <div class="row">
@@ -39,7 +39,7 @@ $(document).ready(function() {
             <div class="tab-content">
 				<div id="step1" class="tab-pane fade in active">
 				    <ul>
-				        <li>書名：{{ part.book.bookname }}</li>
+				        <li>書名：{{ part.book.book_info.bookname }}</li>
 				        <li>段數：{{ part.part }}</li>
 				        <li>編輯者：{{ part.editor }}</li>
 				        <li>時數：{{ part.service_hours }}</li>

@@ -34,7 +34,7 @@ logger.addHandler(fh)
 class book_list(generic.ListView):
 	model = Book
 	def get_queryset(self):
-		return Book.objects.order_by('-bookname')
+		return Book.objects.order_by('-ISBN')
 
 @http_response
 def search_book(request, template_name):
@@ -218,8 +218,7 @@ class editView(generic.View):
 		user = request.user
 		readme_url = request.path +'readme/'
 		try:
-			book = Book.objects.get(ISBN=kwargs['book_ISBN'])
-			part = EBook.objects.get(part=kwargs['part_part'],book=book)
+			part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
 		except: 
 			raise Http404("book or part does not exist")
 		[scanPageList, defaultPageURL] = part.get_image()
@@ -233,8 +232,7 @@ class editView(generic.View):
 		readme_url = request.path +'readme/'
 		response = {}
 		try:
-			book = Book.objects.get(ISBN=kwargs['book_ISBN'])
-			part = EBook.objects.get(part=kwargs['part_part'],book=book)
+			part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
 		except:
 			raise Http404("book or part does not exist")
 		[scanPageList, defaultPageURL] = part.get_image()

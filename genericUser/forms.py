@@ -1,13 +1,18 @@
 ﻿# coding: utf-8
 from django import forms
-from ebookSystem.models import Book
+from ebookSystem.models import *
 from .models import *
 
-class BookForm(forms.ModelForm):
+'''class BookForm(forms.ModelForm):
 	fileObject = forms.FileField()
 	class Meta:
 		model = Book
-		fields = ['bookname', 'author', 'house', 'date', 'ISBN']
+		fields = ['bookname', 'author', 'house', 'date', 'ISBN']'''
+
+class BookInfoForm(forms.ModelForm):
+	class Meta:
+		model = BookInfo
+		fields = '__all__'
 
 class InfoChangeUserForm(forms.ModelForm):
 	class Meta:
