@@ -329,7 +329,7 @@ function createHtmlEditor(){
 
   },
   plugins: [
-  'autoresize save table'],
+  'save table'],
 
 });
 }

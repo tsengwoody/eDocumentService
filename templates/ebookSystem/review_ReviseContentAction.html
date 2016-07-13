@@ -4,7 +4,7 @@
 更正文件
 {% endblock %}
 {% block style %}
- <script language="javascript" src="{% static 'ebookSystem/js/review_ReviseContentAction.js' %}"></script>
+ <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
 {% endblock %}
 {% block header %}
 更正文件
@@ -13,32 +13,7 @@
 
 <form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
 {% csrf_token %}
-	{% ifequal status 'success' %}
-		<div class="modal fade in" id="Dialog" role="dialog">
-		    <div class="modal-dialog modal-sm">
-		        <div class="modal-content alert-success">
-		            <div class="modal-header alert-success" role="alert">
-		                <button type="button" class="close" data-dismiss="modal">&times;</button>
-		                <strong>{{ status }}</strong>
-		                <div class="alertMessage">{{ message }}</div>
-		            </div>
-		        </div>
-		    </div>
-		</div>
-	{% endifequal %}
-	{% ifequal status 'error' %}
-		<div class="modal fade in" id="Dialog" role="dialog">
-		    <div class="modal-dialog modal-sm">
-		        <div class="modal-content alert-danger">
-		            <div class="modal-header alert-danger" role="alert">
-		                <button type="button" class="close" data-dismiss="modal">&times;</button>
-		                <strong>{{ status }}</strong>
-		                <div class="alertMessage">{{ message }}</div>
-		            </div>
-		        </div>
-		    </div>
-		</div>
-	{% endifequal %}
+    {% include 'utils/dialog.html' %}
 	<h4 class="page-header">修正文字資訊</h4>
 	<div class="row">
 	    <div class="col-md-12">
@@ -60,7 +35,7 @@
 					</td>
 	                <td class="col-md-2">
 	                    {% ifequal status 'success' %}
-	                    	<button class="btn btn-md btn-default" type="submit" id="id_revise" name="revise">修正</button>
+	                    	<button class="btn btn-md btn-default send_button" type="submit" id="id_revise" name="revise">修正</button>
 	                    {% endifequal %}
 	                </td>
 	            </tr>

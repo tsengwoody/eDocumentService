@@ -1,5 +1,3 @@
-
-
 $( document ).ready(function() {
     console.log( "document ready!" );
     if($('.modal.fade.in').length>0)
