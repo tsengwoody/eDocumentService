@@ -55,17 +55,11 @@ def create_document(request, template_name='genericUser/create_document.html'):
 			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			return locals()
 		newBook.scaner = user
+		guest = Guest.objects.get(user=user)
+		newBook.guests.add(guest)
 		newBookInfo.save()
 		newBook.save()
 		newBook.create_EBook()
-		if request.POST.has_key('guest'):
-			try:
-				guest = Guest.objects.get(user__username=request.POST['guest'])
-				newBook.guests.add(guest)
-			except:
-				guest = None
-		else:
-			guest = None
 		event = Event.objects.create(creater=user, action=newBook)
 		redirect_to = '/'
 		status = 'success'

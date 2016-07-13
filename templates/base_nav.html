@@ -25,10 +25,10 @@
 				        <span class="caret"></span></a>
 				    <ul class="dropdown-menu">
 				        <li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
-				        <li><a href="{% url 'manager:review_part_list' %}">審核校對文件</a></li>
+				        <li><a href="{% url 'manager:event_list' 'ebook' %}">審核校對文件</a></li>
 				        <li><a href="{% url 'manager:event_list' 'applydocumentaction' %}">代掃辨識上傳作業</a></li>
 				        <li><a href="{% url 'manager:event_list' 'revisecontentaction' %}">審核更正作業</a></li>
-				        <li><a href="{% url 'manager:review_user_list' %}">審核會員</a></li>
+				        <li><a href="{% url 'manager:event_list' 'user' %}">審核會員</a></li>
 				    </ul>
 				</li>
 

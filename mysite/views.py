@@ -6,6 +6,7 @@ from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
 from .forms import *
 from ebookSystem.models import *
+from genericUser.models import Event
 from utils.uploadFile import *
 from utils.decorator import *
 from mysite.settings import PREFIX_PATH
@@ -70,6 +71,7 @@ def register(request, template_name='registration/register.html'):
 			except:
 				status = 'error'
 				message = u'guest申請失敗'
+		event = Event.objects.create(creater=newUser, action=newUser)
 		return locals()
 	if request.method == 'GET':
 		registerUserForm = RegisterUserForm()

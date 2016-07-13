@@ -4,7 +4,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
-#from ebookSystem.models import Book,EBook
 from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 import os
 import datetime
@@ -65,18 +64,34 @@ class Event(models.Model):
 	STATUS = {'success':1, 'error':0}
 
 	def get_url(self):
-		from ebookSystem.models import *
 		from django.core.urlresolvers import reverse
-		if isinstance(self.action, ReviseContentAction):
-			return reverse('ebookSystem:review_ReviseContentAction', kwargs={'id':self.action.id })
+		from ebookSystem.models import Book,EBook, ApplyDocumentAction, ReviseContentAction
+		if isinstance(self.action, ApplyDocumentAction):
+			return reverse('ebookSystem:review_ApplyDocumentAction', kwargs={'id':self.action.id })
 		elif isinstance(self.action, Book):
 			return reverse('ebookSystem:review_document', kwargs={'book_ISBN':self.action.ISBN})
-		elif isinstance(self.action, ApplyDocumentAction):
-			return reverse('ebookSystem:review_ApplyDocumentAction', kwargs={'id':self.action.id })
+		elif isinstance(self.action, EBook):
+			return reverse('ebookSystem:review_part', kwargs={'ISBN_part':self.action.ISBN_part})
+		elif isinstance(self.action, ReviseContentAction):
+			return reverse('ebookSystem:review_ReviseContentAction', kwargs={'id':self.action.id })
+		elif isinstance(self.action, User):
+			return reverse('genericUser:review_user', kwargs={'username':self.action.username })
 
 	def event_category(self):
 		if isinstance(self.action, ReviseContentAction):
 			return u'更正事件'
+		elif isinstance(self.action, Book):
+			return u'上傳文件'
+		elif isinstance(self.action, ApplyDocumentAction):
+			return u'代掃辨識'
+
+	def response(self, status ,message, user):
+		self.reply_time = timezone.now()
+		self.reviewer = user
+		if self.STATUS.has_key(status):
+			self.status = self.STATUS[status]
+		self.message = message
+		self.save()
 
 	def __unicode__(self):
 		return self.creater.username

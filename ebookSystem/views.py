@@ -65,7 +65,7 @@ def search_book(request, template_name):
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
-		events = Event.objects.filter(object_id=book.ISBN)
+		event = Event.objects.get(content_type__model='book', object_id=book.ISBN)
 	except:
 		raise Http404("book does not exist")
 	sourcePath = book.path +u'/source'
@@ -82,59 +82,45 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 			book.save()
 			status = 'success'
 			message = u'審核通過文件'
+			event.response(status=status, message=message, user=request.user)
 		if request.POST['review'] == 'error':
 			shutil.rmtree(book.path)
 			book.delete()
 			status = 'success'
 			message = u'審核退回文件'
-		redirect_to = reverse('manager:review_document_list')
-		for event in events:
-			event.reviewer = request.user
-			if status in event.STATUS.keys():
-				event.status = event.STATUS[status]
-			event.message = message
+			event.response(status='error', message=request.POST['reason'], user=request.user)
+		redirect_to = reverse('manager:event_list', kwargs={'action':'book' })
 		return locals()
 
 @user_category_check(['manager'])
+@http_response
 def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'):
 	try:
 		part = EBook.objects.get(ISBN_part=ISBN_part)
+		event = Event.objects.get(content_type__model='ebook', object_id=part.ISBN_part)
 	except:
 		raise Http404("book does not exist")
-	finishFilePath = part.book.path +'/OCR/part{}.txt'.format(part.part)
-	content =''
-	with codecs.open(finishFilePath, 'r', encoding='utf-8') as fileRead:
-		content = fileRead.read()
+	[content, fileHead] = part.get_content('-finish')
 	if request.method == 'GET':
-		return render(request, template_name, locals())
+		return locals()
 	if request.method == 'POST':
-		response = {}
-		redirect_to = None
 		if request.POST['review'] == 'success':
 			part.status = FINISH
 			part.save()
 			if part.book.collect_finish_part_count() == part.book.part_count:
 				part.book.status = FINISH
 				part.book.save()
-			response['status'] = 'success'
-			response['message'] = u'審核通過文件'
-			response['redirect_to'] = reverse('manager:review_part_list')
+			status = 'success'
+			message = u'審核通過文件'
+			event.response(status=status, message=message, user=request.user)
 		if request.POST['review'] == 'error':
 			part.status = REVISE
 			part.save()
-			response['status'] = 'success'
-			response['message'] = u'審核退回文件'
-			response['redirect_to'] = reverse('manager:review_part_list')
-		status = response['status']
-		message = response['message']
-		redirect_to = response['redirect_to']
-		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json")
-		else:
-			if redirect_to:
-				return HttpResponseRedirect(redirect_to)
-			else:
-				return render(request, template_name, locals())
+			status = 'success'
+			message = u'審核退回文件'
+			event.response(status='error', message=request.POST['reason'], user=request.user)
+		redirect_to = reverse('manager:event_list', kwargs={'action':'ebook' })
+		return locals()
 
 @user_category_check(['manager'])
 @http_response
@@ -155,16 +141,54 @@ def review_ReviseContentAction(request, id, template_name='ebookSystem/review_Re
 			status = 'error'
 			message = u'搜尋到多處修政文字段落，請重新輸入並多傳送些文字'
 		return locals()
-#	if request.method == 'POST':
+	if request.method == 'POST':
+		return locals()
 
 @user_category_check(['manager'])
 @http_response
 def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_ApplyDocumentAction.html'):
+	user = request.user
 	try:
 		action = ApplyDocumentAction.objects.get(id=id)
+		event = Event.objects.get(content_type__model='applydocumentaction', object_id=action.id)
 	except:
 		raise Http404("ApplyDocumentAction does not exist")
 	if request.method == 'GET':
+		return locals()
+	if request.method == 'POST':
+		uploadPath = PREFIX_PATH +u'static/ebookSystem/document/{0}'.format(action.book_info.ISBN)
+		if os.path.exists(uploadPath):
+			status = 'error'
+			message = u'文件已存在'
+			return locals()
+		[status, message] = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
+		uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
+		try:
+			with ZipFile(uploadFilePath, 'r') as uploadFile:
+				ZipFile.testzip(uploadFile)
+		except:
+				shutil.rmtree(uploadPath)
+				status = 'error'
+				message = u'非正確ZIP文件'
+				return locals()
+		unzip_file(uploadFilePath, uploadPath)
+		newBook = Book(book_info=action.book_info, ISBN=action.book_info.ISBN)
+		newBook.path = uploadPath
+		if not newBook.validate_folder():
+			shutil.rmtree(uploadPath)
+			status = 'error'
+			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
+			return locals()
+		newBook.scaner = user
+		guest = Guest.objects.get(user=event.creater)
+		newBook.guests.add(guest)
+		newBook.save()
+		newBook.create_EBook()
+		Event.objects.create(creater=user, action=newBook)
+		redirect_to = reverse('manager:event_list', kwargs={'action':'applydocumentaction' })
+		status = 'success'
+		message = u'成功建立並上傳文件'
+		event.response(status=status, message=message, user=request.user)
 		return locals()
 
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
@@ -276,6 +300,7 @@ class editView(generic.View):
 			redirect_to = reverse('account:profile')
 			status = 'success'
 			message = u'完成文件校對，將進入審核'
+			event = Event.objects.create(creater=user, action=part)
 		return locals()
 
 def readme(request, template_name):

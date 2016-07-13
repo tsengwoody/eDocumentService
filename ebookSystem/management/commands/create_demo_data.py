@@ -24,6 +24,8 @@ class Command(BaseCommand):
 		root = User(username='root', email='edocumentservice@gmail.com', first_name = 'demo root firstname', last_name = 'demo root lastname', is_active=True, is_superuser=True, is_staff=True, phone='0917823099', birthday='2016-01-01', is_editor=True, is_guest=True, is_scaner=True, is_manager=True, status=ACTIVE)
 		root.set_password('root')
 		root.save()
+		rootEditor = Editor.objects.create(user=root)
+		rootGuest = Guest.objects.create(user=root)
 		factory = RequestFactory()
 		request = factory.post(reverse('register'), {'username':'demo-editor', 'password':'demo-editor', 'email':'tsengwoody.tw@gmail.com', 'first_name':'demo editor firstname', 'last_name':'demo editor lastname', 'is_active':True, 'phone':'1234567890', 'birthday':'2016-01-01', 'education':u'碩士', 'editor':'Editor', 'professional_field':u'資訊工程學'})
 		response = register(request)
@@ -40,8 +42,6 @@ class Command(BaseCommand):
 		manager.is_manager=True
 		manager.is_scaner=True
 		manager.save()
-		rootEditor = Editor.objects.create(user=root)
-		rootGuest = Guest.objects.create(user=root)
 		with open(u'temp/藍色駭客.zip') as fileObject:
 			request = factory.post(reverse('genericUser:create_document'), {'bookname':u'藍色駭客', 'author':u'傑佛瑞．迪佛', 'house':u'皇冠', 'ISBN':u'9789573321569', 'date':u'2013-07-11', 'fileObject':fileObject})
 		request.user = manager
@@ -49,6 +49,5 @@ class Command(BaseCommand):
 		assert response.status_code == 302, 'status_code' +str(response.status_code)
 		assert len(Book.objects.all())==1, 'create book fail'
 		assert len(EBook.objects.all()) == 10, 'create part fail'
-		book = Book.objects.get(ISBN=u'9789573321569')
-		book.save()
+		book = Book.objects.get(ISBN=u'9573321564')
 		assert os.path.exists(book.path), 'book resource folder not exist'
