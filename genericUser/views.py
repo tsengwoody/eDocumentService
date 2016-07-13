@@ -231,15 +231,15 @@ def revise_content(request, template_name='genericUser/revise_content.html'):
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
-		if not (request.POST.has_key('book_ISBN') and request.POST.has_key('part') and request.POST.has_key('content')):
+		if not (request.POST['book_ISBN']!='' and request.POST['content']!='' and request.POST['part']!=''):
 			status = 'error'
 			message = u'表單填寫錯誤'
 			return locals()
 		book_ISBN = request.POST['book_ISBN']
 		part = request.POST['part']
 		content = request.POST['content']
-		book = Book.objects.get(ISBN=book_ISBN)
-		ebook = EBook.objects.get(part=part, book=book)
+		ISBN_part = request.POST['book_ISBN'] +'-' +request.POST['part']
+		ebook = EBook.objects.get(ISBN_part=ISBN_part)
 		result = ebook.fuzzy_string_search(string = content, length=10, action='-final')
 		if len(result) == 1:
 			status = 'success'
