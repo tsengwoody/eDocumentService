@@ -12,11 +12,7 @@ from genericUser.models import *
 from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 
 @user_category_check(['manager'])
-def review_part_list(request, template_name='manager/review_part_list.html'):
-	part_list = EBook.objects.filter(status=REVIEW)
-	return render(request, template_name, locals())
-
 def event_list(request, action):
-	event_list = Event.objects.filter(content_type__model=action, status=-1)
+	events = Event.objects.filter(content_type__model=action, status=-1)
 	template_name = 'manager/event_list_' +action +'.html'
 	return render(request, template_name, locals())

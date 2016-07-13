@@ -86,7 +86,7 @@ class Event(models.Model):
 			return u'代掃辨識'
 
 	def response(self, status ,message, user):
-		self.reply_time = timezone.now()
+		self.time_reply = timezone.now()
 		self.reviewer = user
 		if self.STATUS.has_key(status):
 			self.status = self.STATUS[status]
@@ -95,6 +95,16 @@ class Event(models.Model):
 
 	def __unicode__(self):
 		return self.creater.username
+
+class Center(models.Model):
+	name = models.CharField(max_length=230)
+	address = models.CharField(max_length=100)
+	email = models.EmailField()
+	phone = models.CharField(max_length=30)
+	count = models.IntegerField(default=0)
+
+	def __unicode__(self):
+		return self.name
 
 class ContactUs(models.Model):
 	name = models.CharField(max_length=10)

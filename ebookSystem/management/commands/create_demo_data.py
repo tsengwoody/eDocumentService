@@ -49,5 +49,5 @@ class Command(BaseCommand):
 		assert response.status_code == 302, 'status_code' +str(response.status_code)
 		assert len(Book.objects.all())==1, 'create book fail'
 		assert len(EBook.objects.all()) == 10, 'create part fail'
-		book = Book.objects.get(ISBN=u'9573321564')
+		book = Book.objects.get(ISBN=u'9789573321569')
 		assert os.path.exists(book.path), 'book resource folder not exist'

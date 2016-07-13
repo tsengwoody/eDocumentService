@@ -18,7 +18,7 @@
 		<div id="navbar" class="collapse navbar-collapse navbar-dark bg-inverse">
 			<ul class="nav navbar-nav">
 				<li><a href="{% url 'home' %}">首頁</a></li>
-				{% ifequal request.user.status 1 %}
+				{% if request.user.status == 1 %}
 				{% if request.user.is_manager %}
 				<li class="dropdown">
 				    <a class="dropdown-toggle" data-toggle="dropdown" href="#">審核
@@ -31,12 +31,9 @@
 				        <li><a href="{% url 'manager:event_list' 'user' %}">審核會員</a></li>
 				    </ul>
 				</li>
-
-				{% endif %}
-				{% if request.user.is_guest or request.user.is_scaner %}
-				<li><a href="{% url 'genericUser:create_document' %}">上傳文件</a></li>
 				{% endif %}
 				{% if request.user.is_guest %}
+				<li><a href="{% url 'genericUser:create_document' %}">上傳文件</a></li>
 				<li><a href="{% url 'genericUser:apply_document' %}">代掃辨識</a></li>
 				<li><a href="{% url 'guest:profile' %}">進度</a></li>
 				<li><a href="{% url 'genericUser:revise_content' %}">更正</a></li>
@@ -44,8 +41,9 @@
 				{% if request.user.is_editor %}
 				<li><a href="{% url 'account:profile' %}">服務</a></li>
 				{% endif %}
+				<li><a href="{% url 'genericUser:event_list' %}">消息</a></li>
 				<li><a href="{% url 'ebookSystem:search_book' %}">查詢</a></li>
-				{% endifequal %}
+				{% endif %}
 				<li><a href="{% url 'genericUser:info' %}">會員</a></li>
 				<li><a href="{% url 'genericUser:contact_us' %}">聯絡我們</a></li>
 				{% if request.user.is_authenticated %}

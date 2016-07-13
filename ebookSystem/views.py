@@ -147,6 +147,8 @@ def review_ReviseContentAction(request, id, template_name='ebookSystem/review_Re
 @user_category_check(['manager'])
 @http_response
 def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_ApplyDocumentAction.html'):
+	from utils.uploadFile import handle_uploaded_file
+	from utils.zip import *
 	user = request.user
 	try:
 		action = ApplyDocumentAction.objects.get(id=id)
@@ -164,6 +166,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 		[status, message] = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
 		uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
 		try:
+			from zipfile import ZipFile
 			with ZipFile(uploadFilePath, 'r') as uploadFile:
 				ZipFile.testzip(uploadFile)
 		except:
@@ -184,7 +187,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 		newBook.guests.add(guest)
 		newBook.save()
 		newBook.create_EBook()
-		Event.objects.create(creater=user, action=newBook)
+		Event.objects.create(creater=event.creater, action=newBook)
 		redirect_to = reverse('manager:event_list', kwargs={'action':'applydocumentaction' })
 		status = 'success'
 		message = u'成功建立並上傳文件'

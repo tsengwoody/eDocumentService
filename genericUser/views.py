@@ -106,8 +106,45 @@ def apply_document(request, template_name='genericUser/apply_document.html'):
 		return locals()
 
 @user_category_check(['manager'])
+def event_list(request):
+	events = Event.objects.filter(creater=request.user)
+	template_name = 'genericUser/event_list.html'
+	return render(request, template_name, locals())
+
+def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
+	try:
+		book = Book.objects.get(ISBN=book_ISBN)
+	except:
+		raise Http404("book does not exist")
+	return render(request, template_name, locals())
+
+@http_response
+def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
+	if len(ISBN) == 10 and not ISBN10_check(ISBN):
+		status = u'error'
+		message = u'ISBN10碼錯誤'
+		return locals()
+	if len(ISBN) == 13 and not ISBN13_check(ISBN):
+		status = u'error'
+		message = u'ISBN13碼錯誤'
+		return locals()
+	if len(ISBN) == 10:
+		ISBN = ISBN10_to_ISBN13(ISBN)
+	[status, bookname, author, house, date] = get_book_info(ISBN)
+	if status == 'success':
+		message = u'成功取得資料'
+	else:
+		message = u'查無資料'
+	extra_list = ['bookname', 'author', 'house', 'date', 'ISBN']
+	return locals()
+
+@http_response
 def review_user(request, username, template_name='genericUser/review_user.html'):
-	user = get_list_or_404(User, username=username)[0]
+	try:
+		user = User.objects.get(username=username)
+		events = Event.objects.filter(content_type__model='user', object_id=user.id)
+	except:
+		raise Http404("user does not exist")
 	sourcePath = PREFIX_PATH +'static/ebookSystem/disability_card/{0}'.format(user.username)
 	frontPage = user.username +'_front.jpg'
 	frontPageURL = sourcePath +u'/' +frontPage
@@ -116,62 +153,56 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 	backPageURL = sourcePath +u'/' +backPage
 	backPageURL = backPageURL.replace(PREFIX_PATH +'static/', '')
 	if request.method == 'GET':
-		return render(request, template_name, locals())
+		return locals()
 	if request.method == 'POST':
-		response = {}
-		redirect_to = None
 		if request.POST.has_key('active_login'):
 			user.is_active = True
-			response['status'] = 'success'
-			response['message'] = u'已啟用登錄權限'
+			status = 'success'
+			message = u'已啟用登錄權限'
 		elif request.POST.has_key('active_editor'):
 			user.is_editor = True
-			response['status'] = 'success'
-			response['message'] = u'已啟用editor權限'
+			status = 'success'
+			message = u'已啟用editor權限'
 		elif request.POST.has_key('active_guest') :
 			user.is_guest = True
-			response['status'] = 'success'
-			response['message'] = u'已啟用guest權限'
+			status = 'success'
+			message = u'已啟用guest權限'
 		elif request.POST.has_key('active_scaner'):
 			user.is_scaner = True
-			response['status'] = 'success'
-			response['message'] = u'已啟用scaner權限'
+			status = 'success'
+			message = u'已啟用scaner權限'
 		elif request.POST.has_key('inactive_login'):
 			user.is_active = False
-			response['status'] = 'success'
-			response['message'] = u'停用用登錄權限'
+			status = 'success'
+			message = u'停用用登錄權限'
 		elif request.POST.has_key('inactive_editor'):
 			user.is_editor = False
-			response['status'] = 'success'
-			response['message'] = u'已停用editor權限'
+			status = 'success'
+			message = u'已停用editor權限'
 		elif request.POST.has_key('inactive_guest'):
 			user.is_guest = False
-			response['status'] = 'success'
-			response['message'] = u'已停用guest權限'
+			status = 'success'
+			message = u'已停用guest權限'
 		elif request.POST.has_key('inactive_scaner'):
 			user.is_scaner = False
-			response['status'] = 'success'
-			response['message'] = u'已停用scaner權限'
+			status = 'success'
+			message = u'已停用scaner權限'
 		elif request.POST.has_key('finish'):
 			user.status = ACTIVE
-			redirect_to = reverse('manager:review_user_list')
-			response['status'] = 'success'
-			response['message'] = u'完成審核權限開通'
+			redirect_to = reverse('manager:event_list', kwargs={'action':'user' })
+			status = 'success'
+			message = u'完成審核權限開通'
+			for event in events:
+				event.response(status=status, message=message, user=request.user)
 		elif request.POST.has_key('error'):
 			user.status = REVISE
-			redirect_to = reverse('manager:review_user_list')
-			response['status'] = 'success'
-			response['message'] = u'資料異常退回'
+			redirect_to = reverse('manager:event_list', kwargs={'action':'user' })
+			status = 'success'
+			message = u'資料異常退回'
+			for event in events:
+				event.response(status=status, message=message, user=request.user)
 		user.save()
-		status = response['status']
-		message = response['message']
-		if request.is_ajax():
-			return HttpResponse(json.dumps(response), content_type="application/json")
-		else:
-			if redirect_to:
-				return HttpResponseRedirect(redirect_to)
-			else:
-				return render(request, template_name, locals())
+		return locals()
 
 @user_category_check(['user'])
 def info(request, template_name):

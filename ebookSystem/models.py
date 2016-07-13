@@ -262,20 +262,12 @@ class EBook(models.Model):
 		edit_content = content[1]
 		return [finish_content, edit_content]
 
-class Center(models.Model):
-	name = models.CharField(max_length=230)
-	address = models.CharField(max_length=100)
-	email = models.EmailField()
-	phone = models.CharField(max_length=30)
-	count = models.IntegerField(default=0)
-
-	def __unicode__(self):
-		return self.name
-
 class ReviseContentAction(models.Model):
-	ebook = models.ForeignKey('EBook')
+	from ebookSystem.models import EBook
+	ebook = models.ForeignKey(EBook)
 	content = models.CharField(max_length=1000)
 
 class ApplyDocumentAction(models.Model):
-	book_info = models.ForeignKey('BookInfo')
+	from genericUser.models import Center
+	book_info = models.ForeignKey(BookInfo)
 	center = models.ForeignKey(Center, blank=True, null=True)
