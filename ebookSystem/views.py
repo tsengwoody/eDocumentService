@@ -169,12 +169,13 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 			from zipfile import ZipFile
 			with ZipFile(uploadFilePath, 'r') as uploadFile:
 				ZipFile.testzip(uploadFile)
+				uploadFile.extractall(uploadPath)
 		except:
 				shutil.rmtree(uploadPath)
 				status = 'error'
 				message = u'非正確ZIP文件'
 				return locals()
-		unzip_file(uploadFilePath, uploadPath)
+#		unzip_file(uploadFilePath, uploadPath)
 		newBook = Book(book_info=action.book_info, ISBN=action.book_info.ISBN)
 		newBook.path = uploadPath
 		if not newBook.validate_folder():

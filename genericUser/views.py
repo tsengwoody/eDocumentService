@@ -40,12 +40,12 @@ def create_document(request, template_name='genericUser/create_document.html'):
 		try:
 			with ZipFile(uploadFilePath, 'r') as uploadFile:
 				ZipFile.testzip(uploadFile)
+				uploadFile.extractall(uploadPath)
 		except:
 				shutil.rmtree(uploadPath)
 				status = 'error'
 				message = u'非正確ZIP文件'
 				return locals()
-		unzip_file(uploadFilePath, uploadPath)
 		newBookInfo = bookInfoForm.save(commit=False)
 		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'])
 		newBook.path = uploadPath
