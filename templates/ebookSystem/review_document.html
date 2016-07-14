@@ -6,6 +6,10 @@
 
 {% block review_title %}{{ book.book_info.bookname }}審核{% endblock %}
 
+{% block review_step1_title %}Step1:基本資料{% endblock %}
+{% block review_step2_title %}Step2:掃描內容{% endblock %}
+{% block review_step3_title %}Step3:審查結果{% endblock %}
+
 {% block review_step1 %}
 <ul>
     <li>書名：{{ book.book_info.bookname }}</li>
