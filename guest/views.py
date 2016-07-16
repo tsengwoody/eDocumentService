@@ -12,7 +12,7 @@ from .models import *
 from .forms import *
 from utils.decorator import *
 from utils.validate import *
-from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
+from mysite.settings import PREFIX_PATH
 import json
 import shutil
 
@@ -26,13 +26,13 @@ class profileView(generic.View):
 		template_name=self.template_name
 		user=request.user
 		book_list = user.guest.own_book_set.all()
-		edit_book_list = []
-		finish_book_list = []
-		for book in book_list:
-			if book.status == FINISH:
-				finish_book_list.append(book)
-			else:
-				edit_book_list.append(book)
+		edit_book_list = user.guest.own_book_set.all().exclude(status=Book.STATUS['edit'])
+		finish_book_list = user.guest.own_book_set.all().filter(status=Book.STATUS['finish'])
+#		for book in book_list:
+#			if Book.STATUS == Book.STATUS['finish']:
+#				finish_book_list.append(book)
+#			else:
+#				edit_book_list.append(book)
 		return locals()
 
 	@method_decorator(user_category_check(['guest']))
@@ -62,11 +62,6 @@ class profileView(generic.View):
 			status = 'success'
 			message = u'成功刪除文件'
 		book_list = user.guest.own_book_set.all()
-		edit_book_list = []
-		finish_book_list = []
-		for book in book_list:
-			if book.status == FINISH:
-				finish_book_list.append(book)
-			else:
-				edit_book_list.append(book)
+		edit_book_list = user.guest.own_book_set.all().exclude(status=Book.STATUS['edit'])
+		finish_book_list = user.guest.own_book_set.all().filter(status=Book.STATUS['finish'])
 		return locals()

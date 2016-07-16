@@ -29,14 +29,14 @@
 		{% for part in book.ebook_set.all %}
 		<tr>
 			<td>{{part.book.book_info.bookname}}-part{{part.part}}</td>
-			<td>{{part.status}}</td>
+			<td>{{part.status_int2str}}</td>
 			<td>{{part.edited_page}}</td>
 			<td>{{part.service_hours}}</td>
 			<td>{{part.deadline}}</td>
 			<td>
-				{% ifequal part.status FINISH %}
+				{% if part.status_int2str == 'finish' %}
 				<button type="submit" class="btn btn-default" id="emailPart_id" name="emailPart" value={{part.book.ISBN}}-{{part.part}}>傳送email</button>
-				{% endifequal %}
+				{% endif %}
 			</td>
 		</tr>
 		{% endfor %}

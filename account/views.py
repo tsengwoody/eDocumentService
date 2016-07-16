@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import generic
 from ebookSystem.models import *
-from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
+from mysite.settings import PREFIX_PATH
 from utils.decorator import *
 import datetime
 
@@ -21,8 +21,8 @@ class profileView(generic.View):
 		readme_url = request.path +'readme/'
 		template_name=self.template_name
 		user=request.user
-		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EDIT) | Q(status=REVISE))
-		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
+		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
+		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 		editing = False
 		if user.online:
 			delta = timezone.now() - user.online
@@ -36,16 +36,16 @@ class profileView(generic.View):
 		readme_url = request.path +'readme/'
 		template_name=self.template_name
 		user=request.user
-		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EDIT) | Q(status=REVISE))
-		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
+		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
+		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 		if request.POST.has_key('getPart'):
 			if len(editingPartList)>=3:
 				status = 'error'
 				message = u'您已有超過3段文件，請先校對完成再領取'
-				editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
-				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
+				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
+				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
-			activeBook = Book.objects.filter(status = ACTIVE).order_by('upload_date')
+			activeBook = Book.objects.filter(status=Book.STATUS['active']).order_by('upload_date')
 			partialBook = None
 			for book in activeBook:
 				if 0 < book.collect_get_count() < book.part_count:
@@ -60,14 +60,14 @@ class profileView(generic.View):
 			if not partialBook:
 				status = 'error'
 				message = u'無文件'
-				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EDIT) | Q(status=REVISE))
-				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
+				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
+				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
-			getPart = partialBook.ebook_set.filter(status=ACTIVE)[0]
+			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active'])[0]
 			getPart.editor = request.user.editor
 			getPart.get_date = timezone.now()
 			getPart.deadline = getPart.get_date + datetime.timedelta(days=3)
-			getPart.status = EDIT
+			getPart.status = getPart.STATUS['edit']
 			getPart.save()
 			status = 'success'
 			message = u'成功取得文件{}'.format(getPart.__unicode__())
@@ -75,10 +75,10 @@ class profileView(generic.View):
 			if len(editingPartList)>3:
 				status = 'error'
 				message = u'您已有超過3段文件，請先校對完成再領取'
-				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EDIT) | Q(status=REVISE))
-				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
+				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
+				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
-			activeBook = Book.objects.filter(status = ACTIVE).order_by('upload_date')
+			activeBook = Book.objects.filter(status=Book.STATUS['active']).order_by('upload_date')
 			completeBook = None
 			for book in activeBook:
 				if book.collect_get_count() == 0:
@@ -87,14 +87,14 @@ class profileView(generic.View):
 			if not completeBook:
 				status = 'error'
 				message = u'目前無完整文件，請先領部份文件'
-				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EDIT) | Q(status=REVISE))
-				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
+				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
+				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
 			for getPart in completeBook.ebook_set.all():
 				getPart.editor = request.user.editor
 				getPart.get_date = timezone.now()
 				getPart.deadline = getPart.get_date + datetime.timedelta(days=3)
-				getPart.status = EDIT
+				getPart.status = getPart.STATUS['edit']
 				getPart.save()
 			status = 'success'
 			message = u'成功取得完整文件{}'.format(getPart.book.__unicode__())
@@ -104,14 +104,14 @@ class profileView(generic.View):
 			rebackPart.editor=None
 			rebackPart.get_date = None
 			rebackPart.deadline = None
-			rebackPart.status = ACTIVE
+			rebackPart.status = rebackPart.STATUS['active']
 			rebackPart.save()
 			status = 'success'
 			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
 		elif request.POST.has_key('reEditPart'):
 			ISBN_part = request.POST.get('reEditPart')
 			reEditPart = EBook.objects.get(ISBN_part = ISBN_part)
-			reEditPart.status = EDIT
+			reEditPart.status = reEditPart.STATUS['edit']
 			reEditPart.save()
 			status = 'success'
 			message = u'再編輯文件{}'.format(reEditPart.__unicode__())
@@ -122,8 +122,8 @@ class profileView(generic.View):
 			exchangePart.save()
 			status = 'success'
 			message = u'已對換時數{}'.format(exchangePart.service_hours)
-			editingPartList=EBook.objects.filter(editor=user.editor, status=EDIT)
-			finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=FINISH) | Q(status=REVIEW))
+			editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
+			finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 		else:
 			status = 'error'
 			message = u'不明的操作'

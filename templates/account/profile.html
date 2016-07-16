@@ -36,7 +36,7 @@
 			<td>{{part.service_hours}}</td>
 			<td>{{part.get_date}}</td>
 			<td>{{part.deadline}}</td>
-			<td>{{part.status}}</td>
+			<td>{{part.status_int2str}}</td>
 			<td>
 				{% if not editing %}
 				<a class="btn btn-link" role="button" href = {% url 'ebookSystem:edit' part.ISBN_part %}>編輯</a>
@@ -65,14 +65,14 @@
 			<td>{{part.service_hours}}</td>
 			<td>{{part.get_date}}</td>
 			<td>{{part.finish_date}}</td>
-			<td>{{part.status}}</td>
+			<td>{{part.status_int2str}}</td>
 			<td>
-				{% ifequal part.status 3 %}
+				{% if part.status_int2str == 'revise' %}
 				<button type="submit" class="btn btn-default send_button" id="reEditPart_id" name="reEditPart" value={{part.ISBN_part}}>再編輯</button>
-				{% endifequal %}	
-				{% ifequal part.status 5 %}
+				{% endif %}	
+				{% if part.status_int2str == 'finish' %}
 				<button type="submit" class="btn btn-default send_button" id="exchange_id" name="exchange" value={{part.ISBN_part}}>兌換時數</button>
-				{% endifequal %}
+				{% endif %}
 			</td>
 		</tr>
 		{% endfor %}

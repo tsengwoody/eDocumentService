@@ -10,7 +10,7 @@ from django.views import generic
 from .models import *
 from .forms import *
 from genericUser.models import Event
-from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
+from mysite.settings import PREFIX_PATH
 from utils.decorator import *
 from utils.crawler import *
 import os
@@ -78,7 +78,7 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
-			book.status = ACTIVE
+			book.status = book.STATUS['active']
 			book.save()
 			status = 'success'
 			message = u'審核通過文件'
@@ -105,16 +105,16 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
-			part.status = FINISH
+			part.status = part.STATUS['finish']
 			part.save()
 			if part.book.collect_finish_part_count() == part.book.part_count:
-				part.book.status = FINISH
+				part.book.status = part.book.STATUS['finish']
 				part.book.save()
 			status = 'success'
 			message = u'審核通過文件'
 			event.response(status=status, message=message, user=request.user)
 		if request.POST['review'] == 'error':
-			part.status = REVISE
+			part.status = part.STATUS['revise']
 			part.save()
 			status = 'success'
 			message = u'審核退回文件'
@@ -148,7 +148,6 @@ def review_ReviseContentAction(request, id, template_name='ebookSystem/review_Re
 @http_response
 def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_ApplyDocumentAction.html'):
 	from utils.uploadFile import handle_uploaded_file
-	from utils.zip import *
 	user = request.user
 	try:
 		action = ApplyDocumentAction.objects.get(id=id)
@@ -168,7 +167,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 		try:
 			from zipfile import ZipFile
 			with ZipFile(uploadFilePath, 'r') as uploadFile:
-				ZipFile.testzip(uploadFile)
+				uploadFile.testzip()
 				uploadFile.extractall(uploadPath)
 		except:
 				shutil.rmtree(uploadPath)
@@ -298,7 +297,7 @@ class editView(generic.View):
 			content = request.POST['content']
 			part.set_content(finish_content=content, edit_content='')
 			part.edited_page = int(request.POST['page'])
-			part.status = REVIEW
+			part.status = part.STATUS['review']
 			part.finish_date = timezone.now()
 			part.save()
 			redirect_to = reverse('account:profile')
