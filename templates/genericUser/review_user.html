@@ -121,8 +121,8 @@
             </td>
         </tr>
         {% if user.has_editor %}
-        <tr>校對權限
-            <th></th>
+        <tr>
+            <th>校對權限</th>
             <td><div class="switch" data-on="info" data-off="success">
                     <input type="checkbox" name="editor" {%if user.is_editor %}checked{%endif%} />
                 </div>
