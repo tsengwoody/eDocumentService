@@ -33,7 +33,7 @@ class User(AbstractUser):
 	is_manager = models.BooleanField(default=False)
 	is_scaner = models.BooleanField(default=False)
 	status = models.IntegerField(default=REVIEW)
-
+	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5}
 	def __unicode__(self):
 		return self.username
 

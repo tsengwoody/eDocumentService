@@ -13,7 +13,7 @@ from utils.decorator import *
 from utils.uploadFile import handle_uploaded_file
 from utils.zip import *
 from .forms import *
-from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH, MANAGER, SERVICE
+from mysite.settings import PREFIX_PATH
 from zipfile import ZipFile
 import json
 import shutil
@@ -39,13 +39,13 @@ def create_document(request, template_name='genericUser/create_document.html'):
 		uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
 		try:
 			with ZipFile(uploadFilePath, 'r') as uploadFile:
-				ZipFile.testzip(uploadFile)
+				uploadFile.testzip()
 				uploadFile.extractall(uploadPath)
 		except:
-				shutil.rmtree(uploadPath)
-				status = 'error'
-				message = u'非正確ZIP文件'
-				return locals()
+			shutil.rmtree(uploadPath)
+			status = 'error'
+			message = u'非正確ZIP文件'
+			return locals()
 		newBookInfo = bookInfoForm.save(commit=False)
 		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'])
 		newBook.path = uploadPath
@@ -105,7 +105,7 @@ def apply_document(request, template_name='genericUser/apply_document.html'):
 	if request.method == 'GET':
 		return locals()
 
-@user_category_check(['manager'])
+@user_category_check(['user'])
 def event_list(request):
 	events = Event.objects.filter(creater=request.user)
 	template_name = 'genericUser/event_list.html'
@@ -155,52 +155,52 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
-		if request.POST.has_key('active_login'):
+		if request.POST.has_key('login'):
 			user.is_active = True
 			status = 'success'
 			message = u'已啟用登錄權限'
-		elif request.POST.has_key('active_editor'):
+		else:
+			user.is_active = False
+			status = 'success'
+			message = u'停用登錄權限'
+		if request.POST.has_key('editor'):
 			user.is_editor = True
 			status = 'success'
 			message = u'已啟用editor權限'
-		elif request.POST.has_key('active_guest') :
-			user.is_guest = True
-			status = 'success'
-			message = u'已啟用guest權限'
-		elif request.POST.has_key('active_scaner'):
-			user.is_scaner = True
-			status = 'success'
-			message = u'已啟用scaner權限'
-		elif request.POST.has_key('inactive_login'):
-			user.is_active = False
-			status = 'success'
-			message = u'停用用登錄權限'
-		elif request.POST.has_key('inactive_editor'):
+		else:
 			user.is_editor = False
 			status = 'success'
 			message = u'已停用editor權限'
-		elif request.POST.has_key('inactive_guest'):
+		if request.POST.has_key('guest') :
+			user.is_guest = True
+			status = 'success'
+			message = u'已啟用guest權限'
+		else:
 			user.is_guest = False
 			status = 'success'
 			message = u'已停用guest權限'
-		elif request.POST.has_key('inactive_scaner'):
+		if request.POST.has_key('scaner'):
+			user.is_scaner = True
+			status = 'success'
+			message = u'已啟用scaner權限'
+		else:
 			user.is_scaner = False
 			status = 'success'
 			message = u'已停用scaner權限'
-		elif request.POST.has_key('finish'):
-			user.status = ACTIVE
+		if request.POST['review'] == 'success':
+			user.status = user.STATUS['active']
 			redirect_to = reverse('manager:event_list', kwargs={'action':'user' })
 			status = 'success'
 			message = u'完成審核權限開通'
 			for event in events:
 				event.response(status=status, message=message, user=request.user)
-		elif request.POST.has_key('error'):
-			user.status = REVISE
+		elif request.POST['review'] == 'error':
+			user.status = user.STATUS['revise']
 			redirect_to = reverse('manager:event_list', kwargs={'action':'user' })
 			status = 'success'
 			message = u'資料異常退回'
 			for event in events:
-				event.response(status=status, message=message, user=request.user)
+				event.response(status='error', message=request.POST['reason'], user=request.user)
 		user.save()
 		return locals()
 
@@ -216,7 +216,7 @@ def info_change(request,template_name):
 		infoChangeUserForm = InfoChangeUserForm(request.POST, instance = user)
 		if infoChangeUserForm.is_valid():
 			infoChangeUserForm.save()
-			user.status = REVIEW
+			user.status = user.STATUS['review']
 			user.save()
 			redirect_to = reverse('genericUser:info')
 			return HttpResponseRedirect(redirect_to)
@@ -265,7 +265,7 @@ def set_role(request,template_name='genericUser/set_role.html'):
 			else:
 				newEditor = Editor(user=user, professional_field=request.POST['professional_field'])
 			newEditor.save()
-			user.status = REVIEW
+			user.status = user.STATUS['review']
 			user.save()
 			status = 'success'
 			message = u'editor申請成功'
@@ -280,12 +280,12 @@ def set_role(request,template_name='genericUser/set_role.html'):
 			if not user.has_guest():
 				newGuest = Guest(user=user)
 				newGuest.save()
-				user.status = REVIEW
+				user.status = user.STATUS['review']
 				user.save()
 				status = 'success'
 				message = u'guest申請成功'
 			else:
-				user.status = REVIEW
+				user.status = user.STATUS['review']
 				user.save()
 				status = 'success'
 				message = u'guest申請成功'

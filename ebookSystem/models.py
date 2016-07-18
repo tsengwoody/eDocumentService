@@ -29,11 +29,18 @@ class Book(models.Model):
 	priority = models.IntegerField(default=0)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
 	guests = models.ManyToManyField(Guest, related_name='own_book_set')
-	status = models.IntegerField(default=INACTIVE)
+	status = models.IntegerField(default=0)
 	upload_date = models.DateField(default = timezone.now)
 	remark = models.CharField(max_length=255, blank=True, null=True)
+	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5}
 	def __unicode__(self):
 		return self.book_info.bookname
+
+	def status_int2str(self):
+		for k, v in self.STATUS.iteritems():
+			if v == self.status:
+				return k
+		return 'unknown'
 
 	def create_EBook(self):
 		if not (len(self.ebook_set.all()) == 0 and self.validate_folder()):
@@ -96,6 +103,24 @@ class Book(models.Model):
 		self.part_count = part_count
 		return partSet.issubset(OCRFileSet)
 
+	def zip(self):
+		import pyminizip
+		import shutil
+		import zipfile
+		zip_file_name = self.path +'/OCR/' +self.ISBN +'-final.zip'
+		zip_list = [ self.path +'/OCR/' +'part{0}-edit.txt'.format(i+1) for i in range(self.part_count)]
+		pyminizip.compress_multiple(zip_list, zip_file_name, "12345", 5)
+#		zf = zipfile.ZipFile(zip_file_name, "w", zipfile.zlib.DEFLATED)
+#		try:
+#			for i in range(self.part_count):
+#				tar = self.path +'/OCR/' +'part{0}-edit.txt'.format(i+1)
+#				arcname = 'part{0}-edit.txt'.format(i+1)
+#				zf.write(tar, arcname)
+#		except:
+#			pass
+#			shutil.rmtree(zip_file_name)
+#		zf.close()
+
 	def collect_is_finish(self):
 		is_finish = True
 		for part in self.ebook_set.all():
@@ -111,13 +136,13 @@ class Book(models.Model):
 	def collect_finish_part_count(self):
 		finish_part_count = 0
 		for part in self.ebook_set.all():
-			finish_part_count = finish_part_count + (part.status==FINISH)
+			finish_part_count = finish_part_count + (part.status==part.STATUS['finish'])
 		return finish_part_count
 
 	def collect_get_count(self):
 		get_count = 0
 		for part in self.ebook_set.all():
-			if part.status >= EDIT:get_count = get_count +1
+			if part.status >= part.STATUS['edit']:get_count = get_count +1
 		return get_count
 
 	def collect_service_hours(self):
@@ -134,15 +159,20 @@ class EBook(models.Model):
 	end_page = models.IntegerField()
 	edited_page = models.IntegerField(default=0)
 	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL)
-	status = models.IntegerField(default=ACTIVE)
+	status = models.IntegerField(default=1)
 	is_exchange = models.BooleanField(default=False)
 	finish_date = models.DateField(blank=True, null=True)
 	deadline = models.DateField(blank=True, null=True)
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
 	remark = models.CharField(max_length=255, blank=True, null=True)
+	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5}
 
-
+	def status_int2str(self):
+		for k, v in self.STATUS.iteritems():
+			if v == self.status:
+				return k
+		return 'unknown'
 
 	def fuzzy_string_search(self, string, length=5, action=''):
 		class SliceString():
@@ -169,7 +199,6 @@ class EBook(models.Model):
 						tempd[i] = u'□'
 				content_list = zip(temps, tempd)
 				return content_list
-
 		import re
 		import difflib
 		[content, fileHead] = self.get_content(action)
