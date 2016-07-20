@@ -1,4 +1,4 @@
-﻿# coding: utf-8
+# coding: utf-8
 from django.contrib.auth import (login as auth_login, logout as auth_logout, update_session_auth_hash,)
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.core.urlresolvers import reverse, resolve
@@ -25,6 +25,7 @@ formatter = logging.Formatter('%(asctime)s\t%(name)s\t%(levelname)s\t%(message)s
 fh.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(fh)
+
 
 def home(request, template_name='home.html'):
 #	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
@@ -92,12 +93,18 @@ def login(request, template_name='registration/login.html', authentication_form=
 		pass
 	if request.method == 'GET':
 		form = authentication_form(request)
+		captcha=FormWithCaptcha();
 		return locals()
 	if request.method == 'POST':
 		form = authentication_form(request, data=request.POST)
+		reCaptcha = FormWithCaptcha(request.POST);
+		if not reCaptcha.is_valid():
+			status = 'error'
+			message = u'captcha驗證失敗，'+ str(reCaptcha.errors)
+			return locals()
 		if not form.is_valid():
 			status = 'error'
-			message = u'表單驗證失敗' +form.errors['__all__']
+			message = u'表單驗證失敗，' + str(form.errors)
 			return locals()
 		from django.contrib.sessions.models import Session
 		for session in Session.objects.all():

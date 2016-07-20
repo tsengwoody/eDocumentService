@@ -52,6 +52,7 @@ INSTALLED_APPS = (
     'genericUser',
     'guest',
     'manager',
+    'snowpenguin.django.recaptcha2',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -192,6 +193,14 @@ LOGGING = {
         },
     },
 }
+
+#RECAPTCHA
+#RECAPTCHA_PUBLIC_KEY
+RECAPTCHA_PUBLIC_KEY = '6LemWCUTAAAAAN7vPBat6CikMrI1F2jOOmnV_XhO'
+RECAPTCHA_PRIVATE_KEY = '6LemWCUTAAAAAC0N7Q9z9aH-yE2y08-BLECTelv_'
+NOCAPTCHA = False
+#CAPTCHA_AJAX = True
+
 
 #special define
 INACTIVE = 0
