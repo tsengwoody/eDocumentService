@@ -29,7 +29,6 @@ def validate_folder(OCR, source, page_per_part):
 
 from django.core.cache import cache
 from gtts import gTTS
-from mysite.settings import PREFIX_PATH
 import random
 import string
 
@@ -40,7 +39,7 @@ def audio_code():
 	UUID = string.join(UUID).replace(' ','')
 	text = string.join(random.sample(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'], 5), ',')
 	tts = gTTS(text=text, lang='en')
-	tts.save(PREFIX_PATH +'static/audio_code/' +UUID +'.mp3')
+#	tts.save(PREFIX_PATH +'static/audio_code/' +UUID +'.mp3')
 	code = text.replace(',', '')
 	cache.set(UUID, code)
 	return [UUID, code]

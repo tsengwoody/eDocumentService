@@ -13,7 +13,7 @@ from utils.decorator import *
 from utils.uploadFile import handle_uploaded_file
 from utils.zip import *
 from .forms import *
-from mysite.settings import PREFIX_PATH
+from mysite.settings import BASE_DIR
 from zipfile import ZipFile
 import json
 import shutil
@@ -30,7 +30,7 @@ def create_document(request, template_name='genericUser/create_document.html'):
 			status = 'error'
 			message = u'表單驗證失敗' +str(bookInfoForm.errors)
 			return locals()
-		uploadPath = PREFIX_PATH +u'static/ebookSystem/document/{0}'.format(bookInfoForm.cleaned_data['ISBN'])
+		uploadPath = BASE_DIR +u'/file/ebookSystem/document/{0}'.format(bookInfoForm.cleaned_data['ISBN'])
 		if os.path.exists(uploadPath):
 			status = 'error'
 			message = u'文件已存在'
@@ -145,13 +145,13 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 		events = Event.objects.filter(content_type__model='user', object_id=user.id)
 	except:
 		raise Http404("user does not exist")
-	sourcePath = PREFIX_PATH +'static/ebookSystem/disability_card/{0}'.format(user.username)
+	sourcePath = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(user.username)
 	frontPage = user.username +'_front.jpg'
 	frontPageURL = sourcePath +u'/' +frontPage
-	frontPageURL = frontPageURL.replace(PREFIX_PATH +'static/', '')
+	frontPageURL = frontPageURL.replace(BASE_DIR +'/static/', '')
 	backPage = user.username +'_back.jpg'
 	backPageURL = sourcePath +u'/' +backPage
-	backPageURL = backPageURL.replace(PREFIX_PATH +'static/', '')
+	backPageURL = backPageURL.replace(BASE_DIR +'/static/', '')
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
@@ -270,7 +270,7 @@ def set_role(request,template_name='genericUser/set_role.html'):
 			status = 'success'
 			message = u'editor申請成功'
 		if request.POST.has_key('guest'):
-			uploadDir = PREFIX_PATH +'static/ebookSystem/disability_card/{0}'.format(user.username)
+			uploadDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(user.username)
 			if os.path.exists(uploadDir):
 				shutil.rmtree(uploadDir)
 			request.FILES['disability_card_front'].name = user.username +'_front.jpg'

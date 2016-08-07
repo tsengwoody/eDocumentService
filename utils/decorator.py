@@ -70,13 +70,13 @@ def http_response(view):
 
 from .validate import audio_code
 from django.core.cache import cache
-from mysite.settings import PREFIX_PATH
+from mysite.settings import BASE_DIR
 import os
 def audio_code_valid(view):
 	def decorator(request, *args, **kwargs):
 		if request.method == 'POST':
 			if request.POST.has_key('code') and request.POST.has_key('UUID') and request.POST['code'] == cache.get(request.POST['UUID']):
-				os.remove(PREFIX_PATH +'static/audio_code/' +request.POST['UUID'] +'.mp3')
+				os.remove(BASE_DIR +'/static/audio_code/' +request.POST['UUID'] +'.mp3')
 				return view(request, *args, **kwargs)
 			else:
 				if request.is_ajax():

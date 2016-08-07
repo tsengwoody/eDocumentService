@@ -4,7 +4,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
-from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
+from mysite.settings import INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 import os
 import datetime
 

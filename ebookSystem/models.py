@@ -2,13 +2,14 @@
 from django.db import models
 from django.utils import timezone
 
-from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
+from mysite.settings import BASE_DIR,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 from genericUser.models import User
 from guest.models import Guest
 from account.models import Editor
 import os
 import datetime
 import codecs
+import shutil
 
 class BookInfo(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
@@ -103,13 +104,17 @@ class Book(models.Model):
 		self.part_count = part_count
 		return partSet.issubset(OCRFileSet)
 
-	def zip(self):
+	def zip(self, user, password):
 		import pyminizip
-		import shutil
 		import zipfile
 		zip_file_name = self.path +'/OCR/' +self.ISBN +'-final.zip'
-		zip_list = [ self.path +'/OCR/' +'part{0}-edit.txt'.format(i+1) for i in range(self.part_count)]
-		pyminizip.compress_multiple(zip_list, zip_file_name, "12345", 5)
+		zip_list = [ self.path +'/OCR/' +'part{0}-final.txt'.format(i+1) for i in range(self.part_count)]
+		try:
+			pyminizip.compress_multiple(zip_list, zip_file_name, password, 5)
+			return zip_file_name
+		except:
+			shutil.rmtree(zip_file_name)
+			return ''
 #		zf = zipfile.ZipFile(zip_file_name, "w", zipfile.zlib.DEFLATED)
 #		try:
 #			for i in range(self.part_count):
@@ -174,6 +179,9 @@ class EBook(models.Model):
 				return k
 		return 'unknown'
 
+	def get_path(self, string=''):
+		return self.book.path +'/OCR/part{0}{1}.txt'.format(self.part, string)
+
 	def fuzzy_string_search(self, string, length=5, action=''):
 		class SliceString():
 			def __init__(self, start, end, source_content, source_index, destination_content, destination_index):
@@ -236,7 +244,7 @@ class EBook(models.Model):
 		return self.book.book_info.bookname+u'-part'+str(self.part)
 
 	def get_content(self, action='', encoding='utf-8'):
-		filePath = self.book.path+u'/OCR/part{0}{1}.txt'.format(self.part, action)
+		filePath = self.get_path(action)
 		with codecs.open(filePath, 'r', encoding=encoding) as fileRead:
 			firstLine=fileRead.next()
 			fileHead=firstLine[0]
@@ -246,23 +254,43 @@ class EBook(models.Model):
 		return [content,fileHead]
 
 	def set_content(self, finish_content, edit_content, encoding='utf-8', fileHead = u'\ufeff'):
-		finishFilePath = self.book.path+u'/OCR/part{0}-finish.txt'.format(self.part)
-		editFilePath = self.book.path+u'/OCR/part{0}-edit.txt'.format(self.part)
+		finishFilePath = self.get_path('-finish')
+		editFilePath = self.get_path('-edit')
 		with codecs.open(finishFilePath, 'a', encoding=encoding) as fileWrite:
 			fileWrite.write(finish_content)
 		with codecs.open(editFilePath, 'w', encoding=encoding) as fileWrite:
 			fileWrite.write(fileHead+edit_content)
 		return True
 
-	def get_image(self):
-		sourcePath = self.book.path +u'/source'
-		fileList=os.listdir(sourcePath)
+	def get_image(self, user):
+		water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, user.username)
+		source_path = self.book.path +u'/source'
+		fileList=os.listdir(source_path)
 		fileList = sorted(fileList)
 		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
 		scanPageList = scanPageList[self.begin_page:self.end_page+1]
-		defaultPageURL = sourcePath +u'/' +scanPageList[self.edited_page]
-		defaultPageURL=defaultPageURL.replace(PREFIX_PATH +'static/', '')
-		return [scanPageList, defaultPageURL]
+		if not os.path.exists(water_path +'/' +scanPageList[0]):
+			self.create_watermark_image(user)
+		default_page_url = water_path +u'/' +scanPageList[self.edited_page]
+		default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
+		return [scanPageList, default_page_url]
+
+	def create_watermark_image(self, user):
+		water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, user.username)
+		source_path = self.book.path +u'/source'
+		fileList=os.listdir(source_path)
+		fileList = sorted(fileList)
+		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
+		scanPageList = scanPageList[self.begin_page:self.end_page+1]
+		if os.path.exists(water_path +'/' +scanPageList[0]):
+			return False
+		if not os.path.exists(water_path):
+			os.makedirs(water_path, 0770)
+		for s in scanPageList:
+#			sw = watermark(s, user.username)
+#			sw.save(self.book.path +u'/source/' +user.username)
+			shutil.copyfile(source_path +'/' +s, water_path +'/' +s)
+		return True
 
 	def edit_distance(self, action, encoding='utf-8'):
 		import Levenshtein

@@ -9,7 +9,6 @@ import json
 from utils.decorator import *
 from ebookSystem.models import *
 from genericUser.models import *
-from mysite.settings import PREFIX_PATH,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 
 @user_category_check(['manager'])
 def event_list(request, action):

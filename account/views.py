@@ -8,7 +8,6 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import generic
 from ebookSystem.models import *
-from mysite.settings import PREFIX_PATH
 from utils.decorator import *
 import datetime
 

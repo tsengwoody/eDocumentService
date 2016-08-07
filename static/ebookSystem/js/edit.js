@@ -147,7 +147,7 @@ function addMark(strValue,editor) {
 function calSeconds()
 {
     var url=window.location.pathname;
-    var newUrl="/"+url.split('/')[1]+"/"+"edit_ajax"+"/"+url.split('/')[3]+"/"+url.split('/')[4]+"/";
+    var newUrl="/"+url.split('/')[1]+"/"+"edit_ajax"+"/"+url.split('/')[3]+"/";
     var transferData={};
     transferData["online"]="0";
     $.ajax({

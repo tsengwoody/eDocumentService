@@ -5,7 +5,7 @@ import datetime
 import re
 import urllib,urllib2
 from bs4 import BeautifulSoup
-from mysite.settings import PREFIX_PATH
+from mysite.settings import BASE_DIR
 
 def load_post_data(source):
 	post_data = {}
@@ -49,7 +49,7 @@ def get_book_info(ISBN):
 	#		print 'Name = '+item.name
 	#		print 'Value = '+item.value
 	#url = url +'?PHPSESSID' +'=' +phpsessid
-	post_data_file = PREFIX_PATH +'/utils/post_data.txt'
+	post_data_file = BASE_DIR +'/utils/post_data.txt'
 	values = load_post_data(post_data_file)
 	values['FO_SearchValue0'] = ISBN
 	data = urllib.urlencode(values)  

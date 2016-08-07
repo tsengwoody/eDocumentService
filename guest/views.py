@@ -12,7 +12,6 @@ from .models import *
 from .forms import *
 from utils.decorator import *
 from utils.validate import *
-from mysite.settings import PREFIX_PATH
 import json
 import shutil
 
@@ -47,9 +46,15 @@ class profileView(generic.View):
 			subject = u'[文件] {}'.format(emailBook.book_info.bookname)
 			body = u'新愛的{0}您好：\n'.format(user.username)
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[user.email])
-			for part in emailBook.ebook_set.all():
-				attach_file_path = emailBook.path +u'/OCR/part{0}.txt'.format(part.part)
-				email.attach_file(attach_file_path)
+			attach_file_path = emailBook.zip(user, 'test')
+			if attach_file_path == '':
+				status = 'error'
+				message = u'附加文件失敗'
+				return locals()
+			email.attach_file(attach_file_path)
+#			for part in emailBook.ebook_set.all():
+#				attach_file_path = emailBook.path +u'/OCR/part{0}.txt'.format(part.part)
+#				email.attach_file(attach_file_path)
 			email.send(fail_silently=False)
 			status = 'success'
 			message = u'已寄送到您的電子信箱'

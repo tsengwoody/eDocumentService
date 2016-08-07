@@ -211,5 +211,4 @@ REVISE = 4
 FINISH = 5
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'edocumentservice@gmail.com'
-PREFIX_PATH = BASE_DIR +'/'
 SITE_ID = 1

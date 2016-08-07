@@ -2,8 +2,8 @@
 *.mp3
 */migrations/
 db.sqlite3
+file/
 log/
-mysite/settings.py
 static/ebookSystem/document/
 static/ebookSystem/disability_card/
 static/audio_code/

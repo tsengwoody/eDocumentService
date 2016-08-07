@@ -1,4 +1,4 @@
-# coding: utf-8
+﻿# coding: utf-8
 from django.contrib.auth import (login as auth_login, logout as auth_logout, update_session_auth_hash,)
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.core.urlresolvers import reverse, resolve
@@ -9,7 +9,7 @@ from ebookSystem.models import *
 from genericUser.models import Event
 from utils.uploadFile import *
 from utils.decorator import *
-from mysite.settings import PREFIX_PATH
+from mysite.settings import BASE_DIR
 import json
 
 #logging config
@@ -61,7 +61,7 @@ def register(request, template_name='registration/register.html'):
 				status = 'error'
 				message = u'無上傳文件'
 				return locals()
-			uploadDir = PREFIX_PATH +'static/ebookSystem/disability_card/{0}'.format(newUser.username)
+			uploadDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(newUser.username)
 			request.FILES['disability_card_front'].name = request.POST['username'] +'_front.jpg'
 			[status, message] = handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])
 			request.FILES['disability_card_back'].name = request.POST['username'] +'_back.jpg'

@@ -10,7 +10,7 @@ from django.views import generic
 from .models import *
 from .forms import *
 from genericUser.models import Event
-from mysite.settings import PREFIX_PATH
+from mysite.settings import BASE_DIR
 from utils.decorator import *
 from utils.crawler import *
 import os
@@ -68,12 +68,13 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		event = Event.objects.get(content_type__model='book', object_id=book.ISBN)
 	except:
 		raise Http404("book does not exist")
-	sourcePath = book.path +u'/source'
+	water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(book.book_info.ISBN, request.user.username)
+	source_path = book.path +u'/source'
 	scanPageList=[]
 	for ebook in book.ebook_set.all():
-		scanPageList = scanPageList + ebook.get_image()[0]
-	defaultPageURL = sourcePath +u'/' +scanPageList[0]
-	defaultPageURL=defaultPageURL.replace(PREFIX_PATH +'static/', '')
+		scanPageList = scanPageList + ebook.get_image(request.user)[0]
+	defaultPageURL = water_path +u'/' +scanPageList[0]
+	defaultPageURL=defaultPageURL.replace(BASE_DIR +'/static/', '')
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
@@ -110,6 +111,8 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 			if part.book.collect_finish_part_count() == part.book.part_count:
 				part.book.status = part.book.STATUS['finish']
 				part.book.save()
+			import shutil
+			shutil.copyfile(part.get_path('-finish'), part.get_path('-final'))
 			status = 'success'
 			message = u'審核通過文件'
 			event.response(status=status, message=message, user=request.user)
@@ -157,7 +160,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
-		uploadPath = PREFIX_PATH +u'static/ebookSystem/document/{0}'.format(action.book_info.ISBN)
+		uploadPath = BASE_DIR +u'/file/ebookSystem/document/{0}'.format(action.book_info.ISBN)
 		if os.path.exists(uploadPath):
 			status = 'error'
 			message = u'文件已存在'
@@ -221,11 +224,9 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 	extra_list = ['bookname', 'author', 'house', 'date', 'ISBN']
 	return locals()
 
-def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
+def edit_ajax(request, ISBN_part, *args, **kwargs):
 	user = request.user
 	response={}
-	book = Book.objects.get(ISBN=book_ISBN)
-	part = EBook.objects.get(part=part_part,book=book)
 	response = {}
 	if not hasattr(request.user, 'online'):
 		response['status'] = u'error'
@@ -235,9 +236,12 @@ def edit_ajax(request, book_ISBN, part_part, *args, **kwargs):
 		if delta.seconds < 50:
 			response['status'] = u'error'
 			response['message'] = u'您有其他編輯正進行'
+			print response['message']
 		else:
 			user.online = timezone.now()
 			user.save()
+			part = EBook.objects.get(ISBN_part=ISBN_part)
+			print part.ISBN_part
 			part.service_hours = part.service_hours+1
 			part.save()
 			response['status'] = u'success'
@@ -258,7 +262,7 @@ class editView(generic.View):
 			part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
 		except: 
 			raise Http404("book or part does not exist")
-		[scanPageList, defaultPageURL] = part.get_image()
+		[scanPageList, defaultPageURL] = part.get_image(request.user)
 		[editContent, fileHead] = part.get_content('-edit')
 		return locals()
 
@@ -272,7 +276,7 @@ class editView(generic.View):
 			part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
 		except:
 			raise Http404("book or part does not exist")
-		[scanPageList, defaultPageURL] = part.get_image()
+		[scanPageList, defaultPageURL] = part.get_image(request.user)
 		editForm = EditForm(request.POST)
 		if request.POST.has_key('save'):
 			content = request.POST['content']
@@ -285,7 +289,7 @@ class editView(generic.View):
 #			part.set_content(finish_content='', edit_content=content)
 			part.edited_page=int(request.POST['page'])
 			part.save()
-			[scanPageList, defaultPageURL] = part.get_image()
+			[scanPageList, defaultPageURL] = part.get_image(request.user)
 			[editContent, fileHead] = part.get_content('-edit')
 			status = 'success'
 			message = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
