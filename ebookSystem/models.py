@@ -159,10 +159,11 @@ class Book(models.Model):
 class EBook(models.Model):
 	book = models.ForeignKey(Book)
 	part = models.IntegerField()
-	ISBN_part = models.CharField(max_length=23, primary_key=True)
+	ISBN_part = models.CharField(max_length=20, primary_key=True)
 	begin_page = models.IntegerField()
 	end_page = models.IntegerField()
 	edited_page = models.IntegerField(default=0)
+	SpecialContent_count = models.IntegerField(default=0)
 	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL)
 	status = models.IntegerField(default=1)
 	is_exchange = models.BooleanField(default=False)
@@ -318,6 +319,26 @@ class EBook(models.Model):
 		finish_content = content[0]
 		edit_content = content[1]
 		return [finish_content, edit_content]
+
+class SpecialContent(models.Model):
+	id = models.CharField(max_length=20, primary_key=True)
+	ebook = models.ForeignKey(EBook)
+	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL)
+	item_number = models.IntegerField()
+	path = models.CharField(max_length=255, blank=True, null=True)
+	status = models.IntegerField(default=0)
+	type = models.IntegerField()
+	STATUS = {'active':0, 'edit':1, 'finish':2}
+	TYPE = {'image':0, 'mathml':1}
+
+	def __unicode__(self):
+		return self.id
+
+	def status_int2str(self):
+		for k, v in self.STATUS.iteritems():
+			if v == self.status:
+				return k
+		return 'unknown'
 
 class ReviseContentAction(models.Model):
 	from ebookSystem.models import EBook
