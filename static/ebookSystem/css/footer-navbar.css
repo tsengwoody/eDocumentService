@@ -21,6 +21,9 @@ body {
 .footer p{
   margin:0;
 }
+.footer nav{
+  height: 60px;
+}
 nav .pager{
     margin:0px;
 }

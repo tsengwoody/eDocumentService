@@ -7,20 +7,20 @@
     <link href="{% static "ebookSystem/css/bootstrap/assets/docs.min.css" %}" rel="stylesheet" > 
     <link href="{% static "ebookSystem/css/bootstrap/assets/src/docs.css" %}" rel="stylesheet" > 
     <style>
-       .page-header > h3 {
-            padding-top:60px;
-       }
-       .container > h2 {
-         margin-bottom:-30px;
-       }
-       #register {
-         margin-bottom:-60px;
-       }
+
     </style>
 {% endblock %}
 {% block content %}
 <h2>edocumentservice雲端平台系統-使用流程</h2>
 <div class="row">
+    <div class="col-md-2" role="main">
+
+        <ul class="nav nav-pills nav-stacked">
+            <li><a href="#register">註冊與登入</a></li>
+            <li><a href="#volunteer">志工使用程序</a>
+            </li>
+        </ul>
+    </div>
     <div class="col-md-10" role="main">
         <div class="bs-docs-section">
             <section id="register">
@@ -80,14 +80,7 @@
             </section>
         </div>
     </div>
-    <div class="col-md-2" role="main">
 
-        <ul class="nav nav-pills nav-stacked">
-            <li><a href="#register">註冊與登入</a></li>
-            <li><a href="#volunteer">志工使用程序</a>
-            </li>
-        </ul>
-    </div>
 </div>
 
 {% endblock %}
