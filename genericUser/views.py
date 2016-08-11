@@ -316,6 +316,19 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 		message = u'成功寄送內容，我們將盡速回復'
 		return locals()
 
+@user_category_check(['user'])
+@http_response
+def servicehours_list(request, template_name='genericUser/servicehours_list.html'):
+	ServiceHours_list = ServiceHours.objects.filter(user=request.user)
+	if request.method == 'POST':
+		if request.POST.has_key('exchange'):
+			exchange_serviceHours = ServiceHours.objects.get(id=request.POST['exchange'])
+			exchange_serviceHours.is_exchange=True
+			exchange_serviceHours.save()
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
 from django.contrib import messages
 def test_message(request, template_name):
 	messages.add_message(request, messages.INFO, 'Hello world.')

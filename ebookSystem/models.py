@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 
 from mysite.settings import BASE_DIR,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
-from genericUser.models import User
+from genericUser.models import User, ServiceHours
 from guest.models import Guest
 from account.models import Editor
 import os
@@ -163,15 +163,14 @@ class EBook(models.Model):
 	begin_page = models.IntegerField()
 	end_page = models.IntegerField()
 	edited_page = models.IntegerField(default=0)
-	SpecialContent_count = models.IntegerField(default=0)
 	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL)
-	status = models.IntegerField(default=1)
-	is_exchange = models.BooleanField(default=False)
 	finish_date = models.DateField(blank=True, null=True)
 	deadline = models.DateField(blank=True, null=True)
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
+	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL)
 	remark = models.CharField(max_length=255, blank=True, null=True)
+	status = models.IntegerField(default=1)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5}
 
 	def status_int2str(self):
@@ -326,6 +325,8 @@ class SpecialContent(models.Model):
 	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL)
 	item_number = models.IntegerField()
 	path = models.CharField(max_length=255, blank=True, null=True)
+	service_hours = models.IntegerField(default=0)
+	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL)
 	status = models.IntegerField(default=0)
 	type = models.IntegerField()
 	STATUS = {'active':0, 'edit':1, 'finish':2}

@@ -106,6 +106,16 @@ class Center(models.Model):
 	def __unicode__(self):
 		return self.name
 
+class ServiceHours(models.Model):
+	user = models.ForeignKey(User, related_name='servicehours_set')
+	center = models.ForeignKey(Center, blank=True, null=True, related_name='servicehours_set')
+	date = models.DateField()
+	service_hours = models.IntegerField(default=0)
+	is_exchange = models.BooleanField(default=False)
+
+	def __unicode__(self):
+		return self.user.username +str(self.date)
+
 class ContactUs(models.Model):
 	name = models.CharField(max_length=10)
 	email = models.EmailField()

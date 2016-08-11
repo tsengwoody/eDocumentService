@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views import generic
 from .models import *
 from .forms import *
-from genericUser.models import Event
+from genericUser.models import Event, ServiceHours
 from mysite.settings import BASE_DIR
 from utils.decorator import *
 from utils.crawler import *
@@ -107,10 +107,16 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
 			part.status = part.STATUS['finish']
-			part.save()
 			if part.book.collect_finish_part_count() == part.book.part_count:
 				part.book.status = part.book.STATUS['finish']
 				part.book.save()
+			month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
+			try:
+				month_ServiceHours = ServiceHours.objects.get(user=request.user, date=month_day)
+			except:
+				month_ServiceHours = ServiceHours.objects.create(user=request.user, date=month_day)
+			part.serviceHours = month_ServiceHours
+			part.save()
 			import shutil
 			shutil.copyfile(part.get_path('-finish'), part.get_path('-final'))
 			status = 'success'
@@ -236,12 +242,10 @@ def edit_ajax(request, ISBN_part, *args, **kwargs):
 		if delta.seconds < 50:
 			response['status'] = u'error'
 			response['message'] = u'您有其他編輯正進行'
-			print response['message']
 		else:
 			user.online = timezone.now()
 			user.save()
 			part = EBook.objects.get(ISBN_part=ISBN_part)
-			print part.ISBN_part
 			part.service_hours = part.service_hours+1
 			part.save()
 			response['status'] = u'success'

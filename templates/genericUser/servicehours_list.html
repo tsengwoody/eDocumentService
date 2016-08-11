@@ -1,0 +1,40 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+時數
+{% endblock %}
+{% block style %}
+{% load staticfiles %}
+
+<script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
+{% endblock %}
+{% block content %}
+<form action="" method="post">
+	<h3>時數記錄列表</h3>
+	{% csrf_token %} 
+	<table>
+		<tr>
+			<th>月份</th>
+			<th>時數</th>
+			<th>狀態</th>
+			<th>兌換中心</th>
+			<th>動作</th>
+		</tr>
+		{% for ServiceHours in ServiceHours_list %}
+		<tr>
+			<td>{{ ServiceHours.date }}</td>
+			<td>{{ ServiceHours.service_hours }}</td>
+			<td>
+			{% if serviceHours.is_exchange %}
+			已兌換
+			{% else %}
+			未兌換
+			{% endif %}
+			</td>
+			<td>{{ ServiceHours.center }}</td>
+			<td><button class="btn btn-lg btn-default send_button" type="submit" id="id_exchange" name="exchange" value={{ ServiceHours.id }}>兌換</button></td>
+		</tr>
+	{% endfor %}
+	</table>
+</form>
+
+{% endblock %}
