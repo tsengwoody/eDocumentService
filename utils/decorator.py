@@ -27,8 +27,6 @@ def user_category_check(category):
 				return view(request, *args, **kwargs)
 			elif 'guest' in category and request.user.is_guest:
 				return view(request, *args, **kwargs)
-			elif 'scaner' in category and request.user.is_scaner:
-				return view(request, *args, **kwargs)
 			elif 'manager' in category and request.user.is_manager:
 				return view(request, *args, **kwargs)
 			else:

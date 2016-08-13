@@ -97,6 +97,33 @@ class profileView(generic.View):
 				getPart.save()
 			status = 'success'
 			message = u'成功取得完整文件{}'.format(getPart.book.__unicode__())
+		elif request.POST.has_key('designateBook'):
+			if len(editingPartList)>3:
+				status = 'error'
+				message = u'您已有超過3段文件，請先校對完成再領取'
+				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
+				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
+				return locals()
+			activeBook = Book.objects.filter(status=Book.STATUS['designate']).order_by('upload_date')
+			designateBook = None
+			for book in activeBook:
+				if request.user.editor.service_guest in book.guests.all():
+					designateBook = book
+					break
+			if not designateBook:
+				status = 'error'
+				message = u'目前無指定服務對象文件'
+				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
+				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
+				return locals()
+			for getPart in designateBook.ebook_set.all():
+				getPart.editor = request.user.editor
+				getPart.get_date = timezone.now()
+				getPart.deadline = getPart.get_date + datetime.timedelta(days=3)
+				getPart.status = getPart.STATUS['edit']
+				getPart.save()
+			status = 'success'
+			message = u'成功取得指定文件{}'.format(getPart.book.__unicode__())
 		elif request.POST.has_key('rebackPart'):
 			ISBN_part = request.POST.get('rebackPart')
 			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)

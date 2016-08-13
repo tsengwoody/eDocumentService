@@ -79,7 +79,10 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
-			book.status = book.STATUS['active']
+			if book.status == book.STATUS['inactive']:
+				book.status = book.STATUS['active']
+			elif book.status == book.STATUS['indesignate']:
+				book.status = book.STATUS['designate']
 			book.save()
 			status = 'success'
 			message = u'審核通過文件'
@@ -183,7 +186,6 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 				status = 'error'
 				message = u'非正確ZIP文件'
 				return locals()
-#		unzip_file(uploadFilePath, uploadPath)
 		newBook = Book(book_info=action.book_info, ISBN=action.book_info.ISBN)
 		newBook.path = uploadPath
 		if not newBook.validate_folder():
@@ -194,6 +196,8 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 		newBook.scaner = user
 		guest = Guest.objects.get(user=event.creater)
 		newBook.guests.add(guest)
+		if request.POST.has_key('designate'):
+			newBook.status = newBook.STATUS['indesignate']
 		newBook.save()
 		newBook.create_EBook()
 		Event.objects.create(creater=event.creater, action=newBook)

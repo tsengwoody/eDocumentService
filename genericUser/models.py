@@ -8,12 +8,6 @@ from mysite.settings import INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 import os
 import datetime
 
-EDU = (
-	(u'高中' , u'高中'),
-	(u'學士' , u'學士'),
-	(u'碩士' , u'碩士'),
-)
-
 ContactUsKIND = (
 	(u'校對問題' , u'校對問題'),
 	(u'系統問題' , u'系統問題'),
@@ -25,15 +19,19 @@ ContactUsKIND = (
 class User(AbstractUser):
 	phone = models.CharField(max_length=30)
 	birthday = models.DateField()
+	EDU = (
+		(u'高中' , u'高中'),
+		(u'學士' , u'學士'),
+		(u'碩士' , u'碩士'),
+	)
 	education = models.CharField(max_length=30, choices=EDU)
 	online = models.DateTimeField(default = timezone.now)
+	status = models.IntegerField(default=REVIEW)
+	STATUS = {'inactive':0, 'active':1, 'review':2}
 	is_book = models.BooleanField(default=False)
 	is_editor = models.BooleanField(default=False)
 	is_guest = models.BooleanField(default=False)
 	is_manager = models.BooleanField(default=False)
-	is_scaner = models.BooleanField(default=False)
-	status = models.IntegerField(default=REVIEW)
-	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5}
 	def __unicode__(self):
 		return self.username
 

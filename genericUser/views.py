@@ -19,7 +19,7 @@ import json
 import shutil
 
 
-@user_category_check(['scaner'])
+@user_category_check(['guest'])
 @http_response
 def create_document(request, template_name='genericUser/create_document.html'):
 	readme_url = request.path +'readme/'
@@ -54,10 +54,12 @@ def create_document(request, template_name='genericUser/create_document.html'):
 			status = 'error'
 			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			return locals()
+		newBookInfo.save()
 		newBook.scaner = user
 		guest = Guest.objects.get(user=user)
 		newBook.guests.add(guest)
-		newBookInfo.save()
+		if request.POST.has_key('designate'):
+			newBook.status = newBook.STATUS['indesignate']
 		newBook.save()
 		newBook.create_EBook()
 		event = Event.objects.create(creater=user, action=newBook)
@@ -179,14 +181,6 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 			user.is_guest = False
 			status = 'success'
 			message = u'已停用guest權限'
-		if request.POST.has_key('scaner'):
-			user.is_scaner = True
-			status = 'success'
-			message = u'已啟用scaner權限'
-		else:
-			user.is_scaner = False
-			status = 'success'
-			message = u'已停用scaner權限'
 		if request.POST['review'] == 'success':
 			user.status = user.STATUS['active']
 			redirect_to = reverse('manager:event_list', kwargs={'action':'user' })
@@ -210,19 +204,39 @@ def info(request, template_name):
 	return render(request, template_name, locals())
 
 @user_category_check(['user'])
+@http_response
 def info_change(request,template_name):
 	user = request.user
+	try:
+		username = user.editor.service_guest.user.username
+	except:
+		username = 'None'
 	if request.method == 'POST':
 		infoChangeUserForm = InfoChangeUserForm(request.POST, instance = user)
-		if infoChangeUserForm.is_valid():
-			infoChangeUserForm.save()
-			user.status = user.STATUS['review']
-			user.save()
-			redirect_to = reverse('genericUser:info')
-			return HttpResponseRedirect(redirect_to)
+		if not infoChangeUserForm.is_valid():
+			status = 'error'
+			message = u'表單驗證失敗' +str(infoChangeUserForm.errors)
+			return locals()
+		infoChangeUserForm.save()
+		if request.POST.has_key('service_guest'):
+			try:
+				user.editor.service_guest = Guest.objects.get(user__username=request.POST['service_guest'])
+				user.editor.save()
+			except:
+				user.editor.service_guest = None
+				status = u'error'
+				message = u'指定對象失敗，系統無此帳號'
+				return locals()
+		user.status = user.STATUS['review']
+		user.save()
+		Event.objects.create(creater=request.user, action=request.user)
+		status = u'success'
+		message = u'修改資料完成，請等待管理員審核。'
+		redirect_to = reverse('genericUser:info')
+		return locals()
 	if request.method == 'GET':
 		infoChangeUserForm = InfoChangeUserForm(instance = user)
-	return render(request, template_name, locals())
+		return locals()
 
 @user_category_check(['user'])
 @http_response

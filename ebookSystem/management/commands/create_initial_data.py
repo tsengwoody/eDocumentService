@@ -21,7 +21,7 @@ class Command(BaseCommand):
 #		parser.add_argument('create_demo_data', nargs='*')
 
 	def handle(self, *args, **options):
-		root = User(username='root', email='edocumentservice@gmail.com', first_name = 'demo root firstname', last_name = 'demo root lastname', is_active=True, is_superuser=True, is_staff=True, phone='0917823099', birthday='2016-01-01', is_editor=True, is_guest=True, is_scaner=True, is_manager=True, status=ACTIVE)
+		root = User(username='root', email='edocumentservice@gmail.com', first_name = 'demo root firstname', last_name = 'demo root lastname', is_active=True, is_superuser=True, is_staff=True, phone='0917823099', birthday='2016-01-01', is_editor=True, is_guest=True, is_manager=True, status=ACTIVE)
 		root.set_password('root')
 		root.save()
 		rootEditor = Editor.objects.create(user=root)
@@ -36,5 +36,4 @@ class Command(BaseCommand):
 		manager.is_editor=True
 		manager.is_guest=True
 		manager.is_manager=True
-		manager.is_scaner=True
 		manager.save()'''

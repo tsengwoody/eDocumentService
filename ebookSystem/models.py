@@ -30,10 +30,9 @@ class Book(models.Model):
 	priority = models.IntegerField(default=0)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
 	guests = models.ManyToManyField(Guest, related_name='own_book_set')
-	status = models.IntegerField(default=0)
 	upload_date = models.DateField(default = timezone.now)
-	remark = models.CharField(max_length=255, blank=True, null=True)
-	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5}
+	status = models.IntegerField(default=0)
+	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5, 'indesignate':6, 'designate':7}
 	def __unicode__(self):
 		return self.book_info.bookname
 
@@ -169,7 +168,6 @@ class EBook(models.Model):
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
 	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL)
-	remark = models.CharField(max_length=255, blank=True, null=True)
 	status = models.IntegerField(default=1)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5}
 
@@ -328,8 +326,8 @@ class SpecialContent(models.Model):
 	service_hours = models.IntegerField(default=0)
 	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL)
 	status = models.IntegerField(default=0)
-	type = models.IntegerField()
 	STATUS = {'active':0, 'edit':1, 'finish':2}
+	type = models.IntegerField()
 	TYPE = {'image':0, 'mathml':1}
 
 	def __unicode__(self):

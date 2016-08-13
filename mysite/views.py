@@ -48,7 +48,7 @@ def register(request, template_name='registration/register.html'):
 		message = u'註冊成功，請等待帳號審核'
 		if request.POST.has_key('editor'):
 			try:
-				newEditor = Editor(user=newUser, service_hours=0, professional_field=request.POST['professional_field'])
+				newEditor = Editor(user=newUser, professional_field=request.POST['professional_field'])
 				newEditor.save()
 			except:
 				status = 'error'
@@ -72,7 +72,7 @@ def register(request, template_name='registration/register.html'):
 			except:
 				status = 'error'
 				message = u'guest申請失敗'
-		event = Event.objects.create(creater=newUser, action=newUser)
+		Event.objects.create(creater=newUser, action=newUser)
 		return locals()
 	if request.method == 'GET':
 		registerUserForm = RegisterUserForm()
