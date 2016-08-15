@@ -29,7 +29,7 @@ class Book(models.Model):
 	page_per_part = models.IntegerField(default=50)
 	priority = models.IntegerField(default=0)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
-	guests = models.ManyToManyField(Guest, related_name='own_book_set')
+	owners = models.ManyToManyField(Guest, related_name='own_book_set')
 	upload_date = models.DateField(default = timezone.now)
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5, 'indesignate':6, 'designate':7}
@@ -156,13 +156,13 @@ class Book(models.Model):
 		return 		service_hours
 
 class EBook(models.Model):
+	ISBN_part = models.CharField(max_length=20, primary_key=True)
 	book = models.ForeignKey(Book)
 	part = models.IntegerField()
-	ISBN_part = models.CharField(max_length=20, primary_key=True)
 	begin_page = models.IntegerField()
 	end_page = models.IntegerField()
 	edited_page = models.IntegerField(default=0)
-	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL)
+	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL, related_name='edit_ebook_set')
 	finish_date = models.DateField(blank=True, null=True)
 	deadline = models.DateField(blank=True, null=True)
 	get_date = models.DateField(blank=True, null=True)
@@ -320,7 +320,7 @@ class EBook(models.Model):
 class SpecialContent(models.Model):
 	id = models.CharField(max_length=20, primary_key=True)
 	ebook = models.ForeignKey(EBook)
-	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL)
+	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL, related_name='edit_specialcontent_set')
 	item_number = models.IntegerField()
 	path = models.CharField(max_length=255, blank=True, null=True)
 	service_hours = models.IntegerField(default=0)

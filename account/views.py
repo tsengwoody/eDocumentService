@@ -20,8 +20,10 @@ class profileView(generic.View):
 		readme_url = request.path +'readme/'
 		template_name=self.template_name
 		user=request.user
-		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
-		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
+#		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
+#		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
+		editingPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
+		finishPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 		editing = False
 		if user.online:
 			delta = timezone.now() - user.online
@@ -98,16 +100,21 @@ class profileView(generic.View):
 			status = 'success'
 			message = u'成功取得完整文件{}'.format(getPart.book.__unicode__())
 		elif request.POST.has_key('designateBook'):
+			if not request.user.editor.service_guest:
+				status = 'error'
+				message = u'您無設定指定對象，請設定指定對象後再領取。'
+				redirect_to = reverse('genericUser:info_change')
+				return locals()
 			if len(editingPartList)>3:
 				status = 'error'
 				message = u'您已有超過3段文件，請先校對完成再領取'
 				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
 				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
-			activeBook = Book.objects.filter(status=Book.STATUS['designate']).order_by('upload_date')
+			activeBook = Book.objects.filter(Q(status=Book.STATUS['active']) | Q(status=Book.STATUS['designate'])).order_by('upload_date')
 			designateBook = None
 			for book in activeBook:
-				if request.user.editor.service_guest in book.guests.all():
+				if request.user.editor.service_guest in book.owners.all():
 					designateBook = book
 					break
 			if not designateBook:

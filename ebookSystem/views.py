@@ -54,7 +54,7 @@ def search_book(request, template_name):
 			book_ISBN = request.POST['get_book']
 			book = Book.objects.get(ISBN=book_ISBN)
 			guest = Guest.objects.get(user=request.user)
-			book.guests.add(guest)
+			book.owners.add(guest)
 			status = 'success'
 			message = u'獲取成功請到個人頁面進行email傳送'
 			redirect_to = reverse('guest:profile')
@@ -195,7 +195,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 			return locals()
 		newBook.scaner = user
 		guest = Guest.objects.get(user=event.creater)
-		newBook.guests.add(guest)
+		newBook.owners.add(guest)
 		if request.POST.has_key('designate'):
 			newBook.status = newBook.STATUS['indesignate']
 		newBook.save()

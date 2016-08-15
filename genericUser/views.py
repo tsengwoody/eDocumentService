@@ -57,7 +57,7 @@ def create_document(request, template_name='genericUser/create_document.html'):
 		newBookInfo.save()
 		newBook.scaner = user
 		guest = Guest.objects.get(user=user)
-		newBook.guests.add(guest)
+		newBook.owners.add(guest)
 		if request.POST.has_key('designate'):
 			newBook.status = newBook.STATUS['indesignate']
 		newBook.save()
@@ -207,10 +207,6 @@ def info(request, template_name):
 @http_response
 def info_change(request,template_name):
 	user = request.user
-	try:
-		username = user.editor.service_guest.user.username
-	except:
-		username = 'None'
 	if request.method == 'POST':
 		infoChangeUserForm = InfoChangeUserForm(request.POST, instance = user)
 		if not infoChangeUserForm.is_valid():
@@ -227,7 +223,8 @@ def info_change(request,template_name):
 				status = u'error'
 				message = u'指定對象失敗，系統無此帳號'
 				return locals()
-		user.status = user.STATUS['review']
+		if user.username != 'root':
+			user.status = user.STATUS['review']
 		user.save()
 		Event.objects.create(creater=request.user, action=request.user)
 		status = u'success'
@@ -271,38 +268,46 @@ def revise_content(request, template_name='genericUser/revise_content.html'):
 @http_response
 def set_role(request,template_name='genericUser/set_role.html'):
 	user = request.user
+	try:
+		username = user.editor.service_guest.user.username
+	except:
+		username = 'None'
 	if request.method == 'POST':
+		message = ''
 		if request.POST.has_key('editor'):
-			if user.has_editor():
-				service_hours=int(request.POST['service_hours'])
-				newEditor = Editor(user=user, professional_field=request.POST['professional_field'], service_hours=service_hours)
-			else:
-				newEditor = Editor(user=user, professional_field=request.POST['professional_field'])
-			newEditor.save()
-			user.status = user.STATUS['review']
-			user.save()
-			status = 'success'
-			message = u'editor申請成功'
+			try:
+				editor = Editor.objects.get(user=user)
+				editor.professional_field=request.POST['professional_field']
+			except:
+				editor = Editor(user=user, professional_field=request.POST['professional_field'])
+				user.status = user.STATUS['review']
+			if request.POST.has_key('service_guest'):
+				try:
+					editor.service_guest = Guest.objects.get(user__username=request.POST['service_guest'])
+				except:
+					editor.service_guest = None
+					status = u'error'
+					message = u'指定對象失敗，系統無此帳號'
+					return locals()
 		if request.POST.has_key('guest'):
 			uploadDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(user.username)
 			if os.path.exists(uploadDir):
 				shutil.rmtree(uploadDir)
 			request.FILES['disability_card_front'].name = user.username +'_front.jpg'
-			[status, message] = handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])
+			status = handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])[0]
 			request.FILES['disability_card_back'].name = user.username +'_back.jpg'
-			[status, message] = handle_uploaded_file(uploadDir, request.FILES['disability_card_back'])
+			status = handle_uploaded_file(uploadDir, request.FILES['disability_card_back'])[0]
 			if not user.has_guest():
 				newGuest = Guest(user=user)
 				newGuest.save()
-				user.status = user.STATUS['review']
-				user.save()
-				status = 'success'
-				message = u'guest申請成功'
-			else:
-				user.status = user.STATUS['review']
-				user.save()
-				status = 'success'
-				message = u'guest申請成功'
+			user.status = user.STATUS['review']
+		if request.POST.has_key('editor'):
+			editor.save()
+		if request.POST.has_key('guest'):
+			guest.save()
+		user.save()
+		status = u'success'
+		message = u'角色設定成功'
 		return locals()
 	if request.method == 'GET':
 		return locals()

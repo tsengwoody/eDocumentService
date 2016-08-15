@@ -32,6 +32,7 @@ class User(AbstractUser):
 	is_editor = models.BooleanField(default=False)
 	is_guest = models.BooleanField(default=False)
 	is_manager = models.BooleanField(default=False)
+	is_advanced_editor = models.BooleanField(default=False)
 	def __unicode__(self):
 		return self.username
 
