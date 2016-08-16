@@ -1,6 +1,6 @@
 ﻿{% extends "base_nav.html" %}
 {% block title %}
-申請文件代掃辨識
+代掃申請
 {% endblock %}
 {% block style %}
 {% load staticfiles %}
@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block header %}
-申請文件代掃辨識
+代掃申請
 {% endblock %}
 {% block content %}
 
@@ -22,7 +22,7 @@
             {{ bookForm.errors }}
         </div>
     {% endif %}
-    <legend>上傳文件</legend>
+    <legend>代掃申請</legend>
 
     <div class="modal fade" id="pleaseWaitDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">

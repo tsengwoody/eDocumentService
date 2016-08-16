@@ -29,14 +29,23 @@ body > .container {
             <table class="table table-hover table-reflow">
                 <tr>
                     <th class="col-md-4" scope="row">
-                        <label for="id_role">role</label>
+                        帳號角色資訊
+                    </th>
+                    <td>
+                        {% if request.user.has_editor %}志工角色啟用{% endif %}
+                        {% if request.user.has_guest %}服務使用者角色啟用{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_role">角色資料更新</label>
                     </th>
                     <td>
                         <label class="checkbox-inline">
-                            <input type="checkbox" name="editor" id="id_editor" checked="true" value="Editor">Editor</input>
+                            <input type="checkbox" name="editor" id="id_editor" value="Editor">志工</input>
                         </label>
                         <label class="checkbox-inline">
-                            <input type="checkbox" name="guest" id="id_guest" value="Guest">Guest</input>
+                            <input type="checkbox" name="guest" id="id_guest value="Guest">服務使用者</input>
                         </label>
                     </td>
                 </tr>
@@ -46,7 +55,15 @@ body > .container {
                     </th>
                     <td>
                         <input id="id_professional_field" maxlength="30" name="professional_field" value="{{ user.editor.professional_field }}" type="text">
-                        <input type='hidden' name='service_hours' value='{{ user.editor.service_hours }}' />
+                    </td>
+                </tr>
+                <tr class="editor_mode">
+                    <th class="col-md-4" scope="row">
+                        <input type="checkbox" name="service_guest_check" id="id_service_guest_check" value="service_guest_check">
+                        <label for="id_service_guest">指定對象：</label>
+                    </th>
+                    <td>
+                        <input id="id_service_guest" maxlength="30" name="service_guest" value="{{ username }}" type="text">
                     </td>
                 </tr>
                 <tr class="guest_mode">
