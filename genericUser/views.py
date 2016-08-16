@@ -214,19 +214,10 @@ def info_change(request,template_name):
 			message = u'表單驗證失敗' +str(infoChangeUserForm.errors)
 			return locals()
 		infoChangeUserForm.save()
-		if request.POST.has_key('service_guest'):
-			try:
-				user.editor.service_guest = Guest.objects.get(user__username=request.POST['service_guest'])
-				user.editor.save()
-			except:
-				user.editor.service_guest = None
-				status = u'error'
-				message = u'指定對象失敗，系統無此帳號'
-				return locals()
 		if user.username != 'root':
 			user.status = user.STATUS['review']
+			Event.objects.create(creater=request.user, action=request.user)
 		user.save()
-		Event.objects.create(creater=request.user, action=request.user)
 		status = u'success'
 		message = u'修改資料完成，請等待管理員審核。'
 		redirect_to = reverse('genericUser:info')
@@ -273,7 +264,6 @@ def set_role(request,template_name='genericUser/set_role.html'):
 	except:
 		username = 'None'
 	if request.method == 'POST':
-		message = ''
 		if request.POST.has_key('editor'):
 			try:
 				editor = Editor.objects.get(user=user)
@@ -281,7 +271,7 @@ def set_role(request,template_name='genericUser/set_role.html'):
 			except:
 				editor = Editor(user=user, professional_field=request.POST['professional_field'])
 				user.status = user.STATUS['review']
-			if request.POST.has_key('service_guest'):
+			if request.POST.has_key('service_guest_check'):
 				try:
 					editor.service_guest = Guest.objects.get(user__username=request.POST['service_guest'])
 				except:
@@ -308,6 +298,7 @@ def set_role(request,template_name='genericUser/set_role.html'):
 		user.save()
 		status = u'success'
 		message = u'角色設定成功'
+		Event.objects.create(creater=request.user, action=request.user)
 		return locals()
 	if request.method == 'GET':
 		return locals()

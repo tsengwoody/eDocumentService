@@ -43,14 +43,6 @@
                         <input id="id_phone" class="form-control" name="phone" placeholder="Phone" type="phone" value={{ infoChangeUserForm.phone.value }} required />
                     </div>
                 </div>
-                {% if request.user.has_editor %}
-                <div class="form-group">
-                    <label for="id_service_guest" class="control-label col-sm-2"><font style="color:red">*</font>指定服務對象:</label>
-                    <div class="col-sm-5">
-                        <input id="id_service_guest" class="form-control" name="service_guest" placeholder="service_guest" type="service_guest" value={{ username }} required />
-                    </div>
-                </div>
-                {% endif %}
                 <div class="form-group row">
                     <div class="col-sm-offset-2 col-sm-10">
                         <!--<button class="btn btn-default" type="submit" value="change info">修改</button>-->

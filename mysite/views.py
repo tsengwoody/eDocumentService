@@ -127,7 +127,7 @@ def password_change(request, template_name='registration/password_change_form.ht
 		form = password_change_form(user=request.user, data=request.POST)
 		if not form.is_valid():
 			status = 'error'
-			message = u'表單驗證失敗' +str(bookForm.errors)
+			message = u'表單驗證失敗' +str(form.errors)
 			return locals()
 		form.save()
 		# Updating the password logs out all other sessions for the user
@@ -139,7 +139,7 @@ def password_change(request, template_name='registration/password_change_form.ht
 		message = u'成功修改密碼'
 		redirect_to = reverse('genericUser:info')
 		return locals()
-	else:
+	if request.method == "GET":
 		form = password_change_form(user=request.user)
 		return locals()
 
