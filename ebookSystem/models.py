@@ -6,10 +6,11 @@ from mysite.settings import BASE_DIR,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FIN
 from genericUser.models import User, ServiceHours
 from guest.models import Guest
 from account.models import Editor
-import os
+import glob,os
 import datetime
 import codecs
 import shutil
+from PIL import Image, ImageFont, ImageDraw
 
 class BookInfo(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
@@ -260,6 +261,35 @@ class EBook(models.Model):
 			fileWrite.write(fileHead+edit_content)
 		return True
 
+
+	def get_org_image(self, user):
+		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, "org")
+		source_path = self.book.path +u'/source'
+		fileList=os.listdir(source_path)
+		fileList = sorted(fileList)
+		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
+		scanPageList = scanPageList[self.begin_page:self.end_page+1]
+		if not os.path.exists(org_path +'/' +scanPageList[0]):
+			self.create_org_image()
+		default_page_url = org_path +u'/' +scanPageList[self.edited_page]
+		default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
+		return [scanPageList, default_page_url]
+
+	def create_org_image(self):
+		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, "org")
+		source_path = self.book.path +u'/source'
+		fileList=os.listdir(source_path)
+		fileList = sorted(fileList)
+		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
+		scanPageList = scanPageList[self.begin_page:self.end_page+1]
+		if os.path.exists(org_path +'/' +scanPageList[0]):
+			return False
+		if not os.path.exists(org_path):
+			os.makedirs(org_path, 0770)
+		for s in scanPageList:
+			shutil.copyfile(source_path +'/' +s, org_path +'/' +s)
+		return True
+
 	def get_image(self, user):
 		water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, user.username)
 		source_path = self.book.path +u'/source'
@@ -272,10 +302,13 @@ class EBook(models.Model):
 		default_page_url = water_path +u'/' +scanPageList[self.edited_page]
 		default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
 		return [scanPageList, default_page_url]
+	
 
+	
 	def create_watermark_image(self, user):
-		water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, user.username)
+		water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}/'.format(self.book.book_info.ISBN, user.username)
 		source_path = self.book.path +u'/source'
+		font_file = BASE_DIR+u'/static/ebookSystem/font/wt014.ttf'
 		fileList=os.listdir(source_path)
 		fileList = sorted(fileList)
 		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
@@ -285,10 +318,35 @@ class EBook(models.Model):
 		if not os.path.exists(water_path):
 			os.makedirs(water_path, 0770)
 		for s in scanPageList:
+			image_file=source_path +'/' +s
+			self.add_watermark(str(user.username), font_file, 52, image_file, water_path)
+		return True
+
+	def add_watermark(self,text, fontname, fontsize, imagefile, output_dir):
+	    img0 = Image.new("RGBA", (1,1))
+	    draw0 = ImageDraw.Draw(img0)
+	    font = ImageFont.truetype(fontname, fontsize)
+	    t_width, t_height = draw0.textsize(unicode(text, 'UTF-8'), font=font)
+	    img = Image.new("RGBA", (t_width, t_height), (255,0,0,0))
+	    draw = ImageDraw.Draw(img)
+	    draw.text((0,0),unicode(text, 'UTF-8'), font=font, fill=(0,255,255,128))
+	    img2 = Image.open(imagefile)
+	    i_width, i_height = img2.size
+	    px = (i_width - t_width) / 2
+	    py = (i_height - t_height) / 2
+	    img2.paste(img, (px, py), img)
+	    imagefile = imagefile.split('/')[-1]
+	    imagefile = imagefile
+	    print output_dir+" "+imagefile + " saved..."
+	    img2.save(output_dir + imagefile)
+	    del draw0, draw
+	    del img0, img, img2
+
+#		for s in scanPageList:
 #			sw = watermark(s, user.username)
 #			sw.save(self.book.path +u'/source/' +user.username)
-			shutil.copyfile(source_path +'/' +s, water_path +'/' +s)
-		return True
+#			shutil.copyfile(source_path +'/' +s, water_path +'/' +s)
+		#return True
 
 	def edit_distance(self, action, encoding='utf-8'):
 		import Levenshtein

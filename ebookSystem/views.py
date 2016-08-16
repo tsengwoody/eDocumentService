@@ -68,12 +68,12 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		event = Event.objects.get(content_type__model='book', object_id=book.ISBN)
 	except:
 		raise Http404("book does not exist")
-	water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(book.book_info.ISBN, request.user.username)
+	org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(book.book_info.ISBN,"org")
 	source_path = book.path +u'/source'
 	scanPageList=[]
 	for ebook in book.ebook_set.all():
-		scanPageList = scanPageList + ebook.get_image(request.user)[0]
-	defaultPageURL = water_path +u'/' +scanPageList[0]
+		scanPageList = scanPageList + ebook.get_org_image(request.user)[0]
+	defaultPageURL = org_path +u'/' +scanPageList[0]
 	defaultPageURL=defaultPageURL.replace(BASE_DIR +'/static/', '')
 	if request.method == 'GET':
 		return locals()
@@ -84,12 +84,14 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 			elif book.status == book.STATUS['indesignate']:
 				book.status = book.STATUS['designate']
 			book.save()
+			shutil.rmtree(org_path)
 			status = 'success'
 			message = u'審核通過文件'
 			event.response(status=status, message=message, user=request.user)
 		if request.POST['review'] == 'error':
 			shutil.rmtree(book.path)
 			book.delete()
+			shutil.rmtree(org_path)
 			status = 'success'
 			message = u'審核退回文件'
 			event.response(status='error', message=request.POST['reason'], user=request.user)
