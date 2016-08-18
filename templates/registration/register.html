@@ -15,7 +15,7 @@ body > .container {
 </style>
 {% endblock %}
 {% block content %}
-<form method="post" action="{% url 'register' %}">
+<form method="post" action="{% url 'register' %}" role="form">
     {% csrf_token %}
 
     <h3>註冊</h3> 

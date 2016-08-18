@@ -45,7 +45,7 @@ body > .container {
                             <input type="checkbox" name="editor" id="id_editor" value="Editor">志工</input>
                         </label>
                         <label class="checkbox-inline">
-                            <input type="checkbox" name="guest" id="id_guest value="Guest">服務使用者</input>
+                            <input type="checkbox" name="guest" id="id_guest" value="Guest">服務使用者</input>
                         </label>
                     </td>
                 </tr>
@@ -63,7 +63,7 @@ body > .container {
                         <label for="id_service_guest">指定對象：</label>
                     </th>
                     <td>
-                        <input id="id_service_guest" maxlength="30" name="service_guest" value="{{ username }}" type="text">
+                        <input id="id_service_guest" maxlength="30" name="service_guest" value="{{ username }}" type="text" readonly="true">
                     </td>
                 </tr>
                 <tr class="guest_mode">
