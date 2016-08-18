@@ -1,4 +1,9 @@
-﻿{% extends "base_nav.html" %} {% block title %} {{ user.username }}角色 {% endblock %} {% block style %} {% load staticfiles %}
+﻿{% extends "base_nav.html" %} 
+{% block title %} {{ user.username }}角色 {% endblock %} 
+{% block header %}
+{{ user.username }}角色 
+{% endblock %}
+{% block style %} {% load staticfiles %}
 <script language="javascript" src="{% static 'ebookSystem/js/register.js' %}"></script>
 <script language="javascript" src="{% static 'ebookSystem/js/upload_file.js' %}"></script>
 <style>

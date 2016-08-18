@@ -3,7 +3,9 @@
 {% block title %}
 {{ book.book_info.bookname }}審核
 {% endblock %}
-
+{% block header %}
+{{ book.book_info.bookname }}審核
+{% endblock %}
 {% block review_title %}{{ book.book_info.bookname }}審核{% endblock %}
 
 {% block review_step1_title %}Step1:基本資料{% endblock %}
