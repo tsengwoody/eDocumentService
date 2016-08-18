@@ -5,6 +5,7 @@
 {% endblock %}
 {% block style %}
  <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
+ <
 {% endblock %}
 {% block header %}
 代掃辨識上傳作業
@@ -14,25 +15,35 @@
 {{ message }}
 <form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
 {% csrf_token %}
-<legend>代掃辨識上傳作業</legend>
-            <table class="table table-hover table-reflow">
-                <tr>
-                    <th class="col-md-4" scope="row">
-                        <label for="id_username">使用者名稱：</label>
-                    </th>
-                    <td class="col-md-8">
-                        <input id="id_username" maxlength="30" name="username" type="text">
-                    </td>
-                </tr>
-                <tr>
-                    <th class="col-md-4" scope="row">
-                        <label for="id_ISBN">ISBN：</label>
-                    </th>
-                    <td class="col-md-8">
-                        <input id="id_ISBN" maxlength="15" name="ISBN" type="text">
-                    </td>
-                </tr>
-            </table>
-	<input type="submit" class="btn btn-primary" name="go" value="go" id="id_go"> 
+<h3>代掃辨識上傳作業</lh3>
+<div class="row" role="main">
+    <div class="col-md-8 col-md-offset-2">
+        <table class="table table-hover table-reflow">
+            <tr>
+                <th class="col-md-4" scope="row">
+                    <label for="id_username">使用者名稱：</label>
+                </th>
+                <td class="col-md-8">
+                    <input id="id_username" maxlength="30" name="username" type="text" autofocus>
+                </td>
+            </tr>
+            <tr>
+                <th class="col-md-4" scope="row">
+                    <label for="id_ISBN">ISBN：</label>
+                </th>
+                <td class="col-md-8">
+                    <input id="id_ISBN" maxlength="15" name="ISBN" type="text">
+                </td>
+            </tr>
+        </table>
+        <div class="form-group row">
+            <div class="col-sm-offset-4 col-sm-6">
+                <input type="submit" class="btn btn-primary send_form" name="go" value="go" id="id_go">
+                <input type="reset" class="btn btn-danger" value="reset">
+            </div>
+        </div>
+    </div>
+</div>
+
 </form>
 {% endblock %}
