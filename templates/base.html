@@ -65,11 +65,8 @@
 				{% if readmeUrl %}
 				    <li><a href={{ readmeUrl }}>說明</a></li>
 				{% endif %}
-				{% if request.user.is_editor %}
-				    <li><a href="/account/license/" >志工會員使用者條款</a></li>
-				{% endif %}
-				{% if request.user.is_guest %}
-				    <li><a href="/guest/license/" >來賓會員使用者條款</a></li>
+				{% if request.user.is_active %}
+				    <li><a href="/account/license/" >使用者條款</a></li>
 				{% endif %}
 	        </ul>
 		    <ul class="nav navbar-nav navbar-right">

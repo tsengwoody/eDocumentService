@@ -14,7 +14,7 @@
 <form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
 {% csrf_token %}
 	<input id="id_book_ISBN" maxlength="15" name="book_ISBN" type="text">
-	<input type="submit" class="btn btn-primary" name="search_name" value="search_input" id="id_search"> 
+	<input type="submit" class="btn btn-primary" name="search_name" value="search" id="id_search"> 
 	<hr />
 	{{ status }}
 	{{ message }}

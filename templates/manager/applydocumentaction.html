@@ -1,21 +1,21 @@
 ﻿{% extends "base_nav.html" %}
 {% load staticfiles %}
 {% block title %}
-代掃辨識上傳作業
+代掃上傳
 {% endblock %}
 {% block style %}
  <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
  <
 {% endblock %}
 {% block header %}
-代掃辨識上傳作業
+代掃上傳
 {% endblock %}
 {% block content %}
 {{ status }}
 {{ message }}
 <form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
 {% csrf_token %}
-<h3>代掃辨識上傳作業</lh3>
+<h3>代掃上傳</lh3>
 <div class="row" role="main">
     <div class="col-md-8 col-md-offset-2">
         <table class="table table-hover table-reflow">
