@@ -67,7 +67,7 @@ class profileView(generic.View):
 			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active'])[0]
 			getPart.editor = request.user.editor
 			getPart.get_date = timezone.now()
-			getPart.deadline = getPart.get_date + datetime.timedelta(days=3)
+			getPart.deadline = getPart.get_date + datetime.timedelta(days=5)
 			getPart.status = getPart.STATUS['edit']
 			getPart.save()
 			status = 'success'
@@ -94,7 +94,7 @@ class profileView(generic.View):
 			for getPart in completeBook.ebook_set.all():
 				getPart.editor = request.user.editor
 				getPart.get_date = timezone.now()
-				getPart.deadline = getPart.get_date + datetime.timedelta(days=3)
+				getPart.deadline = getPart.get_date + datetime.timedelta(days=5)
 				getPart.status = getPart.STATUS['edit']
 				getPart.save()
 			status = 'success'
@@ -126,7 +126,7 @@ class profileView(generic.View):
 			for getPart in designateBook.ebook_set.all():
 				getPart.editor = request.user.editor
 				getPart.get_date = timezone.now()
-				getPart.deadline = getPart.get_date + datetime.timedelta(days=3)
+				getPart.deadline = getPart.get_date + datetime.timedelta(days=5)
 				getPart.status = getPart.STATUS['edit']
 				getPart.save()
 			status = 'success'
