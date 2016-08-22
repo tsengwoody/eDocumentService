@@ -56,10 +56,7 @@
 	{% block footer %}
 	<footer class="footer">
     <div class="container" role="contentinfo">
-    	<div class="pull-left">		
-			<p>© eDocumentService 2016</p>
-		</div>
-		<div class="pull-right">
+    	<div class="pull-left">
 		    <ul class="list-inline">
 		        {% if readmeUrl %}
 		        <li><a href={{ readmeUrl }}>說明</a></li>
@@ -69,6 +66,9 @@
 		        <li><a href="{% url 'genericUser:func_desc' %}">功能說明</a></li>
 		        <li><a href="{% url 'genericUser:contact_us' %}">聯絡我們</a></li>
 		    </ul>
+		</div>
+    	<div class="pull-right">		
+			<p>© eDocumentService 2016</p>
 		</div>
 
    		
