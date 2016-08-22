@@ -56,7 +56,25 @@
 	{% block footer %}
 	<footer class="footer">
     <div class="container" role="contentinfo">
-   		<ul class="footer-links">
+    	<div class="pull-left">		
+			<p>© eDocumentService 2016</p>
+		</div>
+		<div class="pull-right">
+		    <ul class="list-inline">
+		        {% if readmeUrl %}
+		        <li><a href={{ readmeUrl }}>說明</a></li>
+		        {% endif %} {% if request.user.is_active %}
+		        <li><a href="/account/license/">使用者條款</a></li>
+		        {% endif %}
+		        <li><a href="{% url 'genericUser:func_desc' %}">功能說明</a></li>
+		        <li><a href="{% url 'genericUser:contact_us' %}">聯絡我們</a></li>
+		    </ul>
+		</div>
+
+   		
+        
+        <!--
+        <ul class="footer-links">
 			{% if readmeUrl %}
 			    <li><a href={{ readmeUrl }}>說明</a></li>
 			{% endif %}
@@ -66,9 +84,9 @@
 	    	<li><a href="{% url 'genericUser:func_desc' %}">功能說明</a></li>
 	        <li><a href="{% url 'genericUser:contact_us' %}">聯絡我們</a></li>
         </ul>
-		<p><span class="footer-font-style">©&nbsp;eDocumentService</span> 2016</p>
+        <p><span class="footer-font-style">©&nbsp;eDocumentService</span> 2016</p>-->
     </div>
-</footer>
+	</footer>
 
 	<!-- <nav class="navbar navbar-default navbar-fixed-bottom">
 	    <div class="container">
