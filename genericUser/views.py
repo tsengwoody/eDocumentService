@@ -113,6 +113,11 @@ def event_list(request):
 	template_name = 'genericUser/event_list.html'
 	return render(request, template_name, locals())
 
+
+def func_desc(request, template_name='genericUser/func_desc.html'):
+#	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
+	return render(request, template_name, locals())
+
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
