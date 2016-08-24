@@ -42,7 +42,7 @@ body > .container {
             <table class="table table-hover table-reflow">
                 <tr>
                     <th class="col-md-4" scope="row">
-                        <label for="id_username">使用者名稱：</label>
+                        <label for="id_username"><font style="color:red">*</font>使用者名稱：</label>
                     </th>
                     <td class="col-md-8">
                         <input id="id_username" maxlength="30" name="username" type="text" placeholder="username" autofocus required>
@@ -50,7 +50,7 @@ body > .container {
                 </tr>
                 <tr>
                     <th class="col-md-4" scope="row">
-                        <label for="id_password">密碼：</label>
+                        <label for="id_password"><font style="color:red">*</font>密碼：</label>
                     </th>
                     <td>
                         <input id="id_password" maxlength="30" name="password" type="password" required>
@@ -58,7 +58,7 @@ body > .container {
                 </tr>
                 <tr>
                     <th class="col-md-4" scope="row">
-                        <label for="id_confirm_password">確認密碼：</label>
+                        <label for="id_confirm_password"><font style="color:red">*</font>確認密碼：</label>
                     </th>
                     <td>
                         <input id="id_confirm_password" maxlength="30" name="confirm_password" type="password" required>
@@ -66,7 +66,7 @@ body > .container {
                 </tr>
                 <tr>
                     <th class="col-md-4" scope="row">
-                        <label for="id_first_name">姓氏：</label>
+                        <label for="id_first_name"><font style="color:red">*</font>姓氏：</label>
                     </th>
                     <td>
                         <input id="id_first_name" name="first_name" type="text" placeholder="First name" required>
@@ -74,7 +74,7 @@ body > .container {
                 </tr>
                 <tr>
                     <th class="col-md-4" scope="row">
-                        <label for="id_last_name">名字：</label>
+                        <label for="id_last_name"><font style="color:red">*</font>名字：</label>
                     </th>
                     <td>
                         <input id="id_last_name" name="last_name" type="text" placeholder="Last name" required>
@@ -82,7 +82,7 @@ body > .container {
                 </tr>
                 <tr>
                     <th class="col-md-4" scope="row">
-                        <label for="id_email">電子郵件：</label>
+                        <label for="id_email"><font style="color:red">*</font>電子郵件：</label>
                     </th>
                     <td>
                         <input id="id_email" name="email" type="email" placeholder="Email" required>
@@ -90,7 +90,7 @@ body > .container {
                 </tr>
                 <tr>
                     <th class="col-md-4" scope="row">
-                        <label for="id_phone">聯絡電話：</label>
+                        <label for="id_phone"><font style="color:red">*</font>聯絡電話：</label>
                     </th>
                     <td>
                         <input id="id_phone" name="phone" type="phone" placeholder="Phone" required>
@@ -98,18 +98,18 @@ body > .container {
                 </tr>
                 <tr>
                     <th class="col-md-4" scope="row">
-                        <label for="id_birthday">生日：</label>
+                        <label for="id_birthday"><font style="color:red">*</font>生日：</label>
                     </th>
                     <td>
-                        <input id="id_birthday" name="birthday" type="text" class="datepicker">
+                        <input id="id_birthday" name="birthday" type="text" class="datepicker" placeholder="1989-02-19"  required>
                     </td>
                 </tr>
                 <tr>
                     <th class="col-md-4" scope="row">
-                        <label for="id_education">教育程度：</label>
+                        <label for="id_education"><font style="color:red">*</font>教育程度：</label>
                     </th>
                     <td>
-                        <select id="id_education" name="education">
+                        <select id="id_education" name="education" required>
                             <option value="" selected="selected">---------</option>
                             <option value="高中">高中</option>
                             <option value="學士">學士</option>
@@ -119,7 +119,7 @@ body > .container {
                 </tr>
                 <tr>
                     <th class="col-md-4" scope="row">
-                        <label for="id_role">角色</label>
+                        <label for="id_role"><font style="color:red">*</font>角色</label>
                     </th>
                     <td>
                         <label class="checkbox-inline">
@@ -138,18 +138,18 @@ body > .container {
                 </tr>
                 <tr class="guest_mode">
                     <th class="col-md-4" scope="row">
-                        <label for="id_disability_card_front">身心障礙手冊正面：</label>
+                        <label for="id_disability_card_front"><font style="color:red">*</font>身心障礙手冊正面：</label>
                     </th>
                     <td>
-                        <input id="id_disability_card_front" maxlength="30" name="disability_card_front" type="file" accept="image/*">
+                        <input id="id_disability_card_front" maxlength="30" name="disability_card_front" type="file" accept="image/*" required>
                     </td>
                 </tr>
                 <tr class="guest_mode">
                     <th class="col-md-4" scope="row">
-                        <label for="id_disability_card_back">身心障礙手冊反面：</label>
+                        <label for="id_disability_card_back"><font style="color:red">*</font>身心障礙手冊反面：</label>
                     </th>
                     <td>
-                        <input id="id_disability_card_back" maxlength="30" name="disability_card_back" type="file" accept="image/*">
+                        <input id="id_disability_card_back" maxlength="30" name="disability_card_back" type="file" accept="image/*" required>
                     </td>
                 </tr>
             </table>
