@@ -101,9 +101,9 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'eDocumentServiceDev',
-            'USER': 'root',
-            'PASSWORD': 'root',
+            'NAME': 'eDocumentService',
+            'USER': 'eDocDB',
+            'PASSWORD': 'eDocDB!@#',
             'HOST': '127.0.0.1',
             'PORT': '3306',
         }
@@ -212,3 +212,4 @@ FINISH = 5
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'edocumentservice@gmail.com'
 SITE_ID = 1
+TIME_ZONE = 'Asia/Taipei'

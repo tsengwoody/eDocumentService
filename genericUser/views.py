@@ -2,9 +2,8 @@
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse,HttpResponseRedirect
-from django.utils import timezone
 from django.shortcuts import render, get_list_or_404
-
+from django.utils import timezone
 from account.models import Editor
 from ebookSystem.models import *
 from guest.models import Guest
@@ -17,7 +16,7 @@ from mysite.settings import BASE_DIR
 from zipfile import ZipFile
 import json
 import shutil
-
+import datetime
 
 @user_category_check(['guest'])
 @http_response
@@ -271,6 +270,7 @@ def set_role(request,template_name='genericUser/set_role.html'):
 			except:
 				editor = Editor(user=user, professional_field=request.POST['professional_field'])
 				user.status = user.STATUS['review']
+			Event.objects.create(creater=request.user, action=request.user)
 			if request.POST.has_key('service_guest_check'):
 				try:
 					editor.service_guest = Guest.objects.get(user__username=request.POST['service_guest'])
@@ -294,11 +294,11 @@ def set_role(request,template_name='genericUser/set_role.html'):
 		if request.POST.has_key('editor'):
 			editor.save()
 		if request.POST.has_key('guest'):
+			Event.objects.create(creater=request.user, action=request.user)
 			guest.save()
 		user.save()
 		status = u'success'
 		message = u'角色設定成功'
-		Event.objects.create(creater=request.user, action=request.user)
 		return locals()
 	if request.method == 'GET':
 		return locals()

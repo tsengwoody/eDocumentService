@@ -98,10 +98,10 @@ def login(request, template_name='registration/login.html', authentication_form=
 	if request.method == 'POST':
 		form = authentication_form(request, data=request.POST)
 		reCaptcha = FormWithCaptcha(request.POST);
-		if not reCaptcha.is_valid():
-			status = 'error'
-			message = u'captcha驗證失敗，'+ str(reCaptcha.errors)
-			return locals()
+#		if not reCaptcha.is_valid():
+#			status = 'error'
+#			message = u'captcha驗證失敗，'+ str(reCaptcha.errors)
+#			return locals()
 		if not form.is_valid():
 			status = 'error'
 			message = u'表單驗證失敗，' + str(form.errors)

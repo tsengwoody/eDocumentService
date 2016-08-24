@@ -1,8 +1,7 @@
 ﻿# coding: utf-8
 from django.db import models
 from django.utils import timezone
-
-from mysite.settings import BASE_DIR,INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
+from mysite.settings import BASE_DIR
 from genericUser.models import User, ServiceHours
 from guest.models import Guest
 from account.models import Editor
@@ -52,22 +51,9 @@ class Book(models.Model):
 			if end_page >= self.page_count:
 				end_page = self.page_count-1
 			ISBN_part = self.ISBN + '-{0}'.format(i+1)
-			part = EBook.objects.create(book=self, part=i+1, ISBN_part=ISBN_part, begin_page=begin_page, end_page=end_page)
-		for i in range(1, self.part_count+1):
-			edit_content = ''
-			source = self.path +'/OCR/part{}.txt'.format(i)
-			destination = self.path +'/OCR/part{}-edit.txt'.format(i)
-			with codecs.open(source, 'r', encoding='utf-8') as sourceFile:
-				for edit in sourceFile:
-					if edit[-2:] == '\r\n':
-						edit = '<p>' +edit[:-2] +'</p>' +edit[-2:]
-					else:
-						edit = '<p>' +edit +'</p>'
-					edit_content = edit_content +edit
-			edit_content = edit_content[0:3] +edit_content[4:]
-			if edit_content[-2:] != '\r\n': edit_content=edit_content +'\r\n'
-			with codecs.open(destination, 'w', encoding='utf-8') as destinationFile:
-				destinationFile.write(u'\ufeff' +edit_content)
+			EBook.objects.create(book=self, part=i+1, ISBN_part=ISBN_part, begin_page=begin_page, end_page=end_page)
+		for ebook in self.ebook_set.all():
+			ebook.add_tag()
 		for i in range(1, self.part_count+1):
 			with codecs.open(self.path +'/OCR/part{}-finish.txt'.format(i), 'w', encoding='utf-8') as finishFile:
 				finishFile.write(u'\ufeff')
@@ -179,7 +165,10 @@ class EBook(models.Model):
 		return 'unknown'
 
 	def get_path(self, string=''):
-		return self.book.path +'/OCR/part{0}{1}.txt'.format(self.part, string)
+		if string == '-final':
+			return self.book.path +'/OCR/part{0}{1}.html'.format(self.part, string)
+		else:
+			return self.book.path +'/OCR/part{0}{1}.txt'.format(self.part, string)
 
 	def fuzzy_string_search(self, string, length=5, action=''):
 		class SliceString():
@@ -261,7 +250,6 @@ class EBook(models.Model):
 			fileWrite.write(fileHead+edit_content)
 		return True
 
-
 	def get_org_image(self, user):
 		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, "org")
 		source_path = self.book.path +u'/source'
@@ -342,11 +330,36 @@ class EBook(models.Model):
 	    del draw0, draw
 	    del img0, img, img2
 
-#		for s in scanPageList:
-#			sw = watermark(s, user.username)
-#			sw.save(self.book.path +u'/source/' +user.username)
-#			shutil.copyfile(source_path +'/' +s, water_path +'/' +s)
-		#return True
+	def add_tag(self, encoding='utf-8'):
+			source = self.get_path()
+			destination = self.get_path('-edit')
+			edit_content = ''
+			with codecs.open(source, 'r', encoding=encoding) as sourceFile:
+				for edit in sourceFile:
+					if edit[-2:] == '\r\n':
+						edit = '<p>' +edit[:-2] +'</p>' +edit[-2:]
+					else:
+						edit = '<p>' +edit +'</p>'
+					edit_content = edit_content +edit
+			edit_content = edit_content[0:3] +edit_content[4:] #skip file head
+			if edit_content[-2:] != '\r\n': edit_content=edit_content +'\r\n'
+			with codecs.open(destination, 'w', encoding='utf-8') as destinationFile:
+				destinationFile.write(u'\ufeff' +edit_content)
+
+	def clean_tag(self, template='book_template.html', encoding='utf-8'):
+		template = BASE_DIR +u'/templates/' +template
+		with codecs.open(template, 'r', encoding=encoding) as templateFile:
+			template_content = templateFile.read()
+		head = template_content.split('{}')[0]
+		tail = template_content.split('{}')[1]
+		with codecs.open(self.get_path('-finish'), 'r', encoding=encoding) as sourceFile:
+			source_content = sourceFile.read()
+			source_content = source_content[1:]
+		with codecs.open(self.get_path('-final'), 'w', encoding=encoding) as destinationFile:
+			destination_content = source_content.replace('<br />', '</p>\r\n<p>')
+			destination_content = head +destination_content +tail
+			destination_content = destination_content.replace('<title></title>', '<title>' +self.book.book_info.bookname +str(self.part) +'</title>')
+			destinationFile.write(destination_content)
 
 	def edit_distance(self, action, encoding='utf-8'):
 		import Levenshtein

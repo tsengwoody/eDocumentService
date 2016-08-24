@@ -33,7 +33,7 @@
 		{% for part in editingPartList %}
 		<tr>
 			<td>{{part.book.book_info.bookname}}-part{{part.part}}</td>
-			<td>{{part.edited_page}}/{{ part.book.page_per_part }}</td>
+			<td>{{ part.edited_page|add:'1' }}/{{ part.book.page_per_part }}</td>
 			<td>{{part.service_hours}}</td>
 			<td>{{part.get_date}}</td>
 			<td>{{part.deadline}}</td>
