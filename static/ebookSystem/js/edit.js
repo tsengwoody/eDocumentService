@@ -118,8 +118,11 @@ function alertMessageDialog(status,message) {
 
 }
 function adjZoom(value) {
-    imgSize.value = (parseInt(imgSize.value)+ parseInt(value)).toString() + '%';
-    $('#scanPage').css('width', imgSize.value);
+    if (parseInt(imgSize.value)+ parseInt(value)>0)
+    {
+        imgSize.value = (parseInt(imgSize.value)+ parseInt(value)).toString() + '%';
+        $('#scanPage').css('width', imgSize.value);
+    }
 }
 function addMark(strValue,editor) {
 
