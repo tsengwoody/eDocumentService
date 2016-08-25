@@ -122,8 +122,9 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 				month_ServiceHours = ServiceHours.objects.create(user=request.user, date=month_day)
 			part.serviceHours = month_ServiceHours
 			part.save()
-			import shutil
-			shutil.copyfile(part.get_path('-finish'), part.get_path('-final'))
+#			import shutil
+#			shutil.copyfile(part.get_path('-finish'), part.get_path('-final'))
+			part.clean_tag()
 			status = 'success'
 			message = u'審核通過文件'
 			event.response(status=status, message=message, user=request.user)

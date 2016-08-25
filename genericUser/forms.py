@@ -17,7 +17,7 @@ class BookInfoForm(forms.ModelForm):
 class InfoChangeUserForm(forms.ModelForm):
 	class Meta:
 		model = User
-		fields = ['first_name', 'last_name', 'email', 'phone']
+		fields = ['email', 'phone']
 
 class ContactUsForm(forms.ModelForm):
 	class Meta:

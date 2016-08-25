@@ -1,10 +1,7 @@
 # coding: utf-8
 from django.core.management.base import BaseCommand, CommandError
 
-from account.models import *
-from ebookSystem.models import *
-from genericUser.models import *
-from guest.models import *
+from ebookSystem.models import EBook
 import datetime
 
 class Command(BaseCommand):
@@ -14,9 +11,9 @@ class Command(BaseCommand):
 
 	def handle(self, *args, **options):
 		for part in EBook.objects.all():
-			if part.deadline and part.deadline < datetime.date.today():
+			if part.status == EBook.STATUS['edit'] and part.deadline < datetime.date.today():
 				part.editor=None
 				part.get_date = None
 				part.deadline = None
-				part.status = ACTIVE
+				part.status = part.STATUS['active']
 				part.save()
