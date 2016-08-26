@@ -107,6 +107,7 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 	except:
 		raise Http404("book does not exist")
 	[content, fileHead] = part.get_content('-finish')
+	html_url = part.get_html()
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':

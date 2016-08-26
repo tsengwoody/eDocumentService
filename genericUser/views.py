@@ -114,7 +114,9 @@ def event_list(request):
 
 
 def func_desc(request, template_name='genericUser/func_desc.html'):
-#	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
+	return render(request, template_name, locals())
+
+def license(request, template_name='genericUser/license.html'):
 	return render(request, template_name, locals())
 
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
@@ -295,12 +297,13 @@ def set_role(request,template_name='genericUser/set_role.html'):
 			if not user.has_guest():
 				newGuest = Guest(user=user)
 				newGuest.save()
+			newGuest = Guest.objects.get(user=request.user)
 			user.status = user.STATUS['review']
 		if request.POST.has_key('editor'):
 			editor.save()
 		if request.POST.has_key('guest'):
 			Event.objects.create(creater=request.user, action=request.user)
-			guest.save()
+			newGuest.save()
 		user.save()
 		status = u'success'
 		message = u'角色設定成功'

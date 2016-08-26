@@ -39,10 +39,8 @@
 			<td>{{part.deadline}}</td>
 			<td>{{part.status_int2str}}</td>
 			<td>
-				{% if not editing %}
 				<a class="btn btn-link" role="button" href = {% url 'ebookSystem:edit' part.ISBN_part %}>編輯</a>
 				<img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_load_icon" />
-				{% endif %}
 			</td>
 			<td>
 				<button type="submit" class="btn btn-default send_button" id="rebackPart_id" name="rebackPart" value={{part.ISBN_part}}>還文件</button>

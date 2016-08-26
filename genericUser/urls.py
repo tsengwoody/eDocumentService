@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
 	url(r'^apply_document/$', views.apply_document, name='apply_document'),
 	url(r'^func_desc/$', views.func_desc, name='func_desc'),
+	url(r'^license/$', views.license, name='license'),
 	url(r'^create_document/$', views.create_document, name='create_document'),
 	url(r'^upload_progress/$', views.upload_progress, name='upload_progress'),
 	url(r'^event_list/$', views.event_list, name='event_list'),

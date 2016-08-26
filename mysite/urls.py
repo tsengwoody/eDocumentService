@@ -35,5 +35,4 @@ urlpatterns = [
 	url(r'^auth/login/$', views.login, name='login'),
 	url(r'^auth/logout/$', views.logout_user, name='logout'),
 #	url(r'^auth/', include('django.contrib.auth.urls',)),
-#	url(r"^notifications/", include("pinax.notifications.urls")),
 ]

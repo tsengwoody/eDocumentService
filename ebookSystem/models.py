@@ -165,7 +165,7 @@ class EBook(models.Model):
 		return 'unknown'
 
 	def get_path(self, string=''):
-		if string == '-final':
+		if string == '-final' or string == '-clean':
 			return self.book.path +'/OCR/part{0}{1}.html'.format(self.part, string)
 		else:
 			return self.book.path +'/OCR/part{0}{1}.txt'.format(self.part, string)
@@ -290,9 +290,7 @@ class EBook(models.Model):
 		default_page_url = water_path +u'/' +scanPageList[self.edited_page]
 		default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
 		return [scanPageList, default_page_url]
-	
 
-	
 	def create_watermark_image(self, user):
 		water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}/'.format(self.book.book_info.ISBN, user.username)
 		source_path = self.book.path +u'/source'
@@ -330,6 +328,13 @@ class EBook(models.Model):
 	    del draw0, draw
 	    del img0, img, img2
 
+	def get_html(self):
+		html_path = BASE_DIR +u'/static/ebookSystem/document/{0}/OCR'.format(self.book.book_info.ISBN)
+		shutil.copyfile(self.get_path('-clean'), html_path +'/part{0}-final.html'.format(self.part))
+		default_page_url = html_path +'/part{0}-final.html'.format(self.part)
+		default_page_url = default_page_url.replace(BASE_DIR +'/static/', '')
+		return default_page_url
+
 	def add_tag(self, encoding='utf-8'):
 			source = self.get_path()
 			destination = self.get_path('-edit')
@@ -350,16 +355,25 @@ class EBook(models.Model):
 		template = BASE_DIR +u'/templates/' +template
 		with codecs.open(template, 'r', encoding=encoding) as templateFile:
 			template_content = templateFile.read()
-		head = template_content.split('{}')[0]
+		head = template_content.split('{}')[0][1:]
 		tail = template_content.split('{}')[1]
 		with codecs.open(self.get_path('-finish'), 'r', encoding=encoding) as sourceFile:
 			source_content = sourceFile.read()
-			source_content = source_content[1:]
-		with codecs.open(self.get_path('-final'), 'w', encoding=encoding) as destinationFile:
-			destination_content = source_content.replace('<br />', '</p>\r\n<p>')
-			destination_content = head +destination_content +tail
-			destination_content = destination_content.replace('<title></title>', '<title>' +self.book.book_info.bookname +str(self.part) +'</title>')
-			destinationFile.write(destination_content)
+		file_head = source_content[0]
+		source_content = source_content[1:]
+		source_content = head +source_content +tail
+		source_content = source_content.replace('<br />', '</p>\r\n<p>')
+		from bs4 import BeautifulSoup, NavigableString
+		soup = BeautifulSoup(source_content, 'lxml')
+		span_tags = soup.find_all('span')
+		for span_tag in span_tags:
+			span_tag.unwrap()
+		from utils.process_tag import merge_NavigableString
+		merge_NavigableString(soup)
+		soup.head.title.string = u'{0}-part{1}'.format(self.book.book_info.bookname, self.part)
+		with codecs.open(self.get_path('-clean'), 'w', encoding=encoding) as cleanFile:
+			clean_content = soup.prettify().replace(u'\n', u'\r\n')
+			cleanFile.write(clean_content)
 
 	def edit_distance(self, action, encoding='utf-8'):
 		import Levenshtein

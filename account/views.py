@@ -24,11 +24,11 @@ class profileView(generic.View):
 #		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 		editingPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
 		finishPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
-		editing = False
-		if user.online:
-			delta = timezone.now() - user.online
-			if delta.seconds <50:
-				editing = True
+#		editing = False
+#		if user.online:
+#			delta = timezone.now() - user.online
+#			if delta.seconds <50:
+#				editing = True
 		return locals()
 
 	@method_decorator(user_category_check(['editor']))
@@ -103,7 +103,7 @@ class profileView(generic.View):
 			if not request.user.editor.service_guest:
 				status = 'error'
 				message = u'您無設定指定對象，請設定指定對象後再領取。'
-				redirect_to = reverse('genericUser:info_change')
+				redirect_to = reverse('genericUser:set_role')
 				return locals()
 			if len(editingPartList)>3:
 				status = 'error'

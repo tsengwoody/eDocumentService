@@ -47,10 +47,18 @@ body > .container {
                     </th>
                     <td>
                         <label class="checkbox-inline">
+                            {% if request.user.has_editor %}
+                            <input type="checkbox" name="editor" id="id_editor" value="Editor" checked="true">志工</input>
+                            {% else %}
                             <input type="checkbox" name="editor" id="id_editor" value="Editor">志工</input>
+                            {% endif %}
                         </label>
                         <label class="checkbox-inline">
+                                                        {% if request.user.has_guest %}
+                            <input type="checkbox" name="guest" id="id_guest" value="Guest" checked="true">服務使用者</input>
+                            {% else %}
                             <input type="checkbox" name="guest" id="id_guest" value="Guest">服務使用者</input>
+                            {% endif %}
                         </label>
                     </td>
                 </tr>

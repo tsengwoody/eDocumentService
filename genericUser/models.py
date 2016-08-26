@@ -50,6 +50,12 @@ class User(AbstractUser):
 		except:
 			return False
 
+	def status_int2str(self):
+		for k, v in self.STATUS.iteritems():
+			if v == self.status:
+				return k
+		return 'unknown'
+
 class Event(models.Model):
 	creater = models.ForeignKey(User, related_name='event_creater_set')
 	time = models.DateTimeField(auto_now_add=True)
