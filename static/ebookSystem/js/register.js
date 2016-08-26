@@ -18,7 +18,6 @@ function optradioChange()
     $('.editor_mode').hide();
     $('#id_service_guest').attr('readonly', true);
     $('input[type=checkbox]:checked').each(function(){
-        console.log($(this).val());
         if($(this).val()=='Editor')
             $('.editor_mode').show();
         if($(this).val()=='Guest')
@@ -37,4 +36,7 @@ $(document).ready(function() {
     $('#id_register').click(checkRegister);
     optradioChange();
     $('input[type=checkbox]').change(optradioChange);
+    $('input[type=reset]').click(function(){
+        $('#id_service_guest').attr('readonly', true);
+    });
 });
