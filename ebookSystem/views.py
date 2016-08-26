@@ -132,7 +132,7 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 			status = 'success'
 			message = u'審核退回文件'
 			event.response(status='error', message=request.POST['reason'], user=request.user)
-		shutil.rmtree(BASE_DIR +'/static/' +html_url)
+		os.remove(BASE_DIR +'/static/' +html_url)
 		redirect_to = reverse('manager:event_list', kwargs={'action':'ebook' })
 		return locals()
 

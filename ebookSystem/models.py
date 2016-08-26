@@ -330,6 +330,8 @@ class EBook(models.Model):
 
 	def get_html(self):
 		html_path = BASE_DIR +u'/static/ebookSystem/document/{0}/OCR'.format(self.book.book_info.ISBN)
+		if not os.path.exists(html_path):
+			os.makedirs(html_path)
 		shutil.copyfile(self.get_path('-clean'), html_path +'/part{0}-final.html'.format(self.part))
 		default_page_url = html_path +'/part{0}-final.html'.format(self.part)
 		default_page_url = default_page_url.replace(BASE_DIR +'/static/', '')
