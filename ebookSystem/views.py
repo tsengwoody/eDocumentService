@@ -106,7 +106,7 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 		event = Event.objects.get(content_type__model='ebook', object_id=part.ISBN_part)
 	except:
 		raise Http404("book does not exist")
-	[content, fileHead] = part.get_content('-finish')
+	part.clean_tag()
 	html_url = part.get_html()
 	if request.method == 'GET':
 		return locals()
@@ -123,9 +123,6 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 				month_ServiceHours = ServiceHours.objects.create(user=request.user, date=month_day)
 			part.serviceHours = month_ServiceHours
 			part.save()
-#			import shutil
-#			shutil.copyfile(part.get_path('-finish'), part.get_path('-final'))
-			part.clean_tag()
 			status = 'success'
 			message = u'審核通過文件'
 			event.response(status=status, message=message, user=request.user)
@@ -135,6 +132,7 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 			status = 'success'
 			message = u'審核退回文件'
 			event.response(status='error', message=request.POST['reason'], user=request.user)
+		shutil.rmtree(BASE_DIR +'/static/' +html_url)
 		redirect_to = reverse('manager:event_list', kwargs={'action':'ebook' })
 		return locals()
 
