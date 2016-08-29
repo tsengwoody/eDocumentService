@@ -233,13 +233,11 @@ class EBook(models.Model):
 
 	def get_content(self, action='', encoding='utf-8'):
 		filePath = self.get_path(action)
-		with codecs.open(filePath, 'r', encoding=encoding) as fileRead:
-			firstLine=fileRead.next()
-			fileHead=firstLine[0]
-			content = firstLine[1:]
-			for i in fileRead:
-				content = content+i
-		return [content,fileHead]
+		with codecs.open(filePath, 'r', encoding=encoding) as sourceFile:
+			source_content = sourceFile.read()
+		file_head = source_content[0]
+		source_content = source_content[1:]
+		return [source_content,file_head]
 
 	def set_content(self, finish_content, edit_content, encoding='utf-8', fileHead = u'\ufeff'):
 		finishFilePath = self.get_path('-finish')

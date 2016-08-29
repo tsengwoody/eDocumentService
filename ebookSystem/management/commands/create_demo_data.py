@@ -50,10 +50,10 @@ class Command(BaseCommand):
 		assert len(EBook.objects.all()) == 10, 'create part fail'
 		book = Book.objects.get(ISBN=u'9789573321569')
 		assert os.path.exists(book.path), 'book resource folder not exist'
-		request = factory.post(reverse('genericUser:revise_content'), {'book_ISBN':'9789573321569', 'part':'1', 'content':'<p>附近傳來響亮的電子哀叫聲。紀列德被嚇了一跳。片刻後才認出這聲響，是他在聖妓從沒聽過的聲音。法蘭克﹒畢修普接聽手機。骨瘦憔悴的他聆聽一會兒，撥弄著一邊鬢須，然後回答:『是的，隊長其他呢?』他停頓良久，嘴角略微緊縮。『你沒辦法嗎……好吧，隊長。』</p>\r\n<p>他掛掉電話。</p>\r\n<p>安德森對他揚起一邊眉毛。命案科的警探畢修普口氣平穩地說:『剛才是班斯亭隊長。梅林三屍搶案又有新的進展。有人在胡桃溪附近看見歹徒，也許往我們的方向逃逸。』他快速瞥了紀列德一眼，彷佛他是長椅上的汙潰，然後對安德森說:『我應該告訴你，我講上級把我從這</p>'})
-		request.user = manager
-		response = revise_content(request)
-		assert len(ReviseContentAction.objects.all()) == 1, 'create ReviseContentAction fail'
+#		request = factory.post(reverse('genericUser:revise_content'), {'book_ISBN':'9789573321569', 'part':'1', 'content':'<p>附近傳來響亮的電子哀叫聲。紀列德被嚇了一跳。片刻後才認出這聲響，是他在聖妓從沒聽過的聲音。法蘭克﹒畢修普接聽手機。骨瘦憔悴的他聆聽一會兒，撥弄著一邊鬢須，然後回答:『是的，隊長其他呢?』他停頓良久，嘴角略微緊縮。『你沒辦法嗎……好吧，隊長。』</p>\r\n<p>他掛掉電話。</p>\r\n<p>安德森對他揚起一邊眉毛。命案科的警探畢修普口氣平穩地說:『剛才是班斯亭隊長。梅林三屍搶案又有新的進展。有人在胡桃溪附近看見歹徒，也許往我們的方向逃逸。』他快速瞥了紀列德一眼，彷佛他是長椅上的汙潰，然後對安德森說:『我應該告訴你，我講上級把我從這</p>'})
+#		request.user = manager
+#		response = revise_content(request)
+#		assert len(ReviseContentAction.objects.all()) == 1, 'create ReviseContentAction fail'
 		request = factory.post(reverse('genericUser:apply_document'), {u'ISBN':u'9789865829810', u'bookname':u'遠山的回音', u'author':u'卡勒德.胡賽尼(Khaled Hosseini)著; 李靜宜譯', u'house':u'木馬文化', u'date':u'2014-02-01'})
 		request.user = manager
 		response = apply_document(request)
