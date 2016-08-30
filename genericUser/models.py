@@ -66,7 +66,7 @@ class Event(models.Model):
 	content_type = models.ForeignKey(ContentType)
 	object_id = models.CharField(max_length=30)
 	action = GenericForeignKey('content_type', 'object_id')
-	STATUS = {'success':1, 'error':0}
+	STATUS = {'review':0, 'success':1, 'error':2}
 
 	def get_url(self):
 		from django.core.urlresolvers import reverse

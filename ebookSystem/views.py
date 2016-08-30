@@ -211,12 +211,36 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 		event.response(status=status, message=message, user=request.user)
 		return locals()
 
+@user_category_check(['user'])
+@http_response
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
 	except:
 		raise Http404("book does not exist")
-	return render(request, template_name, locals())
+	if request.method == 'POST':
+		if request.POST.has_key('emailEBook'):
+			from django.core.mail import EmailMessage
+			from mysite.settings import SERVICE
+			ISBN_part = request.POST.get('emailEBook')
+			emailEBook = EBook.objects.get(ISBN_part = ISBN_part)
+			subject = u'[文件] {0}-part{1}'.format(emailEBook.book.book_info.bookname, emailEBook.part)
+			body = u'新愛的{0}您好：\n'.format(request.user.username)
+			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
+			attach_file_path = emailEBook.zip('test')
+			if attach_file_path == '':
+				status = 'error'
+				message = u'附加文件失敗'
+				os.remove(attach_file_path)
+				return locals()
+			email.attach_file(attach_file_path)
+			email.send(fail_silently=False)
+			status = 'success'
+			message = u'已寄送到您的電子信箱'
+			os.remove(attach_file_path)
+		return locals()
+	if request.method == 'GET':
+		return locals()
 
 @http_response
 def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
