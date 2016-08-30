@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import generic
 from ebookSystem.models import *
+from genericUser.models import Event, ServiceHours
 from utils.decorator import *
 import datetime
 
@@ -145,21 +146,20 @@ class profileView(generic.View):
 			ISBN_part = request.POST.get('reEditPart')
 			reEditPart = EBook.objects.get(ISBN_part = ISBN_part)
 			reEditPart.status = reEditPart.STATUS['edit']
+			reEditPart.finish_date = None
 			reEditPart.save()
+			os.rename(reEditPart.get_path('-finish'), reEditPart.get_path('-edit'))
+			with codecs.open(reEditPart.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
+				finishFile.write(u'\ufeff')
+			event = Event.objects.get(content_type__model='ebook', object_id=reEditPart.ISBN_part)
+			event.delete()
 			status = 'success'
 			message = u'再編輯文件{}'.format(reEditPart.__unicode__())
-		elif request.POST.has_key('exchange'):
-			ISBN_part = request.POST.get('exchange')
-			exchangePart = EBook.objects.get(ISBN_part = ISBN_part)
-			exchangePart.is_exchange = True
-			exchangePart.save()
-			status = 'success'
-			message = u'已對換時數{}'.format(exchangePart.service_hours)
-			editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
-			finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 		else:
 			status = 'error'
 			message = u'不明的操作'
+		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
+		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 		return locals()
 
 def readme(request, template_name):

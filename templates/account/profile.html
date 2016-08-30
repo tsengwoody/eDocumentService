@@ -67,12 +67,9 @@
 			<td>{{part.finish_date}}</td>
 			<td>{{part.status_int2str}}</td>
 			<td>
-				{% if part.status_int2str == 'revise' %}
+				{% if part.status_int2str == 'review' %}
 				<button type="submit" class="btn btn-default send_button" id="reEditPart_id" name="reEditPart" value={{part.ISBN_part}}>再編輯</button>
 				{% endif %}	
-				{% if part.status_int2str == 'finish' %}
-				<button type="submit" class="btn btn-default send_button" id="exchange_id" name="exchange" value={{part.ISBN_part}}>兌換時數</button>
-				{% endif %}
 			</td>
 		</tr>
 		{% endfor %}
