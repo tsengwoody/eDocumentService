@@ -12,9 +12,7 @@
 <script language="javascript" src="{% static 'ebookSystem/js/register.js' %}"></script>
 <script language="javascript" src="{% static 'ebookSystem/js/upload_file.js' %}"></script>
 <style>
-body > .container {
-  padding: 20px 15px 0;
-}
+
 </style>
 {% endblock %}
 {% block content %}
@@ -45,7 +43,7 @@ body > .container {
                         <label for="id_username"><font style="color:red">*</font>使用者名稱：</label>
                     </th>
                     <td class="col-md-8">
-                        <input id="id_username" maxlength="30" name="username" type="text" placeholder="username" autofocus required>
+                        <input id="id_username" maxlength="30" name="username" type="text" pattern="^[a-z]*_[0-9]*$" autofocus required><label for="id_username"><font style="color:red">小寫英文字母+'_'+數字</font></label>
                     </td>
                 </tr>
                 <tr>
@@ -69,7 +67,7 @@ body > .container {
                         <label for="id_first_name"><font style="color:red">*</font>姓氏：</label>
                     </th>
                     <td>
-                        <input id="id_first_name" name="first_name" type="text" placeholder="First name" required>
+                        <input id="id_first_name" name="first_name" type="text" placeholder="First name" required><label for="id_first_name"><font style="color:red">請填中文</font></label>
                     </td>
                 </tr>
                 <tr>
@@ -77,7 +75,7 @@ body > .container {
                         <label for="id_last_name"><font style="color:red">*</font>名字：</label>
                     </th>
                     <td>
-                        <input id="id_last_name" name="last_name" type="text" placeholder="Last name" required>
+                        <input id="id_last_name" name="last_name" type="text" placeholder="Last name" required><label for="id_last_name"><font style="color:red">請填中文</font></label>
                     </td>
                 </tr>
                 <tr>
@@ -101,7 +99,7 @@ body > .container {
                         <label for="id_birthday"><font style="color:red">*</font>生日：</label>
                     </th>
                     <td>
-                        <input id="id_birthday" name="birthday" type="text" class="datepicker" placeholder="1989-02-19"  required>
+                        <input id="id_birthday" name="birthday" type="text" class="datepicker" placeholder="1989-02-19"  required><label for="id_last_name"><font style="color:red">1989-02-19</font></label>
                     </td>
                 </tr>
                 <tr>
@@ -141,7 +139,7 @@ body > .container {
                         <label for="id_disability_card_front"><font style="color:red">*</font>身心障礙手冊正面：</label>
                     </th>
                     <td>
-                        <input id="id_disability_card_front" maxlength="30" name="disability_card_front" type="file" accept="image/*" required>
+                        <input id="id_disability_card_front" maxlength="30" name="disability_card_front" type="file" accept="image/*" >
                     </td>
                 </tr>
                 <tr class="guest_mode">
@@ -149,7 +147,7 @@ body > .container {
                         <label for="id_disability_card_back"><font style="color:red">*</font>身心障礙手冊反面：</label>
                     </th>
                     <td>
-                        <input id="id_disability_card_back" maxlength="30" name="disability_card_back" type="file" accept="image/*" required>
+                        <input id="id_disability_card_back" maxlength="30" name="disability_card_back" type="file" accept="image/*" >
                     </td>
                 </tr>
             </table>

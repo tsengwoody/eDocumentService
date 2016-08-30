@@ -56,6 +56,7 @@ function showProgress(uuid)
     });
 }
 function alertDialog(json) {
+    console.log(json.status);
     var str=(json.status=='error')?'danger':'success'
     var dialog='#'+str+'Dialog';
     $(dialog+" .alertMessage").html(json.message);
@@ -67,7 +68,8 @@ function alertDialog(json) {
         if(json.hasOwnProperty('redirect_to'))
             window.location.href = json.redirect_to; 
         else
-            location.reload();
+            if(json.status!='error')
+                location.reload();
     });
 }
 // This function gets cookie with a given name
