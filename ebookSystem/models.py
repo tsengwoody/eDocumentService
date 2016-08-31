@@ -330,7 +330,8 @@ class EBook(models.Model):
 		html_path = BASE_DIR +u'/static/ebookSystem/document/{0}/OCR'.format(self.book.book_info.ISBN)
 		if not os.path.exists(html_path):
 			os.makedirs(html_path)
-		shutil.copyfile(self.get_path('-clean'), html_path +'/part{0}-final.html'.format(self.part))
+		if not os.path.exists(html_path +'/part{0}-final.html'.format(self.part)):
+			shutil.copyfile(self.get_path('-clean'), html_path +'/part{0}-final.html'.format(self.part))
 		default_page_url = html_path +'/part{0}-final.html'.format(self.part)
 		default_page_url = default_page_url.replace(BASE_DIR +'/static/', '')
 		return default_page_url
@@ -361,25 +362,20 @@ class EBook(models.Model):
 			os.remove(zip_file_name)
 			return ''
 
-	def edit_distance(self, action, encoding='utf-8'):
+	def edit_distance(self, src, dst, encoding='utf-8'):
 		import Levenshtein
-		if action == 'origin-finish':
-			source = self.book.path+u'/OCR/part{0}.txt'.format(self.part)
-			finish = self.book.path+u'/OCR/part{0}-finish.txt'.format(self.part)
-			edit = self.book.path+u'/OCR/part{0}-edit.txt'.format(self.part)
-			with codecs.open(finish, 'r', encoding=encoding) as finishFile:
-				finishContent = finishFile.read()
-			with codecs.open(edit, 'r', encoding=encoding) as editFile:
-				editContent = editFile.read()
-			destinationContent = finishContent+editContent[1:]
-		if action == 'finish-final':
-			source = self.book.path+u'/OCR/part{0}-finish.txt'.format(self.part)
-			destination = self.book.path+u'/OCR/part{0}-final.txt'.format(self.part)
-			with codecs.open(destination, 'r', encoding=encoding) as destinationFile:
-				destinationContent = destinationFile.read()
-		with codecs.open(source, 'r', encoding=encoding) as sourceFile:
-			sourceContent = sourceFile.read()
-		return Levenshtein.distance(sourceContent, destinationContent)
+		from bs4 import BeautifulSoup
+		with codecs.open(src, 'r', encoding=encoding) as srcFile:
+			src_content = srcFile.read()
+		srcSoup = BeautifulSoup(src_content, 'lxml')
+		src_content_text = srcSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
+		with codecs.open(dst, 'r', encoding=encoding) as dstFile:
+			dst_content = dstFile.read()
+		dstSoup = BeautifulSoup(dst_content, 'lxml')
+		dst_content_text = dstSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
+#	with codecs.open('temp.html', 'w', encoding='utf-8') as tempFile:
+#		tempFile.write(dst_content_text)
+		return Levenshtein.distance(src_content_text, dst_content_text)
 
 	@staticmethod
 	def split_content(content):

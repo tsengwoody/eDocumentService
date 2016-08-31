@@ -108,6 +108,7 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 		raise Http404("book does not exist")
 	part.clean_tag()
 	html_url = part.get_html()
+	edit_distance = part.edit_distance(part.get_path(), part.get_path('-finish'))
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
@@ -118,13 +119,15 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 				part.book.save()
 			month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
 			try:
-				month_ServiceHours = ServiceHours.objects.get(user=request.user, date=month_day)
+				month_ServiceHours = ServiceHours.objects.get(user=event.creater, date=month_day)
 			except:
-				month_ServiceHours = ServiceHours.objects.create(user=request.user, date=month_day)
+				month_ServiceHours = ServiceHours.objects.create(user=event.creater, date=month_day)
 			part.serviceHours = month_ServiceHours
 			part.save()
+			month_ServiceHours.service_hours = month_ServiceHours.service_hours +part.service_hours
+			month_ServiceHours.save()
 			import shutil
-			shutil.copy2(part.get_path('-clean'), part.get_path('-finish'))
+			shutil.copy2(part.get_path('-clean'), part.get_path('-final'))
 			status = 'success'
 			message = u'審核通過文件'
 			event.response(status=status, message=message, user=request.user)

@@ -333,7 +333,12 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 @user_category_check(['user'])
 @http_response
 def servicehours_list(request, template_name='genericUser/servicehours_list.html'):
-	ServiceHours_list = ServiceHours.objects.filter(user=request.user)
+	month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
+	try:
+		current_ServiceHours = ServiceHours.objects.get(date=month_day)
+	except:
+		pass
+	ServiceHours_list = ServiceHours.objects.filter(user=request.user).exclude(date=month_day)
 	if request.method == 'POST':
 		if request.POST.has_key('exchange'):
 			exchange_serviceHours = ServiceHours.objects.get(id=request.POST['exchange'])
