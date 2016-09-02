@@ -65,7 +65,7 @@ def search_book(request, template_name):
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
-		event = Event.objects.get(content_type__model='book', object_id=book.ISBN)
+		event = Event.objects.get(content_type__model='book', object_id=book.ISBN, status=Event.STATUS['review'])
 	except:
 		raise Http404("book does not exist")
 	org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(book.book_info.ISBN,"org")
@@ -103,7 +103,7 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'):
 	try:
 		part = EBook.objects.get(ISBN_part=ISBN_part)
-		event = Event.objects.get(content_type__model='ebook', object_id=part.ISBN_part)
+		event = Event.objects.get(content_type__model='ebook', object_id=part.ISBN_part, status=Event.STATUS['review'])
 	except:
 		raise Http404("book does not exist")
 	part.clean_tag()
@@ -170,7 +170,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 	user = request.user
 	try:
 		action = ApplyDocumentAction.objects.get(id=id)
-		event = Event.objects.get(content_type__model='applydocumentaction', object_id=action.id)
+		event = Event.objects.get(content_type__model='applydocumentaction', object_id=action.id, status=Event.STATUS['review'])
 	except:
 		raise Http404("ApplyDocumentAction does not exist")
 	if request.method == 'GET':

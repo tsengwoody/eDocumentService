@@ -3,6 +3,7 @@ import codecs
 import cookielib
 import datetime
 import re
+import requests
 import urllib,urllib2
 from bs4 import BeautifulSoup
 from mysite.settings import BASE_DIR
@@ -39,43 +40,37 @@ def load_post_data(source):
 
 def get_book_info(ISBN):
 	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/H30_SearchBooks.php'
-	cookie = cookielib.CookieJar()
-	handler=urllib2.HTTPCookieProcessor(cookie)
-	opener = urllib2.build_opener(handler)
-	response = opener.open(url)
-	for item in cookie:
-		if item.name == 'PHPSESSID':
-			phpsessid = item.value
-	#		print 'Name = '+item.name
-	#		print 'Value = '+item.value
-	#url = url +'?PHPSESSID' +'=' +phpsessid
+	session = requests.Session()
+	response = session.get(url)
+	cookies_dict = session.cookies.get_dict()
+	for key in cookies_dict:
+		if key == 'PHPSESSID':
+			phpsessid = cookies_dict[key]
 	post_data_file = BASE_DIR +'/utils/post_data.txt'
 	values = load_post_data(post_data_file)
 	values['FO_SearchValue0'] = ISBN
-	data = urllib.urlencode(values)  
-	user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0'
-	headers = { 'User-Agent' : user_agent }  
-	request = urllib2.Request(url, data, headers)  
-	response = opener.open(request)
+	response = session.post(url,data=values)
 	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/main_DisplayResults.php?PHPSESSID=' +phpsessid +'&Pact=DisplayAll'
-	response = opener.open(url)
-	res = response.read().decode('utf-8')
+	response = session.get(url)
+	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/main_DisplayRecord.php?PHPSESSID=' +phpsessid +'&Pact=init&Pstart=1'
+	response = session.get(url)
+	res = response.text
 	soup = BeautifulSoup(res, 'html5lib')
-	td = soup.find_all('td', class_=u'資料列_1')
-	bookname=''
-	author=''
-	house=''
-	date=''
+	data_tags = soup.find_all('td', class_=u'資料列_1')
 	try:
-		bookname = unicode(td[4].string)
-		author = unicode(td[5].string)
-		house = unicode(td[6].string)
-		date = unicode(td[7].string)
+		bookname = unicode(data_tags[1].string).replace(u' ', '')
+		author = unicode(data_tags[3].string).replace(u' ', '')
+		house = unicode(data_tags[5].string).replace(u' ', '')
+		date = unicode(data_tags[18].string).replace(u' ', '')
 		year = int(date.split('/')[0]) +1911
 		month = int(date.split('/')[1])
 		date = unicode(datetime.date(year,month,1))
 		status = u'success'
 	except:
+		bookname=''
+		author=''
+		house=''
+		date=''
 		status = u'error'
 	return [status, bookname, author, house, date]
 

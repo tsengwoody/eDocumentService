@@ -150,7 +150,7 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 def review_user(request, username, template_name='genericUser/review_user.html'):
 	try:
 		user = User.objects.get(username=username)
-		events = Event.objects.filter(content_type__model='user', object_id=user.id, reviewer=None)
+		events = Event.objects.filter(content_type__model='user', object_id=user.id, status=Event.STATUS['review'])
 	except:
 		raise Http404("user does not exist")
 	sourcePath = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(user.username)
@@ -335,7 +335,7 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 def servicehours_list(request, template_name='genericUser/servicehours_list.html'):
 	month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
 	try:
-		current_ServiceHours = ServiceHours.objects.get(date=month_day)
+		current_ServiceHours = ServiceHours.objects.get(date=month_day, user=request.user)
 	except:
 		pass
 	ServiceHours_list = ServiceHours.objects.filter(user=request.user).exclude(date=month_day)

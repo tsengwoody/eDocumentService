@@ -12,7 +12,7 @@ from genericUser.models import *
 
 @user_category_check(['manager'])
 def event_list(request, action):
-	events = Event.objects.filter(content_type__model=action, status=-1)
+	events = Event.objects.filter(content_type__model=action, status=-1).exclude(creater=request.user)
 	template_name = 'manager/event_list_' +action +'.html'
 	return render(request, template_name, locals())
 

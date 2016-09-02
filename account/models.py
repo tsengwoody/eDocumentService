@@ -12,4 +12,4 @@ class Editor(models.Model):
 		db_table = 'editor'
 
 	def __unicode__(self):
-		return self.user.username
+		return self.user.first_name +self.user.last_name

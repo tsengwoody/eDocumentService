@@ -26,6 +26,10 @@
 			<th>時數</th>
 			<th>預計完成日期</th>
 			<th>動作</th>
+			{% if request.user.is_superuser %}
+			<th>校對者</th>
+			<th>最後編輯時間</th>
+			{% endif %}
 		</tr>
 		{% for part in book.ebook_set.all %}
 		<tr>
@@ -39,6 +43,10 @@
 				<button type="submit" class="btn btn-default" id="emailEBook_id" name="emailEBook" value={{ part.ISBN_part }}>傳送email</button>
 				{% endif %}
 			</td>
+			{% if request.user.is_superuser %}
+			<td>part.editor.__unicode__</td>
+			<td>part.editor.user.online</td>
+			{% endif %}
 		</tr>
 		{% endfor %}
 	</table>
