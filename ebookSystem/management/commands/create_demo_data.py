@@ -21,7 +21,7 @@ class Command(BaseCommand):
 		parser.add_argument('create_demo_data', nargs='*')
 
 	def handle(self, *args, **options):
-		root = User(username='root', email='edocumentservice@gmail.com', first_name = 'demo root firstname', last_name = 'demo root lastname', is_active=True, is_superuser=True, is_staff=True, phone='0917823099', birthday='2016-01-01', is_editor=True, is_guest=True, is_manager=True, is_advanced_editor=True, status=ACTIVE)
+		root = User(username='root', email='edocumentservice@gmail.com', first_name = 'demo root firstname', last_name = 'demo root lastname', is_active=True, is_superuser=True, is_staff=True, phone='0917823099', birthday='2016-01-01', is_editor=True, is_guest=True, is_manager=True, is_advanced_editor=True, status=User.STATUS['active'])
 		root.set_password('root')
 		root.save()
 		rootEditor = Editor.objects.create(user=root)
@@ -36,7 +36,7 @@ class Command(BaseCommand):
 				request = factory.post(reverse('register'), {'username':'demo-manager', 'password':'demo-manager', 'email':'tsengwoody.tw@gmail.com', 'first_name':'demo manager firstname', 'last_name':'demo manager lastname', 'is_active':True, 'phone':'1234567890', 'birthday':'2016-01-01', 'education':u'碩士', 'editor':'Editor', 'guest':'Guest', 'disability_card_front':dcf_file, 'disability_card_back':dcb_file, 'professional_field':u'資訊工程學'})
 				response = register(request)
 		manager = User.objects.get(username='demo-manager')
-		manager.status = ACTIVE
+		manager.status = manager.STATUS['active']
 		manager.is_editor=True
 		manager.is_guest=True
 		manager.is_manager=True

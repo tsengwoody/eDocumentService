@@ -107,9 +107,9 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 	except:
 		raise Http404("book does not exist")
 	if request.method == 'GET':
-	part.clean_tag()
-	html_url = part.get_html()
-	edit_distance = part.edit_distance(part.get_path(), part.get_path('-finish'))
+		part.clean_tag()
+		html_url = part.get_html()
+		edit_distance = part.edit_distance(part.get_path(), part.get_path('-finish'))
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
@@ -288,6 +288,22 @@ def edit_ajax(request, ISBN_part, *args, **kwargs):
 	else:
 		response['status'] = 'error'
 	return HttpResponse(json.dumps(response), content_type="application/json")
+
+def create_SpecialContent_ajax(request, ISBN_part, *args, **kwargs):
+	response = {}
+	if not request.is_ajax():
+		response['status'] = u'error'
+		response['message'] = u'錯誤的請求'
+	return HttpResponse(json.dumps(response), content_type="application/json")
+	if request.method == 'POST':
+		part = EBook.objects.get(ISBN_part=ISBN_part)
+		item_number = len(part.specialcontent_set.all()) +1
+		id = part.ISBN_part +str(item_number)
+		sc = SpecialContent.objects.create(id=id, ebook=part, item_number=item_number, type=request.POST['type'])
+		response['status'] = u'success'
+		response['message'] = u'建立SpecialContent'
+		response['item_number'] = item_number
+		return HttpResponse(json.dumps(response), content_type="application/json")
 
 class editView(generic.View):
 

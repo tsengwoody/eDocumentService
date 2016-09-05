@@ -45,7 +45,10 @@ def create_document(request, template_name='genericUser/create_document.html'):
 			status = 'error'
 			message = u'非正確ZIP文件'
 			return locals()
-		newBookInfo = bookInfoForm.save(commit=False)
+		try:
+			newBookInfo = BookInfo.objects.get(ISBN=bookInfoForm.cleaned_data['ISBN'])
+		except:
+			newBookInfo = bookInfoForm.save()
 		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'])
 		newBook.path = uploadPath
 		if not newBook.validate_folder():
@@ -53,7 +56,6 @@ def create_document(request, template_name='genericUser/create_document.html'):
 			status = 'error'
 			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			return locals()
-		newBookInfo.save()
 		newBook.scaner = user
 		guest = Guest.objects.get(user=user)
 		newBook.owners.add(guest)
