@@ -256,6 +256,7 @@ function rotateFormat()
     }
 
 }
+var function_click = false;
 function createHtmlEditor(){
 
 //http://blog.squadedit.com/tinymce-and-cursor-position/
@@ -295,8 +296,10 @@ function createHtmlEditor(){
         if(editor.getContent().indexOf('<p>|----------|</p>')<0)
             alertMessageDialog('error',"未存擋成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下完成按紐");
         else{
+            function_click=true;
             editor.save();
             catchErrorHandling("save","");
+
         }
       }
     });
@@ -308,6 +311,7 @@ function createHtmlEditor(){
         if(editor.getContent().indexOf('<p>|----------|</p>')>0)
             alertMessageDialog('error',"未存擋成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下存擋按紐");
         else{
+            function_click=true;
             editor.save();
             catchErrorHandling("finish","");
         }
@@ -318,6 +322,7 @@ function createHtmlEditor(){
       name: 'finish',
       icon: false,
       onclick: function () {
+        function_click=true;
         catchErrorHandling("close","");
       }
     });
@@ -372,7 +377,11 @@ $(document).ready(function() {
     });
 
 
-    $(window).on('beforeunload', function(){
+    $(window).on('beforeunload', function(e){
+        console.log(e);
+      if(function_click)
+        return;
+      function_click=false;
       return 'Are you sure you want to leave?';
     });
 });
