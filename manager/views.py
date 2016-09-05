@@ -12,7 +12,7 @@ from genericUser.models import *
 
 @user_category_check(['manager'])
 def event_list(request, action):
-	events = Event.objects.filter(content_type__model=action, status=-1).exclude(creater=request.user)
+	events = Event.objects.filter(content_type__model=action, status=Event.STATUS['review']).exclude(creater=request.user)
 	template_name = 'manager/event_list_' +action +'.html'
 	return render(request, template_name, locals())
 
@@ -21,12 +21,12 @@ def applydocumentaction(request, template_name='manager/applydocumentaction.html
 	if request.method == 'POST':
 		ISBN = request.POST['ISBN']
 		username = request.POST['username']
-		events = Event.objects.filter(creater__username=username, content_type__model='applydocumentaction')
+		events = Event.objects.filter(creater__username=username, content_type__model='applydocumentaction', status=Event.STATUS['review'])
 		event_list = []
 		for event in events:
 			if event.action.book_info.ISBN == ISBN:
 				event_list.append(event)
-		if len(event_list) == 1:
+		if len(event_list) >= 1:
 			redirect_to = event_list[0].get_url()
 			status = u'success'
 			message = u'代掃申請項目獲取成功'

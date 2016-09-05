@@ -4,7 +4,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
-from mysite.settings import INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 import os
 import datetime
 
@@ -26,7 +25,7 @@ class User(AbstractUser):
 	)
 	education = models.CharField(max_length=30, choices=EDU)
 	online = models.DateTimeField(default = timezone.now)
-	status = models.IntegerField(default=REVIEW)
+	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'review':2}
 	is_book = models.BooleanField(default=False)
 	is_editor = models.BooleanField(default=False)

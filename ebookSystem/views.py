@@ -106,10 +106,10 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 		event = Event.objects.get(content_type__model='ebook', object_id=part.ISBN_part, status=Event.STATUS['review'])
 	except:
 		raise Http404("book does not exist")
+	if request.method == 'GET':
 	part.clean_tag()
 	html_url = part.get_html()
 	edit_distance = part.edit_distance(part.get_path(), part.get_path('-finish'))
-	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
