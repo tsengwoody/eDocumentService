@@ -289,6 +289,22 @@ def edit_ajax(request, ISBN_part, *args, **kwargs):
 		response['status'] = 'error'
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
+def create_SpecialContent_ajax(request, ISBN_part, *args, **kwargs):
+	response = {}
+	if not request.is_ajax():
+		response['status'] = u'error'
+		response['message'] = u'錯誤的請求'
+	return HttpResponse(json.dumps(response), content_type="application/json")
+	if request.method == 'POST':
+		part = EBook.objects.get(ISBN_part=ISBN_part)
+		item_number = len(part.specialcontent_set.all()) +1
+		id = part.ISBN_part +str(item_number)
+		sc = SpecialContent.objects.create(id=id, ebook=part, item_number=item_number, type=request.POST['type'])
+		response['status'] = u'success'
+		response['message'] = u'建立SpecialContent'
+		response['item_number'] = item_number
+		return HttpResponse(json.dumps(response), content_type="application/json")
+
 class editView(generic.View):
 
 	@method_decorator(http_response)

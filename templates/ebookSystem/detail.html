@@ -44,8 +44,8 @@
 				{% endif %}
 			</td>
 			{% if request.user.is_superuser %}
-			<td>part.editor.__unicode__</td>
-			<td>part.editor.user.online</td>
+			<td>{{ part.editor }}</td>
+			<td>{{ part.editor.user.online }}</td>
 			{% endif %}
 		</tr>
 		{% endfor %}
