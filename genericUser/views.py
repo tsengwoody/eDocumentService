@@ -150,7 +150,7 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 def review_user(request, username, template_name='genericUser/review_user.html'):
 	try:
 		user = User.objects.get(username=username)
-		events = Event.objects.filter(content_type__model='user', object_id=user.id)
+		events = Event.objects.filter(content_type__model='user', object_id=user.id, status=Event.STATUS['review'])
 	except:
 		raise Http404("user does not exist")
 	sourcePath = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(user.username)
@@ -165,12 +165,8 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 	if request.method == 'POST':
 		if request.POST.has_key('login'):
 			user.is_active = True
-			status = 'success'
-			message = u'已啟用登錄權限'
 		else:
 			user.is_active = False
-			status = 'success'
-			message = u'停用登錄權限'
 		if request.POST.has_key('editor'):
 			user.is_editor = True
 			status = 'success'
@@ -194,14 +190,13 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 			message = u'完成審核權限開通'
 			for event in events:
 				event.response(status=status, message=message, user=request.user)
+			user.save()
 		elif request.POST['review'] == 'error':
-			user.status = user.STATUS['revise']
 			redirect_to = reverse('manager:event_list', kwargs={'action':'user' })
 			status = 'success'
 			message = u'資料異常退回'
 			for event in events:
 				event.response(status='error', message=request.POST['reason'], user=request.user)
-		user.save()
 		return locals()
 
 @user_category_check(['user'])
@@ -221,7 +216,8 @@ def info_change(request,template_name):
 			return locals()
 		infoChangeUserForm.save()
 		if user.username != 'root':
-			user.status = user.STATUS['review']
+			if user.status == user.STATUS['active']:
+				user.status = user.STATUS['review']
 			Event.objects.create(creater=request.user, action=request.user)
 		user.save()
 		status = u'success'
@@ -337,7 +333,12 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 @user_category_check(['user'])
 @http_response
 def servicehours_list(request, template_name='genericUser/servicehours_list.html'):
-	ServiceHours_list = ServiceHours.objects.filter(user=request.user)
+	month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
+	try:
+		current_ServiceHours = ServiceHours.objects.get(date=month_day, user=request.user)
+	except:
+		pass
+	ServiceHours_list = ServiceHours.objects.filter(user=request.user).exclude(date=month_day)
 	if request.method == 'POST':
 		if request.POST.has_key('exchange'):
 			exchange_serviceHours = ServiceHours.objects.get(id=request.POST['exchange'])

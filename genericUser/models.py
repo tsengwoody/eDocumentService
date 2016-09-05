@@ -4,7 +4,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
-from mysite.settings import INACTIVE, ACTIVE, EDIT, REVIEW, REVISE, FINISH
 import os
 import datetime
 
@@ -26,7 +25,7 @@ class User(AbstractUser):
 	)
 	education = models.CharField(max_length=30, choices=EDU)
 	online = models.DateTimeField(default = timezone.now)
-	status = models.IntegerField(default=REVIEW)
+	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'review':2}
 	is_book = models.BooleanField(default=False)
 	is_editor = models.BooleanField(default=False)
@@ -34,7 +33,7 @@ class User(AbstractUser):
 	is_manager = models.BooleanField(default=False)
 	is_advanced_editor = models.BooleanField(default=False)
 	def __unicode__(self):
-		return self.username
+		return self.first_name +self.last_name
 
 	def has_editor(self):
 		try:
@@ -61,12 +60,18 @@ class Event(models.Model):
 	time = models.DateTimeField(auto_now_add=True)
 	reviewer = models.ForeignKey(User, related_name='event_reviewer_set', blank=True, null=True)
 	time_reply = models.DateTimeField(blank=True, null=True)
-	status = models.IntegerField(default=-1)
+	status = models.IntegerField(default=0)
 	message = models.CharField(max_length=100, blank=True, null=True)
 	content_type = models.ForeignKey(ContentType)
 	object_id = models.CharField(max_length=30)
 	action = GenericForeignKey('content_type', 'object_id')
-	STATUS = {'success':1, 'error':0}
+	STATUS = {'review':0, 'success':1, 'error':2}
+
+	def status_int2str(self):
+		for k, v in self.STATUS.iteritems():
+			if v == self.status:
+				return k
+		return 'unknown'
 
 	def get_url(self):
 		from django.core.urlresolvers import reverse

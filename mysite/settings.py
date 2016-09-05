@@ -157,6 +157,7 @@ EMAIL_PORT=587
 EMAIL_HOST_USER = 'edocumentservice@gmail.com'
 EMAIL_HOST_PASSWORD = 'cozpzzyyuetvhxwe'
 EMAIL_USE_TLS = True
+SERVICE = 'edocumentservice@gmail.com'
 #smtp.mail.yahoo.com
 
 LOGGING = {

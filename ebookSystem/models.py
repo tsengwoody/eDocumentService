@@ -90,16 +90,16 @@ class Book(models.Model):
 		self.part_count = part_count
 		return partSet.issubset(OCRFileSet)
 
-	def zip(self, user, password):
+	def zip(self, password):
 		import pyminizip
-		import zipfile
-		zip_file_name = self.path +'/OCR/' +self.ISBN +'-final.zip'
-		zip_list = [ self.path +'/OCR/' +'part{0}-final.txt'.format(i+1) for i in range(self.part_count)]
+#		import zipfile
+		zip_file_name = self.path +'/OCR/' +self.ISBN +'.zip'
+		zip_list = [ file.get_path('-clean') for file in self.ebook_set.all() ]
 		try:
 			pyminizip.compress_multiple(zip_list, zip_file_name, password, 5)
 			return zip_file_name
 		except:
-			shutil.rmtree(zip_file_name)
+			os.remove(zip_file_name)
 			return ''
 #		zf = zipfile.ZipFile(zip_file_name, "w", zipfile.zlib.DEFLATED)
 #		try:
@@ -330,70 +330,52 @@ class EBook(models.Model):
 		html_path = BASE_DIR +u'/static/ebookSystem/document/{0}/OCR'.format(self.book.book_info.ISBN)
 		if not os.path.exists(html_path):
 			os.makedirs(html_path)
-		shutil.copyfile(self.get_path('-clean'), html_path +'/part{0}-final.html'.format(self.part))
+		if not os.path.exists(html_path +'/part{0}-final.html'.format(self.part)):
+			shutil.copyfile(self.get_path('-clean'), html_path +'/part{0}-final.html'.format(self.part))
 		default_page_url = html_path +'/part{0}-final.html'.format(self.part)
 		default_page_url = default_page_url.replace(BASE_DIR +'/static/', '')
 		return default_page_url
 
 	def add_tag(self, encoding='utf-8'):
-			source = self.get_path()
-			destination = self.get_path('-edit')
-			edit_content = ''
-			with codecs.open(source, 'r', encoding=encoding) as sourceFile:
-				for edit in sourceFile:
-					if edit[-2:] == '\r\n':
-						edit = '<p>' +edit[:-2] +'</p>' +edit[-2:]
-					else:
-						edit = '<p>' +edit +'</p>'
-					edit_content = edit_content +edit
-			edit_content = edit_content[0:3] +edit_content[4:] #skip file head
-			if edit_content[-2:] != '\r\n': edit_content=edit_content +'\r\n'
-			with codecs.open(destination, 'w', encoding='utf-8') as destinationFile:
-				destinationFile.write(u'\ufeff' +edit_content)
+		source = self.get_path()
+		destination = self.get_path('-edit')
+		from utils import tag
+		tag.add_tag(source, destination)
 
 	def clean_tag(self, template='book_template.html', encoding='utf-8'):
+		source = self.get_path('-finish')
+		destination = self.get_path('-clean')
 		template = BASE_DIR +u'/templates/' +template
-		with codecs.open(template, 'r', encoding=encoding) as templateFile:
-			template_content = templateFile.read()
-		head = template_content.split('{}')[0][1:]
-		tail = template_content.split('{}')[1]
-		with codecs.open(self.get_path('-finish'), 'r', encoding=encoding) as sourceFile:
-			source_content = sourceFile.read()
-		file_head = source_content[0]
-		source_content = source_content[1:]
-		source_content = head +source_content +tail
-		source_content = source_content.replace('<br />', '</p>\r\n<p>')
-		from bs4 import BeautifulSoup, NavigableString
-		soup = BeautifulSoup(source_content, 'lxml')
-		span_tags = soup.find_all('span')
-		for span_tag in span_tags:
-			span_tag.unwrap()
-		from utils.process_tag import merge_NavigableString
-		merge_NavigableString(soup)
-		soup.head.title.string = u'{0}-part{1}'.format(self.book.book_info.bookname, self.part)
-		with codecs.open(self.get_path('-clean'), 'w', encoding=encoding) as cleanFile:
-			clean_content = soup.prettify().replace(u'\n', u'\r\n')
-			cleanFile.write(clean_content)
+		from utils import tag
+		tag.add_template_tag(source, destination, template)
+		title = self.book.book_info.bookname +'-part{0}'.format(self.part)
+		tag.clean_tag(destination, destination, title)
 
-	def edit_distance(self, action, encoding='utf-8'):
+	def zip(self, password):
+		import pyminizip
+		zip_file_name = self.book.path +'/OCR/' +self.ISBN_part +'.zip'
+		zip_list = [self.get_path('-clean')]
+		try:
+			pyminizip.compress_multiple(zip_list, zip_file_name, password, 5)
+			return zip_file_name
+		except:
+			os.remove(zip_file_name)
+			return ''
+
+	def edit_distance(self, src, dst, encoding='utf-8'):
 		import Levenshtein
-		if action == 'origin-finish':
-			source = self.book.path+u'/OCR/part{0}.txt'.format(self.part)
-			finish = self.book.path+u'/OCR/part{0}-finish.txt'.format(self.part)
-			edit = self.book.path+u'/OCR/part{0}-edit.txt'.format(self.part)
-			with codecs.open(finish, 'r', encoding=encoding) as finishFile:
-				finishContent = finishFile.read()
-			with codecs.open(edit, 'r', encoding=encoding) as editFile:
-				editContent = editFile.read()
-			destinationContent = finishContent+editContent[1:]
-		if action == 'finish-final':
-			source = self.book.path+u'/OCR/part{0}-finish.txt'.format(self.part)
-			destination = self.book.path+u'/OCR/part{0}-final.txt'.format(self.part)
-			with codecs.open(destination, 'r', encoding=encoding) as destinationFile:
-				destinationContent = destinationFile.read()
-		with codecs.open(source, 'r', encoding=encoding) as sourceFile:
-			sourceContent = sourceFile.read()
-		return Levenshtein.distance(sourceContent, destinationContent)
+		from bs4 import BeautifulSoup
+		with codecs.open(src, 'r', encoding=encoding) as srcFile:
+			src_content = srcFile.read()
+		srcSoup = BeautifulSoup(src_content, 'lxml')
+		src_content_text = srcSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
+		with codecs.open(dst, 'r', encoding=encoding) as dstFile:
+			dst_content = dstFile.read()
+		dstSoup = BeautifulSoup(dst_content, 'lxml')
+		dst_content_text = dstSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
+#	with codecs.open('temp.html', 'w', encoding='utf-8') as tempFile:
+#		tempFile.write(dst_content_text)
+		return Levenshtein.distance(src_content_text, dst_content_text)
 
 	@staticmethod
 	def split_content(content):

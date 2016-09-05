@@ -65,7 +65,7 @@ def search_book(request, template_name):
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
-		event = Event.objects.get(content_type__model='book', object_id=book.ISBN)
+		event = Event.objects.get(content_type__model='book', object_id=book.ISBN, status=Event.STATUS['review'])
 	except:
 		raise Http404("book does not exist")
 	org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(book.book_info.ISBN,"org")
@@ -103,12 +103,13 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'):
 	try:
 		part = EBook.objects.get(ISBN_part=ISBN_part)
-		event = Event.objects.get(content_type__model='ebook', object_id=part.ISBN_part)
+		event = Event.objects.get(content_type__model='ebook', object_id=part.ISBN_part, status=Event.STATUS['review'])
 	except:
 		raise Http404("book does not exist")
+	if request.method == 'GET':
 	part.clean_tag()
 	html_url = part.get_html()
-	if request.method == 'GET':
+	edit_distance = part.edit_distance(part.get_path(), part.get_path('-finish'))
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
@@ -118,13 +119,15 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 				part.book.save()
 			month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
 			try:
-				month_ServiceHours = ServiceHours.objects.get(user=request.user, date=month_day)
+				month_ServiceHours = ServiceHours.objects.get(user=event.creater, date=month_day)
 			except:
-				month_ServiceHours = ServiceHours.objects.create(user=request.user, date=month_day)
+				month_ServiceHours = ServiceHours.objects.create(user=event.creater, date=month_day)
 			part.serviceHours = month_ServiceHours
 			part.save()
+			month_ServiceHours.service_hours = month_ServiceHours.service_hours +part.service_hours
+			month_ServiceHours.save()
 			import shutil
-			shutil.copy2(part.get_path('-clean'), part.get_path('-finish'))
+			shutil.copy2(part.get_path('-clean'), part.get_path('-final'))
 			status = 'success'
 			message = u'審核通過文件'
 			event.response(status=status, message=message, user=request.user)
@@ -167,7 +170,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 	user = request.user
 	try:
 		action = ApplyDocumentAction.objects.get(id=id)
-		event = Event.objects.get(content_type__model='applydocumentaction', object_id=action.id)
+		event = Event.objects.get(content_type__model='applydocumentaction', object_id=action.id, status=Event.STATUS['review'])
 	except:
 		raise Http404("ApplyDocumentAction does not exist")
 	if request.method == 'GET':
@@ -211,12 +214,36 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 		event.response(status=status, message=message, user=request.user)
 		return locals()
 
+@user_category_check(['user'])
+@http_response
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
 	except:
 		raise Http404("book does not exist")
-	return render(request, template_name, locals())
+	if request.method == 'POST':
+		if request.POST.has_key('emailEBook'):
+			from django.core.mail import EmailMessage
+			from mysite.settings import SERVICE
+			ISBN_part = request.POST.get('emailEBook')
+			emailEBook = EBook.objects.get(ISBN_part = ISBN_part)
+			subject = u'[文件] {0}-part{1}'.format(emailEBook.book.book_info.bookname, emailEBook.part)
+			body = u'新愛的{0}您好：\n'.format(request.user.username)
+			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
+			attach_file_path = emailEBook.zip('test')
+			if attach_file_path == '':
+				status = 'error'
+				message = u'附加文件失敗'
+				os.remove(attach_file_path)
+				return locals()
+			email.attach_file(attach_file_path)
+			email.send(fail_silently=False)
+			status = 'success'
+			message = u'已寄送到您的電子信箱'
+			os.remove(attach_file_path)
+		return locals()
+	if request.method == 'GET':
+		return locals()
 
 @http_response
 def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):

@@ -22,6 +22,21 @@
 			<th>兌換中心</th>
 			<th>動作</th>
 		</tr>
+		{% if current_ServiceHours %}
+		<tr>
+			<td>{{ current_ServiceHours.date }}</td>
+			<td>{{ current_ServiceHours.service_hours }}</td>
+			<td>
+			{% if current_ServiceHours.is_exchange %}
+			已兌換
+			{% else %}
+			未兌換
+			{% endif %}
+			</td>
+			<td>{{ current_ServiceHours.center }}</td>
+			<td></td>
+		</tr>
+		{% endif %}
 		{% for ServiceHours in ServiceHours_list %}
 		<tr>
 			<td>{{ ServiceHours.date }}</td>
