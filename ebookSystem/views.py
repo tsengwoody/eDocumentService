@@ -107,9 +107,9 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 	except:
 		raise Http404("book does not exist")
 	if request.method == 'GET':
-	part.clean_tag()
-	html_url = part.get_html()
-	edit_distance = part.edit_distance(part.get_path(), part.get_path('-finish'))
+		part.clean_tag()
+		html_url = part.get_html()
+		edit_distance = part.edit_distance(part.get_path(), part.get_path('-finish'))
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
