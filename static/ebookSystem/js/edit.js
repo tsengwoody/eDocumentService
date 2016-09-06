@@ -147,7 +147,16 @@ function addMark(strValue,editor) {
     editor.insertContent(strValue);
 
 }
-function calSeconds()
+function detectIdel()
+{
+    console.log(idel_min);
+    if(idel_min>30)
+    {
+        window.location.href = "/auth/logout/";
+    }
+    idel_min++;
+}
+function calMins()
 {
     var url=window.location.pathname;
     var newUrl="/"+url.split('/')[1]+"/"+"edit_ajax"+"/"+url.split('/')[3]+"/";
@@ -257,6 +266,7 @@ function rotateFormat()
 
 }
 var function_click = false;
+var idel_min =0;
 function createHtmlEditor(){
 
 //http://blog.squadedit.com/tinymce-and-cursor-position/
@@ -277,7 +287,10 @@ function createHtmlEditor(){
         addMark(message,editor);
       }
     });
-
+    editor.on('change', function(e) {
+        console.log(idel_min);
+        idel_min=0;
+    });
     editor.addButton('mark', {
       text: 'mark',
       icon: false,
@@ -340,6 +353,8 @@ function createHtmlEditor(){
   'save table'],
 
 });
+
+
 }
 $(document).ready(function() {
     console.log("ready!");
@@ -355,9 +370,10 @@ $(document).ready(function() {
         }
     });
     createHtmlEditor();
-    calSeconds();
+    calMins();
     setInterval(function(){ 
-        calSeconds();
+        calMins();
+        detectIdel();
     }, 60000);
 
     $('#prePage').on("click", function() {
@@ -378,7 +394,6 @@ $(document).ready(function() {
 
 
     $(window).on('beforeunload', function(e){
-        console.log(e);
       if(function_click)
         return;
       function_click=false;
