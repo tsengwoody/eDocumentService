@@ -152,6 +152,8 @@ function detectIdel()
     console.log(idel_min);
     if(idel_min>30)
     {
+        function_click=true;
+        idel_min=0;
         window.location.href = "/auth/logout/";
     }
     idel_min++;
@@ -288,7 +290,7 @@ function createHtmlEditor(){
       }
     });
     editor.on('change', function(e) {
-        console.log(idel_min);
+        //console.log(idel_min);
         idel_min=0;
     });
     editor.addButton('mark', {
@@ -358,6 +360,9 @@ function createHtmlEditor(){
 }
 $(document).ready(function() {
     console.log("ready!");
+    function_click = false;
+    idel_min =0;
+
     var csrftoken = getCookie('csrftoken');
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
