@@ -278,7 +278,8 @@ function createHtmlEditor(){
   force_p_newlines : false,
   selector: 'textarea',  // change this value according to your HTML
   toolbar1: 'skip_mark | mark | 存擋 | 完成 | 關閉 | 切換版型',
-  toolbar2: 'undo redo | cut copy paste | bullist numlist | table',
+  toolbar2: 'undo redo | cut copy paste | bullist numlist | table | fontsizeselect',
+  fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt',
   menubar: false,
   setup: function (editor) {
     editor.addButton('skip_mark', {
