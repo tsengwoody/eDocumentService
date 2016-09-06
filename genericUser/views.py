@@ -152,9 +152,9 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 def review_user(request, username, template_name='genericUser/review_user.html'):
 	try:
 		user = User.objects.get(username=username)
-		events = Event.objects.filter(content_type__model='user', object_id=user.id, status=Event.STATUS['review'])
 	except:
 		raise Http404("user does not exist")
+	events = Event.objects.filter(content_type__model='user', object_id=user.id, status=Event.STATUS['review'])
 	sourcePath = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(user.username)
 	frontPage = user.username +'_front.jpg'
 	frontPageURL = sourcePath +u'/' +frontPage
@@ -220,7 +220,9 @@ def info_change(request,template_name):
 		if user.username != 'root':
 			if user.status == user.STATUS['active']:
 				user.status = user.STATUS['review']
-			Event.objects.create(creater=request.user, action=request.user)
+			events = Event.objects.filter(content_type__model='user', object_id=request.user.id, status=Event.STATUS['review'])
+			if len(events) == 0:
+				Event.objects.create(creater=request.user, action=request.user)
 		user.save()
 		status = u'success'
 		message = u'修改資料完成，請等待管理員審核。'

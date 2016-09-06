@@ -62,14 +62,14 @@ class profileView(generic.View):
 			status = 'success'
 			message = u'已寄送到您的電子信箱'
 			os.remove(attach_file_path)
-		if request.POST.has_key('delete'):
-			book_ISBN = request.POST.get('delete')
-			deleteBook = Book.objects.get(ISBN = book_ISBN)
-			deletePath = deleteBook.path
-			shutil.rmtree(deletePath)
-			deleteBook.delete()
-			status = 'success'
-			message = u'成功刪除文件'
+#		if request.POST.has_key('delete'):
+#			book_ISBN = request.POST.get('delete')
+#			deleteBook = Book.objects.get(ISBN = book_ISBN)
+#			deletePath = deleteBook.path
+#			shutil.rmtree(deletePath)
+#			deleteBook.delete()
+#			status = 'success'
+#			message = u'成功刪除文件'
 		book_list = user.guest.own_book_set.all()
 		edit_book_list = user.guest.own_book_set.all().exclude(status=Book.STATUS['edit'])
 		finish_book_list = user.guest.own_book_set.all().filter(status=Book.STATUS['finish'])

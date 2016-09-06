@@ -65,9 +65,9 @@ def search_book(request, template_name):
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
-		event = Event.objects.get(content_type__model='book', object_id=book.ISBN, status=Event.STATUS['review'])
 	except:
 		raise Http404("book does not exist")
+	events = Event.objects.filter(content_type__model='book', object_id=book.ISBN, status=Event.STATUS['review'])
 	org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(book.book_info.ISBN,"org")
 	source_path = book.path +u'/source'
 	scanPageList=[]
@@ -83,18 +83,20 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 				book.status = book.STATUS['active']
 			elif book.status == book.STATUS['indesignate']:
 				book.status = book.STATUS['designate']
-			book.save()
 			shutil.rmtree(org_path)
+			for event in events:
+				event.response(status=status, message=message, user=request.user)
+			book.save()
 			status = 'success'
 			message = u'審核通過文件'
-			event.response(status=status, message=message, user=request.user)
 		if request.POST['review'] == 'error':
 			shutil.rmtree(book.path)
-			book.delete()
 			shutil.rmtree(org_path)
+			book.delete()
 			status = 'success'
 			message = u'審核退回文件'
-			event.response(status='error', message=request.POST['reason'], user=request.user)
+			for event in events:
+				event.response(status='error', message=request.POST['reason'], user=request.user)
 		redirect_to = reverse('manager:event_list', kwargs={'action':'book' })
 		return locals()
 
@@ -103,40 +105,42 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'):
 	try:
 		part = EBook.objects.get(ISBN_part=ISBN_part)
-		event = Event.objects.get(content_type__model='ebook', object_id=part.ISBN_part, status=Event.STATUS['review'])
 	except:
 		raise Http404("book does not exist")
+	events = Event.objects.filter(content_type__model='ebook', object_id=part.ISBN_part, status=Event.STATUS['review'])
 	if request.method == 'GET':
 		part.clean_tag()
 		html_url = part.get_html()
-		edit_distance = part.edit_distance(part.get_path(), part.get_path('-finish'))
+#		edit_distance = part.edit_distance(part.get_path(), part.get_path('-finish'))
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
 			part.status = part.STATUS['finish']
 			if part.book.collect_finish_part_count() == part.book.part_count:
 				part.book.status = part.book.STATUS['finish']
-				part.book.save()
 			month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
 			try:
 				month_ServiceHours = ServiceHours.objects.get(user=event.creater, date=month_day)
 			except:
 				month_ServiceHours = ServiceHours.objects.create(user=event.creater, date=month_day)
 			part.serviceHours = month_ServiceHours
-			part.save()
 			month_ServiceHours.service_hours = month_ServiceHours.service_hours +part.service_hours
-			month_ServiceHours.save()
 			import shutil
 			shutil.copy2(part.get_path('-clean'), part.get_path('-final'))
+			part.book.save()
+			part.save()
+			month_ServiceHours.save()
 			status = 'success'
 			message = u'審核通過文件'
-			event.response(status=status, message=message, user=request.user)
+			for event in events:
+				event.response(status=status, message=message, user=request.user)
 		if request.POST['review'] == 'error':
 			part.status = part.STATUS['revise']
 			part.save()
 			status = 'success'
 			message = u'審核退回文件'
-			event.response(status='error', message=request.POST['reason'], user=request.user)
+			for event in events:
+				event.response(status='error', message=request.POST['reason'], user=request.user)
 		os.remove(BASE_DIR +'/static/' +html_url)
 		redirect_to = reverse('manager:event_list', kwargs={'action':'ebook' })
 		return locals()
@@ -362,7 +366,9 @@ class editView(generic.View):
 			redirect_to = reverse('account:profile')
 			status = 'success'
 			message = u'完成文件校對，將進入審核'
-			event = Event.objects.create(creater=user, action=part)
+			events = Event.objects.filter(content_type__model='ebook', object_id=part.ISBN_part, status=Event.STATUS['review'])
+			if len(events) == 0:
+				event = Event.objects.create(creater=user, action=part)
 		return locals()
 
 def readme(request, template_name):

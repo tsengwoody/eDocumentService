@@ -12,7 +12,10 @@ from genericUser.models import *
 
 @user_category_check(['manager'])
 def event_list(request, action):
-	events = Event.objects.filter(content_type__model=action, status=Event.STATUS['review']).exclude(creater=request.user)
+	if request.user.is_superuser:
+		events = Event.objects.filter(content_type__model=action, status=Event.STATUS['review'])
+	else:
+		events = Event.objects.filter(content_type__model=action, status=Event.STATUS['review']).exclude(creater=request.user)
 	template_name = 'manager/event_list_' +action +'.html'
 	return render(request, template_name, locals())
 
