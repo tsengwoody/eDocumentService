@@ -147,12 +147,13 @@ class profileView(generic.View):
 			reEditPart = EBook.objects.get(ISBN_part = ISBN_part)
 			reEditPart.status = reEditPart.STATUS['edit']
 			reEditPart.finish_date = None
-			reEditPart.save()
 			os.rename(reEditPart.get_path('-finish'), reEditPart.get_path('-edit'))
 			with codecs.open(reEditPart.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
 				finishFile.write(u'\ufeff')
-			event = Event.objects.get(content_type__model='ebook', object_id=reEditPart.ISBN_part)
-			event.delete()
+			events = Event.objects.filter(content_type__model='ebook', object_id=reEditPart.ISBN_part, status=Event.STATUS['review'])
+			for event in events:
+				event.delete()
+			reEditPart.save()
 			status = 'success'
 			message = u'再編輯文件{}'.format(reEditPart.__unicode__())
 		else:
