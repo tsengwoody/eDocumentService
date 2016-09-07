@@ -21,39 +21,37 @@ html, body, .container, .row{
 .oneColumn-text
 {
     height: 30%;
-   
-   
 }
 .oneColumn-image
 {
     height: 70%;   
-    margin-bottom: 25px;
-
+    margin-bottom: 30px;
 }
 textarea.form-control{
-   height: 90%;
+
+   height: 87%;
    width:100%;
 }
 
 #imagePage > nav{
-    height:10%;
-    min-height:30px;
+    height:30px;
 }
-#imagePage > .row{
-    min-height:30px;
-    height:10%;
+#imagePage > #sizeControl{
+  margin-bottom: 10px;
+  margin-top:10px;
+  height:30px;
+}
+#imagePage{
+  /*padding-top:30px;*/
+  padding-bottom: 60px;
 }
 .scrollbarDiv{
    overflow: scroll;
-   height:80%;
+   height:100%;
+   width: 100%;
 }
 
 .centered{
     display: inline-block;
     float:none;
 }
-#sizeControl{
-    margin-top:10px;
-    margin-bottom:10px;
-}
-.
