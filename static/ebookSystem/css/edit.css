@@ -12,7 +12,7 @@ html, body, .container, .row{
 }
 
 #dataContent,.towColumn{
-    height: 98%;
+    height: 100%;
     margin:0px;
 }
 .inline {
@@ -21,22 +21,26 @@ html, body, .container, .row{
 .oneColumn-text
 {
     height: 30%;
-    margin:0px;
+   
+   
 }
 .oneColumn-image
 {
-    height: 70%;
-    margin:0px;
+    height: 70%;   
+    margin-bottom: 25px;
+
 }
 textarea.form-control{
-   height: 75%;
+   height: 90%;
    width:100%;
 }
 
 #imagePage > nav{
     height:10%;
+    min-height:30px;
 }
 #imagePage > .row{
+    min-height:30px;
     height:10%;
 }
 .scrollbarDiv{
