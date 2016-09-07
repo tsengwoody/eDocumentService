@@ -28,13 +28,12 @@ html, body, .container, .row{
     margin-bottom: 40px;
 }
 textarea.form-control{
-
    height: 87%;
    width:100%;
 }
 
 #imagePage > nav{
-    height:30px;
+  height:30px;
 }
 #imagePage > #sizeControl{
   margin-bottom: 10px;

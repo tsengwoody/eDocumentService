@@ -281,11 +281,26 @@ function createHtmlEditor(){
   force_br_newlines : false,
   force_p_newlines : false,
   selector: 'textarea',  // change this value according to your HTML
-  toolbar1: 'skip_mark | mark | 存擋 | 完成 | 關閉 | 切換版型',
-  toolbar2: 'undo redo | cut copy paste | bullist numlist | table | fontsizeselect',
+  toolbar1: '載入全文 | skip_mark | mark | 存擋 | 完成 | 關閉 | 切換版型',
+  toolbar2: 'undo redo | cut copy paste | bullist numlist | table | searchreplace | fontsizeselect ',
   fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt',
   menubar: false,
   setup: function (editor) {
+    editor.on('change', function(e) {
+        //console.log(idel_min);
+        idel_min=0;
+        change_count++;
+    });
+
+    editor.addButton('載入全文', {
+      text: '載入全文',
+      icon: false,
+      onclick: function () {
+        function_click=true;
+        catchErrorHandling("load","");
+      }
+    });
+
     editor.addButton('skip_mark', {
       text: 'skip_mark',
       icon: false,
@@ -294,11 +309,7 @@ function createHtmlEditor(){
         addMark(message,editor);
       }
     });
-    editor.on('change', function(e) {
-        //console.log(idel_min);
-        idel_min=0;
-        change_count++;
-    });
+
     editor.addButton('mark', {
       text: 'mark',
       icon: false,
@@ -358,7 +369,7 @@ function createHtmlEditor(){
 
   },
   plugins: [
-  'save table'],
+  'save table searchreplace'],
 
 });
 
