@@ -55,4 +55,6 @@ $(document).ready(function() {
     $('#nextPage').on("click", function() {
         changePage(1);
     });
+    if($('#includedContent').length>0)
+        $("#includedContent").load($('#url').val()); 
 });

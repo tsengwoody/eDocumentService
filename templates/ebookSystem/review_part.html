@@ -8,6 +8,7 @@
 {% endblock %}
 
 
+
 {% block review_title %}{{ part.book.book_info.bookname }}{{ part.part }}審核{% endblock %}
 
 {% block review_step1_title %}Step1:基本資料{% endblock %}
@@ -27,5 +28,6 @@
 {% endblock %}
 
 {% block review_step2 %}
-<p><a href="{% static html_url %}">文件</a></p>
+<div id="includedContent"></div>
+<input type="hidden"  id="url" value="{% static html_url %}">
 {% endblock %}

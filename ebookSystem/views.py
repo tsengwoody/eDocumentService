@@ -63,6 +63,8 @@ def search_book(request, template_name):
 @user_category_check(['manager'])
 @http_response
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
+	status = 'error'
+	message= 'referenced before assignment'
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
 	except:

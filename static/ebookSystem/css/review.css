@@ -4,6 +4,8 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+
+/*
 .container > form, .container>form>.row {
     height:100%;
 }
@@ -12,25 +14,52 @@
 }
 .tab-content > div {
     height:100%;
-    /*padding-bottom:30px;*/
-}
+}*/
+
+/*仍希望可以修正這個部分*/
 #step2 > nav {
-    height:10%;
-    
+    height:30px;  
+}
+#step2 > .scrollbarDiv{
+    width:100%;
+    height:100%;
+    overflow: scroll;
+}
+#includedContent{
+    width:100%;
+    height:100%;
+    overflow: scroll;
+}
+#step2 > .row{
+    margin-top:10px;
+    height:50px;
+}
+#step2{
+    height:100%;
+    padding-bottom: 135px; /*review_doc:135 review_part75*/
+}
+
+.scrollbarDiv > img {
+    width:100%;
+}
+.tab-content{
+    height:100%;
+}
+
+
+
+/*
+
+#step2 > nav {
+    height:10%;  
 }
 #step2 > .scrollbarDiv{
     height:75%;
     overflow: scroll;
 }
-#step2 > pre{
-    height:85%;
-    overflow: scroll;    
-}
 #step2 > .row{
     height:15%;
     min-height:35px;
 }
-.scrollbarDiv > img {
-    width:90%;
-    
-}
+
+*/
