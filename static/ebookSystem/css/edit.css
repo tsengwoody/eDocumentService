@@ -12,7 +12,7 @@ html, body, .container, .row{
 }
 
 #dataContent,.towColumn{
-    height: 98%;
+    height: 100%;
     margin:0px;
 }
 .inline {
@@ -21,35 +21,37 @@ html, body, .container, .row{
 .oneColumn-text
 {
     height: 30%;
-    margin:0px;
 }
 .oneColumn-image
 {
-    height: 70%;
-    margin:0px;
+    height: 70%;   
+    margin-bottom: 40px;
 }
 textarea.form-control{
-   height: 75%;
+
+   height: 87%;
    width:100%;
 }
 
 #imagePage > nav{
-    height:10%;
+    height:30px;
 }
-#imagePage > .row{
-    height:10%;
+#imagePage > #sizeControl{
+  margin-bottom: 10px;
+  margin-top:10px;
+  height:30px;
+}
+#imagePage{
+  /*padding-top:30px;*/
+  padding-bottom: 60px;
 }
 .scrollbarDiv{
    overflow: scroll;
-   height:80%;
+   height:100%;
+   width: 100%;
 }
 
 .centered{
     display: inline-block;
     float:none;
 }
-#sizeControl{
-    margin-top:10px;
-    margin-bottom:10px;
-}
-.
