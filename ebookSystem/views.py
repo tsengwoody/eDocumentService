@@ -84,11 +84,11 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 			elif book.status == book.STATUS['indesignate']:
 				book.status = book.STATUS['designate']
 			shutil.rmtree(org_path)
-			for event in events:
-				event.response(status=status, message=message, user=request.user)
 			book.save()
 			status = 'success'
 			message = u'審核通過文件'
+			for event in events:
+				event.response(status=status, message=message, user=request.user)
 		if request.POST['review'] == 'error':
 			shutil.rmtree(book.path)
 			shutil.rmtree(org_path)
@@ -108,9 +108,9 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 	except:
 		raise Http404("book does not exist")
 	events = Event.objects.filter(content_type__model='ebook', object_id=part.ISBN_part, status=Event.STATUS['review'])
+	part.clean_tag()
+	html_url = part.get_html()
 	if request.method == 'GET':
-		part.clean_tag()
-		html_url = part.get_html()
 #		edit_distance = part.edit_distance(part.get_path(), part.get_path('-finish'))
 		return locals()
 	if request.method == 'POST':
@@ -119,23 +119,26 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 			if part.book.collect_finish_part_count() == part.book.part_count:
 				part.book.status = part.book.STATUS['finish']
 			month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
-			try:
-				month_ServiceHours = ServiceHours.objects.get(user=event.creater, date=month_day)
-			except:
-				month_ServiceHours = ServiceHours.objects.create(user=event.creater, date=month_day)
-			part.serviceHours = month_ServiceHours
-			month_ServiceHours.service_hours = month_ServiceHours.service_hours +part.service_hours
+			if len(events) > 0:
+				try:
+					month_ServiceHours = ServiceHours.objects.get(user=events[0].creater, date=month_day)
+				except:
+					month_ServiceHours = ServiceHours.objects.create(user=events[0].creater, date=month_day)
+				part.serviceHours = month_ServiceHours
+				month_ServiceHours.service_hours = month_ServiceHours.service_hours +part.service_hours
+				month_ServiceHours.save()
 			import shutil
 			shutil.copy2(part.get_path('-clean'), part.get_path('-final'))
 			part.book.save()
 			part.save()
-			month_ServiceHours.save()
 			status = 'success'
 			message = u'審核通過文件'
 			for event in events:
 				event.response(status=status, message=message, user=request.user)
 		if request.POST['review'] == 'error':
-			part.status = part.STATUS['revise']
+			part.status = part.STATUS['edit']
+			part.finish_date = None
+			part.load_full_content()
 			part.save()
 			status = 'success'
 			message = u'審核退回文件'
@@ -276,21 +279,22 @@ def edit_ajax(request, ISBN_part, *args, **kwargs):
 	if not hasattr(request.user, 'online'):
 		response['status'] = u'error'
 		response['message'] = u'已登出'
-	if 'online' in request.POST:
-		delta = timezone.now() - user.online
-		if delta.seconds < 50:
-			response['status'] = u'error'
-			response['message'] = u'您有其他編輯正進行'
-		else:
-			user.online = timezone.now()
-			user.save()
-			part = EBook.objects.get(ISBN_part=ISBN_part)
-			part.service_hours = part.service_hours+1
-			part.save()
-			response['status'] = u'success'
-			response['message'] = part.service_hours
-	else:
+	if not request.POST.has_key('online'):
 		response['status'] = 'error'
+		response['message'] = ''
+		return HttpResponse(json.dumps(response), content_type="application/json")
+	delta = timezone.now() - user.online
+	if delta.seconds < 50:
+		response['status'] = u'error'
+		response['message'] = u'您有其他編輯正進行'
+		return HttpResponse(json.dumps(response), content_type="application/json")
+	user.online = timezone.now()
+	user.save()
+	part = EBook.objects.get(ISBN_part=ISBN_part)
+	part.service_hours = part.service_hours+1
+	part.save()
+	response['status'] = u'success'
+	response['message'] = part.service_hours
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 def create_SpecialContent_ajax(request, ISBN_part, *args, **kwargs):
@@ -335,21 +339,17 @@ class editView(generic.View):
 			part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
 		except:
 			raise Http404("book or part does not exist")
-		[scanPageList, defaultPageURL] = part.get_image(request.user)
 		editForm = EditForm(request.POST)
+		content = request.POST['content']
 		if request.POST.has_key('save'):
-			content = request.POST['content']
 			[finishContent, editContent] = part.split_content(content)
 			if finishContent == '' or editContent == '':
 				status = 'error'
 				message = u'標記位置不可在首行或末行'
 				return locals()
 			part.set_content(finish_content=finishContent, edit_content=editContent)
-#			part.set_content(finish_content='', edit_content=content)
 			part.edited_page=int(request.POST['page'])
 			part.save()
-			[scanPageList, defaultPageURL] = part.get_image(request.user)
-			[editContent, fileHead] = part.get_content('-edit')
 			status = 'success'
 			message = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
 		elif request.POST.has_key('close'):
@@ -357,7 +357,6 @@ class editView(generic.View):
 			message = u'關閉無儲存資料'
 			redirect_to = reverse('account:profile')
 		elif request.POST.has_key('finish'):
-			content = request.POST['content']
 			part.set_content(finish_content=content, edit_content='')
 			part.edited_page = int(request.POST['page'])
 			part.status = part.STATUS['review']
@@ -369,6 +368,12 @@ class editView(generic.View):
 			events = Event.objects.filter(content_type__model='ebook', object_id=part.ISBN_part, status=Event.STATUS['review'])
 			if len(events) == 0:
 				event = Event.objects.create(creater=user, action=part)
+		elif request.POST.has_key('load'):
+			part.load_full_content()
+			status = 'error'
+			message = u'成功載入全部文件內容'
+		[scanPageList, defaultPageURL] = part.get_image(request.user)
+		[editContent, fileHead] = part.get_content('-edit')
 		return locals()
 
 def readme(request, template_name):

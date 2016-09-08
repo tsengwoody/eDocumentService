@@ -248,6 +248,14 @@ class EBook(models.Model):
 			fileWrite.write(fileHead+edit_content)
 		return True
 
+	def load_full_content(self, fileHead = u'\ufeff'):
+		edit_content = self.get_content('-edit')[0]
+		finish_content = self.get_content('-finish')[0]
+		self.set_content('', finish_content +edit_content)
+		with codecs.open(self.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
+			finishFile.write(u'\ufeff')
+		return finish_content +edit_content
+
 	def get_org_image(self, user):
 		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, "org")
 		source_path = self.book.path +u'/source'

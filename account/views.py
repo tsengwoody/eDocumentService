@@ -65,7 +65,7 @@ class profileView(generic.View):
 				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
 				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
-			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active'])[0]
+			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
 			getPart.editor = request.user.editor
 			getPart.get_date = timezone.now()
 			getPart.deadline = getPart.get_date + datetime.timedelta(days=5)
@@ -147,9 +147,7 @@ class profileView(generic.View):
 			reEditPart = EBook.objects.get(ISBN_part = ISBN_part)
 			reEditPart.status = reEditPart.STATUS['edit']
 			reEditPart.finish_date = None
-			os.rename(reEditPart.get_path('-finish'), reEditPart.get_path('-edit'))
-			with codecs.open(reEditPart.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
-				finishFile.write(u'\ufeff')
+			reEditPart.load_full_content()
 			events = Event.objects.filter(content_type__model='ebook', object_id=reEditPart.ISBN_part, status=Event.STATUS['review'])
 			for event in events:
 				event.delete()
