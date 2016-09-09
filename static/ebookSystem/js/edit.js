@@ -388,7 +388,14 @@ $(document).ready(function() {
     function_click = false;
     idel_min =0;
     change_count=0;
-    $('#Dialog').modal('show');
+    var dialog='#Dialog';
+    $(dialog).on('shown.bs.modal', function () {
+        $(dialog+" .close").focus();
+    });
+    $(dialog).modal();
+
+
+
     var csrftoken = getCookie('csrftoken');
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
