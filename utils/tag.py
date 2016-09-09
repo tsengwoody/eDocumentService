@@ -14,8 +14,6 @@ def merge_NavigableString(tag):
 	else:
 		for i in xrange(len(tag.contents)-1, -1, -1):
 			merge_NavigableString(tag.contents[i])
-#		for tag_child in tag.contents:
-#			merge_NavigableString(tag_child)
 
 def add_tag(source, destination, encoding='utf-8'):
 	edit_content = ''
@@ -54,7 +52,8 @@ def clean_tag(source,  destination, title, encoding='utf-8'):
 	soup = BeautifulSoup(source_content, 'lxml')
 	span_tags = soup.find_all('span')
 	for span_tag in span_tags:
-		span_tag.unwrap()
+		if not span_tag.attrs.has_key('page'):
+			span_tag.unwrap()
 	div_tags = soup.find_all('div')
 	for div_tag in div_tags:
 		div_tag.name = 'p'
@@ -71,6 +70,6 @@ def clean_tag(source,  destination, title, encoding='utf-8'):
 
 import sys
 if __name__ == '__main__':
-#	add_tag(sys.argv[1], sys.argv[2])
+	add_tag(sys.argv[1], sys.argv[1])
 	add_template_tag(sys.argv[1], sys.argv[2], 'book_template.html')
 	clean_tag(sys.argv[2], sys.argv[2])

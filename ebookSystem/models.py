@@ -115,13 +115,13 @@ class Book(models.Model):
 	def collect_is_finish(self):
 		is_finish = True
 		for part in self.ebook_set.all():
-			is_finish = is_finish and part.status == FINISH
+			is_finish = is_finish and part.status == part.STATUS['finish']
 		return is_finish
 
 	def collect_finish_page_count(self):
 		finish_page_count = 0
 		for part in self.ebook_set.all():
-			finish_page_count = finish_page_count + part.edited_page + (part.status==FINISH)
+			finish_page_count = finish_page_count + part.edited_page + (part.status==part.STATUS['finish'])
 		return finish_page_count
 
 	def collect_finish_part_count(self):
@@ -338,8 +338,7 @@ class EBook(models.Model):
 		html_path = BASE_DIR +u'/static/ebookSystem/document/{0}/OCR'.format(self.book.book_info.ISBN)
 		if not os.path.exists(html_path):
 			os.makedirs(html_path)
-		if not os.path.exists(html_path +'/part{0}-final.html'.format(self.part)):
-			shutil.copyfile(self.get_path('-clean'), html_path +'/part{0}-final.html'.format(self.part))
+		shutil.copyfile(self.get_path('-clean'), html_path +'/part{0}-final.html'.format(self.part))
 		default_page_url = html_path +'/part{0}-final.html'.format(self.part)
 		default_page_url = default_page_url.replace(BASE_DIR +'/static/', '')
 		return default_page_url

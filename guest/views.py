@@ -26,7 +26,7 @@ class profileView(generic.View):
 		template_name=self.template_name
 		user=request.user
 		book_list = user.guest.own_book_set.all()
-		edit_book_list = user.guest.own_book_set.all().exclude(status=Book.STATUS['edit'])
+		edit_book_list = user.guest.own_book_set.all().exclude(status=Book.STATUS['finish'])
 		finish_book_list = user.guest.own_book_set.all().filter(status=Book.STATUS['finish'])
 #		for book in book_list:
 #			if Book.STATUS == Book.STATUS['finish']:
@@ -71,6 +71,6 @@ class profileView(generic.View):
 #			status = 'success'
 #			message = u'成功刪除文件'
 		book_list = user.guest.own_book_set.all()
-		edit_book_list = user.guest.own_book_set.all().exclude(status=Book.STATUS['edit'])
+		edit_book_list = user.guest.own_book_set.all().exclude(status=Book.STATUS['finish'])
 		finish_book_list = user.guest.own_book_set.all().filter(status=Book.STATUS['finish'])
 		return locals()

@@ -118,8 +118,6 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
 			part.status = part.STATUS['finish']
-			if part.book.collect_finish_part_count() == part.book.part_count:
-				part.book.status = part.book.STATUS['finish']
 			month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
 			if len(events) > 0:
 				try:
@@ -133,6 +131,8 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 			shutil.copy2(part.get_path('-clean'), part.get_path('-final'))
 			part.book.save()
 			part.save()
+			if part.book.collect_finish_part_count() == part.book.part_count:
+				part.book.status = part.book.STATUS['finish']
 			status = 'success'
 			message = u'審核通過文件'
 			for event in events:
@@ -348,6 +348,8 @@ class editView(generic.View):
 			if finishContent == '' or editContent == '':
 				status = 'error'
 				message = u'標記位置不可在首行或末行'
+				[scanPageList, defaultPageURL] = part.get_image(request.user)
+				[editContent, fileHead] = part.get_content('-edit')
 				return locals()
 			part.set_content(finish_content=finishContent, edit_content=editContent)
 			part.edited_page=int(request.POST['page'])
@@ -372,7 +374,7 @@ class editView(generic.View):
 				event = Event.objects.create(creater=user, action=part)
 		elif request.POST.has_key('load'):
 			part.load_full_content()
-			status = 'error'
+			status = 'success'
 			message = u'成功載入全部文件內容'
 		[scanPageList, defaultPageURL] = part.get_image(request.user)
 		[editContent, fileHead] = part.get_content('-edit')
