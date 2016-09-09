@@ -1,4 +1,4 @@
-﻿function catchErrorHandling(buttonKey,buttonValue)
+﻿/*function catchErrorHandling(buttonKey,buttonValue)
 {
     var transferData={};
     transferData[buttonKey]=buttonValue;
@@ -14,7 +14,7 @@
             console.log(xhr.status + ": " + xhr.responseText);
         }
     });
-}
+}*/
 function alertDialog(json) {
     //console.log(json);
     var str=(json.status=='error')?'danger':'success'
