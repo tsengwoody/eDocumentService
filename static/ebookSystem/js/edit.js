@@ -14,7 +14,6 @@
             console.log(xhr.status + ": " + xhr.responseText);
         }
     });
-
 }
 function alertDialog(json) {
     //console.log(json);
@@ -297,7 +296,9 @@ function createHtmlEditor(){
       icon: false,
       onclick: function () {
         function_click=true;
-        catchErrorHandling("load","");
+        //catchErrorHandling("load","");
+        $('form').append($("<input>").attr("type", "hidden").attr("name", "load").val("load"));
+        $('form').submit();
       }
     });
 
@@ -330,7 +331,9 @@ function createHtmlEditor(){
         else{
             function_click=true;
             editor.save();
-            catchErrorHandling("save","");
+            //catchErrorHandling("save","");
+            $('form').append($("<input>").attr("type", "hidden").attr("name", "save").val("save"));
+            $('form').submit();
 
         }
       }
@@ -345,7 +348,10 @@ function createHtmlEditor(){
         else{
             function_click=true;
             editor.save();
-            catchErrorHandling("finish","");
+            //catchErrorHandling("finish","");
+            $('form').append($("<input>").attr("type", "hidden").attr("name", "finish").val("finish"));
+            $('form').submit();
+
         }
       }
     });
@@ -355,7 +361,9 @@ function createHtmlEditor(){
       icon: false,
       onclick: function () {
         function_click=true;
-        catchErrorHandling("close","");
+        //catchErrorHandling("close","");
+        $('form').append($("<input>").attr("type", "hidden").attr("name", "close").val("close"));
+        $('form').submit();
       }
     });
     editor.addButton('切換版型', {
@@ -380,7 +388,7 @@ $(document).ready(function() {
     function_click = false;
     idel_min =0;
     change_count=0;
-
+    $('#Dialog').modal('show');
     var csrftoken = getCookie('csrftoken');
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
