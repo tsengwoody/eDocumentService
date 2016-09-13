@@ -1,21 +1,4 @@
-﻿/*function catchErrorHandling(buttonKey,buttonValue)
-{
-    var transferData={};
-    transferData[buttonKey]=buttonValue;
-    $.ajax({
-        url:".",
-        type: "POST",
-        data: $("form").serialize()+'&'+buttonKey+'='+buttonValue,
-        success: function(json){
-            alertDialog(json);
-        },
-        error:function(xhr,errmsg,err){
-            //alert(xhr.status+" "+xhr.responseText);
-            console.log(xhr.status + ": " + xhr.responseText);
-        }
-    });
-}*/
-function alertDialog(json) {
+﻿function alertDialog(json) {
     //console.log(json);
     var str=(json.status=='error')?'danger':'success'
     var dialog='#'+str+'Dialog';
@@ -280,7 +263,7 @@ function createHtmlEditor(){
   force_br_newlines : false,
   force_p_newlines : false,
   selector: 'textarea',  // change this value according to your HTML
-  toolbar1: '載入全文 | skip_mark | mark | 存擋 | 完成 | 關閉 | 切換版型',
+  toolbar1: 'mark | 載入全文  | 存擋 | 完成 | 關閉 |  切換版型',
   toolbar2: 'undo redo | cut copy paste | bullist numlist | table | searchreplace | fontsizeselect ',
   fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt',
   menubar: false,
@@ -289,6 +272,37 @@ function createHtmlEditor(){
         //console.log(idel_min);
         idel_min=0;
         change_count++;
+    });
+
+    editor.addButton('mark', {
+      type: 'menubutton',
+      text: 'mark',
+      icon: false,
+      menu: [{
+        text: 'image_mark',
+        onclick: function() {
+          var message = '<p><img id="'+$('#scanPageList :selected').val()+'" alt="this is a picture" height="42" width="42"></p>';
+          addMark(message,editor);
+        }
+      }, {
+        text: 'unknown_mark',
+        onclick: function() {
+          var message = '<p><span class="unknown" id="'+$('#scanPageList :selected').val()+'"><font style="color:red">{???}</font></span></p>';
+          addMark(message,editor)
+        }
+      },{
+        text: 'mathml_mark',
+        onclick: function() {
+          var message = '<p><span class="mathml" id="'+$('#scanPageList :selected').val()+'"><font style="color:blue">mathml</font></span></p>';
+          addMark(message,editor);
+        }
+      },{
+        text: 'save_mark',
+        onclick: function() {
+          var message = '<p>|----------|</p>';
+          addMark(message,editor);
+        }
+      }]
     });
 
     editor.addButton('載入全文', {
@@ -302,24 +316,7 @@ function createHtmlEditor(){
       }
     });
 
-    editor.addButton('skip_mark', {
-      text: 'skip_mark',
-      icon: false,
-      onclick: function () {
-        var message = '<p>{{{'+$('#scanPageList :selected').val()+'}}}</p>';
-        addMark(message,editor);
-      }
-    });
-
-    editor.addButton('mark', {
-      text: 'mark',
-      icon: false,
-      onclick: function () {
-        var message = '<p>|----------|</p>';
-        addMark(message,editor);
-
-      }
-    });
+    
 
     editor.addButton('存擋', {
       text: '存擋',
@@ -380,8 +377,6 @@ function createHtmlEditor(){
   'save table searchreplace'],
 
 });
-
-
 }
 $(document).ready(function() {
     console.log("ready!");

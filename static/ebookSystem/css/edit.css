@@ -11,7 +11,7 @@ html, body, .container, .row{
   height: 100%;
 }
 
-#dataContent,.towColumn{
+.towColumn{
     height: 100%;
     margin:0px;
 }
@@ -24,11 +24,12 @@ html, body, .container, .row{
 }
 .oneColumn-image
 {
-    height: 70%;   
-    margin-bottom: 40px;
+    height: 70%;  
+    margin-bottom: 50px; 
 }
+
 textarea.form-control{
-   height: 87%;
+   height: 80%;
    width:100%;
 }
 
@@ -43,7 +44,16 @@ textarea.form-control{
 #imagePage{
   /*padding-top:30px;*/
   padding-bottom: 60px;
+  
 }
+
+
+@media screen and (min-width: 400px) {
+  #imagePage {
+     margin-bottom: 50px; 
+  }
+}
+
 .scrollbarDiv{
    overflow: scroll;
    height:100%;
