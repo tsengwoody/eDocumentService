@@ -295,7 +295,7 @@ function createHtmlEditor(){
       },{
         text: 'mathml_mark',
         onclick: function() {
-          var message = '<p><span class="mathml" id="'+$('#scanPageList :selected').val()+'"><font style="color:blue">mathml</font></span></p>';
+          var message = '<p><span class="mathml" style="color:blue" id="'+$('#scanPageList :selected').val()+'">mathml</span></p>';
           addMark(message,editor);
         }
       },{
