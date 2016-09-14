@@ -283,12 +283,14 @@ function createHtmlEditor(){
         onclick: function() {
           var message = '<p><img id="'+$('#scanPageList :selected').val()+'" alt="this is a picture" height="42" width="42"></p>';
           addMark(message,editor);
+          //editor.insertContent();
         }
       }, {
         text: 'unknown_mark',
         onclick: function() {
-          var message = '<p><span class="unknown" id="'+$('#scanPageList :selected').val()+'"><font style="color:red">{???}</font></span></p>';
-          addMark(message,editor)
+          var message = '<span class="unknown" id="'+$('#scanPageList :selected').val()+'"><font style="color:red">{???}</font></span>';
+          editor.insertContent(message);
+            
         }
       },{
         text: 'mathml_mark',
