@@ -288,7 +288,7 @@ function createHtmlEditor(){
       }, {
         text: 'unknown_mark',
         onclick: function() {
-          var message = '<span class="unknown" id="'+$('#scanPageList :selected').val()+'"><font style="color:red">{???}</font></span>';
+          var message = '<span class="unknown" style="color: red;" id="'+$('#scanPageList :selected').val()+'">{???}</span>';
           editor.insertContent(message);
             
         }
