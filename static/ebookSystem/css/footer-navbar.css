@@ -36,3 +36,8 @@ code {
 .muted {
     color: #999999;
 }
+
+.center-pills {
+    display: flex;
+    justify-content: center;
+}
