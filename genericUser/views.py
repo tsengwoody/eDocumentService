@@ -1,4 +1,5 @@
 ﻿# coding: utf-8
+from django.core.cache import cache
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse,HttpResponseRedirect
@@ -351,6 +352,9 @@ def servicehours_list(request, template_name='genericUser/servicehours_list.html
 		return locals()
 	if request.method == 'GET':
 		return locals()
+
+#def verify_contact_info(request, media, template='genericUser/verify_contact_info.html'):
+
 
 from django.contrib import messages
 def test_message(request, template_name):

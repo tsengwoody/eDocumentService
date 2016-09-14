@@ -41,9 +41,9 @@ class profileView(generic.View):
 		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
 		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 		if request.POST.has_key('getPart'):
-			if len(editingPartList)>=3:
+			if len(editingPartList)>=10:
 				status = 'error'
-				message = u'您已有超過3段文件，請先校對完成再領取'
+				message = u'您已有超過10段文件，請先校對完成再領取'
 				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
 				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
@@ -74,9 +74,9 @@ class profileView(generic.View):
 			status = 'success'
 			message = u'成功取得文件{}'.format(getPart.__unicode__())
 		elif request.POST.has_key('getCompleteBook'):
-			if len(editingPartList)>3:
+			if len(editingPartList)>10:
 				status = 'error'
-				message = u'您已有超過3段文件，請先校對完成再領取'
+				message = u'您已有超過10段文件，請先校對完成再領取'
 				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
 				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
@@ -106,9 +106,9 @@ class profileView(generic.View):
 				message = u'您無設定指定對象，請設定指定對象後再領取。'
 				redirect_to = reverse('genericUser:set_role')
 				return locals()
-			if len(editingPartList)>3:
+			if len(editingPartList)>10:
 				status = 'error'
-				message = u'您已有超過3段文件，請先校對完成再領取'
+				message = u'您已有超過10段文件，請先校對完成再領取'
 				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
 				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()

@@ -1,0 +1,94 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+聯絡資訊驗證
+{% endblock %}
+
+{% block style %}
+{% load staticfiles %}
+<script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
+{% endblock %}
+
+{% block header %}
+聯絡資訊驗證
+{% endblock %}
+
+{% block content %}
+<form action="" method="post" role="form">
+     <h3>聯絡我們</h3>
+    {% csrf_token %} 
+    {% if contactUsForm.errors %}
+    <div class="alert alert-danger" role="alert">
+        {{ contactUsForm.errors }}
+    </div>
+    {% endif %}
+   
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <table class="table table-hover table-reflow">
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_name"><font style="color:red">*</font>Name:</label>
+                    </th>
+                    <td class="col-md-8">
+                        {% if request.user.username %}
+                        <input id="id_name" maxlength="10" name="name" value={{ request.user.username }} type="text" placeholder="name" required readonly="true"/>
+                        {% else %}
+                        <input id="id_name" maxlength="10" name="name" type="text" placeholder="name" required />
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_email"><font style="color:red">*</font>Email:</label>
+                    </th>
+                    <td class="col-md-8">
+                                                {% if request.user.email %}
+                        <input id="id_email" maxlength="254" name="email" value={{ request.user.email }} type="email" placeholder="email" required readonly="true"/>
+                                                {% else %}
+                        <input id="id_email" maxlength="254" name="email" type="email" placeholder="email" required />
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_name"><font style="color:red">*</font>Kind:</label>
+                    </th>
+                    <td class="col-md-8">
+                        <select id="id_kind" name="kind">
+                            <option value="" selected="selected">---------</option>
+                            <option value="校對問題">校對問題</option>
+                            <option value="系統問題">系統問題</option>
+                            <option value="營運建議">營運建議</option>
+                            <option value="加入我們">加入我們</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_subject"><font style="color:red">*</font>Subject:</label>
+                    </th>
+                    <td class="col-md-8">
+                        <input id="id_subject" maxlength="50" name="subject" type="text" placeholder="subject" required />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4" scope="row">
+                        <label for="id_name"><font style="color:red">*</font>Content:</label>
+                    </th>
+                    <td class="col-md-8">
+                        <textarea id="id_content" maxlength="1000" name="content" type="text" required></textarea>
+                    </td>
+                </tr>
+            </table>
+            <div class="form-group row">
+                <div class="col-sm-offset-4 col-sm-6">
+                    <input type="submit" class="btn btn-primary send_form" value="send" id="send_id">
+                    <input type="reset" class="btn btn-danger" value="reset">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
