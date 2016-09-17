@@ -364,6 +364,18 @@ class editView(generic.View):
 		[editContent, fileHead] = part.get_content('-edit')
 		return locals()
 
-def readme(request, template_name):
-	template_name = resolve(request.path).namespace +'/' +template_name +'_readme.html'
-	return render(request, template_name, locals())
+@http_response
+def special_content(request, ISBN_part, template_name='ebookSystem/special_content.html'):
+	try:
+		part = EBook.objects.get(ISBN_part=ISBN_part)
+	except:
+		raise Http404("book does not exist")
+	if request.method == 'POST':
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+
+#def readme(request, template_name):
+#	template_name = resolve(request.path).namespace +'/' +template_name +'_readme.html'
+#	return render(request, template_name, locals())

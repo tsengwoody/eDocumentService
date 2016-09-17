@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
 	url(r'^book_info/(?P<ISBN>[0-9Xx]+)/$', views.book_info, name='book_info'),
 	url(r'^book_list/$', views.book_list.as_view(), name='book_list'),
+	url(r'^special_content/(?P<ISBN_part>[\d-]+)/$', views.special_content, name='special_content'),
 	url(r'^detail/(?P<book_ISBN>[0-9]+)/$', views.detail, name='detail'),
 	url(r'^edit/(?P<ISBN_part>[0-9\-]+)/$', views.editView.as_view(), name='edit'),
 	url(r'^edit_ajax/(?P<ISBN_part>[0-9\-]+)/$', views.edit_ajax, name='edit_ajax'),

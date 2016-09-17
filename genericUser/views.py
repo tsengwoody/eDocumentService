@@ -353,8 +353,43 @@ def servicehours_list(request, template_name='genericUser/servicehours_list.html
 	if request.method == 'GET':
 		return locals()
 
-#def verify_contact_info(request, media, template='genericUser/verify_contact_info.html'):
-
+@http_response
+def verify_contact_info(request, template='genericUser/verify_contact_info.html'):
+	if not request.is_ajax():
+		status = u'error'
+		message = u'非ajax請求'
+	if request.POST.has_key('generate'):
+		if request.POST['generate'] == 'email':
+			if not cache.has_key(request.user.email):
+				import random
+				import string
+				vcode = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+				cache.set(request.user.email, {'vcode':vcode}, 600)
+			from django.core.mail import EmailMessage
+			subject = u'[驗證] {0} 信箱驗證碼'.format(request.user.username)
+			body = u'新愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
+			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
+			email.send(fail_silently=False)
+			status = 'success'
+			message = u'已寄送到您的電子信箱'
+#		elif request.POST['generate'] == 'phone':
+		return locals()
+	if request.POST.has_key('verification_code') and request.POST.has_key('type'):
+		if request.POST['type'] == 'email':
+			if not cache.has_key(request.user.email):
+				status = u'error'
+				message = u'驗證碼已過期，請重新產生驗證碼'
+				return locals()
+			input_vcode = request.POST['verification_code']
+			vcode = cache.get(request.user.email)
+			if input_vcode == vcode:
+				status = u'success'
+				message = u'信箱驗證通過'
+			else:
+				status = u'error'
+				message = u'信箱驗證碼不符'
+#		elif request.POST['type'] == 'phone':
+		return locals()
 
 from django.contrib import messages
 def test_message(request, template_name):

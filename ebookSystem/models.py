@@ -144,7 +144,7 @@ class Book(models.Model):
 
 class EBook(models.Model):
 	ISBN_part = models.CharField(max_length=20, primary_key=True)
-	book = models.ForeignKey(Book)
+	book = models.ForeignKey(Book, on_delete=models.CASCADE)
 	part = models.IntegerField()
 	begin_page = models.IntegerField()
 	end_page = models.IntegerField()
@@ -156,7 +156,11 @@ class EBook(models.Model):
 	service_hours = models.IntegerField(default=0)
 	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL)
 	status = models.IntegerField(default=1)
-	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5}
+	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_active':5, 'sc_edit':6, 'sc_finish':7}
+	sc_editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_edit_ebook_set')
+	sc_finish_date = models.DateField(blank=True, null=True)
+	sc_deadline = models.DateField(blank=True, null=True)
+	sc_get_date = models.DateField(blank=True, null=True)
 
 	def status_int2str(self):
 		for k, v in self.STATUS.iteritems():
@@ -358,6 +362,83 @@ class EBook(models.Model):
 		title = self.book.book_info.bookname +'-part{0}'.format(self.part)
 		tag.clean_tag(destination, destination, title)
 
+	def create_SpecialContent(self, encoding='utf-8'):
+		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, "org")
+		source_path = self.book.path +u'/source'
+		fileList=os.listdir(source_path)
+		fileList = sorted(fileList)
+		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
+		scanPageList = scanPageList[self.begin_page:self.end_page+1]
+		source = self.get_path('-clean')
+		with codecs.open(source, 'r', encoding=encoding) as sourceFile:
+			source_content = sourceFile.read()
+		file_head = source_content[0]
+		source_content = source_content[1:]
+		from bs4 import BeautifulSoup, NavigableString
+		soup = BeautifulSoup(source_content, 'lxml')
+		span_tags = soup.find_all('span')
+		for span_tag in span_tags:
+			if span_tag.attrs.has_key('class') and ('unknown' in span_tag.attrs['class'] or 'mathml' in span_tag.attrs['class']):
+				p_tag_count = 0
+				for parent in span_tag.parents:
+					if parent.name == 'p':
+						span_tag_pparent = parent
+						p_tag_count = p_tag_count +1
+				if p_tag_count != 1:continue
+				try:
+					tag_id = span_tag_pparent['id']
+					page = scanPageList.index(span_tag['id'])
+				except:
+					continue
+				id = self.ISBN_part +'-' +tag_id
+				content = str(span_tag_pparent)
+				if 'unknown' in span_tag.attrs['class']:
+					type = SpecialContent.TYPE['unknown']
+				elif 'mathml' in span_tag.attrs['class']:
+					type = SpecialContent.TYPE['mathml']
+				else:
+					continue
+				try:
+					SpecialContent.objects.get(id=id)
+				except:
+					SpecialContent.objects.create(id=id, ebook=self, tag_id=tag_id, page=page, content=content, type=type)
+		img_tags = soup.find_all('img')
+		for img_tag in img_tags:
+			if not img_tag.attrs.has_key('src'):
+				p_tag_count = 0
+				for parent in img_tag.parents:
+					if parent.name == 'p':
+						img_tag_pparent = parent
+						p_tag_count = p_tag_count +1
+				if p_tag_count != 1:continue
+				try:
+					tag_id = img_tag_pparent['id']
+					page = scanPageList.index(img_tag['id'])
+				except:
+					continue
+				id = self.ISBN_part +'-' +tag_id
+				content = str(img_tag_pparent)
+				type = SpecialContent.TYPE['image']
+				try:
+					SpecialContent.objects.get(id=id)
+				except:
+					SpecialContent.objects.create(id=id, ebook=self, tag_id=tag_id, page=page, content=content, type=type)
+
+	def collect_service_hours(self):
+		service_hours = 0
+		for sc in self.specialcontent_set.all():
+			service_hours = service_hours + sc.service_hours
+		return 		service_hours
+
+	def finish_specialcontent_count(self):
+		finish_specialcontent_count = 0
+		for sc in self.specialcontent_set.all():
+			finish_specialcontent_count = finish_specialcontent_count + (sc.status==sc.STATUS['finish'])
+		return finish_specialcontent_count
+
+	def specialcontent_count(self):
+		return len(self.specialcontent_set.all())
+
 	def zip(self, password):
 		import pyminizip
 		zip_file_name = self.book.path +'/OCR/' +self.ISBN_part +'.zip'
@@ -392,17 +473,17 @@ class EBook(models.Model):
 		return [finish_content, edit_content]
 
 class SpecialContent(models.Model):
-	id = models.CharField(max_length=20, primary_key=True)
-	ebook = models.ForeignKey(EBook)
-	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL, related_name='edit_specialcontent_set')
-	item_number = models.IntegerField()
-	path = models.CharField(max_length=255, blank=True, null=True)
+	id = models.CharField(max_length=30, primary_key=True)
+	ebook = models.ForeignKey(EBook, on_delete=models.CASCADE)
+	tag_id = models.CharField(max_length=10)
+	page = models.IntegerField()
+	content = models.TextField()
 	service_hours = models.IntegerField(default=0)
 	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL)
 	status = models.IntegerField(default=0)
 	STATUS = {'active':0, 'edit':1, 'finish':2}
 	type = models.IntegerField()
-	TYPE = {'image':0, 'mathml':1}
+	TYPE = {'image':0, 'unknown':1, 'mathml':2}
 
 	def __unicode__(self):
 		return self.id
@@ -410,6 +491,12 @@ class SpecialContent(models.Model):
 	def status_int2str(self):
 		for k, v in self.STATUS.iteritems():
 			if v == self.status:
+				return k
+		return 'unknown'
+
+	def type_int2str(self):
+		for k, v in self.TYPE.iteritems():
+			if v == self.type:
 				return k
 		return 'unknown'
 

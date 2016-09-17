@@ -16,5 +16,6 @@ urlpatterns = [
 	url(r'^set_role/$', views.set_role, {'template_name': 'genericUser/set_role.html'}, name='set_role'),
 	url(r'^review_user/(?P<username>[\w-]+)/$', views.review_user, name='review_user'),
 	url(r'^revise_content/$', views.revise_content, name='revise_content'),
+	url(r'^verify_contact_info/$', views.verify_contact_info, name='verify_contact_info'),
 	url(r'^test_message/$', views.test_message, {'template_name': 'genericUser/test_message.html'}, name='test_message'),
 ]

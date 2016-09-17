@@ -23,8 +23,8 @@ class profileView(generic.View):
 		user=request.user
 #		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
 #		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
-		editingPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
-		finishPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
+		editingPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
+		finishPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
 #		editing = False
 #		if user.online:
 #			delta = timezone.now() - user.online
@@ -38,14 +38,12 @@ class profileView(generic.View):
 		readme_url = request.path +'readme/'
 		template_name=self.template_name
 		user=request.user
-		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
-		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
+		editingPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
+		finishPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
 		if request.POST.has_key('getPart'):
 			if len(editingPartList)>=10:
 				status = 'error'
 				message = u'您已有超過10段文件，請先校對完成再領取'
-				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
-				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
 			activeBook = Book.objects.filter(status=Book.STATUS['active']).order_by('upload_date')
 			partialBook = None
@@ -54,7 +52,6 @@ class profileView(generic.View):
 					partialBook = book
 					break
 			if not partialBook:
-				print 'not partial book'
 				for book in activeBook:
 					if book.collect_get_count() == 0:
 						partialBook = book
@@ -62,8 +59,6 @@ class profileView(generic.View):
 			if not partialBook:
 				status = 'error'
 				message = u'無文件'
-				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
-				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
 			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
 			getPart.editor = request.user.editor
@@ -77,8 +72,6 @@ class profileView(generic.View):
 			if len(editingPartList)>10:
 				status = 'error'
 				message = u'您已有超過10段文件，請先校對完成再領取'
-				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
-				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
 			activeBook = Book.objects.filter(status=Book.STATUS['active']).order_by('upload_date')
 			completeBook = None
@@ -89,8 +82,6 @@ class profileView(generic.View):
 			if not completeBook:
 				status = 'error'
 				message = u'目前無完整文件，請先領部份文件'
-				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
-				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
 			for getPart in completeBook.ebook_set.all():
 				getPart.editor = request.user.editor
@@ -109,8 +100,6 @@ class profileView(generic.View):
 			if len(editingPartList)>10:
 				status = 'error'
 				message = u'您已有超過10段文件，請先校對完成再領取'
-				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
-				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
 			activeBook = Book.objects.filter(Q(status=Book.STATUS['active']) | Q(status=Book.STATUS['designate'])).order_by('upload_date')
 			designateBook = None
@@ -121,8 +110,6 @@ class profileView(generic.View):
 			if not designateBook:
 				status = 'error'
 				message = u'目前無指定服務對象文件'
-				editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
-				finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
 				return locals()
 			for getPart in designateBook.ebook_set.all():
 				getPart.editor = request.user.editor
@@ -157,8 +144,53 @@ class profileView(generic.View):
 		else:
 			status = 'error'
 			message = u'不明的操作'
-		editingPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['edit']) | Q(status=EBook.STATUS['revise']))
-		finishPartList=EBook.objects.filter(editor=user.editor).filter(Q(status=EBook.STATUS['finish']) | Q(status=EBook.STATUS['review']))
+		editingPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
+		finishPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
+		return locals()
+
+@http_response
+def sc_service(request, template_name='account/sc_service.html'):
+	sc_editingPartList = Editor.objects.get(user=request.user).sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']))
+	sc_finishPartList = Editor.objects.get(user=request.user).sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_finish']))
+	if request.method == 'POST':
+		if request.POST.has_key('getPart'):
+			if len(sc_editingPartList)>=10:
+				status = 'error'
+				message = u'您已有超過10段文件，請先校對完成再領取'
+				return locals()
+			try:
+				getPart = EBook.objects.filter(status=EBook.STATUS['sc_active']).order_by('finish_date')[0]
+			except:
+				status = u'error'
+				message = u'無文件'
+				return locals()
+			getPart.sc_editor = request.user.editor
+			getPart.sc_get_date = timezone.now()
+			getPart.status = getPart.STATUS['sc_edit']
+			for sc in getPart.specialcontent_set.all():
+				if sc.status == sc.STATUS['active']:
+					sc.status = sc.STATUS['edit']
+					sc.save()
+			getPart.save()
+			status = 'success'
+			message = u'成功取得文件{}'.format(getPart.__unicode__())
+		elif request.POST.has_key('rebackPart'):
+			ISBN_part = request.POST.get('rebackPart')
+			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
+			rebackPart.sc_editor=None
+			rebackPart.sc_get_date = None
+			rebackPart.status = rebackPart.STATUS['sc_active']
+			for sc in rebackPart.specialcontent_set.all():
+				if sc.status == sc.STATUS['edit']:
+					sc.status = sc.STATUS['active']
+					sc.save()
+			rebackPart.save()
+			status = 'success'
+			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
+		sc_editingPartList = Editor.objects.get(user=request.user).sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']))
+		sc_finishPartList = Editor.objects.get(user=request.user).sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_finish']))
+		return locals()
+	if request.method == 'GET':
 		return locals()
 
 def readme(request, template_name):

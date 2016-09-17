@@ -1,49 +1,38 @@
 ﻿{% extends "base_nav.html" %}
 {% load staticfiles %}
 {% block title %}
-服務
+{{ part }}特殊內容
 {% endblock %}
 {% block style %}
  <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
 {% endblock %}
 {% block header %}
-服務
+{{ part }}特殊內容
 {% endblock %}
 {% block content %}
 
 <form action="" method="post">
 {% csrf_token %}
-	<div id="buttonGroup" style="text-align: center;">
-		<button class="btn btn-lg btn-default send_button" type="submit" id="getPart_id" name="getPart">領部份文件</button>
-		<button class="btn btn-lg btn-default send_button" type="submit" id="getCompleteBook_id" name="getCompleteBook">領完整文件</button>
-		<button class="btn btn-lg btn-default send_button" type="submit" id="designateBook_id" name="designateBook">領指定文件</button>
-	</div>
-	<hr />
-	<h4 class="page-header">正校對文件</h4>
+
+	<h4 class="page-header">{{ part }}文件特殊內容</h4>
 	<table class="table table-striped table-hover">
 		<tr>
-			<th>文件</th>
-			<th>頁數/總頁數</th>
+			<th>tag ID</th>
+			<th>類型</th>
+			<th>頁數</th>
 			<th>時數</th>
-			<th>領取日期</th>
-			<th>期限</th>
 			<th>狀態</th>
-			<th colspan="2">動作</th>
+			<th colspan="1">動作</th>
 		</tr>
-		{% for part in editingPartList %}
+		{% for SpecialContent in part.specialcontent_set.all %}
 		<tr>
-			<td>{{ part }}</td>
-			<td>{{ part.edited_page|add:'1' }}/{{ part.book.page_per_part }}</td>
-			<td>{{part.service_hours}}</td>
-			<td>{{part.get_date}}</td>
-			<td>{{part.deadline}}</td>
-			<td>{{part.status_int2str}}</td>
+			<td>{{ SpecialContent.tag_id }}</td>
+			<td>{{ SpecialContent.type_int2str }}</td>
+			<td>{{ SpecialContent.page }}</td>
+			<td>{{ SpecialContent.service_hours }}</td>
+			<td>{{ SpecialContent.status_int2str }}</td>
 			<td>
-				<a class="btn btn-link" role="button" href = {% url 'ebookSystem:edit' part.ISBN_part %}>編輯</a>
-				<img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_load_icon" />
-			</td>
-			<td>
-				<button type="submit" class="btn btn-default send_button" id="rebackPart_id" name="rebackPart" value={{part.ISBN_part}}>還文件</button>
+
 			</td>
 		</tr>
 		{% endfor %}
