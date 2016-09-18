@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block title %}
-編輯{{ part }}
+進階編輯{{ part }}
 {% endblock %}
 
 {% block style %}
@@ -56,8 +56,8 @@
 							<div class="col-xs-5 centered">
 								<select class="form-control" name="scanPageList" id="scanPageList" onchange="changePageSelect()">
 									{% for scanPage in scanPageList %}
-										{% if forloop.counter0 == part.edited_page %}
-											<option value="{{ scanPage }}" selected>{{ scanPage }}-上次校對頁數</option>
+										{% if forloop.counter0 == show_page %}
+											<option value="{{ scanPage }}" selected>{{ scanPage }}-tag頁數</option>
 										{% else %}
 											<option value="{{ scanPage }}">{{ scanPage }}</option>
 										{% endif %}
@@ -74,7 +74,10 @@
 					<div id="sizeControl">
 						<div class="col-md-4 pull-left">
 								<label for="id_page">頁數:</label>		
-								<input id="id_page" name="page" type="text" size="4" readonly="true"  value="{{ part.edited_page }}">
+								<input id="id_page" name="page" type="text" size="4" readonly="true"  value="{{ show_page }}">
+								{{ current_count|add:'1' }}/{{ total_count }}
+								{% if previous_sc %}<a href="{{ previous_sc.get_url }}">上一個</a>{% endif %}
+								{% if next_sc %}<a href="{{ next_sc.get_url }}">下一個</a>{% endif %}
 						</div>
 						<div class="input-group col-md-3 pull-right">
 							<span class="input-group-btn">

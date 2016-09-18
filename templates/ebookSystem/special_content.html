@@ -24,7 +24,7 @@
 			<th>狀態</th>
 			<th colspan="1">動作</th>
 		</tr>
-		{% for SpecialContent in part.specialcontent_set.all %}
+		{% for SpecialContent in sc_list %}
 		<tr>
 			<td>{{ SpecialContent.tag_id }}</td>
 			<td>{{ SpecialContent.type_int2str }}</td>
@@ -32,7 +32,7 @@
 			<td>{{ SpecialContent.service_hours }}</td>
 			<td>{{ SpecialContent.status_int2str }}</td>
 			<td>
-
+				<a class="btn btn-link" role="button" href ={{ SpecialContent.get_url }}>編輯</a>
 			</td>
 		</tr>
 		{% endfor %}
