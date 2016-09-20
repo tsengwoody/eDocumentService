@@ -1,3 +1,4 @@
+var otpID;
 function getOTP(sender) {
 
     var otpURL = "/genericUser/verify_contact_info/";
@@ -19,8 +20,19 @@ function getOTP(sender) {
             $('#id_send_info').text("已傳送到"+$('#id_send_value').val());
             $('#id_get_otp_load').hide();
             $('#id_get_otp').html('取得驗證碼<span class="badge">600</span>');
+            var w=600;
+            otpID=setInterval(function(){ 
+                if(w==0){
+                    clearInterval(id);
+                    $('#id_send_info').text('');
+                    sender.removeClass("disabled");
+                    $('#id_get_otp').html('取得驗證碼');
+                }else{
+                    w--;
+                    $('#id_get_otp').html('取得驗證碼<span class="badge">'+w+'</span>');
+                }
+            }, 1000);
             //TODO: 顯示倒數計時，使用setTimeOut
-            //sender.removeClass("disabled");
             
         },
         error: function(xhr, errmsg, err) {
@@ -28,6 +40,39 @@ function getOTP(sender) {
             console.log(xhr.status + ": " + xhr.responseText);
              $('#id_get_otp_load').hide();
              sender.removeClass("disabled");
+        }
+    });
+}
+
+function verifyOTP(sender) {
+
+    var otpURL = "/genericUser/verify_contact_info/";
+    var transferData={};
+    transferData["verification_code"]=$('#recipient-code').val();
+    transferData["type"]=sender.val();
+    
+    $.ajax({
+        url: otpURL,
+        type: "POST",
+        data: transferData,
+        beforeSend:function(jqXHR, settings){
+            jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+            $('#id_get_otp').removeClass('disabled');
+            $('#id_send_info').text('');
+            sender.removeClass("disabled");
+            $('#id_get_otp').html('取得驗證碼');
+            clearInterval(otpID);
+            
+        },
+        success: function(json) {
+            alertDialog(json);
+            $('#otpModal').modal('toggle');
+            $('#recipient-code').val('');
+        },
+        error: function(xhr, errmsg, err) {
+            $('#recipient-code').val('');
+            alert(xhr.status + ": " + xhr.responseText);
+            console.log(xhr.status + ": " + xhr.responseText);
         }
     });
 }
@@ -86,7 +131,6 @@ $( document ).ready(function() {
     });
 
     $('#otpModal').on('show.bs.modal', function (event) {
-          $('#id_send_info').text('');
           var button = $(event.relatedTarget) // Button that triggered the modal
           var recipient = button.data('whatever') // Extract info from data-* attributes 
           console.log(button.data('sendto'));
@@ -96,11 +140,15 @@ $( document ).ready(function() {
             if(recipient=="phone")
                 $('#otpModalLabel').text("手機驗證碼");
            $('#id_get_otp').val(recipient);
+           $('#send_otp').val(recipient);
            $('#id_send_value').val(button.data('sendto'));
     });
     $('#id_get_otp').on("click",function(event){
         //console.log($(this).val());
         getOTP($(this));
     });
-
+    $('#send_otp').on("click",function(event){
+        //console.log($(this).val());
+        verifyOTP($(this));
+    });
 });
