@@ -365,6 +365,8 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 				import string
 				vcode = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
 				cache.set(request.user.email, {'vcode':vcode}, 600)
+			else:
+				vcode = cache.get(request.user.email)['vcode']
 			from django.core.mail import EmailMessage
 			subject = u'[驗證] {0} 信箱驗證碼'.format(request.user.username)
 			body = u'新愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
@@ -381,7 +383,7 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 				message = u'驗證碼已過期，請重新產生驗證碼'
 				return locals()
 			input_vcode = request.POST['verification_code']
-			vcode = cache.get(request.user.email)
+			vcode = cache.get(request.user.email)['vcode']
 			if input_vcode == vcode:
 				status = u'success'
 				message = u'信箱驗證通過'
