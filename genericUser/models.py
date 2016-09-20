@@ -32,8 +32,9 @@ class User(AbstractUser):
 	is_guest = models.BooleanField(default=False)
 	is_manager = models.BooleanField(default=False)
 	is_advanced_editor = models.BooleanField(default=False)
-	auth_phone = models.BooleanField(default=False)
 	auth_email = models.BooleanField(default=False)
+	auth_phone = models.BooleanField(default=False)
+
 	def __unicode__(self):
 		return self.first_name +self.last_name
 
