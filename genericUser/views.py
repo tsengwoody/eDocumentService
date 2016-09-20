@@ -13,7 +13,7 @@ from utils.decorator import *
 from utils.uploadFile import handle_uploaded_file
 from utils.zip import *
 from .forms import *
-from mysite.settings import BASE_DIR
+from mysite.settings import BASE_DIR,SERVICE
 from zipfile import ZipFile
 import json
 import shutil
@@ -385,6 +385,8 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 			if input_vcode == vcode:
 				status = u'success'
 				message = u'信箱驗證通過'
+				request.user.auth_email=True
+				request.user.save()
 			else:
 				status = u'error'
 				message = u'信箱驗證碼不符'

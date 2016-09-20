@@ -500,6 +500,10 @@ class SpecialContent(models.Model):
 				return k
 		return 'unknown'
 
+	def get_url(self):
+		return '/ebookSystem/advanced/edit_{0}/{1}'.format(self.type_int2str(), self.id)
+
+
 class ReviseContentAction(models.Model):
 	from ebookSystem.models import EBook
 	ebook = models.ForeignKey(EBook)

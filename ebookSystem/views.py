@@ -370,11 +370,92 @@ def special_content(request, ISBN_part, template_name='ebookSystem/special_conte
 		part = EBook.objects.get(ISBN_part=ISBN_part)
 	except:
 		raise Http404("book does not exist")
+	sc_list = part.specialcontent_set.all().order_by('tag_id')
 	if request.method == 'POST':
 		return locals()
 	if request.method == 'GET':
 		return locals()
 
+@http_response
+def edit_unknown(request, id, template_name='ebookSystem/edit_unknown.html'):
+	try:
+		sc = SpecialContent.objects.get(id=id)
+	except: 
+		raise Http404("special content does not exist")
+	part = sc.ebook
+	page = sc.page
+	water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(part.book.book_info.ISBN, request.user.username)
+	[scanPageList, defaultPageURL] = part.get_image(request.user)
+	sc_list = list(SpecialContent.objects.filter(ebook=part).order_by('tag_id'))
+	total_count = len(sc_list)
+	current_count = sc_list.index(sc)
+	try:
+		next_sc = sc_list[current_count+1]
+	except:
+		next_sc = None
+	try:
+		previous_sc = sc_list[current_count-1]
+	except:
+		previous_sc = None
+	if page == 0:
+		show_page = 0
+		scanPageList = scanPageList[page:page+2]
+		default_page_url = water_path +u'/' +scanPageList[0]
+	elif page == part.book.page_per_part-1:
+		show_page = 1
+		scanPageList = scanPageList[page-1:page+1]
+		default_page_url = water_path +u'/' +scanPageList[1]
+	else:
+		show_page = 1
+		scanPageList = scanPageList[page-1:page+2]
+		default_page_url = water_path +u'/' +scanPageList[1]
+	default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
+	editContent = sc.content
+	if request.method == 'POST':
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+@http_response
+def edit_SpecialContent(request, id, type):
+	try:
+		sc = SpecialContent.objects.get(id=id)
+	except: 
+		raise Http404("special content does not exist")
+	part = sc.ebook
+	page = sc.page
+	water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(part.book.book_info.ISBN, request.user.username)
+	[scanPageList, defaultPageURL] = part.get_image(request.user)
+	sc_list = list(SpecialContent.objects.filter(ebook=part).order_by('tag_id'))
+	total_count = len(sc_list)
+	current_count = sc_list.index(sc)
+	try:
+		next_sc = sc_list[current_count+1]
+	except:
+		next_sc = None
+	if current_count == 0:
+		previous_sc = None
+	else:
+		previous_sc = sc_list[current_count-1]
+	if page == 0:
+		show_page = 0
+		scanPageList = scanPageList[page:page+2]
+		default_page_url = water_path +u'/' +scanPageList[0]
+	elif page == part.book.page_per_part-1:
+		show_page = 1
+		scanPageList = scanPageList[page-1:page+1]
+		default_page_url = water_path +u'/' +scanPageList[1]
+	else:
+		show_page = 1
+		scanPageList = scanPageList[page-1:page+2]
+		default_page_url = water_path +u'/' +scanPageList[1]
+	default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
+	editContent = sc.content
+	template_name = 'ebookSystem/edit_{0}.html'.format(type)
+	if request.method == 'POST':
+		return locals()
+	if request.method == 'GET':
+		return locals()
 
 #def readme(request, template_name):
 #	template_name = resolve(request.path).namespace +'/' +template_name +'_readme.html'
