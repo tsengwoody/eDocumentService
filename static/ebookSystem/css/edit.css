@@ -6,6 +6,7 @@
 
 body{
   margin-bottom: auto;
+  padding-bottom: 40px;
 }
 html, body, .container, .row{
   height: 100%;
@@ -43,14 +44,14 @@ textarea.form-control{
 }
 #imagePage{
   /*padding-top:30px;*/
-  padding-bottom: 60px;
+  padding-bottom: 110px;
   
 }
 
 
 @media screen and (min-width: 400px) {
   #imagePage {
-     margin-bottom: 50px; 
+     margin-bottom: 0px; 
   }
 }
 

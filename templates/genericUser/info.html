@@ -5,9 +5,51 @@
 {% block header %}
 個人資料
 {% endblock %}
+{% block style %}
+{% load staticfiles %}
+<script language="javascript" src="{% static 'ebookSystem/js/getOTP.js' %}"></script>
+{% endblock %}
 {% block content %}
 {% if request.user.is_authenticated %}
 <h3></h3>
+{% csrf_token %}
+<div class="modal fade" id="otpModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content alert-info">
+            <div class="modal-header ">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="otpModalLabel">驗證碼</h4>
+            </div>
+            <div class="modal-body">
+                    <input type="hidden" id="id_send_value" />
+                    <div class="form-group row">
+                      <div class="col-md-6 col-md-offset-3">
+                            <span id="id_send_info" style="color: red;"></span>
+                      </div>
+                      <div class="col-md-4 col-md-offset-4">
+                        
+                        <button type="button" class="btn btn-primary" id="id_get_otp">取得驗證碼<span class="badge">14</span></button>
+                        <img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_otp_load" />
+                      </div>
+                    </div>  
+                    <div class="form-group form-inline row">
+                        <div class="col-md-8 col-md-offset-2">
+                            <label for="recipient-code" class="form-control-label">驗證碼:</label>
+                            <input type="text" class="form-control" id="recipient-code">
+                            <button type="button" class="btn btn-primary">送出驗證碼</button>
+                        </div>
+                    </div>
+                    
+               
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
 <div class="row">
     <div class="col-md-8 col-md-offset-2">
         <div class="panel panel-default">
@@ -17,7 +59,7 @@
             <div class="panel-body">
 				<div class="row">
 				    <div class="col-sm-2">
-				        <label class="control-label">性氏：</label>
+				        <label class="control-label">姓氏：</label>
 				    </div>
 				    <div class="col-sm-10">
 				        {{ user.first_name }}
@@ -36,9 +78,21 @@
 				        <label class="control-label">電子郵件：</label>
 				    </div>
 				    <div class="col-sm-10">
-				        {{ user.email }}
+				        {{ user.email }}<!--<input class="btn-xs btn-default" type="button" value="驗證">-->
+                        <button class="btn-xs btn-default" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="email" data-sendto="{{ user.email }}">驗證</button>
 				    </div>
+
 				</div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <label class="control-label">電話：</label>
+                    </div>
+                    <div class="col-sm-10">
+                        {{ user.phone }}<!--<input class="btn-xs btn-default" type="button" value="驗證">-->
+                        <button class="btn-xs btn-default" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ user.phone }}">驗證</button>
+                    </div>
+                </div>
+                <hr />
                 <div class="form-group row">
                     <div class="col-sm-offset-2 col-sm-10">
                         <a href="{% url 'password_change' %}" role="button" class="btn btn-default">修改密碼</a>

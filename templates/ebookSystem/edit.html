@@ -19,7 +19,8 @@
 {% block content %}
 <form action="" method="post" id="currentForm" role="form">
 	{% csrf_token %}
-	{% ifequal status 'success' %}
+	{% include 'utils/dialog.html' %}
+	<!--{% ifequal status 'success' %}
 		<div class="modal fade in" id="Dialog" role="dialog">
 		    <div class="modal-dialog modal-sm">
 		        <div class="modal-content alert-success">
@@ -45,7 +46,7 @@
 		    </div>
 		</div>
 	{% endifequal %}
-	
+	-->
 		
 			<div class="row">
 				<div id="imagePage" class="col-md-6 towColumn imagePage">
