@@ -23,7 +23,7 @@ code {
 }
 .footer {
     text-align: center;
-    padding: 15px 0;
+    padding-top: 15px;
     min-height:50px;
     /*margin-top: 20px;*/
     border-top: 1px solid #e5e5e5;
