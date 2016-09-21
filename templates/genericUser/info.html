@@ -85,7 +85,6 @@
 				    </div>
 				    <div class="col-sm-10">
 				        {{ request.user.email }}<!--<input class="btn-xs btn-default" type="button" value="驗證">-->
-                        <button>修改</button>
                         {% if not request.user.auth_email %}
                             <button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="email" data-sendto="{{ user.email }}">驗證</button>
                         {% else %}
@@ -100,7 +99,6 @@
                     </div>
                     <div class="col-sm-10">
                         {{ user.phone }}<!--<input class="btn-xs btn-default" type="button" value="驗證">-->
-                        <button>修改</button>
                         {% if not request.user.auth_phone %}
                             <button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ user.phone }}">驗證</button>
                         {% else %}
@@ -112,6 +110,7 @@
                 <div class="form-group row">
                     <div class="col-sm-offset-2 col-sm-10">
                         <a href="{% url 'password_change' %}" role="button" class="btn btn-default">修改密碼</a>
+                        <a href="{% url 'genericUser:change_contact_info' %}" role="button" class="btn btn-default">修改資料</a>
                         <a href="{% url 'genericUser:set_role' %}" role="button" class="btn btn-default">角色設定</a>
                     </div>
                 </div>

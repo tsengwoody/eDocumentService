@@ -226,6 +226,29 @@ def info(request, template_name):
 
 @user_category_check(['user'])
 @http_response
+def change_contact_info(request, template_name):
+	if request.method == 'POST':
+		if request.POST.has_key('email') and (not request.user.email == request.POST['email']):
+			request.user.email = request.POST['email']
+			request.user.auth_email = False
+			request.user.save()
+			status = u'success'
+			message = u'修改資料成功，請重新驗證。'
+		if request.POST.has_key('phone') and (not request.user.phone == request.POST['phone']):
+			request.user.phone = request.POST['phone']
+			request.user.auth_phone = False
+			request.user.save()
+			status = u'success'
+			message = u'修改資料成功，請重新驗證。'
+		status = u'success'
+		message = u'無資料修改。'
+		redirect_to = reverse('genericUser:info')
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+@user_category_check(['user'])
+@http_response
 def revise_content(request, template_name='genericUser/revise_content.html'):
 	user = request.user
 	if request.method == 'GET':
