@@ -17,21 +17,27 @@ function getOTP(sender) {
             sender.addClass("disabled");
         },
         success: function(json) {
-            $('#id_send_info').text("已傳送到"+$('#id_send_value').val());
-            $('#id_get_otp_load').hide();
-            $('#id_get_otp').html('取得驗證碼<span class="badge">600</span>');
-            var w=600;
-            otpID=setInterval(function(){ 
-                if(w==0){
-                    clearInterval(id);
-                    $('#id_send_info').text('');
-                    sender.removeClass("disabled");
-                    $('#id_get_otp').html('取得驗證碼');
-                }else{
-                    w--;
-                    $('#id_get_otp').html('取得驗證碼<span class="badge">'+w+'</span>');
-                }
-            }, 1000);
+            if(json.status=='success')
+            {
+                $('#id_send_info').text("已傳送到"+$('#id_send_value').val());
+                $('#id_get_otp_load').hide();
+                $('#id_get_otp').html('取得驗證碼<span class="badge">600</span>');
+                var w=600;
+                otpID=setInterval(function(){ 
+                    if(w==0){
+                        clearInterval(id);
+                        $('#id_send_info').text('');
+                        sender.removeClass("disabled");
+                        $('#id_get_otp').html('取得驗證碼');
+                    }else{
+                        w--;
+                        $('#id_get_otp').html('取得驗證碼<span class="badge">'+w+'</span>');
+                    }
+                }, 1000);
+            }else{
+                $('#id_send_info').text(json.message);
+            }
+
             //TODO: 顯示倒數計時，使用setTimeOut
             
         },

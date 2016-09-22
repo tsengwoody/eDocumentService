@@ -13,11 +13,13 @@ from utils.decorator import *
 from utils.uploadFile import handle_uploaded_file
 from utils.zip import *
 from .forms import *
-from mysite.settings import BASE_DIR,SERVICE
+from mysite.settings import BASE_DIR,SERVICE,OTP_ACCOUNT,OTP_PASSWORD
 from zipfile import ZipFile
 import json
 import shutil
 import datetime
+import requests
+import urllib,urllib2
 
 @user_category_check(['guest'])
 @http_response
@@ -384,12 +386,30 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 #				vcode = cache.get(request.user.email)['vcode']
 			from django.core.mail import EmailMessage
 			subject = u'[驗證] {0} 信箱驗證碼'.format(request.user.username)
-			body = u'新愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
+			body = u'親愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
 			email.send(fail_silently=False)
 			status = 'success'
 			message = u'已寄送到您的電子信箱'
-#		elif request.POST['generate'] == 'phone':
+		elif request.POST['generate'] == 'phone':
+			if not cache.has_key(request.user.phone):
+				import random
+				import string
+				vcode = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+				cache.set(request.user.email, {'vcode':vcode}, 600)
+			else:
+				vcode = cache.get(request.user.phone)['vcode']
+			data= u'親愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
+ 			url = 'https://api.kotsms.com.tw/kotsmsapi-1.php?username={0}&password={1}&dstaddr={2}&smbody={3}'.format(OTP_ACCOUNT,OTP_PASSWORD,request.user.phone,urllib.quote(data.encode('big5')))
+			session = requests.Session()
+			response = session.get(url)
+			print(response.text.split('=')[1])
+			if response.text.split('=')[1] > 0:
+				status = 'success'
+				message = u'已寄送到您的手機'
+			else:
+				status = 'error'
+				message = u'請確認手機號碼是否正確或聯絡系統管理員'
 		return locals()
 	if request.POST.has_key('verification_code') and request.POST.has_key('type'):
 		if request.POST['type'] == 'email':
