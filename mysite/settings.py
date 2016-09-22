@@ -214,3 +214,5 @@ MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'edocumentservice@gmail.com'
 SITE_ID = 1
 TIME_ZONE = 'Asia/Taipei'
+OTP_ACCOUNT='eDoc'
+OTP_PASSWORD='1qaz2wsx'
