@@ -205,34 +205,48 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 		return locals()
 
 @user_category_check(['user'])
+@http_response
 def info(request, template_name):
-	user = request.user
-	return render(request, template_name, locals())
+	if request.method == 'POST':
+		if request.POST.has_key('email') and (not request.user.email == request.POST['email']):
+			request.user.email = request.POST['email']
+			request.user.auth_email = False
+			request.user.save()
+			status = u'success'
+			message = u'修改資料成功，請重新驗證。'
+		if request.POST.has_key('phone') and (not request.user.phone == request.POST['phone']):
+			request.user.phone = request.POST['phone']
+			request.user.auth_phone = False
+			request.user.save()
+			status = u'success'
+			message = u'修改資料成功，請重新驗證。'
+		status = u'success'
+		message = u'無資料修改。'
+		return locals()
+	if request.method == 'GET':
+		return locals()
 
 @user_category_check(['user'])
 @http_response
-def info_change(request,template_name):
-	user = request.user
+def change_contact_info(request, template_name):
 	if request.method == 'POST':
-		infoChangeUserForm = InfoChangeUserForm(request.POST, instance = user)
-		if not infoChangeUserForm.is_valid():
-			status = 'error'
-			message = u'表單驗證失敗' +str(infoChangeUserForm.errors)
-			return locals()
-		infoChangeUserForm.save()
-		if user.username != 'root':
-			if user.status == user.STATUS['active']:
-				user.status = user.STATUS['review']
-			events = Event.objects.filter(content_type__model='user', object_id=request.user.id, status=Event.STATUS['review'])
-			if len(events) == 0:
-				Event.objects.create(creater=request.user, action=request.user)
-		user.save()
+		if request.POST.has_key('email') and (not request.user.email == request.POST['email']):
+			request.user.email = request.POST['email']
+			request.user.auth_email = False
+			request.user.save()
+			status = u'success'
+			message = u'修改資料成功，請重新驗證。'
+		if request.POST.has_key('phone') and (not request.user.phone == request.POST['phone']):
+			request.user.phone = request.POST['phone']
+			request.user.auth_phone = False
+			request.user.save()
+			status = u'success'
+			message = u'修改資料成功，請重新驗證。'
 		status = u'success'
-		message = u'修改資料完成，請等待管理員審核。'
+		message = u'無資料修改。'
 		redirect_to = reverse('genericUser:info')
 		return locals()
 	if request.method == 'GET':
-		infoChangeUserForm = InfoChangeUserForm(instance = user)
 		return locals()
 
 @user_category_check(['user'])
@@ -368,7 +382,10 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 				vcode = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
 				cache.set(request.user.email, {'vcode':vcode}, 600)
 			else:
-				vcode = cache.get(request.user.email)['vcode']
+				status = u'error'
+				message = u'驗證碼10分鐘內僅能傳送一次，如無收到驗證碼請稍後再試。'
+				return locals()
+#				vcode = cache.get(request.user.email)['vcode']
 			from django.core.mail import EmailMessage
 			subject = u'[驗證] {0} 信箱驗證碼'.format(request.user.username)
 			body = u'親愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)

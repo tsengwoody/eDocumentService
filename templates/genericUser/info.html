@@ -60,7 +60,7 @@
     <div class="col-md-8 col-md-offset-2">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">{{ user.username }} 資料</h3>
+                <h3 class="panel-title">{{ request.user.username }} 資料</h3>
             </div>
             <div class="panel-body">
 				<div class="row">
@@ -68,7 +68,7 @@
 				        <label class="control-label">姓氏：</label>
 				    </div>
 				    <div class="col-sm-10">
-				        {{ user.first_name }}
+				        {{ request.user.first_name }}
 				    </div>
 				</div>
 				<div class="row">
@@ -76,7 +76,7 @@
 				        <label class="control-label">名字：</label>
 				    </div>
 				    <div class="col-sm-10">
-				        {{ user.last_name }}
+				        {{ request.user.last_name }}
 				    </div>
 				</div>
 				<div class="row">
@@ -84,7 +84,7 @@
 				        <label class="control-label">電子郵件：</label>
 				    </div>
 				    <div class="col-sm-10">
-				        {{ user.email }}<!--<input class="btn-xs btn-default" type="button" value="驗證">-->
+				        {{ request.user.email }}<!--<input class="btn-xs btn-default" type="button" value="驗證">-->
                         {% if not request.user.auth_email %}
                             <button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="email" data-sendto="{{ user.email }}">驗證</button>
                         {% else %}
@@ -110,7 +110,7 @@
                 <div class="form-group row">
                     <div class="col-sm-offset-2 col-sm-10">
                         <a href="{% url 'password_change' %}" role="button" class="btn btn-default">修改密碼</a>
-                        <a href="{% url 'genericUser:info_change' %}" role="button" class="btn btn-default">修改資料</a>
+                        <a href="{% url 'genericUser:change_contact_info' %}" role="button" class="btn btn-default">修改資料</a>
                         <a href="{% url 'genericUser:set_role' %}" role="button" class="btn btn-default">角色設定</a>
                     </div>
                 </div>

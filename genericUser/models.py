@@ -25,6 +25,10 @@ class User(AbstractUser):
 	)
 	education = models.CharField(max_length=30, choices=EDU)
 	online = models.DateTimeField(default = timezone.now)
+	ORG = (
+		(u'渣打國際商業銀行' , u'渣打國際商業銀行'),
+	)
+	organization = models.CharField(max_length=30, blank=True, null=True, choices=ORG)
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'review':2}
 	is_book = models.BooleanField(default=False)
