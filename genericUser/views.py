@@ -23,14 +23,13 @@ import datetime
 @http_response
 def create_document(request, template_name='genericUser/create_document.html'):
 	readme_url = request.path +'readme/'
-	user = request.user
 	if request.method == 'POST':
 		bookInfoForm = BookInfoForm(request.POST)
-		if not (bookInfoForm.is_valid()):
+		if not bookInfoForm.is_valid() and not bookInfoForm.errors.has_key('ISBN'):
 			status = 'error'
 			message = u'表單驗證失敗' +str(bookInfoForm.errors)
 			return locals()
-		uploadPath = BASE_DIR +u'/file/ebookSystem/document/{0}'.format(bookInfoForm.cleaned_data['ISBN'])
+		uploadPath = BASE_DIR +u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
 		if os.path.exists(uploadPath):
 			status = 'error'
 			message = u'文件已存在'
@@ -47,7 +46,7 @@ def create_document(request, template_name='genericUser/create_document.html'):
 			message = u'非正確ZIP文件'
 			return locals()
 		try:
-			newBookInfo = BookInfo.objects.get(ISBN=bookInfoForm.cleaned_data['ISBN'])
+			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
 		except:
 			newBookInfo = bookInfoForm.save()
 		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'])
@@ -57,14 +56,13 @@ def create_document(request, template_name='genericUser/create_document.html'):
 			status = 'error'
 			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			return locals()
-		newBook.scaner = user
-		guest = Guest.objects.get(user=user)
-		newBook.owners.add(guest)
+		newBook.scaner = request.user
+		newBook.owner = request.user
 		if request.POST.has_key('designate'):
 			newBook.status = newBook.STATUS['indesignate']
 		newBook.save()
 		newBook.create_EBook()
-		event = Event.objects.create(creater=user, action=newBook)
+		event = Event.objects.create(creater=request.user, action=newBook)
 		redirect_to = '/'
 		status = 'success'
 		message = u'成功建立並上傳文件'

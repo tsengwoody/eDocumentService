@@ -210,8 +210,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			return locals()
 		newBook.scaner = user
-		guest = Guest.objects.get(user=event.creater)
-		newBook.owners.add(guest)
+		newBook.owner = user
 		if request.POST.has_key('designate'):
 			newBook.status = newBook.STATUS['indesignate']
 		newBook.save()
