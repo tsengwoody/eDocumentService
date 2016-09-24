@@ -205,6 +205,7 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 @user_category_check(['user'])
 @http_response
 def info(request, template_name):
+	user = request.user
 	if request.method == 'POST':
 		if request.POST.has_key('email') and (not request.user.email == request.POST['email']):
 			request.user.email = request.POST['email']
@@ -380,10 +381,7 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 				vcode = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
 				cache.set(request.user.email, {'vcode':vcode}, 600)
 			else:
-				status = u'error'
-				message = u'驗證碼10分鐘內僅能傳送一次，如無收到驗證碼請稍後再試。'
-				return locals()
-#				vcode = cache.get(request.user.email)['vcode']
+				vcode = cache.get(request.user.email)['vcode']
 			from django.core.mail import EmailMessage
 			subject = u'[驗證] {0} 信箱驗證碼'.format(request.user.username)
 			body = u'親愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
@@ -396,11 +394,11 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 				import random
 				import string
 				vcode = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
-				cache.set(request.user.email, {'vcode':vcode}, 600)
+				cache.set(request.user.phone, {'vcode':vcode}, 600)
 			else:
 				vcode = cache.get(request.user.phone)['vcode']
 			data= u'親愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
- 			url = 'https://api.kotsms.com.tw/kotsmsapi-1.php?username={0}&password={1}&dstaddr={2}&smbody={3}'.format(OTP_ACCOUNT,OTP_PASSWORD,request.user.phone,urllib.quote(data.encode('big5')))
+			url = 'https://api.kotsms.com.tw/kotsmsapi-1.php?username={0}&password={1}&dstaddr={2}&smbody={3}'.format(OTP_ACCOUNT, OTP_PASSWORD, request.user.phone, urllib.quote(data.encode('big5')))
 			session = requests.Session()
 			response = session.get(url)
 			print(response.text.split('=')[1])
@@ -427,7 +425,21 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 			else:
 				status = u'error'
 				message = u'信箱驗證碼不符'
-#		elif request.POST['type'] == 'phone':
+		if request.POST['type'] == 'phone':
+			if not cache.has_key(request.user.phone):
+				status = u'error'
+				message = u'驗證碼已過期，請重新產生驗證碼'
+				return locals()
+			input_vcode = request.POST['verification_code']
+			vcode = cache.get(request.user.phone)['vcode']
+			if input_vcode == vcode:
+				status = u'success'
+				message = u'手機驗證通過'
+				request.user.auth_phone=True
+				request.user.save()
+			else:
+				status = u'error'
+				message = u'手機驗證碼不符'
 		return locals()
 
 from django.contrib import messages

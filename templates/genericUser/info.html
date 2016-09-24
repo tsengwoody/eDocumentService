@@ -65,18 +65,10 @@
             <div class="panel-body">
 				<div class="row">
 				    <div class="col-sm-2">
-				        <label class="control-label">姓氏：</label>
+				        <label class="control-label">姓名：</label>
 				    </div>
 				    <div class="col-sm-10">
-				        {{ request.user.first_name }}
-				    </div>
-				</div>
-				<div class="row">
-				    <div class="col-sm-2">
-				        <label class="control-label">名字：</label>
-				    </div>
-				    <div class="col-sm-10">
-				        {{ request.user.last_name }}
+				        {{ request.user }}
 				    </div>
 				</div>
 				<div class="row">
@@ -102,7 +94,7 @@
                         {% if not request.user.auth_phone %}
                             <button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ user.phone }}">驗證</button>
                         {% else %}
-                            <button class="btn-xs btn-success disabled" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ user.phone }}">驗證</button>
+                            <button class="btn-xs btn-success disabled" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ user.phone }}">已驗證</button>
                         {% endif %}
                     </div>
                 </div>
