@@ -80,7 +80,7 @@
                         {% if not request.user.auth_email %}
                             <button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="email" data-sendto="{{ user.email }}">驗證</button>
                         {% else %}
-                            <button class="btn-xs btn-success disabled"  type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="email" data-sendto="{{ user.email }}">已驗證</button>
+                            <button class="btn-xs btn-success disabled"  type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="email" data-sendto="{{ user.email }}" disabled>已驗證</button>
                         {% endif %}
 				    </div>
 
@@ -94,7 +94,7 @@
                         {% if not request.user.auth_phone %}
                             <button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ user.phone }}">驗證</button>
                         {% else %}
-                            <button class="btn-xs btn-success disabled" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ user.phone }}">已驗證</button>
+                            <button class="btn-xs btn-success disabled" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ user.phone }}" disabled>已驗證</button>
                         {% endif %}
                     </div>
                 </div>
