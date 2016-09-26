@@ -42,22 +42,32 @@ def search_book(request, template_name):
 		return locals()
 	if request.method == 'POST':
 		if request.POST.has_key('book_ISBN'):
-			book_ISBN = request.POST['book_ISBN']
-			book_list = Book.objects.filter(ISBN=book_ISBN)
-			if len(book_list) > 0:
+			ISBN = request.POST['book_ISBN']
+			try:
+				search_book = Book.objects.get(ISBN=ISBN)
 				status = 'success'
-				message = u'成功查詢資料'
-			else:
+				message = u'成功查詢指定ISBN文件'
+			except:
 				status = 'error'
-				message = u'查無資料'
-		elif request.POST.has_key('get_book'):
-			book_ISBN = request.POST['get_book']
-			book = Book.objects.get(ISBN=book_ISBN)
-			guest = Guest.objects.get(user=request.user)
-			book.owners.add(guest)
+				message = u'查無指定ISBN文件'
+		if request.POST.has_key('get_book'):
+			from django.core.mail import EmailMessage
+			ISBN = request.POST['get_book']
+			emailBook = Book.objects.get(ISBN=ISBN)
+			subject = u'[文件] {}'.format(emailBook.book_info.bookname)
+			body = u'新愛的{0}您好：\n'.format(request.user.username)
+			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
+			attach_file_path = emailBook.zip('test')
+			if attach_file_path == '':
+				status = 'error'
+				message = u'附加文件失敗'
+				os.remove(attach_file_path)
+				return locals()
+			email.attach_file(attach_file_path)
+			email.send(fail_silently=False)
 			status = 'success'
-			message = u'獲取成功請到個人頁面進行email傳送'
-			redirect_to = reverse('guest:profile')
+			message = u'已寄送到您的電子信箱'
+			os.remove(attach_file_path)
 		return locals()
 
 @user_category_check(['manager'])
@@ -210,8 +220,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			return locals()
 		newBook.scaner = user
-		guest = Guest.objects.get(user=event.creater)
-		newBook.owners.add(guest)
+		newBook.owner = user
 		if request.POST.has_key('designate'):
 			newBook.status = newBook.STATUS['indesignate']
 		newBook.save()

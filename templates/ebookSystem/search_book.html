@@ -28,18 +28,18 @@
 			<th>出版日期</th>
 			<th colspan="1">動作</th>
 		</tr>
-		{% for book in book_list %}
 		<tr>
-			<td>{{ book.ISBN }}</td>
-			<td>{{ book.book_info.bookname }}</td>
-			<td>{{ book.book_info.author }}</td>
-			<td>{{ book.book_info.house }}</td>
-			<td>{{ book.book_info.date }}</td>
+			<td>{{ search_book.ISBN }}</td>
+			<td>{{ search_book.book_info.bookname }}</td>
+			<td>{{ search_book.book_info.author }}</td>
+			<td>{{ search_book.book_info.house }}</td>
+			<td>{{ search_book.book_info.date }}</td>
 			<td>
-				<button type="submit" class="btn btn-default send_button" id="get_book_id" name="get_book" value={{ book.ISBN }}>獲取</button>
+				{% if request.user.is_guest and request.user.has_guest and search_book.collect_is_finish %}
+				<button type="submit" class="btn btn-default send_button" id="get_book_id" name="get_book" value={{ search_book.ISBN }}>寄送至郵箱</button>
+				{% endif %}
 			</td>
 		</tr>
-		{% endfor %}
 	</table>
 </form>
 {% endblock %}

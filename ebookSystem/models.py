@@ -29,7 +29,7 @@ class Book(models.Model):
 	page_per_part = models.IntegerField(default=50)
 	priority = models.IntegerField(default=0)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
-	owners = models.ManyToManyField(Guest, related_name='own_book_set')
+	owner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='own_book_set')
 	upload_date = models.DateField(default = timezone.now)
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5, 'indesignate':6, 'designate':7}

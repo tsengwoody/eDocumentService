@@ -25,14 +25,13 @@ import urllib,urllib2
 @http_response
 def create_document(request, template_name='genericUser/create_document.html'):
 	readme_url = request.path +'readme/'
-	user = request.user
 	if request.method == 'POST':
 		bookInfoForm = BookInfoForm(request.POST)
-		if not (bookInfoForm.is_valid()):
+		if not bookInfoForm.is_valid() and not bookInfoForm.errors.has_key('ISBN'):
 			status = 'error'
 			message = u'表單驗證失敗' +str(bookInfoForm.errors)
 			return locals()
-		uploadPath = BASE_DIR +u'/file/ebookSystem/document/{0}'.format(bookInfoForm.cleaned_data['ISBN'])
+		uploadPath = BASE_DIR +u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
 		if os.path.exists(uploadPath):
 			status = 'error'
 			message = u'文件已存在'
@@ -49,7 +48,7 @@ def create_document(request, template_name='genericUser/create_document.html'):
 			message = u'非正確ZIP文件'
 			return locals()
 		try:
-			newBookInfo = BookInfo.objects.get(ISBN=bookInfoForm.cleaned_data['ISBN'])
+			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
 		except:
 			newBookInfo = bookInfoForm.save()
 		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'])
@@ -59,14 +58,13 @@ def create_document(request, template_name='genericUser/create_document.html'):
 			status = 'error'
 			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			return locals()
-		newBook.scaner = user
-		guest = Guest.objects.get(user=user)
-		newBook.owners.add(guest)
+		newBook.scaner = request.user
+		newBook.owner = request.user
 		if request.POST.has_key('designate'):
 			newBook.status = newBook.STATUS['indesignate']
 		newBook.save()
 		newBook.create_EBook()
-		event = Event.objects.create(creater=user, action=newBook)
+		event = Event.objects.create(creater=request.user, action=newBook)
 		redirect_to = '/'
 		status = 'success'
 		message = u'成功建立並上傳文件'
@@ -207,6 +205,7 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 @user_category_check(['user'])
 @http_response
 def info(request, template_name):
+	user = request.user
 	if request.method == 'POST':
 		if request.POST.has_key('email') and (not request.user.email == request.POST['email']):
 			request.user.email = request.POST['email']
@@ -382,10 +381,7 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 				vcode = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
 				cache.set(request.user.email, {'vcode':vcode}, 600)
 			else:
-				status = u'error'
-				message = u'驗證碼10分鐘內僅能傳送一次，如無收到驗證碼請稍後再試。'
-				return locals()
-#				vcode = cache.get(request.user.email)['vcode']
+				vcode = cache.get(request.user.email)['vcode']
 			from django.core.mail import EmailMessage
 			subject = u'[驗證] {0} 信箱驗證碼'.format(request.user.username)
 			body = u'親愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
@@ -398,11 +394,11 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 				import random
 				import string
 				vcode = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
-				cache.set(request.user.email, {'vcode':vcode}, 600)
+				cache.set(request.user.phone, {'vcode':vcode}, 600)
 			else:
 				vcode = cache.get(request.user.phone)['vcode']
 			data= u'親愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
- 			url = 'https://api.kotsms.com.tw/kotsmsapi-1.php?username={0}&password={1}&dstaddr={2}&smbody={3}'.format(OTP_ACCOUNT,OTP_PASSWORD,request.user.phone,urllib.quote(data.encode('big5')))
+			url = 'https://api.kotsms.com.tw/kotsmsapi-1.php?username={0}&password={1}&dstaddr={2}&smbody={3}'.format(OTP_ACCOUNT, OTP_PASSWORD, request.user.phone, urllib.quote(data.encode('big5')))
 			session = requests.Session()
 			response = session.get(url)
 			print(response.text.split('=')[1])
@@ -429,7 +425,21 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 			else:
 				status = u'error'
 				message = u'信箱驗證碼不符'
-#		elif request.POST['type'] == 'phone':
+		if request.POST['type'] == 'phone':
+			if not cache.has_key(request.user.phone):
+				status = u'error'
+				message = u'驗證碼已過期，請重新產生驗證碼'
+				return locals()
+			input_vcode = request.POST['verification_code']
+			vcode = cache.get(request.user.phone)['vcode']
+			if input_vcode == vcode:
+				status = u'success'
+				message = u'手機驗證通過'
+				request.user.auth_phone=True
+				request.user.save()
+			else:
+				status = u'error'
+				message = u'手機驗證碼不符'
 		return locals()
 
 from django.contrib import messages

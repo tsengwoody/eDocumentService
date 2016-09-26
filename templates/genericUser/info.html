@@ -63,18 +63,10 @@
             <div class="panel-body">
 				<div class="row">
 				    <div class="col-sm-2">
-				        <label class="control-label">姓氏：</label>
+				        <label class="control-label">姓名：</label>
 				    </div>
 				    <div class="col-sm-10">
-				        {{ request.user.first_name }}
-				    </div>
-				</div>
-				<div class="row">
-				    <div class="col-sm-2">
-				        <label class="control-label">名字：</label>
-				    </div>
-				    <div class="col-sm-10">
-				        {{ request.user.last_name }}
+				        {{ request.user }}
 				    </div>
 				</div>
 				<div class="row">
