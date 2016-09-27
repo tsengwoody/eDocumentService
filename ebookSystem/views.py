@@ -36,6 +36,13 @@ class book_list(generic.ListView):
 	def get_queryset(self):
 		return Book.objects.order_by('-ISBN')
 
+
+def mathml(request, template_name='ebookSystem/mathml_demo.html'):
+#	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
+	return render(request, template_name, locals())
+
+
+
 @http_response
 def search_book(request, template_name):
 	if request.method == 'GET':

@@ -20,34 +20,6 @@
 <form action="" method="post" id="currentForm" role="form">
 	{% csrf_token %}
 	{% include 'utils/dialog.html' %}
-	<!--{% ifequal status 'success' %}
-		<div class="modal fade in" id="Dialog" role="dialog">
-		    <div class="modal-dialog modal-sm">
-		        <div class="modal-content alert-success">
-		            <div class="modal-header alert-success" role="alert">
-		                <button type="button" class="close" data-dismiss="modal">&times;</button>
-		                <strong>{{ status }}</strong>
-		                <div class="alertMessage">{{ message }}</div>
-		            </div>
-		        </div>
-		    </div>
-		</div>
-	{% endifequal %}
-	{% ifequal status 'error' %}
-		<div class="modal fade in" id="Dialog" role="dialog">
-		    <div class="modal-dialog modal-sm">
-		        <div class="modal-content alert-danger">
-		            <div class="modal-header alert-danger" role="alert">
-		                <button type="button" class="close" data-dismiss="modal">&times;</button>
-		                <strong>{{ status }}</strong>
-		                <div class="alertMessage">{{ message }}</div>
-		            </div>
-		        </div>
-		    </div>
-		</div>
-	{% endifequal %}
-	-->
-		
 			<div class="row">
 				<div id="imagePage" class="col-md-6 towColumn imagePage">
 					<nav>
