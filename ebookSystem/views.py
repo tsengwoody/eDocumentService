@@ -334,7 +334,6 @@ class editView(generic.View):
 			part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
 		except:
 			raise Http404("book or part does not exist")
-		editForm = EditForm(request.POST)
 		content = request.POST['content']
 		if request.POST.has_key('save'):
 			[finishContent, editContent] = part.split_content(content)
@@ -462,6 +461,25 @@ def edit_SpecialContent(request, id, type):
 	editContent = sc.content
 	template_name = 'ebookSystem/edit_{0}.html'.format(type)
 	if request.method == 'POST':
+		if request.POST.has_key('save'):
+			if type == 'image':
+				soup = BeautifulSoup(sc.content, 'lxml')
+				img_tags = soup.find_all('img')
+				img_tag = img_tags[0]
+				img_tag['src'] = 'image/' +sc.id +'.jpg'
+				img_tag['alt'] = request.POST['alt']
+				sc.content = img_tag.prettify(formatter='html')
+			else:
+				sc.content = request.POST['content']
+			sc.save()
+		if request.POST.has_key('upload'):
+			dirname = sc.ebook.book.path +'/OCR/image/' +
+			if not os.path.exists(dirname):
+				os.makedirs(dirname, 0770)
+			path = dirname +sc.id +'.jpg'
+			with open(path, 'wb+') as dst:
+				for chunk in request.FILES['imageFile'].chunks():
+					dst.write(chunk)
 		return locals()
 	if request.method == 'GET':
 		return locals()
