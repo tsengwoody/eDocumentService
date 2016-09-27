@@ -47,15 +47,11 @@
                             <button type="button" class="btn btn-primary" id="send_otp">送出驗證碼</button>
                         </div>
                     </div>
-                    
-               
             </div>
             
         </div>
     </div>
 </div>
-
-
 <div class="row">
     <div class="col-md-8 col-md-offset-2">
         <div class="panel panel-default">
@@ -76,7 +72,7 @@
 				        <label class="control-label">電子郵件：</label>
 				    </div>
 				    <div class="col-sm-10">
-				        {{ request.user.email }}<!--<input class="btn-xs btn-default" type="button" value="驗證">-->
+				        {{ request.user.email }}
                         {% if not request.user.auth_email %}
                             <button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="email" data-sendto="{{ user.email }}">驗證</button>
                         {% else %}
@@ -90,7 +86,7 @@
                         <label class="control-label">電話：</label>
                     </div>
                     <div class="col-sm-10">
-                        {{ user.phone }}<!--<input class="btn-xs btn-default" type="button" value="驗證">-->
+                        {{ user.phone }}
                         {% if not request.user.auth_phone %}
                             <button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ user.phone }}">驗證</button>
                         {% else %}

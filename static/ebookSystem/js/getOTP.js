@@ -4,9 +4,6 @@ function getOTP(sender) {
     var otpURL = "/genericUser/verify_contact_info/";
     var transferData={};
     transferData["generate"]=sender.val();
-    console.log(transferData);
-
-    
     $.ajax({
         url: otpURL,
         type: "POST",
@@ -37,9 +34,6 @@ function getOTP(sender) {
             }else{
                 $('#id_send_info').text(json.message);
             }
-
-            //TODO: 顯示倒數計時，使用setTimeOut
-            
         },
         error: function(xhr, errmsg, err) {
             alert(xhr.status + ": " + xhr.responseText);
@@ -51,7 +45,6 @@ function getOTP(sender) {
 }
 
 function verifyOTP(sender) {
-
     var otpURL = "/genericUser/verify_contact_info/";
     var transferData={};
     transferData["verification_code"]=$('#recipient-code').val();

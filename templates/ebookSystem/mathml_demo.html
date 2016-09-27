@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+    <script src="http://www.wiris.net/demo/editor/editor"></script>
+    <script>
+    var editor;
+    window.onload = function () {
+      editor = com.wiris.jsEditor.JsEditor.newInstance({'language': 'en'});
+            editor.insertInto(document.getElementById('editorContainer'));
+    }
+    function doSet() {
+      editor.setMathML("<math><msubsup><mo>&#x222B;</mo><mn>2</mn><mn>1</mn></msubsup><mn>2</mn><mo>d</mo><mi>x</mi><mspace linebreak=\"newline\"/><mspace linebreak=\"newline\"/></math>");
+    }
+    function doGet() {
+      console.log(editor.getMathML());
+      document.getElementById("setVale").innerHTML=editor.getMathML();
+    }
+    </script>
+  </head>
+  <body>
+    <div id="editorContainer"></div>
+    <a href="#" onclick="doSet()">set</a>
+    <a href="#" onclick="doGet()">get</a>
+
+    <div id='setVale'></div>
+  </body>
+</html>
