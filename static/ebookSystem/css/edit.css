@@ -69,3 +69,6 @@ textarea.form-control{
     float: none;
     margin: 0 auto;
 }
+.hide-me{
+  display: none;    
+}

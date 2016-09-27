@@ -266,7 +266,8 @@ function submitMathml()
 }
 function doGet() {
   console.log(editor.getMathML());
-  $('#setValue').html("<hr />"+editor.getMathML());
+  $('#setValue #message').html(editor.getMathML());
+  $('#setValue').css('visibility','visible').fadeIn();
 }
 var function_click = false;
 var idel_min =0;
@@ -431,6 +432,7 @@ $(document).ready(function() {
     }
     if(url.split('/')[3]=="edit_mathml"){
         createMathMlEditor();
+
     }
 
 
@@ -449,7 +451,9 @@ $(document).ready(function() {
     $('#zoomOUT').on("click",function(){
         adjZoom(10);
     });
-    
+    $("#setValue .close").on("click", function(){
+        $('#setValue').hide();
+    });
 
     $(window).on('beforeunload', function(e){
       if(function_click)
