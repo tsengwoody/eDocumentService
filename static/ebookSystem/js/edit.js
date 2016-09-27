@@ -142,7 +142,6 @@ function detectIdel()
 }
 function calMins()
 {
-    console.log("change cout "+change_count);
     var url=window.location.pathname;
     var newUrl="/"+url.split('/')[1]+"/"+"edit_ajax"+"/"+url.split('/')[3]+"/";
     var transferData={};
@@ -252,12 +251,27 @@ function rotateFormat()
     }
 
 }
+var editor;
+function createMathMlEditor()
+{
+    editor = com.wiris.jsEditor.JsEditor.newInstance({'language': 'zh'});
+    editor.insertInto(document.getElementById('editorContainer'));
+}
+function submitMathml()
+{
+    alert(editor.getMathML());
+    $('form').append($("<input>").attr("type", "hidden").attr("name", "save").val("save"));
+    $('form').append($("<input>").attr("type", "hidden").attr("name", "content").val(editor.getMathML()));
+    $('form').submit();
+}
+function doGet() {
+  console.log(editor.getMathML());
+  $('#setValue').html("<hr />"+editor.getMathML());
+}
 var function_click = false;
 var idel_min =0;
 var change_count=0;
 function createHtmlEditor(){
-
-//http://blog.squadedit.com/tinymce-and-cursor-position/
   tinymce.init({
   forced_root_block : "", 
   force_br_newlines : false,
@@ -404,12 +418,21 @@ $(document).ready(function() {
             }
         }
     });
-    createHtmlEditor();
-    calMins();
-    setInterval(function(){ 
+
+    var url=window.location.pathname;
+    console.log(url.split('/')[2]);
+    if(url.split('/')[2]!="advanced"){
+        createHtmlEditor();
         calMins();
-        detectIdel();
-    }, 60000);
+        setInterval(function(){ 
+            calMins();
+            detectIdel();
+        }, 60000);
+    }
+    if(url.split('/')[3]=="edit_mathml"){
+        createMathMlEditor();
+    }
+
 
     $('#prePage').on("click", function() {
         changePage(-1);
@@ -426,7 +449,7 @@ $(document).ready(function() {
     $('#zoomOUT').on("click",function(){
         adjZoom(10);
     });
-
+    
 
     $(window).on('beforeunload', function(e){
       if(function_click)

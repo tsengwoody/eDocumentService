@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script language="javascript" src="{% static 'ebookSystem/js/bootstrap/tinymce.min.js' %}"></script>
 <script language="javascript" src="{% static 'ebookSystem/js/edit.js' %}"></script>
+<script src="http://www.wiris.net/demo/editor/editor"></script>
 <link href="{% static "ebookSystem/css/edit.css" %}" rel="stylesheet" > 
 {% endblock %}
 
@@ -45,8 +46,6 @@
 		    </div>
 		</div>
 	{% endifequal %}
-	
-		
 			<div class="row">
 				<div id="imagePage" class="col-md-6 towColumn imagePage">
 					<nav>
@@ -75,9 +74,9 @@
 						<div class="col-md-4 pull-left">
 								<label for="id_page">頁數:</label>		
 								<input id="id_page" name="page" type="text" size="4" readonly="true"  value="{{ show_page }}">
-								{{ current_count|add:'1' }}/{{ total_count }}
+							<!--	{{ current_count|add:'1' }}/{{ total_count }}
 								{% if previous_sc %}<a href="{{ previous_sc.get_url }}">上一個</a>{% endif %}
-								{% if next_sc %}<a href="{{ next_sc.get_url }}">下一個</a>{% endif %}
+								{% if next_sc %}<a href="{{ next_sc.get_url }}">下一個</a>{% endif %}-->
 						</div>
 						<div class="input-group col-md-3 pull-right">
 							<span class="input-group-btn">
@@ -92,9 +91,18 @@
 					</div>
 				</div>
 
-				<div id="textPage"class="col-md-6 towColumn">
-					<a href="/ebookSystem/mathml" class="btn btn-info" target="_block" role="button">Link Button</a> 
+				<div id="textPage" class="col-md-6 towColumn">
+				    <div id="editorContainer" style="width:100%;height:300px"></div>
+				    <div class="form-group row">
+				        <div class="col-md-12">
+				        	<div id="setValue" class="col-md-12 col-centered"></div>
+				        	<hr />
+				            <a href="#" role="button" class="btn btn-success" onclick="doGet()">預覽</a>
+				            <a href="#" role="button" class="btn btn-primary" onclick="submitMathml()">送出</a>
+				        </div>
+				    </div>
 				</div>
+
 			</div>
 
 </form>
