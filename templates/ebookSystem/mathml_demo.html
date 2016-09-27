@@ -6,11 +6,11 @@
     <script>
     var editor;
     window.onload = function () {
-      editor = com.wiris.jsEditor.JsEditor.newInstance({'language': 'en'});
-            editor.insertInto(document.getElementById('editorContainer'));
+      editor = com.wiris.jsEditor.JsEditor.newInstance({'language': 'zh'});
+      editor.insertInto(document.getElementById('editorContainer'));
     }
     function doSet() {
-      editor.setMathML("<math><msubsup><mo>&#x222B;</mo><mn>2</mn><mn>1</mn></msubsup><mn>2</mn><mo>d</mo><mi>x</mi><mspace linebreak=\"newline\"/><mspace linebreak=\"newline\"/></math>");
+      editor.setMathML("<math><mrow><mi>x</mi><mo>=</mo><mfrac><mrow><mo form=\"prefix\">−</mo><mi>b</mi><mo>&PlusMinus;</mo><msqrt><msup><mi>b</mi><mn>2</mn></msup><mo>−</mo><mn>4</mn><mo>&InvisibleTimes;</mo><mi>a</mi><mo>&InvisibleTimes;</mo><mi>c</mi></msqrt></mrow><mrow><mn>2</mn><mo>&InvisibleTimes;</mo><mi>a</mi></mrow></mfrac></mrow></math>");
     }
     function doGet() {
       console.log(editor.getMathML());
