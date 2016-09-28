@@ -30,8 +30,8 @@
 		{% for part in sc_editingPartList %}
 		<tr>
 			<td>{{ part }}</td>
-			<td>{{ part.finish_specialcontent_count }}/{{ part.specialcontent_count }}</td>
-			<td>{{ part.collect_service_hours }}</td>
+			<td>{{ part.specialcontent_finish_count }}/{{ part.specialcontent_count }}</td>
+			<td>{{ part.sc_service_hours }}</td>
 			<td>{{ part.sc_get_date }}</td>
 			<td>{{part.status_int2str}}</td>
 			<td>

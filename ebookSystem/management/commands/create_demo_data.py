@@ -59,16 +59,14 @@ class Command(BaseCommand):
 #		request.user = root
 #		response = profileView.get(request)
 		ebook = EBook.objects.get(book=book, part=1)
-		ebook.status = ebook.STATUS['sc_edit']
+		ebook.status = ebook.STATUS['finish']
 		ebook.editor = rootEditor
-		ebook.sc_editor = rootEditor
 		ebook.save()
 		from zipfile import ZipFile
 		src = BASE_DIR +'/temp/part1.zip'
 		dst = ebook.book.path +u'/OCR'
 		with ZipFile(src, 'r') as partFile:
 			partFile.extractall(dst)
-		ebook.create_SpecialContent()
 		request = factory.post(reverse('genericUser:apply_document'), {u'ISBN':u'9789865829810', u'bookname':u'遠山的回音', u'author':u'卡勒德.胡賽尼(Khaled Hosseini)著; 李靜宜譯', u'house':u'木馬文化', u'date':u'2014-02-01'})
 		request.user = manager
 		response = apply_document(request)

@@ -145,7 +145,7 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 				month_ServiceHours.service_hours = month_ServiceHours.service_hours +part.service_hours
 				month_ServiceHours.save()
 			import shutil
-			shutil.copy2(part.get_path('-clean'), part.get_path('-final'))
+			shutil.copy2(part.get_path('-clean'), part.get_path('-sc'))
 			part.book.save()
 			part.save()
 			if part.book.collect_finish_part_count() == part.book.part_count:
@@ -341,7 +341,6 @@ class editView(generic.View):
 			part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
 		except:
 			raise Http404("book or part does not exist")
-		editForm = EditForm(request.POST)
 		content = request.POST['content']
 		if request.POST.has_key('save'):
 			[finishContent, editContent] = part.split_content(content)
@@ -364,7 +363,6 @@ class editView(generic.View):
 			part.set_content(finish_content=content, edit_content='')
 			part.edited_page = int(request.POST['page'])
 			part.status = part.STATUS['review']
-			part.finish_date = timezone.now()
 			part.save()
 			redirect_to = reverse('account:profile')
 			status = 'success'
@@ -388,50 +386,12 @@ def special_content(request, ISBN_part, template_name='ebookSystem/special_conte
 		raise Http404("book does not exist")
 	sc_list = part.specialcontent_set.all().order_by('tag_id')
 	if request.method == 'POST':
+		if request.POST.has_key('write'):
+			sc = SpecialContent.objects.get(id=request.POST['write'])
+			sc.write_to_file()
 		return locals()
 	if request.method == 'GET':
 		return locals()
-
-@http_response
-def edit_unknown(request, id, template_name='ebookSystem/edit_unknown.html'):
-	try:
-		sc = SpecialContent.objects.get(id=id)
-	except: 
-		raise Http404("special content does not exist")
-	part = sc.ebook
-	page = sc.page
-	water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(part.book.book_info.ISBN, request.user.username)
-	[scanPageList, defaultPageURL] = part.get_image(request.user)
-	sc_list = list(SpecialContent.objects.filter(ebook=part).order_by('tag_id'))
-	total_count = len(sc_list)
-	current_count = sc_list.index(sc)
-	try:
-		next_sc = sc_list[current_count+1]
-	except:
-		next_sc = None
-	try:
-		previous_sc = sc_list[current_count-1]
-	except:
-		previous_sc = None
-	if page == 0:
-		show_page = 0
-		scanPageList = scanPageList[page:page+2]
-		default_page_url = water_path +u'/' +scanPageList[0]
-	elif page == part.book.page_per_part-1:
-		show_page = 1
-		scanPageList = scanPageList[page-1:page+1]
-		default_page_url = water_path +u'/' +scanPageList[1]
-	else:
-		show_page = 1
-		scanPageList = scanPageList[page-1:page+2]
-		default_page_url = water_path +u'/' +scanPageList[1]
-	default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
-	editContent = sc.content
-	if request.method == 'POST':
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
 @http_response
 def edit_SpecialContent(request, id, type):
 	try:
@@ -466,9 +426,33 @@ def edit_SpecialContent(request, id, type):
 		scanPageList = scanPageList[page-1:page+2]
 		default_page_url = water_path +u'/' +scanPageList[1]
 	default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
-	editContent = sc.content
+	from bs4 import BeautifulSoup
+	if type == 'mathml':
+		math_tag = BeautifulSoup(sc.content, 'lxml').find('math')
+		editContent = str(math_tag)
+	else:
+		editContent = sc.content
 	template_name = 'ebookSystem/edit_{0}.html'.format(type)
 	if request.method == 'POST':
+		if request.POST.has_key('save'):
+			if type == 'image':
+				soup = BeautifulSoup(sc.content, 'lxml')
+				img_tags = soup.find_all('img')
+				img_tag = img_tags[0]
+				img_tag['src'] = 'image/' +sc.id +'.jpg'
+				img_tag['alt'] = request.POST['alt']
+				sc.content = img_tag.prettify(formatter='html')
+			elif type == 'mathml':
+				sc.content = request.POST['content']
+			sc.save()
+		if request.POST.has_key('upload'):
+			dirname = sc.ebook.book.path +'/OCR/image/'
+			if not os.path.exists(dirname):
+				os.makedirs(dirname, 0770)
+			path = dirname +sc.id +'.jpg'
+			with open(path, 'wb+') as dst:
+				for chunk in request.FILES['imageFile'].chunks():
+					dst.write(chunk)
 		return locals()
 	if request.method == 'GET':
 		return locals()
