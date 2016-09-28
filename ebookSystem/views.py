@@ -441,10 +441,10 @@ def edit_SpecialContent(request, id, type):
 				img_tag = img_tags[0]
 				img_tag['src'] = 'image/' +sc.id +'.jpg'
 				img_tag['alt'] = request.POST['alt']
-				sc.content = u'<p id="{0}"'.format(sc.tag_id) +image_tag.prettify(formatter='html') +u'</p>'
+				sc.content = u'<p id="{0}">'.format(sc.tag_id) +image_tag.prettify(formatter='html') +u'</p>'
 			elif type == 'mathml':
 				math_tag = BeautifulSoup(request.POST['content'], 'lxml').find('math')
-				sc.content = u'<p id="{0}"'.format(sc.tag_id) +math_tag.prettify(formatter='html') +u'</p>'
+				sc.content = u'<p id="{0}">'.format(sc.tag_id) +math_tag.prettify(formatter='html') +u'</p>'
 				sc.save()
 				print 'mathml save'
 		if request.POST.has_key('upload'):
