@@ -446,7 +446,7 @@ def edit_SpecialContent(request, id, type):
 				math_tag = BeautifulSoup(request.POST['content'], 'lxml').find('math')
 				sc.content = u'<p id="{0}">'.format(sc.tag_id) +math_tag.prettify(formatter='html') +u'</p>'
 				sc.save()
-		redirect_to = reverse('ebookSystem:special_content')
+		redirect_to = reverse('ebookSystem:special_content', kwargs={'ISBN_part':part.ISBN_part})
 		if request.POST.has_key('upload'):
 			dirname = sc.ebook.book.path +'/OCR/image/'
 			if not os.path.exists(dirname):
