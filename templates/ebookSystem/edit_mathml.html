@@ -93,6 +93,7 @@
 
 				<div id="textPage" class="col-md-6 towColumn">
 				    <div id="editorContainer" style="width:100%;height:300px"></div>
+				    <input type="hidden" name="content" />
 				    <hr />
 				    <div id="setValue" class="alert alert-success hide-me">
 				        	<a href="#" class="close" aria-label="close">&times;</a>
@@ -100,13 +101,13 @@
 							<span id="message"></span>
 				    </div>
 				    <div class="form-group">
-				        <div class="col-md-12">
+				        <div>
 				            <a href="#" role="button" class="btn btn-success" onclick="doGet()">預覽</a>
 				            <a href="#" role="button" class="btn btn-primary" onclick="submitMathml()">送出</a>
+				            <p style="color:red">*目前數學方程式僅支援Firefox.Safari.IE</p>
 				        </div>
 				    </div>
 				</div>
-
 			</div>
 
 </form>
