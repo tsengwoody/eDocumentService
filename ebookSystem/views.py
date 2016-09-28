@@ -16,6 +16,9 @@ from utils.crawler import *
 import os
 import json
 import shutil
+import uuid
+from django.views.decorators.cache import cache_control
+
 
 #logging config
 import logging
@@ -290,6 +293,7 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 	extra_list = ['bookname', 'author', 'house', 'date', 'ISBN']
 	return locals()
 
+
 def edit_ajax(request, ISBN_part, *args, **kwargs):
 	user = request.user
 	response={}
@@ -317,8 +321,10 @@ def edit_ajax(request, ISBN_part, *args, **kwargs):
 
 class editView(generic.View):
 
+	@cache_control(no_store=True, no_cache=True, max_age=0)
 	@method_decorator(http_response)
 	def get(self, request, encoding='utf-8', *args, **kwargs):
+    	
 		logger.info('{}/edit\t{}'.format(request.user, resolve(request.path).namespace))
 		template_name='ebookSystem/edit.html'
 		user = request.user
@@ -327,10 +333,14 @@ class editView(generic.View):
 			part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
 		except: 
 			raise Http404("book or part does not exist")
+		postToken = uuid.uuid1().hex
+		request.session['postToken'] = postToken
 		[scanPageList, defaultPageURL] = part.get_image(request.user)
 		[editContent, fileHead] = part.get_content('-edit')
+		print "get"
 		return locals()
 
+	@cache_control(no_store=True, no_cache=True, max_age=0)
 	@method_decorator(http_response)
 	def post(self, request, encoding='utf-8', *args, **kwargs):
 		template_name='ebookSystem/edit.html'
@@ -342,6 +352,12 @@ class editView(generic.View):
 		except:
 			raise Http404("book or part does not exist")
 		content = request.POST['content']
+		Token = request.session.get('postToken',default=None)
+		userToken = request.POST['postToken']
+		print ("Token %d",Token)
+		print (" userToken %d",userToken)
+		if  userToken !=Token:
+			raise Http404("請勿重覆傳送")
 		if request.POST.has_key('save'):
 			[finishContent, editContent] = part.split_content(content)
 			if finishContent == '' or editContent == '':
@@ -376,6 +392,10 @@ class editView(generic.View):
 			message = u'成功載入全部文件內容'
 		[scanPageList, defaultPageURL] = part.get_image(request.user)
 		[editContent, fileHead] = part.get_content('-edit')
+		del request.session['postToken']
+		postToken = uuid.uuid1().hex
+		request.session['postToken'] = postToken
+		print request.session.get('postToken',default=None)
 		return locals()
 
 @http_response

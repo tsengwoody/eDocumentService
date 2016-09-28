@@ -261,6 +261,7 @@ function createMathMlEditor()
 function submitMathml()
 {
     //alert(editor.getMathML());
+    function_click=true;
     $('form').append($("<input>").attr("type", "hidden").attr("name", "save").val("save"));
     $("input[name='content']" ).val(editor.getMathML());
    // $('form').append($("<input>").attr("type", "hidden").attr("name", "content").val(editor.getMathML()));
