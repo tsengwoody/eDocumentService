@@ -133,7 +133,6 @@ class profileView(generic.View):
 			ISBN_part = request.POST.get('reEditPart')
 			reEditPart = EBook.objects.get(ISBN_part = ISBN_part)
 			reEditPart.status = reEditPart.STATUS['edit']
-			reEditPart.finish_date = None
 			reEditPart.load_full_content()
 			events = Event.objects.filter(content_type__model='ebook', object_id=reEditPart.ISBN_part, status=Event.STATUS['review'])
 			for event in events:
@@ -159,18 +158,17 @@ def sc_service(request, template_name='account/sc_service.html'):
 				message = u'您已有超過10段文件，請先校對完成再領取'
 				return locals()
 			try:
-				getPart = EBook.objects.filter(status=EBook.STATUS['sc_active']).order_by('finish_date')[0]
+				getPart = EBook.objects.filter(status=EBook.STATUS['finish']).order_by('get_date')[0]
 			except:
 				status = u'error'
 				message = u'無文件'
 				return locals()
 			getPart.sc_editor = request.user.editor
 			getPart.sc_get_date = timezone.now()
+			if getPart.is_sc_rebuild:
+				getPart.create_SpecialContent()
+				getPart.is_sc_rebuild = False
 			getPart.status = getPart.STATUS['sc_edit']
-			for sc in getPart.specialcontent_set.all():
-				if sc.status == sc.STATUS['active']:
-					sc.status = sc.STATUS['edit']
-					sc.save()
 			getPart.save()
 			status = 'success'
 			message = u'成功取得文件{}'.format(getPart.__unicode__())
@@ -179,11 +177,7 @@ def sc_service(request, template_name='account/sc_service.html'):
 			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
 			rebackPart.sc_editor=None
 			rebackPart.sc_get_date = None
-			rebackPart.status = rebackPart.STATUS['sc_active']
-			for sc in rebackPart.specialcontent_set.all():
-				if sc.status == sc.STATUS['edit']:
-					sc.status = sc.STATUS['active']
-					sc.save()
+			rebackPart.status = rebackPart.STATUS['finish']
 			rebackPart.save()
 			status = 'success'
 			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())

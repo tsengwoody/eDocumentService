@@ -150,7 +150,6 @@ class EBook(models.Model):
 	end_page = models.IntegerField()
 	edited_page = models.IntegerField(default=0)
 	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL, related_name='edit_ebook_set')
-	finish_date = models.DateField(blank=True, null=True)
 	deadline = models.DateField(blank=True, null=True)
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
@@ -158,9 +157,11 @@ class EBook(models.Model):
 	status = models.IntegerField(default=1)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_active':5, 'sc_edit':6, 'sc_finish':7}
 	sc_editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_edit_ebook_set')
-	sc_finish_date = models.DateField(blank=True, null=True)
 	sc_deadline = models.DateField(blank=True, null=True)
 	sc_get_date = models.DateField(blank=True, null=True)
+	sc_service_hours = models.IntegerField(default=0)
+	sc_serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_servicehours')
+	is_sc_rebuild = models.BooleanField(default=True)
 
 	def status_int2str(self):
 		for k, v in self.STATUS.iteritems():
@@ -169,7 +170,7 @@ class EBook(models.Model):
 		return 'unknown'
 
 	def get_path(self, string=''):
-		if string == '-final' or string == '-clean':
+		if string in ['-clean', '-final', '-sc']:
 			return self.book.path +'/OCR/part{0}{1}.html'.format(self.part, string)
 		else:
 			return self.book.path +'/OCR/part{0}{1}.txt'.format(self.part, string)
@@ -384,7 +385,7 @@ class EBook(models.Model):
 					if parent.name == 'p':
 						span_tag_pparent = parent
 						p_tag_count = p_tag_count +1
-				if p_tag_count != 1:continue
+				if not p_tag_count == 1:continue
 				try:
 					tag_id = span_tag_pparent['id']
 					page = scanPageList.index(span_tag['id'])
@@ -424,17 +425,13 @@ class EBook(models.Model):
 				except:
 					SpecialContent.objects.create(id=id, ebook=self, tag_id=tag_id, page=page, content=content, type=type)
 
-	def collect_service_hours(self):
-		service_hours = 0
-		for sc in self.specialcontent_set.all():
-			service_hours = service_hours + sc.service_hours
-		return 		service_hours
+	def delete_SpecialContent(self):
+		sc_list = SpecialContent.objects.filter(ebook=self)
+		for sc in sc_list:
+			sc.delete()
 
-	def finish_specialcontent_count(self):
-		finish_specialcontent_count = 0
-		for sc in self.specialcontent_set.all():
-			finish_specialcontent_count = finish_specialcontent_count + (sc.status==sc.STATUS['finish'])
-		return finish_specialcontent_count
+	def specialcontent_finish_count(self):
+		return len(self.specialcontent_set.all().filter(is_edited=True))
 
 	def specialcontent_count(self):
 		return len(self.specialcontent_set.all())
@@ -478,21 +475,12 @@ class SpecialContent(models.Model):
 	tag_id = models.CharField(max_length=10)
 	page = models.IntegerField()
 	content = models.TextField()
-	service_hours = models.IntegerField(default=0)
-	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL)
-	status = models.IntegerField(default=0)
-	STATUS = {'active':0, 'edit':1, 'finish':2}
+	is_edited = models.BooleanField(default=False)
 	type = models.IntegerField()
 	TYPE = {'image':0, 'unknown':1, 'mathml':2}
 
 	def __unicode__(self):
 		return self.id
-
-	def status_int2str(self):
-		for k, v in self.STATUS.iteritems():
-			if v == self.status:
-				return k
-		return 'unknown'
 
 	def type_int2str(self):
 		for k, v in self.TYPE.iteritems():
@@ -503,6 +491,26 @@ class SpecialContent(models.Model):
 	def get_url(self):
 		return '/ebookSystem/advanced/edit_{0}/{1}'.format(self.type_int2str(), self.id)
 
+	def write_to_file(self, encoding='utf-8'):
+		source = self.ebook.get_path('-sc')
+		with codecs.open(source, 'r', encoding=encoding) as sourceFile:
+			source_content = sourceFile.read()
+		file_head = source_content[0]
+		source_content = source_content[1:]
+		from bs4 import BeautifulSoup, NavigableString
+		soup = BeautifulSoup(source_content, 'lxml')
+		tags = soup.find_all('p', id=self.tag_id)
+		if not len(tags) == 1:
+			return False
+		tag = tags[0]
+		nt = BeautifulSoup(self.content, 'lxml').body.p
+		tag.replace_with(nt)
+		with codecs.open(source, 'w', encoding=encoding) as sourceFile:
+			write_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
+			soup = BeautifulSoup(write_content, 'lxml')
+			write_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
+			sourceFile.write(write_content)
+#		self.delete()
 
 class ReviseContentAction(models.Model):
 	from ebookSystem.models import EBook

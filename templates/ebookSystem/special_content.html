@@ -20,19 +20,18 @@
 			<th>tag ID</th>
 			<th>類型</th>
 			<th>頁數</th>
-			<th>時數</th>
-			<th>狀態</th>
-			<th colspan="1">動作</th>
+			<th colspan="2">動作</th>
 		</tr>
 		{% for SpecialContent in sc_list %}
 		<tr>
 			<td>{{ SpecialContent.tag_id }}</td>
 			<td>{{ SpecialContent.type_int2str }}</td>
 			<td>{{ SpecialContent.page }}</td>
-			<td>{{ SpecialContent.service_hours }}</td>
-			<td>{{ SpecialContent.status_int2str }}</td>
 			<td>
 				<a class="btn btn-link" role="button" href ={{ SpecialContent.get_url }}>編輯</a>
+			</td>
+			<td>
+				<input type="submit" class="btn btn-primary" name="write" value="{{ SpecialContent.id }}" id="id_write"> 寫入</input>
 			</td>
 		</tr>
 		{% endfor %}
