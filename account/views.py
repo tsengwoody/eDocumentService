@@ -41,6 +41,8 @@ class profileView(generic.View):
 		editingPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
 		finishPartList = Editor.objects.get(user=user).edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
 		if request.POST.has_key('getPart'):
+			for key in request.session.keys():
+				print key + ':' +request.session[key]
 			if len(editingPartList)>=10:
 				status = 'error'
 				message = u'您已有超過10段文件，請先校對完成再領取'
