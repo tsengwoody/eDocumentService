@@ -42,11 +42,13 @@
 			<th>tag id</th>
 		</tr>
 		{% for lc_item in lc_list %}
+		{% if lc_item.1|length < 10 %}
 		<tr>
 			<td>{{ lc_item.0 }}</td>
-			<td>{{ lc_item.1.0 }}</td>
-			<td>{{ lc_item.1.1 }}</td>
+			<td>{{ lc_item.1|length }}</td>
+			<td>{{ lc_item.1 }}</td>
 		</tr>
+		{% endif %}
 		{% endfor %}
 	</table>
 

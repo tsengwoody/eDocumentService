@@ -43,9 +43,8 @@ def last_character(src):
 			try:
 				lc = list(tag.strings)[-1].replace(' ', '').replace('\r', '').replace('\n', '')[-1]
 				if not lc in lc_dict.keys():
-					lc_dict[lc] = [0, []]
-				lc_dict[lc][0] = lc_dict[lc][0] +1
-				lc_dict[lc][1].append(tag['id'])
+					lc_dict[lc] = []
+				lc_dict[lc].append(tag['id'])
 			except:
 				pass
 	return lc_dict
