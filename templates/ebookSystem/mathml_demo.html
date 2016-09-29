@@ -7,6 +7,11 @@
     <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
     <script src="http://www.wiris.net/demo/editor/editor"></script>
     <script>
+    $(document).ready(function() {
+      $("#setValue .close").on("click", function(){
+        $('#setValue').hide();
+      });
+    });
     var editor;
     window.onload = function () {
       editor = com.wiris.jsEditor.JsEditor.newInstance({'language': 'zh'});
@@ -17,7 +22,8 @@
     }
     function doGet() {
       console.log(editor.getMathML());
-      document.getElementById("setVale").innerHTML=editor.getMathML();
+      $('#setValue #message').html(editor.getMathML());
+      $('#setValue').css('visibility','visible').fadeIn();
     }
     function submitMathml()
     {
@@ -29,7 +35,7 @@
         data: $("form").serialize(),
         success: function(json){
             alertDialogNoReload(json);
-            
+
         },
         error:function(xhr,errmsg,err){
             alert(xhr.status+" "+xhr.responseText);
@@ -45,8 +51,9 @@
         type: "POST",
         data: $("form").serialize(),
         success: function(json){
-            console.log(json);
-            alert(json);
+            alertDialogNoReload(json);
+            console.log(json.math_content);
+            $('#getData #message').html(json.math_content);
         },
         error:function(xhr,errmsg,err){
             alert(xhr.status+" "+xhr.responseText);
@@ -55,16 +62,36 @@
       });
     }
     </script>
+
+    <style>
+      .hide-me{
+          display: none;    
+        }
+
+    </style>
 {% endblock %}
 {% block content %}
-   <form>
-   {% csrf_token %}
-    <div id="editorContainer"></div>
-    <a href="#" onclick="doSet()">default</a>
-    <a href="#" onclick="doGet()">preview</a>
-    <a href="#" onclick="submitMathml()">send</a>
-    <a href="#" onclick="sync()">synchronize</a>
-   
-    <div id='setVale'></div>
-    </form>
+<form>
+    {% csrf_token %}
+    <div id="editorContainer" style="width:100%;height:300px"></div>
+    <a href="#" class="btn btn-default" onclick="doSet()">default</a>
+    <a href="#" class="btn btn-default" onclick="doGet()">preview</a>
+    <a href="#" class="btn btn-default" onclick="submitMathml()">send</a>
+    <a href="#" class="btn btn-default" onclick="sync()">synchronize</a>
+    <div id="setValue" class="alert alert-success hide-me">
+        <a href="#" class="close" aria-label="close">&times;</a>
+        <p>
+            <string>方程式預覽如下：</string>
+        </p>
+        <span id="message"></span>
+    </div>
+    <div id="getData" class="alert alert-info hide-me">
+        <a href="#" class="close" aria-label="close">&times;</a>
+        <p>
+            <string>取得方程式如下：</string>
+        </p>
+        <span id="message"></span>
+    </div>
+</form>
+
 {% endblock %}

@@ -256,29 +256,16 @@ function createMathMlEditor()
 {
     editor = com.wiris.jsEditor.JsEditor.newInstance({'language': 'zh'});
     editor.insertInto(document.getElementById('editorContainer'));
-     editor.setMathML($("input[name='content']" ).val());
+    editor.setMathML($("input[name='content']" ).val());
 }
 function submitMathml()
 {
-   
+    //alert(editor.getMathML());
     function_click=true;
     $('form').append($("<input>").attr("type", "hidden").attr("name", "save").val("save"));
     $("input[name='content']" ).val(editor.getMathML());
-   
-    $.ajax({
-        url:".",
-        type: "POST",
-        data: $("form").serialize(),
-        success: function(json){
-            console.log(json);
-            alertDialog(json);
-        },
-        error:function(xhr,errmsg,err){
-            alert(xhr.status+" "+xhr.responseText);
-            console.log(xhr.status + ": " + xhr.responseText);
-        }
-    });
-
+   // $('form').append($("<input>").attr("type", "hidden").attr("name", "content").val(editor.getMathML()));
+    $('form').submit();
 }
 function doGet() {
   console.log(editor.getMathML());
