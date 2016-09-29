@@ -11,8 +11,8 @@ from .models import *
 from .forms import *
 from genericUser.models import Event, ServiceHours
 from mysite.settings import BASE_DIR
-from utils.decorator import *
 from utils.crawler import *
+from utils.decorator import *
 import os
 import json
 import shutil
@@ -39,12 +39,17 @@ class book_list(generic.ListView):
 	def get_queryset(self):
 		return Book.objects.order_by('-ISBN')
 
-
+@http_response
 def mathml(request, template_name='ebookSystem/mathml_demo.html'):
-#	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
-	return render(request, template_name, locals())
-
-
+	if request.method == 'POST':
+		if request.POST.has_key('set'):
+			cache.set(request.user.username, {'mathml':request.POST['content']}, 600)
+		if request.POST.has_key('get'):
+			math_content = cache.get(request.user.username)['mathml']
+			extra_list = ['math_content']
+		return locals()
+	if request.method == 'GET':
+		return locals()
 
 @http_response
 def search_book(request, template_name):
@@ -120,6 +125,24 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 			for event in events:
 				event.response(status='error', message=request.POST['reason'], user=request.user)
 		redirect_to = reverse('manager:event_list', kwargs={'action':'book' })
+		return locals()
+from utils.analysis import *
+@user_category_check(['manager'])
+@http_response
+def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.html'):
+	try:
+		part = EBook.objects.get(ISBN_part=ISBN_part)
+	except:
+		raise Http404("book does not exist")
+	if request.method == 'GET':
+		[same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
+		ed = edit_distance(part.get_path(), part.get_path('-finish'))
+		delete_count = src_count -same_character
+		insert_count = dst_count -same_character
+		lc_dict = last_character(part.get_path('-clean'))
+		lc_list = lc_dict.items()
+		return locals()
+	if request.method == 'POST':
 		return locals()
 
 @user_category_check(['manager'])

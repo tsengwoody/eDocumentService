@@ -29,6 +29,7 @@
 			{% if request.user.is_superuser %}
 			<th>校對者</th>
 			<th>最後編輯時間</th>
+			<th>分析</th>
 			{% endif %}
 		</tr>
 		{% for part in book.ebook_set.all %}
@@ -46,6 +47,7 @@
 			{% if request.user.is_superuser %}
 			<td>{{ part.editor }}</td>
 			<td>{{ part.editor.user.online }}</td>
+			<td><a href="{% url 'ebookSystem:analyze_part' part.ISBN_part %}" >分析</a></td>
 			{% endif %}
 		</tr>
 		{% endfor %}

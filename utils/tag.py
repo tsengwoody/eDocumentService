@@ -16,18 +16,12 @@ def merge_NavigableString(tag):
 			merge_NavigableString(tag.contents[i])
 
 def add_tag(source, destination, encoding='utf-8'):
-	edit_content = ''
 	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
-		for edit in sourceFile:
-			if edit[-2:] == '\r\n':
-				edit = '<p>' +edit[:-2] +'</p>' +edit[-2:]
-			else:
-				edit = '<p>' +edit +'</p>'
-			edit_content = edit_content +edit
-	edit_content = edit_content[0:3] +edit_content[4:] #skip file head
-	if edit_content[-2:] != '\r\n': edit_content=edit_content +'\r\n'
+		source_content = sourceFile.read()
+		source_content = source_content[1:]
+	destination_content = '<p>' +source_content.replace('\r\n', '</p>\r\n<p>') +'</p>'
 	with codecs.open(destination, 'w', encoding=encoding) as destinationFile:
-		destinationFile.write(u'\ufeff' +edit_content)
+		destinationFile.write(u'\ufeff' +destination_content)
 
 def add_template_tag(source, destination, template, encoding='utf-8'):
 	with codecs.open(template, 'r', encoding=encoding) as templateFile:
@@ -42,7 +36,7 @@ def add_template_tag(source, destination, template, encoding='utf-8'):
 	with codecs.open(destination, 'w', encoding=encoding) as destinationFile:
 		destinationFile.write(u'\ufeff' +source_content)
 
-def clean_tag(source,  destination, title, encoding='utf-8'):
+def clean_tag(source,  destination, title='', encoding='utf-8'):
 	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 		source_content = sourceFile.read()
 	file_head = source_content[0]
@@ -83,27 +77,8 @@ def clean_tag(source,  destination, title, encoding='utf-8'):
 		clean_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
 		cleanFile.write(clean_content)
 
-def find_special_content(source, encoding='utf-8'):
-	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
-		source_content = sourceFile.read()
-	file_head = source_content[0]
-	source_content = source_content[1:]
-	source_content = source_content.replace('<br />', '</p>\r\n<p>')
-	from bs4 import BeautifulSoup, NavigableString
-	soup = BeautifulSoup(source_content, 'lxml')
-	span_tags = soup.find_all('span')
-	for span_tag in span_tags:
-		if span_tag.attrs.has_key('class') and ('unknown' in span_tag.attrs['class'] or 'mathml' in span_tag.attrs['class']):
-			for parent in span_tag.parents:
-				if parent.name == 'p':
-					print parent['id']
-	img_tags = soup.find_all('img')
-	for img_tag in img_tags:
-		print img_tag
-
 import sys
 if __name__ == '__main__':
-#	add_tag(sys.argv[1], sys.argv[1])
-#	add_template_tag(sys.argv[1], sys.argv[2], 'book_template.html')
-#	clean_tag(sys.argv[2], sys.argv[2])
-	find_special_content(sys.argv[1])
+	add_tag(sys.argv[1], sys.argv[2])
+	add_template_tag(sys.argv[2], sys.argv[2], 'book_template.html')
+	clean_tag(sys.argv[2], sys.argv[2])
