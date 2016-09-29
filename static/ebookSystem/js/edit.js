@@ -260,12 +260,25 @@ function createMathMlEditor()
 }
 function submitMathml()
 {
-    //alert(editor.getMathML());
+   
     function_click=true;
     $('form').append($("<input>").attr("type", "hidden").attr("name", "save").val("save"));
     $("input[name='content']" ).val(editor.getMathML());
-   // $('form').append($("<input>").attr("type", "hidden").attr("name", "content").val(editor.getMathML()));
-    $('form').submit();
+   
+    $.ajax({
+        url:".",
+        type: "POST",
+        data: $("form").serialize(),
+        success: function(json){
+            console.log(json);
+            alertDialog(json);
+        },
+        error:function(xhr,errmsg,err){
+            alert(xhr.status+" "+xhr.responseText);
+            console.log(xhr.status + ": " + xhr.responseText);
+        }
+    });
+
 }
 function doGet() {
   console.log(editor.getMathML());
