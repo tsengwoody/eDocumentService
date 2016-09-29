@@ -1,7 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
-  <head>
+{% extends "base_nav.html" %}
+{% load staticfiles %}
+
+
+{% block style %}
+    <script src="{% static "ebookSystem/js/jquery/jquery.min.js" %}" ></script>
+    <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
     <script src="http://www.wiris.net/demo/editor/editor"></script>
     <script>
     var editor;
@@ -16,13 +19,52 @@
       console.log(editor.getMathML());
       document.getElementById("setVale").innerHTML=editor.getMathML();
     }
+    function submitMathml()
+    {
+      $('form').append($("<input>").attr("type", "hidden").attr("name", "set").val("set"));   
+      $('form').append($("<input>").attr("type", "hidden").attr("name", "content").val(editor.getMathML()));
+      $.ajax({
+        url:"/ebookSystem/mathml/",
+        type: "POST",
+        data: $("form").serialize(),
+        success: function(json){
+            alertDialogNoReload(json);
+            
+        },
+        error:function(xhr,errmsg,err){
+            alert(xhr.status+" "+xhr.responseText);
+            console.log(xhr.status + ": " + xhr.responseText);
+        }
+      });
+    }
+    function sync()
+    {
+      $('form').append($("<input>").attr("type", "hidden").attr("name", "get").val("get"));   
+      $.ajax({
+        url:"/ebookSystem/mathml",
+        type: "POST",
+        data: $("form").serialize(),
+        success: function(json){
+            console.log(json);
+            alert(json);
+        },
+        error:function(xhr,errmsg,err){
+            alert(xhr.status+" "+xhr.responseText);
+            console.log(xhr.status + ": " + xhr.responseText);
+        }
+      });
+    }
     </script>
-  </head>
-  <body>
+{% endblock %}
+{% block content %}
+   <form>
+   {% csrf_token %}
     <div id="editorContainer"></div>
-    <a href="#" onclick="doSet()">set</a>
-    <a href="#" onclick="doGet()">get</a>
-
+    <a href="#" onclick="doSet()">default</a>
+    <a href="#" onclick="doGet()">preview</a>
+    <a href="#" onclick="submitMathml()">send</a>
+    <a href="#" onclick="sync()">synchronize</a>
+   
     <div id='setVale'></div>
-  </body>
-</html>
+    </form>
+{% endblock %}
