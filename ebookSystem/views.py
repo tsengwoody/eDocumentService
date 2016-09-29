@@ -44,11 +44,17 @@ def mathml(request, template_name='ebookSystem/mathml_demo.html'):
 	if request.method == 'POST':
 		if request.POST.has_key('set'):
 			cache.set(request.user.username, {'mathml':request.POST['content']}, 600)
+			status = u'success'
+			message = u'成功暫存內容'
 		if request.POST.has_key('get'):
+			if not cache.has_key(request.user.username):
+				status = u'error'
+				message = u'server無資料'
+				return locals()
 			math_content = cache.get(request.user.username)['mathml']
 			extra_list = ['math_content']
-		status = u'success'
-		message = u'成功獲取內容'
+			status = u'success'
+			message = u'成功獲取內容'
 		return locals()
 	if request.method == 'GET':
 		status = u'success'
