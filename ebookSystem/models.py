@@ -31,8 +31,9 @@ class Book(models.Model):
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
 	owner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='own_book_set')
 	upload_date = models.DateField(default = timezone.now)
+	is_private = models.BooleanField(default=False)
 	status = models.IntegerField(default=0)
-	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5, 'indesignate':6, 'designate':7}
+	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5}
 	def __unicode__(self):
 		return self.book_info.bookname
 
@@ -149,14 +150,14 @@ class EBook(models.Model):
 	begin_page = models.IntegerField()
 	end_page = models.IntegerField()
 	edited_page = models.IntegerField(default=0)
-	editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL, related_name='edit_ebook_set')
+	editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='edit_ebook_set')
 	deadline = models.DateField(blank=True, null=True)
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
 	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL)
 	status = models.IntegerField(default=1)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_active':5, 'sc_edit':6, 'sc_finish':7}
-	sc_editor = models.ForeignKey(Editor,blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_edit_ebook_set')
+	sc_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_edit_ebook_set')
 	sc_deadline = models.DateField(blank=True, null=True)
 	sc_get_date = models.DateField(blank=True, null=True)
 	sc_service_hours = models.IntegerField(default=0)
@@ -170,7 +171,7 @@ class EBook(models.Model):
 		return 'unknown'
 
 	def get_path(self, string=''):
-		if string in ['-clean', '-final', '-sc']:
+		if string in ['-clean', '-manual_clean', '-final', '-sc']:
 			return self.book.path +'/OCR/part{0}{1}.html'.format(self.part, string)
 		else:
 			return self.book.path +'/OCR/part{0}{1}.txt'.format(self.part, string)

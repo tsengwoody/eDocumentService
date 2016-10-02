@@ -11,26 +11,30 @@
 {% endblock %}
 {% block content %}
 
-<form action="" method="post">
+<form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
 {% csrf_token %}
 
 	<h4 class="page-header">{{ part }}文件分析</h4>
 	<table class="table table-striped table-hover">
 		<tr>
 			<th>編輯距離</th>
+			<th>相同區數</th>
 			<th>相同字數</th>
 			<th>刪除字數</th>
 			<th>新增字數</th>
 			<th>原始字數</th>
 			<th>校後字數</th>
+			<th>增長字數</th>
 		</tr>
 		<tr>
 			<td>{{ ed }}</td>
+			<td>{{ len_block }}</td>
 			<td>{{ same_character }}</td>
 			<td>{{ delete_count }}</td>
 			<td>{{ insert_count }}</td>
 			<td>{{ src_count }}</td>
 			<td>{{ dst_count }}</td>
+			<td>{{ diff_count }}</td>
 		</tr>
 	</table>
 
@@ -52,23 +56,26 @@
 		{% endfor %}
 	</table>
 
-<!--	<h4 class="page-header">已兌換志工時數</h4>
+	<h4 class="page-header">重複段落檢查</h4>
 	<table class="table table-striped table-hover">
 		<tr>
-			<th>文件</th>
-			<th>時數</th>
-			<th>領取日期</th>
-			<th>完成日期</th>
+			<th>首次tag id</th>
+			<th>次數</th>
+			<th>重複tag id</th>
 		</tr>
-		{% for part in exchangedPartList %}
+		{% for re_item in re_list %}
 		<tr>
-			<td>{{part.book.book_info.bookname}}-part{{part.part}}</td>
-			<td>{{part.service_hours}}</td>
-			<td>{{part.get_date}}</td>
-			<td>{{part.finish_date}}</td>
+			<td>{{ re_item.0 }}</td>
+			<td>{{ re_item.1|length }}</td>
+			<td>{{ re_item.1 }}</td>
 		</tr>
 		{% endfor %}
-	</table>-->
+	</table>
+	<button type="submit" class="btn btn-primary" name="download" value="" id="id_download">下載</button>
+	<input class="form-control-file" id="id_fileObject" name="fileObject" type="file" />
+	<button type="submit" class="btn btn-primary" name="upload" value="" id="id_upload">上傳</button>
+	<button type="submit" class="btn btn-primary" name="finish" value="" id="id_finish">完成</button>
+	<a class="btn btn-link" role="button" href = {% url 'ebookSystem:detail' part.book.ISBN %}>回列表</a>
 </form>
 
 {% endblock %}

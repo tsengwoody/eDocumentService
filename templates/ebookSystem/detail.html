@@ -46,7 +46,7 @@
 			</td>
 			{% if request.user.is_superuser %}
 			<td>{{ part.editor }}</td>
-			<td>{{ part.editor.user.online }}</td>
+			<td>{{ part.editor.online }}</td>
 			<td><a href="{% url 'ebookSystem:analyze_part' part.ISBN_part %}" >分析</a></td>
 			{% endif %}
 		</tr>

@@ -62,6 +62,12 @@ def http_response(view):
 		else:
 			if 'redirect_to' in rend_dict:
 				return HttpResponseRedirect(rend_dict['redirect_to'])
+			elif 'download_path' in rend_dict:
+				with open(rend_dict['download_path'], 'rb') as content_file:
+					response = HttpResponse(content=content_file, )
+				response['Content-Type'] = 'application/octet-stream'
+				response['Content-Disposition'] = 'attachment; filename="{0}"'.format(rend_dict['download_filename'])
+				return response
 			else:
 				return render(request, rend_dict['template_name'], rend_dict)
 	return decorator

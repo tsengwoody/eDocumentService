@@ -60,10 +60,10 @@ class Command(BaseCommand):
 #		response = profileView.get(request)
 		ebook = EBook.objects.get(book=book, part=1)
 		ebook.status = ebook.STATUS['finish']
-		ebook.editor = rootEditor
+		ebook.editor = root
 		ebook.save()
 		from zipfile import ZipFile
-		src = BASE_DIR +'/temp/part1.zip'
+		src = BASE_DIR +'/temp/part.zip'
 		dst = ebook.book.path +u'/OCR'
 		with ZipFile(src, 'r') as partFile:
 			partFile.extractall(dst)

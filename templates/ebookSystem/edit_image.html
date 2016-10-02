@@ -96,7 +96,12 @@
 					<textarea autocomplete="off" id="id_content" name="content" class="form-control" >{{ editContent }}</textarea>
 				</div>
 			</div>
-
+			<label for="id_alt"><font style="color:red">*</font>圖片說明文字：</label>
+			<input id="id_alt" name="alt" type="text" required><label for="id_alt"><font style="color:red">請描述圖片之重要資訊</font></label>
+			<button type="submit" class="btn btn-primary" name="download" value="" id="id_download">下載</button>
+			<input class="form-control-file" id="id_imageFile" name="imageFile" type="file" />
+			<button type="submit" class="btn btn-primary" name="upload" value="" id="id_upload">上傳</button>
+	<button type="submit" class="btn btn-primary" name="save" value="" id="id_save">送出</button>
 </form>
 {% endblock %}
 {% block footer %}

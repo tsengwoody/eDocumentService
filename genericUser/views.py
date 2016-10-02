@@ -61,7 +61,7 @@ def create_document(request, template_name='genericUser/create_document.html'):
 		newBook.scaner = request.user
 		newBook.owner = request.user
 		if request.POST.has_key('designate'):
-			newBook.status = newBook.STATUS['indesignate']
+			newBook.is_private = True
 		newBook.save()
 		newBook.create_EBook()
 		event = Event.objects.create(creater=request.user, action=newBook)
@@ -280,47 +280,17 @@ def revise_content(request, template_name='genericUser/revise_content.html'):
 
 @http_response
 def set_role(request,template_name='genericUser/set_role.html'):
-	user = request.user
-	try:
-		username = user.editor.service_guest.user.username
-	except:
-		username = 'None'
 	if request.method == 'POST':
-		if request.POST.has_key('editor'):
-			try:
-				editor = Editor.objects.get(user=user)
-				editor.professional_field=request.POST['professional_field']
-			except:
-				editor = Editor(user=user, professional_field=request.POST['professional_field'])
-				user.status = user.STATUS['review']
-			Event.objects.create(creater=request.user, action=request.user)
-			if request.POST.has_key('service_guest_check'):
-				try:
-					editor.service_guest = Guest.objects.get(user__username=request.POST['service_guest'])
-				except:
-					editor.service_guest = None
-					status = u'error'
-					message = u'指定對象失敗，系統無此帳號'
-					return locals()
-		if request.POST.has_key('guest'):
+		if request.user.has_editor():
+			request.user.editor.professional_field = request.POST['professional_field']
+		if request.user.has_guest():
 			uploadDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(user.username)
 			if os.path.exists(uploadDir):
 				shutil.rmtree(uploadDir)
 			request.FILES['disability_card_front'].name = user.username +'_front.jpg'
-			status = handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])[0]
+			handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])[0]
 			request.FILES['disability_card_back'].name = user.username +'_back.jpg'
-			status = handle_uploaded_file(uploadDir, request.FILES['disability_card_back'])[0]
-			if not user.has_guest():
-				newGuest = Guest(user=user)
-				newGuest.save()
-			newGuest = Guest.objects.get(user=request.user)
-			user.status = user.STATUS['review']
-		if request.POST.has_key('editor'):
-			editor.save()
-		if request.POST.has_key('guest'):
-			Event.objects.create(creater=request.user, action=request.user)
-			newGuest.save()
-		user.save()
+			handle_uploaded_file(uploadDir, request.FILES['disability_card_back'])[0]
 		status = u'success'
 		message = u'角色設定成功'
 		return locals()

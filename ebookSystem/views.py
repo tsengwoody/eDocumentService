@@ -98,8 +98,8 @@ def search_book(request, template_name):
 @user_category_check(['manager'])
 @http_response
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
-	status = 'error'
-	message= 'referenced before assignment'
+#	status = 'error'
+#	message= 'referenced before assignment'
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
 	except:
@@ -116,10 +116,7 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
-			if book.status == book.STATUS['inactive']:
-				book.status = book.STATUS['active']
-			elif book.status == book.STATUS['indesignate']:
-				book.status = book.STATUS['designate']
+			book.status = book.STATUS['active']
 			shutil.rmtree(org_path)
 			book.save()
 			status = 'success'
@@ -136,24 +133,61 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 				event.response(status='error', message=request.POST['reason'], user=request.user)
 		redirect_to = reverse('manager:event_list', kwargs={'action':'book' })
 		return locals()
+
 from utils.analysis import *
 @user_category_check(['manager'])
 @http_response
 def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.html'):
+	import shutil
 	try:
 		part = EBook.objects.get(ISBN_part=ISBN_part)
 	except:
 		raise Http404("book does not exist")
+	if not os.path.exists(part.get_path('-manual_clean')):
+		shutil.copy2(part.get_path('-sc'), part.get_path('-manual_clean'))
 	if request.method == 'GET':
-		[same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
+		[len_block, same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
 		ed = edit_distance(part.get_path(), part.get_path('-finish'))
 		delete_count = src_count -same_character
 		insert_count = dst_count -same_character
-		lc_dict = last_character(part.get_path('-clean'))
+		diff_count = dst_count -src_count
+		lc_dict = last_character(part.get_path('-manual_clean'))
 		lc_list = lc_dict.items()
+		re_dict = find_repeat(part.get_path('-manual_clean'))
+		re_list = re_dict.items()
+		status = u'success'
+		message = u'分析文件'
 		return locals()
 	if request.method == 'POST':
-		return locals()
+		if request.POST.has_key('download'):
+			download_path = part.get_path('-manual_clean')
+			download_filename = u'part{0}-manual_clean.html'.format(part.part)
+			status = u'success'
+			message = u'下載'
+			return locals()
+		elif request.POST.has_key('upload') and request.FILES.has_key('fileObject'):
+			with open(part.get_path('-manual_clean'), 'wb+') as dst:
+				for chunk in request.FILES['fileObject'].chunks():
+					dst.write(chunk)
+			[len_block, same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
+			ed = edit_distance(part.get_path(), part.get_path('-finish'))
+			delete_count = src_count -same_character
+			insert_count = dst_count -same_character
+			diff_count = dst_count -src_count
+			lc_dict = last_character(part.get_path('-manual_clean'))
+			lc_list = lc_dict.items()
+			re_dict = find_repeat(part.get_path('-manual_clean'))
+			re_list = re_dict.items()
+			status = u'success'
+			message = u'檔案成功更新'
+			return locals()
+		elif request.POST.has_key('finish'):
+			part.status = part.STATUS['sc_active']
+			part.save()
+			status = u'success'
+			message = u'完成'
+			redirect_to = reverse('ebookSystem:detail', kwargs={'book_ISBN':part.book.ISBN})
+			return locals()
 
 @user_category_check(['manager'])
 @http_response
@@ -265,7 +299,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 		newBook.scaner = user
 		newBook.owner = user
 		if request.POST.has_key('designate'):
-			newBook.status = newBook.STATUS['indesignate']
+			newBook.is_private = True
 		newBook.save()
 		newBook.create_EBook()
 		Event.objects.create(creater=event.creater, action=newBook)
@@ -410,7 +444,7 @@ class editView(generic.View):
 			redirect_to = reverse('account:profile')
 		elif request.POST.has_key('finish'):
 			part.set_content(finish_content=content, edit_content='')
-			part.edited_page = int(request.POST['page'])
+			part.edited_page = part.book.page_per_part -1
 			part.status = part.STATUS['review']
 			part.save()
 			redirect_to = reverse('account:profile')
@@ -489,9 +523,7 @@ def edit_SpecialContent(request, id, type):
 	if request.method == 'POST':
 		if request.POST.has_key('save'):
 			if type == 'image':
-				soup = BeautifulSoup(sc.content, 'lxml')
-				img_tags = soup.find_all('img')
-				img_tag = img_tags[0]
+				img_tag = BeautifulSoup(sc.content, 'lxml').find('img')
 				img_tag['src'] = 'image/' +sc.id +'.jpg'
 				img_tag['alt'] = request.POST['alt']
 				sc.content = u'<p id="{0}">'.format(sc.tag_id) +image_tag.prettify(formatter='html') +u'</p>'
@@ -501,14 +533,22 @@ def edit_SpecialContent(request, id, type):
 				sc.save()
 		redirect_to = reverse('ebookSystem:special_content', kwargs={'ISBN_part':part.ISBN_part})
 		if request.POST.has_key('upload'):
-			dirname = sc.ebook.book.path +'/OCR/image/'
-			if not os.path.exists(dirname):
-				os.makedirs(dirname, 0770)
-			path = dirname +sc.id +'.jpg'
-			with open(path, 'wb+') as dst:
-				for chunk in request.FILES['imageFile'].chunks():
-					dst.write(chunk)
+			if type == 'image':
+				dirname = sc.ebook.book.path +'/OCR/image/'
+				if not os.path.exists(dirname):
+					os.makedirs(dirname, 0770)
+				path = dirname +sc.id +'.jpg'
+				with open(path, 'wb+') as dst:
+					for chunk in request.FILES['imageFile'].chunks():
+						dst.write(chunk)
 		return locals()
+		if request.POST.has_key('download'):
+			if type == 'image':
+				download_path = part.book.path +'source/' +request.POST['download']
+				download_filename = request.POST['download']
+				status = u'success'
+				message = u'下載'
+				return locals()
 	if request.method == 'GET':
 		return locals()
 
