@@ -31,3 +31,7 @@
 .tab-content{
     height:100%;
 }
+
+.after-box {
+  clear: left;
+}

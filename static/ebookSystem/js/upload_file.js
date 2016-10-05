@@ -111,7 +111,7 @@ function sameOrigin(url) {
 }
 
 $( document ).ready(function() {
-
+    console.log("upload ready");
     var csrftoken = getCookie('csrftoken');
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
@@ -126,9 +126,13 @@ $( document ).ready(function() {
     if($('.datepicker').length)
         $('.datepicker').datepicker({dateFormat:"yy-mm-dd"});
     $('form').on('submit',function(event){
-        event.preventDefault();
-        console.log("form submitted!");  // sanity check
-        catchErrorHandling();
+        var str =$(document.activeElement).attr('class');
+        if(str.includes('send_no_all_form')!=true)
+        {
+            event.preventDefault();
+            console.log("form submitted!");  // sanity check
+            catchErrorHandling();
+        }
     });
 
 });
