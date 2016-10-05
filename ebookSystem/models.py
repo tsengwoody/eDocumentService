@@ -427,8 +427,7 @@ class EBook(models.Model):
 					SpecialContent.objects.create(id=id, ebook=self, tag_id=tag_id, page=page, content=content, type=type)
 
 	def delete_SpecialContent(self):
-		sc_list = SpecialContent.objects.filter(ebook=self)
-		for sc in sc_list:
+		for sc in self.specialcontent_set.all():
 			sc.delete()
 
 	def specialcontent_finish_count(self):

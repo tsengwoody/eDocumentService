@@ -473,9 +473,25 @@ def special_content(request, ISBN_part, template_name='ebookSystem/special_conte
 		raise Http404("book does not exist")
 	sc_list = part.specialcontent_set.all().order_by('tag_id')
 	if request.method == 'POST':
+		if request.POST.has_key('rebuild'):
+			part.delete_SpecialContent()
+			part.create_SpecialContent
+		if request.POST.has_key('full_write'):
+			for sc in part.specialcontent_set.all():
+				sc.write_to_file()
+		if request.POST.has_key('finish'):
+			if part.is_sc_rebuild:
+				status = u'error'
+				message = u'請先進行特殊內容檢查'
+				return locals()
+			part.status = part.STATUS['sc_finish']
+			part.save()
+			redirect_to = reverse('account:sc_service')
 		if request.POST.has_key('write'):
 			sc = SpecialContent.objects.get(id=request.POST['write'])
 			sc.write_to_file()
+		status = u'success'
+		message = u'操作動作成功'
 		return locals()
 	if request.method == 'GET':
 		return locals()
@@ -530,8 +546,12 @@ def edit_SpecialContent(request, id, type):
 			elif type == 'mathml':
 				math_tag = BeautifulSoup(request.POST['content'], 'lxml').find('math')
 				sc.content = u'<p id="{0}">'.format(sc.tag_id) +math_tag.prettify(formatter='html') +u'</p>'
-				sc.save()
-		redirect_to = reverse('ebookSystem:special_content', kwargs={'ISBN_part':part.ISBN_part})
+			elif type == 'unknown':
+				sc.content = request.POST['content']
+			sc.save()
+			status = u'success'
+			message = u'儲存'
+			redirect_to = reverse('ebookSystem:special_content', kwargs={'ISBN_part':part.ISBN_part})
 		if request.POST.has_key('upload'):
 			if type == 'image':
 				dirname = sc.ebook.book.path +'/OCR/image/'
@@ -541,14 +561,15 @@ def edit_SpecialContent(request, id, type):
 				with open(path, 'wb+') as dst:
 					for chunk in request.FILES['imageFile'].chunks():
 						dst.write(chunk)
-		return locals()
+			status = u'success'
+			message = u'上傳'
 		if request.POST.has_key('download'):
 			if type == 'image':
-				download_path = part.book.path +'source/' +request.POST['download']
+				download_path = part.book.path +'/source/' +request.POST['download']
 				download_filename = request.POST['download']
-				status = u'success'
-				message = u'下載'
-				return locals()
+			status = u'success'
+			message = u'下載'
+		return locals()
 	if request.method == 'GET':
 		return locals()
 

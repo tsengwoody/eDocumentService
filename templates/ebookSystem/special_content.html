@@ -13,7 +13,10 @@
 
 <form action="" method="post">
 {% csrf_token %}
-
+	<button type="submit" class="btn btn-primary" name="rebuild" value="{{ part.ISBN_part }}" id="id_rebuild">檢查特殊內容</button>
+	<button type="submit" class="btn btn-primary" name="full_edit" value="{{ part.ISBN_part }}" id="id_full_edit">全編輯</button>
+	<button type="submit" class="btn btn-primary" name="full_write" value="{{ part.ISBN_part }}" id="id_full_write">全寫入</button>
+	<button type="submit" class="btn btn-primary" name="finish" value="{{ part.ISBN_part }}" id="id_finish">完成</button>
 	<h4 class="page-header">{{ part }}文件特殊內容</h4>
 	<table class="table table-striped table-hover">
 		<tr>
@@ -31,33 +34,7 @@
 				<a class="btn btn-link" role="button" href ={{ SpecialContent.get_url }}>編輯</a>
 			</td>
 			<td>
-				<button type="submit" class="btn btn-primary" name="write" value="{{ SpecialContent.id }}" id="id_write"> 寫入</button>
-			</td>
-		</tr>
-		{% endfor %}
-	</table>
-
-	<h4 class="page-header">完成校對記錄</h4>
-	<table class="table table-striped table-hover">
-		<tr>
-			<th>文件</th>
-			<th>時數</th>
-			<th>領取日期</th>
-			<th>完成日期</th>
-			<th>狀態</th>
-			<th>動作</th>
-		</tr>
-		{% for part in finishPartList %}
-		<tr>
-			<td>{{part.book.book_info.bookname}}-part{{part.part}}</td>
-			<td>{{part.service_hours}}</td>
-			<td>{{part.get_date}}</td>
-			<td>{{part.finish_date}}</td>
-			<td>{{part.status_int2str}}</td>
-			<td>
-				{% if part.status_int2str == 'review' %}
-				<button type="submit" class="btn btn-default send_button" id="reEditPart_id" name="reEditPart" value={{part.ISBN_part}}>再編輯</button>
-				{% endif %}	
+				<button type="submit" class="btn btn-primary" name="write" value="{{ SpecialContent.id }}" id="id_write">寫入</button>
 			</td>
 		</tr>
 		{% endfor %}
