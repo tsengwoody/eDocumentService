@@ -9,8 +9,9 @@
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script language="javascript" src="{% static 'ebookSystem/js/bootstrap/tinymce.min.js' %}"></script>
-<script language="javascript" src="{% static 'ebookSystem/js/edit.js' %}"></script>
-<link href="{% static "ebookSystem/css/edit.css" %}" rel="stylesheet" > 
+<!--<script language="javascript" src="{% static 'ebookSystem/js/edit.js' %}"></script>
+<link href="{% static "ebookSystem/css/edit.css" %}" rel="stylesheet" > -->
+
 {% endblock %}
 
 {% block header %}
@@ -19,36 +20,49 @@
 {% block content %}
 <form action="" method="post" id="currentForm" role="form">
 	{% csrf_token %}
-	{% ifequal status 'success' %}
-		<div class="modal fade in" id="Dialog" role="dialog">
-		    <div class="modal-dialog modal-sm">
-		        <div class="modal-content alert-success">
-		            <div class="modal-header alert-success" role="alert">
-		                <button type="button" class="close" data-dismiss="modal">&times;</button>
-		                <strong>{{ status }}</strong>
-		                <div class="alertMessage">{{ message }}</div>
-		            </div>
-		        </div>
+	{% include 'utils/dialog.html' %}
+	<div class="row">
+	    <div class="col-md-8 col-md-offset-2">
+		    <div class="panel panel-default">
+
+				    <div class="panel-heading">
+				    	<h3 class="panel-title">請輸入圖片相關訊息並上傳</h3>
+				    </div>
+				    <div class="panel-body">
+				        <div class="form-group">
+				            <label for="id_alt">
+				                <font style="color:red">*</font>圖片說明文字：</label>
+				            <input id="id_alt" name="alt" type="text" required>
+				            <label for="id_alt">
+				                <font style="color:red">請描述圖片之重要資訊</font>
+				            </label>
+				        </div>
+				        <div class="form-group row">
+				            <input class="col-xs-4" id="id_imageFile" name="imageFile" type="file" />
+				            <button type="submit" class="btn btn-primary btn-xs" name="upload" value="" id="id_upload">上傳</button>
+				        </div>
+				                        <hr />
+		                <div class="form-group row">
+		                    <div class="col-sm-offset-5 col-sm-2">
+								<button type="submit" class="btn btn-primary" name="save" value="" id="id_save">送出</button>
+		                    </div>
+		                </div>
+				        
+			    	</div>
 		    </div>
-		</div>
-	{% endifequal %}
-	{% ifequal status 'error' %}
-		<div class="modal fade in" id="Dialog" role="dialog">
-		    <div class="modal-dialog modal-sm">
-		        <div class="modal-content alert-danger">
-		            <div class="modal-header alert-danger" role="alert">
-		                <button type="button" class="close" data-dismiss="modal">&times;</button>
-		                <strong>{{ status }}</strong>
-		                <div class="alertMessage">{{ message }}</div>
-		            </div>
-		        </div>
-		    </div>
-		</div>
-	{% endifequal %}
-	
-		
+	    </div>
+	</div>
+
+
+	<hr />
 			<div class="row">
-				<div id="imagePage" class="col-md-6 towColumn imagePage">
+				<div class="col-md-6">
+					<img src="{% static defaultPageURL %}" alt="文件掃描原檔" id="scanPage" name="scanPage" width="100%" >
+					<hr />
+					
+					<button type="submit" class="btn btn-default" name="download" value="{{scanPageList.0}}" id="id_download">下載</button>
+				</div>
+			<!--	<div id="imagePage" class="col-md-6 towColumn imagePage">
 					<nav>
 						<ul class="pager">
 							<li class="previous"><a id="prePage" href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
@@ -77,7 +91,7 @@
 								<input id="id_page" name="page" type="text" size="4" readonly="true"  value="{{ show_page }}">
 								{{ current_count|add:'1' }}/{{ total_count }}
 								{% if previous_sc %}<a href="{{ previous_sc.get_url }}">上一個</a>{% endif %}
-								{% if next_sc %}<a href="{{ next_sc.get_url }}">下一個</a>{% endif %}
+								{% if next_sc %}<a href="{{ next_sc.get_url }}">下一個</a>{% endif %} 
 						</div>
 						<div class="input-group col-md-3 pull-right">
 							<span class="input-group-btn">
@@ -94,14 +108,9 @@
 				
 				<div id="textPage"class="col-md-6 towColumn">
 					<textarea autocomplete="off" id="id_content" name="content" class="form-control" >{{ editContent }}</textarea>
-				</div>
+				</div>-->
 			</div>
-			<label for="id_alt"><font style="color:red">*</font>圖片說明文字：</label>
-			<input id="id_alt" name="alt" type="text" required><label for="id_alt"><font style="color:red">請描述圖片之重要資訊</font></label>
-			<button type="submit" class="btn btn-primary" name="download" value="" id="id_download">下載</button>
-			<input class="form-control-file" id="id_imageFile" name="imageFile" type="file" />
-			<button type="submit" class="btn btn-primary" name="upload" value="" id="id_upload">上傳</button>
-	<button type="submit" class="btn btn-primary" name="save" value="" id="id_save">送出</button>
+			
 </form>
 {% endblock %}
 {% block footer %}

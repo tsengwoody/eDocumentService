@@ -58,13 +58,16 @@
     <div class="container" role="contentinfo">
     	<div class="pull-left">
 		    <ul class="list-inline">
+		     	<li><a href="{% url 'genericUser:func_desc' %}">關於</a></li>
+		        <li><a href="{% url 'genericUser:contact_us' %}">聯絡我們</a></li>
 		        {% if readmeUrl %}
 		        <li><a href={{ readmeUrl }}>說明</a></li>
 		        {% endif %} {% if request.user.is_active %}
 		        <li><a href="/genericUser/license/">使用者條款</a></li>
+		        <li><a href="{% url 'ebookSystem:mathml' %}">mathml</li>
 		        {% endif %}
-		        <li><a href="{% url 'genericUser:func_desc' %}">關於</a></li>
-		        <li><a href="{% url 'genericUser:contact_us' %}">聯絡我們</a></li>
+		       
+
 		    </ul>
 		</div>
     	<div class="pull-right">		

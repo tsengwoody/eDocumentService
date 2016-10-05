@@ -1,0 +1,17 @@
+{% load staticfiles %}
+<script language="javascript" src="{% static 'ebookSystem/js/upload_file.js' %}"></script>
+
+<div class="modal fade" id="pleaseWaitDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body alert-info">
+                <legend>Uploading...</legend>
+                <div class="progress">
+                    <div id="uploadProgressBar" class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                        <span id="uploadProgressText"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
