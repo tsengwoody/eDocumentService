@@ -391,11 +391,8 @@ class editView(generic.View):
 	@cache_control(no_store=True, no_cache=True, max_age=0)
 	@method_decorator(http_response)
 	def get(self, request, encoding='utf-8', *args, **kwargs):
-    	
 		logger.info('{}/edit\t{}'.format(request.user, resolve(request.path).namespace))
 		template_name='ebookSystem/edit.html'
-		user = request.user
-		readme_url = request.path +'readme/'
 		try:
 			part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
 		except: 
@@ -404,7 +401,6 @@ class editView(generic.View):
 		request.session['postToken'] = postToken
 		[scanPageList, defaultPageURL] = part.get_image(request.user)
 		[editContent, fileHead] = part.get_content('-edit')
-		print "get"
 		return locals()
 
 	@cache_control(no_store=True, no_cache=True, max_age=0)
@@ -466,6 +462,21 @@ class editView(generic.View):
 		return locals()
 
 @http_response
+def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
+	try:
+		part = EBook.objects.get(ISBN_part=ISBN_part)
+	except:
+		raise Http404("book does not exist")
+	[scanPageList, defaultPageURL] = part.get_image(request.user)
+	[editContent, fileHead] = part.get_content('-sc')
+	if request.method == 'POST':
+		with codecs.open(part.get_path('-sc'), 'w', encoding='utf-8') as scFile:
+			scFile.write(u'\ufeff' +request.POST['content'])
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+@http_response
 def special_content(request, ISBN_part, template_name='ebookSystem/special_content.html'):
 	try:
 		part = EBook.objects.get(ISBN_part=ISBN_part)
@@ -475,7 +486,7 @@ def special_content(request, ISBN_part, template_name='ebookSystem/special_conte
 	if request.method == 'POST':
 		if request.POST.has_key('rebuild'):
 			part.delete_SpecialContent()
-			part.create_SpecialContent
+			part.create_SpecialContent()
 		if request.POST.has_key('full_write'):
 			for sc in part.specialcontent_set.all():
 				sc.write_to_file()

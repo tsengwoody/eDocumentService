@@ -39,42 +39,12 @@
                         {% if request.user.has_guest %}服務使用者角色啟用{% endif %}
                     </td>
                 </tr>
-                <tr>
-                    <th class="col-md-4" scope="row">
-                        <label for="id_role">角色資料更新</label>
-                    </th>
-                    <td>
-                        <label class="checkbox-inline">
-                            {% if request.user.has_editor %}
-                            <input type="checkbox" name="editor" id="id_editor" value="Editor" checked="true">志工</input>
-                            {% else %}
-                            <input type="checkbox" name="editor" id="id_editor" value="Editor">志工</input>
-                            {% endif %}
-                        </label>
-                        <label class="checkbox-inline">
-                                                        {% if request.user.has_guest %}
-                            <input type="checkbox" name="guest" id="id_guest" value="Guest" checked="true">服務使用者</input>
-                            {% else %}
-                            <input type="checkbox" name="guest" id="id_guest" value="Guest">服務使用者</input>
-                            {% endif %}
-                        </label>
-                    </td>
-                </tr>
                 <tr class="editor_mode">
                     <th class="col-md-4" scope="row">
                         <label for="id_professional_field">專業領域：</label>
                     </th>
                     <td>
                         <input id="id_professional_field" maxlength="30" name="professional_field" value="{{ user.editor.professional_field }}" type="text">
-                    </td>
-                </tr>
-                <tr class="editor_mode">
-                    <th class="col-md-4" scope="row">
-                        <input type="checkbox" name="service_guest_check" id="id_service_guest_check" value="service_guest_check">
-                        <label for="id_service_guest">指定對象：</label>
-                    </th>
-                    <td>
-                        <input id="id_service_guest" maxlength="30" name="service_guest" value="{{ username }}" type="text" readonly="true">
                     </td>
                 </tr>
                 <tr class="guest_mode">
