@@ -41,6 +41,9 @@ code {
     display: flex;
     justify-content: center;
 }
+.img-responsive {
+    margin: 0 auto;
+}
 
 @media (min-width: 768px) {
   .container > .navbar-header,

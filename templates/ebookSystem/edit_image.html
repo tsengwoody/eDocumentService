@@ -9,7 +9,36 @@
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script language="javascript" src="{% static 'ebookSystem/js/bootstrap/tinymce.min.js' %}"></script>
-
+<script language="javascript">
+	$(document).ready(function() {
+	$("#id_save").click(function(event)
+	{	
+		if($('#id_alt').val().length==0)
+		{
+	    	//event.preventDefault(); // cancel default behavior
+	    	$('#id_alt').each(function() {
+            	this.setCustomValidity("請填寫此欄位");
+        	});
+		}
+	});
+	$("#id_write").click(function(event)
+	{	
+		if($('#id_alt').val().length==0)
+		{
+	    	//event.preventDefault(); // cancel default behavior
+	    	$('#id_alt').each(function() {
+            	this.setCustomValidity("請填寫此欄位");
+        	});
+		}
+	});
+	$("#id_download").click(function(event)
+	{	
+    	$('#id_alt').each(function() {
+        	this.setCustomValidity("");
+    	});
+	});
+});
+</script>
 {% endblock %}
 
 {% block header %}
@@ -23,7 +52,6 @@
 	<div class="row">
 	    <div class="col-md-8 col-md-offset-2">
 		    <div class="panel panel-default">
-
 				    <div class="panel-heading">
 				    	<h3 class="panel-title">請輸入圖片相關訊息並上傳</h3>
 				    </div>
@@ -44,9 +72,9 @@
 		                <div class="form-group row">
 		                    <div class="col-sm-offset-4 col-sm-4">
 		                    	<button type="submit" class="btn btn-default send_no_all_form" name="download" value="{{scanPageList.0}}" id="id_download">下載</button>
-								<button type="submit" class="btn btn-default send_no_all_form" name="save" value="" id="id_save">暫存</button>
-								<button type="submit" class="btn btn-default send_no_all_form" name="write" value="" id="id_write">寫入</button>
-								<img src="{% static preview_image_url %}" alt="{{ editContent }}" name="preview_image" id="id_preview_image"/>
+								<button type="submit" class="btn btn-default" name="save" value="" id="id_save">暫存</button>
+								<button type="submit" class="btn btn-default" name="write" value="" id="id_write">寫入</button>
+								
 		                    </div>
 		                </div>
 				        
@@ -54,6 +82,7 @@
 		    </div>
 	    </div>
 	</div>	
+	<img src="{% static preview_image_url %}" alt="{{ editContent }}" name="preview_image" class="img-responsive img-thumbnail center-pills" id="id_preview_image " width="500" height="500" />
 </form>
 {% endblock %}
 {% block footer %}
