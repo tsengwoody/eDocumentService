@@ -57,6 +57,9 @@
 				{% if request.user.is_advanced_editor %}
 				<li><a href="{% url 'account:sc_service' %}">進階服務</a></li>
 				{% endif %}
+				{% if request.user.is_staff %}
+				<li><a href="{% url 'account:an_service' %}">分析</a></li>
+				{% endif %}
 				<li><a href="{% url 'ebookSystem:search_book' %}">查詢</a></li>
 				{% endif %}
 				{% if request.user.is_authenticated %}

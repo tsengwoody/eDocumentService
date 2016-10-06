@@ -11,6 +11,7 @@ from .models import *
 from .forms import *
 from genericUser.models import Event, ServiceHours
 from mysite.settings import BASE_DIR
+from utils.analysis import *
 from utils.crawler import *
 from utils.decorator import *
 import os
@@ -134,11 +135,9 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		redirect_to = reverse('manager:event_list', kwargs={'action':'book' })
 		return locals()
 
-from utils.analysis import *
 @user_category_check(['manager'])
 @http_response
 def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.html'):
-	import shutil
 	try:
 		part = EBook.objects.get(ISBN_part=ISBN_part)
 	except:
@@ -186,7 +185,7 @@ def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.htm
 			part.save()
 			status = u'success'
 			message = u'完成'
-			redirect_to = reverse('ebookSystem:detail', kwargs={'book_ISBN':part.book.ISBN})
+			redirect_to = reverse('account:an_service')
 			return locals()
 
 @user_category_check(['manager'])
@@ -200,7 +199,11 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 	part.clean_tag()
 	html_url = part.get_html()
 	if request.method == 'GET':
-#		edit_distance = part.edit_distance(part.get_path(), part.get_path('-finish'))
+		[len_block, same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
+		ed = edit_distance(part.get_path(), part.get_path('-finish'))
+		delete_count = src_count -same_character
+		insert_count = dst_count -same_character
+		diff_count = dst_count -src_count
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
@@ -544,16 +547,29 @@ def edit_SpecialContent(request, id, type):
 	if type == 'mathml':
 		math_tag = BeautifulSoup(sc.content, 'lxml').find('math')
 		editContent = str(math_tag)
-	else:
+	elif type == 'image':
+		img_tag = BeautifulSoup(sc.content, 'lxml').find('img')
+		image_path = sc.ebook.book.path +'/OCR/image/' +sc.id +'.jpg'
+		image_public_path = sc.ebook.get_path('public') +'/OCR/image/' +sc.id +'.jpg'
+		preview_image_url = image_public_path.replace(BASE_DIR +'/static/', '')
+		editContent = img_tag['alt']
+	elif type == 'unknown':
 		editContent = sc.content
 	template_name = 'ebookSystem/edit_{0}.html'.format(type)
 	if request.method == 'POST':
-		if request.POST.has_key('save'):
+		if request.POST.has_key('save') or request.POST.has_key('write'):
 			if type == 'image':
-				img_tag = BeautifulSoup(sc.content, 'lxml').find('img')
 				img_tag['src'] = 'image/' +sc.id +'.jpg'
 				img_tag['alt'] = request.POST['alt']
-				sc.content = u'<p id="{0}">'.format(sc.tag_id) +image_tag.prettify(formatter='html') +u'</p>'
+				sc.content = u'<p id="{0}">'.format(sc.tag_id) +img_tag.prettify(formatter='html') +u'</p>'
+				if not os.path.exists(os.path.dirname(image_path)):
+					os.makedirs(os.path.dirname(image_path), 0770)
+				if not os.path.exists(os.path.dirname(image_public_path)):
+					os.makedirs(os.path.dirname(image_public_path), 0770)
+				with open(image_path, 'wb+') as dst:
+					for chunk in request.FILES['imageFile'].chunks():
+						dst.write(chunk)
+				shutil.copy2(image_path, image_public_path)
 			elif type == 'mathml':
 				math_tag = BeautifulSoup(request.POST['content'], 'lxml').find('math')
 				sc.content = u'<p id="{0}">'.format(sc.tag_id) +math_tag.prettify(formatter='html') +u'</p>'
@@ -561,7 +577,11 @@ def edit_SpecialContent(request, id, type):
 				sc.content = request.POST['content']
 			sc.save()
 			status = u'success'
-			message = u'儲存'
+			message = u'暫存'
+		if request.POST.has_key('write'):
+			sc.write_to_file()
+			status = u'success'
+			message = u'寫入'
 			redirect_to = reverse('ebookSystem:special_content', kwargs={'ISBN_part':part.ISBN_part})
 		if request.POST.has_key('upload'):
 			if type == 'image':

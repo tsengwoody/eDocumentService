@@ -181,6 +181,41 @@ def sc_service(request, template_name='account/sc_service.html'):
 	if request.method == 'GET':
 		return locals()
 
+@http_response
+def an_service(request, template_name='account/an_service.html'):
+	an_editingPartList = request.user.analyze_ebook_set.all().filter(status=EBook.STATUS['an_edit'])
+	if request.method == 'POST':
+		if request.POST.has_key('getPart'):
+			if len(an_editingPartList)>=10:
+				status = 'error'
+				message = u'您已有超過10段文件，請先校對完成再領取'
+				return locals()
+			try:
+				getPart = EBook.objects.filter(status=EBook.STATUS['sc_finish']).order_by('get_date')[0]
+			except:
+				status = u'error'
+				message = u'無文件'
+				return locals()
+			getPart.analyze_editor = request.user
+			getPart.an_get_date = timezone.now()
+			getPart.status = getPart.STATUS['an_edit']
+			getPart.save()
+			status = 'success'
+			message = u'成功取得文件{}'.format(getPart.__unicode__())
+		elif request.POST.has_key('rebackPart'):
+			ISBN_part = request.POST.get('rebackPart')
+			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
+			rebackPart.analyze_editor=None
+			rebackPart.an_get_date = None
+			rebackPart.status = rebackPart.STATUS['sc_finish']
+			rebackPart.save()
+			status = 'success'
+			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
+		an_editingPartList = request.user.analyze_ebook_set.all().filter(status=EBook.STATUS['an_edit'])
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
 def readme(request, template_name):
 	template_name = resolve(request.path).namespace +'/' +template_name +'_readme.html'
 	return render(request, template_name, locals())
