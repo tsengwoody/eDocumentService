@@ -51,7 +51,6 @@
 			<th>文件</th>
 			<th>時數</th>
 			<th>領取日期</th>
-			<th>完成日期</th>
 			<th>狀態</th>
 			<th>動作</th>
 		</tr>
@@ -59,8 +58,7 @@
 		<tr>
 			<td>{{ part }}</td>
 			<td>{{ part.service_hours }}</td>
-			<td>{{part.get_date}}</td>
-			<td>{{part.finish_date}}</td>
+			<td>{{part.sc_get_date}}</td>
 			<td>{{part.status_int2str}}</td>
 			<td>
 				{% if part.status_int2str == 'review' %}

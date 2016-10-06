@@ -566,10 +566,13 @@ def edit_SpecialContent(request, id, type):
 					os.makedirs(os.path.dirname(image_path), 0770)
 				if not os.path.exists(os.path.dirname(image_public_path)):
 					os.makedirs(os.path.dirname(image_public_path), 0770)
-				with open(image_path, 'wb+') as dst:
-					for chunk in request.FILES['imageFile'].chunks():
-						dst.write(chunk)
-				shutil.copy2(image_path, image_public_path)
+				try:
+					with open(image_path, 'wb+') as dst:
+						for chunk in request.FILES['imageFile'].chunks():
+							dst.write(chunk)
+					shutil.copy2(image_path, image_public_path)
+				except:
+					pass
 			elif type == 'mathml':
 				math_tag = BeautifulSoup(request.POST['content'], 'lxml').find('math')
 				sc.content = u'<p id="{0}">'.format(sc.tag_id) +math_tag.prettify(formatter='html') +u'</p>'
