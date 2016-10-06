@@ -5,10 +5,13 @@ function gen_uuid() {
     }
     return uuid
 }
-function catchErrorHandling()
+function catchErrorHandling(eventFromObject)
 {
     var uuid=gen_uuid();
-    var formData = new FormData($('form').get(0));   
+    console.log($('form').get(0))
+     
+    $('form').append($("<input>").attr("type", "hidden").attr("name", eventFromObject.attr("name")).val(eventFromObject.val())); //for fix firefox problem
+    var formData = new FormData($('form')[0]);
     var refreshIntervalId="";
     $.ajax({
         url:".",
@@ -131,7 +134,7 @@ $( document ).ready(function() {
         {
             event.preventDefault();
             console.log("form submitted!");  // sanity check
-            catchErrorHandling();
+            catchErrorHandling($(document.activeElement));
         }
     });
 
