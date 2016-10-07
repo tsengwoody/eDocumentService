@@ -44,24 +44,33 @@
 					</ul>
 				</li>
 				{% endif %}
+
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">校對<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+					{% if request.user.is_editor %}
+					<li><a href="{% url 'account:profile' %}">一般校對</a></li>
+					{% endif %}
+					{% if request.user.is_advanced_editor %}
+					<li><a href="{% url 'account:sc_service' %}">進階校對</a></li>
+					{% endif %}
+					</ul>
+				</li>
+
 				{% if request.user.is_guest %}
 				<li><a href="{% url 'guest:profile' %}">書庫</a></li>
 				<li><a href="{% url 'genericUser:revise_content' %}">更正</a></li>
-				{% endif %}
-				{% if request.user.is_advanced_editor %}
-
-				{% endif %}
-				{% if request.user.is_editor %}
-				<li><a href="{% url 'account:profile' %}">服務</a></li>
-				{% endif %}
-				{% if request.user.is_advanced_editor %}
-				<li><a href="{% url 'account:sc_service' %}">進階服務</a></li>
 				{% endif %}
 				{% if request.user.is_staff %}
 				<li><a href="{% url 'account:an_service' %}">分析</a></li>
 				{% endif %}
 				<li><a href="{% url 'ebookSystem:search_book' %}">查詢</a></li>
 				{% endif %}
+				{% if request.user.is_authenticated %}
+				
+				{% endif %}
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
 				{% if request.user.is_authenticated %}
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#">帳號<span class="caret"></span></a>
@@ -73,10 +82,6 @@
 						<li><a href="{% url 'genericUser:info' %}">設定</a></li>
 					</ul>
 				</li>
-				{% endif %}
-			</ul>
-			<ul class="nav navbar-nav navbar-right">
-				{% if request.user.is_authenticated %}
 				<li><a href="{% url 'logout' %}"><span class="glyphicon  glyphicon-log-out"></span>登出</a></li>
 				{% else %}
 				<li><a href="{% url 'login' %}"><span class="glyphicon  glyphicon-log-out">登入</a></li>
