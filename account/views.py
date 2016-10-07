@@ -143,7 +143,7 @@ class profileView(generic.View):
 
 @http_response
 def sc_service(request, template_name='account/sc_service.html'):
-	sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']) & Q(is_private=False))
+	sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']))
 	if request.method == 'POST':
 		if request.POST.has_key('getPart'):
 			if len(sc_editingPartList)>=10:
@@ -174,7 +174,7 @@ def sc_service(request, template_name='account/sc_service.html'):
 			rebackPart.save()
 			status = 'success'
 			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
-		sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']) & Q(is_private=False))
+		sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']))
 		return locals()
 	if request.method == 'GET':
 		return locals()
@@ -216,7 +216,7 @@ def an_service(request, template_name='account/an_service.html'):
 
 @http_response
 def de_service(request, template_name='account/an_service.html'):
-	sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']) & Q(is_private=True))
+	sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']))
 	if request.method == 'POST':
 		if request.POST.has_key('designateBook'):
 			if len(editingPartList)>10:
@@ -259,7 +259,7 @@ def de_service(request, template_name='account/an_service.html'):
 			rebackPart.save()
 			status = 'success'
 			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
-		sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']) & Q(is_private=True))
+		sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']))
 		return locals()
 	if request.method == 'GET':
 		return locals()
