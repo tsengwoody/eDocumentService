@@ -55,7 +55,11 @@
 			<td>{{ book.book_info.author }}</td>
 			<td>{{ book.book_info.house }}</td>
 			<td>{{ book.book_info.date }}</td>
-			<td><button type="submit" class="btn btn-default send_button" id="emailBook_id" name="emailBook" value={{book.ISBN}}>傳送email</button></td>
+			<td>
+				{% if request.user.is_guest and request.user.has_guest and book.status_int2str == 'finish' %}
+				<button type="submit" class="btn btn-default send_button" id="emailBook_id" name="emailBook" value={{book.ISBN}}>傳送email</button>
+				{% endif %}
+			</td>
 		</tr>
 		{% endfor %}
 	</table>

@@ -196,7 +196,6 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 	except:
 		raise Http404("book does not exist")
 	events = Event.objects.filter(content_type__model='ebook', object_id=part.ISBN_part, status=Event.STATUS['review'])
-	part.clean_tag()
 	html_url = part.get_html()
 	if request.method == 'GET':
 		[len_block, same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
@@ -208,28 +207,18 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
 			part.status = part.STATUS['finish']
-			month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
-			if len(events) > 0:
-				try:
-					month_ServiceHours = ServiceHours.objects.get(user=events[0].creater, date=month_day)
-				except:
-					month_ServiceHours = ServiceHours.objects.create(user=events[0].creater, date=month_day)
-				part.serviceHours = month_ServiceHours
-				month_ServiceHours.service_hours = month_ServiceHours.service_hours +part.service_hours
-				month_ServiceHours.save()
-			import shutil
-			shutil.copy2(part.get_path('-clean'), part.get_path('-sc'))
-			part.book.save()
 			part.save()
-			if part.book.collect_finish_part_count() == part.book.part_count:
+			shutil.copy2(part.get_path('-clean'), part.get_path('-sc'))
+			if part.book.collect_is_finish():
 				part.book.status = part.book.STATUS['finish']
+			part.book.save()
+			part.group_ServiceHours()
 			status = 'success'
 			message = u'審核通過文件'
 			for event in events:
 				event.response(status=status, message=message, user=request.user)
 		if request.POST['review'] == 'error':
 			part.status = part.STATUS['edit']
-			part.finish_date = None
 			part.load_full_content()
 			part.save()
 			status = 'success'
@@ -499,6 +488,7 @@ def special_content(request, ISBN_part, template_name='ebookSystem/special_conte
 				message = u'請先進行特殊內容檢查'
 				return locals()
 			part.status = part.STATUS['sc_finish']
+			part.group_ServiceHours()
 			part.save()
 			redirect_to = reverse('account:sc_service')
 		if request.POST.has_key('write'):

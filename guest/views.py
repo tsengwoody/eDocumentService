@@ -23,8 +23,8 @@ class profileView(generic.View):
 	@method_decorator(http_response)
 	def get(self, request, *args, **kwargs):
 		template_name=self.template_name
-		edit_book_list = request.user.own_book_set.all().exclude(status__lte=EBook.STATUS['review'])
-		finish_book_list = request.user.own_book_set.all().exclude(status__gte=EBook.STATUS['finish'])
+		edit_book_list = request.user.own_book_set.all().filter(status__lte=Book.STATUS['active'])
+		finish_book_list = request.user.own_book_set.all().filter(status__gte=Book.STATUS['finish'])
 		return locals()
 
 	@method_decorator(user_category_check(['guest']))

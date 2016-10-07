@@ -33,7 +33,7 @@ class Book(models.Model):
 	upload_date = models.DateField(default = timezone.now)
 	is_private = models.BooleanField(default=False)
 	status = models.IntegerField(default=0)
-	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'revise':4, 'finish':5}
+	STATUS = {'inactive':0, 'active':1, 'finish':2}
 	def __unicode__(self):
 		return self.book_info.bookname
 
@@ -241,6 +241,27 @@ class EBook(models.Model):
 
 	def __unicode__(self):
 		return self.book.book_info.bookname+u'-part'+str(self.part)
+
+	def group_ServiceHours(self):
+		month_ServiceHours = None
+		sc_month_ServiceHours = None
+		if self.get_date and self.editor:
+			month = datetime.date(year=self.get_date.year, month=self.get_date.month, day=1)
+			try:
+				month_ServiceHours = ServiceHours.objects.get(user=self.editor, date=month)
+			except:
+				month_ServiceHours = ServiceHours.objects.create(user=self.editor, date=month)
+			self.serviceHours = month_ServiceHours
+			self.save()
+		if self.sc_get_date and self.sc_editor:
+			sc_month = datetime.date(year=self.sc_get_date.year, month=self.sc_get_date.month, day=1)
+			try:
+				sc_month_ServiceHours = ServiceHours.objects.get(user=self.sc_editor, date=sc_month)
+			except:
+				sc_month_ServiceHours = ServiceHours.objects.create(user=self.sc_editor, date=sc_month)
+			self.serviceHours = sc_month_ServiceHours
+			self.save()
+		return [month_ServiceHours, sc_month_ServiceHours]
 
 	def get_content(self, action='', encoding='utf-8'):
 		filePath = self.get_path(action)

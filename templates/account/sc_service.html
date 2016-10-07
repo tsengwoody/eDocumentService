@@ -45,30 +45,6 @@
 		{% endfor %}
 	</table>
 
-	<h4 class="page-header">完成編輯記錄</h4>
-	<table class="table table-striped table-hover">
-		<tr>
-			<th>文件</th>
-			<th>時數</th>
-			<th>領取日期</th>
-			<th>狀態</th>
-			<th>動作</th>
-		</tr>
-		{% for part in sc_finishPartList %}
-		<tr>
-			<td>{{ part }}</td>
-			<td>{{ part.service_hours }}</td>
-			<td>{{part.sc_get_date}}</td>
-			<td>{{part.status_int2str}}</td>
-			<td>
-				{% if part.status_int2str == 'review' %}
-				<button type="submit" class="btn btn-default send_button" id="reEditPart_id" name="reEditPart" value={{part.ISBN_part}}>再編輯</button>
-				{% endif %}	
-			</td>
-		</tr>
-		{% endfor %}
-	</table>
-
 </form>
 
 {% endblock %}
