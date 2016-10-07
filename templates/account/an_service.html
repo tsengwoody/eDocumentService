@@ -21,15 +21,11 @@
 	<table class="table table-striped table-hover">
 		<tr>
 			<th>文件</th>
-			<th>領取日期</th>
-			<th>狀態</th>
 			<th colspan="2">動作</th>
 		</tr>
 		{% for part in an_editingPartList %}
 		<tr>
 			<td>{{ part }}</td>
-			<td>{{ part.sc_get_date }}</td>
-			<td>{{part.status_int2str}}</td>
 			<td>
 				<a class="btn btn-link" role="button" href = {% url 'ebookSystem:analyze_part' part.ISBN_part %}>分析</a>
 				<img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_load_icon" />

@@ -62,6 +62,9 @@ class Command(BaseCommand):
 		ebook.status = ebook.STATUS['finish']
 		ebook.editor = root
 		ebook.save()
+		ebook = EBook.objects.get(book=book, part=2)
+		ebook.status=EBook.STATUS['sc_finish']
+		ebook.save()
 		from zipfile import ZipFile
 		src = BASE_DIR +'/temp/part.zip'
 		dst = ebook.book.path +u'/OCR'
