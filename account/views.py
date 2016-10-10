@@ -151,7 +151,7 @@ def sc_service(request, template_name='account/sc_service.html'):
 				message = u'您已有超過10段文件，請先校對完成再領取'
 				return locals()
 			try:
-				getPart = EBook.objects.filter(status=EBook.STATUS['finish']).order_by('get_date')[0]
+				getPart = EBook.objects.filter(Q(status=EBook.STATUS['finish']) & Q(book__is_private=False)).order_by('get_date')[0]
 			except:
 				status = u'error'
 				message = u'無文件'
@@ -165,6 +165,42 @@ def sc_service(request, template_name='account/sc_service.html'):
 			getPart.save()
 			status = 'success'
 			message = u'成功取得文件{}'.format(getPart.__unicode__())
+		elif request.POST.has_key('designateBook'):
+			if len(sc_editingPartList)>10:
+				status = 'error'
+				message = u'您已有超過10段文件，請先校對完成再領取'
+				return locals()
+			activeBook = None
+			if request.POST.has_key('ISBN'):
+				activeBook = Book.objects.filter(ISBN=request.POST['ISBN'])
+			elif request.POST.has_key('username'):
+				activeBook = Book.objects.filter(owner__username=request.POST['username'])
+			if not activeBook:
+				status = 'error'
+				message = u'無指定文件'
+				return locals()
+			partialBook = None
+			for book in activeBook:
+				if 0 < book.collect_get_count() < book.part_count:
+					partialBook = book
+					break
+			if not partialBook:
+				for book in activeBook:
+					if book.collect_get_count() == 0:
+						partialBook = book
+						break
+			if not partialBook:
+				status = 'error'
+				message = u'無文件'
+				return locals()
+			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['finish']).order_by('part')[0]
+			getPart.editor = request.user
+			getPart.get_date = timezone.now()
+			getPart.deadline = getPart.get_date + datetime.timedelta(days=5)
+			getPart.status = getPart.STATUS['edit']
+			getPart.save()
+			status = 'success'
+			message = u'成功取得指定文件{}'.format(getPart.book.__unicode__())
 		elif request.POST.has_key('rebackPart'):
 			ISBN_part = request.POST.get('rebackPart')
 			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
@@ -215,55 +251,6 @@ def an_service(request, template_name='account/an_service.html'):
 		return locals()
 
 @http_response
-def de_service(request, template_name='account/an_service.html'):
-	sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']))
-	if request.method == 'POST':
-		if request.POST.has_key('designateBook'):
-			if len(editingPartList)>10:
-				status = 'error'
-				message = u'您已有超過10段文件，請先校對完成再領取'
-				return locals()
-			if request.POST.has_key('ISBN'):
-				activeBook = Book.objects.filter(ISBN=request.POST['ISBN'])
-			elif request.POST.has_key('username'):
-				activeBook = Book.objects.filter(owner__username=request.POST['username'])
-			partialBook = None
-			for book in activeBook:
-				if 0 < book.collect_get_count() < book.part_count:
-					partialBook = book
-					break
-			if not partialBook:
-				for book in activeBook:
-					if book.collect_get_count() == 0:
-						partialBook = book
-						break
-			if not partialBook:
-				status = 'error'
-				message = u'無文件'
-				return locals()
-			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
-			getPart.editor = request.user
-			getPart.get_date = timezone.now()
-			getPart.deadline = getPart.get_date + datetime.timedelta(days=5)
-			getPart.status = getPart.STATUS['edit']
-			getPart.save()
-			status = 'success'
-			message = u'成功取得指定文件{}'.format(getPart.book.__unicode__())
-		elif request.POST.has_key('rebackPart'):
-			ISBN_part = request.POST.get('rebackPart')
-			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
-			rebackPart.editor=None
-			rebackPart.get_date = None
-			rebackPart.deadline = None
-			rebackPart.status = rebackPart.STATUS['active']
-			rebackPart.save()
-			status = 'success'
-			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
-		sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']))
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
 def readme(request, template_name):
 	template_name = resolve(request.path).namespace +'/' +template_name +'_readme.html'
 	return render(request, template_name, locals())

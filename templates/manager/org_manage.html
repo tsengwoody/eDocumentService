@@ -1,0 +1,40 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+團體組織管理
+{% endblock %}
+{% block header %}
+團體組織管理
+{% endblock %}
+{% block content %}
+
+<h3>團體組織管理</h3>
+{% for org in request.user.manage_org_set.all %}
+<form action="" method="post">
+{% csrf_token %}
+	<button class="btn btn-lg btn-default send_button" type="submit" id="servicehours_info_id" name="servicehours_info" value="{{ org.id }}">時數統計下載</button>
+	<button class="btn btn-lg btn-default send_button" type="submit" id="volunteer_info_id" name="volunteer_info" value="{{ org.id }}">志工資訊下載</button>
+	<hr />
+	<h4 class="page-header">{{ org }}志工</h4>
+	<table class="table table-striped table-hover">
+		<tr>
+			<th>姓名</th>
+			<th>使用者名稱</th>
+			<th>本月累積時數</th>
+			<th>本月累積頁數</th>
+			<th>時數</th>
+			<th>權限</th>
+		</tr>
+		{% for user in org.user_set.all %}
+		<tr>
+			<td>{{ user }}</td>
+			<td>{{ user.username }}</td>
+			<td>{{ user.get_current_ServiceHours.get_service_hours }}</td>
+			<td>{{ user.get_current_ServiceHours.get_page_count }}</td>
+			<td><a class="btn btn-link" role="button" href = {% url 'genericUser:servicehours_list' user.username %}>列表</a></td>
+			<td><a class="btn btn-link" role="button" href = {% url 'genericUser:review_user' user.username %}>設定</a></td>
+		</tr>
+	{% endfor %}
+	</table>
+</form>
+{% endfor %}
+{% endblock %}

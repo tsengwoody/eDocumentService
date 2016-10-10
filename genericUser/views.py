@@ -115,6 +115,13 @@ def event_list(request):
 	template_name = 'genericUser/event_list.html'
 	return render(request, template_name, locals())
 
+@http_response
+def org_info(request, template_name='genericUser/org_info.html'):
+	org_list = Organization.objects.filter(is_service_center=True)
+	if request.method == 'POST':
+		return locals()
+	if request.method == 'GET':
+		return locals()
 
 def func_desc(request, template_name='genericUser/func_desc.html'):
 	return render(request, template_name, locals())
@@ -166,34 +173,17 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
-		if request.POST.has_key('login'):
-			user.is_active = True
-		else:
-			user.is_active = False
-		if request.POST.has_key('editor'):
-			user.is_editor = True
-			status = 'success'
-			message = u'已啟用editor權限'
-		else:
-			user.is_editor = False
-			status = 'success'
-			message = u'已停用editor權限'
-		if request.POST.has_key('guest') :
-			user.is_guest = True
-			status = 'success'
-			message = u'已啟用guest權限'
-		else:
-			user.is_guest = False
-			status = 'success'
-			message = u'已停用guest權限'
+		user.is_active = True if request.POST.has_key('login') else False
+		user.is_editor = True if request.POST.has_key('editor') else False
+		user.is_guest = True if request.POST.has_key('guest')  else False
 		if request.POST['review'] == 'success':
 			user.status = user.STATUS['active']
+			user.save()
 			redirect_to = reverse('manager:event_list', kwargs={'action':'user' })
 			status = 'success'
 			message = u'完成審核權限開通'
 			for event in events:
 				event.response(status=status, message=message, user=request.user)
-			user.save()
 		elif request.POST['review'] == 'error':
 			redirect_to = reverse('manager:event_list', kwargs={'action':'user' })
 			status = 'success'
@@ -322,17 +312,23 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 
 @user_category_check(['user'])
 @http_response
-def servicehours_list(request, template_name='genericUser/servicehours_list.html'):
+def servicehours_list(request, username, template_name='genericUser/servicehours_list.html'):
+	try:
+		user = User.objects.get(username=username)
+	except:
+		raise Http404("book does not exist")
+	org_list = Organization.objects.all()
 	month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
 	try:
-		current_ServiceHours = ServiceHours.objects.get(date=month_day, user=request.user)
+		current_ServiceHours = ServiceHours.objects.get(date=month_day, user=user)
 	except:
 		pass
-	ServiceHours_list = ServiceHours.objects.filter(user=request.user).exclude(date=month_day)
+	ServiceHours_list = ServiceHours.objects.filter(user=user).exclude(date=month_day)
 	if request.method == 'POST':
 		if request.POST.has_key('exchange'):
 			exchange_serviceHours = ServiceHours.objects.get(id=request.POST['exchange'])
 			exchange_serviceHours.is_exchange=True
+			exchange_serviceHours.org = Organization.objects.get(id=request.POST['org'])
 			exchange_serviceHours.save()
 		return locals()
 	if request.method == 'GET':

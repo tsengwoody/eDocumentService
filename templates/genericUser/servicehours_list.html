@@ -25,31 +25,39 @@
 		{% if current_ServiceHours %}
 		<tr>
 			<td>{{ current_ServiceHours.date }}</td>
-			<td>{{ current_ServiceHours.service_hours }}</td>
-			<td>
-			{% if current_ServiceHours.is_exchange %}
-			已兌換
-			{% else %}
-			未兌換
-			{% endif %}
-			</td>
-			<td>{{ current_ServiceHours.center }}</td>
-			<td></td>
+			<td>{{ current_ServiceHours.get_service_hours }}</td>
+			<td>未兌換</td>
+			<td>{{ current_ServiceHours.org }}</td>
+			<td>當月無法兌換</td>
 		</tr>
 		{% endif %}
 		{% for ServiceHours in ServiceHours_list %}
 		<tr>
 			<td>{{ ServiceHours.date }}</td>
-			<td>{{ ServiceHours.service_hours }}</td>
-			<td>
+			<td>{{ ServiceHours.get_service_hours }}</td>
 			{% if serviceHours.is_exchange %}
-			已兌換
+			<td>已兌換</td>
+			<td>{{ ServiceHours.org }}</td>
+			<td></td>
 			{% else %}
-			未兌換
-			{% endif %}
+			<td>未兌換</td>
+			<td>
+				<select id="id_org" name="org" required>
+					<option value="" selected="selected">---------</option>
+					{% for org in org_list %}
+					<option value="{{ org.id }}">{{ org.name }}</option>
+					{% endfor %}
+				</select>
 			</td>
-			<td>{{ ServiceHours.center }}</td>
-			<td><button class="btn btn-lg btn-default send_button" type="submit" id="id_exchange" name="exchange" value={{ ServiceHours.id }}>兌換</button></td>
+			<td>
+				{% if ServiceHours.user == request.user %}
+				<button class="btn btn-lg btn-default send_button" type="submit" id="id_exchange" name="exchange" value={{ ServiceHours.id }}>兌換</button>
+				{% else %}
+				非時數擁有者無法兌換
+				{% endif %}
+			</td>
+
+			{% endif %}
 		</tr>
 	{% endfor %}
 	</table>

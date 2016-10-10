@@ -4,11 +4,14 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse,HttpResponseRedirect
 from django.utils import timezone
 from django.shortcuts import render, get_list_or_404
-import json
 
 from utils.decorator import *
 from ebookSystem.models import *
 from genericUser.models import *
+from mysite.settings import BASE_DIR
+
+import codecs
+import os
 
 @user_category_check(['manager'])
 def event_list(request, action):
@@ -36,6 +39,27 @@ def applydocumentaction(request, template_name='manager/applydocumentaction.html
 		else:
 			status = u'error'
 			message = u'無此代掃申請項目'
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+@http_response
+def org_manage(request, template_name='manager/org_manage.html'):
+	if request.method == 'POST':
+		if request.POST.has_key('servicehours_info'):
+			pass
+		elif request.POST.has_key('volunteer_info'):
+			org = Organization.objects.get(id=request.POST['volunteer_info'])
+			path = BASE_DIR +u'/file/organization/{0}/volunteer_information.txt'.format(request.POST['volunteer_info'])
+			info = ''
+			for user in org.user_set.all():
+				info = info +u'{0}\t{1}\t{2}\t{3}\t{4}\r\n'.format(unicode(user), user.username, user.email, user.phone, user.birthday)
+			if not os.path.exists(os.path.dirname(path)):
+				os.makedirs(os.path.dirname(path), 0770)
+			with codecs.open(path, 'w', encoding='utf-8') as file:
+				file.write(info)
+			download_path = path
+			download_filename = 'volunteer_information.txt'
 		return locals()
 	if request.method == 'GET':
 		return locals()

@@ -25,10 +25,7 @@ class User(AbstractUser):
 	)
 	education = models.CharField(max_length=30, choices=EDU)
 	online = models.DateTimeField(default = timezone.now)
-	ORG = (
-		(u'渣打國際商業銀行' , u'渣打國際商業銀行'),
-	)
-	organization = models.CharField(max_length=30, blank=True, null=True, choices=ORG)
+	org = models.ForeignKey('Organization',blank=True, null=True, on_delete=models.SET_NULL, related_name='user_set')
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'review':2}
 	is_book = models.BooleanField(default=False)
@@ -61,6 +58,14 @@ class User(AbstractUser):
 			if v == self.status:
 				return k
 		return 'unknown'
+
+	def get_current_ServiceHours(self):
+		month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
+		try:
+			current_ServiceHours = ServiceHours.objects.get(date=month_day, user=self)
+		except:
+			current_ServiceHours = None
+		return current_ServiceHours
 
 class Event(models.Model):
 	creater = models.ForeignKey(User, related_name='event_creater_set')
@@ -113,25 +118,42 @@ class Event(models.Model):
 	def __unicode__(self):
 		return self.creater.username
 
-class Center(models.Model):
-	name = models.CharField(max_length=230)
+class Organization(models.Model):
+	name = models.CharField(max_length=50)
 	address = models.CharField(max_length=100)
 	email = models.EmailField()
 	phone = models.CharField(max_length=30)
-	count = models.IntegerField(default=0)
+	manager = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='manage_org_set')
+	is_service_center = models.BooleanField(default=False)
 
 	def __unicode__(self):
 		return self.name
 
 class ServiceHours(models.Model):
 	user = models.ForeignKey(User, related_name='servicehours_set')
-	center = models.ForeignKey(Center, blank=True, null=True, related_name='servicehours_set')
+	org = models.ForeignKey(Organization, blank=True, null=True, related_name='servicehours_set')
 	date = models.DateField()
 	service_hours = models.IntegerField(default=0)
 	is_exchange = models.BooleanField(default=False)
 
 	def __unicode__(self):
 		return self.user.username +str(self.date)
+
+	def get_service_hours(self):
+		service_hours = 0
+		for part in self.ebook_set.all():
+			service_hours = service_hours +part.service_hours
+		for part in self.sc_ebook_set.all():
+			service_hours = service_hours +part.service_hours
+		return service_hours
+
+	def get_page_count(self):
+		page_count = 0
+		for part in self.ebook_set.all():
+			page_count = page_count +(part.end_page -part.begin_page +1)
+		for part in self.sc_ebook_set.all():
+			page_count = page_count +(part.end_page -part.begin_page +1)
+		return page_count
 
 class ContactUs(models.Model):
 	name = models.CharField(max_length=10)

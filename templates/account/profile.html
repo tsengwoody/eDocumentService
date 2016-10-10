@@ -16,7 +16,6 @@
 	<div id="buttonGroup" style="text-align: center;">
 		<button class="btn btn-lg btn-default send_button" type="submit" id="getPart_id" name="getPart">領部份文件</button>
 <!--		<button class="btn btn-lg btn-default send_button" type="submit" id="getCompleteBook_id" name="getCompleteBook">領完整文件</button>-->
-		<button class="btn btn-lg btn-default send_button" type="submit" id="designateBook_id" name="designateBook">領指定文件</button>
 	</div>
 	<hr />
 	<h4 class="page-header">正校對文件</h4>
@@ -55,7 +54,6 @@
 			<th>文件</th>
 			<th>時數</th>
 			<th>領取日期</th>
-			<th>完成日期</th>
 			<th>狀態</th>
 			<th>動作</th>
 		</tr>
@@ -64,7 +62,6 @@
 			<td>{{part.book.book_info.bookname}}-part{{part.part}}</td>
 			<td>{{part.service_hours}}</td>
 			<td>{{part.get_date}}</td>
-			<td>{{part.finish_date}}</td>
 			<td>{{part.status_int2str}}</td>
 			<td>
 				{% if part.status_int2str == 'review' %}

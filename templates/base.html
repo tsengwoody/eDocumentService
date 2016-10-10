@@ -60,6 +60,7 @@
 		    <ul class="list-inline">
 		     	<li><a href="{% url 'genericUser:func_desc' %}">關於</a></li>
 		        <li><a href="{% url 'genericUser:contact_us' %}">聯絡我們</a></li>
+		        <li><a href="{% url 'genericUser:org_info' %}">服務中心資訊</a></li>
 		        {% if readmeUrl %}
 		        <li><a href={{ readmeUrl }}>說明</a></li>
 		        {% endif %} {% if request.user.is_active %}

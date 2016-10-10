@@ -154,14 +154,14 @@ class EBook(models.Model):
 	deadline = models.DateField(blank=True, null=True)
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
-	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL)
+	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL, related_name='ebook_set')
 	status = models.IntegerField(default=1)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_active':5, 'sc_edit':6, 'sc_finish':7, 'an_edit':8, 'an_finish':9}
 	sc_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_edit_ebook_set')
 	sc_deadline = models.DateField(blank=True, null=True)
 	sc_get_date = models.DateField(blank=True, null=True)
 	sc_service_hours = models.IntegerField(default=0)
-	sc_serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_servicehours')
+	sc_serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_ebook_set')
 	analyze_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='analyze_ebook_set')
 	an_deadline = models.DateField(blank=True, null=True)
 	an_get_date = models.DateField(blank=True, null=True)
@@ -544,6 +544,6 @@ class ReviseContentAction(models.Model):
 	content = models.CharField(max_length=1000)
 
 class ApplyDocumentAction(models.Model):
-	from genericUser.models import Center
+	from genericUser.models import Organization
 	book_info = models.ForeignKey(BookInfo)
-	center = models.ForeignKey(Center, blank=True, null=True)
+	org = models.ForeignKey(Organization, blank=True, null=True)

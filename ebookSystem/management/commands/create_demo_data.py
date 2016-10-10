@@ -6,7 +6,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 from django.core.urlresolvers import reverse
 from django.test import Client, RequestFactory
-
+from django.utils import timezone
 
 from account.models import *
 from ebookSystem.models import *
@@ -59,10 +59,25 @@ class Command(BaseCommand):
 #		request.user = root
 #		response = profileView.get(request)
 		ebook = EBook.objects.get(book=book, part=1)
-		ebook.status = ebook.STATUS['finish']
+		ebook.edited_page = ebook.book.page_per_part -1
 		ebook.editor = root
+		ebook.get_date = timezone.now() -datetime.timedelta(days=30)
+		ebook.deadline = ebook.get_date + datetime.timedelta(days=5)
+		ebook.service_hours = 90
+		ebook.group_ServiceHours()
+		ebook.status = ebook.STATUS['finish']
 		ebook.save()
 		ebook = EBook.objects.get(book=book, part=2)
+		ebook.edited_page = ebook.book.page_per_part -1
+		ebook.editor = root
+		ebook.get_date = timezone.now()
+		ebook.deadline = ebook.get_date + datetime.timedelta(days=5)
+		ebook.service_hours = 80
+		ebook.sc_editor = root
+		ebook.sc_get_date = timezone.now()
+		ebook.sc_deadline = ebook.get_date + datetime.timedelta(days=5)
+		ebook.sc_service_hours = 50
+		ebook.group_ServiceHours()
 		ebook.status=EBook.STATUS['sc_finish']
 		ebook.save()
 		from zipfile import ZipFile
@@ -72,5 +87,8 @@ class Command(BaseCommand):
 			partFile.extractall(dst)
 		request = factory.post(reverse('genericUser:apply_document'), {u'ISBN':u'9789865829810', u'bookname':u'遠山的回音', u'author':u'卡勒德.胡賽尼(Khaled Hosseini)著; 李靜宜譯', u'house':u'木馬文化', u'date':u'2014-02-01'})
 		request.user = manager
+		org = Organization.objects.create(name=u'eDocumentService', address=u'台北市大同區1段149號7樓', email=u'edocumentservice@gmail.com', phone='0917823099', manager=root, is_service_center=True)
+		root.org=org
+		root.save()
 		response = apply_document(request)
 		assert len(ApplyDocumentAction.objects.all()) == 1, 'create ApplyDocumentAction fail'
