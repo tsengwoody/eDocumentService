@@ -21,6 +21,24 @@ import datetime
 import requests
 import urllib,urllib2
 
+@http_response
+def article_content(request, id, template_name='genericUser/article/content.html'):
+	try:
+		article = Article.objects.get(id=id)
+	except:
+		raise Http404("article does not exist")
+	if request.method == 'POST':
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+@http_response
+def article_create(request, template_name='genericUser/article/create.html'):
+	if request.method == 'POST':
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
 @user_category_check(['guest'])
 @http_response
 def create_document(request, template_name='genericUser/create_document.html'):

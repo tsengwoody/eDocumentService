@@ -3,6 +3,8 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
+	url(r'^article/create/$', views.article_create, name='article/create'),
+	url(r'^article/content/(?P<id>[\d-]+)/$', views.article_content, name='article/content'),
 	url(r'^apply_document/$', views.apply_document, name='apply_document'),
 	url(r'^func_desc/$', views.func_desc, name='func_desc'),
 	url(r'^org_info$', views.org_info, name='org_info'),

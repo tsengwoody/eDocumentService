@@ -6,7 +6,7 @@ from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
 from .forms import *
 from ebookSystem.models import *
-from genericUser.models import Event
+from genericUser.models import Event, Article
 from utils.uploadFile import *
 from utils.decorator import *
 from mysite.settings import BASE_DIR
@@ -27,9 +27,11 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 
+@http_response
 def home(request, template_name='home.html'):
 #	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
-	return render(request, template_name, locals())
+	article_list = Article.objects.all()
+	return locals()
 
 @http_response
 def register(request, template_name='registration/register.html'):

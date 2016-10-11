@@ -1,0 +1,50 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+新增文章
+{% endblock %}
+
+{% block style %}
+{% load staticfiles %}
+<script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
+{% endblock %}
+
+{% block header %}
+新增文章
+{% endblock %}
+
+{% block content %}
+<form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
+{% csrf_token %} 
+<h3>新增文章</h3>
+	<table>
+		<tr>
+			<th class="col-md-4" scope="row">
+				<label for="idcategory"><font style="color:red">*</font>類別：</label>
+			</th>
+			<td class="col-md-8">
+				<select id="id_category" name="category">
+					<option value="" selected="selected">---------</option>
+					<option value="其他">其他</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th class="col-md-4" scope="row">
+				<label for="id_subject"><font style="color:red">*</font>Subject:</label>
+			</th>
+			<td class="col-md-8">
+				<input id="id_subject" maxlength="100" name="subject" type="text" placeholder="subject" required />
+			</td>
+		</tr>
+		<tr>
+			<th>主要內容</th>
+			<td></td>
+		</tr>
+		<tr>
+			<th>附件</th>
+			<td></td>
+		</tr>
+	</table>
+</form>
+
+{% endblock %}

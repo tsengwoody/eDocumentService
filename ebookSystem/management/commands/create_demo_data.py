@@ -87,8 +87,9 @@ class Command(BaseCommand):
 			partFile.extractall(dst)
 		request = factory.post(reverse('genericUser:apply_document'), {u'ISBN':u'9789865829810', u'bookname':u'遠山的回音', u'author':u'卡勒德.胡賽尼(Khaled Hosseini)著; 李靜宜譯', u'house':u'木馬文化', u'date':u'2014-02-01'})
 		request.user = manager
+		response = apply_document(request)
 		org = Organization.objects.create(name=u'eDocumentService', address=u'台北市大同區1段149號7樓', email=u'edocumentservice@gmail.com', phone='0917823099', manager=root, is_service_center=True)
 		root.org=org
 		root.save()
-		response = apply_document(request)
+		article = Article.objects.create(author=root, subject=u'平台操作說明', category=u'文件')
 		assert len(ApplyDocumentAction.objects.all()) == 1, 'create ApplyDocumentAction fail'

@@ -4,6 +4,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
+from mysite.settings import BASE_DIR
 import os
 import datetime
 
@@ -14,6 +15,13 @@ ContactUsKIND = (
 	(u'加入我們' , u'加入我們'),
 	(u'其他' , u'其他'),
 )
+
+class PublicFile(object):
+	from mysite.settings import BASE_DIR
+	def __init__(self, path):
+		self.name = os.path.basename(path)
+		self.path = path
+		self.url = path.replace(BASE_DIR +'/static/', '')
 
 class User(AbstractUser):
 	phone = models.CharField(max_length=30)
@@ -154,6 +162,35 @@ class ServiceHours(models.Model):
 		for part in self.sc_ebook_set.all():
 			page_count = page_count +(part.end_page -part.begin_page +1)
 		return page_count
+
+class Article(models.Model):
+	author = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='article_set')
+	subject = models.CharField(max_length=100)
+	datetime = models.DateField(default = timezone.now)
+	ArticleCATEGORY = (
+		(u'公告' , u'公告'),
+		(u'文件' , u'文件'),
+	)
+	category = models.CharField(max_length=10, choices=ArticleCATEGORY)
+	is_download = models.BooleanField(default=False)
+
+	def __unicode__(self):
+		return self.subject
+
+	def get_attachment(self):
+		path = os.path.join(BASE_DIR, 'static') +u'/article/{0}/attachment'.format(self.id)
+		try:
+			attachment_list = os.listdir(path)
+		except:
+			attachment_list = []
+		publicFile_list = []
+		for attachment in attachment_list:
+			publicFile_list.append(PublicFile(os.path.join(path, attachment)))
+		return publicFile_list
+
+	def get_main_content(self):
+		path = os.path.join(BASE_DIR, 'static') +u'/article/{0}/main_content.html'.format(self.id)
+		return PublicFile(path)
 
 class ContactUs(models.Model):
 	name = models.CharField(max_length=10)

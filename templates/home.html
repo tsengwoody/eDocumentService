@@ -16,6 +16,26 @@
 <section id="announcement" role="main">
     <div class="page-header">
         <h3>系統公告</h3></div>
+        <form action="" method="post">
+            <table>
+                <tr>
+                    <th>類別</th>
+                    <th>時間</th>
+                    <th>作者</th>
+                    <th>主旨</th>
+                    <th colspan="1">閱讀</th>
+                </tr>
+            {% for article in article_list %}
+                <tr>
+                    <td>{{ article.category }}</td>
+                    <td>{{ article.datetime }}</td>
+                    <td>{{ article.author }}</td>
+                    <td>{{ article.subject }}</td>
+                    <td><a class="btn btn-link" role="button" href = {% url 'genericUser:article/content' article.id %}>閱讀</a></td>
+                </tr>
+            {% endfor %}
+            </table>
+        </form>
     <div class="bs-callout bs-callout-warning">
         <div class="panel-group" id="announcement-panel">
             <div class="panel panel-default">

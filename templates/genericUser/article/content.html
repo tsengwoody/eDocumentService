@@ -1,0 +1,35 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+{{ article.subject }}
+{% endblock %}
+
+{% block style %}
+{% load staticfiles %}
+<script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
+{% endblock %}
+
+{% block header %}
+{{ article.subject }}
+{% endblock %}
+
+{% block content %}
+<form action="" method="post" role="form" >
+    {% csrf_token %} 
+    <h3>{{ article.subject }}</h3>   
+    path={% static article.get_main_content.url %}
+<table>
+	<tr>
+		<th>編號</th>
+		<th>檔名</th>
+		<th>下載</th>
+	</tr>
+	{% for attachment in article.get_attachment %}
+	<tr>
+		<td>{{ forloop.counter }}</td>
+		<td>{{ attachment.name }}</td>
+		<td><a class="btn btn-link" role="button" href = "{%static attachment.url %}">下載</a></td>
+	</tr>
+	{% endfor %}
+</table>
+</form>
+{% endblock %}
