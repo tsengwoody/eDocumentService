@@ -192,6 +192,8 @@ class Article(models.Model):
 		path = os.path.join(BASE_DIR, 'static') +u'/article/{0}/main_content.html'.format(self.id)
 		return PublicFile(path)
 
+
+
 class ContactUs(models.Model):
 	name = models.CharField(max_length=10)
 	email = models.EmailField()

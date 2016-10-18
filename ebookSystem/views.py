@@ -357,7 +357,7 @@ def edit_ajax(request, ISBN_part, *args, **kwargs):
 	user = request.user
 	response={}
 	response = {}
-	if not hasattr(request.user, 'online'):
+	if not getattr(request.user, 'has_editor', None):
 		response['status'] = u'error'
 		response['message'] = u'已登出'
 	if not request.POST.has_key('online'):
@@ -374,6 +374,9 @@ def edit_ajax(request, ISBN_part, *args, **kwargs):
 	part = EBook.objects.get(ISBN_part=ISBN_part)
 	part.service_hours = part.service_hours+1
 	part.save()
+	book = part.book
+	order = len(EditRecorder.objects.filter(book=book, part=part))
+#	EditRecorder.objects.create(book=book, part=part, user=request.user, order=order)
 	response['status'] = u'success'
 	response['message'] = part.service_hours
 	return HttpResponse(json.dumps(response), content_type="application/json")

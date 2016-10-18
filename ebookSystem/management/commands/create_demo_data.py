@@ -92,4 +92,8 @@ class Command(BaseCommand):
 		root.org=org
 		root.save()
 		article = Article.objects.create(author=root, subject=u'平台操作說明', category=u'文件')
+		src = BASE_DIR +'/temp/article_NVDA.zip'
+		dst = BASE_DIR +'/static/article/{0}'.format(article.id)
+		with ZipFile(src, 'r') as partFile:
+			partFile.extractall(dst)
 		assert len(ApplyDocumentAction.objects.all()) == 1, 'create ApplyDocumentAction fail'

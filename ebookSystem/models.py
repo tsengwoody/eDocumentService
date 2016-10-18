@@ -547,3 +547,20 @@ class ApplyDocumentAction(models.Model):
 	from genericUser.models import Organization
 	book_info = models.ForeignKey(BookInfo)
 	org = models.ForeignKey(Organization, blank=True, null=True)
+
+class EditRecorder():
+	book = models.ForeignKey(Book,on_delete=models.SET_NULL)
+	part = models.ForeignKey(EBook,on_delete=models.SET_NULL)
+	time = models.DateTimeField(default = timezone.now)
+	user = models.ForeignKey(User, on_delete=models.SET_NULL)
+	order = models.IntegerField()
+	edit_count = models.IntegerField()
+
+	def __unicode__(self):
+		return self.part +self.order
+
+'''	class Meta:
+		indexes = [
+			models.Index(fields=['book'], name='book_idx'),
+			models.Index(fields=['part'], name='part_idx'),
+		]'''
