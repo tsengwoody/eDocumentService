@@ -63,3 +63,12 @@ code {
     margin-left: 0;
   }
 }
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+.centered{
+    display: inline-block;
+    float:none;
+    text-align: center;
+}
