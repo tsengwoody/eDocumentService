@@ -178,9 +178,6 @@ jQuery.fn.quickpaginate = function( settings ) {
 	
 	init(); // run the function
 };
-
-
-
 $(function(){
  		$('table').each( function() { 
  			if($(this).hasClass('no-page')==false)

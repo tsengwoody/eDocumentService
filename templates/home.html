@@ -61,7 +61,7 @@
             <div class="panel-heading">最新消息</div>
             <div class="panel-body">
                 {% for article in article_list %}
-                <p><a class="btn btn-link" role="button" href={ % url 'genericUser:article/content' article.id %}>{{ article.datetime }} {{ article.subject }}</a></p>
+                <p><a class="btn btn-link" role="button" href="{% url 'genericUser:article/content' article.id %}">{{ article.datetime }} {{ article.subject }}</a></p>
                 {% endfor %}
                 <div class="pull-right">
                     <p><a class="btn btn-default center" href="#" role="button">View details »</a></p>

@@ -75,7 +75,7 @@
 			<ul class="nav navbar-nav navbar-right">
 				{% if request.user.is_authenticated %}
 				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#">帳號<span class="caret"></span></a>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user">帳號<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li><a href="{% url 'genericUser:event_list' %}">消息</a></li>
 						{% if request.user.has_editor %}
