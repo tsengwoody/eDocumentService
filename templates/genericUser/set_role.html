@@ -4,7 +4,6 @@
 {{ user.username }}角色 
 {% endblock %}
 {% block style %} {% load staticfiles %}
-<script language="javascript" src="{% static 'ebookSystem/js/register.js' %}"></script>
 <style>
 
 </style>
@@ -15,17 +14,18 @@
     {% include 'utils/dialog.html' %}
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
-            <table class="table table-hover table-reflow">
+            <table class="table table-hover table-reflow no-page">
                 <tr>
                     <th class="col-md-4" scope="row">
                         帳號角色資訊
                     </th>
                     <td>
-                        {% if request.user.has_editor %}志工角色啟用{% endif %}
-                        {% if request.user.has_guest %}服務使用者角色啟用{% endif %}
+                        {% if request.user.has_editor %}<span class="label label-success">志工角色</span>{% endif %}
+                        {% if request.user.has_guest %}<span class="label label-success">服務使用者角色<span>{% endif %}
                     </td>
                 </tr>
-                <tr class="editor_mode">
+                {% if request.user.has_editor %}
+                <tr>
                     <th class="col-md-4" scope="row">
                         <label for="id_professional_field">專業領域：</label>
                     </th>
@@ -33,7 +33,9 @@
                         <input id="id_professional_field" maxlength="30" name="professional_field" value="{{ user.editor.professional_field }}" type="text">
                     </td>
                 </tr>
-                <tr class="guest_mode">
+                {% endif %}
+                {% if request.user.has_guest %}
+                <tr>
                     <th class="col-md-4" scope="row">
                         <label for="id_disability_card_front">身心障礙手冊正面</label>
                     </th>
@@ -41,7 +43,7 @@
                         <input id="id_disability_card_front" maxlength="30" name="disability_card_front" type="file" accept="image/jpeg">
                     </td>
                 </tr>
-                <tr class="guest_mode">
+                <tr>
                     <th class="col-md-4" scope="row">
                         <label for="id_disability_card_back">身心障礙手冊反面:</label>
                     </th>
@@ -49,6 +51,7 @@
                         <input id="id_disability_card_back" maxlength="30" name="disability_card_back" type="file" accept="image/jpeg">
                     </td>
                 </tr>
+                {% endif %}
             </table>
             <div class="form-group row">
                 <div class="col-sm-offset-4 col-sm-6">
