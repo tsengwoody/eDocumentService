@@ -13,10 +13,16 @@
 
 <form action="" method="post">
 {% csrf_token %}
-	<button type="submit" class="btn btn-primary" name="rebuild" value="{{ part.ISBN_part }}" id="id_rebuild">檢查特殊內容</button>
-	<a class="btn btn-link" role="button" href ={% url 'ebookSystem:full_edit' part.ISBN_part %}>全編輯</a>
-<!--	<button type="submit" class="btn btn-primary" name="full_write" value="{{ part.ISBN_part }}" id="id_full_write">全寫入</button>-->
-	<button type="submit" class="btn btn-primary" name="finish" value="{{ part.ISBN_part }}" id="id_finish">完成</button>
+<div class="text-center">
+    <div class="btn-group">
+        <button type="submit" class="btn btn-default" name="rebuild" value="{{ part.ISBN_part }}" id="id_rebuild">檢查特殊內容</button>
+        <a class="btn btn-default" role="button" href={% url 'ebookSystem:full_edit' part.ISBN_part %}>全編輯</a>
+        <!--	<button type="submit" class="btn btn-primary" name="full_write" value="{{ part.ISBN_part }}" id="id_full_write">全寫入</button>-->
+        <button type="submit" class="btn btn-default" name="finish" value="{{ part.ISBN_part }}" id="id_finish">完成</button>
+    </div>
+</div>
+
+
 	<h4 class="page-header">{{ part }}文件特殊內容</h4>
 	<table class="table table-striped table-hover">
 		<tr>

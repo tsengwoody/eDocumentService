@@ -25,8 +25,6 @@
      <!-- <li data-target="#myCarousel" data-slide-to="1"></li>
       <li data-target="#myCarousel" data-slide-to="2"></li>
       <li data-target="#myCarousel" data-slide-to="3"></li>
-
-    hi2.v1.top.jpg
       -->
     </ol>
 
@@ -65,12 +63,12 @@
         <div class="panel panel-danger">
             <div class="panel-heading">最新消息</div>
             <div class="panel-body">
-                {% for article in article_list %}
+                {% for article in article_list|slice:":5" %}
                 <p><a class="btn btn-link" role="button" href="{% url 'genericUser:article/content' article.id %}">{{ article.datetime }} {{ article.subject }}</a></p>
                 {% endfor %}
-                <div class="pull-right">
+                <!--<div class="pull-right">
                     <p><a class="btn btn-default center" href="#" role="button">View details »</a></p>
-                </div>
+                </div>-->
             </div>
         </div>
     </div>
@@ -80,7 +78,7 @@
             <div class="panel-body">
                 <p>「mark」鍵：進行書籍重製中，完成一部分之編輯後，可點選mark鍵，會插入此︱----------︱符號，之後再點選「存檔」鍵，下次再開啟書籍重製頁面時，則上次插入mark點以上之資料(已完成重製資料的部分資料)已系統存檔並消失，則可繼續進行未完成重製資料之校對。</p>
                 <div class="pull-right">
-                    <p><a class="btn btn-default center" href="#" role="button">View details »</a></p>
+                    <p><a class="btn btn-default center" role="button" href="/genericUser/user_guide" >View details »</a></p>
                 </div>
             </div>
         </div>

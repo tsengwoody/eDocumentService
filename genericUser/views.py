@@ -21,6 +21,11 @@ import datetime
 import requests
 import urllib,urllib2
 
+
+def user_guide(request, template_name='genericUser/user_guide.html'):
+	return render(request, template_name, locals())
+
+
 @http_response
 def article_content(request, id, template_name='genericUser/article/content.html'):
 	try:

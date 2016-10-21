@@ -16,6 +16,12 @@ import json
 import os
 import shutil
 
+
+@http_response
+def userGuide(request, template_name='home.html'):
+#	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
+	return render(request, template_name, locals())
+
 class profileView(generic.View):
 	template_name=''
 
