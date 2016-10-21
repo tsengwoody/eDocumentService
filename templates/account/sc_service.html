@@ -5,17 +5,80 @@
 {% endblock %}
 {% block style %}
  <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
+ <script language="javascript">
+ $( document ).ready(function() {
+ 	$('#sendAssignDoc').on("click",function(event){
+        var transferData={};
+        var type=$('input[name=assignType]:checked').val();
+        var sendValue=$('#assignDocData').val();
+        transferData[type]=sendValue;
+        transferData["designateBook"]="designateBook";
+        console.log(transferData);
+	    $.ajax({
+	        url: ".",
+	        type: "POST",
+	        data: transferData,
+	        beforeSend:function(jqXHR, settings){
+	            jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+	            $('#id_get_otp_load').show();
+	        },
+	        success: function(json) {
+	            alertDialog(json);
+	            $('#assignDocModal').modal('toggle');
+	            $('#id_get_otp_load').hide();
+	        },
+	        error: function(xhr, errmsg, err) {
+	            alert(xhr.status + ": " + xhr.responseText);
+	            console.log(xhr.status + ": " + xhr.responseText);
+	            $('#id_get_otp_load').hide();
+	        }
+	    });
+    });
+ });
+ </script>
 {% endblock %}
 {% block header %}
 進階服務
 {% endblock %}
 {% block content %}
-
+<div class="modal fade" id="assignDocModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content alert-info">
+            <div class="modal-header ">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="assignDocModalLabel">領取指定文件</h4>
+            </div>
+			<div class="modal-body">
+			    <div class="form-group form-inline row">
+			        <div class="col-md-8 col-md-offset-2">
+			            <label class="form-check-inline">
+			                <input class="form-check-input" type="radio" name="assignType" id="assignType" value="ISBN" checked> ISBN
+			            </label>
+			            <label class="form-check-inline">
+			                <input class="form-check-input" type="radio" name="assignType" id="assignType" value="username"> 指定使用者
+			            </label>
+			            <input type="text" class="form-control" id="assignDocData">
+			        </div>
+			       
+			         
+			    </div>
+			</div>
+			<div class="modal-footer">
+				<img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_otp_load" />
+        		<button type="button" class="btn btn-primary" id="sendAssignDoc">查詢</button>
+        		
+      		</div>
+            
+        </div>
+    </div>
+</div>
 <form action="" method="post">
 {% csrf_token %}
 	<div id="buttonGroup" style="text-align: center;">
 		<button class="btn btn-lg btn-default send_button" type="submit" id="getPart_id" name="getPart">領文件</button>
-		<button class="btn btn-lg btn-default send_button" type="submit" id="designateBook_id" name="designateBook">領指定文件</button>
+		<button class="btn btn-lg btn-default send_button" type="button" data-toggle="modal" data-target="#assignDocModal" id="designateBook_id" name="designateBook">領指定文件</button>
 	</div>
 	<hr />
 	<h4 class="page-header">正編輯文件</h4>

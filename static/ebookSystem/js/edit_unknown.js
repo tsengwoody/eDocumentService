@@ -251,7 +251,7 @@ function createHtmlEditor(){
   force_br_newlines : false,
   force_p_newlines : false,
   selector: 'textarea',  // change this value according to your HTML
-  toolbar1: '載入全文  | 暫存 | 寫入',
+  toolbar1: '暫存 | 寫入',
   toolbar2: 'undo redo | cut copy paste | bullist numlist | table | searchreplace | fontsizeselect ',
   fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt',
   menubar: false,
@@ -260,17 +260,6 @@ function createHtmlEditor(){
         //console.log(idel_min);
         idel_min=0;
         change_count++;
-    });
-
-    editor.addButton('載入全文', {
-      text: '載入全文',
-      icon: false,
-      onclick: function () {
-        function_click=true;
-        //catchErrorHandling("load","");
-        $('form').append($("<input>").attr("type", "hidden").attr("name", "load").val("load"));
-        $('form').submit();
-      }
     });
     editor.addButton('暫存', {
       text: '暫存',
@@ -328,8 +317,6 @@ $(document).ready(function() {
         }
     });
 
-    
-    
     createHtmlEditor();
     calMins();
     setInterval(function(){ 
