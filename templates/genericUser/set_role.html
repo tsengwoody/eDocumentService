@@ -20,8 +20,8 @@
                         帳號角色資訊
                     </th>
                     <td>
-                        {% if request.user.has_editor %}<span class="label label-success">志工角色</span>{% endif %}
-                        {% if request.user.has_guest %}<span class="label label-success">服務使用者角色<span>{% endif %}
+                        {% if request.user.has_editor %}<span class="label label-success">志工</span>{% endif %}
+                        {% if request.user.has_guest %}<span class="label label-success">服務使用者<span>{% endif %}
                     </td>
                 </tr>
                 {% if request.user.has_editor %}

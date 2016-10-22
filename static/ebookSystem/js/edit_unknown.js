@@ -221,27 +221,7 @@ function getCursorPosition(editor){
 
     return index;
 }
-var editor;
-function createMathMlEditor()
-{
-    editor = com.wiris.jsEditor.JsEditor.newInstance({'language': 'zh'});
-    editor.insertInto(document.getElementById('editorContainer'));
-    editor.setMathML($("input[name='content']" ).val());
-}
-function submitMathml()
-{
-    //alert(editor.getMathML());
-    function_click=true;
-    $('form').append($("<input>").attr("type", "hidden").attr("name", "save").val("save"));
-    $("input[name='content']" ).val(editor.getMathML());
-   // $('form').append($("<input>").attr("type", "hidden").attr("name", "content").val(editor.getMathML()));
-    $('form').submit();
-}
-function doGet() {
-  console.log(editor.getMathML());
-  $('#setValue #message').html(editor.getMathML());
-  $('#setValue').css('visibility','visible').fadeIn();
-}
+
 var function_click = false;
 var idel_min =0;
 var change_count=0;
@@ -317,14 +297,7 @@ $(document).ready(function() {
         }
     });
 
-    createHtmlEditor();
-    calMins();
-    setInterval(function(){ 
-        calMins();
-        detectIdel();
-    }, 60000);
-    
-  
+    createHtmlEditor();  
 
     $('#prePage').on("click", function() {
         changePage(-1);
