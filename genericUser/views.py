@@ -64,7 +64,7 @@ def article_create(request, template_name='genericUser/article/create.html'):
 			pass
 		with ZipFile(src, 'r') as zipFile:
 			zipFile.extractall(dst)
-		add_base_tag(os.path.join(dst, 'main_content.html'), article.id)
+		add_base_url(os.path.join(dst, 'main_content.html'), article.id)
 		status = 'success'
 		message = u'成功新增文章'
 		redirect_to = '/'

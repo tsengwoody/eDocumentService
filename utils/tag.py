@@ -15,20 +15,21 @@ def merge_NavigableString(tag):
 		for i in xrange(len(tag.contents)-1, -1, -1):
 			merge_NavigableString(tag.contents[i])
 
-def add_base_tag(src, id, encoding='utf-8'):
+def add_base_url(src, id, encoding='utf-8'):
+#	try:
+	import re
 	soup = BeautifulSoup(open(src), 'lxml')
-	try:
-		if soup.head:
-			base_tag = soup.new_tag('base', href="/static/article/{0}/".format(id))
-			soup.head.append(base_tag)
-			with codecs.open(src, 'w', encoding=encoding) as dstFile:
-				dst_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
-				dstFile.write(dst_content)
-			return True
-		else:
-			return False
-	except:
-		return False
+	base_url = '/static/article/{0}/'.format(id)
+	tags = soup.find_all(src=re.compile('^[\d\w]+'))
+	for tag in tags:
+		tag['src'] = base_url +tag['src']
+		print tag['src']
+	with codecs.open(src, 'w', encoding=encoding) as dstFile:
+		dst_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
+		dstFile.write(dst_content)
+	return True
+#	except:
+#		return False
 
 def add_tag(source, destination, encoding='utf-8'):
 	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
