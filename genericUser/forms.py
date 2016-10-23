@@ -12,3 +12,8 @@ class ContactUsForm(forms.ModelForm):
 	class Meta:
 		model = ContactUs
 		exclude = ['message_datetime']
+
+class UserChangeForm(forms.ModelForm):
+	class Meta:
+		model = User
+		fields = ['username', 'email', 'first_name', 'last_name', 'phone', 'birthday', 'education']

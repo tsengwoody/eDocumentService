@@ -384,6 +384,7 @@ def edit_ajax(request, ISBN_part, *args, **kwargs):
 class editView(generic.View):
 
 	@cache_control(no_store=True, no_cache=True, max_age=0)
+	@user_category_check('editor')
 	@method_decorator(http_response)
 	def get(self, request, encoding='utf-8', *args, **kwargs):
 		logger.info('{}/edit\t{}'.format(request.user, resolve(request.path).namespace))
@@ -399,6 +400,7 @@ class editView(generic.View):
 		return locals()
 
 	@cache_control(no_store=True, no_cache=True, max_age=0)
+	@user_category_check('editor')
 	@method_decorator(http_response)
 	def post(self, request, encoding='utf-8', *args, **kwargs):
 		template_name='ebookSystem/edit.html'
@@ -435,7 +437,7 @@ class editView(generic.View):
 			redirect_to = reverse('account:profile')
 		elif request.POST.has_key('finish'):
 			part.set_content(finish_content=content, edit_content='')
-			part.edited_page = part.book.page_per_part -1
+			part.edited_page = part.end_page -part.begin_page
 			part.status = part.STATUS['review']
 			part.save()
 			redirect_to = reverse('account:profile')
@@ -527,7 +529,7 @@ def edit_SpecialContent(request, id, type):
 		show_page = 0
 		scanPageList = scanPageList[page:page+2]
 		default_page_url = water_path +u'/' +scanPageList[0]
-	elif page == part.book.page_per_part-1:
+	elif page == part.end_page -part.begin_page:
 		show_page = 1
 		scanPageList = scanPageList[page-1:page+1]
 		default_page_url = water_path +u'/' +scanPageList[1]
@@ -542,8 +544,8 @@ def edit_SpecialContent(request, id, type):
 		editContent = str(math_tag)
 	elif type == 'image':
 		img_tag = BeautifulSoup(sc.content, 'lxml').find('img')
-		image_path = sc.ebook.book.path +'/OCR/image/' +sc.id +'.jpg'
-		image_public_path = sc.ebook.get_path('public') +'/OCR/image/' +sc.id +'.jpg'
+		image_path = sc.ebook.book.path +'/OCR/resource/image_' +sc.id +'.jpg'
+		image_public_path = sc.ebook.get_path('public') +'/OCR/resource/image_' +sc.id +'.jpg'
 		preview_image_url = image_public_path.replace(BASE_DIR +'/static/', '')
 		editContent = img_tag['alt']
 	elif type == 'unknown':
@@ -552,7 +554,7 @@ def edit_SpecialContent(request, id, type):
 	if request.method == 'POST':
 		if request.POST.has_key('save') or request.POST.has_key('write'):
 			if type == 'image':
-				img_tag['src'] = 'image/' +sc.id +'.jpg'
+				img_tag['src'] = 'resource/' +sc.id +'.jpg'
 				img_tag['alt'] = request.POST['alt']
 				sc.content = u'<p id="{0}">'.format(sc.tag_id) +img_tag.prettify(formatter='html') +u'</p>'
 				if not os.path.exists(os.path.dirname(image_path)):

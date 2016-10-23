@@ -45,43 +45,36 @@ def register(request, template_name='registration/register.html'):
 		newUser.set_password(request.POST.get('password'))
 		newUser.is_active = True
 		newUser.save()
-		redirect_to = reverse('login')
-		status = 'success'
-		message = u'註冊成功，請等待帳號審核'
-		if request.POST.has_key('editor'):
+		if request.POST['role'] == 'Editor':
 			try:
-				newEditor = Editor(user=newUser, professional_field=request.POST['professional_field'])
-				newEditor.save()
+				newEditor = Editor.objects.create(user=newUser, professional_field=request.POST['professional_field'])
 			except:
 				status = 'error'
 				message = u'editor申請失敗'
-		if request.POST.has_key('guest'):
-			try:
-				request.FILES['disability_card_front']
-				request.FILES['disability_card_back']
-			except:
-				status = 'error'
-				message = u'無上傳文件'
 				return locals()
+		elif request.POST['role'] == 'Guest':
 			uploadDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(newUser.username)
 			request.FILES['disability_card_front'].name = request.POST['username'] +'_front.jpg'
 			[status, message] = handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])
 			request.FILES['disability_card_back'].name = request.POST['username'] +'_back.jpg'
 			[status, message] = handle_uploaded_file(uploadDir, request.FILES['disability_card_back'])
 			try:
-				newGuest = Guest(user=newUser)
-				newGuest.save()
+				newGuest = Guest.objects.create(user=newUser)
 			except:
+				print 'error:guest'
 				status = 'error'
 				message = u'guest申請失敗'
+				return locals()
 		Event.objects.create(creater=newUser, action=newUser)
+		status = 'success'
+		message = u'註冊成功，請等待帳號審核'
+		redirect_to = reverse('login')
 		return locals()
 	if request.method == 'GET':
 		registerUserForm = RegisterUserForm()
 		return locals()
 
 from utils.decorator import *
-#@audio_code_valid
 @http_response
 def login(request, template_name='registration/login.html', authentication_form=AuthenticationForm):
 	"""

@@ -11,65 +11,132 @@
 {% endblock %}
 
 {% block content %}
-<!--<h3>修改資料</h3>-->
-<h3></h3>
+<h3>{{ request.user }}資料修改</h3> 
 <form method="post" action="" class="form-horizontal" role="form">
 {% csrf_token %}
-<div class="row">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">{{ user.username }} 修改資料</h3></div>
-            <div class="panel-body">
-                {% if user.status_int2str == 'inactive' %}
-                <div class="form-group">
-                    <label for="id_first_name" class="control-label col-sm-2"><font style="color:red">*</font>姓氏：</label>
-                    <div class="col-sm-5">
-                        <input id="id_first_name" class="form-control" name="first_name" type="text" placeholder="FirstName" value="{{ request.user.first_name }}" required />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="id_last_name" class="control-label col-sm-2"><font style="color:red">*</font>名字：</label>
-                    <div class="col-sm-5">
-                        <input id="id_last_name" class="form-control" name="last_name" type="text" placeholder="LastName" value="{{ request.user.last_name }}" required />
-                    </div>
-                </div>
-                {% else %}
-                <div class="form-group">
-                    <label for="id_first_name" class="control-label col-sm-3">姓氏：</label>
-                    <div class="col-sm-5">
-                        <input id="id_first_name" class="form-control" name="first_name" type="text" placeholder="FirstName" value="{{ request.user.first_name }}" required readonly="true" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="id_last_name" class="control-label col-sm-3">名字：</label>
-                    <div class="col-sm-5">
-                        <input id="id_last_name" class="form-control" name="last_name" type="text" placeholder="LastName" value="{{ request.user.last_name }}" required readonly="true" />
-                    </div>
-                </div>
-                {% endif %}
-                <div class="form-group">
-                    <label for="id_email" class="control-label col-sm-3"><font style="color:red">*</font>電子郵件：</label>
-                    <div class="col-sm-5">
-                        <input id="id_email" class="form-control" name="email" type="email" placeholder="Email" value="{{ request.user.email }}" required />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="id_phone" class="control-label col-sm-3"><font style="color:red">*</font>聯絡電話：</label>
-                    <div class="col-sm-5">
-                        <input id="id_phone" class="form-control" name="phone" placeholder="Phone" type="phone" value="{{ request.user.phone }}" required />
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-offset-4 col-sm-4">
-                        <!--<button class="btn btn-default" type="submit" value="change info">修改</button>-->
-                        <input type="submit" class="btn btn-primary" value="修改" id="send_id">
-                        <input type="reset" class="btn btn-danger" value="reset">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
+			{{ message }}
+			<table class="table table-hover table-reflow no-page">
+				<tr>
+					<th class="col-md-4" scope="row">
+						<label for="id_username"><font style="color:red">*</font>使用者名稱：</label>
+					</th>
+					<td class="col-md-8">
+						{{ request.user.username }}
+						<input id="id_username" name="username" value="{{ request.user.username }}" type="hidden" placeholder="username" required>
+					</td>
+				</tr>
+				<tr>
+					<th class="col-md-4" scope="row">
+						<label for="id_first_name"><font style="color:red">*</font>姓氏：</label>
+					</th>
+					<td>
+						{% if user.status_int2str == 'review' %}
+						<input id="id_first_name" name="first_name" value="{{ request.user.first_name }}" type="text" placeholder="First name" required><label for="id_first_name"><font style="color:red">請填寫中文性名</font></label>
+						{% else %}
+						<input id="id_first_name" name="first_name" value="{{ request.user.first_name }}" type="hidden" placeholder="First name" required>
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th class="col-md-4" scope="row">
+						<label for="id_last_name"><font style="color:red">*</font>名字：</label>
+					</th>
+					<td>
+						{% if user.status_int2str == 'review' %}
+						<input id="id_last_name" name="last_name" value="{{ request.user.last_name }}" type="text" placeholder="Last name" required><label for="id_last_name"><font style="color:red">請填寫中文性名</font></label>
+						{% else %}
+						<input id="id_last_name" name="last_name" value="{{ request.user.last_name }}" type="hidden" placeholder="Last name" required>
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th class="col-md-4" scope="row">
+						<label for="id_email"><font style="color:red">*</font>電子郵件：</label>
+					</th>
+					<td>
+						<input id="id_email" name="email" value="{{ request.user.email }}" type="email" placeholder="Email" required>
+					</td>
+				</tr>
+				<tr>
+					<th class="col-md-4" scope="row">
+						<label for="id_phone"><font style="color:red">*</font>聯絡電話：</label>
+					</th>
+					<td>
+						{% if not request.user.auth_phone %}
+						<input id="id_phone" name="phone" value="{{ request.user.phone }}" type="phone" pattern="^[0-9]{10}$" placeholder="Phone" required><label for="id_phone"><font style="color:red">請填寫手機號碼</font></label>
+						{% else %}
+						<input id="id_phone" name="phone" value="{{ request.user.phone }}" type="hidden" pattern="^[0-9]{10}$" placeholder="Phone" required>
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th class="col-md-4" scope="row">
+						<label for="id_birthday"><font style="color:red">*</font>生日：</label>
+					</th>
+					<td>
+						{{ request.user.birthday }}
+						<input id="id_birthday" name="birthday" value="{{ request.user.birthday.year }}-{{ request.user.birthday.month }}-{{ request.user.birthday.day }}" type="hidden" placeholder="birthday" required>
+					</td>
+				</tr>
+				<tr>
+					<th class="col-md-4" scope="row">
+						<label for="id_education"><font style="color:red">*</font>教育程度：</label>
+					</th>
+					<td>
+						<select id="id_education" name="education" required>
+							<option value="">---------</option>
+							{% for edu in request.user.EDU %}
+							{% if request.user.education == edu.0 %}
+							<option value="{{ edu.0 }}" selected="selected">{{ edu.1 }}</option>
+							{% else %}
+							<option value="{{ edu.0 }}">{{ edu.1 }}</option>
+							{% endif %}
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+				{% if request.user.has_editor %}
+				<tr class="editor_mode">
+					<th class="col-md-4" scope="row">
+						<label for="id_professional_field">專業領域：</label>
+					</th>
+					<td>
+						<input id="id_professional_field" maxlength="30" name="professional_field" value="{% if request.user.editor.professional_field %}{{ request.user.editor.professional_field }}{% endif %}" type="text">
+					</td>
+				</tr>
+				{% endif %}
+				{% if request.user.has_guest %}
+				<tr class="guest_mode">
+					<th class="col-md-4" scope="row">
+						<label for="id_disability_card_front"><font style="color:red">*</font>身心障礙手冊正面：</label>
+					</th>
+					<td>
+						<img src="/static/{{ DCDir_url }}/{{ request.user.username }}_front.jpg" alt="身心障礙手冊正面" />
+						<input id="id_disability_card_front" maxlength="30" name="disability_card_front" type="file" accept="image/*" >
+					</td>
+				</tr>
+				<tr class="guest_mode">
+					<th class="col-md-4" scope="row">
+						<label for="id_disability_card_back"><font style="color:red">*</font>身心障礙手冊反面：</label>
+					</th>
+					<td>
+						<img src="/static/{{ DCDir_url }}/{{ request.user.username }}_back.jpg" alt="身心障礙手冊反面" />
+						<input id="id_disability_card_back" maxlength="30" name="disability_card_back" type="file" accept="image/*" >
+					</td>
+				</tr>
+				{% endif %}
+			</table>
+			<div class="form-group row">
+				<div class="col-sm-offset-4 col-sm-6">
+					<input type="submit" class="btn btn-primary" value="儲存" id="id_send">
+<!--					<button class="btn btn-lg btn-default send_button" type="submit" id="id_save" name="save">儲存</button>-->
+					<a class="btn btn-link" role="button" href = {% url 'genericUser:info' %}>取消</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
 </form>
 {% endblock %}

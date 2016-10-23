@@ -15,8 +15,3 @@ class EditForm(forms.Form):
 #		if data.find('|----------|') == -1:
 #			raise forms.ValidationError("無法儲存檔案，您傳的資料無特殊標記無法得知校對完成位置")
 #		return data
-
-class RegisterUserForm(forms.ModelForm):
-	class Meta:
-		model = User
-		fields = '__all__'

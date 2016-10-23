@@ -150,6 +150,7 @@ class EBook(models.Model):
 	begin_page = models.IntegerField()
 	end_page = models.IntegerField()
 	edited_page = models.IntegerField(default=0)
+	number_of_times = models.IntegerField(default=1)
 	editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='edit_ebook_set')
 	deadline = models.DateField(blank=True, null=True)
 	get_date = models.DateField(blank=True, null=True)
@@ -548,11 +549,23 @@ class ApplyDocumentAction(models.Model):
 	book_info = models.ForeignKey(BookInfo)
 	org = models.ForeignKey(Organization, blank=True, null=True)
 
-class EditRecorder():
-	book = models.ForeignKey(Book,on_delete=models.SET_NULL)
-	part = models.ForeignKey(EBook,on_delete=models.SET_NULL)
+class EditRecord(models.Model):
+	part = models.ForeignKey(EBook, blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
+	CATEGORY = (
+		('based' , u'初階'),
+		(u'advance' , u'進階'),
+	)
+	category = models.CharField(max_length=10, choices=CATEGORY)
+	number_of_times = models.IntegerField()
+	editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
+	get_date = models.DateField(blank=True, null=True)
+	service_hours = models.IntegerField(default=0)
+	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
+
+class EditLog(models.Model):
+	edit_record = models.ForeignKey(EditRecord, blank=True, null=True, on_delete=models.SET_NULL, related_name='editlog_set')
+	user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='editlog_set')
 	time = models.DateTimeField(default = timezone.now)
-	user = models.ForeignKey(User, on_delete=models.SET_NULL)
 	order = models.IntegerField()
 	edit_count = models.IntegerField()
 

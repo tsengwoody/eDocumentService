@@ -11,102 +11,158 @@
 <script language="javascript" src="{% static 'ebookSystem/js/getOTP.js' %}"></script>
 <style type="text/css">
 #otpModal .modal-content{
-    background-color: #f5f5f5;
+	background-color: #f5f5f5;
 }
 </style>
 {% endblock %}
 {% block content %}
-{% if request.user.is_authenticated %}
-<h3></h3>
 {% csrf_token %}
 <div class="modal fade" id="otpModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content alert-info">
-            <div class="modal-header ">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title" id="otpModalLabel">驗證碼</h4>
-            </div>
-            <div class="modal-body">
-                    <input type="hidden" id="id_send_value" />
-                    <div class="form-group row">
-                      <div class="col-md-6 col-md-offset-3">
-                            <span id="id_send_info" style="color: red;"></span>
-                      </div>
-                      <div class="col-md-4 col-md-offset-4">
-                        
-                        <button type="button" class="btn btn-primary" id="id_get_otp">取得驗證碼</button>
-                        <img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_otp_load" />
-                      </div>
-                    </div>  
-                    <div class="form-group form-inline row">
-                        <div class="col-md-8 col-md-offset-2">
-                            <label for="recipient-code" class="form-control-label">驗證碼:</label>
-                            <input type="text" class="form-control" id="recipient-code">
-                            <button type="button" class="btn btn-primary" id="send_otp">送出驗證碼</button>
-                        </div>
-                    </div>
-            </div>
-            
-        </div>
-    </div>
+	<div class="modal-dialog" role="document">
+		<div class="modal-content alert-info">
+			<div class="modal-header ">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="otpModalLabel">驗證碼</h4>
+			</div>
+			<div class="modal-body">
+					<input type="hidden" id="id_send_value" />
+					<div class="form-group row">
+					  <div class="col-md-6 col-md-offset-3">
+							<span id="id_send_info" style="color: red;"></span>
+					  </div>
+					  <div class="col-md-4 col-md-offset-4">
+						
+						<button type="button" class="btn btn-primary" id="id_get_otp">取得驗證碼</button>
+						<img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_otp_load" />
+					  </div>
+					</div>  
+					<div class="form-group form-inline row">
+						<div class="col-md-8 col-md-offset-2">
+							<label for="recipient-code" class="form-control-label">驗證碼:</label>
+							<input type="text" class="form-control" id="recipient-code">
+							<button type="button" class="btn btn-primary" id="send_otp">送出驗證碼</button>
+						</div>
+					</div>
+			</div>
+			
+		</div>
+	</div>
 </div>
 <div class="row">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">{{ request.user.username }} 資料</h3>
-            </div>
-            <div class="panel-body">
-				<div class="row">
-				    <div class="col-sm-2">
-				        <label class="control-label">姓名：</label>
-				    </div>
-				    <div class="col-sm-10">
-				        {{ request.user }}
-				    </div>
-				</div>
-				<div class="row">
-				    <div class="col-sm-2">
-				        <label class="control-label">電子郵件：</label>
-				    </div>
-				    <div class="col-sm-10">
-				        {{ request.user.email }}
-                        {% if not request.user.auth_email %}
-                            <button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="email" data-sendto="{{ user.email }}">驗證</button>
-                        {% else %}
-                            <button class="btn-xs btn-success disabled"  type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="email" data-sendto="{{ user.email }}" disabled>已驗證</button>
-                        {% endif %}
-				    </div>
+	<div class="col-md-8 col-md-offset-2">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">個人資料</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover table-reflow no-page">
+					<tr>
+						<th class="col-md-4" scope="row">
+							使用者名稱：
+						</th>
+						<td class="col-md-8">
+							{{ request.user.username }}
+						</td>
+					</tr>
+					<tr>
+						<th class="col-md-4" scope="row">
+							姓氏：
+						</th>
+						<td>
+							{{ request.user.first_name }}
+						</td>
+					</tr>
+					<tr>
+						<th class="col-md-4" scope="row">
+							名字：
+						</th>
+						<td>
+							{{ request.user.last_name }}
+						</td>
+					</tr>
+					<tr>
+						<th class="col-md-4" scope="row">
+							電子郵件：
+						</th>
+						<td>
+							{{ request.user.email }}
+							{% if not request.user.auth_email %}
+							<button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="email" data-sendto="{{ request.user.email }}">驗證</button>
+							{% else %}
+							<button class="btn-xs btn-success disabled"  type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="email" data-sendto="{{ request.user.email }}" disabled>已驗證</button>
+							{% endif %}
+						</td>
+					</tr>
+					<tr>
+						<th class="col-md-4" scope="row">
+							聯絡電話：
+						</th>
+						<td>
+							{{ request.user.phone }}
+							{% if not request.user.auth_phone %}
+							<button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ request.user.phone }}">驗證</button>
+							{% else %}
+							<button class="btn-xs btn-success disabled" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ request.user.phone }}" disabled>已驗證</button>
+							{% endif %}
+						</td>
+					</tr>
+					<tr>
+						<th class="col-md-4" scope="row">
+							生日：
+						</th>
+						<td>
+							{{ request.user.birthday }}
+						</td>
+					</tr>
+					<tr>
+						<th class="col-md-4" scope="row">
+							教育程度：
+						</th>
+						<td>
+							{{ request.user.education }}
+						</td>
+					</tr>
+					{% if request.user.has_editor %}
+					<tr class="editor_mode">
+						<th class="col-md-4" scope="row">
+							專業領域：
+						</th>
+						<td>
+							{{ request.user.editor.professional_field }}
+						</td>
+					</tr>
+					{% endif %}
+					{% if request.user.has_guest %}
+					<tr class="guest_mode">
+						<th class="col-md-4" scope="row">
+							身心障礙手冊正面：
+						</th>
+						<td>
+							<img src="/static/{{ DCDir_url }}/{{ request.user.username }}_front.jpg" alt="身心障礙手冊正面" />
+						</td>
+					</tr>
+					<tr class="guest_mode">
+						<th class="col-md-4" scope="row">
+							身心障礙手冊反面：
+						</th>
+						<td>
+							<img src="/static/{{ DCDir_url }}/{{ request.user.username }}_back.jpg" alt="身心障礙手冊反面" />
+						</td>
+					</tr>
+					{% endif %}
+				</table>
 
+				<hr />
+				<div class="form-group row">
+					<div class="col-sm-offset-3 col-sm-6">
+						<a href="{% url 'password_change' %}" role="button" class="btn btn-default">修改密碼</a>
+						<a href="{% url 'genericUser:change_contact_info' %}" role="button" class="btn btn-default">修改個人資料</a>
+					</div>
 				</div>
-                <div class="row">
-                    <div class="col-sm-2">
-                        <label class="control-label">電話：</label>
-                    </div>
-                    <div class="col-sm-10">
-                        {{ user.phone }}
-                        {% if not request.user.auth_phone %}
-                            <button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ user.phone }}">驗證</button>
-                        {% else %}
-                            <button class="btn-xs btn-success disabled" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ user.phone }}" disabled>已驗證</button>
-                        {% endif %}
-                    </div>
-                </div>
-                <hr />
-                <div class="form-group row">
-                    <div class="col-sm-offset-3 col-sm-6">
-                        <a href="{% url 'password_change' %}" role="button" class="btn btn-default">修改密碼</a>
-                        <a href="{% url 'genericUser:change_contact_info' %}" role="button" class="btn btn-default">修改資料</a>
-                        <a href="{% url 'genericUser:set_role' %}" role="button" class="btn btn-default">角色設定</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+			</div>
+		</div>
+	</div>
 </div>
-{% else %}
-	<h5>您尚未登錄</h5>
-{% endif %}
 {% endblock %}

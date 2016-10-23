@@ -2,6 +2,7 @@
 from django.core.cache import cache
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
+from django.forms import modelform_factory
 from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render, get_list_or_404
 from django.utils import timezone
@@ -10,6 +11,7 @@ from ebookSystem.models import *
 from guest.models import Guest
 from genericUser.models import *
 from utils.decorator import *
+from utils.tag import *
 from utils.uploadFile import handle_uploaded_file
 from utils.zip import *
 from .forms import *
@@ -39,9 +41,36 @@ def article_content(request, id, template_name='genericUser/article/content.html
 
 @http_response
 def article_create(request, template_name='genericUser/article/create.html'):
+	ArticleForm = modelform_factory(Article, fields=('author', 'subject', 'category'))
+	article_category = Article.CATEGORY
 	if request.method == 'POST':
+		articleForm = ArticleForm(request.POST)
+		if not articleForm.is_valid():
+			status = 'error'
+			message = u'表單驗證失敗' +str(articleForm.errors)
+			return locals()
+		article = articleForm.save(commit=False)
+		article.author = request.user
+		article.save()
+		src = BASE_DIR +'/static/article/{0}/article.zip'.format(article.id)
+		dst = os.path.dirname(src)
+		if not os.path.exists(dst):
+			os.makedirs(dst, 0770)
+		try:
+			with open(src, 'wb+') as zipFile:
+				for chunk in request.FILES['zipFile'].chunks():
+					zipFile.write(chunk)
+		except:
+			pass
+		with ZipFile(src, 'r') as zipFile:
+			zipFile.extractall(dst)
+		add_base_tag(os.path.join(dst, 'main_content.html'), article.id)
+		status = 'success'
+		message = u'成功新增文章'
+		redirect_to = '/'
 		return locals()
 	if request.method == 'GET':
+		articleForm = ArticleForm()
 		return locals()
 
 @user_category_check(['guest'])
@@ -187,12 +216,8 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 		raise Http404("user does not exist")
 	events = Event.objects.filter(content_type__model='user', object_id=user.id, status=Event.STATUS['review'])
 	sourcePath = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(user.username)
-	frontPage = user.username +'_front.jpg'
-	frontPageURL = sourcePath +u'/' +frontPage
-	frontPageURL = frontPageURL.replace(BASE_DIR +'/static/', '')
-	backPage = user.username +'_back.jpg'
-	backPageURL = sourcePath +u'/' +backPage
-	backPageURL = backPageURL.replace(BASE_DIR +'/static/', '')
+	DCDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(user.username)
+	DCDir_url = DCDir.replace(BASE_DIR +'/static/', '')
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
@@ -215,10 +240,11 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 				event.response(status='error', message=request.POST['reason'], user=request.user)
 		return locals()
 
-@user_category_check(['user'])
 @http_response
 def info(request, template_name):
 	user = request.user
+	DCDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(request.user.username)
+	DCDir_url = DCDir.replace(BASE_DIR +'/static/', '')
 	if request.method == 'POST':
 		if request.POST.has_key('email') and (not request.user.email == request.POST['email']):
 			request.user.email = request.POST['email']
@@ -238,27 +264,47 @@ def info(request, template_name):
 	if request.method == 'GET':
 		return locals()
 
-@user_category_check(['user'])
 @http_response
 def change_contact_info(request, template_name):
+	DCDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(request.user.username)
+	DCDir_url = DCDir.replace(BASE_DIR +'/static/', '')
 	if request.method == 'POST':
-		if request.POST.has_key('email') and (not request.user.email == request.POST['email']):
-			request.user.email = request.POST['email']
+		userChangeForm = UserChangeForm(request.POST, instance=request.user)
+		if not userChangeForm.is_valid():
+			status = u'error'
+			message = u'表單驗證失敗 {0}'.format(str(userChangeForm.errors))
+			return locals()
+		user = User.objects.get(username=request.user.username)
+		if not user.email == userChangeForm.cleaned_data['email']:
 			request.user.auth_email = False
+			print 'email change'
 			request.user.save()
 			status = u'success'
-			message = u'修改資料成功，請重新驗證。'
-		if request.POST.has_key('phone') and (not request.user.phone == request.POST['phone']):
-			request.user.phone = request.POST['phone']
+			message = u'修改通訊資料，請重新驗證。'
+		if not user.phone == userChangeForm.cleaned_data['phone']:
 			request.user.auth_phone = False
 			request.user.save()
 			status = u'success'
-			message = u'修改資料成功，請重新驗證。'
+			message = u'修改通訊資料，請重新驗證。'
+		userChangeForm.save()
+		try:
+			request.user.editor.professional_field = request.POST['professional_field']
+#			request.user.editor.save()
+		except:
+			pass
+		try:
+			request.FILES['disability_card_front'].name = request.POST['username'] +'_front.jpg'
+			[status, message] = handle_uploaded_file(DCDir, request.FILES['disability_card_front'])
+			request.FILES['disability_card_back'].name = request.POST['username'] +'_back.jpg'
+			[status, message] = handle_uploaded_file(DCDir, request.FILES['disability_card_back'])
+		except:
+			pass
 		status = u'success'
-		message = u'無資料修改。'
+		message = u'資料修改完成'
 		redirect_to = reverse('genericUser:info')
 		return locals()
 	if request.method == 'GET':
+		userChangeForm = UserChangeForm(instance=request.user)
 		return locals()
 
 @user_category_check(['user'])
@@ -333,7 +379,6 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 		message = u'成功寄送內容，我們將盡速回復'
 		return locals()
 
-@user_category_check(['user'])
 @http_response
 def servicehours_list(request, username, template_name='genericUser/servicehours_list.html'):
 	try:

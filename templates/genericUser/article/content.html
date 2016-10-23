@@ -21,7 +21,11 @@ $(document).ready(function() {
 <form action="" method="post" role="form" >
     {% csrf_token %} 
     <h3>{{ article.subject }}</h3>   
-
+	<hr />
+	<div id="includedContent"></div>
+	<input type="hidden"  id="url" value="{% static article.get_main_content.url %}">
+		<hr />
+	<h3>附件</h3>
 	<table class="table table-striped table-hover">
 	    <tr>
 	        <th>檔名</th>
@@ -34,9 +38,5 @@ $(document).ready(function() {
 	    </tr>
 	    {% endfor %}
 	</table>
-
-    <div id="includedContent"></div>
-    <input type="hidden"  id="url" value="{% static article.get_main_content.url %}">
-
 </form>
 {% endblock %}

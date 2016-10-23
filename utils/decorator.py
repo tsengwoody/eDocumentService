@@ -7,7 +7,6 @@ import json
 def user_category_check(category):
 	def user_category_out(view):
 		def user_category_in(request, *args, **kwargs):
-			print request.path
 			response = {}
 			if not request.user.is_authenticated():
 				template_name = 'user_category_check.html'
@@ -21,13 +20,19 @@ def user_category_check(category):
 					return HttpResponse(json.dumps(response), content_type="application/json")
 				else:
 					return render(request, template_name, locals())
-			if 'user' in category and request.user.is_authenticated():
+			if 'user' in category and request.user.authentication():
 				return view(request, *args, **kwargs)
 			elif 'editor' in category and request.user.is_editor:
 				return view(request, *args, **kwargs)
 			elif 'guest' in category and request.user.is_guest:
 				return view(request, *args, **kwargs)
 			elif 'manager' in category and request.user.is_manager:
+				return view(request, *args, **kwargs)
+			elif 'advanced_editor' in category and request.user.is_advanced_editor:
+				return view(request, *args, **kwargs)
+			elif 'staff' in category and request.user.is_staff:
+				return view(request, *args, **kwargs)
+			elif 'superuser' in category and request.user.is_superuser:
 				return view(request, *args, **kwargs)
 			else:
 				template_name = 'user_category_check.html'

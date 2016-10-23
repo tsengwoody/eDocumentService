@@ -85,7 +85,7 @@
     <table class="table table-hover table-reflow table-striped">
         {% if user.has_editor %}
         <tr>
-            <td colspan=2><div class="text-center">校對</div></td>
+            <td colspan=2><div class="text-center">志工</div></td>
         </tr>
         <tr class="editor_mode">
             <th class="col-md-4" scope="row">
@@ -97,14 +97,14 @@
         </tr>
         {% endif %} {% if user.has_guest %}
         <tr>
-            <th colspan=2><div class="text-center">來賓</div></th>
+            <td colspan=2><div class="text-center">服務使用者</div></td>
         </tr>
         <tr class="guest_mode">
             <th class="col-md-4" scope="row">
                 <label for="id_disability_card_front">disability_card_front field:</label>
             </th>
             <td>
-                <img src="{% static frontPageURL %}" alt="手冊正" id="id_frontPage" name="frontPage" width="100%">
+				<img src="/static/{{ DCDir_url }}/{{ user.username }}_front.jpg" alt="身心障礙手冊正面" />
             </td>
         </tr>
         <tr class="guest_mode">
@@ -112,7 +112,7 @@
                 <label for="id_disability_card_back">disability_card_back field:</label>
             </th>
             <td>
-                <img src="{% static backPageURL %}" alt="手冊反" id="id_backPage" name="backPage" width="100%">
+				<img src="/static/{{ DCDir_url }}/{{ user.username }}_back.jpg" alt="身心障礙手冊反面" />
             </td>
         </tr>
         {% endif %}

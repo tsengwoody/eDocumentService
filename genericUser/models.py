@@ -37,10 +37,12 @@ class User(AbstractUser):
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'review':2}
 	is_book = models.BooleanField(default=False)
+	is_license = models.BooleanField(default=False)
 	is_editor = models.BooleanField(default=False)
 	is_guest = models.BooleanField(default=False)
 	is_manager = models.BooleanField(default=False)
 	is_advanced_editor = models.BooleanField(default=False)
+	is_special = models.BooleanField(default=False)
 	auth_email = models.BooleanField(default=False)
 	auth_phone = models.BooleanField(default=False)
 
@@ -60,6 +62,9 @@ class User(AbstractUser):
 			return True
 		except:
 			return False
+
+	def authentication(self):
+		return self.status == self.STATUS['active'] and self.auth_email and self.auth_phone
 
 	def status_int2str(self):
 		for k, v in self.STATUS.iteritems():
@@ -167,12 +172,12 @@ class Article(models.Model):
 	author = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='article_set')
 	subject = models.CharField(max_length=100)
 	datetime = models.DateField(default = timezone.now)
-	ArticleCATEGORY = (
+	CATEGORY = (
 		(u'公告' , u'公告'),
 		(u'文件' , u'文件'),
 	)
-	category = models.CharField(max_length=10, choices=ArticleCATEGORY)
-	is_download = models.BooleanField(default=False)
+	category = models.CharField(max_length=10, choices=CATEGORY)
+	path = models.CharField(max_length=255, blank=True, null=True)
 
 	def __unicode__(self):
 		return self.subject
