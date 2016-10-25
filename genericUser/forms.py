@@ -8,10 +8,10 @@ class BookInfoForm(forms.ModelForm):
 		model = BookInfo
 		fields = '__all__'
 
-class ContactUsForm(forms.ModelForm):
+'''class ContactUsForm(forms.ModelForm):
 	class Meta:
 		model = ContactUs
-		exclude = ['message_datetime']
+		exclude = ['datetime']'''
 
 class UserChangeForm(forms.ModelForm):
 	class Meta:

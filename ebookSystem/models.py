@@ -33,7 +33,9 @@ class Book(models.Model):
 	upload_date = models.DateField(default = timezone.now)
 	is_private = models.BooleanField(default=False)
 	status = models.IntegerField(default=0)
-	STATUS = {'inactive':0, 'active':1, 'finish':2}
+#	STATUS = {'inactive':0, 'active':1, 'finish':2}
+	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8}
+
 	def __unicode__(self):
 		return self.book_info.bookname
 
@@ -42,6 +44,16 @@ class Book(models.Model):
 			if v == self.status:
 				return k
 		return 'unknown'
+
+	def check_status(self):
+		status_list = []
+		for part in self.ebook_set.all():
+			status_list.append(part.status)
+		status = min(status_list)
+		status
+		self.status = status
+		self.save()
+		return status
 
 	def create_EBook(self):
 		if not (len(self.ebook_set.all()) == 0 and self.validate_folder()):
@@ -156,14 +168,14 @@ class EBook(models.Model):
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
 	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL, related_name='ebook_set')
-	status = models.IntegerField(default=1)
-	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_active':5, 'sc_edit':6, 'sc_finish':7, 'an_edit':8, 'an_finish':9}
+	status = models.IntegerField(default=0)
+	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8}
 	sc_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_edit_ebook_set')
 	sc_deadline = models.DateField(blank=True, null=True)
 	sc_get_date = models.DateField(blank=True, null=True)
 	sc_service_hours = models.IntegerField(default=0)
 	sc_serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_ebook_set')
-	analyze_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='analyze_ebook_set')
+	an_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='an_edit_ebook_set')
 	an_deadline = models.DateField(blank=True, null=True)
 	an_get_date = models.DateField(blank=True, null=True)
 	is_sc_rebuild = models.BooleanField(default=True)
@@ -173,6 +185,88 @@ class EBook(models.Model):
 			if v == self.status:
 				return k
 		return 'unknown'
+
+	def change_status(self, direction, status, **kwargs):
+		if not self.status +direction == self.STATUS[status]:
+			return False
+		if direction == 1:
+			if self.status +direction == self.STATUS['active']:
+				try:
+					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
+				except:
+					editRecord = EditRecord.objects.create(part=self, category='based', number_of_times=self.number_of_times)
+				self.status = self.status +direction
+			elif self.status +direction == self.STATUS['edit']:
+				self.editor = kwargs['user']
+				self.get_date = timezone.now()
+				self.deadline = self.get_date + datetime.timedelta(days=5)
+				self.status = self.status +direction
+			elif self.status +direction == self.STATUS['review']:
+				self.edited_page = self.end_page -self.begin_page
+				self.status = self.status +direction
+			elif self.status +direction == self.STATUS['finish']:
+				self.clean_tag()
+				shutil.copy2(self.get_path('-clean'), self.get_path('-sc'))
+				try:
+					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
+					editRecord.record_info()
+				except:
+					return False
+				self.status = self.status +direction
+			elif self.status +direction == self.STATUS['sc_edit']:
+				self.sc_editor = kwargs['user']
+				self.sc_get_date = timezone.now()
+				self.sc_deadline = self.sc_get_date + datetime.timedelta(days=2)
+				if self.is_sc_rebuild:
+					self.create_SpecialContent()
+					self.is_sc_rebuild = False
+				self.status = self.status +direction
+			elif self.status +direction == self.STATUS['sc_finish']:
+				if self.is_sc_rebuild:
+					return False
+				try:
+					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
+					editRecord.record_info()
+				except:
+					return False
+				self.status = self.status +direction
+			elif self.status +direction == self.STATUS['an_edit']:
+				self.an_editor = kwargs['user']
+				self.an_get_date = timezone.now()
+				self.an_deadline = self.an_get_date + datetime.timedelta(days=5)
+				self.status = self.status +direction
+			elif self.status +direction == self.STATUS['an_finish']:
+				self.status = self.status +direction
+		elif direction == -1:
+			if self.status +direction == self.STATUS['inactive']:
+				return False
+			elif self.status +direction == self.STATUS['active']:
+				self.editor=None
+				self.get_date = None
+				self.deadline = None
+				self.status = self.status +direction
+			elif self.status +direction == self.STATUS['edit']:
+				self.load_full_content()
+				self.status = self.status +direction
+			elif self.status +direction == self.STATUS['review']:
+				return False
+			elif self.status +direction == self.STATUS['finish']:
+				self.sc_editor = None
+				self.sc_get_date = None
+				self.sc_deadline = None
+				self.status = self.status +direction
+			elif self.status +direction == self.STATUS['sc_edit']:
+				return False
+			elif self.status +direction == self.STATUS['sc_finish']:
+				self.an_editor = None
+				self.an_get_date = None
+				self.an_deadline = None
+				self.status = self.status +direction
+			elif self.status +direction == self.STATUS['an_edit']:
+				return False
+		self.save()
+		self.book.check_status()
+		return True
 
 	def get_path(self, string=''):
 		if string == 'public':
@@ -562,15 +656,45 @@ class EditRecord(models.Model):
 	service_hours = models.IntegerField(default=0)
 	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
 
+	class Meta:
+		unique_together = ('part', 'category', 'number_of_times')
+
+	def __unicode__(self):
+		return self.part
+
+	def record_info(self):
+		if self.category == 'based':
+			self.editor = self.part.editor
+			self.get_date = self.part.get_date
+			self.service_hours = self.part.service_hours
+			self.serviceHours = self.part.serviceHours
+		elif self.category == 'advanced':
+			self.editor = self.part.sc_editor
+			self.get_date = self.part.sc_get_date
+			self.service_hours = self.part.sc_service_hours
+			self.serviceHours = self.part.sc_serviceHours
+
+	def group_ServiceHours(self):
+		month_ServiceHours = None
+		if self.get_date and self.editor:
+			month = datetime.date(year=self.get_date.year, month=self.get_date.month, day=1)
+			try:
+				month_ServiceHours = ServiceHours.objects.get(user=self.editor, date=month)
+			except:
+				month_ServiceHours = ServiceHours.objects.create(user=self.editor, date=month)
+			self.serviceHours = month_ServiceHours
+			self.save()
+		return month_ServiceHours
+
 class EditLog(models.Model):
-	edit_record = models.ForeignKey(EditRecord, blank=True, null=True, on_delete=models.SET_NULL, related_name='editlog_set')
+	editRecord = models.ForeignKey(EditRecord, blank=True, null=True, on_delete=models.SET_NULL, related_name='editlog_set')
 	user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='editlog_set')
 	time = models.DateTimeField(default = timezone.now)
 	order = models.IntegerField()
 	edit_count = models.IntegerField()
 
 	def __unicode__(self):
-		return self.part +self.order
+		return self.edit_record +self.order
 
 '''	class Meta:
 		indexes = [

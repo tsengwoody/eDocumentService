@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block header %}
-{{ book.book_info.bookname }}-part{{part.part}}
+編輯{{ part }}
 {% endblock %}
 {% block content %}
 <form action="" method="post" id="currentForm" role="form">
@@ -69,7 +69,7 @@
 					<textarea autocomplete="off" id="id_content" name="content" class="form-control" >{{ editContent }}</textarea>
 				</div>
 			</div>
-			<input type="hidden" name="postToken"  id="postToken" value="{{postToken}}"/>
+	<input type="hidden" name="postToken"  id="postToken" value="{{postToken}}"/>
 </form>
 {% endblock %}
 {% block footer %}
