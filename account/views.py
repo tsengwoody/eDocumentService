@@ -52,11 +52,7 @@ class profileView(generic.View):
 				message = u'無文件'
 				return locals()
 			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
-			getPart.editor = request.user
-			getPart.get_date = timezone.now()
-			getPart.deadline = getPart.get_date + datetime.timedelta(days=5)
-			getPart.status = getPart.STATUS['edit']
-			getPart.save()
+			getPart.change_status(1, 'edit', user=request.user)
 			status = 'success'
 			message = u'成功取得文件{}'.format(getPart.__unicode__())
 		elif request.POST.has_key('getCompleteBook'):
@@ -75,11 +71,7 @@ class profileView(generic.View):
 				message = u'目前無完整文件，請先領部份文件'
 				return locals()
 			for getPart in completeBook.ebook_set.all():
-				getPart.editor = request.user
-				getPart.get_date = timezone.now()
-				getPart.deadline = getPart.get_date + datetime.timedelta(days=5)
-				getPart.status = getPart.STATUS['edit']
-				getPart.save()
+				getPart.change_status(1, 'edit', user=request.user)
 			status = 'success'
 			message = u'成功取得完整文件{}'.format(getPart.book.__unicode__())
 		elif request.POST.has_key('designateBook'):
@@ -106,32 +98,22 @@ class profileView(generic.View):
 				message = u'無文件'
 				return locals()
 			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
-			getPart.editor = request.user
-			getPart.get_date = timezone.now()
-			getPart.deadline = getPart.get_date + datetime.timedelta(days=5)
-			getPart.status = getPart.STATUS['edit']
-			getPart.save()
+			getPart.change_status(1, 'edit', user=request.user)
 			status = 'success'
 			message = u'成功取得指定文件{}'.format(getPart.book.__unicode__())
 		elif request.POST.has_key('rebackPart'):
 			ISBN_part = request.POST.get('rebackPart')
 			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
-			rebackPart.editor=None
-			rebackPart.get_date = None
-			rebackPart.deadline = None
-			rebackPart.status = rebackPart.STATUS['active']
-			rebackPart.save()
+			rebackPart.change_status(-1, 'active', user=request.user)
 			status = 'success'
 			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
 		elif request.POST.has_key('reEditPart'):
 			ISBN_part = request.POST.get('reEditPart')
 			reEditPart = EBook.objects.get(ISBN_part = ISBN_part)
-			reEditPart.status = reEditPart.STATUS['edit']
-			reEditPart.load_full_content()
+			reEditPart.change_status(-1, 'edit')
 			events = Event.objects.filter(content_type__model='ebook', object_id=reEditPart.ISBN_part, status=Event.STATUS['review'])
 			for event in events:
 				event.delete()
-			reEditPart.save()
 			status = 'success'
 			message = u'再編輯文件{}'.format(reEditPart.__unicode__())
 		else:
@@ -156,13 +138,7 @@ def sc_service(request, template_name='account/sc_service.html'):
 				status = u'error'
 				message = u'無文件'
 				return locals()
-			getPart.sc_editor = request.user
-			getPart.sc_get_date = timezone.now()
-			if getPart.is_sc_rebuild:
-				getPart.create_SpecialContent()
-				getPart.is_sc_rebuild = False
-			getPart.status = getPart.STATUS['sc_edit']
-			getPart.save()
+			getPart.change_status(1, 'sc_edit', user=request.user)
 			status = 'success'
 			message = u'成功取得文件{}'.format(getPart.__unicode__())
 		elif request.POST.has_key('designateBook'):
@@ -194,20 +170,13 @@ def sc_service(request, template_name='account/sc_service.html'):
 				message = u'無文件'
 				return locals()
 			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['finish']).order_by('part')[0]
-			getPart.editor = request.user
-			getPart.get_date = timezone.now()
-			getPart.deadline = getPart.get_date + datetime.timedelta(days=5)
-			getPart.status = getPart.STATUS['edit']
-			getPart.save()
+			getPart.change_status(1, 'sc_edit', user=request.user)
 			status = 'success'
 			message = u'成功取得指定文件{}'.format(getPart.book.__unicode__())
 		elif request.POST.has_key('rebackPart'):
 			ISBN_part = request.POST.get('rebackPart')
 			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
-			rebackPart.sc_editor=None
-			rebackPart.sc_get_date = None
-			rebackPart.status = rebackPart.STATUS['finish']
-			rebackPart.save()
+			rebackPart.change_status(-1, 'finish')
 			status = 'success'
 			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
 		sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']))
@@ -217,7 +186,7 @@ def sc_service(request, template_name='account/sc_service.html'):
 
 @http_response
 def an_service(request, template_name='account/an_service.html'):
-	an_editingPartList = request.user.analyze_ebook_set.all().filter(status=EBook.STATUS['an_edit'])
+	an_editingPartList = request.user.an_edit_ebook_set.all().filter(status=EBook.STATUS['an_edit'])
 	if request.method == 'POST':
 		if request.POST.has_key('getPart'):
 			if len(an_editingPartList)>=10:
@@ -230,22 +199,16 @@ def an_service(request, template_name='account/an_service.html'):
 				status = u'error'
 				message = u'無文件'
 				return locals()
-			getPart.analyze_editor = request.user
-			getPart.an_get_date = timezone.now()
-			getPart.status = getPart.STATUS['an_edit']
-			getPart.save()
+			getPart.change_status(1, 'an_edit', user=request.user)
 			status = 'success'
 			message = u'成功取得文件{}'.format(getPart.__unicode__())
 		elif request.POST.has_key('rebackPart'):
 			ISBN_part = request.POST.get('rebackPart')
 			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
-			rebackPart.analyze_editor=None
-			rebackPart.an_get_date = None
-			rebackPart.status = rebackPart.STATUS['sc_finish']
-			rebackPart.save()
+			rebackPart.change_status(-1, 'sc_finish')
 			status = 'success'
 			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
-		an_editingPartList = request.user.analyze_ebook_set.all().filter(status=EBook.STATUS['an_edit'])
+		an_editingPartList = request.user.an_edit_ebook_set.all().filter(status=EBook.STATUS['an_edit'])
 		return locals()
 	if request.method == 'GET':
 		return locals()

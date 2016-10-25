@@ -50,41 +50,39 @@ class Command(BaseCommand):
 		manager.save()
 		with open(u'temp/藍色駭客.zip') as fileObject:
 			request = factory.post(reverse('genericUser:create_document'), {'bookname':u'藍色駭客', 'author':u'傑佛瑞．迪佛', 'house':u'皇冠', 'ISBN':u'9789573321569', 'date':u'2013-07-11', 'fileObject':fileObject})
-		request.user = manager
+		request.user = root
 		response = create_document(request)
 		assert response.status_code == 302, 'status_code' +str(response.status_code)
 		assert len(Book.objects.all())==1, 'create book fail'
 		assert len(EBook.objects.all()) == 10, 'create part fail'
 		book = Book.objects.get(ISBN=u'9789573321569')
 		assert os.path.exists(book.path), 'book resource folder not exist'
-		book.status = book.STATUS['active']
-		ebook = EBook.objects.get(book=book, part=1)
-		ebook.edited_page = ebook.book.page_per_part -1
-		ebook.editor = root
-		ebook.get_date = timezone.now() -datetime.timedelta(days=30)
-		ebook.deadline = ebook.get_date + datetime.timedelta(days=5)
-		ebook.service_hours = 90
-		ebook.group_ServiceHours()
-		ebook.status = ebook.STATUS['finish']
-		ebook.save()
-		ebook = EBook.objects.get(book=book, part=2)
-		ebook.edited_page = ebook.book.page_per_part -1
-		ebook.editor = root
-		ebook.get_date = timezone.now()
-		ebook.deadline = ebook.get_date + datetime.timedelta(days=5)
-		ebook.service_hours = 80
-		ebook.sc_editor = root
-		ebook.sc_get_date = timezone.now()
-		ebook.sc_deadline = ebook.get_date + datetime.timedelta(days=5)
-		ebook.sc_service_hours = 50
-		ebook.group_ServiceHours()
-		ebook.status=EBook.STATUS['sc_finish']
-		ebook.save()
 		from zipfile import ZipFile
 		src = BASE_DIR +'/temp/part.zip'
-		dst = ebook.book.path +u'/OCR'
+		dst = book.path +u'/OCR'
 		with ZipFile(src, 'r') as partFile:
 			partFile.extractall(dst)
+		ebook = EBook.objects.get(book=book, part=1)
+		book.status = book.STATUS['active']
+		book.save()
+		assert ebook.change_status(1, 'active'), 'change status error'
+		assert ebook.change_status(1, 'edit', user=root), 'change status error'
+		assert ebook.change_status(1, 'review'), 'change status error'
+		assert ebook.change_status(1, 'finish'), 'change status error'
+		ebook.service_hours = 90
+		ebook.group_ServiceHours()
+		ebook.save()
+		ebook = EBook.objects.get(book=book, part=2)
+		assert ebook.change_status(1, 'active'), 'change status error'
+		assert ebook.change_status(1, 'edit', user=root), 'change status error'
+		assert ebook.change_status(1, 'review'), 'change status error'
+		assert ebook.change_status(1, 'finish'), 'change status error'
+		ebook.service_hours = 80
+		assert ebook.change_status(1, 'sc_edit', user=root), 'change status error'
+		assert ebook.change_status(1, 'sc_finish'), 'change status error'
+		ebook.sc_service_hours = 50
+		ebook.group_ServiceHours()
+		ebook.save()
 		request = factory.post(reverse('genericUser:apply_document'), {u'ISBN':u'9789865829810', u'bookname':u'遠山的回音', u'author':u'卡勒德.胡賽尼(Khaled Hosseini)著; 李靜宜譯', u'house':u'木馬文化', u'date':u'2014-02-01'})
 		request.user = manager
 		response = apply_document(request)

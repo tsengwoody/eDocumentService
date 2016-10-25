@@ -154,18 +154,17 @@ class ServiceHours(models.Model):
 
 	def get_service_hours(self):
 		service_hours = 0
-		for part in self.ebook_set.all():
-			service_hours = service_hours +part.service_hours
-		for part in self.sc_ebook_set.all():
-			service_hours = service_hours +part.service_hours
+		for editRecord in self.editrecord_set.all():
+			service_hours = service_hours +editRecord.service_hours
+#		for part in self.sc_ebook_set.all():
+#			service_hours = service_hours +part.service_hours
+		self.service_hours = service_hours
 		return service_hours
 
 	def get_page_count(self):
 		page_count = 0
-		for part in self.ebook_set.all():
-			page_count = page_count +(part.end_page -part.begin_page +1)
-		for part in self.sc_ebook_set.all():
-			page_count = page_count +(part.end_page -part.begin_page +1)
+		for editRecord in self.editrecord_set.all():
+			page_count = page_count +(editRecord.part.end_page -editRecord.part.begin_page +1)
 		return page_count
 
 class Article(models.Model):
@@ -202,10 +201,17 @@ class Article(models.Model):
 class ContactUs(models.Model):
 	name = models.CharField(max_length=10)
 	email = models.EmailField()
-	message_datetime = models.DateField(default = timezone.now)
-	kind = models.CharField(max_length=10, choices=ContactUsKIND)
-	subject = models.CharField(max_length=50)
-	content = models.CharField(max_length=1000)
+	subject = models.CharField(max_length=100)
+	datetime = models.DateField(default = timezone.now)
+	CATEGORY = (
+		(u'校對問題' , u'校對問題'),
+		(u'系統問題' , u'系統問題'),
+		(u'營運建議' , u'營運建議'),
+		(u'加入我們' , u'加入我們'),
+		(u'其他' , u'其他'),
+	)
+	category = models.CharField(max_length=10, choices=CATEGORY)
+	content = models.TextField()
 	def __unicode__(self):
 		return self.subject
 

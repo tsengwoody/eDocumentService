@@ -99,8 +99,6 @@ def search_book(request, template_name):
 @user_category_check(['manager'])
 @http_response
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
-#	status = 'error'
-#	message= 'referenced before assignment'
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
 	except:
@@ -117,9 +115,9 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
-			book.status = book.STATUS['active']
+			for part in book.ebook_set.all():
+				part.change_status(1, 'active')
 			shutil.rmtree(org_path)
-			book.save()
 			status = 'success'
 			message = u'審核通過文件'
 			for event in events:
@@ -196,7 +194,7 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 	except:
 		raise Http404("book does not exist")
 	events = Event.objects.filter(content_type__model='ebook', object_id=part.ISBN_part, status=Event.STATUS['review'])
-	html_url = part.get_html()
+#	html_url = part.get_html()
 	if request.method == 'GET':
 		[len_block, same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
 		ed = edit_distance(part.get_path(), part.get_path('-finish'))
@@ -206,12 +204,8 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
-			part.status = part.STATUS['finish']
-			part.save()
+			part.change_status(1, 'finish')
 			shutil.copy2(part.get_path('-clean'), part.get_path('-sc'))
-			if part.book.collect_is_finish():
-				part.book.status = part.book.STATUS['finish']
-			part.book.save()
 			part.group_ServiceHours()
 			status = 'success'
 			message = u'審核通過文件'
@@ -374,57 +368,40 @@ def edit_ajax(request, ISBN_part, *args, **kwargs):
 	part = EBook.objects.get(ISBN_part=ISBN_part)
 	part.service_hours = part.service_hours+1
 	part.save()
-	book = part.book
-	order = len(EditRecorder.objects.filter(book=book, part=part))
-#	EditRecorder.objects.create(book=book, part=part, user=request.user, order=order)
+	try:
+		editRecord = EditRecord.objects.get(part=part, category='based', number_of_times=part.number_of_times)
+	except:
+		editRecord = EditRecord.objects.create(part=part, category='based', number_of_times=part.number_of_times)
+	order = len(EditLog.objects.filter(edit_record=editRecord))
+	EditLog.objects.create(edit_record=editRecord, user=request.user, time=timezone.now(), order=order, edit_count=int(request.POST['online']))
 	response['status'] = u'success'
 	response['message'] = part.service_hours
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
-class editView(generic.View):
-
-	@cache_control(no_store=True, no_cache=True, max_age=0)
-	@user_category_check('editor')
-	@method_decorator(http_response)
-	def get(self, request, encoding='utf-8', *args, **kwargs):
-		logger.info('{}/edit\t{}'.format(request.user, resolve(request.path).namespace))
-		template_name='ebookSystem/edit.html'
-		try:
-			part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
-		except: 
-			raise Http404("book or part does not exist")
-		postToken = uuid.uuid1().hex
-		request.session['postToken'] = postToken
-		[scanPageList, defaultPageURL] = part.get_image(request.user)
-		[editContent, fileHead] = part.get_content('-edit')
-		return locals()
-
-	@cache_control(no_store=True, no_cache=True, max_age=0)
-	@user_category_check('editor')
-	@method_decorator(http_response)
-	def post(self, request, encoding='utf-8', *args, **kwargs):
-		template_name='ebookSystem/edit.html'
-		user = request.user
-		readme_url = request.path +'readme/'
-		response = {}
-		try:
-			part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
-		except:
-			raise Http404("book or part does not exist")
-		content = request.POST['content']
+@cache_control(no_store=True, no_cache=True, max_age=0)
+@user_category_check('editor')
+@http_response
+def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args, **kwargs):
+	logger.info('{}/edit\t{}'.format(request.user, resolve(request.path).namespace))
+	try:
+		part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
+	except: 
+		raise Http404("book or part does not exist")
+	[scanPageList, defaultPageURL] = part.get_image(request.user)
+	[editContent, fileHead] = part.get_content('-edit')
+	if request.method == 'POST':
 		Token = request.session.get('postToken',default=None)
 		userToken = request.POST['postToken']
 		print ("Token %d",Token)
 		print (" userToken %d",userToken)
 		if  userToken !=Token:
 			raise Http404("請勿重覆傳送")
+		content = request.POST['content']
 		if request.POST.has_key('save'):
 			[finishContent, editContent] = part.split_content(content)
 			if finishContent == '' or editContent == '':
 				status = 'error'
 				message = u'標記位置不可在首行或末行'
-				[scanPageList, defaultPageURL] = part.get_image(request.user)
-				[editContent, fileHead] = part.get_content('-edit')
 				return locals()
 			part.set_content(finish_content=finishContent, edit_content=editContent)
 			part.edited_page=int(request.POST['page'])
@@ -437,15 +414,11 @@ class editView(generic.View):
 			redirect_to = reverse('account:profile')
 		elif request.POST.has_key('finish'):
 			part.set_content(finish_content=content, edit_content='')
-			part.edited_page = part.end_page -part.begin_page
-			part.status = part.STATUS['review']
-			part.save()
-			redirect_to = reverse('account:profile')
+			part.change_status(1, 'review')
 			status = 'success'
 			message = u'完成文件校對，將進入審核'
-			events = Event.objects.filter(content_type__model='ebook', object_id=part.ISBN_part, status=Event.STATUS['review'])
-			if len(events) == 0:
-				event = Event.objects.create(creater=user, action=part)
+			redirect_to = reverse('account:profile')
+			event = Event.objects.create(creater=request.user, action=part)
 		elif request.POST.has_key('load'):
 			part.load_full_content()
 			status = 'success'
@@ -457,7 +430,12 @@ class editView(generic.View):
 		request.session['postToken'] = postToken
 		print request.session.get('postToken',default=None)
 		return locals()
+	if request.method == 'GET':
+		postToken = uuid.uuid1().hex
+		request.session['postToken'] = postToken
+		return locals()
 
+@user_category_check('advanced_editor')
 @http_response
 def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
 	try:
@@ -473,6 +451,7 @@ def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
 	if request.method == 'GET':
 		return locals()
 
+@user_category_check('advanced_editor')
 @http_response
 def special_content(request, ISBN_part, template_name='ebookSystem/special_content.html'):
 	try:
@@ -492,7 +471,7 @@ def special_content(request, ISBN_part, template_name='ebookSystem/special_conte
 				status = u'error'
 				message = u'請先進行特殊內容檢查'
 				return locals()
-			part.status = part.STATUS['sc_finish']
+			part.change_status(1, 'sc_finish')
 			part.group_ServiceHours()
 			part.save()
 			redirect_to = reverse('account:sc_service')
@@ -504,6 +483,8 @@ def special_content(request, ISBN_part, template_name='ebookSystem/special_conte
 		return locals()
 	if request.method == 'GET':
 		return locals()
+
+@user_category_check('advanced_editor')
 @http_response
 def edit_SpecialContent(request, id, type):
 	try:

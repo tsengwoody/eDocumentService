@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block title %}
-進階編輯{{ part }}
+編輯罕字{{ part }}
 {% endblock %}
 
 {% block style %}
@@ -17,12 +17,12 @@
 {% endblock %}
 
 {% block header %}
-{{ book.book_info.bookname }}-part{{part.part}}
+編輯罕字{{ part }}
 {% endblock %}
 {% block content %}
 <form action="" method="post" id="currentForm" role="form">
 	{% csrf_token %}
-	{% ifequal status 'success' %}
+	{% if status == 'success' %}
 		<div class="modal fade in" id="Dialog" role="dialog">
 		    <div class="modal-dialog modal-sm">
 		        <div class="modal-content alert-success">
@@ -34,8 +34,8 @@
 		        </div>
 		    </div>
 		</div>
-	{% endifequal %}
-	{% ifequal status 'error' %}
+	{% endif %}
+	{% if status == 'error' %}
 		<div class="modal fade in" id="Dialog" role="dialog">
 		    <div class="modal-dialog modal-sm">
 		        <div class="modal-content alert-danger">
@@ -47,9 +47,8 @@
 		        </div>
 		    </div>
 		</div>
-	{% endifequal %}
-	
-		
+	{% endif %}
+
 			<div class="row">
 				<div id="imagePage" class="col-md-6 towColumn imagePage">
 					<nav>

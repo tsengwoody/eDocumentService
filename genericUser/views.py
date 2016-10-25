@@ -15,7 +15,7 @@ from utils.tag import *
 from utils.uploadFile import handle_uploaded_file
 from utils.zip import *
 from .forms import *
-from mysite.settings import BASE_DIR,SERVICE,OTP_ACCOUNT,OTP_PASSWORD
+from mysite.settings import BASE_DIR,SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWORD
 from zipfile import ZipFile
 import json
 import shutil
@@ -358,25 +358,26 @@ def set_role(request,template_name='genericUser/set_role.html'):
 
 @http_response
 def contact_us(request, template_name='genericUser/contact_us.html'):
-	if request.method == 'GET':
-		contactUsForm = ContactUsForm()
-		return locals()
+	ContactUsForm = modelform_factory(ContactUs, fields=('name', 'email', 'subject', 'category', 'content'))
+	contactus_category = ContactUs.CATEGORY
 	if request.method == 'POST':
 		contactUsForm = ContactUsForm(request.POST)
 		if not contactUsForm.is_valid():
 			status = 'error'
-			message = u'表單驗證失敗{}'.format(contactUsForm.errors)
+			message = u'表單驗證失敗{0}'.format(str(contactUsForm.errors))
 			return locals()
 		contactUs = contactUsForm.save(commit=False)
-		contactUs.message_datetime = timezone.now()
-		subject = u'[{}] {}'.format (contactUs.kind, contactUs.subject)
+		subject = u'[{0}] {1}'.format (contactUs.category, contactUs.subject)
 		body = u'姓名:'+ contactUs.name+ u'\nemail:'+ contactUs.email+ u'\n內容：\n'+ contactUs.content
-		email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=MANAGER)
-		email.send(fail_silently=False)
+#		email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=MANAGER)
+#		email.send(fail_silently=False)
 		contactUs.save()
-		if request.user.is_authenticated():redirect_to = reverse('account:profile')
 		status = 'success'
 		message = u'成功寄送內容，我們將盡速回復'
+		redirect_to = '/'
+		return locals()
+	if request.method == 'GET':
+		contactUsForm = ContactUsForm()
 		return locals()
 
 @http_response
