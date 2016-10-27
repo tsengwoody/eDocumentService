@@ -35,7 +35,7 @@
 			<td>{{ search_book.book_info.house }}</td>
 			<td>{{ search_book.book_info.date }}</td>
 			<td>
-				{% if request.user.is_guest and request.user.has_guest and search_book.collect_is_finish %}
+				{% if request.user.is_guest and request.user.has_guest and book.status >= 3 %}
 				<button type="submit" class="btn btn-default send_button" id="get_book_id" name="get_book" value={{ search_book.ISBN }}>寄送至郵箱</button>
 				{% endif %}
 			</td>
