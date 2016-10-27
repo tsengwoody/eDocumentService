@@ -25,7 +25,7 @@
 			<th>校對頁數</th>
 			<th>時數</th>
 			<th>預計完成日期</th>
-			<th>動作</th>
+			<th colspan="2">動作</th>
 			{% if request.user.is_superuser %}
 			<th>校對者</th>
 			<th>最後編輯時間</th>
@@ -39,15 +39,25 @@
 			<td>{{ part.edited_page|add:'1' }}</td>
 			<td>{{part.service_hours}}</td>
 			<td>{{part.deadline}}</td>
+			{% if request.user.is_guest and request.user.has_guest and part.status >= 3 %}
 			<td>
-				{% if part.status_int2str == 'finish' %}
-				<button type="submit" class="btn btn-default" id="emailEBook_id" name="emailEBook" value={{ part.ISBN_part }}>傳送email</button>
-				{% endif %}
+				<button type="submit" class="btn btn-default send_button" id="email_id" name="email" value={{part.ISBN_part}}>傳送至電郵</button>
 			</td>
+			<td>
+				<button type="submit" class="btn btn-default send_button" id="download_id" name="download" value={{part.ISBN_part}}>傳送至本地</button>
+			</td>
+			{% else %}
+			<td></td>
+			<td></td>
+			{% endif %}
 			{% if request.user.is_superuser %}
 			<td>{{ part.editor }}</td>
 			<td>{{ part.editor.online }}</td>
-			<td><a href="{% url 'ebookSystem:analyze_part' part.ISBN_part %}" >分析</a></td>
+			<td>
+				{% if part.status >= 3 %}
+				<a href="{% url 'ebookSystem:analyze_part' part.ISBN_part %}" >分析</a>
+				{% endif %}
+			</td>
 			{% endif %}
 		</tr>
 		{% endfor %}

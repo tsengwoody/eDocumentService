@@ -48,13 +48,13 @@ class Command(BaseCommand):
 		manager.is_guest=True
 		manager.is_manager=True
 		manager.save()
-		with open(u'temp/藍色駭客.zip') as fileObject:
+		src = BASE_DIR +u'/temp/藍色駭客.zip'
+		with open(src) as fileObject:
 			request = factory.post(reverse('genericUser:create_document'), {'bookname':u'藍色駭客', 'author':u'傑佛瑞．迪佛', 'house':u'皇冠', 'ISBN':u'9789573321569', 'date':u'2013-07-11', 'fileObject':fileObject})
 		request.user = root
 		response = create_document(request)
 		assert response.status_code == 302, 'status_code' +str(response.status_code)
 		assert len(Book.objects.all())==1, 'create book fail'
-		assert len(EBook.objects.all()) == 10, 'create part fail'
 		book = Book.objects.get(ISBN=u'9789573321569')
 		assert os.path.exists(book.path), 'book resource folder not exist'
 		from zipfile import ZipFile
@@ -62,9 +62,11 @@ class Command(BaseCommand):
 		dst = book.path +u'/OCR'
 		with ZipFile(src, 'r') as partFile:
 			partFile.extractall(dst)
-		ebook = EBook.objects.get(book=book, part=1)
 		book.status = book.STATUS['active']
 		book.save()
+		book.create_EBook()
+		assert len(EBook.objects.all()) == 10, 'create part fail'
+		ebook = EBook.objects.get(book=book, part=1)
 		assert ebook.change_status(1, 'active'), 'change status error'
 		assert ebook.change_status(1, 'edit', user=root), 'change status error'
 		assert ebook.change_status(1, 'review'), 'change status error'
@@ -83,6 +85,34 @@ class Command(BaseCommand):
 		ebook.sc_service_hours = 50
 		ebook.group_ServiceHours()
 		ebook.save()
+
+		src = BASE_DIR +u'/temp/山羊島的藍色奇蹟.zip'
+		with open(src) as fileObject:
+			request = factory.post(reverse('genericUser:create_document'), {'bookname':u'山羊島的藍色奇蹟', 'author':u'多利安助川著; 卓惠娟譯', 'house':u'博識圖書', 'ISBN':u'9789866104626', 'date':u'2015-07-01', 'fileObject':fileObject})
+		request.user = root
+		response = create_document(request)
+		assert response.status_code == 302, 'status_code' +str(response.status_code)
+		assert len(Book.objects.all())==2, 'create book fail'
+		book = Book.objects.get(ISBN=u'9789866104626')
+		assert os.path.exists(book.path), 'book resource folder not exist'
+		url = reverse('ebookSystem:review_document', kwargs={'book_ISBN':9789866104626})
+		request = factory.post(url, {u'reason': [u''], u'page': [u'0'], u'scanPageList': [u'A00001.jpg'], u'review': [u'success']})
+		request.user = root
+		response = review_document(request, u'9789866104626')
+		assert len(EBook.objects.all()) == 16, 'create part fail'
+		assert len(book.ebook_set.all())==6, 'create part fail'
+		src = BASE_DIR +'/temp/part-finish.zip'
+		dst = book.path +u'/OCR'
+		with ZipFile(src, 'r') as partFile:
+			partFile.extractall(dst)
+		for ebook in book.ebook_set.all():
+			assert ebook.change_status(1, 'edit', user=root), 'change status error'
+			assert ebook.change_status(1, 'review'), 'change status error'
+			assert ebook.change_status(1, 'finish'), 'change status error'
+			ebook.service_hours = 80
+			ebook.group_ServiceHours()
+			ebook.save()
+
 		request = factory.post(reverse('genericUser:apply_document'), {u'ISBN':u'9789865829810', u'bookname':u'遠山的回音', u'author':u'卡勒德.胡賽尼(Khaled Hosseini)著; 李靜宜譯', u'house':u'木馬文化', u'date':u'2014-02-01'})
 		request.user = manager
 		response = apply_document(request)

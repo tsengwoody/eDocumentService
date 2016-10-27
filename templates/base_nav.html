@@ -25,11 +25,14 @@
 					<ul class="dropdown-menu">
 						<li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
 						<li><a href="{% url 'manager:event_list' 'ebook' %}">審核校對文件</a></li>
-						<li><a href="{% url 'manager:event_list' 'revisecontentaction' %}">審核更正作業</a></li>
 						<li><a href="{% url 'manager:event_list' 'user' %}">審核會員</a></li>
-						<li><a href="{% url 'manager:event_list' 'applydocumentaction' %}">代掃申請列表</a></li>
+						<li><a href="{% url 'manager:event_list' 'revisecontentaction' %}">審核更正作業</a></li>
 						<li><a href="{% url 'manager:org_manage' %}">組織管理</a></li>
+						{% if request.user.is_superuser %}
+						<li><a href="{% url 'manager:event_list' 'applydocumentaction' %}">代掃申請列表</a></li>
 						<li><a href="{% url 'genericUser:article/create' %}">訊息發佈</a></li>
+						<li><a href="{% url 'ebookSystem:book_list' %}">書籍列表</a></li>
+						{% endif %}
 					</ul>
 				</li>
 				{% endif %}
@@ -61,7 +64,7 @@
 				</li>
 
 				{% if request.user.is_guest %}
-				<li><a href="{% url 'guest:profile' %}">書庫</a></li>
+				<li><a href="{% url 'guest:book_repository' %}">書庫</a></li>
 				<li><a href="{% url 'genericUser:revise_content' %}">更正</a></li>
 				{% endif %}
 				{% if request.user.is_staff %}

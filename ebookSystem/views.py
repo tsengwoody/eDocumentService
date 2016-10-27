@@ -1,6 +1,7 @@
 ﻿# coding: utf-8
 import codecs
 import datetime
+from zipfile import ZipFile
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponseRedirect,HttpResponse, Http404
 from django.shortcuts import render
@@ -35,10 +36,10 @@ fh.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(fh)
 
-class book_list(generic.ListView):
-	model = Book
-	def get_queryset(self):
-		return Book.objects.order_by('-ISBN')
+#class book_list(generic.ListView):
+#	model = Book
+#	def get_queryset(self):
+#		return Book.objects.order_by('-ISBN')
 
 @http_response
 def mathml(request, template_name='ebookSystem/mathml_demo.html'):
@@ -62,10 +63,17 @@ def mathml(request, template_name='ebookSystem/mathml_demo.html'):
 		message = u'成功獲取內容'
 		return locals()
 
+@user_category_check(['manager'])
 @http_response
-def search_book(request, template_name):
+def book_list(request, template_name='ebookSystem/book_list.html'):
+	object_list = Book.objects.all()
+	if request.method == 'POST':
+		return locals()
 	if request.method == 'GET':
 		return locals()
+
+@http_response
+def search_book(request, template_name):
 	if request.method == 'POST':
 		if request.POST.has_key('book_ISBN'):
 			ISBN = request.POST['book_ISBN']
@@ -76,24 +84,33 @@ def search_book(request, template_name):
 			except:
 				status = 'error'
 				message = u'查無指定ISBN文件'
-		if request.POST.has_key('get_book'):
+		if request.POST.has_key('email'):
 			from django.core.mail import EmailMessage
-			ISBN = request.POST['get_book']
-			emailBook = Book.objects.get(ISBN=ISBN)
-			subject = u'[文件] {}'.format(emailBook.book_info.bookname)
+			getBook = Book.objects.get(ISBN=request.POST['email'])
+			attach_file_path = getBook.zip(request.user, 'test')
+			if not attach_file_path:
+				status = 'error'
+				message = u'準備文件失敗'
+				return locals()
+			subject = u'[文件] {0}'.format(getBook)
 			body = u'新愛的{0}您好：\n'.format(request.user.username)
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
-			attach_file_path = emailBook.zip('test')
-			if attach_file_path == '':
-				status = 'error'
-				message = u'附加文件失敗'
-				os.remove(attach_file_path)
-				return locals()
 			email.attach_file(attach_file_path)
 			email.send(fail_silently=False)
 			status = 'success'
 			message = u'已寄送到您的電子信箱'
 			os.remove(attach_file_path)
+		if request.POST.has_key('download'):
+			getBook = Book.objects.get(ISBN=request.POST['download'])
+			attach_file_path = getBook.zip(request.user, 'test')
+			if not attach_file_path:
+				status = 'error'
+				message = u'準備文件失敗'
+				return locals()
+			download_path = attach_file_path
+			download_filename = os.path.basename(attach_file_path)
+		return locals()
+	if request.method == 'GET':
 		return locals()
 
 @user_category_check(['manager'])
@@ -106,15 +123,14 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 	events = Event.objects.filter(content_type__model='book', object_id=book.ISBN, status=Event.STATUS['review'])
 	org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(book.book_info.ISBN,"org")
 	source_path = book.path +u'/source'
-	scanPageList=[]
-	for ebook in book.ebook_set.all():
-		scanPageList = scanPageList + ebook.get_org_image(request.user)[0]
-	defaultPageURL = org_path +u'/' +scanPageList[0]
-	defaultPageURL=defaultPageURL.replace(BASE_DIR +'/static/', '')
+	[scanPageList, defaultPageURL] = book.get_org_image(request.user)
+#	defaultPageURL = org_path +u'/' +scanPageList[0]
+#	defaultPageURL=defaultPageURL.replace(BASE_DIR +'/static/', '')
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
+			book.create_EBook()
 			for part in book.ebook_set.all():
 				part.change_status(1, 'active')
 			shutil.rmtree(org_path)
@@ -140,30 +156,29 @@ def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.htm
 		part = EBook.objects.get(ISBN_part=ISBN_part)
 	except:
 		raise Http404("book does not exist")
-	if not os.path.exists(part.get_path('-manual_clean')):
-		shutil.copy2(part.get_path('-sc'), part.get_path('-manual_clean'))
 	if request.method == 'GET':
 		[len_block, same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
 		ed = edit_distance(part.get_path(), part.get_path('-finish'))
 		delete_count = src_count -same_character
 		insert_count = dst_count -same_character
 		diff_count = dst_count -src_count
-		lc_dict = last_character(part.get_path('-manual_clean'))
-		lc_list = lc_dict.items()
-		re_dict = find_repeat(part.get_path('-manual_clean'))
-		re_list = re_dict.items()
+		if os.path.exists(part.get_path('-an')):
+			lc_dict = last_character(part.get_path('-an'))
+			lc_list = lc_dict.items()
+			re_dict = find_repeat(part.get_path('-an'))
+			re_list = re_dict.items()
 		status = u'success'
 		message = u'分析文件'
 		return locals()
 	if request.method == 'POST':
 		if request.POST.has_key('download'):
-			download_path = part.get_path('-manual_clean')
-			download_filename = u'part{0}-manual_clean.html'.format(part.part)
+			download_path = part.get_path('-an')
+			download_filename = u'part{0}-an.html'.format(part.part)
 			status = u'success'
 			message = u'下載'
 			return locals()
 		elif request.POST.has_key('upload') and request.FILES.has_key('fileObject'):
-			with open(part.get_path('-manual_clean'), 'wb+') as dst:
+			with open(part.get_path('-an'), 'wb+') as dst:
 				for chunk in request.FILES['fileObject'].chunks():
 					dst.write(chunk)
 			[len_block, same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
@@ -171,15 +186,16 @@ def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.htm
 			delete_count = src_count -same_character
 			insert_count = dst_count -same_character
 			diff_count = dst_count -src_count
-			lc_dict = last_character(part.get_path('-manual_clean'))
-			lc_list = lc_dict.items()
-			re_dict = find_repeat(part.get_path('-manual_clean'))
-			re_list = re_dict.items()
+			if os.path.exists(part.get_path('-an')):
+				lc_dict = last_character(part.get_path('-an'))
+				lc_list = lc_dict.items()
+				re_dict = find_repeat(part.get_path('-an'))
+				re_list = re_dict.items()
 			status = u'success'
 			message = u'檔案成功更新'
 			return locals()
 		elif request.POST.has_key('finish'):
-			part.status = part.STATUS['sc_active']
+			part.change_status(1, 'an_finish', request.user)
 			part.save()
 			status = u'success'
 			message = u'完成'
@@ -194,7 +210,6 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 	except:
 		raise Http404("book does not exist")
 	events = Event.objects.filter(content_type__model='ebook', object_id=part.ISBN_part, status=Event.STATUS['review'])
-#	html_url = part.get_html()
 	if request.method == 'GET':
 		[len_block, same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
 		ed = edit_distance(part.get_path(), part.get_path('-finish'))
@@ -205,21 +220,17 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
 			part.change_status(1, 'finish')
-			shutil.copy2(part.get_path('-clean'), part.get_path('-sc'))
 			part.group_ServiceHours()
 			status = 'success'
 			message = u'審核通過文件'
 			for event in events:
 				event.response(status=status, message=message, user=request.user)
 		if request.POST['review'] == 'error':
-			part.status = part.STATUS['edit']
-			part.load_full_content()
-			part.save()
+			part.change_status(-1, 'edit')
 			status = 'success'
 			message = u'審核退回文件'
 			for event in events:
 				event.response(status='error', message=request.POST['reason'], user=request.user)
-		os.remove(BASE_DIR +'/static/' +html_url)
 		redirect_to = reverse('manager:event_list', kwargs={'action':'ebook' })
 		return locals()
 
@@ -245,11 +256,11 @@ def review_ReviseContentAction(request, id, template_name='ebookSystem/review_Re
 	if request.method == 'POST':
 		return locals()
 
-@user_category_check(['manager'])
+@user_category_check(['advanced_editor'])
 @http_response
 def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_ApplyDocumentAction.html'):
 	from utils.uploadFile import handle_uploaded_file
-	user = request.user
+	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date'))
 	try:
 		action = ApplyDocumentAction.objects.get(id=id)
 		event = Event.objects.get(content_type__model='applydocumentaction', object_id=action.id, status=Event.STATUS['review'])
@@ -266,7 +277,6 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 		[status, message] = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
 		uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
 		try:
-			from zipfile import ZipFile
 			with ZipFile(uploadFilePath, 'r') as uploadFile:
 				uploadFile.testzip()
 				uploadFile.extractall(uploadPath)
@@ -275,19 +285,18 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 				status = 'error'
 				message = u'非正確ZIP文件'
 				return locals()
-		newBook = Book(book_info=action.book_info, ISBN=action.book_info.ISBN)
-		newBook.path = uploadPath
+		newBook = Book(book_info=action.book_info, ISBN=action.book_info.ISBN, path=uploadPath)
 		if not newBook.validate_folder():
 			shutil.rmtree(uploadPath)
 			status = 'error'
 			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			return locals()
-		newBook.scaner = user
-		newBook.owner = user
+		newBook.set_page_count()
+		newBook.scaner = request.user
+		newBook.owner = request.user
 		if request.POST.has_key('designate'):
 			newBook.is_private = True
 		newBook.save()
-		newBook.create_EBook()
 		Event.objects.create(creater=event.creater, action=newBook)
 		redirect_to = reverse('manager:event_list', kwargs={'action':'applydocumentaction' })
 		status = 'success'
@@ -303,25 +312,31 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	except:
 		raise Http404("book does not exist")
 	if request.method == 'POST':
-		if request.POST.has_key('emailEBook'):
+		if request.POST.has_key('email'):
 			from django.core.mail import EmailMessage
-			from mysite.settings import SERVICE
-			ISBN_part = request.POST.get('emailEBook')
-			emailEBook = EBook.objects.get(ISBN_part = ISBN_part)
-			subject = u'[文件] {0}-part{1}'.format(emailEBook.book.book_info.bookname, emailEBook.part)
+			getPart = EBook.objects.get(ISBN_part=request.POST['email'])
+			attach_file_path = getPart.zip(request.user, 'test')
+			if not attach_file_path:
+				status = 'error'
+				message = u'準備文件失敗'
+				return locals()
+			subject = u'[文件] {0}'.format(getBook)
 			body = u'新愛的{0}您好：\n'.format(request.user.username)
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
-			attach_file_path = emailEBook.zip('test')
-			if attach_file_path == '':
-				status = 'error'
-				message = u'附加文件失敗'
-				os.remove(attach_file_path)
-				return locals()
 			email.attach_file(attach_file_path)
 			email.send(fail_silently=False)
 			status = 'success'
 			message = u'已寄送到您的電子信箱'
 			os.remove(attach_file_path)
+		if request.POST.has_key('download'):
+			getPart = EBook.objects.get(ISBN_part=request.POST['download'])
+			attach_file_path = getPart.zip(request.user, 'test')
+			if not attach_file_path:
+				status = 'error'
+				message = u'準備文件失敗'
+				return locals()
+			download_path = attach_file_path
+			download_filename = os.path.basename(attach_file_path)
 		return locals()
 	if request.method == 'GET':
 		return locals()

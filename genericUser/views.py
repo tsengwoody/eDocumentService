@@ -76,10 +76,10 @@ def article_create(request, template_name='genericUser/article/create.html'):
 @user_category_check(['guest'])
 @http_response
 def create_document(request, template_name='genericUser/create_document.html'):
-	readme_url = request.path +'readme/'
+	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date'))
 	if request.method == 'POST':
 		bookInfoForm = BookInfoForm(request.POST)
-		if not bookInfoForm.is_valid() and not bookInfoForm.errors.has_key('ISBN'):
+		if not bookInfoForm.is_valid():
 			status = 'error'
 			message = u'表單驗證失敗' +str(bookInfoForm.errors)
 			return locals()
@@ -102,20 +102,21 @@ def create_document(request, template_name='genericUser/create_document.html'):
 		try:
 			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
 		except:
-			newBookInfo = bookInfoForm.save()
-		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'])
-		newBook.path = uploadPath
+			newBookInfo = bookInfoForm.save(commit=False)
+			newBookInfo.ISBN = request.POST['ISBN']
+			newBookInfo.save()
+		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path = uploadPath)
 		if not newBook.validate_folder():
 			shutil.rmtree(uploadPath)
 			status = 'error'
 			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			return locals()
+		newBook.set_page_count()
 		newBook.scaner = request.user
 		newBook.owner = request.user
 		if request.POST.has_key('designate'):
 			newBook.is_private = True
 		newBook.save()
-		newBook.create_EBook()
 		event = Event.objects.create(creater=request.user, action=newBook)
 		redirect_to = '/'
 		status = 'success'
@@ -144,7 +145,7 @@ def upload_progress(request):
 
 @http_response
 def apply_document(request, template_name='genericUser/apply_document.html'):
-	user = request.user
+	BookInfoForm = modelform_factory(BookInfo, fields=('ISBN', 'bookname', 'author', 'house', 'date'))
 	if request.method == 'POST':
 		bookInfoForm = BookInfoForm(request.POST)
 		if not bookInfoForm.is_valid():
@@ -153,7 +154,7 @@ def apply_document(request, template_name='genericUser/apply_document.html'):
 			return locals()
 		newBookInfo = bookInfoForm.save()
 		applyDocumentAction = ApplyDocumentAction.objects.create(book_info=newBookInfo)
-		event = Event.objects.create(creater=user, action=applyDocumentAction)
+		event = Event.objects.create(creater=request.user, action=applyDocumentAction)
 		redirect_to = '/'
 		status = 'success'
 		message = u'成功申請代掃描辨識，請將書籍寄至所選之中心'

@@ -3,10 +3,10 @@ from django import forms
 from ebookSystem.models import *
 from .models import *
 
-class BookInfoForm(forms.ModelForm):
+'''class BookInfoForm(forms.ModelForm):
 	class Meta:
 		model = BookInfo
-		fields = '__all__'
+		exclude = ['ISBN']'''
 
 '''class ContactUsForm(forms.ModelForm):
 	class Meta:

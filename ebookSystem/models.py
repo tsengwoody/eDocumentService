@@ -55,43 +55,91 @@ class Book(models.Model):
 		self.save()
 		return status
 
-	def create_EBook(self):
-		if not (len(self.ebook_set.all()) == 0 and self.validate_folder()):
+	def create_EBook(self, page_list=[]):
+		if page_list == []:
+			if not (len(self.ebook_set.all()) == 0 and self.validate_folder()):
+				return False
+			part_count = (self.page_count-1)/self.page_per_part+1
+			for i in range(part_count):
+				begin_page = i*self.page_per_part
+				end_page = (i+1)*self.page_per_part-1
+				if end_page >= self.page_count:
+					end_page = self.page_count-1
+				ISBN_part = '{0}-{1}'.format(self.ISBN, i+1)
+				EBook.objects.create(book=self, part=i+1, ISBN_part=ISBN_part, begin_page=begin_page, end_page=end_page)
+			self.part_count = len(page_list)
+			self.save()
+			return True
+		elif page_list != []:
+			if not len(self.ebook_set.all()) == 0:
+				return False
+			for page_info in page_list:
+				part = page_info[0]
+				begin_page = page_info[1]
+				end_page = page_info[2]
+				ISBN_part = '{0}-{1}'.format(self.ISBN, page_info[0])
+				EBook.objects.create(book=self, part=part, ISBN_part=ISBN_part, begin_page=begin_page, end_page=end_page)
+			self.part_count = len(page_list)
+			self.save()
+			return True
+
+	def get_org_image(self, user):
+		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book_info.ISBN, "org")
+		source_path = self.path +u'/source'
+		fileList=os.listdir(source_path)
+		fileList = sorted(fileList)
+		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
+		if not os.path.exists(org_path +'/' +scanPageList[0]):
+			self.create_org_image()
+		default_page_url = org_path +u'/' +scanPageList[0]
+		default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
+		return [scanPageList, default_page_url]
+
+	def create_org_image(self):
+		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book_info.ISBN, "org")
+		source_path = self.path +u'/source'
+		fileList=os.listdir(source_path)
+		fileList = sorted(fileList)
+		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
+		if os.path.exists(org_path +'/' +scanPageList[0]):
 			return False
-		for i in range(self.part_count):
-			begin_page = i*self.page_per_part
-			end_page = (i+1)*self.page_per_part-1
-			if end_page >= self.page_count:
-				end_page = self.page_count-1
-			ISBN_part = self.ISBN + '-{0}'.format(i+1)
-			EBook.objects.create(book=self, part=i+1, ISBN_part=ISBN_part, begin_page=begin_page, end_page=end_page)
-		for ebook in self.ebook_set.all():
-			ebook.add_tag()
-		for i in range(1, self.part_count+1):
-			with codecs.open(self.path +'/OCR/part{}-finish.txt'.format(i), 'w', encoding='utf-8') as finishFile:
-				finishFile.write(u'\ufeff')
+		if not os.path.exists(org_path):
+			os.makedirs(org_path, 0770)
+		for s in scanPageList:
+			shutil.copyfile(source_path +'/' +s, org_path +'/' +s)
 		return True
 
-	def validate_folder(self):
+	def set_page_count(self):
 		source = self.path + u'/source'
+		sourceFileList=os.listdir(source)
+		page_count = 0
+		for scanPage in sourceFileList:
+			if scanPage.split('.')[-1].lower() == 'jpg':
+				page_count = page_count + 1
+		self.page_count = page_count
+		self.save()
+		return self.page_count
+
+	def validate_folder(self):
+		try:
+			source = self.path + u'/source'
+		except:
+			return False
+		sourceFileList=os.listdir(source)
+		page_count = 0
+		for scanPage in sourceFileList:
+			if scanPage.split('.')[-1].lower() == 'jpg':
+				page_count = page_count + 1
 		OCR = self.path + u'/OCR'
 		partList = []
 		OCRFileList = []
-		sourceFileList = []
 		try:
 			OCRFileList = os.listdir(OCR)
 			for file in OCRFileList:
 				with codecs.open(os.path.join(OCR, file), 'r', encoding='utf-8') as fileRead:
 					content=fileRead.read()
-			sourceFileList=os.listdir(source)
 		except:
-			self.page_count = None
-			self.part_count = None
 			return False
-		page_count = 0
-		for scanPage in sourceFileList:
-			if scanPage.split('.')[-1].lower() == 'jpg':
-				page_count = page_count + 1
 		part_count = (page_count-1)/self.page_per_part+1
 		for i in range(part_count):
 			partList.append('part{}.{}'.format(i+1, 'txt'))
@@ -99,21 +147,26 @@ class Book(models.Model):
 		for i in range(i):
 			OCRFileList[i] = OCRFileList[i].lower()
 		OCRFileSet = set(OCRFileList)
-		self.page_count = page_count
-		self.part_count = part_count
 		return partSet.issubset(OCRFileSet)
 
-	def zip(self, password):
+	def zip(self, user, password):
 		import pyminizip
-#		import zipfile
-		zip_file_name = self.path +'/OCR/' +self.ISBN +'.zip'
-		zip_list = [ file.get_path('-clean') for file in self.ebook_set.all() ]
+		zip_file_name = BASE_DIR +'/file/ebookSystem/document/{0}/OCR/{1}_{2}.zip'.format(self.book_info.ISBN, self.book_info.ISBN, user.username)
+		self.check_status()
+		if self.STATUS['finish'] <= self.status <= self.STATUS['sc_finish']:
+			zip_list = [ file.get_path('-clean') for file in self.ebook_set.all() ]
+		elif self.STATUS['sc_finish'] <= self.status:
+			zip_list = [ file.get_path('-sc') for file in self.ebook_set.all() ]
 		try:
 			pyminizip.compress_multiple(zip_list, zip_file_name, password, 5)
 			return zip_file_name
 		except:
-			os.remove(zip_file_name)
-			return ''
+			try:
+				os.remove(zip_file_name)
+			except:
+				pass
+			return False
+#		import zipfile
 #		zf = zipfile.ZipFile(zip_file_name, "w", zipfile.zlib.DEFLATED)
 #		try:
 #			for i in range(self.part_count):
@@ -195,6 +248,11 @@ class EBook(models.Model):
 					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
 				except:
 					editRecord = EditRecord.objects.create(part=self, category='based', number_of_times=self.number_of_times)
+				if not os.path.exists(self.get_path()):
+					self.add_tag()
+				if not os.path.exists(self.get_path('-finish')):
+						with codecs.open(self.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
+							finishFile.write(u'\ufeff')
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['edit']:
 				self.editor = kwargs['user']
@@ -205,7 +263,7 @@ class EBook(models.Model):
 				self.edited_page = self.end_page -self.begin_page
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['finish']:
-				self.clean_tag()
+				self.clean_tag(self.get_path('-finish'), self.get_path('-clean'))
 				shutil.copy2(self.get_path('-clean'), self.get_path('-sc'))
 				try:
 					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
@@ -224,6 +282,7 @@ class EBook(models.Model):
 			elif self.status +direction == self.STATUS['sc_finish']:
 				if self.is_sc_rebuild:
 					return False
+				shutil.copy2(self.get_path('-sc'), self.get_path('-an'))
 				try:
 					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
 					editRecord.record_info()
@@ -233,7 +292,7 @@ class EBook(models.Model):
 			elif self.status +direction == self.STATUS['an_edit']:
 				self.an_editor = kwargs['user']
 				self.an_get_date = timezone.now()
-				self.an_deadline = self.an_get_date + datetime.timedelta(days=5)
+				self.an_deadline = self.an_get_date + datetime.timedelta(days=1)
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['an_finish']:
 				self.status = self.status +direction
@@ -268,10 +327,23 @@ class EBook(models.Model):
 		self.book.check_status()
 		return True
 
+	def get_image(self, user):
+		water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, user.username)
+		source_path = self.book.path +u'/source'
+		fileList=os.listdir(source_path)
+		fileList = sorted(fileList)
+		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
+		scanPageList = scanPageList[self.begin_page:self.end_page+1]
+		if not os.path.exists(water_path +'/' +scanPageList[0]):
+			self.create_watermark_image(user)
+		default_page_url = water_path +u'/' +scanPageList[self.edited_page]
+		default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
+		return [scanPageList, default_page_url]
+
 	def get_path(self, string=''):
 		if string == 'public':
 			return self.book.path.replace('/file', '/static')
-		elif string in ['-clean', '-manual_clean', '-final', '-sc']:
+		elif string in ['-clean', '-sc', '-an', '-final']:
 			return self.book.path +'/OCR/part{0}{1}.html'.format(self.part, string)
 		else:
 			return self.book.path +'/OCR/part{0}{1}.txt'.format(self.part, string)
@@ -442,33 +514,24 @@ class EBook(models.Model):
 		return True
 
 	def add_watermark(self,text, fontname, fontsize, imagefile, output_dir):
-	    img0 = Image.new("RGBA", (1,1))
-	    draw0 = ImageDraw.Draw(img0)
-	    font = ImageFont.truetype(fontname, fontsize)
-	    t_width, t_height = draw0.textsize(unicode(text, 'UTF-8'), font=font)
-	    img = Image.new("RGBA", (t_width, t_height), (255,0,0,0))
-	    draw = ImageDraw.Draw(img)
-	    draw.text((0,0),unicode(text, 'UTF-8'), font=font, fill=(0,255,255,128))
-	    img2 = Image.open(imagefile)
-	    i_width, i_height = img2.size
-	    px = (i_width - t_width) / 2
-	    py = (i_height - t_height) / 2
-	    img2.paste(img, (px, py), img)
-	    imagefile = imagefile.split('/')[-1]
-	    imagefile = imagefile
-	    print output_dir+" "+imagefile + " saved..."
-	    img2.save(output_dir + imagefile)
-	    del draw0, draw
-	    del img0, img, img2
-
-	def get_html(self):
-		html_path = BASE_DIR +u'/static/ebookSystem/document/{0}/OCR'.format(self.book.book_info.ISBN)
-		if not os.path.exists(html_path):
-			os.makedirs(html_path)
-		shutil.copyfile(self.get_path('-clean'), html_path +'/part{0}-final.html'.format(self.part))
-		default_page_url = html_path +'/part{0}-final.html'.format(self.part)
-		default_page_url = default_page_url.replace(BASE_DIR +'/static/', '')
-		return default_page_url
+		img0 = Image.new("RGBA", (1,1))
+		draw0 = ImageDraw.Draw(img0)
+		font = ImageFont.truetype(fontname, fontsize)
+		t_width, t_height = draw0.textsize(unicode(text, 'UTF-8'), font=font)
+		img = Image.new("RGBA", (t_width, t_height), (255,0,0,0))
+		draw = ImageDraw.Draw(img)
+		draw.text((0,0),unicode(text, 'UTF-8'), font=font, fill=(0,255,255,128))
+		img2 = Image.open(imagefile)
+		i_width, i_height = img2.size
+		px = (i_width - t_width) / 2
+		py = (i_height - t_height) / 2
+		img2.paste(img, (px, py), img)
+		imagefile = imagefile.split('/')[-1]
+		imagefile = imagefile
+		print output_dir+" "+imagefile + " saved..."
+		img2.save(output_dir + imagefile)
+		del draw0, draw
+		del img0, img, img2
 
 	def add_tag(self, encoding='utf-8'):
 		source = self.get_path()
@@ -476,14 +539,12 @@ class EBook(models.Model):
 		from utils import tag
 		tag.add_tag(source, destination)
 
-	def clean_tag(self, template='book_template.html', encoding='utf-8'):
-		source = self.get_path('-finish')
-		destination = self.get_path('-clean')
+	def clean_tag(self, src, dst, template='book_template.html', encoding='utf-8'):
 		template = BASE_DIR +u'/templates/' +template
 		from utils import tag
-		tag.add_template_tag(source, destination, template)
+		tag.add_template_tag(src, dst, template)
 		title = self.book.book_info.bookname +'-part{0}'.format(self.part)
-		tag.clean_tag(destination, destination, title)
+		tag.clean_tag(dst, dst, title)
 
 	def create_SpecialContent(self, encoding='utf-8'):
 		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, "org")
@@ -557,16 +618,22 @@ class EBook(models.Model):
 	def specialcontent_count(self):
 		return len(self.specialcontent_set.all())
 
-	def zip(self, password):
+	def zip(self, user, password):
 		import pyminizip
-		zip_file_name = self.book.path +'/OCR/' +self.ISBN_part +'.zip'
-		zip_list = [self.get_path('-clean')]
+		zip_file_name = BASE_DIR +'/file/ebookSystem/document/{0}/OCR/{1}_{2}.zip'.format(self.book.book_info.ISBN, self.ISBN_part, user.username)
+		if self.STATUS['finish'] <= self.status <= self.STATUS['sc_finish']:
+			zip_list = [self.get_path('-clean')]
+		elif self.STATUS['sc_finish'] <= self.status:
+			zip_list = [self.get_path('-clean')]
 		try:
 			pyminizip.compress_multiple(zip_list, zip_file_name, password, 5)
 			return zip_file_name
 		except:
-			os.remove(zip_file_name)
-			return ''
+			try:
+				os.remove(zip_file_name)
+			except:
+				pass
+			return False
 
 	def edit_distance(self, src, dst, encoding='utf-8'):
 		import Levenshtein
@@ -660,7 +727,7 @@ class EditRecord(models.Model):
 		unique_together = ('part', 'category', 'number_of_times')
 
 	def __unicode__(self):
-		return self.part
+		return self.part.ISBN_part
 
 	def record_info(self):
 		if self.category == 'based':
@@ -687,17 +754,37 @@ class EditRecord(models.Model):
 		return month_ServiceHours
 
 class EditLog(models.Model):
-	editRecord = models.ForeignKey(EditRecord, blank=True, null=True, on_delete=models.SET_NULL, related_name='editlog_set')
+	edit_record = models.ForeignKey(EditRecord, blank=True, null=True, on_delete=models.SET_NULL, related_name='editlog_set')
 	user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='editlog_set')
 	time = models.DateTimeField(default = timezone.now)
 	order = models.IntegerField()
 	edit_count = models.IntegerField()
 
 	def __unicode__(self):
-		return self.edit_record +self.order
+		return self.edit_record.part.ISBN_part +'-{0}'.format(self.order)
 
 '''	class Meta:
 		indexes = [
 			models.Index(fields=['book'], name='book_idx'),
 			models.Index(fields=['part'], name='part_idx'),
 		]'''
+
+def add_watermark(self,text, fontname, fontsize, imagefile, output_dir):
+	img0 = Image.new("RGBA", (1,1))
+	draw0 = ImageDraw.Draw(img0)
+	font = ImageFont.truetype(fontname, fontsize)
+	t_width, t_height = draw0.textsize(unicode(text, 'UTF-8'), font=font)
+	img = Image.new("RGBA", (t_width, t_height), (255,0,0,0))
+	draw = ImageDraw.Draw(img)
+	draw.text((0,0),unicode(text, 'UTF-8'), font=font, fill=(0,255,255,128))
+	img2 = Image.open(imagefile)
+	i_width, i_height = img2.size
+	px = (i_width - t_width) / 2
+	py = (i_height - t_height) / 2
+	img2.paste(img, (px, py), img)
+	imagefile = imagefile.split('/')[-1]
+	imagefile = imagefile
+	print output_dir+" "+imagefile + " saved..."
+	img2.save(output_dir + imagefile)
+	del draw0, draw
+	del img0, img, img2

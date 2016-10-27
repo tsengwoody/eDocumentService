@@ -22,47 +22,45 @@ def userGuide(request, template_name='home.html'):
 #	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
 	return render(request, template_name, locals())
 
-class profileView(generic.View):
-	template_name=''
-
-	@method_decorator(user_category_check(['guest']))
-	@method_decorator(http_response)
-	def get(self, request, *args, **kwargs):
-		template_name=self.template_name
-		edit_book_list = request.user.own_book_set.all().filter(status__lte=Book.STATUS['active'])
-		finish_book_list = request.user.own_book_set.all().filter(status__gte=Book.STATUS['finish'])
-		return locals()
-
-	@method_decorator(user_category_check(['guest']))
-	@method_decorator(http_response)
-	def post(self, request, *args, **kwargs):
-		template_name=self.template_name
-		if request.POST.has_key('emailBook'):
+@user_category_check(['guest'])
+@http_response
+def book_repository(request, template_name='guest/book_repository.html'):
+	edit_book_list = request.user.own_book_set.all().filter(status__lte=Book.STATUS['review'])
+	finish_book_list = request.user.own_book_set.all().filter(status__gte=Book.STATUS['finish'])
+	if request.method == 'POST':
+		if request.POST.has_key('email'):
 			from django.core.mail import EmailMessage
-			book_ISBN = request.POST.get('emailBook')
-			emailBook = Book.objects.get(ISBN = book_ISBN)
-			subject = u'[文件] {}'.format(emailBook.book_info.bookname)
+			getBook = Book.objects.get(ISBN=request.POST['email'])
+			attach_file_path = getBook.zip(request.user, 'test')
+			if not attach_file_path:
+				status = 'error'
+				message = u'準備文件失敗'
+				return locals()
+			subject = u'[文件] {0}'.format(getBook)
 			body = u'新愛的{0}您好：\n'.format(request.user.username)
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
-			attach_file_path = emailBook.zip('test')
-			if attach_file_path == '':
-				status = 'error'
-				message = u'附加文件失敗'
-				os.remove(attach_file_path)
-				return locals()
 			email.attach_file(attach_file_path)
 			email.send(fail_silently=False)
 			status = 'success'
 			message = u'已寄送到您的電子信箱'
 			os.remove(attach_file_path)
-#		if request.POST.has_key('delete'):
-#			book_ISBN = request.POST.get('delete')
-#			deleteBook = Book.objects.get(ISBN = book_ISBN)
-#			deletePath = deleteBook.path
-#			shutil.rmtree(deletePath)
-#			deleteBook.delete()
-#			status = 'success'
-#			message = u'成功刪除文件'
-		edit_book_list = request.user.own_book_set.all().exclude(status__lte=EBook.STATUS['review'])
-		finish_book_list = request.user.own_book_set.all().exclude(status__gte=EBook.STATUS['finish'])
+		if request.POST.has_key('download'):
+			getBook = Book.objects.get(ISBN=request.POST['download'])
+			attach_file_path = getBook.zip(request.user, 'test')
+			if not attach_file_path:
+				status = 'error'
+				message = u'準備文件失敗'
+				return locals()
+			download_path = attach_file_path
+			download_filename = os.path.basename(attach_file_path)
+		if request.POST.has_key('delete'):
+			deleteBook = Book.objects.get(ISBN=request.POST['delete'])
+			shutil.rmtree(deleteBook.path)
+			deleteBook.delete()
+			status = 'success'
+			message = u'成功刪除文件'
+		edit_book_list = request.user.own_book_set.all().filter(status__lte=Book.STATUS['review'])
+		finish_book_list = request.user.own_book_set.all().filter(status__gte=Book.STATUS['finish'])
+		return locals()
+	if request.method == 'GET':
 		return locals()

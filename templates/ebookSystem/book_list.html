@@ -1,18 +1,15 @@
 ﻿{% extends "base_nav.html" %}
 {% block title %}
-書列表
+書籍列表
 {% endblock %}
 {% block header %}
-書列表
+書籍列表
 {% endblock %}
 {% block content %}
-{% if object_list %}
-	<ul>
+<h3>書籍列表</h3>
+<ul>
 	{% for book in object_list %}
-		<li><a href="{%url "ebookSystem:detail" book.ISBN %}">{{ book.book_info.bookname }}</a></li>
-	{% endfor %}
+		<li><a href="{%url "ebookSystem:detail" book.ISBN %}">{{ book }}</a></li>
+		{% endfor %}
 	</ul>
-{% else %}
-	<p>No ebook are available.</p>
-{% endif %}
 {% endblock %}
