@@ -50,7 +50,6 @@ class Book(models.Model):
 		for part in self.ebook_set.all():
 			status_list.append(part.status)
 		status = min(status_list)
-		status
 		self.status = status
 		self.save()
 		return status
@@ -627,7 +626,8 @@ class EBook(models.Model):
 			zip_list = [self.get_path('-clean')]
 		try:
 			pyminizip.compress_multiple(zip_list, zip_file_name, password, 5)
-			return zip_file_name
+			return self.get_path('-clean')
+#			return zip_file_name
 		except:
 			try:
 				os.remove(zip_file_name)
@@ -714,7 +714,7 @@ class EditRecord(models.Model):
 	part = models.ForeignKey(EBook, blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
 	CATEGORY = (
 		('based' , u'初階'),
-		(u'advance' , u'進階'),
+		(u'advanced' , u'進階'),
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
 	number_of_times = models.IntegerField()
@@ -740,6 +740,7 @@ class EditRecord(models.Model):
 			self.get_date = self.part.sc_get_date
 			self.service_hours = self.part.sc_service_hours
 			self.serviceHours = self.part.sc_serviceHours
+		self.save()
 
 	def group_ServiceHours(self):
 		month_ServiceHours = None
