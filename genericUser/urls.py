@@ -10,6 +10,7 @@ urlpatterns = [
 	url(r'^func_desc/$', views.func_desc, name='func_desc'),
 	url(r'^org_info$', views.org_info, name='org_info'),
 	url(r'^license/$', views.license, name='license'),
+	url(r'^security/$', views.security, name='security'),
 	url(r'^create_document/$', views.create_document, name='create_document'),
 	url(r'^upload_progress/$', views.upload_progress, name='upload_progress'),
 	url(r'^event_list/$', views.event_list, name='event_list'),
