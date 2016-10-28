@@ -61,11 +61,16 @@ def http_response(view):
 			response['message'] = rend_dict['message']
 			if 'redirect_to' in rend_dict:
 				response['redirect_to'] = rend_dict['redirect_to']
+			if 'permission_denied' in rend_dict:
+				response['permission_denied'] = rend_dict['permission_denied']
 			for key in rend_dict['extra_list']:
 				response[key] = rend_dict[key]
 			return HttpResponse(json.dumps(response), content_type="application/json")
 		else:
-			if 'redirect_to' in rend_dict:
+			if 'permission_denied' in rend_dict:
+				template_name = 'user_category_check.html'
+				return render(request, template_name, {})
+			elif 'redirect_to' in rend_dict:
 				return HttpResponseRedirect(rend_dict['redirect_to'])
 			elif 'download_path' in rend_dict:
 				with open(rend_dict['download_path'], 'rb') as content_file:

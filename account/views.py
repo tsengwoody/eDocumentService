@@ -11,30 +11,18 @@ from ebookSystem.models import *
 from genericUser.models import Event, ServiceHours
 from utils.decorator import *
 import datetime
+GET_MAX_PART = 3
 
-class profileView(generic.View):
-	template_name=''
-
-	@method_decorator(user_category_check(['editor']))
-	@method_decorator(http_response)
-	def get(self, request, *args, **kwargs):
-		readme_url = request.path +'readme/'
-		template_name=self.template_name
-		editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
-		finishPartList = request.user.edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
-		return locals()
-
-	@method_decorator(user_category_check(['editor']))
-	@method_decorator(http_response)
-	def post(self, request, *args, **kwargs):
-		readme_url = request.path +'readme/'
-		template_name=self.template_name
-		editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
-		finishPartList = request.user.edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
+@user_category_check(['editor'])
+@http_response
+def service(request, template_name='account/service.html'):
+	editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
+	finishPartList = request.user.edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
+	if request.method == 'POST':
 		if request.POST.has_key('getPart'):
-			if len(editingPartList)>=10:
+			if len(editingPartList)>=GET_MAX_PART:
 				status = 'error'
-				message = u'您已有超過10段文件，請先校對完成再領取'
+				message = u'您已有超過{0}段文件，請先校對完成再領取'.format(GET_MAX_PART)
 				return locals()
 			activeBook = Book.objects.filter(Q(status=Book.STATUS['active']) & Q(is_private=False)).order_by('upload_date')
 			partialBook = None
@@ -122,7 +110,10 @@ class profileView(generic.View):
 		editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
 		finishPartList = request.user.edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
 		return locals()
+	if request.method == 'GET':
+		return locals()
 
+@user_category_check(['advanced_editor'])
 @http_response
 def sc_service(request, template_name='account/sc_service.html'):
 	sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']))

@@ -67,7 +67,7 @@ class Book(models.Model):
 					end_page = self.page_count-1
 				ISBN_part = '{0}-{1}'.format(self.ISBN, i+1)
 				EBook.objects.create(book=self, part=i+1, ISBN_part=ISBN_part, begin_page=begin_page, end_page=end_page)
-			self.part_count = len(page_list)
+			self.part_count = len(self.ebook_set.all())
 			self.save()
 			return True
 		elif page_list != []:
@@ -79,7 +79,7 @@ class Book(models.Model):
 				end_page = page_info[2]
 				ISBN_part = '{0}-{1}'.format(self.ISBN, page_info[0])
 				EBook.objects.create(book=self, part=part, ISBN_part=ISBN_part, begin_page=begin_page, end_page=end_page)
-			self.part_count = len(page_list)
+			self.part_count = len(self.ebook_set.all())
 			self.save()
 			return True
 
@@ -248,7 +248,7 @@ class EBook(models.Model):
 					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
 				except:
 					editRecord = EditRecord.objects.create(part=self, category='based', number_of_times=self.number_of_times)
-				if not os.path.exists(self.get_path()):
+				if os.path.exists(self.get_path()) and not os.path.exists(self.get_path('-edit')):
 					self.add_tag()
 				if not os.path.exists(self.get_path('-finish')):
 						with codecs.open(self.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
@@ -375,7 +375,7 @@ class EBook(models.Model):
 				return content_list
 		import re
 		import difflib
-		[content, fileHead] = self.get_content(action)
+		content = self.get_content(action)
 		headString = string[0:length]
 		tailString = string[-length:]
 		destination_content = string
@@ -434,9 +434,9 @@ class EBook(models.Model):
 		filePath = self.get_path(action)
 		with codecs.open(filePath, 'r', encoding=encoding) as sourceFile:
 			source_content = sourceFile.read()
-		file_head = source_content[0]
-		source_content = source_content[1:]
-		return [source_content,file_head]
+#		file_head = source_content[0]
+#		source_content = source_content[1:]
+		return source_content
 
 	def set_content(self, finish_content, edit_content, encoding='utf-8', fileHead = u'\ufeff'):
 		finishFilePath = self.get_path('-finish')
@@ -444,15 +444,15 @@ class EBook(models.Model):
 		with codecs.open(finishFilePath, 'a', encoding=encoding) as fileWrite:
 			fileWrite.write(finish_content)
 		with codecs.open(editFilePath, 'w', encoding=encoding) as fileWrite:
-			fileWrite.write(fileHead+edit_content)
+			fileWrite.write(edit_content)
 		return True
 
-	def load_full_content(self, fileHead = u'\ufeff'):
-		edit_content = self.get_content('-edit')[0]
-		finish_content = self.get_content('-finish')[0]
+	def load_full_content(self):
+		edit_content = self.get_content('-edit')
+		finish_content = self.get_content('-finish')
 		self.set_content('', finish_content +edit_content)
 		with codecs.open(self.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
-			finishFile.write(u'\ufeff')
+			finishFile.write(u' ')
 		return finish_content +edit_content
 
 	def get_org_image(self, user):
