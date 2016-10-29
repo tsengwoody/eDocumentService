@@ -94,7 +94,10 @@ def same(src_tag, dst_tag):
 
 if __name__ == '__main__':
 	import sys
-	print edit_distance(sys.argv[1], sys.argv[2])
-	print diff(sys.argv[1], sys.argv[2])
-	print last_character(sys.argv[3])
-	print find_repeat(sys.argv[4])
+	try:
+		print edit_distance(sys.argv[1], sys.argv[2])
+		print diff(sys.argv[1], sys.argv[2])
+		print last_character(sys.argv[3])
+		print find_repeat(sys.argv[4])
+	except:
+		pass

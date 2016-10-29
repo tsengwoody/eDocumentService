@@ -335,6 +335,16 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 				return locals()
 			download_path = attach_file_path
 			download_filename = os.path.basename(attach_file_path)
+		if request.POST.has_key('view'):
+			getPart = EBook.objects.get(ISBN_part=request.POST['view'])
+			attach_file_path = getPart.replace()
+			if not attach_file_path:
+				status = 'error'
+				message = u'準備文件失敗'
+				return locals()
+			download_path = attach_file_path
+			download_filename = os.path.basename(attach_file_path)
+		return locals()
 		return locals()
 	if request.method == 'GET':
 		return locals()

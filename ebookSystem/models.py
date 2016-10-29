@@ -342,7 +342,7 @@ class EBook(models.Model):
 	def get_path(self, string=''):
 		if string == 'public':
 			return self.book.path.replace('/file', '/static')
-		elif string in ['-clean', '-sc', '-an', '-final']:
+		elif string in ['-clean', '-sc', '-an', '-final', '-re']:
 			return self.book.path +'/OCR/part{0}{1}.html'.format(self.part, string)
 		else:
 			return self.book.path +'/OCR/part{0}{1}.txt'.format(self.part, string)
@@ -617,6 +617,13 @@ class EBook(models.Model):
 	def specialcontent_count(self):
 		return len(self.specialcontent_set.all())
 
+	def replace(self):
+		from utils.replace import replace
+		shutil.copy2(self.get_path('-clean'), self.get_path('-re'))
+		replace(self.get_path('-re'))
+		print self.get_path('-re')
+		return self.get_path('-re')
+
 	def zip(self, user, password):
 		import pyminizip
 		zip_file_name = BASE_DIR +'/file/ebookSystem/document/{0}/OCR/{1}_{2}.zip'.format(self.book.book_info.ISBN, self.ISBN_part, user.username)
@@ -626,8 +633,7 @@ class EBook(models.Model):
 			zip_list = [self.get_path('-clean')]
 		try:
 			pyminizip.compress_multiple(zip_list, zip_file_name, password, 5)
-			return self.get_path('-clean')
-#			return zip_file_name
+			return zip_file_name
 		except:
 			try:
 				os.remove(zip_file_name)
