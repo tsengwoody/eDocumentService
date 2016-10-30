@@ -14,7 +14,7 @@ from PIL import Image, ImageFont, ImageDraw
 class BookInfo(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
 	bookname = models.CharField(max_length=50)
-	author = models.CharField(max_length=50)
+	author = models.CharField(max_length=200)
 	house = models.CharField(max_length=30)
 	date = models.DateField()
 	def __unicode__(self):
@@ -76,7 +76,7 @@ class Book(models.Model):
 				part = page_info[0]
 				begin_page = page_info[1]
 				end_page = page_info[2]
-				ISBN_part = '{0}-{1}'.format(self.ISBN, page_info[0])
+				ISBN_part = '{0}-{1}'.format(self.ISBN, part)
 				EBook.objects.create(book=self, part=part, ISBN_part=ISBN_part, begin_page=begin_page, end_page=end_page)
 			self.part_count = len(self.ebook_set.all())
 			self.save()
