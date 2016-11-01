@@ -50,22 +50,22 @@
 					</ul>
 				</li>
 				{% endif %}
-
+					{% if request.user.is_editor or request.user.is_advanced_editor %}
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#">校對<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 					{% if request.user.is_editor %}
-					<li><a href="{% url 'account:profile' %}">一般校對</a></li>
+					<li><a href="{% url 'account:service' %}">一般校對</a></li>
 					{% endif %}
 					{% if request.user.is_advanced_editor %}
 					<li><a href="{% url 'account:sc_service' %}">進階校對</a></li>
 					{% endif %}
 					</ul>
 				</li>
-
+					{% endif %}
 				{% if request.user.is_guest %}
 				<li><a href="{% url 'guest:book_repository' %}">書庫</a></li>
-				<li><a href="{% url 'genericUser:revise_content' %}">更正</a></li>
+<!--				<li><a href="{% url 'genericUser:revise_content' %}">更正</a></li>-->
 				{% endif %}
 				{% if request.user.is_staff %}
 				<li><a href="{% url 'account:an_service' %}">分析</a></li>

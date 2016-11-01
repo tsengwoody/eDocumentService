@@ -124,8 +124,6 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 	org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(book.book_info.ISBN,"org")
 	source_path = book.path +u'/source'
 	[scanPageList, defaultPageURL] = book.get_org_image(request.user)
-#	defaultPageURL = org_path +u'/' +scanPageList[0]
-#	defaultPageURL=defaultPageURL.replace(BASE_DIR +'/static/', '')
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
@@ -337,6 +335,16 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 				return locals()
 			download_path = attach_file_path
 			download_filename = os.path.basename(attach_file_path)
+		if request.POST.has_key('view'):
+			getPart = EBook.objects.get(ISBN_part=request.POST['view'])
+			attach_file_path = getPart.replace()
+			if not attach_file_path:
+				status = 'error'
+				message = u'準備文件失敗'
+				return locals()
+			download_path = attach_file_path
+			download_filename = os.path.basename(attach_file_path)
+		return locals()
 		return locals()
 	if request.method == 'GET':
 		return locals()
@@ -402,8 +410,14 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 		part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
 	except: 
 		raise Http404("book or part does not exist")
+	if not part.editor == request.user:
+		status = u'error'
+		message = u'您非本文件之校對者！'
+#		permission_denied = True
+		redirect_to = reverse('account:service')
+		return locals()
 	[scanPageList, defaultPageURL] = part.get_image(request.user)
-	[editContent, fileHead] = part.get_content('-edit')
+	editContent = part.get_content('-edit')
 	if request.method == 'POST':
 		Token = request.session.get('postToken',default=None)
 		userToken = request.POST['postToken']
@@ -439,7 +453,7 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 			status = 'success'
 			message = u'成功載入全部文件內容'
 		[scanPageList, defaultPageURL] = part.get_image(request.user)
-		[editContent, fileHead] = part.get_content('-edit')
+		editContent = part.get_content('-edit')
 		del request.session['postToken']
 		postToken = uuid.uuid1().hex
 		request.session['postToken'] = postToken
@@ -458,7 +472,7 @@ def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
 	except:
 		raise Http404("book does not exist")
 	[scanPageList, defaultPageURL] = part.get_image(request.user)
-	[editContent, fileHead] = part.get_content('-sc')
+	editContent = part.get_content('-sc')
 	if request.method == 'POST':
 		with codecs.open(part.get_path('-sc'), 'w', encoding='utf-8') as scFile:
 			scFile.write(u'\ufeff' +request.POST['content'])
@@ -485,6 +499,10 @@ def special_content(request, ISBN_part, template_name='ebookSystem/special_conte
 			if part.is_sc_rebuild:
 				status = u'error'
 				message = u'請先進行特殊內容檢查'
+				return locals()
+			if not len(part.specialcontent_set.all()) == 0:
+				status = u'error'
+				message = u'請先完成特殊內容編輯'
 				return locals()
 			part.change_status(1, 'sc_finish')
 			part.group_ServiceHours()

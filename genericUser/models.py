@@ -64,7 +64,7 @@ class User(AbstractUser):
 			return False
 
 	def authentication(self):
-		return self.status == self.STATUS['active'] and self.auth_email and self.auth_phone
+		return (self.auth_email and self.auth_phone) or self.is_special
 
 	def status_int2str(self):
 		for k, v in self.STATUS.iteritems():

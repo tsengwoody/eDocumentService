@@ -55,7 +55,7 @@
 			<td>{{ book.book_info.author }}</td>
 			<td>{{ book.book_info.house }}</td>
 			<td>{{ book.book_info.date }}</td>
-			{% if request.user.is_guest and request.user.has_guest and part.status >= 3 %}
+			{% if request.user.is_guest and request.user.has_guest and book.status >= 3 %}
 			<td>
 				<button type="submit" class="btn btn-default send_button" id="email_id" name="email" value={{book.ISBN}}>傳送至電郵</button>
 			</td>

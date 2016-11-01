@@ -34,10 +34,10 @@ def add_base_url(src, id, encoding='utf-8'):
 def add_tag(source, destination, encoding='utf-8'):
 	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 		source_content = sourceFile.read()
-		source_content = source_content[1:]
+#		source_content = source_content[1:]
 	destination_content = '<p>' +source_content.replace('\r\n', '</p>\r\n<p>') +'</p>'
 	with codecs.open(destination, 'w', encoding=encoding) as destinationFile:
-		destinationFile.write(u'\ufeff' +destination_content)
+		destinationFile.write(destination_content)
 
 def add_template_tag(source, destination, template, encoding='utf-8'):
 	with codecs.open(template, 'r', encoding=encoding) as templateFile:
@@ -46,17 +46,17 @@ def add_template_tag(source, destination, template, encoding='utf-8'):
 		tail = template_content.split('{}')[1]
 	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 		source_content = sourceFile.read()
-		file_head = source_content[0]
-		source_content = source_content[1:]
+#		file_head = source_content[0]
+#		source_content = source_content[1:]
 	source_content = head +source_content +tail
 	with codecs.open(destination, 'w', encoding=encoding) as destinationFile:
-		destinationFile.write(u'\ufeff' +source_content)
+		destinationFile.write(source_content)
 
 def clean_tag(source,  destination, title='', encoding='utf-8'):
 	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 		source_content = sourceFile.read()
-	file_head = source_content[0]
-	source_content = source_content[1:]
+#	file_head = source_content[0]
+#	source_content = source_content[1:]
 	source_content = source_content.replace('<br />', '</p>\r\n<p>')
 	from bs4 import BeautifulSoup, NavigableString
 	soup = BeautifulSoup(source_content, 'lxml')
