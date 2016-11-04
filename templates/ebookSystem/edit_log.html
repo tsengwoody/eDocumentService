@@ -1,0 +1,46 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+{{ part }}編輯軌跡
+{% endblock %}
+{% block header %}
+{{ part }}編輯軌跡
+{% endblock %}
+{% block content %}
+<legend><h3>{{ part }}編輯軌跡</h3></legend>
+<form action="" method="post">
+	{% csrf_token %}
+	{% for er in part.editrecord_set.all %}
+	<h4>第{{ er.number_of_times }}次{{ er.category }}校對</h4>
+	<table class="table table-striped table-hover">
+		<tr>
+			<th>校對者</th>
+			<th>領取日期</th>
+			<th>時數</th>
+		</tr>
+		<tr>
+			<td>{{ er.editor }}</td>
+			<td>{{ er.get_date }}</td>
+			<td>{{ er.service_hours }}</td>
+		</tr>
+	</table>
+	<table class="table table-striped table-hover">
+		<tr>
+			<th>使用者</th>
+			<th>時間</th>
+			<th>序列</th>
+			<th>修改次數</th>
+			<th>有效</th>
+		</tr>
+	{% for el in er.editlog_set.all %}
+		<tr>
+			<td>{{ el.user }}</td>
+			<td>{{ el.time }}</td>
+			<td>{{ el.order }}</td>
+			<td>{{ el.edit_count }}</td>
+			<td></td>
+		</tr>
+	{% endfor %}
+	</table>
+	{% endfor %}
+</form>
+{% endblock %}

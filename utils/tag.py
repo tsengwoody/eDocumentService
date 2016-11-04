@@ -1,6 +1,7 @@
 ﻿# coding: utf-8
 import codecs
 import os
+import re
 from bs4 import BeautifulSoup, NavigableString
 
 def merge_NavigableString(tag):
@@ -55,25 +56,29 @@ def add_template_tag(source, destination, template, encoding='utf-8'):
 def clean_tag(source,  destination, title='', encoding='utf-8'):
 	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 		source_content = sourceFile.read()
-#	file_head = source_content[0]
-#	source_content = source_content[1:]
-	source_content = source_content.replace('<br />', '</p>\r\n<p>')
-	from bs4 import BeautifulSoup, NavigableString
+		source_content = source_content.replace('<br />', '</p><p>')
 	soup = BeautifulSoup(source_content, 'lxml')
+#	soup = BeautifulSoup(open(source), 'lxml')
+#	soup = replace_br_tag(soup)
 	span_tags = soup.find_all('span')
 	for span_tag in span_tags:
 		if not (span_tag.attrs.has_key('class') and ('unknown' in span_tag.attrs['class'] or 'mathml' in span_tag.attrs['class'])):
 			span_tag.unwrap()
 #		else:
 		if span_tag.attrs.has_key('class') and 'unknown' in span_tag.attrs['class']:
-			span_tag_string = span_tag.string.split('{???}')
-			if len(span_tag_string) == 2:
+			try:
+				span_tag_string = span_tag.string.split('{???}')
+				if len(span_tag_string) != 2:raise
 				span_tag.insert_before(NavigableString(span_tag_string[0]))
 				span_tag.string = '{???}'
 				span_tag.insert_after(NavigableString(span_tag_string[1]))
+			except:
+				print 'extract {0}'.format(span_tag)
+				span_tag.extract()
 	div_tags = soup.find_all('div')
 	for div_tag in div_tags:
 		div_tag.name = 'p'
+#	soup = BeautifulSoup(soup.prettify(formatter='html'), 'lxml')
 	p_tags = soup.find_all('p')
 	for p_tag in p_tags:
 		del p_tag['class']
@@ -83,10 +88,10 @@ def clean_tag(source,  destination, title='', encoding='utf-8'):
 		if isinstance(tag, NavigableString) and tag.string != '\n':
 			tag.wrap(soup.new_tag('p'))
 	i = 0
-	for tag in soup.body.contents:
-		if tag.name == 'p':
-			tag.attrs['id'] = i
-			i = i +1
+	p_tags = soup.find_all('p')
+	for p_tag in p_tags:
+		p_tag.attrs['id'] = i
+		i = i +1
 	with codecs.open( destination, 'w', encoding=encoding) as cleanFile:
 		clean_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
 		soup = BeautifulSoup(clean_content, 'lxml')

@@ -165,6 +165,11 @@ def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.htm
 			lc_list = lc_dict.items()
 			re_dict = find_repeat(part.get_path('-an'))
 			re_list = re_dict.items()
+		else:
+			lc_dict = last_character(part.get_path('-clean'))
+			lc_list = lc_dict.items()
+			re_dict = find_repeat(part.get_path('-clean'))
+			re_list = re_dict.items()
 		status = u'success'
 		message = u'分析文件'
 		return locals()
@@ -188,6 +193,11 @@ def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.htm
 				lc_dict = last_character(part.get_path('-an'))
 				lc_list = lc_dict.items()
 				re_dict = find_repeat(part.get_path('-an'))
+				re_list = re_dict.items()
+			else:
+				lc_dict = last_character(part.get_path('-clean'))
+				lc_list = lc_dict.items()
+				re_dict = find_repeat(part.get_path('-clean'))
 				re_list = re_dict.items()
 			status = u'success'
 			message = u'檔案成功更新'
@@ -218,7 +228,6 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
 			part.change_status(1, 'finish')
-			part.group_ServiceHours()
 			status = 'success'
 			message = u'審核通過文件'
 			for event in events:
@@ -335,8 +344,29 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 				return locals()
 			download_path = attach_file_path
 			download_filename = os.path.basename(attach_file_path)
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+@user_category_check(['superuser'])
+@http_response
+def detail_manager(request, book_ISBN, template_name='ebookSystem/detail_manager.html'):
+	try:
+		book = Book.objects.get(ISBN=book_ISBN)
+	except:
+		raise Http404("book does not exist")
+	if request.method == 'POST':
 		if request.POST.has_key('view'):
 			getPart = EBook.objects.get(ISBN_part=request.POST['view'])
+			attach_file_path = getPart.get_path('-clean')
+			if not attach_file_path:
+				status = 'error'
+				message = u'準備文件失敗'
+				return locals()
+			download_path = attach_file_path
+			download_filename = os.path.basename(attach_file_path)
+		if request.POST.has_key('view_se'):
+			getPart = EBook.objects.get(ISBN_part=request.POST['view_se'])
 			attach_file_path = getPart.replace()
 			if not attach_file_path:
 				status = 'error'
@@ -345,6 +375,17 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 			download_path = attach_file_path
 			download_filename = os.path.basename(attach_file_path)
 		return locals()
+	if request.method == 'GET':
+		return locals()
+
+@user_category_check(['superuser'])
+@http_response
+def edit_log(request, ISBN_part, template_name='ebookSystem/edit_log.html'):
+	try:
+		part = EBook.objects.get(ISBN_part=ISBN_part)
+	except:
+		raise Http404("ebook does not exist")
+	if request.method == 'POST':
 		return locals()
 	if request.method == 'GET':
 		return locals()
@@ -440,13 +481,13 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 		elif request.POST.has_key('close'):
 			status = 'success'
 			message = u'關閉無儲存資料'
-			redirect_to = reverse('account:profile')
+			redirect_to = reverse('account:service')
 		elif request.POST.has_key('finish'):
 			part.set_content(finish_content=content, edit_content='')
 			part.change_status(1, 'review')
 			status = 'success'
 			message = u'完成文件校對，將進入審核'
-			redirect_to = reverse('account:profile')
+			redirect_to = reverse('account:service')
 			event = Event.objects.create(creater=request.user, action=part)
 		elif request.POST.has_key('load'):
 			part.load_full_content()
@@ -492,9 +533,13 @@ def special_content(request, ISBN_part, template_name='ebookSystem/special_conte
 		if request.POST.has_key('rebuild'):
 			part.delete_SpecialContent()
 			part.create_SpecialContent()
+			status = u'success'
+			message = u'重新檢查特殊內容成功'
 		if request.POST.has_key('full_write'):
 			for sc in part.specialcontent_set.all():
 				sc.write_to_file()
+			status = u'success'
+			message = u'全寫入成功'
 		if request.POST.has_key('finish'):
 			if part.is_sc_rebuild:
 				status = u'error'
@@ -505,14 +550,14 @@ def special_content(request, ISBN_part, template_name='ebookSystem/special_conte
 				message = u'請先完成特殊內容編輯'
 				return locals()
 			part.change_status(1, 'sc_finish')
-			part.group_ServiceHours()
-			part.save()
+			status = u'success'
+			message = u'特殊內容編輯完成'
 			redirect_to = reverse('account:sc_service')
 		if request.POST.has_key('write'):
 			sc = SpecialContent.objects.get(id=request.POST['write'])
 			sc.write_to_file()
-		status = u'success'
-		message = u'操作動作成功'
+			status = u'success'
+			message = u'寫入動作成功'
 		return locals()
 	if request.method == 'GET':
 		return locals()
