@@ -33,7 +33,6 @@ class Book(models.Model):
 	upload_date = models.DateField(default = timezone.now)
 	is_private = models.BooleanField(default=False)
 	status = models.IntegerField(default=0)
-#	STATUS = {'inactive':0, 'active':1, 'finish':2}
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8}
 
 	def __unicode__(self):
@@ -152,10 +151,7 @@ class Book(models.Model):
 		import pyminizip
 		zip_file_name = BASE_DIR +'/file/ebookSystem/document/{0}/OCR/{1}_{2}.zip'.format(self.book_info.ISBN, self.book_info.ISBN, user.username)
 		self.check_status()
-		if self.STATUS['finish'] <= self.status <= self.STATUS['sc_finish']:
-			zip_list = [ file.get_path('-clean') for file in self.ebook_set.all() ]
-		elif self.STATUS['sc_finish'] <= self.status:
-			zip_list = [ file.get_path('-sc') for file in self.ebook_set.all() ]
+		zip_list = [ file.get_file() for file in self.ebook_set.all() ]
 		try:
 			pyminizip.compress_multiple(zip_list, zip_file_name, password, 5)
 			return zip_file_name
@@ -262,7 +258,8 @@ class EBook(models.Model):
 				self.edited_page = self.end_page -self.begin_page
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['finish']:
-				self.clean_tag(self.get_path('-finish'), self.get_path('-clean'))
+				self.add_template_tag(self.get_path('-finish'), self.get_path('-clean'))
+				self.clean_tag(self.get_path('-clean'), self.get_path('-clean'))
 				shutil.copy2(self.get_path('-clean'), self.get_path('-sc'))
 				self.group_ServiceHours()
 				try:
@@ -535,17 +532,20 @@ class EBook(models.Model):
 		del img0, img, img2
 
 	def add_tag(self, encoding='utf-8'):
+		from utils import tag
 		source = self.get_path()
 		destination = self.get_path('-edit')
-		from utils import tag
 		tag.add_tag(source, destination)
 
-	def clean_tag(self, src, dst, template='book_template.html', encoding='utf-8'):
+	def add_template_tag(self, src, dst, template='book_template.html', encoding='utf-8'):
 		template = BASE_DIR +u'/templates/' +template
 		from utils import tag
 		tag.add_template_tag(src, dst, template)
+
+	def clean_tag(self, src, dst, template='book_template.html', encoding='utf-8'):
+		from utils import tag
 		title = self.book.book_info.bookname +'-part{0}'.format(self.part)
-		tag.clean_tag(dst, dst, title)
+		tag.clean_tag(src, dst, title)
 
 	def create_SpecialContent(self, encoding='utf-8'):
 		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, "org")
@@ -621,18 +621,23 @@ class EBook(models.Model):
 
 	def replace(self):
 		from utils.replace import replace
-		shutil.copy2(self.get_path('-clean'), self.get_path('-re'))
+		shutil.copy2(self.get_file(), self.get_path('-re'))
 		replace(self.get_path('-re'))
-		print self.get_path('-re')
 		return self.get_path('-re')
+
+	def get_file(self):
+		if self.STATUS['finish'] <= self.status < self.STATUS['sc_finish']:
+			return self.get_path('-clean')
+		elif self.STATUS['sc_finish'] <= self.status < self.STATUS['an_finish']:
+			return self.get_path('-sc')
+		elif self.STATUS['an_finish'] <= self.status:
+			return self.get_path('-an')
+
 
 	def zip(self, user, password):
 		import pyminizip
 		zip_file_name = BASE_DIR +'/file/ebookSystem/document/{0}/OCR/{1}_{2}.zip'.format(self.book.book_info.ISBN, self.ISBN_part, user.username)
-		if self.STATUS['finish'] <= self.status <= self.STATUS['sc_finish']:
-			zip_list = [self.get_path('-clean')]
-		elif self.STATUS['sc_finish'] <= self.status:
-			zip_list = [self.get_path('-clean')]
+		zip_list = [self.get_file()]
 		try:
 			pyminizip.compress_multiple(zip_list, zip_file_name, password, 5)
 			return zip_file_name

@@ -125,6 +125,64 @@ def create_document(request, template_name='genericUser/create_document.html'):
 	if request.method == 'GET':
 		return locals()
 
+@user_category_check(['user'])
+@http_response
+def upload_document(request, template_name='genericUser/upload_document.html'):
+	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date'))
+	if request.method == 'POST':
+		bookInfoForm = BookInfoForm(request.POST)
+		if not bookInfoForm.is_valid():
+			status = 'error'
+			message = u'表單驗證失敗' +str(bookInfoForm.errors)
+			return locals()
+		uploadPath = BASE_DIR +u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
+		if os.path.exists(uploadPath):
+			status = 'error'
+			message = u'文件已存在'
+			return locals()
+		[status, message] = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
+		uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
+		if request.POST['category'] == 'txt':
+			final_file = os.path.join(uploadPath, 'OCR') +'/part1.txt'
+			try:
+				os.makedirs(os.path.dirname(final_file))
+				shutil.copy2(uploadFilePath, final_file)
+			except:
+				shutil.rmtree(uploadPath)
+				status = 'error'
+				message = u'非正確{0}文件'.format(request.POST['category'])
+				return locals()
+		try:
+			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
+		except:
+			newBookInfo = bookInfoForm.save(commit=False)
+			newBookInfo.ISBN = request.POST['ISBN']
+			newBookInfo.save()
+		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path = uploadPath, page_count=-1 ,part_count=1, page_per_part=-1)
+		newBook.scaner = request.user
+		newBook.owner = request.user
+		newBook.save()
+		ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN']+'-1', begin_page=-1, end_page=-1)
+		if request.POST['category'] == 'txt':
+			try:
+				ebook.add_tag()
+				shutil.copy2(ebook.get_path('-edit'), ebook.get_path('-finish'))
+				with codecs.open(self.get_path('-edit'), 'w', encoding='utf-8') as editFile:
+					editFile.write(u'\ufeff')
+				ebook.add_template_tag(ebook.get_path('-finish'), ebook.get_path('-clean'))
+				ebook.clean_tag(ebook.get_path('-clean'), ebook.get_path('-clean'))
+				shutil.copy2(ebook.get_path('-clean'), ebook.get_path('-sc'))
+				ebook.status = ebook.STATUS['sc_finish']
+			except:
+				shutil.rmtree(uploadPath)
+				newBook.delete()
+		redirect_to = '/'
+		status = 'success'
+		message = u'成功建立並上傳文件'
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
 def upload_progress(request):
 	"""
 	Return JSON object with information about the progress of an upload.

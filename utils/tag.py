@@ -1,4 +1,5 @@
-﻿# coding: utf-8
+﻿
+# coding: utf-8
 import codecs
 import os
 import re
@@ -64,21 +65,9 @@ def clean_tag(source,  destination, title='', encoding='utf-8'):
 	for span_tag in span_tags:
 		if not (span_tag.attrs.has_key('class') and ('unknown' in span_tag.attrs['class'] or 'mathml' in span_tag.attrs['class'])):
 			span_tag.unwrap()
-#		else:
-		if span_tag.attrs.has_key('class') and 'unknown' in span_tag.attrs['class']:
-			try:
-				span_tag_string = span_tag.string.split('{???}')
-				if len(span_tag_string) != 2:raise
-				span_tag.insert_before(NavigableString(span_tag_string[0]))
-				span_tag.string = '{???}'
-				span_tag.insert_after(NavigableString(span_tag_string[1]))
-			except:
-				print 'extract {0}'.format(span_tag)
-				span_tag.extract()
 	div_tags = soup.find_all('div')
 	for div_tag in div_tags:
 		div_tag.name = 'p'
-#	soup = BeautifulSoup(soup.prettify(formatter='html'), 'lxml')
 	p_tags = soup.find_all('p')
 	for p_tag in p_tags:
 		del p_tag['class']

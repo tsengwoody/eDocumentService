@@ -358,7 +358,7 @@ def detail_manager(request, book_ISBN, template_name='ebookSystem/detail_manager
 	if request.method == 'POST':
 		if request.POST.has_key('view'):
 			getPart = EBook.objects.get(ISBN_part=request.POST['view'])
-			attach_file_path = getPart.get_path('-clean')
+			attach_file_path = getPart.get_file()
 			if not attach_file_path:
 				status = 'error'
 				message = u'準備文件失敗'

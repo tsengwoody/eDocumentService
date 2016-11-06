@@ -12,6 +12,7 @@ urlpatterns = [
 	url(r'^license/$', views.license, name='license'),
 	url(r'^security/$', views.security, name='security'),
 	url(r'^create_document/$', views.create_document, name='create_document'),
+	url(r'^upload_document/$', views.upload_document, name='upload_document'),
 	url(r'^upload_progress/$', views.upload_progress, name='upload_progress'),
 	url(r'^event_list/$', views.event_list, name='event_list'),
 	url(r'^contact_us/$', views.contact_us, {'template_name': 'genericUser/contact_us.html'}, name='contact_us'),

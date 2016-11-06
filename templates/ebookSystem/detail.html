@@ -26,9 +26,6 @@
 			<th>時數</th>
 			<th>預計完成日期</th>
 			<th colspan="2">動作</th>
-			{% if request.user.is_superuser %}
-			<th>管理</th>
-			{% endif %}
 		</tr>
 		{% for part in book.ebook_set.all %}
 		<tr>
@@ -48,13 +45,11 @@
 			<td></td>
 			<td></td>
 			{% endif %}
-			{% if request.user.is_superuser %}
-			<td>
-				<a href="{% url 'ebookSystem:detail_manager' book.ISBN %}" >管理</a>
-			</td>
-			{% endif %}
 		</tr>
 		{% endfor %}
 	</table>
+	{% if request.user.is_superuser %}
+	<a class="btn btn-link" role="button" href="{% url 'ebookSystem:detail_manager' book.ISBN %}" >管理</a>
+	{% endif %}
 </form>
 {% endblock %}
