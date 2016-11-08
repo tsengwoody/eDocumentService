@@ -31,8 +31,7 @@
     <!-- Wrapper for slides -->
     <div class="carousel-inner" role="listbox">
       <div class="item active">
-        <img src="{% static "ebookSystem/img/target1.jpg" %}" alt="我看不見書，但我想閱讀" title="eDocumentService
-        資訊平台" style="height: 346px;" >
+        <img src="{% static "ebookSystem/img/target1.jpg" %}" alt="我看不見書，但我想閱讀" title="雲端千眼" style="height: 346px;width=800px" >
       </div>
 
 <!--      <div class="item">
@@ -73,23 +72,23 @@
         </div>
     </div>
     <div class="col-lg-4">
-        <div class="panel panel-info">
-            <div class="panel-heading">雲端平台系統-使用流程</div>
-            <div class="panel-body">
+        <div class="panel panel-info" itemscope="" itemtype="http://schema.org/Product">
+            <div class="panel-heading" itemprop="name">雲端千眼-使用流程</div>
+            <div class="panel-body" itemprop="description">
                 <p>「mark」鍵：進行書籍重製中，完成一部分之編輯後，可點選mark鍵，會插入此︱----------︱符號，之後再點選「存檔」鍵，下次再開啟書籍重製頁面時，則上次插入mark點以上之資料(已完成重製資料的部分資料)已系統存檔並消失，則可繼續進行未完成重製資料之校對。</p>
                 <div class="pull-right">
-                    <p><a class="btn btn-default center" role="button" href="/genericUser/user_guide" >View details »</a></p>
+                    <p><a class="btn btn-default center" role="button" href="/genericUser/user_guide" itemprop="url" >View details »</a></p>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-lg-4">
-        <div class="panel panel-success">
-            <div class="panel-heading">關於我們</div>
-            <div class="panel-body">
+        <div class="panel panel-success" itemscope="" itemtype="http://schema.org/Product">
+            <div class="panel-heading" itemprop="name">關於雲端千眼</div>
+            <div class="panel-body" itemprop="description">
                 <p>莎士比亞有句名言：「生活里沒有書籍，就好像大地沒有陽光；智慧里沒有書籍，就好像鳥兒沒有翅膀。」而『edocumentservice平台』的建立，主要便是希望透過平台，讓視障服務使用者能夠閱讀重製轉化後的電子書，並且透過平台自動化管理，減少視障服務使用者在取得資訊所遇到的困難。</p>
                 <div class="pull-right">
-                    <p><a class="btn btn-default center" href="{% url 'genericUser:func_desc' %}" role="button">View details »</a></p>
+                    <p><a class="btn btn-default center" href="{% url 'genericUser:func_desc' %}" role="button" itemprop="url">View details »</a></p>
                 </div>
             </div>
         </div>
