@@ -57,24 +57,24 @@
 	</div>
 	{% block footer %}
 	<footer class="footer">
-    <div class="container" role="contentinfo" itemscope="" itemtype="http://schema.org/Organization">
-    	<div class="pull-left">
-		    <ul class="list-inline">
-		     	<li ><a itemprop="url" href="{% url 'genericUser:func_desc' %}">關於雲端千眼</a></li>
-		        <li itemprop="url"><a href="{% url 'genericUser:contact_us' %}">聯絡我們</a></li>
-		        <li itemprop="location"><a href="{% url 'genericUser:org_info' %}">服務中心資訊</a></li>
-		        {% if readmeUrl %}
-		        <li itemprop="url"><a href={{ readmeUrl }}>說明</a></li>
-		        {% endif %} {% if request.user.is_active %}
-		        <li itemprop="url"><a href="/genericUser/license/">使用者條款</a></li>
-		        <li itemprop="url"><a href="/genericUser/security/">資訊安全政策</a></li>
-		        {% endif %}
-		    </ul>
-		</div>
-    	<div class="pull-right">		
-			<p itemprop="owns">© eDocumentService 2016</p>
-		</div>
-    </div>
+	    <div class="container" role="contentinfo" itemscope="" itemtype="http://schema.org/Organization">
+	    	<div class="pull-left">
+			    <ul class="list-inline">
+			     	<li ><a itemprop="url" href="{% url 'genericUser:func_desc' %}">關於雲端千眼</a></li>
+			        <li itemprop="url"><a href="{% url 'genericUser:contact_us' %}">聯絡我們</a></li>
+			        <li itemprop="url"><a href="{% url 'genericUser:org_info' %}">服務中心資訊</a></li>
+			        {% if readmeUrl %}
+			        <li itemprop="url"><a href={{ readmeUrl }}>說明</a></li>
+			        {% endif %} {% if request.user.is_active %}
+			        <li itemprop="url"><a href="/genericUser/license/">使用者條款</a></li>
+			        <li itemprop="url"><a href="/genericUser/security/">資訊安全政策</a></li>
+			        {% endif %}
+			    </ul>
+			</div>
+	    	<div class="pull-right">		
+				<p itemprop="owns">© eDocumentService 2016</p>
+			</div>
+	    </div>
 	</footer>
 	{% endblock %}
 	<script src="{% static "ebookSystem/js/bootstrap/bootstrap.min.js" %}" type="text/javascript"></script>
