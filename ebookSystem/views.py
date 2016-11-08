@@ -11,7 +11,7 @@ from django.views import generic
 from .models import *
 from .forms import *
 from genericUser.models import Event, ServiceHours
-from mysite.settings import BASE_DIR
+from mysite.settings import BASE_DIR, SERVICE
 from utils.analysis import *
 from utils.crawler import *
 from utils.decorator import *
@@ -327,7 +327,7 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 				status = 'error'
 				message = u'準備文件失敗'
 				return locals()
-			subject = u'[文件] {0}'.format(getBook)
+			subject = u'[文件] {0}'.format(getPart)
 			body = u'新愛的{0}您好：\n'.format(request.user.username)
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
 			email.attach_file(attach_file_path)
