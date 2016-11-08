@@ -263,10 +263,9 @@ class EBook(models.Model):
 				shutil.copy2(self.get_path('-clean'), self.get_path('-sc'))
 				self.group_ServiceHours()
 				try:
-					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
-					editRecord.record_info()
+					editRecord = EditRecord.objects.get(part=self, category='advanced', number_of_times=self.number_of_times)
 				except:
-					return False
+					editRecord = EditRecord.objects.create(part=self, category='advanced', number_of_times=self.number_of_times)
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['sc_edit']:
 				self.sc_editor = kwargs['user']
