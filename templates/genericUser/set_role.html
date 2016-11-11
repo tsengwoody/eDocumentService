@@ -21,7 +21,7 @@
                     </th>
                     <td>
                         {% if request.user.has_editor %}<span class="label label-success">志工</span>{% endif %}
-                        {% if request.user.has_guest %}<span class="label label-success">服務使用者<span>{% endif %}
+                        {% if request.user.has_guest %}<span class="label label-success">視障者<span>{% endif %}
                     </td>
                 </tr>
                 {% if request.user.has_editor %}
