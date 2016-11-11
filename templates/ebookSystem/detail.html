@@ -1,4 +1,5 @@
 ﻿{% extends "base_nav.html" %}
+{% load staticfiles %}
 {% block title %}
 {{ book }}資訊
 {% endblock %}
@@ -6,7 +7,8 @@
 {{ book }}資訊 
 {% endblock %}
 {% block content %}
-
+{% include 'utils/get_book.html' %}
+{% include 'utils/dialog.html' %}
 <legend><h3>{{ book }}資訊</h3></legend>
 <ul>
 	<li>ISBN：{{ book.ISBN }}</li>
@@ -36,10 +38,10 @@
 			<td>{{part.deadline}}</td>
 			{% if request.user.is_guest and request.user.has_guest and part.status >= 3 %}
 			<td>
-				<button type="submit" class="btn btn-default send_button" id="email_id" name="email" value={{part.ISBN_part}}>傳送至電郵</button>
+				<button type="button" class="btn btn-default" id="email_id" name="email" data-target="#getBookModal" data-toggle="modal" data-whatever="email" data-isbn={{part.ISBN_part}}  value={{part.ISBN_part}}>寄到信箱</button>
 			</td>
 			<td>
-				<button type="submit" class="btn btn-default send_button" id="download_id" name="download" value={{part.ISBN_part}}>傳送至本地</button>
+				<button type="button" class="btn btn-default" id="download_id" name="download" data-whatever="download" data-toggle="modal" data-target="#getBookModal" data-isbn={{part.ISBN_part}} value={{part.ISBN_part}}>下載</button>
 			</td>
 			{% else %}
 			<td></td>
@@ -49,7 +51,7 @@
 		{% endfor %}
 	</table>
 	{% if request.user.is_superuser %}
-	<a class="btn btn-link" role="button" href="{% url 'ebookSystem:detail_manager' book.ISBN %}" >管理</a>
+	<a class="btn btn-primary" role="button" href="{% url 'ebookSystem:detail_manager' book.ISBN %}" >管理</a>
 	{% endif %}
 </form>
 {% endblock %}

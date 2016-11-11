@@ -2,22 +2,26 @@
 {% block style %}
 <style type="text/css">
 body {
-  height:100%;
-  padding-top: 0px;    /*nav height*/
-  padding-bottom:70px;  /*footer height and nav margin-bottom*/
+    height: 100%;
+    padding-top: 0px;
+    /*nav height*/
+    padding-bottom: 70px;
+    /*footer height and nav margin-bottom*/
 }
-ul.nav-pills {
-    padding-top:50px;
 
+ul.nav-pills {
+    padding-top: 50px;
     position: relative;
-} 
-@media screen and (min-width: 768px) {
-  ul.nav-pills {
-    padding-top:50px;
-   /* top: 70px;*/
-    position: fixed;
-  }
 }
+
+@media screen and (min-width: 768px) {
+    ul.nav-pills {
+        padding-top: 50px;
+        /* top: 70px;*/
+        position: fixed;
+    }
+}
+
 blockquote {
     padding: 10px 20px;
     margin: 0 0 20px;
@@ -25,30 +29,34 @@ blockquote {
     border-left: 5px solid #eee;
 }
 
-#function {padding-top:50px;}
-#objective {padding-top:50px;}
-#about {padding-top:50px;}
+#function {
+    padding-top: 50px;
+}
 
-.nav-link{
-background: rgba(0, 0, 0, .05);
-border-right: 4px solid #4267b2;
+#objective {
+    padding-top: 50px;
 }
-.about_us_main{
-   padding-left: 50px;
+
+#about {
+    padding-top: 50px;
 }
+
+.nav-link {
+    background: rgba(0, 0, 0, .05);
+    border-right: 4px solid #4267b2;
+}
+
+.about_us_main {
+    padding-left: 50px;
+}
+
 @media screen and (min-width: 992px) {
-.about_us_main{
-   padding-left: 15px;
+    .about_us_main {
+        padding-left: 15px;
+    }
 }
 </style>
 
-<script type="text/javascript">
-$(document).ready(function() {
-
-//$('body').scrollspy({ target: '#navbar-about' , offset: 50 })
-
-});
-</script>
 {% endblock %}
 
 {% block content %}
