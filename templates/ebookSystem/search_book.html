@@ -26,7 +26,7 @@
 			<th>作者</th>
 			<th>出版社</th>
 			<th>出版日期</th>
-			<th colspan="1">動作</th>
+			<th colspan="2">動作</th>
 		</tr>
 		<tr>
 			<td>{{ search_book.ISBN }}</td>
@@ -35,8 +35,13 @@
 			<td>{{ search_book.book_info.house }}</td>
 			<td>{{ search_book.book_info.date }}</td>
 			<td>
-				{% if request.user.is_guest and request.user.has_guest and book.status >= 3 %}
-				<button type="submit" class="btn btn-default send_button" id="get_book_id" name="get_book" value={{ search_book.ISBN }}>寄送至郵箱</button>
+				{% if request.user.is_guest and request.user.has_guest and search_book.status >= 3 %}
+				<button type="button" class="btn btn-default" id="email_id" name="email" data-target="#getBookModal" data-toggle="modal" data-whatever="email" data-isbn={{book.ISBN}}  value={{book.ISBN}}>寄到信箱</button>
+				{% endif %}
+			</td>
+			<td>
+				{% if request.user.is_guest and request.user.has_guest and search_book.status >= 3 %}
+				<button type="button" class="btn btn-default" id="download_id" name="download" data-whatever="download" data-toggle="modal" data-target="#getBookModal" data-isbn={{book.ISBN}} value={{book.ISBN}}>下載</button>
 				{% endif %}
 			</td>
 		</tr>

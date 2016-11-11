@@ -148,7 +148,11 @@ class Book(models.Model):
 		return partSet.issubset(OCRFileSet)
 
 	def zip(self, user, password):
+		from django.contrib.auth import authenticate
 		import pyminizip
+		user = authenticate(username=user.username, password=password)
+		if user is None:
+			return False
 		zip_file_name = BASE_DIR +'/file/ebookSystem/document/{0}/OCR/{1}_{2}.zip'.format(self.book_info.ISBN, self.book_info.ISBN, user.username)
 		self.check_status()
 		zip_list = [ file.get_file() for file in self.ebook_set.all() ]
@@ -634,7 +638,11 @@ class EBook(models.Model):
 
 
 	def zip(self, user, password):
+		from django.contrib.auth import authenticate
 		import pyminizip
+		user = authenticate(user.username, password)
+		if user is None:
+			return False
 		zip_file_name = BASE_DIR +'/file/ebookSystem/document/{0}/OCR/{1}_{2}.zip'.format(self.book.book_info.ISBN, self.ISBN_part, user.username)
 		zip_list = [self.get_file()]
 		try:
