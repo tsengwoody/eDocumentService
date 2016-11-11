@@ -31,7 +31,7 @@ def book_repository(request, template_name='guest/book_repository.html'):
 		if request.POST.has_key('email'):
 			from django.core.mail import EmailMessage
 			getBook = Book.objects.get(ISBN=request.POST['email'])
-			attach_file_path = getBook.zip(request.user, 'test')
+			attach_file_path = getBook.zip(request.user, request.POST['password'])
 			if not attach_file_path:
 				status = 'error'
 				message = u'準備文件失敗'
@@ -46,7 +46,7 @@ def book_repository(request, template_name='guest/book_repository.html'):
 			os.remove(attach_file_path)
 		if request.POST.has_key('download'):
 			getBook = Book.objects.get(ISBN=request.POST['download'])
-			attach_file_path = getBook.zip(request.user, 'test')
+			attach_file_path = getBook.zip(request.user, request.POST['password'])
 			if not attach_file_path:
 				status = 'error'
 				message = u'準備文件失敗'
