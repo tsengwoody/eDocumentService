@@ -488,7 +488,7 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 			else:
 				vcode = cache.get(request.user.phone)['vcode']
 			data= u'親愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
-			url = 'https://api.kotsms.com.tw/kotsmsapi-1.php?username={0}&password={1}&dstaddr={2}&smbody={3}'.format(OTP_ACCOUNT, OTP_PASSWORD, request.user.phone, urllib.quote(data.encode('big5')))
+			url = 'https://api2.kotsms.com.tw/kotsmsapi-1.php?username={0}&password={1}&dstaddr={2}&smbody={3}'.format(OTP_ACCOUNT, OTP_PASSWORD, request.user.phone, urllib.quote(data.encode('big5')))
 			session = requests.Session()
 			response = session.get(url)
 			print(response.text.split('=')[1])

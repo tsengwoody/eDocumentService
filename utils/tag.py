@@ -37,6 +37,7 @@ def add_tag(source, destination, encoding='utf-8'):
 	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 		source_content = sourceFile.read()
 #		source_content = source_content[1:]
+	source_content = source_content.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
 	destination_content = '<p>' +source_content.replace('\r\n', '</p>\r\n<p>') +'</p>'
 	with codecs.open(destination, 'w', encoding=encoding) as destinationFile:
 		destinationFile.write(destination_content)

@@ -402,12 +402,12 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 		return locals()
 	if len(ISBN) == 10:
 		ISBN = ISBN10_to_ISBN13(ISBN)
-	[status, bookname, author, house, date] = get_book_info(ISBN)
+	[status, bookname, author, house, date, bookbinding] = get_book_info(ISBN)
 	if status == 'success':
 		message = u'成功取得資料'
 	else:
 		message = u'查無資料'
-	extra_list = ['bookname', 'author', 'house', 'date', 'ISBN']
+	extra_list = ['bookname', 'author', 'house', 'date', 'ISBN', 'bookbinding']
 	return locals()
 
 

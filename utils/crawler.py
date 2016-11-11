@@ -6,7 +6,8 @@ import re
 import requests
 import urllib,urllib2
 from bs4 import BeautifulSoup
-from mysite.settings import BASE_DIR
+#from mysite.settings import BASE_DIR
+
 
 def load_post_data(source):
 	post_data = {}
@@ -46,14 +47,17 @@ def get_book_info(ISBN):
 	for key in cookies_dict:
 		if key == 'PHPSESSID':
 			phpsessid = cookies_dict[key]
-	post_data_file = BASE_DIR +'/utils/post_data.txt'
+#	post_data_file = BASE_DIR +'/utils/post_data.txt'
+	post_data_file = '/django/eDocumentService/utils/post_data.txt'
 	values = load_post_data(post_data_file)
 	values['FO_SearchValue0'] = ISBN
 	response = session.post(url,data=values)
-	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/main_DisplayResults.php?PHPSESSID=' +phpsessid +'&Pact=DisplayAll'
+#	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/main_DisplayResults.php?PHPSESSID=' +phpsessid +'&Pact=DisplayAll'
+	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/main_DisplayRecord.php?PHPSESSID=' +phpsessid +'&Pact=DisplayAll'
 	response = session.get(url)
 	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/main_DisplayRecord.php?PHPSESSID=' +phpsessid +'&Pact=init&Pstart=1'
 	response = session.get(url)
+	response.encoding = 'utf-8'
 	res = response.text
 	soup = BeautifulSoup(res, 'html5lib')
 	data_tags = soup.find_all('td', class_=u'資料列_1')
@@ -65,14 +69,18 @@ def get_book_info(ISBN):
 		year = int(date.split('/')[0]) +1911
 		month = int(date.split('/')[1])
 		date = unicode(datetime.date(year,month,1))
+		bookbinding = 	unicode(data_tags[14].string).replace(u' ', '')
+		pattern = re.compile(r'\((.*)\)')
+		bookbinding = pattern.search(bookbinding).group(1)
 		status = u'success'
 	except:
 		bookname=''
 		author=''
 		house=''
 		date=''
+		bookbinding = ''
 		status = u'error'
-	return [status, bookname, author, house, date]
+	return [status, bookname, author, house, date, bookbinding]
 
 def ISBN10_check(ISBN):
 	match = re.search(r'^(\d{9})(\d|X)$', ISBN)
@@ -102,9 +110,8 @@ def ISBN10_to_ISBN13(ISBN):
 	check_digit = (10 - (result % 10)) % 10
 	return str(digits +str(check_digit))
 
+import sys
 if __name__ == '__main__':
-	book_info = get_book_info('9789573323969')
+	book_info = get_book_info(sys.argv[1])
 	for info in book_info:
 		print info
-	print ISBN10_to_ISBN13('957331990X')
-	print ISBN13_check('9789865829810')
