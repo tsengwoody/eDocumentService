@@ -11,11 +11,18 @@
 {% endblock %}
 {% block content %}
 
-<form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
+<form action="" method="post"  role="form" enctype="multipart/form-data">
 {% csrf_token %}
-	<input id="id_book_ISBN" maxlength="15" name="book_ISBN" type="text">
-	<input type="submit" class="btn btn-primary" name="search_name" value="search" id="id_search"> 
-	<hr />
+
+
+<div class="form-inline">
+  <div class="form-group">
+    <label for="id_book_ISBN">請輸入ISBN</label>
+    <input id="id_book_ISBN" class="form-control" maxlength="15" name="book_ISBN" type="text">
+  </div>
+  <input type="submit" class="btn btn-primary" name="search_name" value="search" id="id_search"> 
+</div>
+
 	{{ status }}
 	{{ message }}
 	<h4 class="page-header">查詢文件資訊</h4>

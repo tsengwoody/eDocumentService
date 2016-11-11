@@ -51,12 +51,8 @@
 	</div>
 </div>
 <div class="row">
+<h3 >個人資料</h3>
 	<div class="col-md-8 col-md-offset-2">
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">個人資料</h3>
-			</div>
-			<div class="panel-body">
 				<table class="table table-hover table-reflow no-page">
 					<tr>
 						<th class="col-md-4" scope="row">
@@ -153,15 +149,10 @@
 					</tr>
 					{% endif %}
 				</table>
-
-				<hr />
-				<div class="form-group row">
-					<div class="col-sm-offset-3 col-sm-6">
+				<div class="form-group row text-center">
 						<a href="{% url 'password_change' %}" role="button" class="btn btn-default">修改密碼</a>
 						<a href="{% url 'genericUser:change_contact_info' %}" role="button" class="btn btn-default">修改個人資料</a>
-					</div>
 				</div>
-			</div>
 		</div>
 	</div>
 </div>

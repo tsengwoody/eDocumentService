@@ -38,10 +38,21 @@
 			<td>{{part.service_hours}}</td>
 			<td>{{part.get_date}}</td>
 			<td>{{ part.editor }}</td>
-			<td><button type="submit" class="btn btn-default send_button" id="view_id" name="view" value={{part.ISBN_part}}>閱讀</button></td>
-			<td><button type="submit" class="btn btn-default send_button" id="view_se_id" name="view_se" value={{part.ISBN_part}}>閱讀(SE)</button></td>
-			<td><a href="{% url 'ebookSystem:analyze_part' part.ISBN_part %}" >分析</a></td>
-			<td><a href="{% url 'ebookSystem:edit_log' part.ISBN_part %}" >軌跡</a></td>
+			<td>
+			{% if part.status >= 3 %}<button type="submit" class="btn btn-default send_button" id="view_id" name="view" value={{part.ISBN_part}}>閱讀</button>{% endif %}</td>
+			<td>{% if part.status >= 3 %}<button type="submit" class="btn btn-default send_button" id="view_se_id" name="view_se" value={{part.ISBN_part}}>閱讀(SE)</button>{% endif %}</td>
+
+			<td>
+				{% if part.status >= 3 %}
+					<a href="{% url 'ebookSystem:analyze_part' part.ISBN_part %}" >分析</a>
+				{% endif %}
+			</td>
+			<td>
+				{% if part.status >= 3 %}
+					<a href="{% url 'ebookSystem:edit_log' part.ISBN_part %}" >軌跡</a>
+				{%endif%}
+			</td>
+			
 		</tr>
 		{% endfor %}
 	</table>

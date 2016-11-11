@@ -9,8 +9,10 @@
 {% block content %}
 {% include 'utils/get_book.html' %}
 {% include 'utils/dialog.html' %}
-<legend><h3>{{ book }}資訊</h3></legend>
-<ul>
+<legend><h3>{{ book }}資訊 {% if request.user.is_superuser %}
+	<a class="btn btn-primary pull-right" role="button" href="{% url 'ebookSystem:detail_manager' book.ISBN %}" >管理</a>
+	{% endif %}</h3></legend>
+<ul >
 	<li>ISBN：{{ book.ISBN }}</li>
 	<li>書名：{{ book.book_info.bookname }}</li>
 	<li>作者：{{ book.book_info.author }}</li>
@@ -50,8 +52,5 @@
 		</tr>
 		{% endfor %}
 	</table>
-	{% if request.user.is_superuser %}
-	<a class="btn btn-primary" role="button" href="{% url 'ebookSystem:detail_manager' book.ISBN %}" >管理</a>
-	{% endif %}
 </form>
 {% endblock %}

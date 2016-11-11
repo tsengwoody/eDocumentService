@@ -71,11 +71,23 @@
 		</tr>
 		{% endfor %}
 	</table>
-	<button type="submit" class="btn btn-primary" name="download" value="" id="id_download">下載</button>
-	<input class="form-control-file" id="id_fileObject" name="fileObject" type="file" />
-	<button type="submit" class="btn btn-primary" name="upload" value="" id="id_upload">上傳</button>
-	<button type="submit" class="btn btn-primary" name="finish" value="" id="id_finish">完成</button>
-	<a class="btn btn-link" role="button" href = {% url 'account:an_service' %}>回列表</a>
+
+	<div class="form-inline">
+	    <div class="form-group">
+	        <input class="form-control-file file" id="id_fileObject" name="fileObject" type="file" />
+	    </div>
+	    <button type="submit" class="btn btn-sm btn-success" name="upload" value="" id="id_upload">上傳</button>
+	</div>
+	<div class="form-inline">
+	<div class="form-group">
+	<a class="btn btn-success" role="button" href = {% url 'account:an_service' %}><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>回列表</a>
+	<button type="submit" class="btn btn-success" name="download" value="" id="id_download"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>下載</button>
+	<button type="submit" class="btn btn-success" name="finish" value="" id="id_finish">確認</button>
+	</div>
+	</div>
+	
+	
+	
 </form>
 
 {% endblock %}
