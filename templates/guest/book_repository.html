@@ -10,7 +10,8 @@
 書庫
 {% endblock %}
 {% block content %}
-
+{% include 'utils/get_book.html' %}
+{% include 'utils/dialog.html' %}
 <form action="" method="post">
 {% csrf_token %}
 
@@ -57,10 +58,12 @@
 			<td>{{ book.book_info.date }}</td>
 			{% if request.user.is_guest and request.user.has_guest and book.status >= 3 %}
 			<td>
-				<button type="button" class="btn btn-default" id="email_id" name="email" value={{book.ISBN}}>寄到信箱</button>
+				<!--<button type="button" class="btn btn-default" id="email_id" name="email" value={{book.ISBN}}>寄到信箱</button> -->
+				<button type="button" class="btn btn-default" id="email_id" name="email" data-target="#getBookModal" data-toggle="modal" data-whatever="email" data-isbn={{book.ISBN}}  value={{book.ISBN}}>寄到信箱</button>
 			</td>
 			<td>
-				<button type="button" class="btn btn-default" id="download_id" name="download" value={{book.ISBN}}>下載</button>
+				<!--<button type="button" class="btn btn-default" id="download_id" name="download" value={{book.ISBN}}>下載</button>-->
+				<button type="button" class="btn btn-default" id="download_id" name="download" data-whatever="download" data-toggle="modal" data-target="#getBookModal" data-isbn={{book.ISBN}} value={{book.ISBN}}>下載</button>
 			</td>
 			{% else %}
 			<td></td>
