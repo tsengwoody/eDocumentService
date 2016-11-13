@@ -4,8 +4,8 @@
 	{% load staticfiles %}
 	<meta charset="UTF-8">
 	<meta name="copyright" content="eDocumentService,雲端千眼平台" />
-	<meta name="description" content="我看不見書，但我想閱讀。雲端千眼平台，讓雲端成為視障者的眼" />
-	<meta name="keywords" content="eDocumentService,視障者閱讀,雲端千眼,志工服務" />
+	<meta name="description" content="eDocumentService雲端千眼運用網路志工群眾參與，致力於提供視障者快速的電子化文件服務，透過客製化軟體開發打造友善、資訊無障礙的使用體驗。" />
+	<meta name="keywords" content="eDocumentService,視障者閱讀,雲端千眼,志工服務,我看不見書，但我想閱讀" />
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="cache-control" content="max-age=0" />
@@ -17,7 +17,7 @@
 	<link href="{% static "ebookSystem/css/bootstrap/bootstrap.min.css" %}" rel="stylesheet" >
 	<script src="{% static "ebookSystem/js/bootstrap/ie-emulation-modes-warning.js" %}" type="text/javascript"></script>
 	<script src="{% static "ebookSystem/js/jquery/jquery.min.js" %}" ></script> 
-	<title>雲端千眼-{% block title %}{% endblock %}</title>
+	<title>{% block title %}{% endblock %} | 雲端千眼</title>
 	{% block resource%} {% endblock%}
 	{% block style %}{% endblock %}
 </head>

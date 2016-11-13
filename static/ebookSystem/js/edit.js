@@ -427,7 +427,7 @@ $(document).ready(function() {
     console.log(url.split('/')[2]);
     if(url.split('/')[2]!="advanced"){
         createHtmlEditor();
-        calMins();
+        //calMins();
         setInterval(function(){ 
             calMins();
             detectIdel();
