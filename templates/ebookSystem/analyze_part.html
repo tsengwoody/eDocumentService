@@ -71,7 +71,7 @@
 		</tr>
 		{% endfor %}
 	</table>
-
+	{% if part.status_int2str == 'an_edit' %}
 	<div class="form-inline">
 	    <div class="form-group">
 	        <input class="form-control-file file" id="id_fileObject" name="fileObject" type="file" />
@@ -85,9 +85,7 @@
 	<button type="submit" class="btn btn-success" name="finish" value="" id="id_finish">確認</button>
 	</div>
 	</div>
-	
-	
-	
+	{% endif %}
 </form>
 
 {% endblock %}

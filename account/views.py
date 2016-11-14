@@ -123,13 +123,19 @@ def sc_service(request, template_name='account/sc_service.html'):
 				status = 'error'
 				message = u'您已有超過10段文件，請先校對完成再領取'
 				return locals()
-			try:
-				getPart = EBook.objects.filter(Q(status=EBook.STATUS['finish']) & Q(book__is_private=False)).order_by('get_date')[0]
-			except:
+			getPart = None
+			for part in EBook.objects.filter(Q(status=EBook.STATUS['finish']) & Q(book__is_private=False)).order_by('get_date'):
+				part.change_status(1, 'sc_edit', user=request.user)
+				if len(part.specialcontent_set.all()) == 0:
+					part.change_status(1, 'sc_finish')
+				else:
+					getPart = part
+					break
+			if getPart is None:
 				status = u'error'
 				message = u'無文件'
 				return locals()
-			getPart.change_status(1, 'sc_edit', user=request.user)
+#			getPart.change_status(1, 'sc_edit', user=request.user)
 			status = 'success'
 			message = u'成功取得文件{}'.format(getPart.__unicode__())
 		elif request.POST.has_key('designateBook'):

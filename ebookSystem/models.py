@@ -155,7 +155,7 @@ class Book(models.Model):
 			return False
 		zip_file_name = BASE_DIR +'/file/ebookSystem/document/{0}/OCR/{1}_{2}.zip'.format(self.book_info.ISBN, self.book_info.ISBN, user.username)
 		self.check_status()
-		zip_list = [ file.get_file() for file in self.ebook_set.all() ]
+		zip_list = [ file.get_clean_file() for file in self.ebook_set.all() ]
 		try:
 			pyminizip.compress_multiple(zip_list, zip_file_name, password, 5)
 			return zip_file_name
@@ -262,9 +262,9 @@ class EBook(models.Model):
 				self.edited_page = self.end_page -self.begin_page
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['finish']:
-				self.add_template_tag(self.get_path('-finish'), self.get_path('-clean'))
-				self.clean_tag(self.get_path('-clean'), self.get_path('-clean'))
-				shutil.copy2(self.get_path('-clean'), self.get_path('-sc'))
+				self.add_template_tag(self.get_path('-finish'), self.get_path('-ge'))
+				self.clean_tag(self.get_path('-ge'), self.get_path('-ge'))
+				self.clean_tag(self.get_path('-ge'), self.get_path('-sc'))
 				self.group_ServiceHours()
 				try:
 					editRecord = EditRecord.objects.get(part=self, category='advanced', number_of_times=self.number_of_times)
@@ -272,12 +272,15 @@ class EBook(models.Model):
 					editRecord = EditRecord.objects.create(part=self, category='advanced', number_of_times=self.number_of_times)
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['sc_edit']:
-				self.sc_editor = kwargs['user']
-				self.sc_get_date = timezone.now()
-				self.sc_deadline = self.sc_get_date + datetime.timedelta(days=2)
+				sc_count = 0
 				if self.is_sc_rebuild:
 					self.create_SpecialContent()
+					sc_count = len(self.specialcontent_set.all())
 					self.is_sc_rebuild = False
+				if sc_count > 0:
+					self.sc_editor = kwargs['user']
+					self.sc_get_date = timezone.now()
+					self.sc_deadline = self.sc_get_date + datetime.timedelta(days=2)
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['sc_finish']:
 				if self.is_sc_rebuild:
@@ -291,9 +294,10 @@ class EBook(models.Model):
 					return False
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['an_edit']:
-				self.an_editor = kwargs['user']
-				self.an_get_date = timezone.now()
-				self.an_deadline = self.an_get_date + datetime.timedelta(days=1)
+				if kwargs.has_key('user'):
+					self.an_editor = kwargs['user']
+					self.an_get_date = timezone.now()
+					self.an_deadline = self.an_get_date + datetime.timedelta(days=1)
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['an_finish']:
 				self.status = self.status +direction
@@ -344,7 +348,7 @@ class EBook(models.Model):
 	def get_path(self, string=''):
 		if string == 'public':
 			return self.book.path.replace('/file', '/static')
-		elif string in ['-clean', '-sc', '-an', '-final', '-re']:
+		elif string in ['-clean', '-ge', '-sc', '-an', '-final', '-re']:
 			return self.book.path +'/OCR/part{0}{1}.html'.format(self.part, string)
 		else:
 			return self.book.path +'/OCR/part{0}{1}.txt'.format(self.part, string)
@@ -557,11 +561,9 @@ class EBook(models.Model):
 		fileList = sorted(fileList)
 		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
 		scanPageList = scanPageList[self.begin_page:self.end_page+1]
-		source = self.get_path('-clean')
+		source = self.get_path('-ge')
 		with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 			source_content = sourceFile.read()
-		file_head = source_content[0]
-		source_content = source_content[1:]
 		from bs4 import BeautifulSoup, NavigableString
 		soup = BeautifulSoup(source_content, 'lxml')
 		span_tags = soup.find_all('span')
@@ -624,27 +626,38 @@ class EBook(models.Model):
 
 	def replace(self):
 		from utils.replace import replace
-		shutil.copy2(self.get_file(), self.get_path('-re'))
+		shutil.copy2(self.get_clean_file(), self.get_path('-re'))
 		replace(self.get_path('-re'))
 		return self.get_path('-re')
 
 	def get_file(self):
 		if self.STATUS['finish'] <= self.status < self.STATUS['sc_finish']:
-			return self.get_path('-clean')
+			return self.get_path('-ge')
 		elif self.STATUS['sc_finish'] <= self.status < self.STATUS['an_finish']:
 			return self.get_path('-sc')
 		elif self.STATUS['an_finish'] <= self.status:
 			return self.get_path('-an')
-
+		else:
+			return None
+	def get_clean_file(self):
+		if self.STATUS['finish'] <= self.status < self.STATUS['sc_finish']:
+			shutil.copy2(self.get_path('-ge'), self.get_path('-clean'))
+			return self.get_path('-clean')
+		elif self.STATUS['sc_finish'] <= self.status < self.STATUS['an_finish']:
+			shutil.copy2(self.get_path('-sc'), self.get_path('-clean'))
+			return self.get_path('-clean')
+		elif self.STATUS['an_finish'] <= self.status:
+			shutil.copy2(self.get_path('-an'), self.get_path('-clean'))
+			return self.get_path('-clean')
 
 	def zip(self, user, password):
 		from django.contrib.auth import authenticate
 		import pyminizip
-		user = authenticate(user.username, password)
+		user = authenticate(username=user.username, password=password)
 		if user is None:
 			return False
 		zip_file_name = BASE_DIR +'/file/ebookSystem/document/{0}/OCR/{1}_{2}.zip'.format(self.book.book_info.ISBN, self.ISBN_part, user.username)
-		zip_list = [self.get_file()]
+		zip_list = [self.get_clean_file()]
 		try:
 			pyminizip.compress_multiple(zip_list, zip_file_name, password, 5)
 			return zip_file_name

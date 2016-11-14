@@ -161,28 +161,27 @@ def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.htm
 		delete_count = src_count -same_character
 		insert_count = dst_count -same_character
 		diff_count = dst_count -src_count
-		if os.path.exists(part.get_path('-an')):
-			lc_dict = last_character(part.get_path('-an'))
+		if part.get_file() is not None:
+			lc_dict = last_character(part.get_file())
 			lc_list = lc_dict.items()
-			re_dict = find_repeat(part.get_path('-an'))
-			re_list = re_dict.items()
-		else:
-			lc_dict = last_character(part.get_path('-clean'))
-			lc_list = lc_dict.items()
-			re_dict = find_repeat(part.get_path('-clean'))
+			re_dict = find_repeat(part.get_file())
 			re_list = re_dict.items()
 		status = u'success'
 		message = u'分析文件'
 		return locals()
 	if request.method == 'POST':
+		if part.get_file() is None:
+			status = u'error'
+			message = u'文件未就緒'
+			return locals()
 		if request.POST.has_key('download'):
-			download_path = part.get_path('-an')
-			download_filename = u'part{0}-an.html'.format(part.part)
+			download_path = part.get_file()
+			download_filename = os.path.basename(download_path)
 			status = u'success'
 			message = u'下載'
 			return locals()
 		elif request.POST.has_key('upload') and request.FILES.has_key('fileObject'):
-			with open(part.get_path('-an'), 'wb+') as dst:
+			with open(part.get_file(), 'wb+') as dst:
 				for chunk in request.FILES['fileObject'].chunks():
 					dst.write(chunk)
 			[len_block, same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
@@ -190,22 +189,15 @@ def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.htm
 			delete_count = src_count -same_character
 			insert_count = dst_count -same_character
 			diff_count = dst_count -src_count
-			if os.path.exists(part.get_path('-an')):
-				lc_dict = last_character(part.get_path('-an'))
-				lc_list = lc_dict.items()
-				re_dict = find_repeat(part.get_path('-an'))
-				re_list = re_dict.items()
-			else:
-				lc_dict = last_character(part.get_path('-clean'))
-				lc_list = lc_dict.items()
-				re_dict = find_repeat(part.get_path('-clean'))
-				re_list = re_dict.items()
+			lc_dict = last_character(part.get_file())
+			lc_list = lc_dict.items()
+			re_dict = find_repeat(part.get_file())
+			re_list = re_dict.items()
 			status = u'success'
 			message = u'檔案成功更新'
 			return locals()
 		elif request.POST.has_key('finish'):
-			part.change_status(1, 'an_finish', request.user)
-			part.save()
+			part.change_status(1, 'an_finish', user=request.user)
 			status = u'success'
 			message = u'完成'
 			redirect_to = reverse('account:an_service')
@@ -323,7 +315,7 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 		if request.POST.has_key('email'):
 			from django.core.mail import EmailMessage
 			getPart = EBook.objects.get(ISBN_part=request.POST['email'])
-			attach_file_path = getPart.zip(request.user, 'test')
+			attach_file_path = getPart.zip(request.user, request.POST['password'])
 			if not attach_file_path:
 				status = 'error'
 				message = u'準備文件失敗'
@@ -338,7 +330,7 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 			os.remove(attach_file_path)
 		if request.POST.has_key('download'):
 			getPart = EBook.objects.get(ISBN_part=request.POST['download'])
-			attach_file_path = getPart.zip(request.user, 'test')
+			attach_file_path = getPart.zip(request.user, request.POST['password'])
 			if not attach_file_path:
 				status = 'error'
 				message = u'準備文件失敗'
@@ -361,7 +353,7 @@ def detail_manager(request, book_ISBN, template_name='ebookSystem/detail_manager
 	if request.method == 'POST':
 		if request.POST.has_key('view'):
 			getPart = EBook.objects.get(ISBN_part=request.POST['view'])
-			attach_file_path = getPart.get_file()
+			attach_file_path = getPart.get_clean_file()
 			if not attach_file_path:
 				status = 'error'
 				message = u'準備文件失敗'
@@ -370,6 +362,7 @@ def detail_manager(request, book_ISBN, template_name='ebookSystem/detail_manager
 			download_filename = os.path.basename(attach_file_path)
 		if request.POST.has_key('view_se'):
 			getPart = EBook.objects.get(ISBN_part=request.POST['view_se'])
+			attach_file_path = getPart.get_clean_file()
 			attach_file_path = getPart.replace()
 			if not attach_file_path:
 				status = 'error'

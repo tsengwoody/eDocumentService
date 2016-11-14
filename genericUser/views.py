@@ -169,9 +169,9 @@ def upload_document(request, template_name='genericUser/upload_document.html'):
 				shutil.copy2(ebook.get_path('-edit'), ebook.get_path('-finish'))
 				with codecs.open(self.get_path('-edit'), 'w', encoding='utf-8') as editFile:
 					editFile.write(u'\ufeff')
-				ebook.add_template_tag(ebook.get_path('-finish'), ebook.get_path('-clean'))
-				ebook.clean_tag(ebook.get_path('-clean'), ebook.get_path('-clean'))
-				shutil.copy2(ebook.get_path('-clean'), ebook.get_path('-sc'))
+				ebook.add_template_tag(ebook.get_path('-finish'), ebook.get_path('-ge'))
+				ebook.clean_tag(ebook.get_path('-ge'), ebook.get_path('-ge'))
+				shutil.copy2(ebook.get_path('-ge'), ebook.get_path('-sc'))
 				ebook.status = ebook.STATUS['sc_finish']
 			except:
 				shutil.rmtree(uploadPath)
