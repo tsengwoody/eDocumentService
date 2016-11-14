@@ -26,7 +26,7 @@
                     $('#id_get_otp_load').show();
                 },
                 success: function(json) {
-                    alertDialog(json);
+                    alertDialogNoReload(json);
                     $('#getBookModal').modal('toggle');
                     $('#id_get_otp_load').hide();
                     $('#inputPasword').val('')

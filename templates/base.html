@@ -65,10 +65,11 @@
 			        <li itemprop="url"><a href="{% url 'genericUser:org_info' %}">服務中心資訊</a></li>
 			        {% if readmeUrl %}
 			        <li itemprop="url"><a href={{ readmeUrl }}>說明</a></li>
-			        {% endif %} {% if request.user.is_active %}
+			        {% endif %}
+			        <!-- {% if request.user.is_active %}
 			        <li itemprop="url"><a href="/genericUser/license/">使用者條款</a></li>
 			        <li itemprop="url"><a href="/genericUser/security/">資訊安全政策</a></li>
-			        {% endif %}
+			        {% endif %}-->
 			    </ul>
 			</div>
 	    	<div class="pull-right">		
