@@ -8,6 +8,7 @@ urlpatterns = [
 	url(r'^article/content/(?P<id>[\d-]+)/$', views.article_content, name='article/content'),
 	url(r'^apply_document/$', views.apply_document, name='apply_document'),
 	url(r'^func_desc/$', views.func_desc, name='func_desc'),
+	url(r'^privacy/$', views.privacy, name='privacy'),
 	url(r'^org_info$', views.org_info, name='org_info'),
 	url(r'^license/$', views.license, name='license'),
 	url(r'^security/$', views.security, name='security'),

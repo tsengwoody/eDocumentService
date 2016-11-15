@@ -234,6 +234,10 @@ def org_info(request, template_name='genericUser/org_info.html'):
 	if request.method == 'GET':
 		return locals()
 
+def privacy(request, template_name='genericUser/privacy.html'):
+	if request.method == 'GET':
+		return render(request, template_name, locals())
+
 def func_desc(request, template_name='genericUser/func_desc.html'):
 	return render(request, template_name, locals())
 
