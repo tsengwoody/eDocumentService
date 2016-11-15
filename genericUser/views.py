@@ -4,7 +4,7 @@ from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.forms import modelform_factory
 from django.http import HttpResponse,HttpResponseRedirect
-from django.shortcuts import render, get_list_or_404
+from django.shortcuts import render, get_list_or_404,redirect
 from django.utils import timezone
 from account.models import Editor
 from ebookSystem.models import *
@@ -235,6 +235,11 @@ def org_info(request, template_name='genericUser/org_info.html'):
 		return locals()
 
 def privacy(request, template_name='genericUser/privacy.html'):
+	if request.method == 'POST':
+		if 'is_privacy' in request.POST:
+			request.user.auth_privacy=True
+			request.user.save()
+		return redirect('/')
 	if request.method == 'GET':
 		return render(request, template_name, locals())
 
@@ -395,6 +400,7 @@ def revise_content(request, template_name='genericUser/revise_content.html'):
 			status = 'error'
 			message = u'搜尋到多處修政文字段落，請重新輸入並多傳送些文字'
 		return locals()
+
 
 @http_response
 def set_role(request,template_name='genericUser/set_role.html'):

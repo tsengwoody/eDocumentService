@@ -73,7 +73,8 @@
 				{% endif %}
 				<li><a href="{% url 'ebookSystem:search_book' %}">查詢</a></li>
 				{% endif %}
-				{% if request.user.is_authenticated %}
+				{% if not request.user.auth_privacy and request.user.is_authenticated %}
+				<li><a href="{% url 'genericUser:privacy' %}">簽署隱私權條款</a></li>
 				
 				{% endif %}
 			</ul>
