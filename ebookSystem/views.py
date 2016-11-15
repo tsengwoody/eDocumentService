@@ -524,7 +524,7 @@ def special_content(request, ISBN_part, template_name='ebookSystem/special_conte
 		part = EBook.objects.get(ISBN_part=ISBN_part)
 	except:
 		raise Http404("book does not exist")
-	sc_list = part.specialcontent_set.all().order_by('tag_id')
+	sc_list = part.specialcontent_set.all().order_by('page')
 	if request.method == 'POST':
 		if request.POST.has_key('rebuild'):
 			part.delete_SpecialContent()

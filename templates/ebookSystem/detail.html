@@ -38,7 +38,7 @@
 			<td>{{ part.edited_page|add:'1' }}</td>
 			<td>{{part.service_hours}}</td>
 			<td>{{part.deadline}}</td>
-			{% if request.user.is_guest and request.user.has_guest and part.status >= 3 %}
+			{% if request.user.is_guest and request.user.has_guest and part.status >= 4 %}
 			<td>
 				<button type="button" class="btn btn-default" id="email_id" name="email" data-target="#getBookModal" data-toggle="modal" data-whatever="email" data-isbn={{part.ISBN_part}}  value={{part.ISBN_part}}>寄到信箱</button>
 			</td>

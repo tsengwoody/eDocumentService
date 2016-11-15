@@ -243,15 +243,15 @@ class EBook(models.Model):
 			return False
 		if direction == 1:
 			if self.status +direction == self.STATUS['active']:
+				if os.path.exists(self.get_path()) and not os.path.exists(self.get_path('-edit')):
+					self.add_tag()
+				if not os.path.exists(self.get_path('-finish')):
+					with codecs.open(self.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
+						finishFile.write(u'\ufeff')
 				try:
 					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
 				except:
 					editRecord = EditRecord.objects.create(part=self, category='based', number_of_times=self.number_of_times)
-				if os.path.exists(self.get_path()) and not os.path.exists(self.get_path('-edit')):
-					self.add_tag()
-				if not os.path.exists(self.get_path('-finish')):
-						with codecs.open(self.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
-							finishFile.write(u'\ufeff')
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['edit']:
 				self.editor = kwargs['user']
@@ -267,31 +267,38 @@ class EBook(models.Model):
 				self.clean_tag(self.get_path('-ge'), self.get_path('-sc'))
 				self.group_ServiceHours()
 				try:
+					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
+					editRecord.record_info()
+				except:
+					return False
+				try:
 					editRecord = EditRecord.objects.get(part=self, category='advanced', number_of_times=self.number_of_times)
 				except:
 					editRecord = EditRecord.objects.create(part=self, category='advanced', number_of_times=self.number_of_times)
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['sc_edit']:
-				sc_count = 0
-				if self.is_sc_rebuild:
-					self.create_SpecialContent()
-					sc_count = len(self.specialcontent_set.all())
-					self.is_sc_rebuild = False
-				if sc_count > 0:
+				self.delete_SpecialContent()
+				self.create_SpecialContent()
+				self.is_sc_rebuild = False
+				if len(self.specialcontent_set.all()) > 0:
 					self.sc_editor = kwargs['user']
 					self.sc_get_date = timezone.now()
 					self.sc_deadline = self.sc_get_date + datetime.timedelta(days=2)
-				self.status = self.status +direction
+					self.status = self.status +direction
+				else:
+					shutil.copy2(self.get_path('-sc'), self.get_path('-an'))
+					self.status = self.status +direction +1
 			elif self.status +direction == self.STATUS['sc_finish']:
 				if self.is_sc_rebuild:
 					return False
 				shutil.copy2(self.get_path('-sc'), self.get_path('-an'))
-				self.group_ServiceHours()
-				try:
-					editRecord = EditRecord.objects.get(part=self, category='advanced', number_of_times=self.number_of_times)
-					editRecord.record_info()
-				except:
-					return False
+				if self.sc_get_date != None and self.sc_editor != None:
+					self.group_ServiceHours()
+					try:
+						editRecord = EditRecord.objects.get(part=self, category='advanced', number_of_times=self.number_of_times)
+						editRecord.record_info()
+					except:
+						return False
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['an_edit']:
 				if kwargs.has_key('user'):
@@ -330,7 +337,7 @@ class EBook(models.Model):
 				return False
 		self.save()
 		self.book.check_status()
-		return True
+		return self.status
 
 	def get_image(self, user):
 		water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, user.username)
@@ -557,7 +564,10 @@ class EBook(models.Model):
 	def create_SpecialContent(self, encoding='utf-8'):
 		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, "org")
 		source_path = self.book.path +u'/source'
-		fileList=os.listdir(source_path)
+		try:
+			fileList=os.listdir(source_path)
+		except:
+			fileList = []
 		fileList = sorted(fileList)
 		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
 		scanPageList = scanPageList[self.begin_page:self.end_page+1]
@@ -766,13 +776,15 @@ class EditRecord(models.Model):
 		if self.category == 'based':
 			self.editor = self.part.editor
 			self.get_date = self.part.get_date
+			self.save()
+			self.serviceHours = 				self.group_ServiceHours()
 			self.service_hours = self.part.service_hours
-			self.serviceHours = self.part.serviceHours
 		elif self.category == 'advanced':
 			self.editor = self.part.sc_editor
 			self.get_date = self.part.sc_get_date
+			self.save()
+			self.serviceHours = self.group_ServiceHours()
 			self.service_hours = self.part.sc_service_hours
-			self.serviceHours = self.part.sc_serviceHours
 		self.save()
 
 	def group_ServiceHours(self):
@@ -786,6 +798,20 @@ class EditRecord(models.Model):
 			self.serviceHours = month_ServiceHours
 			self.save()
 		return month_ServiceHours
+
+	def compute_service_hours(self):
+		service_hours = 0
+		for editLog in self.editlog_set.all().order_by('order'):
+			if editLog.edit_count != 0:
+				service_hours = service_hours +1
+				continue
+			try:
+				previous_editLog = self.editlog_set.all().get(order=editLog.order-1)
+				if previous_editLog.edit_count != 0:
+					service_hours = service_hours +1
+			except:
+				continue
+		return service_hours
 
 class EditLog(models.Model):
 	edit_record = models.ForeignKey(EditRecord, blank=True, null=True, on_delete=models.SET_NULL, related_name='editlog_set')
