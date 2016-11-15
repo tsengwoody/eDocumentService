@@ -125,17 +125,14 @@ def sc_service(request, template_name='account/sc_service.html'):
 				return locals()
 			getPart = None
 			for part in EBook.objects.filter(Q(status=EBook.STATUS['finish']) & Q(book__is_private=False)).order_by('get_date'):
-				part.change_status(1, 'sc_edit', user=request.user)
-				if len(part.specialcontent_set.all()) == 0:
-					part.change_status(1, 'sc_finish')
-				else:
+				ebook_status = part.change_status(1, 'sc_edit', user=request.user)
+				if ebook_status == EBook.STATUS['sc_edit']:
 					getPart = part
 					break
 			if getPart is None:
 				status = u'error'
 				message = u'無文件'
 				return locals()
-#			getPart.change_status(1, 'sc_edit', user=request.user)
 			status = 'success'
 			message = u'成功取得文件{}'.format(getPart.__unicode__())
 		elif request.POST.has_key('designateBook'):

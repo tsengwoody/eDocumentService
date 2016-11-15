@@ -49,12 +49,12 @@
 				{% endif %}
 			</td>
 			<td>
-				{% if part.status >= 4 %}
+				{% if part.status >= 3 %}
 				<a href="{% url 'ebookSystem:analyze_part' part.ISBN_part %}" >分析</a>
 				{% endif %}
 			</td>
 			<td>
-				{% if part.status >= 4 %}
+				{% if part.status >= 1 %}
 				<a href="{% url 'ebookSystem:edit_log' part.ISBN_part %}" >軌跡</a>
 				{%endif%}
 			</td>

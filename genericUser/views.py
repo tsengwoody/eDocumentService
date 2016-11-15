@@ -447,7 +447,7 @@ def servicehours_list(request, username, template_name='genericUser/servicehours
 		current_ServiceHours = ServiceHours.objects.get(date=month_day, user=user)
 	except:
 		pass
-	ServiceHours_list = ServiceHours.objects.filter(user=user).exclude(date=month_day)
+	ServiceHours_list = ServiceHours.objects.filter(user=user).exclude(date=month_day).order_by('date')
 	if request.method == 'POST':
 		if request.POST.has_key('exchange'):
 			exchange_serviceHours = ServiceHours.objects.get(id=request.POST['exchange'])

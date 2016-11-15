@@ -146,6 +146,8 @@ function calMins()
     var newUrl="/"+url.split('/')[1]+"/"+"edit_ajax"+"/"+url.split('/')[3]+"/";
     var transferData={};
     transferData["online"]=change_count;
+    transferData["page"]=$('#id_page').val();
+    console.log(transferData);
     $.ajax({
         url: newUrl,
         type: "POST",
@@ -424,7 +426,6 @@ $(document).ready(function() {
     });
 
     var url=window.location.pathname;
-    console.log(url.split('/')[2]);
     if(url.split('/')[2]!="advanced"){
         createHtmlEditor();
         //calMins();

@@ -16,11 +16,15 @@
 			<th>校對者</th>
 			<th>領取日期</th>
 			<th>時數</th>
+			<th>停留時數</th>
+			<th>計算時數</th>
 		</tr>
 		<tr>
 			<td>{{ er.editor }}</td>
 			<td>{{ er.get_date }}</td>
+			<td>{{ er.editlog_set.all|length }}</td>
 			<td>{{ er.service_hours }}</td>
+			<td>{{ er.compute_service_hours }}</td>
 		</tr>
 	</table>
 	<table class="table table-striped table-hover">
