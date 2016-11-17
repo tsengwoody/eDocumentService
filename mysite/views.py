@@ -41,9 +41,14 @@ def register(request, template_name='registration/register.html'):
 			status = 'error'
 			message = u'表單驗證失敗' +str(registerUserForm.errors)
 			return locals()
+		if 'is_privacy' not in request.POST:
+			status = 'error'
+			message = u'請勾選隱私權條款'
+			return locals()
 		newUser = registerUserForm.save(commit=False)
 		newUser.set_password(request.POST.get('password'))
 		newUser.is_active = True
+		newUser.auth_privacy = True
 		newUser.save()
 		if request.POST['role'] == 'Editor':
 			try:
@@ -105,8 +110,13 @@ def login(request, template_name='registration/login.html', authentication_form=
 		for session in Session.objects.all():
 			if session.get_decoded().has_key('_auth_user_id') and int(session.get_decoded()['_auth_user_id']) == user.id:
 				session.delete()
+		
+
 		auth_login(request, form.get_user())
-		redirect_to = '/'
+		if request.user.auth_privacy==False:
+			redirect_to='/genericUser/privacy/'
+		else:
+			redirect_to = '/'
 		status = 'success'
 		message = u'登錄成功'
 		return locals()

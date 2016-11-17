@@ -45,6 +45,7 @@ class User(AbstractUser):
 	is_special = models.BooleanField(default=False)
 	auth_email = models.BooleanField(default=False)
 	auth_phone = models.BooleanField(default=False)
+	auth_privacy = models.BooleanField(default=False)
 
 	def __unicode__(self):
 		return self.first_name +self.last_name
@@ -64,7 +65,7 @@ class User(AbstractUser):
 			return False
 
 	def authentication(self):
-		return (self.auth_email and self.auth_phone) or self.is_special
+		return (self.auth_email and self.auth_phone and self.auth_privacy) or self.is_special
 
 	def status_int2str(self):
 		for k, v in self.STATUS.iteritems():

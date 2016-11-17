@@ -1,0 +1,22 @@
+{% extends "base_nav.html" %}
+{% load staticfiles %}
+{% block title %}
+隱私權政策
+{% endblock %}
+
+{% block content %}
+
+{% include 'utils/privacy_law.html' %}
+<form method="post" action=".">
+{% csrf_token %}
+{% if request.user.is_authenticated and not request.user.auth_privacy %}
+<div class="checkbox">
+  <label><input type="checkbox" name="is_privacy" value="agree">我同意此隱私權政策</label>
+</div>
+<div class="form-group row text-center">
+    <button type="submit" class="btn btn-primary" >送出</button>
+    <input type="reset" class="btn btn-danger" value="清除">
+</div>
+{% endif %}
+</form>
+{% endblock %}
