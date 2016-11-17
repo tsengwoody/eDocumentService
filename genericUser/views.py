@@ -39,6 +39,7 @@ def article_content(request, id, template_name='genericUser/article/content.html
 	if request.method == 'GET':
 		return locals()
 
+@user_category_check(['superuser'])
 @http_response
 def article_create(request, template_name='genericUser/article/create.html'):
 	ArticleForm = modelform_factory(Article, fields=('author', 'subject', 'category'))
@@ -201,6 +202,7 @@ def upload_progress(request):
 	else:
 		return HttpResponseServerError('Server Error: You must provide X-Progress-ID header or query param.')
 
+@user_category_check(['guest'])
 @http_response
 def apply_document(request, template_name='genericUser/apply_document.html'):
 	BookInfoForm = modelform_factory(BookInfo, fields=('ISBN', 'bookname', 'author', 'house', 'date'))
@@ -252,6 +254,7 @@ def license(request, template_name='genericUser/license.html'):
 def security(request, template_name='genericUser/security.html'):
 	return render(request, template_name, locals())
 
+@user_category_check(['user'])
 @http_response
 def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 	if len(ISBN) == 10 and not ISBN10_check(ISBN):
@@ -272,6 +275,7 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 	extra_list = ['bookname', 'author', 'house', 'date', 'ISBN']
 	return locals()
 
+@user_category_check(['manager'])
 @http_response
 def review_user(request, username, template_name='genericUser/review_user.html'):
 	try:
@@ -304,6 +308,7 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 				event.response(status='error', message=request.POST['reason'], user=request.user)
 		return locals()
 
+@user_category_check(['user'])
 @http_response
 def info(request, template_name):
 	user = request.user
@@ -328,6 +333,7 @@ def info(request, template_name):
 	if request.method == 'GET':
 		return locals()
 
+@user_category_check(['user'])
 @http_response
 def change_contact_info(request, template_name):
 	DCDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(request.user.username)
@@ -403,25 +409,6 @@ def revise_content(request, template_name='genericUser/revise_content.html'):
 
 
 @http_response
-def set_role(request,template_name='genericUser/set_role.html'):
-	if request.method == 'POST':
-		if request.user.has_editor():
-			request.user.editor.professional_field = request.POST['professional_field']
-		if request.user.has_guest():
-			uploadDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(user.username)
-			if os.path.exists(uploadDir):
-				shutil.rmtree(uploadDir)
-			request.FILES['disability_card_front'].name = user.username +'_front.jpg'
-			handle_uploaded_file(uploadDir, request.FILES['disability_card_front'])[0]
-			request.FILES['disability_card_back'].name = user.username +'_back.jpg'
-			handle_uploaded_file(uploadDir, request.FILES['disability_card_back'])[0]
-		status = u'success'
-		message = u'角色設定成功'
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
-@http_response
 def contact_us(request, template_name='genericUser/contact_us.html'):
 	ContactUsForm = modelform_factory(ContactUs, fields=('name', 'email', 'subject', 'category', 'content'))
 	contactus_category = ContactUs.CATEGORY
@@ -445,6 +432,7 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 		contactUsForm = ContactUsForm()
 		return locals()
 
+@user_category_check(['user'])
 @http_response
 def servicehours_list(request, username, template_name='genericUser/servicehours_list.html'):
 	try:
@@ -468,6 +456,7 @@ def servicehours_list(request, username, template_name='genericUser/servicehours
 	if request.method == 'GET':
 		return locals()
 
+@user_category_check(['user'])
 @http_response
 def verify_contact_info(request, template='genericUser/verify_contact_info.html'):
 	if not request.is_ajax():
