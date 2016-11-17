@@ -24,9 +24,9 @@ class Book(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
 	book_info = models.OneToOneField(BookInfo, related_name='book')
 	path = models.CharField(max_length=255, blank=True, null=True)
-	page_count = models.IntegerField(blank=True, null=True)
-	part_count = models.IntegerField(blank=True, null=True)
-	page_per_part = models.IntegerField(default=50)
+	page_count = models.IntegerField(default = -1)
+	part_count = models.IntegerField(default = 1)
+	page_per_part = models.IntegerField(default=-1)
 	priority = models.IntegerField(default=0)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
 	owner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='own_book_set')
@@ -271,16 +271,16 @@ class EBook(models.Model):
 					editRecord.record_info()
 				except:
 					return False
-				try:
-					editRecord = EditRecord.objects.get(part=self, category='advanced', number_of_times=self.number_of_times)
-				except:
-					editRecord = EditRecord.objects.create(part=self, category='advanced', number_of_times=self.number_of_times)
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['sc_edit']:
 				self.delete_SpecialContent()
 				self.create_SpecialContent()
 				self.is_sc_rebuild = False
 				if len(self.specialcontent_set.all()) > 0:
+					try:
+						editRecord = EditRecord.objects.get(part=self, category='advanced', number_of_times=self.number_of_times)
+					except:
+						editRecord = EditRecord.objects.create(part=self, category='advanced', number_of_times=self.number_of_times)
 					self.sc_editor = kwargs['user']
 					self.sc_get_date = timezone.now()
 					self.sc_deadline = self.sc_get_date + datetime.timedelta(days=2)

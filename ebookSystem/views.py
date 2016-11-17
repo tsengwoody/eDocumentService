@@ -129,7 +129,7 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
-			book.create_EBook()
+#			book.create_EBook()
 			for part in book.ebook_set.all():
 				part.change_status(1, 'active')
 			shutil.rmtree(org_path)
