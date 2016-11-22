@@ -10,7 +10,18 @@
           type=button.data('whatever') // Extract info from data-* attributes 
     });
 
+    $("#inputPasword").keypress(function(e){
+      code = (e.keyCode ? e.keyCode : e.which);
+      if (code == 13)
+      {
+        e.preventDefault();
+        $("#sendPassword").click();
+      }
+    });
+
+   
     $('#sendPassword').on("click",function(event){
+          console.log("sendPassword enter");
         if(type=="email")
         {
             var transferData={};
@@ -41,9 +52,10 @@
         }
         else
         {
-            $('form').append($("<input>").attr("type", "hidden").attr("name", "password").val($('#inputPasword').val()));
-            $('form').append($("<input>").attr("type", "hidden").attr("name", "download").val($(this).val()));
+            $('form').append($("<input>").attr("type", "hidden").attr("name", "password").attr("class","temp").val($('#inputPasword').val()));
+            $('form').append($("<input>").attr("type", "hidden").attr("name", "download").attr("class","temp").val($(this).val()));
             $('form').submit();
+            $('input:hidden.temp').remove();
             $('#getBookModal').modal('toggle');
             $('#inputPasword').val('');
         }
