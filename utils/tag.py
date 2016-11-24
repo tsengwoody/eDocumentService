@@ -1,5 +1,4 @@
-﻿
-# coding: utf-8
+﻿# coding: utf-8
 import codecs
 import os
 import re
@@ -20,7 +19,7 @@ def merge_NavigableString(tag):
 def add_base_url(src, id, encoding='utf-8'):
 #	try:
 	import re
-	soup = BeautifulSoup(open(src), 'lxml')
+	soup = BeautifulSoup(open(src), 'html5lib')
 	base_url = '/static/article/{0}/'.format(id)
 	tags = soup.find_all(src=re.compile('^[\d\w]+'))
 	for tag in tags:
@@ -59,9 +58,7 @@ def clean_tag(source,  destination, title='', encoding='utf-8'):
 	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 		source_content = sourceFile.read()
 		source_content = source_content.replace('<br />', '</p><p>')
-	soup = BeautifulSoup(source_content, 'lxml')
-#	soup = BeautifulSoup(open(source), 'lxml')
-#	soup = replace_br_tag(soup)
+	soup = BeautifulSoup(source_content, 'html5lib')
 	span_tags = soup.find_all('span')
 	for span_tag in span_tags:
 		if not (span_tag.attrs.has_key('class') and ('unknown' in span_tag.attrs['class'] or 'mathml' in span_tag.attrs['class'])):
@@ -85,7 +82,7 @@ def clean_tag(source,  destination, title='', encoding='utf-8'):
 	with codecs.open( destination, 'w', encoding=encoding) as cleanFile:
 #		clean_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
 		clean_content = str(soup)
-		soup = BeautifulSoup(clean_content, 'lxml')
+		soup = BeautifulSoup(clean_content, 'html5lib')
 		clean_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
 		cleanFile.write(clean_content)
 

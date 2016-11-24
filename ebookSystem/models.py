@@ -570,11 +570,11 @@ class EBook(models.Model):
 		fileList = sorted(fileList)
 		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
 		scanPageList = scanPageList[self.begin_page:self.end_page+1]
-		source = self.get_path('-ge')
+		source = self.get_path('-sc')
 		with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 			source_content = sourceFile.read()
 		from bs4 import BeautifulSoup, NavigableString
-		soup = BeautifulSoup(source_content, 'lxml')
+		soup = BeautifulSoup(source_content, 'html5lib')
 		span_tags = soup.find_all('span')
 		for span_tag in span_tags:
 			if span_tag.attrs.has_key('class') and ('unknown' in span_tag.attrs['class'] or 'mathml' in span_tag.attrs['class']):
@@ -683,11 +683,11 @@ class EBook(models.Model):
 		from bs4 import BeautifulSoup
 		with codecs.open(src, 'r', encoding=encoding) as srcFile:
 			src_content = srcFile.read()
-		srcSoup = BeautifulSoup(src_content, 'lxml')
+		srcSoup = BeautifulSoup(src_content, 'html5lib')
 		src_content_text = srcSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
 		with codecs.open(dst, 'r', encoding=encoding) as dstFile:
 			dst_content = dstFile.read()
-		dstSoup = BeautifulSoup(dst_content, 'lxml')
+		dstSoup = BeautifulSoup(dst_content, 'html5lib')
 		dst_content_text = dstSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
 #	with codecs.open('temp.html', 'w', encoding='utf-8') as tempFile:
 #		tempFile.write(dst_content_text)
@@ -726,19 +726,17 @@ class SpecialContent(models.Model):
 		source = self.ebook.get_path('-sc')
 		with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 			source_content = sourceFile.read()
-		file_head = source_content[0]
-		source_content = source_content[1:]
 		from bs4 import BeautifulSoup, NavigableString
-		soup = BeautifulSoup(source_content, 'lxml')
+		soup = BeautifulSoup(source_content, 'html5lib')
 		tags = soup.find_all('p', id=self.tag_id)
 		if not len(tags) == 1:
 			return False
 		tag = tags[0]
-		nt = BeautifulSoup(self.content, 'lxml').body.p
+		nt = BeautifulSoup(self.content, 'html5lib').body.p
 		tag.replace_with(nt)
 		with codecs.open(source, 'w', encoding=encoding) as sourceFile:
 			write_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
-			soup = BeautifulSoup(write_content, 'lxml')
+			soup = BeautifulSoup(write_content, 'html5lib')
 			write_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
 			sourceFile.write(write_content)
 		self.delete()

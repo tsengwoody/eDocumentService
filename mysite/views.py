@@ -1,5 +1,5 @@
 ﻿# coding: utf-8
-from django.contrib.auth import (login as auth_login, logout as auth_logout, update_session_auth_hash,)
+from django.contrib.auth import (login as auth_login, logout as auth_logout, update_session_auth_hash, authenticate,)
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponse,HttpResponseRedirect
@@ -49,6 +49,7 @@ def register(request, template_name='registration/register.html'):
 		newUser.set_password(request.POST.get('password'))
 		newUser.is_active = True
 		newUser.is_license = True
+		newUser.is_editor = True
 		newUser.save()
 		if request.POST['role'] == 'Editor':
 			try:
@@ -66,14 +67,20 @@ def register(request, template_name='registration/register.html'):
 			try:
 				newGuest = Guest.objects.create(user=newUser)
 			except:
-				print 'error:guest'
 				status = 'error'
 				message = u'guest申請失敗'
 				return locals()
 		Event.objects.create(creater=newUser, action=newUser)
+		username = request.POST['username']
+		password = request.POST['password']
+		user = authenticate(username=username, password=password)
+		if user is not None:
+			auth_login(request, user)
+		else:
+			pass
 		status = 'success'
-		message = u'註冊成功，請等待帳號審核'
-		redirect_to = reverse('login')
+		message = u'註冊成功，請進行通訊資料驗證'
+		redirect_to = reverse('genericUser:info')
 		return locals()
 	if request.method == 'GET':
 		registerUserForm = RegisterUserForm()
