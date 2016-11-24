@@ -562,7 +562,6 @@ class EBook(models.Model):
 		tag.clean_tag(src, dst, title)
 
 	def create_SpecialContent(self, encoding='utf-8'):
-		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, "org")
 		source_path = self.book.path +u'/source'
 		try:
 			fileList=os.listdir(source_path)
@@ -602,6 +601,7 @@ class EBook(models.Model):
 					SpecialContent.objects.get(id=id)
 				except:
 					SpecialContent.objects.create(id=id, ebook=self, tag_id=tag_id, page=page, content=content, type=type)
+		#image markup
 		img_tags = soup.find_all('img')
 		for img_tag in img_tags:
 			if not img_tag.attrs.has_key('src'):

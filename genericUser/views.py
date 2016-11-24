@@ -240,19 +240,16 @@ def org_info(request, template_name='genericUser/org_info.html'):
 	if request.method == 'GET':
 		return locals()
 
-def privacy(request, template_name='genericUser/privacy.html'):
+def license(request, template_name='genericUser/license.html'):
 	if request.method == 'POST':
 		if 'is_privacy' in request.POST:
-			request.user.auth_privacy=True
+			request.user.is_license=True
 			request.user.save()
 		return redirect('/')
 	if request.method == 'GET':
 		return render(request, template_name, locals())
 
 def func_desc(request, template_name='genericUser/func_desc.html'):
-	return render(request, template_name, locals())
-
-def license(request, template_name='genericUser/license.html'):
 	return render(request, template_name, locals())
 
 def security(request, template_name='genericUser/security.html'):
@@ -312,7 +309,6 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 				event.response(status='error', message=request.POST['reason'], user=request.user)
 		return locals()
 
-@user_category_check(['user'])
 @http_response
 def info(request, template_name):
 	user = request.user
@@ -337,7 +333,6 @@ def info(request, template_name):
 	if request.method == 'GET':
 		return locals()
 
-@user_category_check(['user'])
 @http_response
 def change_contact_info(request, template_name):
 	DCDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(request.user.username)

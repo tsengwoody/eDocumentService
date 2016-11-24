@@ -76,6 +76,7 @@ def book_list(request, template_name='ebookSystem/book_list.html'):
 @http_response
 def search_book(request, template_name):
 	if request.method == 'POST':
+		print request.POST
 		if request.POST.has_key('book_ISBN'):
 			ISBN = request.POST['book_ISBN']
 			try:
@@ -85,6 +86,8 @@ def search_book(request, template_name):
 			except:
 				status = 'error'
 				message = u'查無指定ISBN文件'
+		elif request.POST.has_key('bookname'):
+			pass
 		if request.POST.has_key('email'):
 			from django.core.mail import EmailMessage
 			getBook = Book.objects.get(ISBN=request.POST['email'])
@@ -572,14 +575,6 @@ def edit_SpecialContent(request, id, type):
 	sc_list = list(SpecialContent.objects.filter(ebook=part).order_by('tag_id'))
 	total_count = len(sc_list)
 	current_count = sc_list.index(sc)
-	try:
-		next_sc = sc_list[current_count+1]
-	except:
-		next_sc = None
-	if current_count == 0:
-		previous_sc = None
-	else:
-		previous_sc = sc_list[current_count-1]
 	if page == 0:
 		show_page = 0
 		scanPageList = scanPageList[page:page+2]
@@ -595,10 +590,10 @@ def edit_SpecialContent(request, id, type):
 	default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
 	from bs4 import BeautifulSoup
 	if type == 'mathml':
-		math_tag = BeautifulSoup(sc.content, 'lxml').find('math')
+		math_tag = BeautifulSoup(sc.content, 'html5lib').find('math')
 		editContent = str(math_tag)
 	elif type == 'image':
-		img_tag = BeautifulSoup(sc.content, 'lxml').find('img')
+		img_tag = BeautifulSoup(sc.content, 'html5lib').find('img')
 		image_path = sc.ebook.book.path +'/OCR/resource/image_' +sc.id +'.jpg'
 		image_public_path = sc.ebook.get_path('public') +'/OCR/resource/image_' +sc.id +'.jpg'
 		preview_image_url = image_public_path.replace(BASE_DIR +'/static/', '')
@@ -611,7 +606,7 @@ def edit_SpecialContent(request, id, type):
 			if type == 'image':
 				img_tag['src'] = 'resource/' +sc.id +'.jpg'
 				img_tag['alt'] = request.POST['alt']
-				sc.content = u'<p id="{0}">'.format(sc.tag_id) +img_tag.prettify(formatter='html') +u'</p>'
+				sc.content = u'<p id="{0}">'.format(sc.tag_id) +unicode(img_tag) +u'</p>'
 				if not os.path.exists(os.path.dirname(image_path)):
 					os.makedirs(os.path.dirname(image_path), 0770)
 				if not os.path.exists(os.path.dirname(image_public_path)):
@@ -622,12 +617,20 @@ def edit_SpecialContent(request, id, type):
 							dst.write(chunk)
 					shutil.copy2(image_path, image_public_path)
 				except:
-					pass
+					status = u'error'
+					message = u'上傳影像失敗'
+					return locals()
 			elif type == 'mathml':
-				math_tag = BeautifulSoup(request.POST['content'], 'lxml').find('math')
-				sc.content = u'<p id="{0}">'.format(sc.tag_id) +math_tag.prettify(formatter='html') +u'</p>'
+				math_tag = BeautifulSoup(request.POST['content'], 'html5lib').find('math')
+				sc.content = u'<p id="{0}">'.format(sc.tag_id) +unicode(math_tag) +u'</p>'
 			elif type == 'unknown':
-				sc.content = request.POST['content']
+				p_tag = BeautifulSoup(request.POST['content'], 'html5lib')
+				try:
+					unknown_tag = p_tag.find('span', class_='unknown')
+					remove_tag = unknown_tag.unwrap()
+				except:
+					pass
+				sc.content = unicode(p_tag)
 			sc.save()
 			status = u'success'
 			message = u'暫存'
@@ -636,17 +639,6 @@ def edit_SpecialContent(request, id, type):
 			status = u'success'
 			message = u'寫入'
 			redirect_to = reverse('ebookSystem:special_content', kwargs={'ISBN_part':part.ISBN_part})
-		if request.POST.has_key('upload'):
-			if type == 'image':
-				dirname = sc.ebook.book.path +'/OCR/image/'
-				if not os.path.exists(dirname):
-					os.makedirs(dirname, 0770)
-				path = dirname +sc.id +'.jpg'
-				with open(path, 'wb+') as dst:
-					for chunk in request.FILES['imageFile'].chunks():
-						dst.write(chunk)
-			status = u'success'
-			message = u'上傳'
 		if request.POST.has_key('download'):
 			if type == 'image':
 				download_path = part.book.path +'/source/' +request.POST['download']

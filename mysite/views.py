@@ -48,7 +48,7 @@ def register(request, template_name='registration/register.html'):
 		newUser = registerUserForm.save(commit=False)
 		newUser.set_password(request.POST.get('password'))
 		newUser.is_active = True
-		newUser.auth_privacy = True
+		newUser.is_license = True
 		newUser.save()
 		if request.POST['role'] == 'Editor':
 			try:
@@ -113,8 +113,8 @@ def login(request, template_name='registration/login.html', authentication_form=
 		
 
 		auth_login(request, form.get_user())
-		if request.user.auth_privacy==False:
-			redirect_to='/genericUser/privacy/'
+		if request.user.is_license==False:
+			redirect_to='/genericUser/license/'
 		else:
 			redirect_to = '/'
 		status = 'success'

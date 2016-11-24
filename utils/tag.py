@@ -72,7 +72,7 @@ def clean_tag(source,  destination, title='', encoding='utf-8'):
 	p_tags = soup.find_all('p')
 	for p_tag in p_tags:
 		del p_tag['class']
-	merge_NavigableString(soup)
+#	merge_NavigableString(soup)
 	soup.head.title.string = title
 	for tag in soup.body.contents:
 		if isinstance(tag, NavigableString) and tag.string != '\n':
@@ -83,7 +83,8 @@ def clean_tag(source,  destination, title='', encoding='utf-8'):
 		p_tag.attrs['id'] = i
 		i = i +1
 	with codecs.open( destination, 'w', encoding=encoding) as cleanFile:
-		clean_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
+#		clean_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
+		clean_content = str(soup)
 		soup = BeautifulSoup(clean_content, 'lxml')
 		clean_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
 		cleanFile.write(clean_content)
