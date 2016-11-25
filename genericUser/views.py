@@ -455,7 +455,7 @@ def servicehours_list(request, username, template_name='genericUser/servicehours
 	if request.method == 'GET':
 		return locals()
 
-@user_category_check(['user'])
+#@user_category_check(['user'])
 @http_response
 def verify_contact_info(request, template='genericUser/verify_contact_info.html'):
 	if not request.is_ajax():

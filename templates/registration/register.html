@@ -24,9 +24,9 @@
                             <font style="color:red">*</font>使用者名稱：</label>
                     </th>
                     <td class="col-md-8">
-                        <input id="id_username" maxlength="30" name="username" type="text" pattern="^[a-z0-9_]*$" autofocus required>
+                        <input id="id_username" maxlength="30" name="username" type="text" pattern="^[a-z][a-z0-9_]*$" autofocus required>
                         <label for="id_username">
-                            <font style="color:red">小寫英文字母、數字、'_'</font>
+                            <font style="color:red">首字為英文字母，其餘小寫英文字母、數字、'_'</font>
                         </label>
                     </td>
                 </tr>

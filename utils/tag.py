@@ -80,10 +80,10 @@ def clean_tag(source,  destination, title='', encoding='utf-8'):
 		p_tag.attrs['id'] = i
 		i = i +1
 	with codecs.open( destination, 'w', encoding=encoding) as cleanFile:
-#		clean_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
-		clean_content = str(soup)
+		clean_content = unicode(soup)
 		soup = BeautifulSoup(clean_content, 'html5lib')
-		clean_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
+#		clean_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
+		clean_content = unicode(soup)
 		cleanFile.write(clean_content)
 
 import sys

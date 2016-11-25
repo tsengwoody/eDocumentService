@@ -590,7 +590,7 @@ class EBook(models.Model):
 				except:
 					continue
 				id = self.ISBN_part +'-' +tag_id
-				content = str(span_tag_pparent)
+				content = unicode(span_tag_pparent)
 				if 'unknown' in span_tag.attrs['class']:
 					type = SpecialContent.TYPE['unknown']
 				elif 'mathml' in span_tag.attrs['class']:
@@ -617,7 +617,7 @@ class EBook(models.Model):
 				except:
 					continue
 				id = self.ISBN_part +'-' +tag_id
-				content = str(img_tag_pparent)
+				content = unicode(img_tag_pparent)
 				type = SpecialContent.TYPE['image']
 				try:
 					SpecialContent.objects.get(id=id)
@@ -735,9 +735,9 @@ class SpecialContent(models.Model):
 		nt = BeautifulSoup(self.content, 'html5lib').body.p
 		tag.replace_with(nt)
 		with codecs.open(source, 'w', encoding=encoding) as sourceFile:
-			write_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
+			write_content = unicode(soup)
 			soup = BeautifulSoup(write_content, 'html5lib')
-			write_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
+			write_content = unicode(soup)
 			sourceFile.write(write_content)
 		self.delete()
 
@@ -817,6 +817,7 @@ class EditLog(models.Model):
 	time = models.DateTimeField(default = timezone.now)
 	order = models.IntegerField()
 	edit_count = models.IntegerField()
+	page = models.IntegerField()
 
 	def __unicode__(self):
 		return self.edit_record.part.ISBN_part +'-{0}'.format(self.order)
