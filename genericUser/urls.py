@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
 	url(r'^user_guide', views.user_guide, name='user_guide'),
+	url(r'^recruit', views.recruit, name='recruit'),
 	url(r'^article/create/$', views.article_create, name='article/create'),
 	url(r'^article/content/(?P<id>[\d-]+)/$', views.article_content, name='article/content'),
 	url(r'^apply_document/$', views.apply_document, name='apply_document'),
