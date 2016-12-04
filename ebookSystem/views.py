@@ -75,19 +75,26 @@ def book_list(request, template_name='ebookSystem/book_list.html'):
 
 @http_response
 def search_book(request, template_name):
-	if request.method == 'POST':
-		print request.POST
-		if request.POST.has_key('book_ISBN'):
-			ISBN = request.POST['book_ISBN']
+	if request.method == 'POST' :
+		if request.POST.has_key('search_value') and not request.POST.has_key('download') and not request.POST.has_key('email'):
+			search_value = request.POST['search_value']
+			search_type = request.POST['search_type']
+			#print search_value
+
 			try:
-				search_book = Book.objects.get(ISBN=ISBN)
+				if search_type == 'ISBN':
+					search_book = Book.objects.get(ISBN=search_value)
+				elif search_type == 'BookName':
+					bookInfo=BookInfo.objects.filter(bookname__contains=search_value)
+					search_book = Book.objects.get(book_info=bookInfo)
+					#search_book = Book.objects.select_related().filter(book_info__bookname__contains=search_value)
 				status = 'success'
-				message = u'成功查詢指定ISBN文件'
+				message = u'成功查詢指定文件'
 			except:
 				status = 'error'
 				message = u'查無指定ISBN文件'
-		elif request.POST.has_key('bookname'):
-			pass
+		#elif request.POST.has_key('bookname'):
+		#	pass
 		if request.POST.has_key('email'):
 			from django.core.mail import EmailMessage
 			getBook = Book.objects.get(ISBN=request.POST['email'])

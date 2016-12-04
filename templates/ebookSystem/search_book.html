@@ -18,8 +18,10 @@
 
 <div class="form-inline">
   <div class="form-group">
-    <label for="id_book_ISBN">請輸入ISBN</label>
-    <input id="id_book_ISBN" class="form-control" maxlength="15" name="book_ISBN" type="text">
+    <!-- <label for="id_book_ISBN">請輸入型態</label> -->
+    <label><input type="radio" name="search_type" value="ISBN" checked="true">ISBN</label>
+    <label><input type="radio" name="search_type" value="BookName">書名</label>
+    <input id="id_book_ISBN" class="form-control" maxlength="15" name="search_value" type="text">
   </div>
   <button type="submit" class="btn btn-primary" name="search_name" value="search" id="id_search">搜尋</button>
 </div>
