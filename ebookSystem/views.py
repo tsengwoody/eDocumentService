@@ -83,11 +83,13 @@ def search_book(request, template_name):
 
 			try:
 				if search_type == 'ISBN':
-					search_book = Book.objects.get(ISBN=search_value)
+					search_book_list = Book.objects.get(ISBN=search_value)
 				elif search_type == 'BookName':
-					bookInfo=BookInfo.objects.filter(bookname__contains=search_value)
-					search_book = Book.objects.get(book_info=bookInfo)
-					#search_book = Book.objects.select_related().filter(book_info__bookname__contains=search_value)
+					search_book_list = Book.objects.select_related().filter(book_info__bookname__contains=search_value)
+					#bookInfo=BookInfo.objects.filter(bookname__contains=search_value)
+					#search_book = Book.objects.get(book_info=bookInfo)
+					
+					print search_book_list
 				status = 'success'
 				message = u'成功查詢指定文件'
 			except:

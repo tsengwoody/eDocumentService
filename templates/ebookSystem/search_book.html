@@ -35,8 +35,9 @@
 			<th>出版日期</th>
 			<th colspan="2">動作</th>
 		</tr>
+		{% for search_book in search_book_list %}
 		<tr>
-			<td>{{ search_book.ISBN }}</td>
+			<td>{{ search_book.book_info.ISBN }}</td>
 			<td>{{ search_book.book_info.bookname }}</td>
 			<td>{{ search_book.book_info.author }}</td>
 			<td>{{ search_book.book_info.house }}</td>
@@ -52,6 +53,7 @@
 				{% endif %}
 			</td>
 		</tr>
+		{% endfor %}
 	</table>
 </form>
 {% endblock %}
