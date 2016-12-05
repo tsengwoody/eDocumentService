@@ -11,7 +11,7 @@
 {% csrf_token %}
 {% if request.user.is_authenticated and not request.user.is_license %}
 <div class="checkbox">
-  <label><input type="checkbox" name="is_privacy" value="agree">我同意此隱私權政策</label>
+  <label><input type="checkbox" name="is_privacy" value="agree">我同意使用者條款隱私權政策</label>
 </div>
 <div class="form-group row text-center">
     <button type="submit" class="btn btn-primary" >送出</button>
