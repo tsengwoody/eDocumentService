@@ -11,9 +11,5 @@ class Command(BaseCommand):
 
 	def handle(self, *args, **options):
 		for part in EBook.objects.all():
-			if part.status == EBook.STATUS['edit'] and part.deadline < datetime.date.today():
-				part.editor=None
-				part.get_date = None
-				part.deadline = None
-				part.status = part.STATUS['active']
-				part.save()
+			if part.status == EBook.STATUS['edit'] and part.deadline and part.deadline < datetime.date.today():
+				part.change_status(-1, 'active')

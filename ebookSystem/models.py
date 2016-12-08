@@ -776,7 +776,7 @@ class EditRecord(models.Model):
 			self.get_date = self.part.get_date
 			self.save()
 			self.serviceHours = 				self.group_ServiceHours()
-			self.service_hours = self.part.service_hours
+			self.service_hours = self.compute_service_hours()
 		elif self.category == 'advanced':
 			self.editor = self.part.sc_editor
 			self.get_date = self.part.sc_get_date

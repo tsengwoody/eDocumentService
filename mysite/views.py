@@ -30,7 +30,7 @@ logger.addHandler(fh)
 @http_response
 def home(request, template_name='home.html'):
 #	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
-	article_list = Article.objects.all()
+	article_list = Article.objects.all().order_by('-datetime')
 	return locals()
 
 @http_response

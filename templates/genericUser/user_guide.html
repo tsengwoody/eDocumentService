@@ -1,204 +1,192 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% load staticfiles %}
 {% block title %}
 首頁
 {% endblock %}
 
 {% block style %}
-    <link href="{% static "ebookSystem/css/bootstrap/assets/docs.min.css" %}" rel="stylesheet" > 
-    <link href="{% static "ebookSystem/css/bootstrap/assets/src/docs.css" %}" rel="stylesheet" > 
+	<link href="{% static "ebookSystem/css/bootstrap/assets/docs.min.css" %}" rel="stylesheet" > 
+	<link href="{% static "ebookSystem/css/bootstrap/assets/src/docs.css" %}" rel="stylesheet" > 
 {% endblock %}
 {% block content %}
-<h3>edocumentservice雲端平台系統-使用流程</h3>
+<h3>edocumentservice雲端千眼平台-使用流程</h3>
 <div class="row">
-    <div class="col-md-2">
-        <ul class="nav nav-pills nav-stacked">
-            <li class="active"><a data-toggle="pill" href="#Visually_impaired">視障者</a></li>
-            <li>
-                <a data-toggle="pill" href="#Volunteers">志工</a></li>
-        </ul>
-    </div>
-    <div class="col-md-10">
-        <div class="tab-content">
-            <div id="Visually_impaired" class="tab-pane fade in active">
-                <section id="Visually_impaired_section">
-                        <div class="panel-group" id="Visually-impaired-panel">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title">
-                                        <a data-toggle="collapse" data-parent="#accordion" href="#Visually_impaired_register">註冊與登錄</a>
-                                    </h4>
-                                </div>
-                                <div id="Visually_impaired_register" class="panel-collapse collapse in">
-                                    <div class="panel-body">
-                                        <ol>
-                                            <li>請點選導航區功能清單註冊連結。</li>
-                                            <li>註冊頁面為輸入基本資料表格，請依提示填寫。</li>
-                                            <li>角色列請勾選服務使用者，並將身心障礙手冊正反掃描檔(.jpg)上傳。</li>
-                                            <li>確認資料無誤後，點選「送出」按鈕完成註冊</li>
-                                            <li>請點選導航區功能清單登錄連結，並在登錄頁面輸入帳號和密碼。</li>
-                                        </ol>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title">
-                                      <a data-toggle="collapse" data-parent="#accordion" href="#Visually_impaired_verify">通訊資料驗證</a>
-                                    </h4>
-                                </div>
-                                <div id="Visually_impaired_verify" class="panel-collapse collapse in">
-                                    <div class="panel-body">
-                                        <ol>
-                                            <li>登入成功後，頁面挑轉回首頁。此時功能清單有帳號選單，展開後點選設定連結，進入個人資料維護頁面。</li>
-                                            <li>電子郵件、聯絡電話e列中的資料格內會有「驗證」按鈕，請點選進行驗證</li>
-                                            <li>按下驗證跳出對話方塊後，請點選「取得驗證碼」按鈕，此時系統會發送6字元的驗證碼至您的電子郵件/聯絡電話內，請依收到之驗證碼填入編輯框中並按「送出驗證碼」完成驗證。</li>
-                                        </ol>
-                                    </div>
-                                </div>
-                            </div>
+	<div class="col-md-2">
+		<ul class="nav nav-pills nav-stacked">
+			<li class="active"><a data-toggle="pill" href="#Visually_impaired">視障者</a></li>
+			<li>
+				<a data-toggle="pill" href="#Volunteers">志工</a></li>
+		</ul>
+	</div>
+	<div class="col-md-10">
+		<div class="tab-content">
+			<div id="Visually_impaired" class="tab-pane fade in active">
+				<section id="Visually_impaired_section">
+						<div class="panel-group" id="Visually-impaired-panel">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4 class="panel-title">
+										<a data-toggle="collapse" data-parent="#accordion" href="#Visually_impaired_register">註冊與登錄</a>
+									</h4>
+								</div>
+								<div id="Visually_impaired_register" class="panel-collapse collapse in">
+									<div class="panel-body">
+										<ol>
+											<li>請點選導航區功能清單註冊連結。</li>
+											<li>註冊頁面為輸入基本資料表格，請依提示填寫。</li>
+											<li>角色列請勾選視障者，並將身心障礙手冊正反掃描檔(.jpg)上傳。</li>
+											<li>確認資料無誤後，點選「送出」按鈕完成註冊</li>
+											<li>註冊成功後，平台會自動導向帳號設定頁面，請進行通訊資料驗證。。</li>
+										</ol>
+									</div>
+								</div>
+							</div>
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4 class="panel-title">
+									  <a data-toggle="collapse" data-parent="#accordion" href="#Visually_impaired_verify">通訊資料驗證</a>
+									</h4>
+								</div>
+								<div id="Visually_impaired_verify" class="panel-collapse collapse in">
+									<div class="panel-body">
+										<ol>
+											<li>電子郵件、聯絡電話e列中的資料格內會有「驗證」按鈕，請點選進行驗證</li>
+											<li>按下驗證跳出對話方塊後，請點選「取得驗證碼」按鈕，此時系統會發送6字元的驗證碼至您的電子郵件/聯絡電話內，請依收到之驗證碼填入編輯框中並按「送出驗證碼」完成驗證。</li>
+										</ol>
+									</div>
+								</div>
+							</div>
 
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#Visually_impaired_doc_upload">文件->自掃上傳</a></h4>
-                                </div>
-                                <div id="Visually_impaired_doc_upload" class="panel-collapse collapse in">
-                                    <div class="panel-body">
-                                        <p>文件->自掃上傳可將壓縮包(掃描與辨識文件)上傳至平台進行校對</p>
-                                        <p>點選自掃上傳進入上傳文件頁面。</p>
-                                        <p>輸入書籍之ISBN碼->按下「取得書籍資訊」取得書籍資訊後系統會自動填入下方唯讀編輯框內->確認取得之書籍資料</p>
-                                        <p>文件列->選擇上傳的壓縮包->送出</p>
-                                        <p>上傳成功後在書庫內就能看到剛上傳的書籍資訊與最新狀態。</p>
-                                    </div>
-                                </div>
-                            </div>
-
-
-
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#Visually_impaired_book_store">書庫</a></h4>
-                                </div>
-                                <div id="Visually_impaired_book_store" class="panel-collapse collapse in">
-                                    <div class="panel-body">
-                                        <p>書庫頁面內分為「校對文件進度」、「您擁有的文件」兩個表格，分別顯示不同階段的文件資訊</p>
-                                        <p>校對文件進度：此為尚未完成一般校對文件會顯示於此處，你可以點選「詳細資料」連結查閱每個分段的狀態。</p>
-                                        <p>您擁有的文件：此為已完成一般校對文件會顯示於此處，你可以點選「傳送至電郵」或「下載」獲取文件。</p>
-                                        <p>獲取文件時，需再次書入使用者密碼以確認身份</p>
-                                        <p>獲取得文件為壓縮包，密碼為使用者密碼</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#Visually_impaired_search">查詢</a></h4>
-                                </div>
-                                <div id="Visually_impaired_search" class="panel-collapse collapse in">
-                                    <div class="panel-body">
-                                        <p>可透過ISBN查詢是否平台上已提供此本書籍。</p>
-                                        <p>若有查詢到欲瀏覽之書籍，再下方表格內會顯示書籍資訊與「寄到信箱」與「下載」同書庫之功能。</p>
-                                    </div>
-                                </div>
-                            </div>
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#Visually_impaired_doc_upload">文件->自掃上傳</a></h4>
+								</div>
+								<div id="Visually_impaired_doc_upload" class="panel-collapse collapse in">
+									<div class="panel-body">
+										<p>文件->自掃上傳可將壓縮包(掃描與辨識文件)上傳至平台進行校對</p>
+										<p>點選自掃上傳進入上傳文件頁面。</p>
+										<p>輸入書籍之ISBN碼->按下「取得書籍資訊」取得書籍資訊後系統會自動填入下方唯讀編輯框內->確認取得之書籍資料</p>
+										<p>文件列->選擇上傳的壓縮包->送出</p>
+										<p>上傳成功後在書庫內就能看到剛上傳的書籍資訊與最新狀態。</p>
+									</div>
+								</div>
+							</div>
 
 
 
-                            </div>
-                    </section>
-            </div>
-            <div id="Volunteers" class="tab-pane fade">
-                <section id="explanation">
-                        <div class="panel-group" id="explanation-panel">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title">
-                                        <a data-toggle="collapse" data-parent="#accordion" href="#register">註冊與登入</a>
-                                    </h4>
-                                </div>
-                                <div id="register" class="panel-collapse collapse in">
-                                    <div class="panel-body">
-                                        <p class="lead">首頁->點選<b>註冊</b>(填寫個人基本資料及個人專業領域，並將角色一欄勾選為☑志工)->註冊完畢->登入成功!</p>
-                                        <p>★填寫個人專業領域之目的為，希望未來能夠透過專業書籍與相關專業領域志工的媒合，減少專業書籍重製之錯誤率。</p>
-                                        <p>★角色一欄中，☑志工與☑視障者之差別為，視障者受到著作權使用免責的保障，而能於此平台取用電子書，因此則需要提供身心障礙手冊電子檔影本(正反面)，作為身分驗證，而志工則否。</p>
-                                    </div>
-                                </div>
-                                </div>
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <h4 class="panel-title">
-          <a data-toggle="collapse" data-parent="#accordion" href="#volunteer">校對程序</a>
-        </h4>
-                                    </div>
-                                    <div id="volunteer" class="panel-collapse collapse in">
-                                        <div class="panel-body">
-                                            <div class="bs-callout bs-callout-danger">
-                                                <h4>校對注意事項</h4>
-                                                <p>一、以段落為基準，每段即為一行，辨識軟體基本以這種方式輸出，如有遺漏再請將分多行的文字但為一段之內容合併成一行。</p>
-                                                <p>二、每行前不需空格。</p>
-                                                <p>三、英文文句標點使用半形符號。</p>
-                                                <p>四、中文文句標點使用全形符號，但遇到英文、數字使用半形符號</p>
-                                                <p>五、當遇到特殊內容無法輸入、不知如何輸入時，請依種類插入相應標記</p>
-                                            </div>
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#Visually_impaired_book_store">書庫</a></h4>
+								</div>
+								<div id="Visually_impaired_book_store" class="panel-collapse collapse in">
+									<div class="panel-body">
+										<p>書庫頁面內分為「校對文件進度」、「您擁有的文件」兩個表格，分別顯示不同階段的文件資訊</p>
+										<p>校對文件進度：此為尚未完成一般校對文件會顯示於此處，你可以點選「詳細資料」連結查閱每個分段的狀態。</p>
+										<p>您擁有的文件：此為已完成一般校對文件會顯示於此處，你可以點選「傳送至電郵」或「下載」獲取文件。</p>
+										<p>獲取文件時，需再次書入使用者密碼以確認身份</p>
+										<p>取得的文件為壓縮包，壓縮包設有密碼，密碼為平台使用者密碼</p>
+									</div>
+								</div>
+							</div>
 
-                                            
-                                                <p class="lead">登入成功後->畫面挑轉進入志工使用頁面</p>
-                                                <img src="{% static "ebookSystem/img/volunteer_img.png" %}" alt="登入頁面" style="margin-right: auto; margin-left: auto;max-width: 100%;height: auto;">
-                                                <div class="caption">
-                                                    <p>
-                                                        <b>首頁</b>：系統平台介紹與各項操作說明。
-                                                        <br /><b>一般校對</b>：★以下詳細介紹。
-                                                        <br /><b>查詢</b>：提供使用者或志工查詢，輸入書籍之ISBN碼，則可查詢是否已存在該重製後書籍。
-                                                        <br /><b>帳號->消息</b>：紀錄志工已完成之書籍重製文件及服務時數。
-                                                        <br /><b>帳號->設定</b>：顯示登錄者基本資料，並可修改宓碼、基本資料與角色設定。
-                                                        <br /><b>聯絡我們</b>：提供志工或視障者之意見回饋。
-                                                    </p>
-                                                </div>
-                                          
-                                            <p class="lead">★點選服務鍵：</p>
-                                            <h4>Step 1:選擇勾選☑領部分文件或☑領完整文件</h4>
-                                            <ol>
-                                                <li>志工若勾選☑領部分文件，則只會得到書籍其中一小部分的文件資料(每五十頁為一個part)作重製，適合所能提供重製時數較少之志工教快速完成重製﹔</li>
-                                                <li>志工若勾選☑領完整文件，則會得到整本書籍完整的文件資料作重製，適合對該書及有興趣想要在重製書籍同時能閱讀全文之志工，所花費之重製時數會較長，然而，偶爾因系統上所需重製之書籍數不足，因此可能未能有機會領完整文件。</li>
-                                            </ol>
-                                            <p><b>頁數</b>：代表志工實際完成重製之頁數。
-                                                <br /><b>時數</b>：代表志工實際登錄進行重製之時間。(以分鐘為單位)。
-                                                <br /><b>還文件</b>：取消領取文件。</p>
-                                            <h4>Step 2進入編輯頁面之使用程序(左側為書籍掃描圖檔，右側為編輯校對文字介面)</h4>
-                                            <p>點選☑領部分文件或☑領完整文件後進入【編輯頁面】</p>
-                                            
-                                                <p class="text-success"><b>右側編輯頁上方各項工具介紹</b></p>
-                                                <img src="{% static "ebookSystem/img/edit_img.png" %}" alt="編輯頁面" alt="按下mark後顯示下拉選單" style="margin-right: auto; margin-left: auto;max-width: 100%;height: auto;">
-                                                <div class="caption">
-                                                    <ul>
-                                                        <li>「image_mark」鍵：遇到有圖片時請按此按鈕，會插入一個圖片標示。</li>
-                                                        <li>「unknown_mark」鍵：遇到不會打的字請按此按鈕，會插入紅色文字段{???}。</li>
-                                                        <li>「mathml_mark」鍵：遇到科學符號、數學公式請按此按鈕，會插入藍色文字段mathml。</li>
-                                                        <li>「save_mark」鍵：進行書籍重製中，完成一部分之編輯後，可點選mark鍵，會插入此︱----------︱符號，之後再點選「存檔」鍵，下次再開啟書籍重製頁面時，則上次插入mark點以上之資料(已完成重製資料的部分資料)已系統存檔並消失，則可繼續進行未完成重製資料之校對。</li>
-                                                        <li>「存檔」鍵：僅完成部分書籍重製時，可插入mark鍵︱----------︱符號，並逕行存檔。</li>
-                                                        <li>「完成」鍵：完成自己所領取的整份資料重製時，可按「完成」鍵送出完整校對內容，若誤按可至「服務」頁面重新點選「再編輯」再繼續編輯。</li>
-                                                        <li>「切換版型」鍵：依書籍為直式或橫式，校對志工可切換編輯版型調整為直式或橫式，便於編輯與校對。</li>
-                                                    </ul>
-                                                </div>
-                                            
-                                            <h4>Step 3書籍完成重製</h4>
-                                            <p>整份重製資料完成->存檔->於志工服務頁面顯示志工服務時數。</p>
-            
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                    </section>
-                </div>
-            </div>
-        </div>
-    </div>
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#Visually_impaired_search">查詢</a></h4>
+								</div>
+								<div id="Visually_impaired_search" class="panel-collapse collapse in">
+									<div class="panel-body">
+										<p>可透過ISBN或書名關鍵字查詢是否平台上已提供此本書籍。</p>
+										<p>若有查詢到欲瀏覽之書籍，再下方表格內會顯示書籍資訊與「寄到信箱」與「下載」同書庫之功能。</p>
+									</div>
+								</div>
+							</div>
 
 
 
-<!--
+							</div>
+					</section>
+			</div>
+			<div id="Volunteers" class="tab-pane fade">
+				<section id="explanation">
+						<div class="panel-group" id="explanation-panel">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4 class="panel-title">
+										<a data-toggle="collapse" data-parent="#accordion" href="#register">註冊與登入</a>
+									</h4>
+								</div>
+								<div id="register" class="panel-collapse collapse in">
+									<div class="panel-body">
+										<p class="lead">首頁->點選<b>註冊</b>(填寫個人基本資料，並將角色一欄勾選為「志工」->註冊完畢->登入成功！</p>
+<!--										<p>★填寫個人專業領域之目的為，希望未來能夠透過專業書籍與相關專業領域志工的媒合，減少專業書籍重製之錯誤率。</p>-->
+										<p>★角色一欄中，「志工與「視障者之差別為，視障者受到著作權使用免責的保障，而能於此平台取用電子書，因此則需要提供身心障礙手冊電子檔影本(正反面)，作為身分驗證，而志工則否。</p>
+									</div>
+								</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title">
+		  <a data-toggle="collapse" data-parent="#accordion" href="#volunteer">校對流程</a>
+		</h4>
+									</div>
+									<div id="volunteer" class="panel-collapse collapse in">
+										<div class="panel-body">
+											<div class="bs-callout bs-callout-danger">
+												<h4>校對注意事項</h4>
+												<p>一、以段落為基準，每段即為一行，辨識軟體基本以這種方式輸出，如有遺漏再請將分多行的文字但為一段之內容合併成一行。</p>
+												<p>二、每行前不需空格。</p>
+												<p>三、英文文句標點使用半形符號。</p>
+												<p>四、中文文句標點使用全形符號，但遇到英文、數字使用半形符號</p>
+												<p>五、當遇到特殊內容無法輸入、不知如何輸入時，請依種類插入相應標記</p>
+											</div>
 
--->
+											
+												<p class="lead">登入成功後->畫面挑轉進入志工使用頁面</p>
+												<img src="{% static "ebookSystem/img/volunteer_img.png" %}" alt="登入頁面" style="margin-right: auto; margin-left: auto;max-width: 100%;height: auto;">
+												<div class="caption">
+													<p>
+														<b>首頁</b>：eDocumentService-雲端千眼平台介紹與各項操作說明。
+														<br /><b>一般校對</b>：★以下詳細介紹。
+														<br /><b>查詢</b>：提供使用者查詢，可輸入書籍之ISBN或書名關鍵字，可查詢是否已存在該重製後書籍。
+<!--														<br /><b>帳號->消息</b>：紀錄志工已完成之書籍重製文件及服務時數。-->
+														<br /><b>帳號->設定</b>：顯示登錄者基本資料，並可修改宓碼與個人資料。
+														<br /><b>帳號->時數</b>：顯示每月志工服務時數，以分鐘為單位，平台會依編輯行為認定服務時數。
+														<br /><b>聯絡我們</b>：提供使用者之意見回饋。
+													</p>
+												</div>
+										  
+											<p class="lead">★點選校對->一般校對：</p>
+											<h4>Step 1:點選「領文件」</h4>
 
+											<p><b>領文件</b>：平台會自動給予一段尚未校對僅進行軟體辨識的文件。
+											<br><b>頁數</b>：代表志工實際完成重製之頁數。
+												<br /><b>時數</b>：代表志工實際登錄進行重製之時間。(以分鐘為單位)。
+												<br /><b>還文件</b>：取消領取文件。當時間不足時判斷有段時間無法從事時，可「還文件」將文件釋放給其他志工領取。
+												<br /><b>編輯</b>：點選此鍵後便會進入編輯頁面。</p>
+											<h4>Step 2編輯頁面之各項功能(左側為書籍掃描圖檔，右側為編輯校對文字介面)</h4>
+												<p class="text-success"><b>右側編輯頁上方各項工具介紹</b></p>
+												<img src="{% static "ebookSystem/img/edit_img.png" %}" alt="編輯頁面" alt="按下mark後顯示下拉選單" style="margin-right: auto; margin-left: auto;max-width: 100%;height: auto;">
+												<div class="caption">
+													<ul>
+														<li>「image_mark」鍵：遇到有圖片時請按此按鈕，會插入一個圖片標示。</li>
+														<li>「unknown_mark」鍵：遇到不會打的字請按此按鈕，會插入紅色文字段{???}。</li>
+														<li>「mathml_mark」鍵：遇到科學符號、數學公式請按此按鈕，會插入藍色文字段mathml。</li>
+														<li>「save_mark」鍵：進行書籍重製中，完成一部分之編輯後，可點選此按鈕，會插入此「|----------|」符號，之後再點選「存檔」鍵，下次再開啟編輯頁面時，則上次插入mark點以上之資料(已完成重製資料的部分資料)已系統存檔並不再顯示，則可繼續進行未完成重製資料之校對。</li>
+														<li>「存檔」鍵：僅完成部分書籍重製時，可插入mark鍵︱----------︱符號，並逕行存檔。</li>
+														<li>「完成」鍵：完成自己所領取的整份資料重製時，可按「完成」鍵送出完整校對內容，若誤按可至「服務」頁面重新點選「再編輯」再繼續編輯。</li>
+														<li>「切換版型」鍵：依書籍為直式或橫式，校對志工可切換編輯版型調整為直式或橫式，便於編輯與校對。</li>
+														<li>「載入全文」鍵：志工如需再編輯或誤按造成文字存入平台而無法顯示編輯，可點此按鍵，平台會將整份文件載入便可繼續編輯。</li>
+													</ul>
+												</div>
+											<h4>Step 3書籍完成重製</h4>
+											<p>整份重製文件完成->存檔->於志工服務頁面顯示時數。(此處時數為停留於編輯頁面之時數並非服務時數，服務時數請以「帳號->時數」內之時數為準)</p>
+										</div>
+									</div>
+								</div>
+							</div>
+					</section>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}
