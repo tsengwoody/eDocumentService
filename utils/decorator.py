@@ -76,7 +76,7 @@ def http_response(view):
 				with open(rend_dict['download_path'], 'rb') as content_file:
 					response = HttpResponse(content=content_file, )
 				response['Content-Type'] = 'application/octet-stream'
-				response['Content-Disposition'] = 'attachment; filename="{0}"'.format(rend_dict['download_filename'])
+				response['Content-Disposition'] = u'attachment; filename="{0}"'.format(rend_dict['download_filename']).encode('utf-8')
 				return response
 			else:
 				return render(request, rend_dict['template_name'], rend_dict)

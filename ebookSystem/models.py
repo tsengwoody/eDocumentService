@@ -317,6 +317,7 @@ class EBook(models.Model):
 				self.deadline = None
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['edit']:
+				self.edit_page = 0
 				self.load_full_content()
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['review']:
@@ -817,7 +818,7 @@ class EditLog(models.Model):
 	time = models.DateTimeField(default = timezone.now)
 	order = models.IntegerField()
 	edit_count = models.IntegerField()
-	page = models.IntegerField()
+#	page = models.IntegerField()
 
 	def __unicode__(self):
 		return self.edit_record.part.ISBN_part +'-{0}'.format(self.order)

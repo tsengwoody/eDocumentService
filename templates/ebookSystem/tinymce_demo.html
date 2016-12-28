@@ -1,8 +1,8 @@
 ﻿{% extends "base_nav.html" %}
-{% load staticfiles %}
 {% block title %}
-MathML 編輯 demo
+HTML 編輯 demo
 {% endblock %}
+{% load staticfiles %}
 {% block style %}
     <script src="{% static "ebookSystem/js/jquery/jquery.min.js" %}" ></script>
     <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
@@ -102,6 +102,5 @@ MathML 編輯 demo
 </form>
 
 {% endblock %}
-
 {% block footer %}
 {% endblock %}

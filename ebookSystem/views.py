@@ -64,6 +64,29 @@ def mathml(request, template_name='ebookSystem/mathml_demo.html'):
 		message = u'成功獲取內容'
 		return locals()
 
+@http_response
+def tinymce_demo(request, template_name='ebookSystem/tinymce_demo.html'):
+	if request.method == 'POST':
+		if request.POST.has_key('set'):
+			cache.set(request.user.username, {'html':request.POST['content']}, 600)
+			status = u'success'
+			message = u'成功暫存內容'
+		if request.POST.has_key('get'):
+			try:
+				content = cache.get(request.user.username)['html']
+				extra_list = ['content']
+				status = u'success'
+				message = u'成功獲取內容'
+				return locals()
+			except:
+				status = u'error'
+				message = u'server無資料'
+				return locals()
+	if request.method == 'GET':
+		status = u'success'
+		message = u'get'
+		return locals()
+
 @user_category_check(['manager'])
 @http_response
 def book_list(request, template_name='ebookSystem/book_list.html'):
@@ -79,8 +102,6 @@ def search_book(request, template_name):
 		if request.POST.has_key('search_value') and not request.POST.has_key('download') and not request.POST.has_key('email'):
 			search_value = request.POST['search_value']
 			search_type = request.POST['search_type']
-			#print search_value
-
 			try:
 				if search_type == 'ISBN':
 					search_book_list = Book.objects.get(ISBN=search_value)
@@ -88,15 +109,14 @@ def search_book(request, template_name):
 					search_book_list = Book.objects.select_related().filter(book_info__bookname__contains=search_value)
 					#bookInfo=BookInfo.objects.filter(bookname__contains=search_value)
 					#search_book = Book.objects.get(book_info=bookInfo)
-					
-					print search_book_list
+				if len(search_book_list) > 0:
+					status = 'error'
+					message = u'查無指定ISBN文件'
 				status = 'success'
 				message = u'成功查詢指定文件'
 			except:
 				status = 'error'
 				message = u'查無指定ISBN文件'
-		#elif request.POST.has_key('bookname'):
-		#	pass
 		if request.POST.has_key('email'):
 			from django.core.mail import EmailMessage
 			getBook = Book.objects.get(ISBN=request.POST['email'])

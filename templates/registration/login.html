@@ -1,73 +1,54 @@
 ﻿{% extends "base_nav.html" %}
 {% block resource %}
-    {% load staticfiles %}
-    <link href="{% static "ebookSystem/css/signin.css" %}" rel="stylesheet" >
-    <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script> 
-    <!--<script language="javascript" src="{% static 'ebookSystem/js/login.js' %}"></script>-->
+	{% load staticfiles %}
+	<link href="{% static "ebookSystem/css/signin.css" %}" rel="stylesheet" >
+	<script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
+	<script src="https://www.google.com/recaptcha/api.js" async defer></script> 
+	<!--<script language="javascript" src="{% static 'ebookSystem/js/login.js' %}"></script>-->
 {% endblock%}
 
 {% block title %}
-登錄login page
+登錄
 {% endblock %}
-
 
 {% block content %}
 {% if next %}
-    {% if user.is_authenticated %}
-    <div class="alert alert-warning">
-        <p>Your account doesn't have access to this page. To proceed,
-        please login with an account that has access.</p>
-    </div>
-    {% else %}
-    <div class="alert alert-info">
-        <p>Please login to see this page.</p>
-    </div>
-    {% endif %}
+	{% if user.is_authenticated %}
+	<div class="alert alert-warning">
+		<p>Your account doesn't have access to this page. To proceed,
+		please login with an account that has access.</p>
+	</div>
+	{% else %}
+	<div class="alert alert-info">
+		<p>Please login to see this page.</p>
+	</div>
+	{% endif %}
 {% endif %}
 <div class="form-signin" >
-    <form class="form-signin" role="form" method="post" action="">
-    <h2 class="form-signin-heading">Sign in</h2>
-        {% csrf_token %}
-
-
-        <div class="form-group">
-            <label for="id_username">{{ form.username.label_tag.value }}</label>
-            <input id="id_username" name="username" type="text" placeholder="username" class="form-control" required />
-        </div>
-        <div class="form-group">
-            <label for="id_password">{{ form.password.label_tag.value }}</label>
-            <input id="id_password" name="password" type="password" placeholder="password" class="form-control" required />
-        </div>
-        {{captcha}}
-<!--        <div class="form-group">
-            <label for="id_code">語音驗證碼：</label>
-            <input id="id_code" name="code" value="{{code}}" type="text" class="form-control" required />
-        </div>     
-            <audio id="id_audio_file" src = "/static/audio_code/{{ UUID }}.mp3" ></audio>-->
-
-            <input type="hidden" name="UUID" value="{{ UUID }}" />
-
-        <!--<input type="submit" value="login" /> -->
-
-        <button class="btn btn-lg btn-primary btn-block send_form" type="submit">Sign in</button>
-        <input type="hidden" name="next" value="{{ next }}" />
-    </form>
-<!--    <button onclick="document.getElementById('id_audio_file').play();">播放</button>-->
-    {% if error_message %}
-        <div class="alert alert-danger" role="alert">
-            {{ error_message }}
-        </div>
-    {% endif %}
-
-    {% if form.errors %}
-        <div class="alert alert-danger" role="alert">
-            <p>Your username and password didn't match. Please try again.</p>
-        </div>
-    {% endif %}
-
+	<form class="form-signin" role="form" method="post" action="">
+	<h2 class="form-signin-heading">登錄</h2>
+		{% csrf_token %}
+		<div class="form-group">
+			<label for="id_username">{{ form.username.label_tag.value }}</label>
+			<input id="id_username" name="username" type="text" placeholder="username" class="form-control" required />
+		</div>
+		<div class="form-group">
+			<label for="id_password">{{ form.password.label_tag.value }}</label>
+			<input id="id_password" name="password" type="password" placeholder="password" class="form-control" required />
+		</div>
+		{{captcha}}
+		<button class="btn btn-lg btn-primary btn-block send_form" type="submit">登錄</button>
+		<input type="hidden" name="next" value="{{ next }}" />
+	</form>
+	{% if error_message %}
+		<div class="alert alert-danger" role="alert">
+			{{ error_message }}
+		</div>
+	{% endif %}
+	{% if form.errors %}
+		<div class="alert alert-danger" role="alert">
+			<p>Your username and password didn't match. Please try again.</p>
+		</div>
+	{% endif %}
 </div>
-
-{# Assumes you setup the password_reset view in your URLconf #}
 {% endblock %}
-{% block footer %}{% endblock %}

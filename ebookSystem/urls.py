@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
 	url(r'^mathml', views.mathml, name='mathml'),
+	url(r'^tinymce_demo', views.tinymce_demo, name='tinymce_demo'),
 	url(r'^advanced/edit_(?P<type>\w+)/(?P<id>[0-9\-]+)/$', views.edit_SpecialContent, name='edit_SpecialContent'),
 	url(r'^analyze_part/(?P<ISBN_part>[\d-]+)/$', views.analyze_part, name='analyze_part'),
 	url(r'^book_info/(?P<ISBN>[0-9Xx]+)/$', views.book_info, name='book_info'),
