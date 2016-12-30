@@ -71,6 +71,7 @@ def tinymce_demo(request, template_name='ebookSystem/tinymce_demo.html'):
 			cache.set(request.user.username, {'html':request.POST['content']}, 600)
 			status = u'success'
 			message = u'成功暫存內容'
+			return locals()
 		if request.POST.has_key('get'):
 			try:
 				content = cache.get(request.user.username)['html']
