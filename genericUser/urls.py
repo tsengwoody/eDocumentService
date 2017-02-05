@@ -21,6 +21,7 @@ urlpatterns = [
 	url(r'^servicehours_list/(?P<username>[\w-]+)/$', views.servicehours_list, {'template_name': 'genericUser/servicehours_list.html'}, name='servicehours_list'),
 	url(r'^info/$', views.info, {'template_name': 'genericUser/info.html'}, name='info'),
 	url(r'^change_contact_info/$', views.change_contact_info, {'template_name': 'genericUser/change_contact_info.html'}, name='change_contact_info'),
+	url(r'^retrieve_password/$', views.retrieve_password, name='retrieve_password'),
 	url(r'^review_user/(?P<username>[\w-]+)/$', views.review_user, name='review_user'),
 	url(r'^revise_content/$', views.revise_content, name='revise_content'),
 	url(r'^verify_contact_info/$', views.verify_contact_info, name='verify_contact_info'),

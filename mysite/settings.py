@@ -210,6 +210,7 @@ EDIT =2
 REVIEW =3
 REVISE = 4
 FINISH = 5
+DEFAULT_FROM_EMAIL = 'edocumentservice@gmail.com'
 MANAGER = ['tsengwoody@yahoo.com.tw']
 SERVICE = 'edocumentservice@gmail.com'
 SITE_ID = 1

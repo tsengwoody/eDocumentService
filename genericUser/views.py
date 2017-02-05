@@ -23,14 +23,47 @@ import datetime
 import requests
 import urllib, urllib2
 
+@http_response
+def retrieve_password(request, template_name='genericUser/retrieve_password.html'):
+	if request.method == 'POST':
+		if not (request.POST.has_key('username') and request.POST.has_key('name') and request.POST.has_key('birthday')):
+			status = 'error'
+			message = u'資料不完整'
+			return locals()
+		try:
+			birthday = request.POST['birthday'].split('-')
+			birthday = [ int(i) for i in birthday ]
+			birthday = datetime.date(birthday[0], birthday[1], birthday[2])
+			user = User.objects.get(username=request.POST['username'], birthday=birthday)
+		except:
+			status = 'error'
+			message = u'無法取得使用者資料，請確認填寫的資料是否無誤'
+			return locals()
+		import random
+		import string
+		reset_password = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+		user.set_password(reset_password)
+		try:
+			subject = u'重設密碼郵件'
+			message = u'您的新密碼為：{0}'.format(reset_password)
+			user.email_user(subject=subject, message=message)
+		except:
+			status = 'error'
+			message = u'傳送郵件失敗'
+			return locals()
+		user.save()
+		status = 'success'
+		message = u'成功重設密碼，請至信箱取得'
+		redirect_to = reverse('login')
+		return locals()
+	if request.method == 'GET':
+		return locals()
 
 def user_guide(request, template_name='genericUser/user_guide.html'):
 	return render(request, template_name, locals())
 
-
 def recruit(request, template_name='genericUser/recruit.html'):
 	return render(request, template_name, locals())
-
 
 @http_response
 def article_content(request, id, template_name='genericUser/article/content.html'):
