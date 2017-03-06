@@ -74,7 +74,7 @@ class Command(BaseCommand):
 		assert ebook.change_status(1, 'review'), 'change status error'
 		assert ebook.change_status(1, 'finish'), 'change status error'
 		ebook.service_hours = 90
-		ebook.group_ServiceHours()
+		ebook.group_ServiceInfo()
 		ebook.save()
 		ebook = EBook.objects.get(book=book, part=2)
 		assert ebook.change_status(1, 'active'), 'change status error'

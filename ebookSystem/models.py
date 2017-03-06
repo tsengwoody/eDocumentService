@@ -2,7 +2,7 @@
 from django.db import models
 from django.utils import timezone
 from mysite.settings import BASE_DIR
-from genericUser.models import User, ServiceHours
+from genericUser.models import User, ServiceInfo
 from guest.models import Guest
 from account.models import Editor
 import glob,os
@@ -10,6 +10,7 @@ import datetime
 import codecs
 import shutil
 from PIL import Image, ImageFont, ImageDraw
+from bs4 import BeautifulSoup, NavigableString
 
 class BookInfo(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
@@ -27,6 +28,7 @@ class Book(models.Model):
 	page_count = models.IntegerField(default = -1)
 	part_count = models.IntegerField(default = 1)
 	page_per_part = models.IntegerField(default=-1)
+	finish_date = models.DateField(blank=True, null=True)
 	priority = models.IntegerField(default=0)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
 	owner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='own_book_set')
@@ -50,6 +52,8 @@ class Book(models.Model):
 			status_list.append(part.status)
 		status = min(status_list)
 		self.status = status
+		if self.status_int2str == 'finish':
+			self.finish_date = timezone.now()
 		self.save()
 		return status
 
@@ -219,14 +223,14 @@ class EBook(models.Model):
 	deadline = models.DateField(blank=True, null=True)
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
-	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL, related_name='ebook_set')
+	serviceInfo = models.ForeignKey(ServiceInfo,blank=True, null=True, on_delete=models.SET_NULL, related_name='ebook_set')
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8}
 	sc_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_edit_ebook_set')
 	sc_deadline = models.DateField(blank=True, null=True)
 	sc_get_date = models.DateField(blank=True, null=True)
 	sc_service_hours = models.IntegerField(default=0)
-	sc_serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_ebook_set')
+	sc_serviceInfo = models.ForeignKey(ServiceInfo,blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_ebook_set')
 	an_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='an_edit_ebook_set')
 	an_deadline = models.DateField(blank=True, null=True)
 	an_get_date = models.DateField(blank=True, null=True)
@@ -237,6 +241,13 @@ class EBook(models.Model):
 			if v == self.status:
 				return k
 		return 'unknown'
+
+	def get_character_count(self, encoding='utf-8'):
+		with codecs.open(self.get_file(), 'r', encoding=encoding) as dstFile:
+			dst_content = dstFile.read()
+		dstSoup = BeautifulSoup(dst_content, 'html5lib')
+		dst_content_text = dstSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
+		return len(dst_content_text)
 
 	def change_status(self, direction, status, **kwargs):
 		if not self.status +direction == self.STATUS[status]:
@@ -265,7 +276,7 @@ class EBook(models.Model):
 				self.add_template_tag(self.get_path('-finish'), self.get_path('-ge'))
 				self.clean_tag(self.get_path('-ge'), self.get_path('-ge'))
 				self.clean_tag(self.get_path('-ge'), self.get_path('-sc'))
-				self.group_ServiceHours()
+				self.group_ServiceInfo()
 				try:
 					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
 					editRecord.record_info()
@@ -293,7 +304,7 @@ class EBook(models.Model):
 					return False
 				shutil.copy2(self.get_path('-sc'), self.get_path('-an'))
 				if self.sc_get_date != None and self.sc_editor != None:
-					self.group_ServiceHours()
+					self.group_ServiceInfo()
 					try:
 						editRecord = EditRecord.objects.get(part=self, category='advanced', number_of_times=self.number_of_times)
 						editRecord.record_info()
@@ -422,26 +433,26 @@ class EBook(models.Model):
 	def __unicode__(self):
 		return self.book.book_info.bookname+u'-part'+str(self.part)
 
-	def group_ServiceHours(self):
-		month_ServiceHours = None
-		sc_month_ServiceHours = None
+	def group_ServiceInfo(self):
+		month_ServiceInfo = None
+		sc_month_ServiceInfo = None
 		if self.get_date and self.editor:
 			month = datetime.date(year=self.get_date.year, month=self.get_date.month, day=1)
 			try:
-				month_ServiceHours = ServiceHours.objects.get(user=self.editor, date=month)
+				month_ServiceInfo = ServiceInfo.objects.get(user=self.editor, date=month)
 			except:
-				month_ServiceHours = ServiceHours.objects.create(user=self.editor, date=month)
-			self.serviceHours = month_ServiceHours
+				month_ServiceInfo = ServiceInfo.objects.create(user=self.editor, date=month)
+			self.serviceInfo = month_ServiceInfo
 			self.save()
 		if self.sc_get_date and self.sc_editor:
 			sc_month = datetime.date(year=self.sc_get_date.year, month=self.sc_get_date.month, day=1)
 			try:
-				sc_month_ServiceHours = ServiceHours.objects.get(user=self.sc_editor, date=sc_month)
+				sc_month_ServiceInfo = ServiceInfo.objects.get(user=self.sc_editor, date=sc_month)
 			except:
-				sc_month_ServiceHours = ServiceHours.objects.create(user=self.sc_editor, date=sc_month)
-			self.serviceHours = sc_month_ServiceHours
+				sc_month_ServiceInfo = ServiceInfo.objects.create(user=self.sc_editor, date=sc_month)
+			self.serviceInfo = sc_month_ServiceInfo
 			self.save()
-		return [month_ServiceHours, sc_month_ServiceHours]
+		return [month_ServiceInfo, sc_month_ServiceInfo]
 
 	def get_content(self, action='', encoding='utf-8'):
 		filePath = self.get_path(action)
@@ -574,7 +585,6 @@ class EBook(models.Model):
 		source = self.get_path('-sc')
 		with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 			source_content = sourceFile.read()
-		from bs4 import BeautifulSoup, NavigableString
 		soup = BeautifulSoup(source_content, 'html5lib')
 		span_tags = soup.find_all('span')
 		for span_tag in span_tags:
@@ -681,7 +691,6 @@ class EBook(models.Model):
 
 	def edit_distance(self, src, dst, encoding='utf-8'):
 		import Levenshtein
-		from bs4 import BeautifulSoup
 		with codecs.open(src, 'r', encoding=encoding) as srcFile:
 			src_content = srcFile.read()
 		srcSoup = BeautifulSoup(src_content, 'html5lib')
@@ -727,7 +736,6 @@ class SpecialContent(models.Model):
 		source = self.ebook.get_path('-sc')
 		with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 			source_content = sourceFile.read()
-		from bs4 import BeautifulSoup, NavigableString
 		soup = BeautifulSoup(source_content, 'html5lib')
 		tags = soup.find_all('p', id=self.tag_id)
 		if not len(tags) == 1:
@@ -763,7 +771,7 @@ class EditRecord(models.Model):
 	editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
-	serviceHours = models.ForeignKey(ServiceHours,blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
+	serviceInfo = models.ForeignKey(ServiceInfo,blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
 
 	class Meta:
 		unique_together = ('part', 'category', 'number_of_times')
@@ -776,27 +784,27 @@ class EditRecord(models.Model):
 			self.editor = self.part.editor
 			self.get_date = self.part.get_date
 			self.save()
-			self.serviceHours = 				self.group_ServiceHours()
+			self.serviceInfo = self.group_ServiceInfo()
 			self.service_hours = self.compute_service_hours()
 		elif self.category == 'advanced':
 			self.editor = self.part.sc_editor
 			self.get_date = self.part.sc_get_date
 			self.save()
-			self.serviceHours = self.group_ServiceHours()
+			self.serviceInfo = self.group_ServiceInfo()
 			self.service_hours = self.part.sc_service_hours
 		self.save()
 
-	def group_ServiceHours(self):
-		month_ServiceHours = None
+	def group_ServiceInfo(self):
+		month_ServiceInfo = None
 		if self.get_date and self.editor:
 			month = datetime.date(year=self.get_date.year, month=self.get_date.month, day=1)
 			try:
-				month_ServiceHours = ServiceHours.objects.get(user=self.editor, date=month)
+				month_ServiceInfo = ServiceInfo.objects.get(user=self.editor, date=month)
 			except:
-				month_ServiceHours = ServiceHours.objects.create(user=self.editor, date=month)
-			self.serviceHours = month_ServiceHours
+				month_ServiceInfo = ServiceInfo.objects.create(user=self.editor, date=month)
+			self.serviceInfo = month_ServiceInfo
 			self.save()
-		return month_ServiceHours
+		return month_ServiceInfo
 
 	def compute_service_hours(self):
 		service_hours = 0

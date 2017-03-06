@@ -72,13 +72,13 @@ class User(AbstractUser):
 				return k
 		return 'unknown'
 
-	def get_current_ServiceHours(self):
+	def get_current_ServiceInfo(self):
 		month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
 		try:
-			current_ServiceHours = ServiceHours.objects.get(date=month_day, user=self)
+			current_ServiceInfo = ServiceInfo.objects.get(date=month_day, user=self)
 		except:
-			current_ServiceHours = None
-		return current_ServiceHours
+			current_ServiceInfo = None
+		return current_ServiceInfo
 
 class Event(models.Model):
 	creater = models.ForeignKey(User, related_name='event_creater_set')
@@ -142,9 +142,9 @@ class Organization(models.Model):
 	def __unicode__(self):
 		return self.name
 
-class ServiceHours(models.Model):
-	user = models.ForeignKey(User, related_name='servicehours_set')
-	org = models.ForeignKey(Organization, blank=True, null=True, related_name='servicehours_set')
+class ServiceInfo(models.Model):
+	user = models.ForeignKey(User, related_name='serviceinfo_set')
+	org = models.ForeignKey(Organization, blank=True, null=True, related_name='serviceinfo_set')
 	date = models.DateField()
 	service_hours = models.IntegerField(default=0)
 	is_exchange = models.BooleanField(default=False)
@@ -156,9 +156,6 @@ class ServiceHours(models.Model):
 		service_hours = 0
 		for editRecord in self.editrecord_set.all():
 			service_hours = service_hours +editRecord.service_hours
-#		for part in self.sc_ebook_set.all():
-#			service_hours = service_hours +part.service_hours
-		self.service_hours = service_hours
 		return service_hours
 
 	def get_page_count(self):
@@ -166,6 +163,13 @@ class ServiceHours(models.Model):
 		for editRecord in self.editrecord_set.all():
 			page_count = page_count +(editRecord.part.end_page -editRecord.part.begin_page +1)
 		return page_count
+
+	def get_character_count(self):
+		character_count = 0
+		for editRecord in self.editrecord_set.all():
+			i = editRecord.part.get_character_count()
+			character_count = character_count +i
+		return character_count
 
 class Article(models.Model):
 	author = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='article_set')

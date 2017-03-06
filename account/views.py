@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import generic
 from ebookSystem.models import *
-from genericUser.models import Event, ServiceHours
+from genericUser.models import Event
 from utils.decorator import *
 import datetime
 GET_MAX_PART = 3

@@ -26,9 +26,10 @@
 						<li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
 						<li><a href="{% url 'manager:event_list' 'ebook' %}">審核校對文件</a></li>
 						<li><a href="{% url 'manager:event_list' 'user' %}">審核會員</a></li>
-						<li><a href="{% url 'manager:event_list' 'revisecontentaction' %}">審核更正作業</a></li>
-						<li><a href="{% url 'manager:org_manage' %}">組織管理</a></li>
+						<li><a href="{% url 'manager:statistics' %}">統計資訊</a></li>
+<!--						<li><a href="{% url 'manager:event_list' 'revisecontentaction' %}">審核更正作業</a></li>-->
 						{% if request.user.is_superuser %}
+						<li><a href="{% url 'manager:org_manage' %}">組織管理</a></li>
 						<li><a href="{% url 'manager:event_list' 'applydocumentaction' %}">代掃申請列表</a></li>
 						<li><a href="{% url 'genericUser:article/create' %}">訊息發佈</a></li>
 						<li><a href="{% url 'ebookSystem:book_list' %}">書籍列表</a></li>
@@ -85,7 +86,7 @@
 					<ul class="dropdown-menu">
 						<li><a href="{% url 'genericUser:event_list' %}">消息</a></li>
 						{% if request.user.has_editor %}
-						<li><a href="{% url 'genericUser:servicehours_list' request.user.username %}">時數</a></li>
+						<li><a href="{% url 'genericUser:serviceinfo_list' request.user.username %}">時數</a></li>
 						{% endif %}
 						<li><a href="{% url 'genericUser:info' %}">設定</a></li>
 					</ul>

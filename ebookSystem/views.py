@@ -11,7 +11,7 @@ from django.utils.decorators import method_decorator
 from django.views import generic
 from .models import *
 from .forms import *
-from genericUser.models import Event, ServiceHours
+from genericUser.models import Event
 from mysite.settings import BASE_DIR, SERVICE
 from utils.analysis import *
 from utils.crawler import *

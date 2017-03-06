@@ -486,7 +486,7 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 
 @user_category_check(['user'])
 @http_response
-def servicehours_list(request, username, template_name='genericUser/servicehours_list.html'):
+def serviceinfo_list(request, username, template_name='genericUser/serviceinfo_list.html'):
 	try:
 		user = User.objects.get(username=username)
 	except:
@@ -494,16 +494,16 @@ def servicehours_list(request, username, template_name='genericUser/servicehours
 	org_list = Organization.objects.all()
 	month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
 	try:
-		current_ServiceHours = ServiceHours.objects.get(date=month_day, user=user)
+		current_ServiceInfo = ServiceInfo.objects.get(date=month_day, user=user)
 	except:
 		pass
-	ServiceHours_list = ServiceHours.objects.filter(user=user).exclude(date=month_day).order_by('date')
+	ServiceInfo_list = ServiceInfo.objects.filter(user=user).exclude(date=month_day).order_by('date')
 	if request.method == 'POST':
 		if request.POST.has_key('exchange'):
-			exchange_serviceHours = ServiceHours.objects.get(id=request.POST['exchange'])
-			exchange_serviceHours.is_exchange = True
-			exchange_serviceHours.org = Organization.objects.get(id=request.POST['org'])
-			exchange_serviceHours.save()
+			exchange_serviceInfo = ServiceInfo.objects.get(id=request.POST['exchange'])
+			exchange_serviceInfo.is_exchange = True
+			exchange_serviceInfo.org = Organization.objects.get(id=request.POST['org'])
+			exchange_serviceInfo.save()
 		return locals()
 	if request.method == 'GET':
 		return locals()
