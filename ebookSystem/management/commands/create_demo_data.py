@@ -34,15 +34,14 @@ class Command(BaseCommand):
 		root.save()
 		rootEditor = Editor.objects.create(user=root, professional_field=u'資訊工程學')
 		rootGuest = Guest.objects.create(user=root)
-
 		client = Client()
 		response = client.post(reverse('register'), {'username':'demo-editor', 'password':'demo-editor', 'email':'tsengwoody.tw@gmail.com', 'first_name':'demo editor firstname', 'last_name':'demo editor lastname', 'is_active':True, 'phone':'1234567890', 'birthday':'2016-01-01', 'education':u'碩士', 'role':'Editor', 'professional_field':u'資訊工程學','is_privacy':True})
-		
-		#print "-------regiest demo_editor-------"
+
 		with open('temp/dcf.jpg') as dcf_file:
 			with open('temp/dcb.jpg') as dcb_file:
 				response = client.post(reverse('register'), {'username':'demo-guest', 'password':'demo-guest', 'email':'tsengwoody.tw@gmail.com', 'first_name':'demo guest firstname', 'last_name':'demo guest lastname', 'is_active':True, 'phone':'1234567890', 'birthday':'2016-01-01', 'education':u'碩士', 'role':'Guest', 'disability_card_front':dcf_file, 'disability_card_back':dcb_file,'is_privacy':True})
 				response = client.post(reverse('register'), {'username':'demo-manager', 'password':'demo-manager', 'email':'tsengwoody.tw@gmail.com', 'first_name':'demo manager firstname', 'last_name':'demo manager lastname', 'is_active':True, 'phone':'1234567890', 'birthday':'2016-01-01', 'education':u'碩士', 'role':'Editor', 'professional_field':u'資訊工程學','is_privacy':True})
+		print response
 		manager = User.objects.get(username='demo-manager')
 		manager.status = manager.STATUS['active']
 		manager.is_editor=True
@@ -71,10 +70,9 @@ class Command(BaseCommand):
 		ebook = EBook.objects.get(book=book, part=1)
 		assert ebook.change_status(1, 'active'), 'change status error'
 		assert ebook.change_status(1, 'edit', user=root), 'change status error'
+		ebook.service_hours = 90
 		assert ebook.change_status(1, 'review'), 'change status error'
 		assert ebook.change_status(1, 'finish'), 'change status error'
-		ebook.service_hours = 90
-		ebook.group_ServiceInfo()
 		ebook.save()
 		ebook = EBook.objects.get(book=book, part=2)
 		assert ebook.change_status(1, 'active'), 'change status error'

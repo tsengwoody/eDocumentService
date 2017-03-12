@@ -124,12 +124,12 @@ def create_document(request, template_name='genericUser/create_document.html'):
 			message = u'表單驗證失敗' + str(bookInfoForm.errors)
 			return locals()
 		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
+		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'])
 		if os.path.exists(uploadPath):
 			status = 'error'
 			message = u'文件已存在'
 			return locals()
-		[status, message] = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
-		uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
+		[status, message] = handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
 		try:
 			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
 		except:
@@ -178,12 +178,12 @@ def upload_document(request, template_name='genericUser/upload_document.html'):
 			message = u'表單驗證失敗' + str(bookInfoForm.errors)
 			return locals()
 		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
+		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'])
 		if os.path.exists(uploadPath):
 			status = 'error'
 			message = u'文件已存在'
 			return locals()
-		[status, message] = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
-		uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
+		[status, message] = handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
 		try:
 			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
 		except:
@@ -203,8 +203,7 @@ def upload_document(request, template_name='genericUser/upload_document.html'):
 		newBook.scaner = request.user
 		newBook.owner = request.user
 		newBook.save()
-		ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN'] + '-1', begin_page=-1,
-									 end_page=-1)
+		ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN'] + '-1', begin_page=-1, end_page=-1)
 		if request.POST['category'] == 'txt':
 			try:
 				shutil.copy2(uploadFilePath, final_file)
@@ -398,7 +397,6 @@ def change_contact_info(request, template_name):
 		user = User.objects.get(username=request.user.username)
 		if not user.email == userChangeForm.cleaned_data['email']:
 			request.user.auth_email = False
-			print 'email change'
 			request.user.save()
 			status = u'success'
 			message = u'修改通訊資料，請重新驗證。'
@@ -410,16 +408,16 @@ def change_contact_info(request, template_name):
 		userChangeForm.save()
 		try:
 			request.user.editor.professional_field = request.POST['professional_field']
-		#			request.user.editor.save()
+			request.user.editor.save()
 		except:
 			pass
 		try:
-			request.FILES['disability_card_front'].name = request.POST['username'] + '_front.jpg'
-			[status, message] = handle_uploaded_file(DCDir, request.FILES['disability_card_front'])
-			request.FILES['disability_card_back'].name = request.POST['username'] + '_back.jpg'
-			[status, message] = handle_uploaded_file(DCDir, request.FILES['disability_card_back'])
+			[status, message] = handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_front.jpg'), request.FILES['disability_card_front'])
+			[status, message] = handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_back.jpg'), request.FILES['disability_card_back'])
 		except:
-			pass
+			status = u'error'
+			message = u'手冊修改失敗'
+			return locals()
 		status = u'success'
 		message = u'資料修改完成'
 		redirect_to = reverse('genericUser:info')
@@ -427,7 +425,6 @@ def change_contact_info(request, template_name):
 	if request.method == 'GET':
 		userChangeForm = UserChangeForm(instance=request.user)
 		return locals()
-
 
 @user_category_check(['user'])
 @http_response

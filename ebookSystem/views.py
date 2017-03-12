@@ -303,12 +303,12 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 		return locals()
 	if request.method == 'POST':
 		uploadPath = BASE_DIR +u'/file/ebookSystem/document/{0}'.format(action.book_info.ISBN)
+		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'])
 		if os.path.exists(uploadPath):
 			status = 'error'
 			message = u'文件已存在'
 			return locals()
-		[status, message] = handle_uploaded_file(uploadPath, request.FILES['fileObject'])
-		uploadFilePath = os.path.join(uploadPath, request.FILES['fileObject'].name)
+		[status, message] = handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
 		try:
 			with ZipFile(uploadFilePath, 'r') as uploadFile:
 				uploadFile.testzip()
@@ -331,7 +331,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 			newBook.is_private = True
 		newBook.save()
 		Event.objects.create(creater=event.creater, action=newBook)
-		redirect_to = reverse('manager:event_list', kwargs={'action':'applydocumentaction' })
+		redirect_to = reverse('manager:applydocumentaction')
 		status = 'success'
 		message = u'成功建立並上傳文件'
 		event.response(status=status, message=message, user=request.user)

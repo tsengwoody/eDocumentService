@@ -47,13 +47,10 @@ class Book(models.Model):
 		return 'unknown'
 
 	def check_status(self):
-		status_list = []
-		for part in self.ebook_set.all():
-			status_list.append(part.status)
-		status = min(status_list)
+		status = min([ part.status for part in self.ebook_set.all() ])
 		self.status = status
 		if self.status_int2str == 'finish':
-			self.finish_date = timezone.now()
+			self.finish_date = max([ i.deadline for i in self.ebook_set.all() ])
 		self.save()
 		return status
 
@@ -223,14 +220,12 @@ class EBook(models.Model):
 	deadline = models.DateField(blank=True, null=True)
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
-	serviceInfo = models.ForeignKey(ServiceInfo,blank=True, null=True, on_delete=models.SET_NULL, related_name='ebook_set')
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8}
 	sc_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_edit_ebook_set')
 	sc_deadline = models.DateField(blank=True, null=True)
 	sc_get_date = models.DateField(blank=True, null=True)
 	sc_service_hours = models.IntegerField(default=0)
-	sc_serviceInfo = models.ForeignKey(ServiceInfo,blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_ebook_set')
 	an_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='an_edit_ebook_set')
 	an_deadline = models.DateField(blank=True, null=True)
 	an_get_date = models.DateField(blank=True, null=True)
@@ -276,10 +271,10 @@ class EBook(models.Model):
 				self.add_template_tag(self.get_path('-finish'), self.get_path('-ge'))
 				self.clean_tag(self.get_path('-ge'), self.get_path('-ge'))
 				self.clean_tag(self.get_path('-ge'), self.get_path('-sc'))
-				self.group_ServiceInfo()
 				try:
 					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
 					editRecord.record_info()
+					editRecord.group_ServiceInfo()
 				except:
 					return False
 				self.status = self.status +direction
@@ -304,10 +299,10 @@ class EBook(models.Model):
 					return False
 				shutil.copy2(self.get_path('-sc'), self.get_path('-an'))
 				if self.sc_get_date != None and self.sc_editor != None:
-					self.group_ServiceInfo()
 					try:
 						editRecord = EditRecord.objects.get(part=self, category='advanced', number_of_times=self.number_of_times)
 						editRecord.record_info()
+						editRecord.group_ServiceInfo()
 					except:
 						return False
 				self.status = self.status +direction
@@ -432,27 +427,6 @@ class EBook(models.Model):
 
 	def __unicode__(self):
 		return self.book.book_info.bookname+u'-part'+str(self.part)
-
-	def group_ServiceInfo(self):
-		month_ServiceInfo = None
-		sc_month_ServiceInfo = None
-		if self.get_date and self.editor:
-			month = datetime.date(year=self.get_date.year, month=self.get_date.month, day=1)
-			try:
-				month_ServiceInfo = ServiceInfo.objects.get(user=self.editor, date=month)
-			except:
-				month_ServiceInfo = ServiceInfo.objects.create(user=self.editor, date=month)
-			self.serviceInfo = month_ServiceInfo
-			self.save()
-		if self.sc_get_date and self.sc_editor:
-			sc_month = datetime.date(year=self.sc_get_date.year, month=self.sc_get_date.month, day=1)
-			try:
-				sc_month_ServiceInfo = ServiceInfo.objects.get(user=self.sc_editor, date=sc_month)
-			except:
-				sc_month_ServiceInfo = ServiceInfo.objects.create(user=self.sc_editor, date=sc_month)
-			self.serviceInfo = sc_month_ServiceInfo
-			self.save()
-		return [month_ServiceInfo, sc_month_ServiceInfo]
 
 	def get_content(self, action='', encoding='utf-8'):
 		filePath = self.get_path(action)
@@ -784,13 +758,11 @@ class EditRecord(models.Model):
 			self.editor = self.part.editor
 			self.get_date = self.part.get_date
 			self.save()
-			self.serviceInfo = self.group_ServiceInfo()
 			self.service_hours = self.compute_service_hours()
 		elif self.category == 'advanced':
 			self.editor = self.part.sc_editor
 			self.get_date = self.part.sc_get_date
 			self.save()
-			self.serviceInfo = self.group_ServiceInfo()
 			self.service_hours = self.part.sc_service_hours
 		self.save()
 

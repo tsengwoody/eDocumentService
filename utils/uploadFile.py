@@ -1,16 +1,17 @@
 ﻿# coding: utf-8
 import os
 
-def handle_uploaded_file(dirname, file):
-	if not os.path.exists(dirname):
-		os.makedirs(dirname, 0770)
-	fullpath = os.path.join(dirname, file.name)
-	if os.path.exists(fullpath):
-		return ['error', u'檔案已存在']
-	with open(fullpath, 'wb+') as destination:
-		for chunk in file.chunks():
-			destination.write(chunk)
-	return ['success', u'檔案成功上傳']
+def handle_uploaded_file(path, file):
+	dirname = os.path.dirname(path)
+	try:
+		if not os.path.exists(dirname):
+			os.makedirs(dirname, 0770)
+		with open(path, 'wb+') as destination:
+			for chunk in file.chunks():
+				destination.write(chunk)
+		return ['success', u'檔案上傳成功']
+	except:
+		return ['error', u'檔案上傳失敗']
 
 from django.core.files.uploadhandler import FileUploadHandler,    UploadFileException
 
