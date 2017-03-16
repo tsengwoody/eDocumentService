@@ -13,7 +13,6 @@ from genericUser.models import *
 from utils.decorator import *
 from utils.tag import *
 from utils.uploadFile import handle_uploaded_file
-from utils.zip import *
 from .forms import *
 from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWORD
 from zipfile import ZipFile
@@ -139,7 +138,7 @@ def article_create(request, template_name='genericUser/article/create.html'):
 		return locals()
 
 
-@user_category_check(['guest'])
+@user_category_check(['guest', 'advanced_editor'])
 @http_response
 def create_document(request, template_name='genericUser/create_document.html'):
 	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date'))
