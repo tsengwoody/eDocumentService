@@ -49,7 +49,7 @@ class Book(models.Model):
 	def check_status(self):
 		status = min([ part.status for part in self.ebook_set.all() ])
 		self.status = status
-		if self.status_int2str == 'finish':
+		if self.status_int2str() == 'finish':
 			self.finish_date = max([ i.deadline for i in self.ebook_set.all() ])
 		self.save()
 		return status

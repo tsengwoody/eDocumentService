@@ -13,7 +13,6 @@ from genericUser.models import *
 from utils.decorator import *
 from utils.tag import *
 from utils.uploadFile import handle_uploaded_file
-from utils.zip import *
 from .forms import *
 from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWORD
 from zipfile import ZipFile
@@ -26,36 +25,62 @@ import urllib, urllib2
 @http_response
 def retrieve_password(request, template_name='genericUser/retrieve_password.html'):
 	if request.method == 'POST':
-		if not (request.POST.has_key('username') and request.POST.has_key('name') and request.POST.has_key('birthday')):
-			status = 'error'
-			message = u'資料不完整'
+		if request.POST.has_key('type') and request.POST['type'] == 'password':
+			if not (request.POST.has_key('username') and request.POST.has_key('email') and request.POST.has_key('birthday')):
+				status = 'error'
+				message = u'資料不完整'
+				return locals()
+			try:
+				birthday = request.POST['birthday'].split('-')
+				birthday = [ int(i) for i in birthday ]
+				birthday = datetime.date(birthday[0], birthday[1], birthday[2])
+				user = User.objects.get(username=request.POST['username'], email=request.POST['email'], birthday=birthday)
+			except:
+				status = 'error'
+				message = u'無法取得使用者資料，請確認填寫的資料是否無誤'
+				return locals()
+			import random
+			import string
+			reset_password = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+			user.set_password(reset_password)
+			try:
+				subject = u'重設密碼郵件'
+				message = u'您的新密碼為：{0}'.format(reset_password)
+				user.email_user(subject=subject, message=message)
+			except:
+				status = 'error'
+				message = u'傳送郵件失敗'
+				return locals()
+			user.save()
+			status = 'success'
+			message = u'成功重設密碼，請至信箱取得'
+			redirect_to = reverse('login')
 			return locals()
-		try:
-			birthday = request.POST['birthday'].split('-')
-			birthday = [ int(i) for i in birthday ]
-			birthday = datetime.date(birthday[0], birthday[1], birthday[2])
-			user = User.objects.get(username=request.POST['username'], birthday=birthday)
-		except:
-			status = 'error'
-			message = u'無法取得使用者資料，請確認填寫的資料是否無誤'
+		elif request.POST.has_key('type') and request.POST['type'] == 'username':
+			if not (request.POST.has_key('email') and request.POST.has_key('birthday')):
+				status = 'error'
+				message = u'資料不完整'
+				return locals()
+			try:
+				birthday = request.POST['birthday'].split('-')
+				birthday = [ int(i) for i in birthday ]
+				birthday = datetime.date(birthday[0], birthday[1], birthday[2])
+				user = User.objects.get(email=request.POST['email'], birthday=birthday)
+			except:
+				status = 'error'
+				message = u'無法取得使用者資料，請確認填寫的資料是否無誤'
+				return locals()
+			try:
+				subject = u'取得username郵件'
+				message = u'您的username為：{0}'.format(user.username)
+				user.email_user(subject=subject, message=message)
+			except:
+				status = 'error'
+				message = u'傳送郵件失敗'
+				return locals()
+			status = 'success'
+			message = u'已將username寄至註冊信箱'
 			return locals()
-		import random
-		import string
-		reset_password = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
-		user.set_password(reset_password)
-		try:
-			subject = u'重設密碼郵件'
-			message = u'您的新密碼為：{0}'.format(reset_password)
-			user.email_user(subject=subject, message=message)
-		except:
-			status = 'error'
-			message = u'傳送郵件失敗'
-			return locals()
-		user.save()
-		status = 'success'
-		message = u'成功重設密碼，請至信箱取得'
-		redirect_to = reverse('login')
-		return locals()
 	if request.method == 'GET':
 		return locals()
 
@@ -113,7 +138,7 @@ def article_create(request, template_name='genericUser/article/create.html'):
 		return locals()
 
 
-@user_category_check(['guest'])
+@user_category_check(['guest', 'advanced_editor'])
 @http_response
 def create_document(request, template_name='genericUser/create_document.html'):
 	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date'))

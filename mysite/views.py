@@ -64,7 +64,6 @@ def register(request, template_name='registration/register.html'):
 				[status, message] = handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_front.jpg'), request.FILES['disability_card_front'])
 				[status, message] = handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_back.jpg'), request.FILES['disability_card_back'])
 				newGuest = Guest.objects.create(user=newUser)
-				newUser.is_guest = True
 			except:
 				status = 'error'
 				message = u'guest申請失敗'

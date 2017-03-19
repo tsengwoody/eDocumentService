@@ -105,12 +105,12 @@ def search_book(request, template_name):
 			search_type = request.POST['search_type']
 			try:
 				if search_type == 'ISBN':
-					search_book_list = Book.objects.get(ISBN=search_value)
+					search_book_list = Book.objects.filter(ISBN=search_value)
 				elif search_type == 'BookName':
 					search_book_list = Book.objects.select_related().filter(book_info__bookname__contains=search_value)
 					#bookInfo=BookInfo.objects.filter(bookname__contains=search_value)
 					#search_book = Book.objects.get(book_info=bookInfo)
-				if len(search_book_list) > 0:
+				if len(search_book_list) <= 0:
 					status = 'error'
 					message = u'查無指定ISBN文件'
 				status = 'success'

@@ -41,8 +41,8 @@
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#">文件<span class="caret"></span></a>
 					<ul class="dropdown-menu">
-					{% if request.user.is_guest %}
 						<li><a href="{% url 'genericUser:create_document' %}">自掃上傳</a></li>
+					{% if request.user.is_guest %}
 						<li><a href="{% url 'genericUser:apply_document' %}">代掃申請</a></li>
 					{% endif %}
 						<li><a href="{% url 'genericUser:upload_document' %}">文件上傳</a></li>
