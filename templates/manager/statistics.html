@@ -16,7 +16,7 @@
 <h3>統計資料</h3>
 <form action="" method="post" role="form">
 {% csrf_token %}
-<table>
+<table class='table table-striped'>
 	<tr>
 		<th>時間</th>
 		<th>視障者人數</th>
@@ -35,7 +35,7 @@
 	{% endfor %}
 </table>
 <h3>活躍登錄志工</h3>
-<table>
+<table class='table table-striped'>
 	<tr>
 		<th>性名</th>
 		<th>使用者名稱</th>
