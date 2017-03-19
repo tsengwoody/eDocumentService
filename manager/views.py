@@ -27,7 +27,7 @@ def statistics(request, template_name='manager/statistics.html'):
 			guest_list = User.objects.filter(is_guest=True, date_joined__lt=month)
 			finish_list = Book.objects.filter(finish_date__lt=month, upload_date__lt=month)
 			book_list = Book.objects.filter(upload_date__lt=month)
-			result.append((month, len(guest_list), len(editor_list), len(book_list), len(finish_list)))
+			result.append((month.date(), len(guest_list), len(editor_list), len(book_list), len(finish_list)))
 		return locals()
 
 @user_category_check(['manager'])
