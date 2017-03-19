@@ -25,7 +25,7 @@ def statistics(request, template_name='manager/statistics.html'):
 #		month_list = [ datetime.date.today() - datetime.timedelta(i*365/12) for i in range(6) ]
 		result = []
 		for month in month_list:
-			editor_list = User.objects.filter(is_editor=True, date_joined__lt=month, last_login__gt=month)
+			editor_list = User.objects.filter(is_editor=True, date_joined__lt=month, last_login__gt=month -datetime.timedelta(days=30))
 			guest_list = User.objects.filter(is_guest=True, date_joined__lt=month)
 			finish_list = Book.objects.filter(finish_date__lt=month, upload_date__lt=month)
 			book_list = Book.objects.filter(upload_date__lt=month)

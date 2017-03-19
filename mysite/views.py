@@ -49,7 +49,6 @@ def register(request, template_name='registration/register.html'):
 		newUser.set_password(request.POST.get('password'))
 		newUser.is_active = True
 		newUser.is_license = True
-		newUser.save()
 		if request.POST['role'] == 'Editor':
 			try:
 				newEditor = Editor.objects.create(user=newUser, professional_field=request.POST['professional_field'])

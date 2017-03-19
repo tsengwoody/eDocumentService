@@ -32,6 +32,7 @@ def add_base_url(src, id, encoding='utf-8'):
 #	except:
 #		return False
 
+#將txt純文字加入<p> tag
 def add_tag(source, destination, encoding='utf-8'):
 	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 		source_content = sourceFile.read()
@@ -41,6 +42,7 @@ def add_tag(source, destination, encoding='utf-8'):
 	with codecs.open(destination, 'w', encoding=encoding) as destinationFile:
 		destinationFile.write(destination_content)
 
+#將加入<p>文件加入<head>、<body> html的tag
 def add_template_tag(source, destination, template, encoding='utf-8'):
 	with codecs.open(template, 'r', encoding=encoding) as templateFile:
 		template_content = templateFile.read()
@@ -54,6 +56,7 @@ def add_template_tag(source, destination, template, encoding='utf-8'):
 	with codecs.open(destination, 'w', encoding=encoding) as destinationFile:
 		destinationFile.write(source_content)
 
+#對校對者所完成的文件進行清理
 def clean_tag(source,  destination, title='', encoding='utf-8'):
 	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 		source_content = sourceFile.read()
@@ -61,6 +64,7 @@ def clean_tag(source,  destination, title='', encoding='utf-8'):
 	soup = BeautifulSoup(source_content, 'html5lib')
 	span_tags = soup.find_all('span')
 	for span_tag in span_tags:
+		#將非校對者特意插入的span tag刪除
 		if not (span_tag.attrs.has_key('class') and ('unknown' in span_tag.attrs['class'] or 'mathml' in span_tag.attrs['class'])):
 			span_tag.unwrap()
 	div_tags = soup.find_all('div')
@@ -72,6 +76,7 @@ def clean_tag(source,  destination, title='', encoding='utf-8'):
 #	merge_NavigableString(soup)
 	soup.head.title.string = title
 	for tag in soup.body.contents:
+		#body下無<p> tag的元素將用加入<p>在外層
 		if isinstance(tag, NavigableString) and tag.string != '\n':
 			tag.wrap(soup.new_tag('p'))
 	i = 0
