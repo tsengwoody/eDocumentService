@@ -43,7 +43,7 @@ logger.addHandler(fh)
 #		return Book.objects.order_by('-ISBN')
 
 @http_response
-def mathml(request, template_name='ebookSystem/mathml_demo.html'):
+def mathml(request, template_name='ebookSystem/editor.html'):
 	if request.method == 'POST':
 		if request.POST.has_key('set'):
 			cache.set(request.user.username, {'mathml':request.POST['content']}, 600)
