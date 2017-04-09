@@ -173,10 +173,16 @@
 
 		this.setContent = function () {
 			var type = $('.nav-tabs .active').text();
-			console.log(type);
-			var newEle = document.createElement('div');
 			var editor = type === "normal" ? _this.normalEditor : _this.mathEditor;
 			var html = editor.getContent();
+			var newEle = document.createElement('div');
+
+			if (_this.selectedEle !== "") {
+				_this.selectedEle.innerHTML = html;
+				editor.resetContent();
+				_this.selectedEle = "";
+				return;
+			}
 
 			newEle.className = type;
 			newEle.innerHTML = html;
@@ -192,6 +198,7 @@
 				var targetEle = e.path.filter(function (ele) {
 					return ele.className === type;
 				})[0];
+				_this.selectedEle = targetEle;
 
 				editor.setContent(targetEle.innerHTML);
 				if (type === 'math') {
@@ -205,6 +212,7 @@
 		this.container = document.getElementById('previewPanel');
 		this.normalEditor = normalEditor;
 		this.mathEditor = mathEditor;
+		this.selectedEle = "";
 	};
 
 	exports.default = PreviewPanel;
