@@ -37,7 +37,7 @@
 			<input id="id_password" name="password" type="password" placeholder="password" class="form-control" required />
 		</div>
 		{{captcha}}
-		<button class="btn btn-lg btn-primary btn-block send_form" type="submit">登錄</button>
+		<button class="btn btn-lg btn-primary btn-block send_form" type="submit" id="id_submit">登錄</button>
 		<input type="hidden" name="next" value="{{ next }}" />
 	</form>
 	{% if error_message %}
