@@ -178,10 +178,16 @@
 			var newEle = document.createElement('div');
 
 			if (_this.selectedEle !== "") {
-				_this.selectedEle.innerHTML = html;
-				editor.resetContent();
-				_this.selectedEle = "";
-				return;
+				if (_this.selectedEle.className.split(' ')[0] === type) {
+					_this.selectedEle.innerHTML = html;
+					editor.resetContent();
+					_this.selectedEle.className = _this.selectedEle.className.split(' ')[0];
+					_this.selectedEle = "";
+					return;
+				} else {
+					_this.selectedEle.className = _this.selectedEle.className.split(' ')[0];
+					_this.selectedEle = "";
+				}
 			}
 
 			newEle.className = type;
@@ -194,16 +200,22 @@
 
 		this.handleContentToEditor = function (editor) {
 			return function (e) {
+				if (_this.selectedEle !== "") {
+					_this.selectedEle.className = _this.selectedEle.className.split(' ')[0];
+				}
 				var type = editor.getEditorType();
-				var targetEle = e.path.filter(function (ele) {
-					return ele.className === type;
-				})[0];
-				_this.selectedEle = targetEle;
 
-				editor.setContent(targetEle.innerHTML);
+				var targetEle = e.target;
+				while (targetEle.className !== type) {
+					targetEle = targetEle.parentElement;
+				}
+				_this.selectedEle = targetEle;
+				_this.selectedEle.className += ' selectedEle';
+
+				editor.setContent(_this.selectedEle.innerHTML);
 				if (type === 'math') {
 					$('.nav-tabs a[href="#mathEditorTab"]').tab('show');
-				} else {
+				} else if (type === 'normal') {
 					$('.nav-tabs a[href="#normalEditorTab"]').tab('show');
 				}
 			};
