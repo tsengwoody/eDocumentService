@@ -49,11 +49,13 @@ def register(request, template_name='registration/register.html'):
 		newUser.set_password(request.POST.get('password'))
 		newUser.is_active = True
 		newUser.is_license = True
+		newUser.save()
 		if request.POST['role'] == 'Editor':
 			try:
 				newEditor = Editor.objects.create(user=newUser, professional_field=request.POST['professional_field'])
 				newUser.is_editor = True
 			except:
+				newUser.delete()
 				status = 'error'
 				message = u'editor申請失敗'
 				return locals()
@@ -64,6 +66,7 @@ def register(request, template_name='registration/register.html'):
 				[status, message] = handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_back.jpg'), request.FILES['disability_card_back'])
 				newGuest = Guest.objects.create(user=newUser)
 			except:
+				newUser.delete()
 				status = 'error'
 				message = u'guest申請失敗'
 				return locals()
