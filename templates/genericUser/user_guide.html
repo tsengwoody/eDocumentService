@@ -61,7 +61,7 @@
 								<div class="panel-heading">
 									<h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#Visually_impaired_doc_upload">文件->自掃上傳</a></h4>
 								</div>
-								<div id="Visually_impaired_doc_upload" class="panel-collapse collapse in">
+								<div id="Visually_impaired_doc_upload" class="panel-collapse collapse">
 									<div class="panel-body">
 										<p>文件->自掃上傳可將壓縮包(掃描與辨識文件)上傳至平台進行校對</p>
 										<p>點選自掃上傳進入上傳文件頁面。</p>
@@ -78,7 +78,7 @@
 								<div class="panel-heading">
 									<h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#Visually_impaired_book_store">書庫</a></h4>
 								</div>
-								<div id="Visually_impaired_book_store" class="panel-collapse collapse in">
+								<div id="Visually_impaired_book_store" class="panel-collapse collapse">
 									<div class="panel-body">
 										<p>書庫頁面內分為「校對文件進度」、「您擁有的文件」兩個表格，分別顯示不同階段的文件資訊</p>
 										<p>校對文件進度：此為尚未完成一般校對文件會顯示於此處，你可以點選「詳細資料」連結查閱每個分段的狀態。</p>
@@ -93,7 +93,7 @@
 								<div class="panel-heading">
 									<h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#Visually_impaired_search">查詢</a></h4>
 								</div>
-								<div id="Visually_impaired_search" class="panel-collapse collapse in">
+								<div id="Visually_impaired_search" class="panel-collapse collapse ">
 									<div class="panel-body">
 										<p>可透過ISBN或書名關鍵字查詢是否平台上已提供此本書籍。</p>
 										<p>若有查詢到欲瀏覽之書籍，再下方表格內會顯示書籍資訊與「寄到信箱」與「下載」同書庫之功能。</p>
@@ -129,7 +129,7 @@
 		  <a data-toggle="collapse" data-parent="#accordion" href="#volunteer">校對流程</a>
 		</h4>
 									</div>
-									<div id="volunteer" class="panel-collapse collapse in">
+									<div id="volunteer" class="panel-collapse collapse ">
 										<div class="panel-body">
 											<div class="bs-callout bs-callout-danger">
 												<h4>校對注意事項</h4>
@@ -141,7 +141,7 @@
 											</div>
 
 											
-												<p class="lead">登入成功後->畫面挑轉進入志工使用頁面</p>
+												<p class="lead">登入成功後->畫面跳轉進入志工使用頁面</p>
 												<img src="{% static "ebookSystem/img/volunteer_img.png" %}" alt="登入頁面" style="margin-right: auto; margin-left: auto;max-width: 100%;height: auto;">
 												<div class="caption">
 													<p>
@@ -183,6 +183,31 @@
 										</div>
 									</div>
 								</div>
+								
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h4 class="panel-title">
+											<a data-toggle="collapse" data-parent="#accordion" href="#ABBYY">辨識軟體使用方法</a>
+										</h4>	
+									</div>
+	 								<div id="ABBYY" class="panel-collapse collapse">
+										<div class="panel-body">
+											<img src="{% static "ebookSystem/img/ABBY_use_guide/ABBY_image001.png" %}" alt="FineReader軟體開啟初始畫面" style="margin-right: auto; margin-left: auto;max-width: 100%;height: auto;">
+											<p>Step 1: 以ABBYY FineReader識別軟體開啟圖書影像檔案</p>
+											<img src="{% static "ebookSystem/img/ABBY_use_guide/ABBY_image002.png" %}" alt="FineReader載入畫面" style="margin-right: auto; margin-left: auto;max-width: 100%;height: auto;">
+											<p>Step 2: 開啟並等待檔案載入，進行影像識別轉換為文字文件</p>
+											<img src="{% static "ebookSystem/img/ABBY_use_guide/ABBY_image003.png" %}" alt="FineReader識別完成畫面" style="margin-right: auto; margin-left: auto;max-width: 100%;height: auto;">
+											<p>Step 3: 識別完成後在右上欄位可見該頁文字</p>
+											<img src="{% static "ebookSystem/img/ABBY_use_guide/ABBY_image004.png" %}" alt="FineReader存檔畫面" style="margin-right: auto; margin-left: auto;max-width: 100%;height: auto;">
+											<p>Step 4: 進行存檔，在左方欄位選取所需頁面，依指示右鍵另存文字文件</p>
+											<img src="{% static "ebookSystem/img/ABBY_use_guide/ABBY_image005.png" %}" alt="FineReader存檔選項畫面" style="margin-right: auto; margin-left: auto;max-width: 100%;height: auto;">
+											<p>Step 5: 點入格式選項，在TXT選項中確認符合圖中設定後，點選存檔</p>
+											<img src="{% static "ebookSystem/img/ABBY_use_guide/ABBY_image006.jpg" %}" alt="FineReader存檔完成畫面" style="margin-right: auto; margin-left: auto;max-width: 100%;height: auto;">
+											<p>Step 6: 圖書影像識別轉換完成之文字文件如上圖</p>
+										</div>
+									<div>
+								</div>
+								
 							</div>
 					</section>
 				</div>
