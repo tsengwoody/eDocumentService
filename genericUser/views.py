@@ -389,6 +389,7 @@ def info(request, template_name):
 	user = request.user
 	DCDir = BASE_DIR + '/static/ebookSystem/disability_card/{0}'.format(request.user.username)
 	DCDir_url = DCDir.replace(BASE_DIR + '/static/', '')
+	userForm = UserForm(instance=request.user)
 	if request.method == 'POST':
 		if request.POST.has_key('email') and (not request.user.email == request.POST['email']):
 			request.user.email = request.POST['email']
@@ -414,23 +415,23 @@ def change_contact_info(request, template_name):
 	DCDir = BASE_DIR + '/static/ebookSystem/disability_card/{0}'.format(request.user.username)
 	DCDir_url = DCDir.replace(BASE_DIR + '/static/', '')
 	if request.method == 'POST':
-		userChangeForm = UserChangeForm(request.POST, instance=request.user)
-		if not userChangeForm.is_valid():
+		userForm = UserForm(instance=request.user, data=request.POST)
+		if not userForm.is_valid():
 			status = u'error'
-			message = u'表單驗證失敗 {0}'.format(str(userChangeForm.errors))
+			message = u'表單驗證失敗 {0}'.format(str(userForm.errors))
 			return locals()
 		user = User.objects.get(username=request.user.username)
-		if not user.email == userChangeForm.cleaned_data['email']:
+		userForm.save()
+		if not user.email == userForm.cleaned_data['email']:
 			request.user.auth_email = False
 			request.user.save()
 			status = u'success'
 			message = u'修改通訊資料，請重新驗證。'
-		if not user.phone == userChangeForm.cleaned_data['phone']:
+		if not user.phone == userForm.cleaned_data['phone']:
 			request.user.auth_phone = False
 			request.user.save()
 			status = u'success'
 			message = u'修改通訊資料，請重新驗證。'
-		userChangeForm.save()
 		try:
 			request.user.editor.professional_field = request.POST['professional_field']
 			request.user.editor.save()
@@ -440,15 +441,13 @@ def change_contact_info(request, template_name):
 			[status, message] = handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_front.jpg'), request.FILES['disability_card_front'])
 			[status, message] = handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_back.jpg'), request.FILES['disability_card_back'])
 		except:
-			status = u'error'
-			message = u'手冊修改失敗'
-			return locals()
+			pass
 		status = u'success'
 		message = u'資料修改完成'
 		redirect_to = reverse('genericUser:info')
 		return locals()
 	if request.method == 'GET':
-		userChangeForm = UserChangeForm(instance=request.user)
+		userForm = UserForm(instance=request.user)
 		return locals()
 
 @user_category_check(['user'])

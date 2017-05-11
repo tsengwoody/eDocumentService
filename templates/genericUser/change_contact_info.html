@@ -18,85 +18,25 @@
 		<div class="col-md-8 col-md-offset-2">
 			{{ message }}
 			<table class="table table-hover table-reflow no-page">
+				{% for field in userForm %}
 				<tr>
 					<th class="col-md-4" scope="row">
-						<label for="id_username"><font style="color:red">*</font>使用者名稱：</label>
+						<label for="{{ field.id_for_label }}">
+							{% if field.field.widget.is_required %}<font style="color:red">*</font>{% endif %}{{ field.label }}:</label>
 					</th>
 					<td class="col-md-8">
-						{{ request.user.username }}
-						<input id="id_username" name="username" value="{{ request.user.username }}" type="hidden" placeholder="username" required>
-					</td>
-				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_first_name"><font style="color:red">*</font>姓氏：</label>
-					</th>
-					<td>
-						{% if user.status_int2str == 'review' %}
-						<input id="id_first_name" name="first_name" value="{{ request.user.first_name }}" type="text" placeholder="First name" required><label for="id_first_name"><font style="color:red">請填寫中文性名</font></label>
+						{% if field.can_modify %}
+						{{ field }}
+						<label for="{{ field.id_for_label }}">
+							<font style="color:red">{{ field.help_text }}</font>
+						</label>
 						{% else %}
-						<input id="id_first_name" name="first_name" value="{{ request.user.first_name }}" type="hidden" placeholder="First name" required>
+						{{ field.value }}
+						<input type="hidden" name="{{ field.name }}" value="{{ field.value }}">
 						{% endif %}
 					</td>
 				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_last_name"><font style="color:red">*</font>名字：</label>
-					</th>
-					<td>
-						{% if user.status_int2str == 'review' %}
-						<input id="id_last_name" name="last_name" value="{{ request.user.last_name }}" type="text" placeholder="Last name" required><label for="id_last_name"><font style="color:red">請填寫中文性名</font></label>
-						{% else %}
-						<input id="id_last_name" name="last_name" value="{{ request.user.last_name }}" type="hidden" placeholder="Last name" required>
-						{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_email"><font style="color:red">*</font>電子郵件：</label>
-					</th>
-					<td>
-						<input id="id_email" name="email" value="{{ request.user.email }}" type="email" placeholder="Email" required>
-					</td>
-				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_phone"><font style="color:red">*</font>聯絡電話：</label>
-					</th>
-					<td>
-						{% if not request.user.auth_phone %}
-						<input id="id_phone" name="phone" value="{{ request.user.phone }}" type="phone" pattern="^[0-9]{10}$" placeholder="Phone" required><label for="id_phone"><font style="color:red">請填寫手機號碼</font></label>
-						{% else %}
-						<input id="id_phone" name="phone" value="{{ request.user.phone }}" type="hidden" pattern="^[0-9]{10}$" placeholder="Phone" required>
-						{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_birthday"><font style="color:red">*</font>生日：</label>
-					</th>
-					<td>
-						{{ request.user.birthday }}
-						<input id="id_birthday" name="birthday" value="{{ request.user.birthday.year }}-{{ request.user.birthday.month }}-{{ request.user.birthday.day }}" type="hidden" placeholder="birthday" required>
-					</td>
-				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_education"><font style="color:red">*</font>教育程度：</label>
-					</th>
-					<td>
-						<select id="id_education" name="education" required>
-							<option value="">---------</option>
-							{% for edu in request.user.EDU %}
-							{% if request.user.education == edu.0 %}
-							<option value="{{ edu.0 }}" selected="selected">{{ edu.1 }}</option>
-							{% else %}
-							<option value="{{ edu.0 }}">{{ edu.1 }}</option>
-							{% endif %}
-							{% endfor %}
-						</select>
-					</td>
-				</tr>
+				{% endfor %}
 				{% if request.user.has_editor %}
 				<tr class="editor_mode">
 					<th class="col-md-4" scope="row">

@@ -18,107 +18,20 @@
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
 			<table class="table table-hover table-reflow no-page">
+				{% for field in registerUserForm %}
 				<tr>
 					<th class="col-md-4" scope="row">
-						<label for="id_username">
-							<font style="color:red">*</font>使用者名稱：</label>
+						<label for="{{ field.id_for_label }}">
+							{% if field.field.widget.is_required %}<font style="color:red">*</font>{% endif %}{{ field.label }}:</label>
 					</th>
 					<td class="col-md-8">
-						<input id="id_username" maxlength="30" name="username" type="text" pattern="^[a-z][a-z0-9_]*$" autofocus required>
-						<label for="id_username">
-							<font style="color:red">首字為英文字母，其餘小寫英文字母、數字、'_'</font>
+						{{ field }}
+						<label for="{{ field.id_for_label }}">
+							<font style="color:red">{{ field.help_text }}</font>
 						</label>
 					</td>
 				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_password">
-							<font style="color:red">*</font>密碼：</label>
-					</th>
-					<td>
-						<input id="id_password" maxlength="30" name="password" type="password" required>
-					</td>
-				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_confirm_password">
-							<font style="color:red">*</font>確認密碼：</label>
-					</th>
-					<td>
-						<input id="id_confirm_password" maxlength="30" name="confirm_password" type="password" required>
-					</td>
-				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_first_name">
-							<font style="color:red">*</font>姓氏：</label>
-					</th>
-					<td>
-						<input id="id_first_name" name="first_name" type="text" placeholder="First name" required>
-						<label for="id_first_name">
-							<font style="color:red">請填寫中文性名</font>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_last_name">
-							<font style="color:red">*</font>名字：</label>
-					</th>
-					<td>
-						<input id="id_last_name" name="last_name" type="text" placeholder="Last name" required>
-						<label for="id_last_name">
-							<font style="color:red">請填寫中文性名</font>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_email">
-							<font style="color:red">*</font>電子郵件：</label>
-					</th>
-					<td>
-						<input id="id_email" name="email" type="email" placeholder="Email" required>
-					</td>
-				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_phone">
-							<font style="color:red">*</font>聯絡電話：</label>
-					</th>
-					<td>
-						<input id="id_phone" name="phone" type="phone" pattern="^[0-9]{10}$" placeholder="Phone" required>
-						<label for="id_phone">
-							<font style="color:red">請填寫手機號碼</font>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_birthday">
-							<font style="color:red">*</font>生日：</label>
-					</th>
-					<td>
-						<input id="id_birthday" name="birthday" type="text" pattern="^[0-9]{4}-[0-9]{2}-[0-9]{2}$" class="datepicker" placeholder="1989-02-19" required>
-						<label for="id_birthday">
-							<font style="color:red">1989-02-19</font>
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<th class="col-md-4" scope="row">
-						<label for="id_education">
-							<font style="color:red">*</font>教育程度：</label>
-					</th>
-					<td>
-						<select id="id_education" name="education" required>
-							<option value="" selected="selected">---------</option>
-							<option value="高中">高中(職)(以下)</option>
-							<option value="學士">學士</option>
-							<option value="碩士">碩士(以上)</option>
-						</select>
-					</td>
-				</tr>
+				{% endfor %}
 				<tr>
 					<th class="col-md-4" scope="row">
 						<label for="id_role">

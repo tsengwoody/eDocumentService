@@ -40,6 +40,10 @@ class Book(models.Model):
 	def __unicode__(self):
 		return self.book_info.bookname
 
+	def delete(self, *args, **kwargs):
+		shutil.rmtree(self.path)
+		super(Book, self).delete(*args, **kwargs)
+
 	def status_int2str(self):
 		for k, v in self.STATUS.iteritems():
 			if v == self.status:

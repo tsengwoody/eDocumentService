@@ -52,74 +52,25 @@
 </div>
 <div class="row">
 <h3 >個人資料</h3>
-	<div class="col-md-8 col-md-offset-2">
-				<table class="table table-hover table-reflow no-page">
-					<tr>
-						<th class="col-md-4" scope="row">
-							使用者名稱：
-						</th>
-						<td class="col-md-8">
-							{{ request.user.username }}
-						</td>
-					</tr>
-					<tr>
-						<th class="col-md-4" scope="row">
-							姓氏：
-						</th>
-						<td>
-							{{ request.user.first_name }}
-						</td>
-					</tr>
-					<tr>
-						<th class="col-md-4" scope="row">
-							名字：
-						</th>
-						<td>
-							{{ request.user.last_name }}
-						</td>
-					</tr>
-					<tr>
-						<th class="col-md-4" scope="row">
-							電子郵件：
-						</th>
-						<td>
-							{{ request.user.email }}
-							{% if not request.user.auth_email %}
-							<button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="email" data-sendto="{{ request.user.email }}">驗證</button>
-							{% else %}
-							<button class="btn-xs btn-success disabled"  type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="email" data-sendto="{{ request.user.email }}" disabled>已驗證</button>
-							{% endif %}
-						</td>
-					</tr>
-					<tr>
-						<th class="col-md-4" scope="row">
-							聯絡電話：
-						</th>
-						<td>
-							{{ request.user.phone }}
-							{% if not request.user.auth_phone %}
-							<button class="btn-xs btn-warning" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ request.user.phone }}">驗證</button>
-							{% else %}
-							<button class="btn-xs btn-success disabled" type="button" value="phone" data-toggle="modal" data-target="#otpModal" data-whatever="phone" data-sendto="{{ request.user.phone }}" disabled>已驗證</button>
-							{% endif %}
-						</td>
-					</tr>
-					<tr>
-						<th class="col-md-4" scope="row">
-							生日：
-						</th>
-						<td>
-							{{ request.user.birthday }}
-						</td>
-					</tr>
-					<tr>
-						<th class="col-md-4" scope="row">
-							教育程度：
-						</th>
-						<td>
-							{{ request.user.education }}
-						</td>
-					</tr>
+<div class="col-md-8 col-md-offset-2">
+	<table class="table table-hover table-reflow no-page">
+		{% for field in userForm %}
+		<tr>
+			<th class="col-md-4" scope="row">
+				{{ field.label }}
+			</th>
+			<td class="col-md-8">
+				{{ field.value }}
+				{% if field.name == 'email' or field.name == 'phone' %}
+				{% if field.name == 'email' and not userForm.instance.auth_email or field.name == 'phone' and not userForm.instance.auth_phone %}
+				<button class="btn-xs btn-warning" type="button" value="{{ field.name }}" data-toggle="modal" data-target="#otpModal" data-whatever="{{ field.name }}" data-sendto="{{ field.value }}">驗證</button>
+				{% else %}
+				<button class="btn-xs btn-success disabled"  type="button" value="{{ field.name }}" data-toggle="modal" data-target="#otpModal" data-whatever="{{ field.name }}" data-sendto="{{ field.value }}" disabled>已驗證</button>
+				{% endif %}
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
 					{% if request.user.has_editor %}
 					<tr class="editor_mode">
 						<th class="col-md-4" scope="row">

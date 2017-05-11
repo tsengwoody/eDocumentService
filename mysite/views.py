@@ -36,6 +36,7 @@ def home(request, template_name='home.html'):
 @http_response
 def register(request, template_name='registration/register.html'):
 	if request.method == 'POST':
+#		print request.POST
 		registerUserForm = RegisterUserForm(request.POST)
 		if not registerUserForm.is_valid():
 			status = 'error'
