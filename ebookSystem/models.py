@@ -749,6 +749,7 @@ class EditRecord(models.Model):
 	editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
+	stay_hours = models.IntegerField(default=0)
 	serviceInfo = models.ForeignKey(ServiceInfo,blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
 
 	class Meta:
@@ -761,11 +762,13 @@ class EditRecord(models.Model):
 		if self.category == 'based':
 			self.editor = self.part.editor
 			self.get_date = self.part.get_date
+			self.stay_hours = self.part.service_hours
 			self.save()
 			self.service_hours = self.compute_service_hours()
 		elif self.category == 'advanced':
 			self.editor = self.part.sc_editor
 			self.get_date = self.part.sc_get_date
+			self.stay_hours = self.part.service_hours
 			self.save()
 			self.service_hours = self.part.sc_service_hours
 		self.save()

@@ -152,6 +152,12 @@ class ServiceInfo(models.Model):
 	def __unicode__(self):
 		return self.user.username +str(self.date)
 
+	def get_stay_hours(self):
+		stay_hours = 0
+		for editRecord in self.editrecord_set.all():
+			stay_hours = stay_hours +editRecord.stay_hours
+		return stay_hours
+
 	def get_service_hours(self):
 		service_hours = 0
 		for editRecord in self.editrecord_set.all():

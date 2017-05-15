@@ -45,7 +45,7 @@
 					{% if request.user.is_guest %}
 						<li><a href="{% url 'genericUser:apply_document' %}">代掃申請</a></li>
 					{% endif %}
-						<li><a href="{% url 'genericUser:upload_document' %}">文件上傳</a></li>
+<!--						<li><a href="{% url 'genericUser:upload_document' %}">文件上傳</a></li>-->
 					{% if request.user.is_advanced_editor %}
 						<li><a href="{% url 'manager:applydocumentaction' %}">代掃上傳</a></li>
 					{% endif %}

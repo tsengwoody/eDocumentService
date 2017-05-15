@@ -53,7 +53,7 @@
 						<label for="id_disability_card_front"><font style="color:red">*</font>身心障礙手冊正面：</label>
 					</th>
 					<td>
-						<img src="/static/{{ DCDir_url }}/{{ request.user.username }}_front.jpg" alt="身心障礙手冊正面" />
+						<img src="/static/{{ DCDir_url }}/{{ request.user.username }}_front.jpg" alt="身心障礙手冊正面" width="100%"/>
 						<input id="id_disability_card_front" maxlength="30" name="disability_card_front" type="file" accept="image/*" >
 					</td>
 				</tr>
@@ -62,7 +62,7 @@
 						<label for="id_disability_card_back"><font style="color:red">*</font>身心障礙手冊反面：</label>
 					</th>
 					<td>
-						<img src="/static/{{ DCDir_url }}/{{ request.user.username }}_back.jpg" alt="身心障礙手冊反面" />
+						<img src="/static/{{ DCDir_url }}/{{ request.user.username }}_back.jpg" alt="身心障礙手冊反面" width="100%"/>
 						<input id="id_disability_card_back" maxlength="30" name="disability_card_back" type="file" accept="image/*" >
 					</td>
 				</tr>
@@ -70,7 +70,8 @@
 			</table>
 			<div class="form-group row">
 				<div class="col-sm-offset-4 col-sm-6">
-					<input type="submit" class="btn btn-primary" value="儲存" id="id_send">
+<!--					<input type="submit" class="btn btn-primary" value="儲存" id="id_send">-->
+	<button type="submit" class="btn btn-primary send_form" id="id_save">儲存</button>
 <!--					<button class="btn btn-lg btn-default send_button" type="submit" id="id_save" name="save">儲存</button>-->
 					<a class="btn btn-danger" role="button" href = {% url 'genericUser:info' %}>取消</a>
 				</div>

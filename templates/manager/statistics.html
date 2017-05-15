@@ -12,15 +12,15 @@
 
 {% block content %}
 {{ status }}
-{{ message }}
 <h3>統計資料</h3>
 <form action="" method="post" role="form">
 {% csrf_token %}
 <table class='table table-striped'>
 	<tr>
 		<th>時間</th>
-		<th>視障者人數</th>
 		<th>校對志工人數</th>
+		<th>視障者人數</th>
+		<th>活躍校對志工人數(30日內有上線)</th>
 		<th>已掃描書數</th>
 		<th>已校對書數</th>
 	</tr>
@@ -31,6 +31,7 @@
 		<td>{{ i.2 }}</td>
 		<td>{{ i.3 }}</td>
 		<td>{{ i.4 }}</td>
+		<td>{{ i.5 }}</td>
 	</tr>
 	{% endfor %}
 </table>

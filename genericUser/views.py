@@ -521,10 +521,19 @@ def serviceinfo_list(request, username, template_name='genericUser/serviceinfo_l
 	ServiceInfo_list = ServiceInfo.objects.filter(user=user).exclude(date=month_day).order_by('date')
 	if request.method == 'POST':
 		if request.POST.has_key('exchange'):
-			exchange_serviceInfo = ServiceInfo.objects.get(id=request.POST['exchange'])
-			exchange_serviceInfo.is_exchange = True
-			exchange_serviceInfo.org = Organization.objects.get(id=request.POST['org'])
-			exchange_serviceInfo.save()
+			try:
+				exchange_serviceInfo = ServiceInfo.objects.get(id=request.POST['exchange'])
+				exchange_serviceInfo.is_exchange = True
+				exchange_serviceInfo.org = Organization.objects.get(id=request.POST['org'])
+				exchange_serviceInfo.save()
+				status = u'success'
+				message = u'兌換成功'
+			except:
+				status = u'error'
+				message = u'兌換失敗'
+		else:
+			status = u'error'
+			message = u'兌換失敗'
 		return locals()
 	if request.method == 'GET':
 		return locals()

@@ -17,7 +17,8 @@
 	<table class="table table-striped table-hover">
 		<tr>
 			<th>月份</th>
-			<th>時數</th>
+			<th>停留時數</th>
+			<th>服務時數</th>
 			<th>頁數</th>
 			<th>字數</th>
 			<th>狀態</th>
@@ -27,6 +28,7 @@
 		{% if current_ServiceInfo %}
 		<tr>
 			<td>{{ current_ServiceInfo.date }}</td>
+			<td>{{ current_ServiceInfo.get_stay_hours }}</td>
 			<td>{{ current_ServiceInfo.get_service_hours }}</td>
 			<td>{{ current_ServiceInfo.get_page_count }}</td>
 			<td>{{ current_ServiceInfo.get_character_count }}</td>
@@ -38,10 +40,11 @@
 		{% for ServiceInfo in ServiceInfo_list %}
 		<tr>
 			<td>{{ ServiceInfo.date }}</td>
+			<td>{{ ServiceInfo.get_stay_hours }}</td>
 			<td>{{ ServiceInfo.get_service_hours }}</td>
 			<td>{{ ServiceInfo.get_page_count }}</td>
 			<td>{{ ServiceInfo.get_character_count }}</td>
-			{% if serviceInfo.is_exchange %}
+			{% if ServiceInfo.is_exchange %}
 			<td>已兌換</td>
 			<td>{{ ServiceInfo.org }}</td>
 			<td></td>
@@ -56,8 +59,8 @@
 				</select>
 			</td>
 			<td>
-				{% if ServiceInfo.user == request.user %}
-				<button class="btn btn-sm btn-primary send_button" type="submit" id="id_exchange" name="exchange" value={{ ServiceInfo.id }}>兌換</button>
+				{% if ServiceInfo.user == request.user or ServiceInfo.user.org.manager == request.user %}
+				<button class="btn btn-sm btn-primary send_form_button" type="submit" id="id_exchange" name="exchange" value={{ ServiceInfo.id }}>兌換</button>
 				{% else %}
 				非時數擁有者無法兌換
 				{% endif %}

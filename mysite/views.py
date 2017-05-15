@@ -94,7 +94,6 @@ def login(request, template_name='registration/login.html', authentication_form=
 	"""
 	Displays the login form and handles the login action.
 	"""
-	user = request.user
 	try:
 		UUID = locals()['kwargs']['UUID']
 		code = cache.get(UUID)
@@ -115,17 +114,19 @@ def login(request, template_name='registration/login.html', authentication_form=
 			status = 'error'
 			message = u'表單驗證失敗，' + str(form.errors)
 			return locals()
-		from django.contrib.sessions.models import Session
-		for session in Session.objects.all():
-			if session.get_decoded().has_key('_auth_user_id') and int(session.get_decoded()['_auth_user_id']) == user.id:
-				session.delete()
-		
 
 		auth_login(request, form.get_user())
 		if request.user.is_license==False:
 			redirect_to='/genericUser/license/'
 		else:
 			redirect_to = '/'
+		from django.contrib.sessions.models import Session
+		for session in Session.objects.all():
+			try:
+				if int(session.get_decoded()['_auth_user_id']) == request.user.id and request.user.username != 'root':
+					session.delete()
+			except:
+				pass
 		status = 'success'
 		message = u'登錄成功'
 		return locals()

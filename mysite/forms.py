@@ -92,8 +92,8 @@ class RegisterUserForm(forms.ModelForm):
 		help_texts = {
 			'username': u'首字為英文字母，其餘小寫英文字母、數字、"_"',
 			'email': u'請填寫電子信箱',
-			'first_name': u'請填寫中文性名',
-			'last_name': u'請填寫中文性名',
+			'first_name': u'請填寫中文姓名',
+			'last_name': u'請填寫中文姓名',
 			'phone': u'請填寫手機',
 			'birthday': u'範例日期格式：1989-02-19',
 			'education': u'請選擇教育程度',
