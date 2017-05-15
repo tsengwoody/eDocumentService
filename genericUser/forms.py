@@ -87,7 +87,7 @@ class UserForm(forms.ModelForm):
 			'org': u'所屬單位',
 		}
 		help_texts = {
-			'username': u'首字為英文字母，其餘小寫英文字母、數字、"_"',
+			'username': u'請使用小寫英文字母或數字，首字必需為小寫英文字母',
 			'email': u'請填寫電子信箱',
 			'first_name': u'請填寫中文姓名',
 			'last_name': u'請填寫中文姓名',
