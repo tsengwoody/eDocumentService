@@ -13,7 +13,6 @@ from mysite.settings import BASE_DIR
 import codecs
 import os
 
-@user_category_check(['manager'])
 @http_response
 def statistics(request, template_name='manager/statistics.html'):
 	if request.method == 'POST':
