@@ -35,20 +35,5 @@
 	</tr>
 	{% endfor %}
 </table>
-<h3>活躍登錄志工</h3>
-<table class='table table-striped'>
-	<tr>
-		<th>性名</th>
-		<th>使用者名稱</th>
-		<th>上次登錄時間</th>
-	</tr>
-	{% for u in active_editor_list %}
-	<tr>
-		<td>{{ u.first_name }}{{ u.last_name }}</td>
-		<td>{{ u.username }}</td>
-		<td>{{ u.last_login }}</td>
-	</tr>
-{% endfor %}
-</table>
 </form>
 {% endblock %}

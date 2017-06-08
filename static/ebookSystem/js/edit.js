@@ -132,7 +132,7 @@ function addMark(strValue,editor) {
 function detectIdel()
 {
     console.log("idel_min "+idel_min);
-    if(idel_min>30)
+    if(idel_min>10)
     {
         function_click=true;
         idel_min=0;

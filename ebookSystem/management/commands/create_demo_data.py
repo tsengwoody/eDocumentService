@@ -32,7 +32,7 @@ class Command(BaseCommand):
 		root.auth_phone = True
 		root.auth_privacy = True
 		root.save()
-		org = Organization.objects.create(name=u'eDocumentService', address=u'台北市大同區1段149號7樓', email=u'edocumentservice@gmail.com', phone='0917823099', manager=root, is_service_center=True)
+		org = Organization.objects.create(name=u'eDocumentService', address=u'台北市大同區1段149號7樓', email=u'edocumentservice@gmail.com', phone='0917823098', manager=root, is_service_center=True)
 		root.org=org
 		root.save()
 		rootEditor = Editor.objects.create(user=root, professional_field=u'資訊工程學')
@@ -41,8 +41,8 @@ class Command(BaseCommand):
 		response = client.post(reverse('register'), {'username':'demo-editor', 'password':'demo-editor', 'confirm_password':'demo-editor', 'email':'tsengwoody.tw@gmail.com', 'first_name':'demo editor firstname', 'last_name':'demo editor lastname', 'is_active':True, 'phone':'1234567890', 'birthday':'2016-01-01', 'education':u'碩士', 'role':'Editor', 'is_book':'on', 'org':u'1', 'professional_field':u'資訊工程學','is_privacy':True})
 		with open('temp/dcf.jpg') as dcf_file:
 			with open('temp/dcb.jpg') as dcb_file:
-				response = client.post(reverse('register'), {'username':'demo-guest', 'password':'demo-guest', 'confirm_password':'demo-guest', 'email':'tsengwoody.tw@gmail.com', 'first_name':'demo guest firstname', 'last_name':'demo guest lastname', 'is_active':True, 'phone':'1234567890', 'birthday':'2016-01-01', 'education':u'碩士', 'is_book':'on', 'role':'Guest', 'org':u'1', 'disability_card_front':dcf_file, 'disability_card_back':dcb_file,'is_privacy':True})
-				response = client.post(reverse('register'), {'username':'demo-manager', 'password':'demo-manager', 'confirm_password':'demo-manager', 'email':'tsengwoody.tw@gmail.com', 'first_name':'demo manager firstname', 'last_name':'demo manager lastname', 'is_active':True, 'phone':'1234567890', 'birthday':'2016-01-01', 'education':u'碩士', 'is_book':'on', 'org':u'1', 'role':'Editor', 'professional_field':u'資訊工程學','is_privacy':True})
+				response = client.post(reverse('register'), {'username':'demo-guest', 'password':'demo-guest', 'confirm_password':'demo-guest', 'email':'tsengwoody@gmail.com', 'first_name':'demo guest firstname', 'last_name':'demo guest lastname', 'is_active':True, 'phone':'1234567899', 'birthday':'2016-01-01', 'education':u'碩士', 'is_book':'on', 'role':'Guest', 'org':u'1', 'disability_card_front':dcf_file, 'disability_card_back':dcb_file,'is_privacy':True})
+				response = client.post(reverse('register'), {'username':'demo-manager', 'password':'demo-manager', 'confirm_password':'demo-manager', 'email':'tsengwoody@yahoo.com.tw', 'first_name':'demo manager firstname', 'last_name':'demo manager lastname', 'is_active':True, 'phone':'1234567898', 'birthday':'2016-01-01', 'education':u'碩士', 'is_book':'on', 'org':u'1', 'role':'Editor', 'professional_field':u'資訊工程學','is_privacy':True})
 		manager = User.objects.get(username='demo-manager')
 		manager.status = manager.STATUS['active']
 		manager.is_editor=True

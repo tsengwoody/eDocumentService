@@ -24,7 +24,7 @@ class PublicFile(object):
 		self.url = path.replace(BASE_DIR +'/static/', '')
 
 class User(AbstractUser):
-	phone = models.CharField(max_length=30)
+	phone = models.CharField(max_length=30, unique=True)
 	birthday = models.DateField()
 	EDU = (
 		(u'高中' , u'高中'),

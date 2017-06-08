@@ -42,6 +42,7 @@ class Book(models.Model):
 
 	def delete(self, *args, **kwargs):
 		shutil.rmtree(self.path)
+		print 'delete'
 		super(Book, self).delete(*args, **kwargs)
 
 	def status_int2str(self):
@@ -753,7 +754,7 @@ class EditRecord(models.Model):
 	serviceInfo = models.ForeignKey(ServiceInfo,blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
 
 	class Meta:
-		unique_together = ('part', 'category', 'number_of_times')
+		unique_together = (('part', 'category', 'number_of_times'),)
 
 	def __unicode__(self):
 		return self.part.ISBN_part

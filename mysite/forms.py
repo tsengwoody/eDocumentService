@@ -77,6 +77,11 @@ class RegisterUserForm(forms.ModelForm):
 				},
 				choices = EMPTY_OPTION +EDUCATION_OPTION,
 			),
+			'is_book': forms.CheckboxInput(
+				attrs={
+					'checked': True,
+				},
+			),
 		}
 		labels = {
 			'username': u'使用者名稱',
