@@ -81,29 +81,3 @@ def http_response(view):
 			else:
 				return render(request, rend_dict['template_name'], rend_dict)
 	return decorator
-
-from .validate import audio_code
-from django.core.cache import cache
-from mysite.settings import BASE_DIR
-import os
-def audio_code_valid(view):
-	def decorator(request, *args, **kwargs):
-		if request.method == 'POST':
-			if request.POST.has_key('code') and request.POST.has_key('UUID') and request.POST['code'] == cache.get(request.POST['UUID']):
-				os.remove(BASE_DIR +'/static/audio_code/' +request.POST['UUID'] +'.mp3')
-				return view(request, *args, **kwargs)
-			else:
-				if request.is_ajax():
-					response = {}
-					response['status'] = 'error'
-					response['message'] = u'驗證碼錯誤'
-					return HttpResponse(json.dumps(response), content_type="application/json")
-				else:
-					template_name = 'audio_code_error.html'
-					return render(request, template_name, locals())
-		if request.method == 'GET':
-			[UUID, code] = audio_code()
-			UUIDDict = {'UUID':UUID}
-			kwargs.update(UUIDDict)
-			return view(request, *args, **kwargs)
-	return decorator
