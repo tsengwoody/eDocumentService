@@ -102,7 +102,7 @@ def article_content(request, id, template_name='genericUser/article/content.html
 		return locals()
 
 
-@user_category_check(['superuser'])
+@view_permission
 @http_response
 def article_create(request, template_name='genericUser/article/create.html'):
 	ArticleForm = modelform_factory(Article, fields=('author', 'subject', 'category'))
@@ -138,7 +138,7 @@ def article_create(request, template_name='genericUser/article/create.html'):
 		return locals()
 
 
-@user_category_check(['guest', 'advanced_editor'])
+@view_permission
 @http_response
 def create_document(request, template_name='genericUser/create_document.html'):
 	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date'))
@@ -192,7 +192,7 @@ def create_document(request, template_name='genericUser/create_document.html'):
 		return locals()
 
 
-@user_category_check(['user'])
+@view_permission
 @http_response
 def upload_document(request, template_name='genericUser/upload_document.html'):
 	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date'))
@@ -273,7 +273,7 @@ def upload_progress(request):
 		return HttpResponseServerError('Server Error: You must provide X-Progress-ID header or query param.')
 
 
-@user_category_check(['guest'])
+@view_permission
 @http_response
 def apply_document(request, template_name='genericUser/apply_document.html'):
 	BookInfoForm = modelform_factory(BookInfo, fields=('ISBN', 'bookname', 'author', 'house', 'date'))
@@ -294,7 +294,7 @@ def apply_document(request, template_name='genericUser/apply_document.html'):
 		return locals()
 
 
-@user_category_check(['user'])
+@view_permission
 def event_list(request):
 	events = Event.objects.filter(creater=request.user)
 	template_name = 'genericUser/event_list.html'
@@ -314,11 +314,11 @@ def license(request, template_name='genericUser/license.html'):
 	if request.method == 'POST':
 		if 'is_privacy' in request.POST:
 			request.user.is_license = True
+			request.user.permission.add(Permission.objects.get(codename='license'))
 			request.user.save()
 		return redirect('/')
 	if request.method == 'GET':
 		return render(request, template_name, locals())
-
 
 def func_desc(request, template_name='genericUser/func_desc.html'):
 	return render(request, template_name, locals())
@@ -328,7 +328,7 @@ def security(request, template_name='genericUser/security.html'):
 	return render(request, template_name, locals())
 
 
-@user_category_check(['user'])
+@view_permission
 @http_response
 def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 	if len(ISBN) == 10 and not ISBN10_check(ISBN):
@@ -350,7 +350,7 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 	return locals()
 
 
-@user_category_check(['manager'])
+@view_permission
 @http_response
 def review_user(request, username, template_name='genericUser/review_user.html'):
 	try:
@@ -364,9 +364,11 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
-		user.is_active = True if request.POST.has_key('login') else False
-		user.is_editor = True if request.POST.has_key('editor') else False
-		user.is_guest = True if request.POST.has_key('guest')  else False
+		print Permission.objects.all()
+		for item in ['active', 'editor', 'guest', ]:
+			exec("user.is_{0} = True if request.POST.has_key('{0}') else False".format(item))
+			p = Permission.objects.get(codename=item)
+			exec("user.permission.add(p) if request.POST.has_key('{0}') else user.permission.remove(p)".format(item))
 		if request.POST['review'] == 'success':
 			user.status = user.STATUS['active']
 			user.save()
@@ -450,7 +452,7 @@ def change_contact_info(request, template_name):
 		userForm = UserForm(instance=request.user)
 		return locals()
 
-@user_category_check(['user'])
+@view_permission
 @http_response
 def revise_content(request, template_name='genericUser/revise_content.html'):
 	user = request.user
@@ -505,7 +507,7 @@ def contact_us(request, template_name='genericUser/contact_us.html'):
 		contactUsForm = ContactUsForm()
 		return locals()
 
-@user_category_check(['user'])
+@view_permission
 @http_response
 def serviceinfo_list(request, username, template_name='genericUser/serviceinfo_list.html'):
 	try:

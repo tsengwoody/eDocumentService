@@ -88,7 +88,7 @@ def tinymce_demo(request, template_name='ebookSystem/tinymce_demo.html'):
 		message = u'get'
 		return locals()
 
-@user_category_check(['manager'])
+@view_permission
 @http_response
 def book_list(request, template_name='ebookSystem/book_list.html'):
 	object_list = Book.objects.all()
@@ -147,7 +147,7 @@ def search_book(request, template_name):
 	if request.method == 'GET':
 		return locals()
 
-@user_category_check(['manager'])
+@view_permission
 @http_response
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
 	try:
@@ -181,7 +181,7 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		redirect_to = reverse('manager:event_list', kwargs={'action':'book' })
 		return locals()
 
-@user_category_check(['manager'])
+@view_permission
 @http_response
 def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.html'):
 	try:
@@ -236,7 +236,7 @@ def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.htm
 			redirect_to = reverse('account:an_service')
 			return locals()
 
-@user_category_check(['manager'])
+@view_permission
 @http_response
 def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'):
 	try:
@@ -267,7 +267,7 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 		redirect_to = reverse('manager:event_list', kwargs={'action':'ebook' })
 		return locals()
 
-@user_category_check(['manager'])
+@view_permission
 @http_response
 def review_ReviseContentAction(request, id, template_name='ebookSystem/review_ReviseContentAction.html'):
 	try:
@@ -289,7 +289,7 @@ def review_ReviseContentAction(request, id, template_name='ebookSystem/review_Re
 	if request.method == 'POST':
 		return locals()
 
-@user_category_check(['advanced_editor'])
+@view_permission
 @http_response
 def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_ApplyDocumentAction.html'):
 	from utils.uploadFile import handle_uploaded_file
@@ -337,7 +337,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 		event.response(status=status, message=message, user=request.user)
 		return locals()
 
-@user_category_check(['user'])
+@view_permission
 @http_response
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	try:
@@ -376,7 +376,7 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	if request.method == 'GET':
 		return locals()
 
-@user_category_check(['superuser'])
+@view_permission
 @http_response
 def detail_manager(request, book_ISBN, template_name='ebookSystem/detail_manager.html'):
 	try:
@@ -407,7 +407,7 @@ def detail_manager(request, book_ISBN, template_name='ebookSystem/detail_manager
 	if request.method == 'GET':
 		return locals()
 
-@user_category_check(['superuser'])
+@view_permission
 @http_response
 def edit_log(request, ISBN_part, template_name='ebookSystem/edit_log.html'):
 	try:
@@ -472,7 +472,7 @@ def edit_ajax(request, ISBN_part, *args, **kwargs):
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 @cache_control(no_store=True, no_cache=True, max_age=0)
-@user_category_check('editor')
+@view_permission
 @http_response
 def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args, **kwargs):
 	logger.info('{}/edit\t{}'.format(request.user, resolve(request.path).namespace))
@@ -534,7 +534,7 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 		request.session['postToken'] = postToken
 		return locals()
 
-@user_category_check('advanced_editor')
+@view_permission
 @http_response
 def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
 	try:
@@ -550,7 +550,7 @@ def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
 	if request.method == 'GET':
 		return locals()
 
-@user_category_check('advanced_editor')
+@view_permission
 @http_response
 def special_content(request, ISBN_part, template_name='ebookSystem/special_content.html'):
 	try:
@@ -591,7 +591,7 @@ def special_content(request, ISBN_part, template_name='ebookSystem/special_conte
 	if request.method == 'GET':
 		return locals()
 
-@user_category_check('advanced_editor')
+@view_permission
 @http_response
 def edit_SpecialContent(request, id, type):
 	try:

@@ -22,7 +22,7 @@ def userGuide(request, template_name='home.html'):
 #	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
 	return render(request, template_name, locals())
 
-@user_category_check(['guest'])
+@view_permission
 @http_response
 def book_repository(request, template_name='guest/book_repository.html'):
 	edit_book_list = request.user.own_book_set.all().filter(status__lte=Book.STATUS['review'])

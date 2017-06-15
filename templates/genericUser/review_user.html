@@ -119,7 +119,7 @@
         <tr>
             <th>登錄權限</th>
             <td><div class="switch" data-on="info" data-off="success">
-                    <input type="checkbox" name="login" {%if user.is_active %}checked{%endif%} />
+                    <input type="checkbox" name="active" {%if user.is_active %}checked{%endif%} />
                 </div>
             </td>
         </tr>
@@ -138,19 +138,10 @@
             <td>
                 <div class="switch" data-on="info" data-off="success">
                     <input type="checkbox" name="guest" {%if user.is_guest %}checked{%endif%} />
-
                 </div>
             </td>
         </tr>
         {% endif %}
-        <tr>
-            <th>上傳權限</th>
-            <td>
-                <div class="switch" data-on="info" data-off="success">
-                    <input type="checkbox" name="scaner" {%if user.is_scaner %}checked{%endif%} />
-                </div>
-            </td>
-        </tr>
     </table>
 </div>
 <div class="col-md-2">

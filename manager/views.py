@@ -33,7 +33,7 @@ def statistics(request, template_name='manager/statistics.html'):
 		active_editor_list = User.objects.filter(is_editor=True, last_login__gt=month)
 		return locals()
 
-@user_category_check(['manager'])
+@view_permission
 def event_list(request, action):
 	if request.user.is_superuser:
 		events = Event.objects.filter(content_type__model=action, status=Event.STATUS['review'])

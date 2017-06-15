@@ -25,25 +25,95 @@ class Command(BaseCommand):
 		parser.add_argument('create_demo_data', nargs='*')
 
 	def handle(self, *args, **options):
-		root = User(username='root', email='edocumentservice@gmail.com', first_name = 'demo root firstname', last_name = 'demo root lastname', is_active=True, is_superuser=True, is_staff=True, phone='0917823099', birthday='2016-01-01', is_editor=True, is_guest=True, is_manager=True, is_advanced_editor=True, education=u'學士')
+		p = ['active', 'editor', 'guest', 'manager', 'advanced_editor', 'root', 'license', ]
+		for item in p:
+			exec("permission_{0} = Permission.objects.create(name='{0}', codename='{0}')".format(item))
+		urls = [
+			('manager', 'event_list', 'action:book', (permission_manager, )),
+			('manager', 'event_list', 'action:ebook', (permission_manager, )),
+			('manager', 'event_list', 'action:user', (permission_manager, )),
+			('manager', 'statistics', None, (permission_manager, )),
+			('manager', 'org_manage', None, (permission_root, )),
+			('manager', 'event_list', 'action:applydocumentaction', (permission_root, )),
+			('genericUser', 'article/create', None, (permission_root, )),
+			('ebookSystem', 'book_list', None, (permission_root, )),
+			('genericUser', 'create_document', None, (permission_guest, )),
+			('genericUser', 'apply_document', None, (permission_guest, )),
+			('manager', 'applydocumentaction', None, (permission_advanced_editor, )),
+			('account', 'service', None, (permission_editor, )),
+			('account', 'sc_service', None, (permission_advanced_editor, )),
+			('guest', 'book_repository', None, (permission_guest, )),
+			('account', 'an_service', None, (permission_root, )),
+		]
+		for url in urls:
+			v = View.objects.create(namespace=url[0], url_name=url[1], kwarg=url[2])
+			for p in url[3]:
+				v.permission.add(p)
+		root = User(
+			username='root',
+			email='edocumentservice@gmail.com',
+			first_name = 'demo root firstname',
+			last_name = 'demo root lastname',
+			is_active=True,
+			is_superuser=True,
+			is_staff=True,
+			phone='0917823099',
+			birthday='2016-01-01',
+			is_editor=True,
+			is_guest=True,
+			is_manager=True,
+			is_advanced_editor=True,
+			auth_email=True,
+			auth_phone=True,
+			education=u'學士',
+		)
 		root.set_password('root')
 		root.status = root.STATUS['active']
-		root.auth_email = True
-		root.auth_phone = True
-		root.auth_privacy = True
 		root.save()
 		org = Organization.objects.create(name=u'eDocumentService', address=u'台北市大同區1段149號7樓', email=u'edocumentservice@gmail.com', phone='0917823098', manager=root, is_service_center=True)
 		root.org=org
 		root.save()
+		p = ['active', 'editor', 'guest', 'manager', 'advanced_editor', 'root', 'license', ]
+		for item in p:
+			exec("root.permission.add(permission_{0})".format(item))
 		rootEditor = Editor.objects.create(user=root, professional_field=u'資訊工程學')
 		rootGuest = Guest.objects.create(user=root)
 		client = Client()
 		response = client.post(reverse('register'), {'username':'demo-editor', 'password':'demo-editor', 'confirm_password':'demo-editor', 'email':'tsengwoody.tw@gmail.com', 'first_name':'demo editor firstname', 'last_name':'demo editor lastname', 'is_active':True, 'phone':'1234567890', 'birthday':'2016-01-01', 'education':u'碩士', 'role':'Editor', 'is_book':'on', 'org':u'1', 'professional_field':u'資訊工程學','is_privacy':True})
-		with open('temp/dcf.jpg') as dcf_file:
-			with open('temp/dcb.jpg') as dcb_file:
-				response = client.post(reverse('register'), {'username':'demo-guest', 'password':'demo-guest', 'confirm_password':'demo-guest', 'email':'tsengwoody@gmail.com', 'first_name':'demo guest firstname', 'last_name':'demo guest lastname', 'is_active':True, 'phone':'1234567899', 'birthday':'2016-01-01', 'education':u'碩士', 'is_book':'on', 'role':'Guest', 'org':u'1', 'disability_card_front':dcf_file, 'disability_card_back':dcb_file,'is_privacy':True})
-				response = client.post(reverse('register'), {'username':'demo-manager', 'password':'demo-manager', 'confirm_password':'demo-manager', 'email':'tsengwoody@yahoo.com.tw', 'first_name':'demo manager firstname', 'last_name':'demo manager lastname', 'is_active':True, 'phone':'1234567898', 'birthday':'2016-01-01', 'education':u'碩士', 'is_book':'on', 'org':u'1', 'role':'Editor', 'professional_field':u'資訊工程學','is_privacy':True})
+		editor = User.objects.get(username='demo-editor')
+		editor.auth_email = True
+		editor.auth_phone = True
+		editor.save()
+		with open('temp/dcf.jpg') as dcf_file, open('temp/dcb.jpg') as dcb_file:
+			response = client.post(
+				reverse('register'),
+				{
+					'username':'demo-guest',
+					'password':'demo-guest',
+					'confirm_password':'demo-guest',
+					'email':'tsengwoody@gmail.com',
+					'first_name':'demo guest firstname',
+					'last_name':'demo guest lastname',
+					'is_active':True,
+					'phone':'1234567899',
+					'birthday':'2016-01-01',
+					'education':u'碩士',
+					'is_book':'on',
+					'role':'Guest',
+					'org':u'1',
+					'disability_card_front':dcf_file,
+					'disability_card_back':dcb_file,
+					'is_privacy':True,
+				}
+			)
+			response = client.post(
+				reverse('register'),
+				{'username':'demo-manager', 'password':'demo-manager', 'confirm_password':'demo-manager', 'email':'tsengwoody@yahoo.com.tw', 'first_name':'demo manager firstname', 'last_name':'demo manager lastname', 'is_active':True, 'phone':'1234567898', 'birthday':'2016-01-01', 'education':u'碩士', 'is_book':'on', 'org':u'1', 'role':'Editor', 'professional_field':u'資訊工程學','is_privacy':True},
+			)
 		manager = User.objects.get(username='demo-manager')
+		p = ['active', 'editor', 'guest', 'manager', 'advanced_editor', 'license', ]
+		for item in p:
+			exec("manager.permission.add(permission_{0})".format(item))
 		manager.status = manager.STATUS['active']
 		manager.is_editor=True
 		manager.is_guest=True

@@ -6,7 +6,7 @@ from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
 from .forms import *
 from ebookSystem.models import *
-from genericUser.models import Event, Article
+from genericUser.models import *
 from utils.uploadFile import *
 from utils.decorator import *
 from mysite.settings import BASE_DIR
@@ -51,10 +51,15 @@ def register(request, template_name='registration/register.html'):
 		newUser.is_active = True
 		newUser.is_license = True
 		newUser.save()
+		newUser.permission.add(
+			Permission.objects.get(codename='active'),
+			Permission.objects.get(codename='license')
+		)
 		if request.POST['role'] == 'Editor':
 			try:
 				newEditor = Editor.objects.create(user=newUser, professional_field=request.POST['professional_field'])
 				newUser.is_editor = True
+				newUser.permission.add(Permission.objects.get(codename='editor'))
 			except:
 				newUser.delete()
 				status = 'error'
@@ -116,7 +121,7 @@ def login(request, template_name='registration/login.html', authentication_form=
 			return locals()
 
 		auth_login(request, form.get_user())
-		if request.user.is_license==False:
+		if Permission.objects.get(codename='license') not in request.user.permission.all():
 			redirect_to='/genericUser/license/'
 		else:
 			redirect_to = '/'
@@ -135,7 +140,7 @@ def logout_user(request, template_name='registration/logged_out.html'):
 	auth_logout(request)
 	return render(request, template_name, locals())
 
-@user_category_check(['user'])
+@view_permission
 @http_response
 def password_change(request, template_name='registration/password_change_form.html', password_change_form=PasswordChangeForm):
 	if request.method == "POST":

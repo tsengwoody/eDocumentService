@@ -1,53 +1,50 @@
 ﻿# coding: utf-8
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
 import json
 
-def user_category_check(category):
-	def user_category_out(view):
-		def user_category_in(request, *args, **kwargs):
-			response = {}
-			if not request.user.is_authenticated():
-				template_name = 'user_category_check.html'
-				redirect_to = reverse('login')
-				status = 'error'
-				message = u'您尚未登錄'
-				response['redirect_to'] = redirect_to
-				response['status'] = status
-				response['message'] = message
-				if request.is_ajax():
-					return HttpResponse(json.dumps(response), content_type="application/json")
-				else:
-					return render(request, template_name, locals())
-			if 'user' in category and request.user.authentication():
-				return view(request, *args, **kwargs)
-			elif 'editor' in category and request.user.is_editor:
-				return view(request, *args, **kwargs)
-			elif 'guest' in category and request.user.is_guest:
-				return view(request, *args, **kwargs)
-			elif 'manager' in category and request.user.is_manager:
-				return view(request, *args, **kwargs)
-			elif 'advanced_editor' in category and request.user.is_advanced_editor:
-				return view(request, *args, **kwargs)
-			elif 'staff' in category and request.user.is_staff:
-				return view(request, *args, **kwargs)
-			elif 'superuser' in category and request.user.is_superuser:
-				return view(request, *args, **kwargs)
+from genericUser.models import View
+
+def view_permission(view):
+	def decorator(request, *args, **kwargs):
+		r = resolve(request.path)
+		kwarg = ''
+		for k,v in r.kwargs.iteritems():
+			kwarg = kwarg +'{0}:{1},'.format(k,v)
+		kwarg = None if len(kwarg) == 0 else kwarg[:-1]
+		try:
+			v = View.objects.get(namespace=r.namespace, url_name=r.url_name, kwarg=kwarg)
+		except View.DoesNotExist:
+			v = None
+		response = {}
+		if not request.user.is_authenticated():
+			template_name = 'user_category_check.html'
+			redirect_to = reverse('login')
+			status = 'error'
+			message = u'您尚未登錄'
+			response['redirect_to'] = redirect_to
+			response['status'] = status
+			response['message'] = message
+			if request.is_ajax():
+				return HttpResponse(json.dumps(response), content_type="application/json")
 			else:
-				template_name = 'user_category_check.html'
-				redirect_to = reverse('login')
-				status = 'error'
-				message = u'帳號無權限'
-				response['redirect_to'] = redirect_to
-				response['status'] = status
-				response['message'] = message
-				if request.is_ajax():
-					return HttpResponse(json.dumps(response), content_type="application/json")
-				else:
-					return render(request, template_name, locals())
-		return user_category_in
-	return user_category_out
+				return render(request, template_name, locals())
+		if (v and v.check_permission(request.user)) or not v:
+			return view(request, *args, **kwargs)
+		else:
+			template_name = 'user_category_check.html'
+			redirect_to = reverse('login')
+			status = 'error'
+			message = u'帳號無權限'
+			response['redirect_to'] = redirect_to
+			response['status'] = status
+			response['message'] = message
+			if request.is_ajax():
+				return HttpResponse(json.dumps(response), content_type="application/json")
+			else:
+				return render(request, template_name, locals())
+	return decorator
 
 def http_response(view):
 	def decorator(request, *args, **kwargs):

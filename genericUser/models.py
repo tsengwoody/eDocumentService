@@ -42,7 +42,7 @@ class User(AbstractUser):
 	is_guest = models.BooleanField(default=False)
 	is_manager = models.BooleanField(default=False)
 	is_advanced_editor = models.BooleanField(default=False)
-	is_special = models.BooleanField(default=False)
+	permission = models.ManyToManyField('Permission')
 	auth_email = models.BooleanField(default=False)
 	auth_phone = models.BooleanField(default=False)
 
@@ -64,7 +64,7 @@ class User(AbstractUser):
 			return False
 
 	def authentication(self):
-		return (self.auth_email and self.auth_phone and self.is_license) or self.is_special
+		return self.auth_email and self.auth_phone and self.is_license
 
 	def status_int2str(self):
 		for k, v in self.STATUS.iteritems():
@@ -79,6 +79,9 @@ class User(AbstractUser):
 		except:
 			current_ServiceInfo = None
 		return current_ServiceInfo
+
+	def custom_url(self):
+		pass
 
 class Event(models.Model):
 	creater = models.ForeignKey(User, related_name='event_creater_set')
@@ -231,3 +234,38 @@ class Reply(models.Model):
 	content = models.CharField(max_length=1000)
 	def __unicode__(self):
 		return self.message_datetime
+
+class View(models.Model):
+	namespace = models.CharField(max_length=100, )
+	url_name = models.CharField(max_length=100, )
+	kwarg = models.CharField(max_length=100, blank=True, null=True, )
+	permission = models.ManyToManyField('Permission')
+
+	def __unicode__(self):
+		if self.kwarg:
+			return self.namespace +'-' +self.url_name +'-' +self.kwarg
+		else:
+			return self.namespace +'-' +self.url_name +'-' +'None'
+
+	def check_permission(self, user):
+		if len(self.permission.all()) < 0: return True
+		r = len([permission for permission in user.permission.all() if permission in self.permission.all()])
+		if r > 0: #有交集
+			return True
+		else:
+			return False
+
+class Permission(models.Model):
+	name = models.CharField(max_length=100, )
+	codename = models.CharField(max_length=255, )
+
+	def __unicode__(self):
+		return self.name
+
+class ObjectPermission(models.Model):
+	user = models.ForeignKey(User, related_name='objectpermission_set')
+	content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+	object_id = models.PositiveIntegerField()
+
+	def __unicode__(self):
+		return self.id +'-' +self.user

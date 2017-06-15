@@ -18,16 +18,22 @@
 		</div>
 		<div id="navbar" class="collapse navbar-collapse navbar-dark bg-inverse">
 			<ul class="nav navbar-nav">
-			{% if request.user.authentication %}
-				{% if request.user.is_manager %}
+				{% if request.user.authentication %}
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">客製<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						
+					</ul>
+				</li>
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#">管理<span class="caret"></span></a>
 					<ul class="dropdown-menu">
+						{% if request.user.is_manager %}
 						<li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
 						<li><a href="{% url 'manager:event_list' 'ebook' %}">審核校對文件</a></li>
 						<li><a href="{% url 'manager:event_list' 'user' %}">審核會員</a></li>
 						<li><a href="{% url 'manager:statistics' %}">統計資訊</a></li>
-<!--						<li><a href="{% url 'manager:event_list' 'revisecontentaction' %}">審核更正作業</a></li>-->
+						{% endif %}
 						{% if request.user.is_superuser %}
 						<li><a href="{% url 'manager:org_manage' %}">組織管理</a></li>
 						<li><a href="{% url 'manager:event_list' 'applydocumentaction' %}">代掃申請列表</a></li>
@@ -36,23 +42,21 @@
 						{% endif %}
 					</ul>
 				</li>
-				{% endif %}
-				{% if request.user.is_advanced_editor or request.user.is_guest %}
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#">文件<span class="caret"></span></a>
 					<ul class="dropdown-menu">
+						{% if request.user.is_advanced_editor or request.user.is_guest %}
 						<li><a href="{% url 'genericUser:create_document' %}">自掃上傳</a></li>
-					{% if request.user.is_guest %}
+						{% endif %}
+						{% if request.user.is_guest %}
 						<li><a href="{% url 'genericUser:apply_document' %}">代掃申請</a></li>
-					{% endif %}
+						{% endif %}
 <!--						<li><a href="{% url 'genericUser:upload_document' %}">文件上傳</a></li>-->
-					{% if request.user.is_advanced_editor %}
+						{% if request.user.is_advanced_editor %}
 						<li><a href="{% url 'manager:applydocumentaction' %}">代掃上傳</a></li>
-					{% endif %}
+						{% endif %}
 					</ul>
 				</li>
-				{% endif %}
-					{% if request.user.is_editor or request.user.is_advanced_editor %}
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#">校對<span class="caret"></span></a>
 					<ul class="dropdown-menu">
@@ -64,19 +68,16 @@
 					{% endif %}
 					</ul>
 				</li>
-					{% endif %}
 				{% if request.user.is_guest %}
 				<li><a href="{% url 'guest:book_repository' %}">書庫</a></li>
-<!--				<li><a href="{% url 'genericUser:revise_content' %}">更正</a></li>-->
 				{% endif %}
-				{% if request.user.is_staff %}
+				{% if request.user.is_superuser %}
 				<li><a href="{% url 'account:an_service' %}">分析</a></li>
 				{% endif %}
 				<li><a href="{% url 'ebookSystem:search_book' %}">查詢</a></li>
 				{% endif %}
 				{% if not request.user.is_license and request.user.is_authenticated %}
 				<li><a href="{% url 'genericUser:license' %}">簽署隱私權條款</a></li>
-				
 				{% endif %}
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
@@ -85,7 +86,7 @@
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user">帳號<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li><a href="{% url 'genericUser:event_list' %}">消息</a></li>
-						{% if request.user.has_editor %}
+						{% if request.user.is_editor %}
 						<li><a href="{% url 'genericUser:serviceinfo_list' request.user.username %}">時數</a></li>
 						{% endif %}
 						<li><a href="{% url 'genericUser:info' %}">設定</a></li>
