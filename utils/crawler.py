@@ -69,9 +69,13 @@ def get_book_info(ISBN):
 		year = int(date.split('/')[0]) +1911
 		month = int(date.split('/')[1])
 		date = unicode(datetime.date(year,month,1))
-		bookbinding = 	unicode(data_tags[14].string).replace(u' ', '')
+		bookbinding = unicode(data_tags[14].string).replace(u' ', '')
 		pattern = re.compile(r'\((.*)\)')
 		bookbinding = pattern.search(bookbinding).group(1)
+		chinese_book_category = unicode(data_tags[9].string).replace(u' ', '')
+		pattern = re.compile(r'(\d{3,3}).*')
+		chinese_book_category = pattern.search(chinese_book_category).group(1)
+		order = unicode(data_tags[7].string).replace(u' ', '')
 		status = u'success'
 	except:
 		bookname=''
@@ -79,8 +83,10 @@ def get_book_info(ISBN):
 		house=''
 		date=''
 		bookbinding = ''
+		chinese_book_category = ''
+		order = ''
 		status = u'error'
-	return [status, bookname, author, house, date, bookbinding]
+	return [status, bookname, author, house, date, bookbinding, chinese_book_category, order]
 
 def ISBN10_check(ISBN):
 	match = re.search(r'^(\d{9})(\d|X)$', ISBN)

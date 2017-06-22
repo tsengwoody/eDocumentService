@@ -24,7 +24,6 @@
 		<tr>
 			<th>文件</th>
 			<th>頁數/總頁數</th>
-			<th>時數</th>
 			<th>領取日期</th>
 			<th>期限</th>
 			<th>狀態</th>
@@ -34,7 +33,6 @@
 		<tr>
 			<td>{{ part }}</td>
 			<td>{{ part.edited_page|add:'1' }}/{{ part.book.page_per_part }}</td>
-			<td>{{part.service_hours}}</td>
 			<td>{{part.get_date}}</td>
 			<td>{{part.deadline}}</td>
 			<td>{{part.status_int2str}}</td>
@@ -61,7 +59,7 @@
 		{% for part in finishPartList %}
 		<tr>
 			<td>{{part.book.book_info.bookname}}-part{{part.part}}</td>
-			<td>{{part.service_hours}}</td>
+			<td></td>
 			<td>{{part.get_date}}</td>
 			<td>{{part.status_int2str}}</td>
 			<td>

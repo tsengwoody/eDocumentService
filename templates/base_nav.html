@@ -30,13 +30,15 @@
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#">管理<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						{% if request.user.is_manager %}
-						<li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
-						<li><a href="{% url 'manager:event_list' 'ebook' %}">審核校對文件</a></li>
 						<li><a href="{% url 'manager:event_list' 'user' %}">審核會員</a></li>
 						<li><a href="{% url 'manager:statistics' %}">統計資訊</a></li>
 						{% endif %}
-						{% if request.user.is_superuser %}
+						{% if request.user.manage_org_set.all|length > 0 %}
 						<li><a href="{% url 'manager:org_manage' %}">組織管理</a></li>
+						{% endif %}
+						{% if request.user.is_superuser %}
+						<li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
+						<li><a href="{% url 'manager:event_list' 'ebook' %}">審核校對文件</a></li>
 						<li><a href="{% url 'manager:event_list' 'applydocumentaction' %}">代掃申請列表</a></li>
 						<li><a href="{% url 'genericUser:article/create' %}">訊息發佈</a></li>
 						<li><a href="{% url 'ebookSystem:book_list' %}">書籍列表</a></li>

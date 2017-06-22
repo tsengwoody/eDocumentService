@@ -15,28 +15,21 @@
 	<li>出版社：{{ book.book_info.house }}</li>
 	<li>出版日：{{ book.book_info.date }}</li>
 </ul>
-
-<form action="" method="post">
-	{% csrf_token %}
 	<table class="table table-striped table-hover">
 		<tr>
 			<th>文件</th>
 			<th>狀態</th>
-			<th>校對頁數</th>
-			<th>時數</th>
-			<th>領取日期</th>
 			<th>校對者</th>
 			<th colspan="2">預覽</th>
-			<th>分析</th>
-			<th>軌跡</th>
+			<th colspan="2">傳輸</th>
+			<th colspan="3">動作</th>
 		</tr>
 		{% for part in book.ebook_set.all %}
+		<form action="" method="post" enctype="multipart/form-data">
+{% csrf_token %}
 		<tr>
 			<td>{{ part }}</td>
 			<td>{{part.status_int2str}}</td>
-			<td>{{ part.edited_page|add:'1' }}</td>
-			<td>{{part.service_hours}}</td>
-			<td>{{part.get_date}}</td>
 			<td>{{ part.editor }}</td>
 			<td>
 				{% if part.status >= 4 %}
@@ -49,6 +42,20 @@
 				{% endif %}
 			</td>
 			<td>
+				<button type="submit" class="btn btn-default send_button" id="id_download" name="download" value={{part.ISBN_part}}>下載</button>
+</td>
+			<td>
+				<div class="form-inline">
+					<div class="form-group">
+						<input class="form-control-file file" id="id_fileObject" name="fileObject" type="file" />
+					</div>
+					<button type="submit" class="btn btn-sm btn-success" name="upload" value="{{ part.ISBN_part }}" id="id_upload">上傳</button>
+				</div>
+			</td>
+			<td>
+				<button type="submit" class="btn btn-sm btn-success" name="reset" value="{{ part.ISBN_part }}" id="id_upload">重置</button>
+			</td>
+			<td>
 				{% if part.status >= 3 %}
 				<a href="{% url 'ebookSystem:analyze_part' part.ISBN_part %}" >分析</a>
 				{% endif %}
@@ -59,7 +66,7 @@
 				{%endif%}
 			</td>
 		</tr>
+</form>
 		{% endfor %}
 	</table>
-</form>
 {% endblock %}

@@ -14,31 +14,43 @@
 
 {% block review_step1 %}
 <ul>
-    <li>書名：{{ book.book_info.bookname }}</li>
-    <li>作者：{{ book.book_info.author }}</li>
-    <li>出版社：{{ book.book_info.house }}</li>
-    <li>出版日：{{ book.book_info.date }}</li>
-    <li>ISBN：{{ book.ISBN }}</li>
+	<li>書名：{{ book.book_info.bookname }}</li>
+	<li>作者：{{ book.book_info.author }}</li>
+	<li>出版社：{{ book.book_info.house }}</li>
+	<li>出版日：{{ book.book_info.date }}</li>
+	<li>ISBN：{{ book.ISBN }}</li>
 </ul>
 {% endblock %}
 {% block review_step2 %}
+<ul>
+{% for i in sdc %}
+	<li>part{{ forloop.counter }}</li>
+{% endfor %}
+</ul>
+
+{% for scanPageList, defaultPageURL, content in sdc %}
+<h3>part{{ forloop.counter }}</h3>
 <nav>
-    <ul class="pager">
-        <li class="previous"><a id="prePage" href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
-        <li>
-            <div class="col-xs-5" style="display: inline-block;float: none;">
-                <select class="form-control" name="scanPageList" id="scanPageList" onchange="changePageSelect()">
-                    {% for scanPage in scanPageList %}
-                    <option value="{{ scanPage }}">{{ scanPage }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </li>
-        <li class="next"><a id="nextPage" href="#">Newer<span aria-hidden="true">&rarr;</span></a></li>
-    </ul>
+	<ul class="pager">
+		<li class="previous"><a id="prePage" href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
+		<li>
+			<div class="col-xs-5" style="display: inline-block;float: none;">
+
+				<select class="form-control" name="scanPageList" id="scanPageList" onchange="changePageSelect()">
+					{% for scanPage in scanPageList %}
+					<option value="{{ scanPage }}">{{ scanPage }}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</li>
+		<li class="next"><a id="nextPage" href="#">Newer<span aria-hidden="true">&rarr;</span></a></li>
+	</ul>
 </nav>
 <div class="form-group scrollbarDiv">
-    <img src="{% static defaultPageURL %}" alt="文件掃描原檔" id="scanPage" name="scanPage" />
+	<img src="{% static defaultPageURL %}" alt="文件掃描原檔-part{{ forloop.counter }}" />
 </div>
+{% autoescape off %}
+{{ content }}
+{% endautoescape %}
+{% endfor %}
 {% endblock %}
-

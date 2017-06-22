@@ -3,6 +3,7 @@ import codecs
 import datetime
 from zipfile import ZipFile
 from django.core.urlresolvers import reverse, resolve
+from django.db.models import F,Q
 from django.forms import modelform_factory
 from django.http import HttpResponseRedirect,HttpResponse, Http404
 from django.shortcuts import render
@@ -91,7 +92,13 @@ def tinymce_demo(request, template_name='ebookSystem/tinymce_demo.html'):
 @view_permission
 @http_response
 def book_list(request, template_name='ebookSystem/book_list.html'):
-	object_list = Book.objects.all()
+	from collections import defaultdict
+	books_list = []
+	for i in range(10):
+		books = BookInfo.objects.filter(
+			Q(chinese_book_category__startswith=str(i))
+		)
+		books_list.append((i, books))
 	if request.method == 'POST':
 		return locals()
 	if request.method == 'GET':
@@ -157,12 +164,18 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 	events = Event.objects.filter(content_type__model='book', object_id=book.ISBN, status=Event.STATUS['review'])
 	org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(book.book_info.ISBN,"org")
 	source_path = book.path +u'/source'
-	[scanPageList, defaultPageURL] = book.get_org_image(request.user)
+	scan_page_list, default_page_url = book.get_org_image(request.user)
+	t = []
+	for part in book.ebook_set.all():
+		import io
+		with io.open(part.get_path(), 'r', encoding='utf-8') as f:
+			t.append(f.read())
+	sdc = zip(scan_page_list, default_page_url, t)
+
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
-#			book.create_EBook()
 			for part in book.ebook_set.all():
 				part.change_status(1, 'active')
 			shutil.rmtree(org_path)
@@ -293,48 +306,72 @@ def review_ReviseContentAction(request, id, template_name='ebookSystem/review_Re
 @http_response
 def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_ApplyDocumentAction.html'):
 	from utils.uploadFile import handle_uploaded_file
-	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date'))
 	try:
 		action = ApplyDocumentAction.objects.get(id=id)
 		event = Event.objects.get(content_type__model='applydocumentaction', object_id=action.id, status=Event.STATUS['review'])
 	except:
 		raise Http404("ApplyDocumentAction does not exist")
-	if request.method == 'GET':
-		return locals()
 	if request.method == 'POST':
-		uploadPath = BASE_DIR +u'/file/ebookSystem/document/{0}'.format(action.book_info.ISBN)
-		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'])
+		#book info 設定
+		try:
+			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
+		except:
+			newBookInfo = bookInfoForm.save(commit=False)
+			newBookInfo.ISBN = request.POST['ISBN']
+			newBookInfo.save()
+		#上傳文件設定
+		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
+		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.zip')
 		if os.path.exists(uploadPath):
 			status = 'error'
 			message = u'文件已存在'
 			return locals()
 		[status, message] = handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
+		#壓縮文件測試
 		try:
 			with ZipFile(uploadFilePath, 'r') as uploadFile:
 				uploadFile.testzip()
 				uploadFile.extractall(uploadPath)
 		except:
-				shutil.rmtree(uploadPath)
-				status = 'error'
-				message = u'非正確ZIP文件'
-				return locals()
-		newBook = Book(book_info=action.book_info, ISBN=action.book_info.ISBN, path=uploadPath)
-		if not newBook.validate_folder():
+			shutil.rmtree(uploadPath)
+			status = 'error'
+			message = u'非正確ZIP文件'
+			return locals()
+		#資料夾檢查
+		from utils import validate
+		try:
+			validate.validate_folder(
+				os.path.join(uploadPath, 'OCR'),
+				os.path.join(uploadPath, 'source'),
+				50
+			)
+		except BaseException as e:
 			shutil.rmtree(uploadPath)
 			status = 'error'
 			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			return locals()
-		newBook.set_page_count()
+		#建立book object
+		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path=uploadPath, page_per_part=50)
+		try:
+			newBook.set_page_count()
+		except:
+			shutil.rmtree(uploadPath)
+			status = 'error'
+			message = u'set_page_count error'
+			return locals()
 		newBook.scaner = request.user
 		newBook.owner = request.user
 		if request.POST.has_key('designate'):
 			newBook.is_private = True
 		newBook.save()
-		Event.objects.create(creater=event.creater, action=newBook)
-		redirect_to = reverse('manager:applydocumentaction')
+		newBook.create_EBook()
+		event = Event.objects.create(creater=request.user, action=newBook)
+		redirect_to = '/'
 		status = 'success'
 		message = u'成功建立並上傳文件'
 		event.response(status=status, message=message, user=request.user)
+		return locals()
+	if request.method == 'GET':
 		return locals()
 
 @view_permission
@@ -393,7 +430,7 @@ def detail_manager(request, book_ISBN, template_name='ebookSystem/detail_manager
 				return locals()
 			download_path = attach_file_path
 			download_filename = os.path.basename(attach_file_path)
-		if request.POST.has_key('view_se'):
+		elif request.POST.has_key('view_se'):
 			getPart = EBook.objects.get(ISBN_part=request.POST['view_se'])
 			attach_file_path = getPart.get_clean_file()
 			attach_file_path = getPart.replace()
@@ -403,6 +440,37 @@ def detail_manager(request, book_ISBN, template_name='ebookSystem/detail_manager
 				return locals()
 			download_path = attach_file_path
 			download_filename = os.path.basename(attach_file_path)
+		elif request.POST.has_key('download'):
+			getPart = EBook.objects.get(ISBN_part=request.POST['download'])
+			attach_file_path = getPart.zip_full()
+			if not attach_file_path:
+				status = 'error'
+				message = u'準備文件失敗'
+				return locals()
+			download_path = attach_file_path
+			download_filename = os.path.basename(attach_file_path)
+		elif request.POST.has_key('upload'):
+			getPart = EBook.objects.get(ISBN_part=request.POST['upload'])
+			uploadFilePath = os.path.join(getPart.book.path, '{0}.zip'.format(getPart.ISBN_part))
+			with open(uploadFilePath, 'wb+') as dst:
+				for chunk in request.FILES['fileObject'].chunks():
+					dst.write(chunk)
+			try:
+				with ZipFile(uploadFilePath, 'r') as uploadFile:
+					uploadFile.testzip()
+					uploadFile.extractall(getPart.book.path +'/OCR')
+			except BaseException as e:
+				print e
+				os.remove(uploadFilePath)
+				status = 'error'
+				message = u'非正確ZIP文件'
+				return locals()
+			os.remove(uploadFilePath)
+		elif request.POST.has_key('reset'):
+			getPart = EBook.objects.get(ISBN_part=request.POST['reset'])
+			getPart.add_tag()
+			with codecs.open(getPart.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
+				finishFile.write(u'\ufeff')
 		return locals()
 	if request.method == 'GET':
 		return locals()
@@ -431,12 +499,12 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 		return locals()
 	if len(ISBN) == 10:
 		ISBN = ISBN10_to_ISBN13(ISBN)
-	[status, bookname, author, house, date, bookbinding] = get_book_info(ISBN)
+	[status, bookname, author, house, date, bookbinding, chinese_book_category, order] = get_book_info(ISBN)
 	if status == 'success':
 		message = u'成功取得資料'
 	else:
 		message = u'查無資料'
-	extra_list = ['bookname', 'author', 'house', 'date', 'ISBN', 'bookbinding']
+	extra_list = ['bookname', 'author', 'house', 'date', 'ISBN', 'bookbinding', 'chinese_book_category', 'order']
 	return locals()
 
 
@@ -501,6 +569,9 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 			if finishContent == '' or editContent == '':
 				status = 'error'
 				message = u'標記位置不可在首行或末行'
+				del request.session['postToken']
+				postToken = uuid.uuid1().hex
+				request.session['postToken'] = postToken
 				return locals()
 			part.set_content(finish_content=finishContent, edit_content=editContent)
 			part.edited_page=int(request.POST['page'])
@@ -530,6 +601,7 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 		print request.session.get('postToken',default=None)
 		return locals()
 	if request.method == 'GET':
+		print 'get'
 		postToken = uuid.uuid1().hex
 		request.session['postToken'] = postToken
 		return locals()

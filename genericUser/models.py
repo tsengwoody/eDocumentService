@@ -209,8 +209,6 @@ class Article(models.Model):
 		path = os.path.join(BASE_DIR, 'static') +u'/article/{0}/main_content.html'.format(self.id)
 		return PublicFile(path)
 
-
-
 class ContactUs(models.Model):
 	name = models.CharField(max_length=10)
 	email = models.EmailField()
@@ -228,17 +226,9 @@ class ContactUs(models.Model):
 	def __unicode__(self):
 		return self.subject
 
-class Reply(models.Model):
-	contact_us = models.ForeignKey(ContactUs)
-	message_datetime = models.DateField()
-	content = models.CharField(max_length=1000)
-	def __unicode__(self):
-		return self.message_datetime
-
 class View(models.Model):
 	namespace = models.CharField(max_length=100, )
 	url_name = models.CharField(max_length=100, )
-	kwarg = models.CharField(max_length=100, blank=True, null=True, )
 	permission = models.ManyToManyField('Permission')
 
 	def __unicode__(self):
@@ -261,11 +251,3 @@ class Permission(models.Model):
 
 	def __unicode__(self):
 		return self.name
-
-class ObjectPermission(models.Model):
-	user = models.ForeignKey(User, related_name='objectpermission_set')
-	content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-	object_id = models.PositiveIntegerField()
-
-	def __unicode__(self):
-		return self.id +'-' +self.user

@@ -14,10 +14,14 @@ from bs4 import BeautifulSoup, NavigableString
 
 class BookInfo(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
-	bookname = models.CharField(max_length=50)
-	author = models.CharField(max_length=200)
-	house = models.CharField(max_length=30)
+	bookname = models.CharField(max_length=255)
+	author = models.CharField(max_length=255)
+	house = models.CharField(max_length=255)
 	date = models.DateField()
+	bookbinding = models.CharField(max_length=255)
+	chinese_book_category = models.IntegerField()
+	order = models.CharField(max_length=255)
+
 	def __unicode__(self):
 		return self.bookname
 
@@ -56,12 +60,14 @@ class Book(models.Model):
 		self.status = status
 		if self.status_int2str() == 'finish':
 			self.finish_date = max([ i.deadline for i in self.ebook_set.all() ])
+		elif self.status_int2str() == 'final':
+			pass
 		self.save()
 		return status
 
 	def create_EBook(self, page_list=[]):
 		if page_list == []:
-			if not (len(self.ebook_set.all()) == 0 and self.validate_folder()):
+			if not len(self.ebook_set.all()) == 0:
 				return False
 			part_count = (self.page_count-1)/self.page_per_part+1
 			for i in range(part_count):
@@ -92,12 +98,19 @@ class Book(models.Model):
 		source_path = self.path +u'/source'
 		fileList=os.listdir(source_path)
 		fileList = sorted(fileList)
-		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
-		if not os.path.exists(org_path +'/' +scanPageList[0]):
+		scan_page_list = [scan_page for scan_page in fileList if scan_page.split('.')[-1].lower() == 'jpg']
+		scan_page_lists = []
+		for i in range(self.part_count-1):
+			scan_page_lists.append(
+				scan_page_list[i*self.page_per_part:(i+1)*self.page_per_part]
+			)
+		scan_page_lists.append(
+				scan_page_list[(self.part_count-1)*self.page_per_part:]
+		)
+		if not os.path.exists(org_path +'/' +scan_page_list[0]):
 			self.create_org_image()
-		default_page_url = org_path +u'/' +scanPageList[0]
-		default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
-		return [scanPageList, default_page_url]
+		default_page_url_list = [ u'{0}/{1}'.format(org_path, scan_page_list[i*self.page_per_part]).replace(BASE_DIR +'/static/', '') for i in range(self.part_count)]
+		return [scan_page_lists, default_page_url_list]
 
 	def create_org_image(self):
 		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book_info.ISBN, "org")
@@ -125,33 +138,15 @@ class Book(models.Model):
 		return self.page_count
 
 	def validate_folder(self):
+		from utils import validate
 		try:
-			source = self.path + u'/source'
-		except:
-			return False
-		sourceFileList=os.listdir(source)
-		page_count = 0
-		for scanPage in sourceFileList:
-			if scanPage.split('.')[-1].lower() == 'jpg':
-				page_count = page_count + 1
-		OCR = self.path + u'/OCR'
-		partList = []
-		OCRFileList = []
-		try:
-			OCRFileList = os.listdir(OCR)
-			for file in OCRFileList:
-				with codecs.open(os.path.join(OCR, file), 'r', encoding='utf-8') as fileRead:
-					content=fileRead.read()
-		except:
-			return False
-		part_count = (page_count-1)/self.page_per_part+1
-		for i in range(part_count):
-			partList.append('part{}.{}'.format(i+1, 'txt'))
-		partSet = set(partList)
-		for i in range(i):
-			OCRFileList[i] = OCRFileList[i].lower()
-		OCRFileSet = set(OCRFileList)
-		return partSet.issubset(OCRFileSet)
+			validate.validate_folder(
+				os.path.join(self.path, 'OCR'),
+				os.path.join(self.path, 'source'),
+				self.page_per_part,
+			)
+		except BaseException as e:
+			raise e
 
 	def zip(self, user, password):
 		from django.contrib.auth import authenticate
@@ -161,7 +156,10 @@ class Book(models.Model):
 			return False
 		zip_file_name = BASE_DIR +'/file/ebookSystem/document/{0}/OCR/{1}_{2}.zip'.format(self.book_info.ISBN, self.book_info.ISBN, user.username)
 		self.check_status()
-		zip_list = [ file.get_clean_file() for file in self.ebook_set.all() ]
+		if self.status == self.STATUS['final']:
+			zip_list = [self.path +'/OCR/{0}.epub'.format(self.ISBN)]
+		else:
+			zip_list = [ file.get_clean_file() for file in self.ebook_set.all() ]
 		try:
 			pyminizip.compress_multiple(zip_list, zip_file_name, password, 5)
 			return zip_file_name
@@ -171,17 +169,6 @@ class Book(models.Model):
 			except:
 				pass
 			return False
-#		import zipfile
-#		zf = zipfile.ZipFile(zip_file_name, "w", zipfile.zlib.DEFLATED)
-#		try:
-#			for i in range(self.part_count):
-#				tar = self.path +'/OCR/' +'part{0}-edit.txt'.format(i+1)
-#				arcname = 'part{0}-edit.txt'.format(i+1)
-#				zf.write(tar, arcname)
-#		except:
-#			pass
-#			shutil.rmtree(zip_file_name)
-#		zf.close()
 
 	def collect_is_finish(self):
 		is_finish = True
@@ -226,7 +213,7 @@ class EBook(models.Model):
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
 	status = models.IntegerField(default=0)
-	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8}
+	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8, 'final':9}
 	sc_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_edit_ebook_set')
 	sc_deadline = models.DateField(blank=True, null=True)
 	sc_get_date = models.DateField(blank=True, null=True)
@@ -252,6 +239,8 @@ class EBook(models.Model):
 	def change_status(self, direction, status, **kwargs):
 		if not self.status +direction == self.STATUS[status]:
 			return False
+
+		#正向status變化
 		if direction == 1:
 			if self.status +direction == self.STATUS['active']:
 				if os.path.exists(self.get_path()) and not os.path.exists(self.get_path('-edit')):
@@ -319,10 +308,12 @@ class EBook(models.Model):
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['an_finish']:
 				self.status = self.status +direction
+			elif self.status +direction == self.STATUS['final']:
+				self.status = self.status +direction
+
+		#反向status變化
 		elif direction == -1:
-			if self.status +direction == self.STATUS['inactive']:
-				return False
-			elif self.status +direction == self.STATUS['active']:
+			if self.status +direction == self.STATUS['active']:
 				self.editor=None
 				self.get_date = None
 				self.deadline = None
@@ -331,22 +322,20 @@ class EBook(models.Model):
 				self.edit_page = 0
 				self.load_full_content()
 				self.status = self.status +direction
-			elif self.status +direction == self.STATUS['review']:
-				return False
 			elif self.status +direction == self.STATUS['finish']:
 				self.sc_editor = None
 				self.sc_get_date = None
 				self.sc_deadline = None
 				self.status = self.status +direction
-			elif self.status +direction == self.STATUS['sc_edit']:
-				return False
 			elif self.status +direction == self.STATUS['sc_finish']:
 				self.an_editor = None
 				self.an_get_date = None
 				self.an_deadline = None
 				self.status = self.status +direction
-			elif self.status +direction == self.STATUS['an_edit']:
+			else:
 				return False
+
+		#儲存並確認book object status
 		self.save()
 		self.book.check_status()
 		return self.status
@@ -367,9 +356,9 @@ class EBook(models.Model):
 	def get_path(self, string=''):
 		if string == 'public':
 			return self.book.path.replace('/file', '/static')
-		elif string in ['-clean', '-ge', '-sc', '-an', '-final', '-re']:
+		elif string in ['-clean', '-ge', '-sc', '-an', '-final',]:
 			return self.book.path +'/OCR/part{0}{1}.html'.format(self.part, string)
-		else:
+		elif string in ['', '-edit', '-finish']:
 			return self.book.path +'/OCR/part{0}{1}.txt'.format(self.part, string)
 
 	def fuzzy_string_search(self, string, length=5, action=''):
@@ -635,10 +624,13 @@ class EBook(models.Model):
 			return self.get_path('-ge')
 		elif self.STATUS['sc_finish'] <= self.status < self.STATUS['an_finish']:
 			return self.get_path('-sc')
-		elif self.STATUS['an_finish'] <= self.status:
+		elif self.STATUS['an_finish'] <= self.status < self.STATUS['final']:
 			return self.get_path('-an')
+		elif self.STATUS['final'] <= self.status:
+			return self.get_path('-final')
 		else:
 			return None
+
 	def get_clean_file(self):
 		if self.STATUS['finish'] <= self.status < self.STATUS['sc_finish']:
 			shutil.copy2(self.get_path('-ge'), self.get_path('-clean'))
@@ -656,7 +648,8 @@ class EBook(models.Model):
 		user = authenticate(username=user.username, password=password)
 		if user is None:
 			return False
-		zip_file_name = BASE_DIR +'/file/ebookSystem/document/{0}/OCR/{1}_{2}.zip'.format(self.book.book_info.ISBN, self.ISBN_part, user.username)
+		zip_file_name = BASE_DIR +'/file/ebookSystem/document/{0}/OCR/{1}-{2}.zip'.format(self.book.book_info.ISBN, self.ISBN_part, user.username)
+		str_file_list = ['edit', 'finish']
 		zip_list = [self.get_clean_file()]
 		try:
 			pyminizip.compress_multiple(zip_list, zip_file_name, password, 5)
@@ -667,6 +660,21 @@ class EBook(models.Model):
 			except:
 				pass
 			return False
+
+	def zip_full(self, ):
+		from django.contrib.auth import authenticate
+		import pyminizip
+		zip_file_name = BASE_DIR +'/file/ebookSystem/document/{0}/OCR/{1}.zip'.format(self.book.book_info.ISBN, self.ISBN_part, )
+		zip_list = [self.get_path(), self.get_path('-edit'), self.get_path('-finish'), ]
+		try:
+			pyminizip.compress_multiple(zip_list, zip_file_name, '', 5)
+			return zip_file_name
+		except BaseException as e:
+			try:
+				os.remove(zip_file_name)
+				raise e
+			except:
+				raise e
 
 	def edit_distance(self, src, dst, encoding='utf-8'):
 		import Levenshtein
@@ -788,7 +796,7 @@ class EditRecord(models.Model):
 
 	def compute_service_hours(self):
 		service_hours = 0
-		for editLog in self.editlog_set.all().order_by('order'):
+		for editLog in self.editlog_set.filter(user=self.editor).order_by('order'):
 			if editLog.edit_count != 0:
 				service_hours = service_hours +1
 				continue

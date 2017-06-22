@@ -22,7 +22,10 @@ function getBookInfo(ISBN, transferData) {
             $('#id_author').val(json.author);
             $('#id_date').val(json.date);
             $('#id_house').val(json.house);
-            $('#id_ISBN').val(json.ISBN);
+			$('#id_bookbinding').val(json.bookbinding);
+			$('#id_chinese_book_category').val(json.chinese_book_category);
+			$('#id_order').val(json.order);
+			$('#id_ISBN').val(json.ISBN);
             //TODO: GET ISBN
             $('#id_get_isbn_load_icon').hide();
 

@@ -7,9 +7,31 @@
 {% endblock %}
 {% block content %}
 <h3>書籍列表</h3>
-<ul class="list-group">
-	{% for book in object_list %}
-		<li  class="list-group-item"><a href="{%url "ebookSystem:detail" book.ISBN %}">{{ book }}</a></li>
-		{% endfor %}
-	</ul>
+{% for books in books_list %}
+<h4>圖書分類號：{{ books.0 }}</h4>
+<table>
+	<tr>
+		<th>ISBN</th>
+		<th>書名</th>
+		<th>裝訂冊數</th>
+		<th>版次</th>
+		<th>作者</th>
+		<th>出版社</th>
+		<th>出版日期</th>
+		<th>資訊</th>
+	</tr>
+	{% for bookinfo in books.1 %}
+	<tr>
+		<td>{{ bookinfo.ISBN }}</td>
+		<td>{{ bookinfo.bookname }}</td>
+		<td>{{ bookinfo.bookbinding }}</td>
+		<td>{{ bookinfo.order }}</td>
+		<td>{{ bookinfo.author }}</td>
+		<td>{{ bookinfo.house }}</td>
+		<td>{{ bookinfo.date }}</td>
+		<td><a href = /ebookSystem/detail/{{bookinfo.ISBN}}/>詳細資訊</a></td>
+	</tr>
+	{% endfor %}
+</table>
+{% endfor %}
 {% endblock %}

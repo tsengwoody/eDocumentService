@@ -137,30 +137,32 @@ def article_create(request, template_name='genericUser/article/create.html'):
 		articleForm = ArticleForm()
 		return locals()
 
-
 @view_permission
 @http_response
 def create_document(request, template_name='genericUser/create_document.html'):
-	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date'))
+	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date', 'bookbinding', 'chinese_book_category', 'order'))
 	if request.method == 'POST':
+		#book info 設定
 		bookInfoForm = BookInfoForm(request.POST)
 		if not bookInfoForm.is_valid():
 			status = 'error'
 			message = u'表單驗證失敗' + str(bookInfoForm.errors)
 			return locals()
-		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
-		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'])
-		if os.path.exists(uploadPath):
-			status = 'error'
-			message = u'文件已存在'
-			return locals()
-		[status, message] = handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
 		try:
 			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
 		except:
 			newBookInfo = bookInfoForm.save(commit=False)
 			newBookInfo.ISBN = request.POST['ISBN']
 			newBookInfo.save()
+		#上傳文件設定
+		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
+		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.zip')
+		if os.path.exists(uploadPath):
+			status = 'error'
+			message = u'文件已存在'
+			return locals()
+		[status, message] = handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
+		#壓縮文件測試
 		try:
 			with ZipFile(uploadFilePath, 'r') as uploadFile:
 				uploadFile.testzip()
@@ -170,13 +172,28 @@ def create_document(request, template_name='genericUser/create_document.html'):
 			status = 'error'
 			message = u'非正確ZIP文件'
 			return locals()
-		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path=uploadPath, page_per_part=50)
-		if not newBook.validate_folder():
+		#資料夾檢查
+		from utils import validate
+		try:
+			validate.validate_folder(
+				os.path.join(uploadPath, 'OCR'),
+				os.path.join(uploadPath, 'source'),
+				50
+			)
+		except BaseException as e:
 			shutil.rmtree(uploadPath)
 			status = 'error'
 			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
 			return locals()
-		newBook.set_page_count()
+		#建立book object
+		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path=uploadPath, page_per_part=50)
+		try:
+			newBook.set_page_count()
+		except:
+			shutil.rmtree(uploadPath)
+			status = 'error'
+			message = u'set_page_count error'
+			return locals()
 		newBook.scaner = request.user
 		newBook.owner = request.user
 		if request.POST.has_key('designate'):
@@ -191,61 +208,63 @@ def create_document(request, template_name='genericUser/create_document.html'):
 	if request.method == 'GET':
 		return locals()
 
-
 @view_permission
 @http_response
 def upload_document(request, template_name='genericUser/upload_document.html'):
-	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date'))
+	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date', 'bookbinding', 'chinese_book_category', 'order'))
 	if request.method == 'POST':
+		#book info 設定
 		bookInfoForm = BookInfoForm(request.POST)
 		if not bookInfoForm.is_valid():
 			status = 'error'
 			message = u'表單驗證失敗' + str(bookInfoForm.errors)
 			return locals()
-		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
-		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'])
-		if os.path.exists(uploadPath):
-			status = 'error'
-			message = u'文件已存在'
-			return locals()
-		[status, message] = handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
 		try:
 			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
 		except:
 			newBookInfo = bookInfoForm.save(commit=False)
 			newBookInfo.ISBN = request.POST['ISBN']
 			newBookInfo.save()
+		#上傳文件設定
+		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
+		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.' +request.POST['category'])
+		if os.path.exists(uploadPath):
+			status = 'error'
+			message = u'文件已存在'
+			return locals()
+		[status, message] = handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
+		#根據選擇上傳格式作業
+		final_file = os.path.join(uploadPath, 'OCR') + '/{0}.{1}'.format(request.POST['ISBN'], request.POST['category'])
+		#txt
 		if request.POST['category'] == 'txt':
-			final_file = os.path.join(uploadPath, 'OCR') + '/part1.txt'
 			try:
 				os.makedirs(os.path.dirname(final_file))
+				shutil.copy2(uploadFilePath, final_file)
 			except:
 				shutil.rmtree(uploadPath)
 				status = 'error'
-				message = u'非正確{0}文件'.format(request.POST['category'])
+				message = u'建立文件失敗'
 				return locals()
+
+		#epub
+		if request.POST['category'] == 'epub':
+			try:
+				os.makedirs(os.path.dirname(final_file))
+				shutil.copy2(uploadFilePath, final_file)
+			except:
+				shutil.rmtree(uploadPath)
+				status = 'error'
+				message = u'建立文件失敗'
+				return locals()
+
+		#建立book object和ebook object
 		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path=uploadPath)
 		newBook.scaner = request.user
 		newBook.owner = request.user
 		newBook.save()
 		ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN'] + '-1', begin_page=-1, end_page=-1)
-		if request.POST['category'] == 'txt':
-			try:
-				shutil.copy2(uploadFilePath, final_file)
-				ebook.add_tag()
-				shutil.copy2(ebook.get_path('-edit'), ebook.get_path('-finish'))
-				with codecs.open(self.get_path('-edit'), 'w', encoding='utf-8') as editFile:
-					editFile.write(u'\ufeff')
-				ebook.add_template_tag(ebook.get_path('-finish'), ebook.get_path('-ge'))
-				ebook.clean_tag(ebook.get_path('-ge'), ebook.get_path('-ge'))
-				ebook.clean_tag(ebook.get_path('-ge'), ebook.get_path('-sc'))
-				ebook.status = ebook.STATUS['sc_finish']
-			except:
-				shutil.rmtree(uploadPath)
-				newBook.delete()
-				status = 'error'
-				message = u'處理{0}文件錯誤'.format(request.POST['category'])
-				return locals()
+		ebook.change_status(9, 'final')
+
 		redirect_to = '/'
 		status = 'success'
 		message = u'成功建立並上傳文件'
@@ -276,14 +295,20 @@ def upload_progress(request):
 @view_permission
 @http_response
 def apply_document(request, template_name='genericUser/apply_document.html'):
-	BookInfoForm = modelform_factory(BookInfo, fields=('ISBN', 'bookname', 'author', 'house', 'date'))
+	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date', 'bookbinding', 'chinese_book_category', 'order'))
 	if request.method == 'POST':
+		#book info 設定
 		bookInfoForm = BookInfoForm(request.POST)
 		if not bookInfoForm.is_valid():
 			status = 'error'
 			message = u'表單驗證失敗' + str(bookInfoForm.errors)
 			return locals()
-		newBookInfo = bookInfoForm.save()
+		try:
+			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
+		except:
+			newBookInfo = bookInfoForm.save(commit=False)
+			newBookInfo.ISBN = request.POST['ISBN']
+			newBookInfo.save()
 		applyDocumentAction = ApplyDocumentAction.objects.create(book_info=newBookInfo)
 		event = Event.objects.create(creater=request.user, action=applyDocumentAction)
 		redirect_to = '/'
@@ -292,7 +317,6 @@ def apply_document(request, template_name='genericUser/apply_document.html'):
 		return locals()
 	if request.method == 'GET':
 		return locals()
-
 
 @view_permission
 def event_list(request):
@@ -341,12 +365,12 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 		return locals()
 	if len(ISBN) == 10:
 		ISBN = ISBN10_to_ISBN13(ISBN)
-	[status, bookname, author, house, date] = get_book_info(ISBN)
+	[status, bookname, author, house, date, bookbinding, chinese_book_category, order] = get_book_info(ISBN)
 	if status == 'success':
 		message = u'成功取得資料'
 	else:
 		message = u'查無資料'
-	extra_list = ['bookname', 'author', 'house', 'date', 'ISBN']
+	extra_list = ['bookname', 'author', 'house', 'date', 'bookbinding', 'chinese_book_category', 'order', 'ISBN']
 	return locals()
 
 
@@ -365,7 +389,7 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 		return locals()
 	if request.method == 'POST':
 		print Permission.objects.all()
-		for item in ['active', 'editor', 'guest', ]:
+		for item in ['active', 'editor', 'guest', 'manager', 'advanced_editor', ]:
 			exec("user.is_{0} = True if request.POST.has_key('{0}') else False".format(item))
 			p = Permission.objects.get(codename=item)
 			exec("user.permission.add(p) if request.POST.has_key('{0}') else user.permission.remove(p)".format(item))

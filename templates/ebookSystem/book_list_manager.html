@@ -1,0 +1,15 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+書籍列表
+{% endblock %}
+{% block header %}
+書籍列表
+{% endblock %}
+{% block content %}
+<h3>書籍列表</h3>
+<ul class="list-group">
+	{% for book in object_list %}
+		<li  class="list-group-item"><a href="{%url "ebookSystem:detail" book.ISBN %}">{{ book }}</a></li>
+		{% endfor %}
+	</ul>
+{% endblock %}

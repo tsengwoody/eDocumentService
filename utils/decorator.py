@@ -9,12 +9,8 @@ from genericUser.models import View
 def view_permission(view):
 	def decorator(request, *args, **kwargs):
 		r = resolve(request.path)
-		kwarg = ''
-		for k,v in r.kwargs.iteritems():
-			kwarg = kwarg +'{0}:{1},'.format(k,v)
-		kwarg = None if len(kwarg) == 0 else kwarg[:-1]
 		try:
-			v = View.objects.get(namespace=r.namespace, url_name=r.url_name, kwarg=kwarg)
+			v = View.objects.get(namespace=r.namespace, url_name=r.url_name)
 		except View.DoesNotExist:
 			v = None
 		response = {}

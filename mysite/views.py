@@ -53,7 +53,7 @@ def register(request, template_name='registration/register.html'):
 		newUser.save()
 		newUser.permission.add(
 			Permission.objects.get(codename='active'),
-			Permission.objects.get(codename='license')
+			Permission.objects.get(codename='license'),
 		)
 		if request.POST['role'] == 'Editor':
 			try:
