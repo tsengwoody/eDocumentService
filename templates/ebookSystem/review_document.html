@@ -1,56 +1,111 @@
 ﻿{% extends "ebookSystem/review.html" %}
+
 {% load staticfiles %}
+
 {% block title %}
+
 {{ book.book_info.bookname }}審核
+
 {% endblock %}
+
 {% block header %}
+
 {{ book.book_info.bookname }}審核
+
 {% endblock %}
+
 {% block review_title %}{{ book.book_info.bookname }}審核{% endblock %}
 
+
+
 {% block review_step1_title %}Step1:基本資料{% endblock %}
+
 {% block review_step2_title %}Step2:掃描內容{% endblock %}
+
 {% block review_step3_title %}Step3:審查結果{% endblock %}
 
+
+
 {% block review_step1 %}
+
 <ul>
+
 	<li>書名：{{ book.book_info.bookname }}</li>
+
 	<li>作者：{{ book.book_info.author }}</li>
+
 	<li>出版社：{{ book.book_info.house }}</li>
+
 	<li>出版日：{{ book.book_info.date }}</li>
+
 	<li>ISBN：{{ book.ISBN }}</li>
+
 </ul>
+
 {% endblock %}
+
+
 {% block review_step2 %}
-<ul>
+
+<ul class="nav nav-tabs">
+
 {% for i in sdc %}
-	<li>part{{ forloop.counter }}</li>
+
+	<li><a href="#step2_part{{ forloop.counter }}_div" data-toggle="tab">part{{ forloop.counter }}</a></li>
+
 {% endfor %}
+
 </ul>
 
-{% for scanPageList, defaultPageURL, content in sdc %}
-<h3>part{{ forloop.counter }}</h3>
-<nav>
-	<ul class="pager">
-		<li class="previous"><a id="prePage" href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
-		<li>
-			<div class="col-xs-5" style="display: inline-block;float: none;">
+<div class="tab-content">
 
-				<select class="form-control" name="scanPageList" id="scanPageList" onchange="changePageSelect()">
+	{% for scanPageList, defaultPageURL, content in sdc %}
+
+	<div class="tab-pane" id="step2_part{{ forloop.counter }}_div">
+
+		<div style="margin:20px 0px 10px 0px;">
+			<button type="button" class="btn btn-info" onclick="review_doc_scrto('{{ forloop.counter }}', 'true')">顯示捲動至最初頁</button>
+			<button type="button" class="btn btn-info" onclick="review_doc_scrto('{{ forloop.counter }}', 'false')">顯示捲動至最後頁</button>
+		</div>
+
+		<ul class="pager" style="justify-content:space-between">
+			<li class="previous"><a href="#" onclick="review_doc_changeimg('{{ forloop.counter }}',-1); return false;"><span aria-hidden="true">&larr;</span> Older</a></li>
+
+			<li class="col-xs-5" style="display: inline-block;float: none;">
+				<select id="step2_part{{ forloop.counter }}_select" class="form-control" onchange="review_doc_viewimg('{{ forloop.counter }}')">
+
 					{% for scanPage in scanPageList %}
+
 					<option value="{{ scanPage }}">{{ scanPage }}</option>
+
 					{% endfor %}
+
 				</select>
-			</div>
-		</li>
-		<li class="next"><a id="nextPage" href="#">Newer<span aria-hidden="true">&rarr;</span></a></li>
-	</ul>
-</nav>
-<div class="form-group scrollbarDiv">
-	<img src="{% static defaultPageURL %}" alt="文件掃描原檔-part{{ forloop.counter }}" />
+
+			</li>
+		  
+			<li class="next"><a href="#" onclick="review_doc_changeimg('{{ forloop.counter }}',1); return false;">Newer<span aria-hidden="true">&rarr;</span></a></li>
+		</ul>
+
+		<div id="step2_part{{ forloop.counter }}_divimg" class="col-xs-6" style="height:400px; overflow: scroll;">
+
+			<img id="step2_part{{ forloop.counter }}_img" src="{% static defaultPageURL %}" alt="文件掃描原檔-part{{ forloop.counter }}" />
+
+		</div>
+
+		{% autoescape off %}
+		<div id="step2_part{{ forloop.counter }}_divtext" class="col-xs-6" style="height:400px; overflow-y: scroll;">
+
+			{{ content }}
+
+		</div>
+		{% endautoescape %}
+
+	</div>
+
+	{% endfor %}
+
 </div>
-{% autoescape off %}
-{{ content }}
-{% endautoescape %}
-{% endfor %}
+
 {% endblock %}
+
