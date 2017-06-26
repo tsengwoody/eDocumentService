@@ -59,7 +59,7 @@ function review_doc_scrto(ipart, btop) {
 	let divtext=$('#'+'step2_part'+ipart+'_divtext');
 
 	//two mode
-	if(btop==='true'){
+	if(btop===true){
 		let opt=$(opts[0]);
 		opt[0].selected = true; 
 		sel.change();
@@ -127,6 +127,16 @@ function review_doc_viewimg(ipart){
 
 }
 
+function review_doc_zoom(ipart, value) {
+	let img=$('#'+'step2_part'+ipart+'_img');
+	let inp=$('#'+'step2_part'+ipart+'_inpzoom');
+	if (parseInt(inp.val())+ parseInt(value)>0){
+	
+		let v = (parseInt(inp.val())+ parseInt(value)).toString() + '%';
+		inp.val(v);
+		img.css('width', v);
+	}
+}
 
 $(document).ready(function() {
 	console.log("ready!");
