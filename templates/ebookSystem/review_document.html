@@ -57,6 +57,21 @@
 
 </ul>
 
+
+<script>
+	function review_doc_zoom(ipart, value) {
+		let img=$('#'+'step2_part'+ipart+'_img');
+		let inp=$('#'+'step2_part'+ipart+'_inpzoom');
+		if (parseInt(inp.val())+ parseInt(value)>0){
+		
+			let v = (parseInt(inp.val())+ parseInt(value)).toString() + '%';
+			inp.val(v);
+			img.css('width', v);
+		}
+	}
+</script>
+
+
 <div class="tab-content">
 
 	{% for scanPageList, defaultPageURL, content in sdc %}
@@ -64,8 +79,8 @@
 	<div class="tab-pane" id="step2_part{{ forloop.counter }}_div">
 
 		<div style="margin:20px 0px 10px 0px;">
-			<button type="button" class="btn btn-info" onclick="review_doc_scrto('{{ forloop.counter }}', 'true')">顯示捲動至最初頁</button>
-			<button type="button" class="btn btn-info" onclick="review_doc_scrto('{{ forloop.counter }}', 'false')">顯示捲動至最後頁</button>
+			<button type="button" class="btn btn-info" onclick="review_doc_scrto('{{ forloop.counter }}', true)">顯示捲動至最初頁</button>
+			<button type="button" class="btn btn-info" onclick="review_doc_scrto('{{ forloop.counter }}', false)">顯示捲動至最後頁</button>
 		</div>
 
 		<ul class="pager" style="justify-content:space-between">
@@ -87,9 +102,27 @@
 			<li class="next"><a href="#" onclick="review_doc_changeimg('{{ forloop.counter }}',1); return false;">Newer<span aria-hidden="true">&rarr;</span></a></li>
 		</ul>
 
-		<div id="step2_part{{ forloop.counter }}_divimg" class="col-xs-6" style="height:400px; overflow: scroll;">
+		<div class="col-xs-6">
 
-			<img id="step2_part{{ forloop.counter }}_img" src="{% static defaultPageURL %}" alt="文件掃描原檔-part{{ forloop.counter }}" />
+			<div id="step2_part{{ forloop.counter }}_divimg"  style="height:400px; overflow: scroll;">
+
+				<img id="step2_part{{ forloop.counter }}_img" src="{% static defaultPageURL %}" alt="文件掃描原檔-part{{ forloop.counter }}" style="width:100%"/>
+
+			</div>
+
+			<div class="input-group col-md-3 pull-right">
+
+				<span class="input-group-btn">
+					<button class="btn btn-default btn-sm" type="button" onclick="review_doc_zoom('{{ forloop.counter }}',-10)">-</button>
+				</span>
+											
+				<input id="step2_part{{ forloop.counter }}_inpzoom" class="form-control input-sm" type="text" size="2" value="100%" readonly="true">
+
+				<span class="input-group-btn">
+					<button class="btn btn-default btn-sm" type="button" onclick="review_doc_zoom('{{ forloop.counter }}',10)">+</button>
+				</span>
+
+			</div>
 
 		</div>
 

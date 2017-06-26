@@ -59,7 +59,7 @@ function review_doc_scrto(ipart, btop) {
 	let divtext=$('#'+'step2_part'+ipart+'_divtext');
 
 	//two mode
-	if(btop==='true'){
+	if(btop===true){
 		let opt=$(opts[0]);
 		opt[0].selected = true; 
 		sel.change();
