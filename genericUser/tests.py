@@ -93,26 +93,59 @@ class create_documentViewTests(baseViewTests):
 			reverse(
 				'genericUser:create_document'
 			),
-			{
+{
 				u'ISBN': u'9789866031632',
-				u'author': u'\u6e6f\u59c6.\u72c4\u99ac\u514b(Tom DeMarco), \u63d0\u6469\u897f.\u674e\u65af\u7279(Timothy Lister)\u8457; \u9322\u4e00\u4e00\u8b6f',
-				u'house': u'\u7d93\u6fdf\u65b0\u6f6e\u793e',
-				u'bookname': u'Peopleware\u8166\u529b\u5bc6\u96c6\u7522\u696d\u7684\u4eba\u624d\u7ba1\u7406\u4e4b\u9053',
+				u'author': u'湯姆.狄馬克(Tom DeMarco), 提摩西.李斯特(Timothy Lister)著; 錢一一譯',
+				u'house': u'經濟新潮社',
+				u'bookname': u'Peopleware腦力密集產業的人才管理之道',
 				u'date': u'2014-12-01',
-				u'bookbinding': 'bookbinding test',
-				u'chinese_book_category': 'cbc test',
-				u'order': 'order test',
+				u'bookbinding': '平裝',
+				u'chinese_book_category': '494',
+				u'order': '二版',
 				'fileObject': book_file,
 			},
-#			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
 		book_file.close()
-		self.assertEqual(len(Book.objects.all()), 1, 'create book fail')
-		
+		print response.json()['message']
+		self.assertEqual(len(Book.objects.all()), 1, len(Book.objects.all()))
 
 	def tearDown(self):
 		try:
 			shutil.rmtree(BASE_DIR +'/file/ebookSystem/document/{}'.format('9789866031632'))
 #			shutil.rmtree(os.path.join(BASE_DIR, '/file/ebookSystem/document/9789866031632'))
+		except BaseException as e:
+			print('error')
+			print(e)
+
+class upload_documentViewTests(baseViewTests):
+	def test_correct_case(self):
+		book_file = open(BASE_DIR +u'/temp/人工智慧來了.epub')
+		response = self.client.post(
+			reverse(
+				'genericUser:upload_document'
+			),
+			{
+				u'ISBN': u'9789571074047',
+				u'author': u'宮下奈都作; 王蘊潔譯',
+				u'house': u'尖端',
+				u'bookname': u'羊與鋼之森',
+				u'date': u'2017-05-01',
+				u'bookbinding': '平裝',
+				u'chinese_book_category': '861',
+				u'order': '1版',
+				'fileObject': book_file,
+				'category': 'epub',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		book_file.close()
+		print response.json()['message']
+		self.assertEqual(len(Book.objects.all()), 1, len(Book.objects.all()))
+
+	def tearDown(self):
+		try:
+#			shutil.rmtree(BASE_DIR +u'/temp/羊與鋼之森.epub')
+			pass
 		except BaseException as e:
 			print(e)

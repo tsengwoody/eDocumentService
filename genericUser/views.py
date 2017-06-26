@@ -250,7 +250,8 @@ def upload_document(request, template_name='genericUser/upload_document.html'):
 		if request.POST['category'] == 'epub':
 			try:
 				os.makedirs(os.path.dirname(final_file))
-				shutil.copy2(uploadFilePath, final_file)
+				from utils.epub import through
+				through(uploadFilePath, final_file)
 			except:
 				shutil.rmtree(uploadPath)
 				status = 'error'

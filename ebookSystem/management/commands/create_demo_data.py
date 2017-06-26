@@ -330,6 +330,10 @@ class Command(BaseCommand):
 #			assert ebook.change_status(1, 'review'), 'change status error'
 #			assert ebook.change_status(1, 'finish'), 'change status error'
 
+		src = BASE_DIR +u'/temp/羊與鋼之森.epub'
+
+
+
 		src = BASE_DIR +'/temp/article_NVDA.zip'
 		with open(src) as fileObject:
 			factory = RequestFactory()

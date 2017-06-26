@@ -18,9 +18,9 @@ class BookInfo(models.Model):
 	author = models.CharField(max_length=255)
 	house = models.CharField(max_length=255)
 	date = models.DateField()
-	bookbinding = models.CharField(max_length=255)
-	chinese_book_category = models.IntegerField()
-	order = models.CharField(max_length=255)
+	bookbinding = models.CharField(max_length=255, blank=True, null=True)
+	chinese_book_category = models.IntegerField(blank=True, null=True)
+	order = models.CharField(max_length=255, blank=True, null=True)
 
 	def __unicode__(self):
 		return self.bookname
@@ -38,6 +38,7 @@ class Book(models.Model):
 	owner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='own_book_set')
 	upload_date = models.DateField(default = timezone.now)
 	is_private = models.BooleanField(default=False)
+	source = models.CharField(max_length=100, blank=True, null=True)
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8}
 
@@ -45,8 +46,10 @@ class Book(models.Model):
 		return self.book_info.bookname
 
 	def delete(self, *args, **kwargs):
-		shutil.rmtree(self.path)
-		print 'delete'
+		try:
+			shutil.rmtree(self.path)
+		except:
+			pass
 		super(Book, self).delete(*args, **kwargs)
 
 	def status_int2str(self):
@@ -243,11 +246,9 @@ class EBook(models.Model):
 		#正向status變化
 		if direction == 1:
 			if self.status +direction == self.STATUS['active']:
-				if os.path.exists(self.get_path()) and not os.path.exists(self.get_path('-edit')):
-					self.add_tag()
-				if not os.path.exists(self.get_path('-finish')):
-					with codecs.open(self.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
-						finishFile.write(u'\ufeff')
+				self.add_tag()
+				with codecs.open(self.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
+					finishFile.write(u'\ufeff')
 				try:
 					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
 				except:

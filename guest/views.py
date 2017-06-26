@@ -55,7 +55,6 @@ def book_repository(request, template_name='guest/book_repository.html'):
 			download_filename = os.path.basename(attach_file_path)
 		if request.POST.has_key('delete'):
 			deleteBook = Book.objects.get(ISBN=request.POST['delete'])
-			shutil.rmtree(deleteBook.path)
 			deleteBook.delete()
 			status = 'success'
 			message = u'成功刪除文件'
