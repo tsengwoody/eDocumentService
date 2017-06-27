@@ -24,7 +24,7 @@ class PublicFile(object):
 		self.url = path.replace(BASE_DIR +'/static/', '')
 
 class User(AbstractUser):
-	phone = models.CharField(max_length=30, unique=True)
+	phone = models.CharField(max_length=30)
 	birthday = models.DateField()
 	EDU = (
 		(u'高中' , u'高中'),
@@ -231,6 +231,9 @@ class View(models.Model):
 	url_name = models.CharField(max_length=100, )
 	permission = models.ManyToManyField('Permission')
 
+	class Meta:
+		unique_together = (('namespace', 'url_name',),)
+
 	def __unicode__(self):
 		if self.kwarg:
 			return self.namespace +'-' +self.url_name +'-' +self.kwarg
@@ -246,8 +249,8 @@ class View(models.Model):
 			return False
 
 class Permission(models.Model):
-	name = models.CharField(max_length=100, )
-	codename = models.CharField(max_length=255, )
+	name = models.CharField(max_length=100, unique=True)
+	codename = models.CharField(max_length=255, unique=True)
 
 	def __unicode__(self):
 		return self.name
