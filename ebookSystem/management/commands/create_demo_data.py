@@ -229,10 +229,7 @@ class Command(BaseCommand):
 			},
 #				HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 			)
-#			factory = RequestFactory()
-#			request = factory.post(reverse('genericUser:create_document'), {'bookname':u'藍色駭客', 'author':u'傑佛瑞．迪佛', 'house':u'皇冠', 'ISBN':u'9789573321569', 'date':u'2013-07-11', 'fileObject':fileObject})
-#		request.user = root
-#		response = create_document(request)
+
 #		print response.json()['message']
 		assert response.status_code == 302, 'status_code' +str(response.status_code)
 		assert len(Book.objects.all())==1, 'create book fail'
@@ -294,7 +291,7 @@ class Command(BaseCommand):
 		assert ebook.change_status(1, 'review'), 'change status error'
 		assert ebook.change_status(1, 'finish'), 'change status error'
 		assert ebook.change_status(1, 'sc_edit', user=root), 'change status error'
-		ebook.save()
+
 		src = BASE_DIR +u'/temp/山羊島的藍色奇蹟.zip'
 		with open(src) as book_file:
 			client = Client()
@@ -320,19 +317,38 @@ class Command(BaseCommand):
 		assert os.path.exists(book.path), 'book resource folder not exist'
 		assert len(EBook.objects.all()) == 16, 'create part fail'
 		assert len(book.ebook_set.all())==6, 'create part fail'
-#		src = BASE_DIR +'/temp/part-finish.zip'
-#		dst = book.path +u'/OCR'
-#		with ZipFile(src, 'r') as partFile:
-#			partFile.extractall(dst)
-#		for ebook in book.ebook_set.all():
-#			assert ebook.change_status(1, 'edit', user=root), 'change status error'
-#			ebook.service_hours = 80
-#			assert ebook.change_status(1, 'review'), 'change status error'
-#			assert ebook.change_status(1, 'finish'), 'change status error'
+
+		book_file = open(BASE_DIR +u'/temp/自創思維.epub')
+		client = Client()
+		client.login(username='root', password='root')
+		response = client.post(
+			reverse(
+				'genericUser:upload_document'
+			),
+			{
+				u'ISBN': u'9789863981459',
+				u'author': u'雷德.霍夫曼(Reid Hoffman), 班.卡斯諾查(Ben Casnocha)著; 洪慧芳譯',
+				u'house': u'天下雜誌',
+				u'bookname': u'自創思維: 人生是永遠的測試版,瞬息萬變世界的新工作態度',
+				u'date': u'2016-02-01',
+				u'bookbinding': '平裝',
+				u'chinese_book_category': '494',
+				u'order': '第二版',
+				'fileObject': book_file,
+				'category': 'epub',
+			},
+#			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		book_file.close()
+		assert response.status_code == 302, 'status_code' +str(response.status_code)
+		assert len(Book.objects.all())==3, 'create book fail'
+
+		src = BASE_DIR +'/temp/part-finish.zip'
+		dst = book.path +u'/OCR'
+		with ZipFile(src, 'r') as partFile:
+			partFile.extractall(dst)
 
 		src = BASE_DIR +u'/temp/羊與鋼之森.epub'
-
-
 
 		src = BASE_DIR +'/temp/article_NVDA.zip'
 		with open(src) as fileObject:

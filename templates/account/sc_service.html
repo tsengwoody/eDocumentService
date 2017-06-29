@@ -104,7 +104,7 @@
 			<td>{{ part.sc_get_date }}</td>
 			<td>{{part.status_int2str}}</td>
 			<td>
-				<a class="btn btn-link" role="button" href = {% url 'ebookSystem:special_content' part.ISBN_part %}>編輯</a>
+				<a class="btn btn-link" role="button" href = {% url 'ebookSystem:full_edit' part.ISBN_part %}>編輯</a>
 				<img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_load_icon" />
 			</td>
 			<td>

@@ -5,10 +5,12 @@ from . import views
 urlpatterns = [
 	url(r'^mathml', views.mathml, name='mathml'),
 	url(r'^tinymce_demo', views.tinymce_demo, name='tinymce_demo'),
+	url(r'^get_resource', views.get_resource, name='get_resource'),
 	url(r'^advanced/edit_(?P<type>\w+)/(?P<id>[0-9\-]+)/$', views.edit_SpecialContent, name='edit_SpecialContent'),
 	url(r'^analyze_part/(?P<ISBN_part>[\d-]+)/$', views.analyze_part, name='analyze_part'),
 	url(r'^book_info/(?P<ISBN>[0-9Xx]+)/$', views.book_info, name='book_info'),
 	url(r'^book_list/$', views.book_list, name='book_list'),
+	url(r'^book_list_manager/$', views.book_list_manager, name='book_list_manager'),
 	url(r'^special_content/(?P<ISBN_part>[\d-]+)/$', views.special_content, name='special_content'),
 	url(r'^detail/(?P<book_ISBN>[0-9]+)/$', views.detail, name='detail'),
 	url(r'^detail_manager/(?P<book_ISBN>[0-9]+)/$', views.detail_manager, name='detail_manager'),

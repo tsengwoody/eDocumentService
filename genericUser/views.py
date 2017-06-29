@@ -199,7 +199,12 @@ def create_document(request, template_name='genericUser/create_document.html'):
 		if request.POST.has_key('designate'):
 			newBook.is_private = True
 		newBook.save()
-		newBook.create_EBook()
+		try:
+			newBook.create_EBook()
+		except BaseException as e:
+			status = 'error'
+			message = u'建立分段失敗'
+			return locals()
 		event = Event.objects.create(creater=request.user, action=newBook)
 		redirect_to = '/'
 		status = 'success'
@@ -248,11 +253,23 @@ def upload_document(request, template_name='genericUser/upload_document.html'):
 
 		#epub
 		if request.POST['category'] == 'epub':
+			from ebooklib import epub
+			from utils.epub import *
 			try:
 				os.makedirs(os.path.dirname(final_file))
-				from utils.epub import through
 				through(uploadFilePath, final_file)
-			except:
+				book = epub.read_epub(final_file)
+				book = add_bookinfo(
+					book,
+					ISBN = newBookInfo.ISBN,
+					bookname = newBookInfo.bookname,
+					author = newBookInfo.author,
+					date = str(newBookInfo.date),
+					house = newBookInfo.house,
+				)
+				epub.write_epub(final_file, book, {})
+			except BaseException as e:
+				print e
 				shutil.rmtree(uploadPath)
 				status = 'error'
 				message = u'建立文件失敗'
@@ -389,7 +406,6 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 	if request.method == 'GET':
 		return locals()
 	if request.method == 'POST':
-		print Permission.objects.all()
 		for item in ['active', 'editor', 'guest', 'manager', 'advanced_editor', ]:
 			exec("user.is_{0} = True if request.POST.has_key('{0}') else False".format(item))
 			p = Permission.objects.get(codename=item)

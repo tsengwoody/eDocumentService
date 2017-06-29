@@ -27,6 +27,7 @@ def userGuide(request, template_name='home.html'):
 def book_repository(request, template_name='guest/book_repository.html'):
 	edit_book_list = request.user.own_book_set.all().filter(status__lte=Book.STATUS['review'])
 	finish_book_list = request.user.own_book_set.all().filter(status__gte=Book.STATUS['finish'])
+	bookinfos = [ book.book_info for book in finish_book_list ]
 	if request.method == 'POST':
 		if request.POST.has_key('email'):
 			from django.core.mail import EmailMessage

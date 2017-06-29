@@ -116,64 +116,29 @@ def service(request, template_name='account/service.html'):
 @view_permission
 @http_response
 def sc_service(request, template_name='account/sc_service.html'):
-	sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']))
+	sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(status=EBook.STATUS['sc_edit'])
 	if request.method == 'POST':
 		if request.POST.has_key('getPart'):
-			if len(sc_editingPartList)>=10:
+			if len(sc_editingPartList)>=3:
 				status = 'error'
-				message = u'您已有超過10段文件，請先校對完成再領取'
+				message = u'您已有超過3段文件，請先校對完成再領取'
 				return locals()
-			getPart = None
-			for part in EBook.objects.filter(Q(status=EBook.STATUS['finish']) & Q(book__is_private=False)).order_by('get_date'):
-				ebook_status = part.change_status(1, 'sc_edit', user=request.user)
-				if ebook_status == EBook.STATUS['sc_edit']:
-					getPart = part
-					break
-			if getPart is None:
-				status = u'error'
-				message = u'無文件'
-				return locals()
-			status = 'success'
-			message = u'成功取得文件{}'.format(getPart.__unicode__())
-		elif request.POST.has_key('designateBook'):
-			if len(sc_editingPartList)>10:
-				status = 'error'
-				message = u'您已有超過10段文件，請先校對完成再領取'
-				return locals()
-			activeBook = None
-			if request.POST.has_key('ISBN'):
-				activeBook = Book.objects.filter(ISBN=request.POST['ISBN'])
-			elif request.POST.has_key('username'):
-				activeBook = Book.objects.filter(owner__username=request.POST['username'])
-			if not activeBook:
-				status = 'error'
-				message = u'無指定文件'
-				return locals()
-			partialBook = None
-			for book in activeBook:
-				if 0 < book.collect_get_count() < book.part_count:
-					partialBook = book
-					break
-			if not partialBook:
-				for book in activeBook:
-					if book.collect_get_count() == 0:
-						partialBook = book
-						break
-			if not partialBook:
+			try:
+				getPart = EBook.objects.filter(status=EBook.STATUS['finish']).order_by('get_date')[0]
+			except BaseException as e:
 				status = 'error'
 				message = u'無文件'
 				return locals()
-			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['finish']).order_by('part')[0]
 			getPart.change_status(1, 'sc_edit', user=request.user)
 			status = 'success'
-			message = u'成功取得指定文件{}'.format(getPart.book.__unicode__())
+			message = u'成功取得文件{}'.format(getPart.__unicode__())
 		elif request.POST.has_key('rebackPart'):
 			ISBN_part = request.POST.get('rebackPart')
 			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
 			rebackPart.change_status(-1, 'finish')
 			status = 'success'
 			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
-		sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(Q(status=EBook.STATUS['sc_edit']))
+		sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(status=EBook.STATUS['sc_edit'])
 		return locals()
 	if request.method == 'GET':
 		return locals()

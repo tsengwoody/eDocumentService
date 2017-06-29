@@ -18,42 +18,14 @@
 
 <div class="form-inline">
   <div class="form-group">
-    <!-- <label for="id_book_ISBN">請輸入型態</label> -->
     <label><input type="radio" name="search_type" value="ISBN" checked="true">ISBN</label>
     <label><input type="radio" name="search_type" value="BookName">書名</label>
     <input id="id_book_ISBN" class="form-control" maxlength="15" name="search_value" type="text">
   </div>
   <button type="submit" class="btn btn-primary" name="search_name" value="search" id="id_search">搜尋</button>
 </div>
-	<h4 class="page-header">查詢文件資訊</h4>
-	<table class="table table-striped table-hover">
-		<tr>
-			<th>ISBN</th>
-			<th>書名</th>
-			<th>作者</th>
-			<th>出版社</th>
-			<th>出版日期</th>
-			<th colspan="2">動作</th>
-		</tr>
-		{% for search_book in search_book_list %}
-		<tr>
-			<td>{{ search_book.book_info.ISBN }}</td>
-			<td>{{ search_book.book_info.bookname }}</td>
-			<td>{{ search_book.book_info.author }}</td>
-			<td>{{ search_book.book_info.house }}</td>
-			<td>{{ search_book.book_info.date }}</td>
-			<td>
-				{% if request.user.is_guest and request.user.has_guest and search_book.status >= 4 %}
-				<button type="button" class="btn btn-default" id="email_id" name="email" data-target="#getBookModal" data-toggle="modal" data-whatever="email" data-isbn={{search_book.ISBN}}  value={{search_book.ISBN}}>寄到信箱</button>
-				{% endif %}
-			</td>
-			<td>
-				{% if request.user.is_guest and request.user.has_guest and search_book.status >= 4 %}
-				<button type="button" class="btn btn-default" id="download_id" name="download" data-whatever="download" data-toggle="modal" data-target="#getBookModal" data-isbn={{search_book.ISBN}} value={{search_book.ISBN}}>下載</button>
-				{% endif %}
-			</td>
-		</tr>
-		{% endfor %}
-	</table>
 </form>
+	<h4 class="page-header">查詢文件資訊</h4>
+{% include 'ebookSystem/BookInfo_user.html' %}
+
 {% endblock %}

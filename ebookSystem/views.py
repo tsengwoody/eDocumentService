@@ -91,40 +91,8 @@ def tinymce_demo(request, template_name='ebookSystem/tinymce_demo.html'):
 
 @view_permission
 @http_response
-def book_list(request, template_name='ebookSystem/book_list.html'):
-	from collections import defaultdict
-	books_list = []
-	for i in range(10):
-		books = BookInfo.objects.filter(
-			Q(chinese_book_category__startswith=str(i))
-		)
-		books_list.append((i, books))
+def get_resource(request, template_name='guest/book_repository.html'):
 	if request.method == 'POST':
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
-@http_response
-def search_book(request, template_name):
-	if request.method == 'POST' :
-		if request.POST.has_key('search_value') and not request.POST.has_key('download') and not request.POST.has_key('email'):
-			search_value = request.POST['search_value']
-			search_type = request.POST['search_type']
-			try:
-				if search_type == 'ISBN':
-					search_book_list = Book.objects.filter(ISBN=search_value)
-				elif search_type == 'BookName':
-					search_book_list = Book.objects.select_related().filter(book_info__bookname__contains=search_value)
-					#bookInfo=BookInfo.objects.filter(bookname__contains=search_value)
-					#search_book = Book.objects.get(book_info=bookInfo)
-				if len(search_book_list) <= 0:
-					status = 'error'
-					message = u'查無指定ISBN文件'
-				status = 'success'
-				message = u'成功查詢指定文件'
-			except:
-				status = 'error'
-				message = u'查無指定ISBN文件'
 		if request.POST.has_key('email'):
 			from django.core.mail import EmailMessage
 			getBook = Book.objects.get(ISBN=request.POST['email'])
@@ -142,6 +110,86 @@ def search_book(request, template_name):
 			message = u'已寄送到您的電子信箱'
 			os.remove(attach_file_path)
 		if request.POST.has_key('download'):
+			getBook = Book.objects.get(ISBN=request.POST['download'])
+			attach_file_path = getBook.zip(request.user, request.POST['password'])
+			if not attach_file_path:
+				status = 'error'
+				message = u'準備文件失敗'
+				return locals()
+			download_path = attach_file_path
+			download_filename = os.path.basename(attach_file_path)
+		if request.POST.has_key('delete'):
+			deleteBook = Book.objects.get(ISBN=request.POST['delete'])
+			deleteBook.delete()
+			status = 'success'
+			message = u'成功刪除文件'
+		edit_book_list = request.user.own_book_set.all().filter(status__lte=Book.STATUS['review'])
+		finish_book_list = request.user.own_book_set.all().filter(status__gte=Book.STATUS['finish'])
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+@view_permission
+@http_response
+def book_list(request, template_name='ebookSystem/book_list.html'):
+	from collections import defaultdict
+	books_list = []
+	for i in range(10):
+		books = Book.objects.filter(
+			Q(book_info__chinese_book_category__startswith=str(i))
+		)
+		books_list.append((i, [ book.book_info for book in books ]))
+	if request.method == 'POST':
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+@view_permission
+@http_response
+def book_list_manager(request, template_name='ebookSystem/book_list_manager.html'):
+	books = Book.objects.all()
+	bookinfos = [ book.book_info for book in books ]
+	if request.method == 'POST':
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+@http_response
+def search_book(request, template_name):
+	if request.method == 'POST' :
+		if request.POST.has_key('search_value'):
+			search_value = request.POST['search_value']
+			search_type = request.POST['search_type']
+			try:
+				if search_type == 'ISBN':
+					books = Book.objects.filter(ISBN=search_value)
+				elif search_type == 'BookName':
+					books = Book.objects.select_related().filter(book_info__bookname__contains=search_value)
+				if len(books) <= 0:
+					raise SystemError('not found')
+				bookinfos = [ book.book_info for book in books ]
+				status = 'success'
+				message = u'成功查詢指定文件'
+			except:
+				status = 'error'
+				message = u'查無指定ISBN文件'
+		elif request.POST.has_key('email'):
+			from django.core.mail import EmailMessage
+			getBook = Book.objects.get(ISBN=request.POST['email'])
+			attach_file_path = getBook.zip(request.user, request.POST['password'])
+			if not attach_file_path:
+				status = 'error'
+				message = u'準備文件失敗'
+				return locals()
+			subject = u'[文件] {0}'.format(getBook)
+			body = u'新愛的{0}您好：\n'.format(request.user.username)
+			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
+			email.attach_file(attach_file_path)
+			email.send(fail_silently=False)
+			status = 'success'
+			message = u'已寄送到您的電子信箱'
+			os.remove(attach_file_path)
+		elif request.POST.has_key('download'):
 			getBook = Book.objects.get(ISBN=request.POST['download'])
 			attach_file_path = getBook.zip(request.user, request.POST['password'])
 			if not attach_file_path:
@@ -184,7 +232,6 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 			for event in events:
 				event.response(status=status, message=message, user=request.user)
 		if request.POST['review'] == 'error':
-			shutil.rmtree(book.path)
 			shutil.rmtree(org_path)
 			book.delete()
 			status = 'success'

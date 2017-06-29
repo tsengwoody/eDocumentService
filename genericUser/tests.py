@@ -120,20 +120,20 @@ class create_documentViewTests(baseViewTests):
 
 class upload_documentViewTests(baseViewTests):
 	def test_correct_case(self):
-		book_file = open(BASE_DIR +u'/temp/人工智慧來了.epub')
+		book_file = open(BASE_DIR +u'/temp/自創思維.epub')
 		response = self.client.post(
 			reverse(
 				'genericUser:upload_document'
 			),
 			{
-				u'ISBN': u'9789571074047',
-				u'author': u'宮下奈都作; 王蘊潔譯',
-				u'house': u'尖端',
-				u'bookname': u'羊與鋼之森',
-				u'date': u'2017-05-01',
+				u'ISBN': u'9789863981459',
+				u'author': u'雷德.霍夫曼(Reid Hoffman), 班.卡斯諾查(Ben Casnocha)著; 洪慧芳譯',
+				u'house': u'天下雜誌',
+				u'bookname': u'自創思維: 人生是永遠的測試版,瞬息萬變世界的新工作態度',
+				u'date': u'2016-02-01',
 				u'bookbinding': '平裝',
-				u'chinese_book_category': '861',
-				u'order': '1版',
+				u'chinese_book_category': '494',
+				u'order': '第二版',
 				'fileObject': book_file,
 				'category': 'epub',
 			},
