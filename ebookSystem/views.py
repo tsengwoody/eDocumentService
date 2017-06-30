@@ -157,7 +157,7 @@ def book_list_manager(request, template_name='ebookSystem/book_list_manager.html
 @http_response
 def search_book(request, template_name):
 	if request.method == 'POST' :
-		if request.POST.has_key('search_value'):
+		if request.POST.has_key('search_value') and not request.POST.has_key('download') and not request.POST.has_key('email'):
 			search_value = request.POST['search_value']
 			search_type = request.POST['search_type']
 			try:

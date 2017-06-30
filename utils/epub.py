@@ -1,6 +1,9 @@
 ﻿# coding=utf-8
-
+import io
+import os
+import shutil
 import sys
+from bs4 import BeautifulSoup, NavigableString
 from ebooklib import epub
 
 def through(src, dst):
@@ -19,6 +22,20 @@ def through(src, dst):
 	epub.write_epub(dst, book, {})
 
 def add_bookinfo(epubBook, **kwargs):
+
+	new_metadata_DC = {}
+	for k,v in epubBook.metadata[epub.NAMESPACES['DC']].iteritems():
+		for t in v:
+			new_metadata_DC[k] = []
+			try:
+				if not t[1]['id'] == 'eDocumentService':
+					new_metadata_DC[k].append(t)
+			except:
+				new_metadata_DC[k].append(t)
+			if new_metadata_DC[k] == []:
+				del new_metadata_DC[k]
+	epubBook.metadata[epub.NAMESPACES['DC']] = new_metadata_DC
+
 	epubBook.add_metadata('DC', 'title', kwargs['bookname'], {'id': 'eDocumentService'})
 	epubBook.add_metadata('DC', 'creator', kwargs['author'], {'id': 'eDocumentService'})
 	epubBook.add_metadata('DC', 'ISBN', kwargs['ISBN'], {'id': 'eDocumentService'})
@@ -26,9 +43,7 @@ def add_bookinfo(epubBook, **kwargs):
 	epubBook.add_metadata('DC', 'publisher', kwargs['house'], {'id': 'eDocumentService'})
 	return epubBook
 
-from bs4 import BeautifulSoup, NavigableString
-
-def html2epub(part_list, **kwargs):
+def html2epub(part_list, dst, **kwargs):
 
 	book = epub.EpubBook()
 	book = add_bookinfo(book, **kwargs)
@@ -41,7 +56,7 @@ def html2epub(part_list, **kwargs):
 			title=u'{0}-part{1}'.format(kwargs['bookname'], i+1),
 			file_name='Text/part{0}.xhtml'.format(i+1),
 		)
-		c.content = c_soup.prettify(formatter="html")
+		c.content = unicode(c_soup)
 		book.add_item(c)
 		c_list.append(c)
 		toc.append(
@@ -58,40 +73,36 @@ def html2epub(part_list, **kwargs):
 	book.add_item(epub.EpubNav())
 	book.spine = ['nav'] +c_list
 
-	epub.write_epub('{0}.epub'.format(kwargs['ISBN']), book, {})
+	epub.write_epub(dst, book, {})
 
-def txt2epub(part_list, **kwargs):
+def txt2epub(src, dst, line_per_chapter=100, **kwargs):
 
-	book = epub.EpubBook()
-	book = add_bookinfo(book, **kwargs)
+	temp_folder = 'epub_temp'
+	if not os.path.exists(temp_folder):
+		os.mkdir(temp_folder)
+	part_list = []
+	with io.open(src, 'r', encoding='utf-8') as fr:
+		for index, line in enumerate(fr.readlines()):
+			if index % line_per_chapter == 0:
+				part = index/line_per_chapter + 1
+				try:
+					fw.close()
+				except BaseException as e:
+					print e
+				temp_file = temp_folder +'/part{0}.txt'.format(part)
+				fw = io.open(temp_file, 'w', encoding='utf-8')
+				part_list.append(temp_file)
+			fw.write(line)
+		fw.close()
 
-	c_list = []
-	toc = []
-	for i in range(len(part_list)):
-		c_soup = BeautifulSoup(open(part_list[i]), 'html5lib')
-		c = epub.EpubHtml(
-			title=u'{0}-part{1}'.format(kwargs['bookname'], i+1),
-			file_name='Text/part{0}.xhtml'.format(i+1),
-		)
-		c.content = c_soup.prettify(formatter="html")
-		book.add_item(c)
-		c_list.append(c)
-		toc.append(
-			epub.Link(
-				'Text/part{0}.xhtml'.format(i+1),
-				'part{0}'.format(i+1),
-				'part{0}'.format(i+1),
-			)
-		)
+	from tag import add_tag, add_template_tag
+	for f in part_list:
+		add_tag(f, f,)
+		add_template_tag(f, f, 'book_template.html')
 
-	book.toc = toc
+	html2epub(part_list, dst, **kwargs)
 
-	book.add_item(epub.EpubNcx())
-	book.add_item(epub.EpubNav())
-	book.spine = ['nav'] +c_list
-
-	epub.write_epub('{0}.epub'.format(kwargs['ISBN']), book, {})
+	shutil.rmtree(temp_folder)
 
 if __name__ == '__main__':
-	html2epub(sys.argv[1], sys.argv[2])
-	through(sys.argv[1], sys.argv[1])
+	pass

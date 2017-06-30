@@ -1,5 +1,7 @@
 ﻿# coding: utf-8
+import cgi
 import codecs
+import io
 import os
 import re
 from bs4 import BeautifulSoup, NavigableString
@@ -18,7 +20,6 @@ def merge_NavigableString(tag):
 
 def add_base_url(src, id, encoding='utf-8'):
 #	try:
-	import re
 	soup = BeautifulSoup(open(src), 'html5lib')
 	base_url = '/static/article/{0}/'.format(id)
 	tags = soup.find_all(src=re.compile('^[\d\w]+'))
@@ -34,13 +35,12 @@ def add_base_url(src, id, encoding='utf-8'):
 
 #將txt純文字加入<p> tag
 def add_tag(source, destination, encoding='utf-8'):
-	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
-		source_content = sourceFile.read()
-#		source_content = source_content[1:]
-	source_content = source_content.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
-	destination_content = '<p>' +source_content.replace('\r\n', '</p>\r\n<p>') +'</p>'
+	with io.open(source, 'r', encoding=encoding) as sourceFile:
+		source_content_list = sourceFile.readlines()
+	source_content_list = [ '<p>' +cgi.escape(line).strip() +'</p>' for line in source_content_list ]
 	with codecs.open(destination, 'w', encoding=encoding) as destinationFile:
-		destinationFile.write(destination_content)
+		for line in source_content_list:
+			destinationFile.write(line)
 
 #將加入<p>文件加入<head>、<body> html的tag
 def add_template_tag(source, destination, template, encoding='utf-8'):
@@ -50,8 +50,6 @@ def add_template_tag(source, destination, template, encoding='utf-8'):
 		tail = template_content.split('{}')[1]
 	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 		source_content = sourceFile.read()
-#		file_head = source_content[0]
-#		source_content = source_content[1:]
 	source_content = head +source_content +tail
 	with codecs.open(destination, 'w', encoding=encoding) as destinationFile:
 		destinationFile.write(source_content)
