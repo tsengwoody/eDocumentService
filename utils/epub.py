@@ -88,7 +88,7 @@ def txt2epub(src, dst, line_per_chapter=100, **kwargs):
 				try:
 					fw.close()
 				except BaseException as e:
-					print e
+					pass
 				temp_file = temp_folder +'/part{0}.txt'.format(part)
 				fw = io.open(temp_file, 'w', encoding='utf-8')
 				part_list.append(temp_file)
@@ -98,7 +98,7 @@ def txt2epub(src, dst, line_per_chapter=100, **kwargs):
 	from tag import add_tag, add_template_tag
 	for f in part_list:
 		add_tag(f, f,)
-		add_template_tag(f, f, 'book_template.html')
+		add_template_tag(f, f, )
 
 	html2epub(part_list, dst, **kwargs)
 

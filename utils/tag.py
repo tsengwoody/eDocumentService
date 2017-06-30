@@ -43,11 +43,10 @@ def add_tag(source, destination, encoding='utf-8'):
 			destinationFile.write(line)
 
 #將加入<p>文件加入<head>、<body> html的tag
-def add_template_tag(source, destination, template, encoding='utf-8'):
-	with codecs.open(template, 'r', encoding=encoding) as templateFile:
-		template_content = templateFile.read()
-		head = template_content.split('{}')[0][1:]
-		tail = template_content.split('{}')[1]
+def add_template_tag(source, destination, encoding='utf-8'):
+	template_content = u'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title></title></head><body>{}</body></html>'
+	head = template_content.split('{}')[0][1:]
+	tail = template_content.split('{}')[1]
 	with codecs.open(source, 'r', encoding=encoding) as sourceFile:
 		source_content = sourceFile.read()
 	source_content = head +source_content +tail

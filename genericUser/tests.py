@@ -119,14 +119,14 @@ class create_documentViewTests(baseViewTests):
 			print(e)
 
 class upload_documentViewTests(baseViewTests):
-	def test_correct_case(self):
+	def test_correct_epub_case(self):
 		book_file = open(BASE_DIR +u'/temp/自創思維.epub')
 		response = self.client.post(
 			reverse(
 				'genericUser:upload_document'
 			),
 			{
-				u'ISBN': u'9789863981459',
+				u'ISBN': u'9789863981454',
 				u'author': u'雷德.霍夫曼(Reid Hoffman), 班.卡斯諾查(Ben Casnocha)著; 洪慧芳譯',
 				u'house': u'天下雜誌',
 				u'bookname': u'自創思維: 人生是永遠的測試版,瞬息萬變世界的新工作態度',
@@ -142,10 +142,37 @@ class upload_documentViewTests(baseViewTests):
 		book_file.close()
 		print response.json()['message']
 		self.assertEqual(len(Book.objects.all()), 1, len(Book.objects.all()))
+		book = Book.objects.first()
+		shutil.rmtree(book.path)
+
+	def test_correct_txt_case(self):
+		book_file = open(BASE_DIR +u'/temp/9789862621684.txt')
+		response = self.client.post(
+			reverse(
+				'genericUser:upload_document'
+			),
+			{
+				u'ISBN': u'9789862621684',
+				u'author': u'朝井遼著; 黃薇嬪譯',
+				u'house': u'貓頭鷹',
+				u'bookname': u'聽說桐島退社了',
+				u'date': u'2013-09-01',
+				u'bookbinding': '平裝',
+				u'chinese_book_category': '861',
+				u'order': '初版',
+				'fileObject': book_file,
+				'category': 'txt',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		book_file.close()
+		print response.json()['message']
+		self.assertEqual(len(Book.objects.all()), 1, len(Book.objects.all()))
+		book = Book.objects.first()
+		shutil.rmtree(book.path)
 
 	def tearDown(self):
 		try:
-#			shutil.rmtree(BASE_DIR +u'/temp/羊與鋼之森.epub')
 			pass
 		except BaseException as e:
 			print(e)

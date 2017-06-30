@@ -239,13 +239,22 @@ def upload_document(request, template_name='genericUser/upload_document.html'):
 			return locals()
 		[status, message] = handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
 		#根據選擇上傳格式作業
-		final_file = os.path.join(uploadPath, 'OCR') + '/{0}.{1}'.format(request.POST['ISBN'], request.POST['category'])
+		final_file = os.path.join(uploadPath, 'OCR') + '/{0}.epub'.format(request.POST['ISBN'], )
 		#txt
 		if request.POST['category'] == 'txt':
+			from ebooklib import epub
+			from utils.epub import txt2epub
 			try:
 				os.makedirs(os.path.dirname(final_file))
-				shutil.copy2(uploadFilePath, final_file)
-			except:
+				info = {
+					'ISBN': newBookInfo.ISBN,
+					'bookname': newBookInfo.bookname,
+					'author': newBookInfo.author,
+					'date': str(newBookInfo.date),
+					'house': newBookInfo.house,
+				}
+				txt2epub(uploadFilePath, final_file, **info)
+			except BaseException as e:
 				shutil.rmtree(uploadPath)
 				status = 'error'
 				message = u'建立文件失敗'
@@ -254,7 +263,7 @@ def upload_document(request, template_name='genericUser/upload_document.html'):
 		#epub
 		if request.POST['category'] == 'epub':
 			from ebooklib import epub
-			from utils.epub import *
+			from utils.epub import through, add_bookinfo
 			try:
 				os.makedirs(os.path.dirname(final_file))
 				through(uploadFilePath, final_file)
