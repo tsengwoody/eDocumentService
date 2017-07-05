@@ -2,6 +2,26 @@
 {% block style %}
  <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
  <script language="javascript">
+
+function generalajax(transferData){
+    $.ajax({
+        url:".",
+        type: "POST",
+        data: transferData,
+        beforeSend:function(jqXHR, settings){
+            jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+            //$('#id_get_otp_load').show();
+        },
+        success: function(json){
+            alertDialog(json);
+        },
+        error:function(xhr,errmsg,err){
+            alert(xhr.status+" "+xhr.responseText);
+            console.log(xhr.status + ": " + xhr.responseText);
+        }
+    });
+}
+
  $( document ).ready(function() {
     var type;
     $('#getBookModal').on('show.bs.modal', function (event) {
@@ -21,9 +41,10 @@
 
    
     $('#sendPassword').on("click",function(event){
-          console.log("sendPassword enter");
+        console.log("sendPassword enter");
         if(type=="email")
         {
+            console.log("type: email");
             var transferData={};
             var sendValue=$(this).val();
             transferData['password']=$('#inputPasword').val();
@@ -50,8 +71,24 @@
                 }
             });
         }
+        else if(type==="download2"){
+            console.log("type: download2");
+
+            //transferData
+            var transferData={
+                download:$(this).val(), //ISBN
+                password:$('#inputPasword').val()
+            };
+
+            //generalajax
+            generalajax(transferData);
+
+            //待伺服器接收與回傳具有header的檔案
+
+        }
         else
         {
+            console.log("type: form post");
             $('form').append($("<input>").attr("type", "hidden").attr("name", "password").attr("class","temp").val($('#inputPasword').val()));
             $('form').append($("<input>").attr("type", "hidden").attr("name", "download").attr("class","temp").val($(this).val()));
             $('form').submit();
