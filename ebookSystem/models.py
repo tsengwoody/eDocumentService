@@ -180,7 +180,7 @@ class Book(models.Model):
 				part_list = [ file.get_clean_file() for file in self.ebook_set.all() ]
 				from utils.epub import html2epub
 				info = {
-					'ISBN': newBookInfo.ISBN,
+					'ISBN': self.book_info.ISBN,
 					'bookname': self.book_info.bookname,
 					'author': self.book_info.author,
 					'date': str(self.book_info.date),
@@ -191,7 +191,7 @@ class Book(models.Model):
 				book.set_identifier(user.username)
 				epub.write_epub(custom_epub, book, {})
 			except BaseException as e:
-				pass
+				raise e
 			zip_list = [custom_epub]
 		try:
 			pyminizip.compress_multiple(zip_list, custom_zip, password, 5)

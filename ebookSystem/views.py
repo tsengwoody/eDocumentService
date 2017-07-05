@@ -136,7 +136,8 @@ def book_list(request, template_name='ebookSystem/book_list.html'):
 	books_list = []
 	for i in range(10):
 		books = Book.objects.filter(
-			Q(book_info__chinese_book_category__startswith=str(i))
+			Q(book_info__chinese_book_category__startswith=str(i)),
+			Q(status__gte=Book.STATUS['finish'])
 		)
 		books_list.append((i, [ book.book_info for book in books ]))
 	if request.method == 'POST':
