@@ -41,7 +41,6 @@
 						<li><a href="{% url 'manager:event_list' 'ebook' %}">審核校對文件</a></li>
 						<li><a href="{% url 'manager:event_list' 'applydocumentaction' %}">代掃申請列表</a></li>
 						<li><a href="{% url 'genericUser:article/create' %}">訊息發佈</a></li>
-						<li><a href="{% url 'ebookSystem:book_list' %}">書籍列表</a></li>
 						<li><a href="{% url 'ebookSystem:book_list_manager' %}">書籍管理</a></li>
 						{% endif %}
 					</ul>
@@ -55,7 +54,9 @@
 						{% if request.user.is_guest %}
 						<li><a href="{% url 'genericUser:apply_document' %}">代掃申請</a></li>
 						{% endif %}
+						{% if request.user.is_superuser %}
 						<li><a href="{% url 'genericUser:upload_document' %}">EPUB上傳</a></li>
+						{% endif %}
 						{% if request.user.is_advanced_editor %}
 						<li><a href="{% url 'manager:applydocumentaction' %}">代掃上傳</a></li>
 						{% endif %}
@@ -78,7 +79,13 @@
 				{% if request.user.is_superuser %}
 				<li><a href="{% url 'account:an_service' %}">分析</a></li>
 				{% endif %}
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">書目<span class="caret"></span></a>
+					<ul class="dropdown-menu">
 				<li><a href="{% url 'ebookSystem:search_book' %}">查詢</a></li>
+				<li><a href="{% url 'ebookSystem:book_list' %}">索引</a></li>
+					</ul>
+				</li>
 				{% endif %}
 				{% if not request.user.is_license and request.user.is_authenticated %}
 				<li><a href="{% url 'genericUser:license' %}">簽署隱私權條款</a></li>

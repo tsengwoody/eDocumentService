@@ -24,15 +24,20 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'e_#e-byj7#a+$v7#wmocwd8wp)+&wajk0axt70dl@)nsx!*glq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+import socket
+if socket.gethostname() == 'edoc':
+	DEBUG = False
+else:
+	DEBUG = True
+
 if DEBUG is False:
     #ALLOWED_HOSTS = ['www.edocumentservice.org', '104.155.204.241']
     ALLOWED_HOSTS = ['*']
 else:
     ALLOWED_HOSTS = []
 ADMINS = [
-    ('woody', 'tsengwoody.tw@gmail.com'),
-    ('amy', 't101598002@ntut.edu.tw'),
+#    ('woody', 'tsengwoody.tw@gmail.com'),
+#    ('amy', 't101598002@ntut.edu.tw'),
     ('eDocumentService', 'edocumentservice@gmail.com'),
 ]
 
@@ -202,16 +207,8 @@ RECAPTCHA_PRIVATE_KEY = '6LemWCUTAAAAAC0N7Q9z9aH-yE2y08-BLECTelv_'
 NOCAPTCHA = False
 #CAPTCHA_AJAX = True
 
-
-#special define
-INACTIVE = 0
-ACTIVE =1
-EDIT =2
-REVIEW =3
-REVISE = 4
-FINISH = 5
 DEFAULT_FROM_EMAIL = 'edocumentservice@gmail.com'
-MANAGER = ['tsengwoody@yahoo.com.tw']
+MANAGER = ['edocumentservice@gmail.com']
 SERVICE = 'edocumentservice@gmail.com'
 SITE_ID = 1
 TIME_ZONE = 'Asia/Taipei'

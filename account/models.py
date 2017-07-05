@@ -2,7 +2,6 @@
 from django.db import models
 from genericUser.models import User
 from guest.models import Guest
-from mysite import settings
 
 class Editor(models.Model):
 	user = models.OneToOneField(User, primary_key=True)

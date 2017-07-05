@@ -174,7 +174,25 @@ class Book(models.Model):
 				pass
 			zip_list = [custom_epub]
 		else:
-			zip_list = [ file.get_clean_file() for file in self.ebook_set.all() ]
+			final_epub = self.path +'/temp/{0}_{1}.temp'.format(self.ISBN, user.username)
+			custom_epub = self.path +'/temp/{0}_{1}.epub'.format(self.ISBN, user.username)
+			try:
+				part_list = [ file.get_clean_file() for file in self.ebook_set.all() ]
+				from utils.epub import html2epub
+				info = {
+					'ISBN': newBookInfo.ISBN,
+					'bookname': self.book_info.bookname,
+					'author': self.book_info.author,
+					'date': str(self.book_info.date),
+					'house': self.book_info.house,
+				}
+				html2epub(part_list, final_epub, **info)
+				book = epub.read_epub(final_epub)
+				book.set_identifier(user.username)
+				epub.write_epub(custom_epub, book, {})
+			except BaseException as e:
+				pass
+			zip_list = [custom_epub]
 		try:
 			pyminizip.compress_multiple(zip_list, custom_zip, password, 5)
 			return custom_zip
@@ -539,10 +557,9 @@ class EBook(models.Model):
 		destination = self.get_path('-edit')
 		tag.add_tag(source, destination)
 
-	def add_template_tag(self, src, dst, template='book_template.html', encoding='utf-8'):
-		template = BASE_DIR +u'/templates/' +template
+	def add_template_tag(self, src, dst, encoding='utf-8'):
 		from utils import tag
-		tag.add_template_tag(src, dst, template)
+		tag.add_template_tag(src, dst)
 
 	def clean_tag(self, src, dst, template='book_template.html', encoding='utf-8'):
 		from utils import tag
@@ -645,7 +662,6 @@ class EBook(models.Model):
 			return self.get_path('-clean')
 		except:
 			return None
-
 
 	def zip(self, user, password):
 		from django.contrib.auth import authenticate

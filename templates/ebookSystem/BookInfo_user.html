@@ -18,7 +18,7 @@
 		<td>{{ bookinfo.author }}</td>
 		<td>{{ bookinfo.house }}</td>
 		<td>{{ bookinfo.date }}</td>
-			{% if request.user.is_guest and request.user.has_guest and bookinfo.book.status == 9 %}
+			{% if request.user.is_guest and request.user.has_guest and bookinfo.book.status >= 4 %}
 			<td>
 				<button type="button" class="btn btn-default" id="email_id" name="email" data-target="#getBookModal" data-toggle="modal" data-whatever="email" data-isbn={{ bookinfo.ISBN }}  value={{ bookinfo.ISBN }}>寄到信箱</button>
 			</td>

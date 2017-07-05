@@ -9,38 +9,19 @@ from ebooklib import epub
 def through(src, dst):
 
 	book = epub.read_epub(src)
-	#book.set_identifier('eDocumentService')
-
-	nav = 0
-	for item in book.items:
-		if isinstance(item, epub.EpubNav):
-			book.items[book.items.index(item)] = epub.EpubNav()
-			nav = nav +1
-	if not nav:
-		book.add_item(epub.EpubNav())
-
 	epub.write_epub(dst, book, {})
 
 def add_bookinfo(epubBook, **kwargs):
 
-	new_metadata_DC = {}
 	for k,v in epubBook.metadata[epub.NAMESPACES['DC']].iteritems():
-		for t in v:
-			new_metadata_DC[k] = []
-			try:
-				if not t[1]['id'] == 'eDocumentService':
-					new_metadata_DC[k].append(t)
-			except:
-				new_metadata_DC[k].append(t)
-			if new_metadata_DC[k] == []:
-				del new_metadata_DC[k]
-	epubBook.metadata[epub.NAMESPACES['DC']] = new_metadata_DC
+		if k in kwargs.keys():
+			del epubBook.metadata[epub.NAMESPACES['DC']][k]
 
-	epubBook.add_metadata('DC', 'title', kwargs['bookname'], {'id': 'eDocumentService'})
-	epubBook.add_metadata('DC', 'creator', kwargs['author'], {'id': 'eDocumentService'})
-	epubBook.add_metadata('DC', 'ISBN', kwargs['ISBN'], {'id': 'eDocumentService'})
-	epubBook.add_metadata('DC', 'date', kwargs['date'], {'id': 'eDocumentService'})
-	epubBook.add_metadata('DC', 'publisher', kwargs['house'], {'id': 'eDocumentService'})
+	epubBook.add_metadata('DC', 'title', kwargs['bookname'])
+	epubBook.add_metadata('DC', 'creator', kwargs['author'])
+	epubBook.add_metadata('DC', 'source', kwargs['ISBN'])
+	epubBook.add_metadata('DC', 'date', kwargs['date'])
+	epubBook.add_metadata('DC', 'publisher', kwargs['house'])
 	return epubBook
 
 def html2epub(part_list, dst, **kwargs):

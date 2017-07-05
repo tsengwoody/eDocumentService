@@ -15,7 +15,7 @@
 			<th>狀態</th>
 			<th>頁數/總頁數</th>
 			<th>時數</th>
-			<th colspan="3">動作</th>
+			<th colspan="4">動作</th>
 		</tr>
 		{% for bookinfo in bookinfos %}
 		<tr>
@@ -26,8 +26,9 @@
 			<td>{{bookinfo.book.collect_service_hours}}</td>
 			<td><a href ="{% url 'ebookSystem:detail' bookinfo.ISBN %}" >詳細資訊</a></td>
 			<td><a class="btn btn-primary pull-right" role="button" href="{% url 'ebookSystem:detail_manager' bookinfo.ISBN %}" >管理</a></td>
+			<td><a class="btn btn-primary pull-right" role="button" href="{% url 'ebookSystem:review_document' bookinfo.ISBN %}" >審核</a></td>
 			<td>
-				{% if book.status_int2str == 'inactive' %}
+				{% if bookinfo.book.status_int2str == 'inactive' %}
 				<button type="submit" class="btn btn-default send_button" id="delete_id" name="delete" value={{book.ISBN}}>刪除</button>
 				{% endif %}
 			</td>

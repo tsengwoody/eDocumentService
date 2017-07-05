@@ -61,11 +61,27 @@ def get_book_info(ISBN):
 	res = response.text
 	soup = BeautifulSoup(res, 'html5lib')
 	data_tags = soup.find_all('td', class_=u'資料列_1')
+
+	advance_info = data_tags[14:]
+	row = -1
+	for index, item in enumerate(advance_info):
+		if index % 7 ==0:
+			get_ISBN = unicode(item.string).replace(u' ', '')
+			pattern = re.compile(r'(\d{13,13}).*')
+			try:
+				get_ISBN = pattern.search(get_ISBN).group(1)
+			except:
+				get_ISBN = ''
+			if get_ISBN == ISBN:
+				row = index/7
+
 	try:
+		if row == -1:
+			raise ValueError('row error')
 		bookname = unicode(data_tags[1].string).replace(u' ', '')
 		author = unicode(data_tags[3].string).replace(u' ', '')
 		house = unicode(data_tags[5].string).replace(u' ', '')
-		date = unicode(data_tags[18].string).replace(u' ', '')
+		date = unicode(advance_info[row*7 +4].string).replace(u' ', '')
 		year = int(date.split('/')[0]) +1911
 		month = int(date.split('/')[1])
 		date = unicode(datetime.date(year,month,1))
@@ -77,7 +93,7 @@ def get_book_info(ISBN):
 		date=''
 		status = u'error'
 	try:
-		bookbinding = unicode(data_tags[14].string).replace(u' ', '')
+		bookbinding = unicode(advance_info[row*7].string).replace(u' ', '')
 		pattern = re.compile(r'\((.*)\)')
 		bookbinding = pattern.search(bookbinding).group(1)
 	except BaseException as e:
