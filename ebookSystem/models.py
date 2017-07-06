@@ -289,7 +289,7 @@ class EBook(models.Model):
 			elif self.status +direction == self.STATUS['edit']:
 				self.editor = kwargs['user']
 				self.get_date = timezone.now()
-				self.deadline = self.get_date + datetime.timedelta(days=5)
+				self.deadline = kwargs['deadline']
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['review']:
 				self.edited_page = self.end_page -self.begin_page

@@ -40,7 +40,7 @@ def service(request, template_name='account/service.html'):
 				message = u'無文件'
 				return locals()
 			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
-			getPart.change_status(1, 'edit', user=request.user)
+			getPart.change_status(1, 'edit', user=request.user, deadline=timezone.now() +datetime.timedelta(days=5))
 			status = 'success'
 			message = u'成功取得文件{}'.format(getPart.__unicode__())
 		elif request.POST.has_key('getCompleteBook'):
@@ -59,7 +59,7 @@ def service(request, template_name='account/service.html'):
 				message = u'目前無完整文件，請先領部份文件'
 				return locals()
 			for getPart in completeBook.ebook_set.all():
-				getPart.change_status(1, 'edit', user=request.user)
+				getPart.change_status(1, 'edit', user=request.user, deadline=timezone.now() +datetime.timedelta(days=5))
 			status = 'success'
 			message = u'成功取得完整文件{}'.format(getPart.book.__unicode__())
 		elif request.POST.has_key('designateBook'):
@@ -86,13 +86,13 @@ def service(request, template_name='account/service.html'):
 				message = u'無文件'
 				return locals()
 			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
-			getPart.change_status(1, 'edit', user=request.user)
+			getPart.change_status(1, 'edit', user=request.user, deadline=timezone.now() +datetime.timedelta(days=5))
 			status = 'success'
 			message = u'成功取得指定文件{}'.format(getPart.book.__unicode__())
 		elif request.POST.has_key('rebackPart'):
 			ISBN_part = request.POST.get('rebackPart')
 			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
-			rebackPart.change_status(-1, 'active', user=request.user)
+			rebackPart.change_status(-1, 'active')
 			status = 'success'
 			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
 		elif request.POST.has_key('reEditPart'):

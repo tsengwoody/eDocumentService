@@ -446,7 +446,7 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 			status = 'success'
 			message = u'已寄送到您的電子信箱'
 			os.remove(attach_file_path)
-		if request.POST.has_key('download'):
+		elif request.POST.has_key('download'):
 			getPart = EBook.objects.get(ISBN_part=request.POST['download'])
 			attach_file_path = getPart.zip(request.user, request.POST['password'])
 			if not attach_file_path:
@@ -457,6 +457,15 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 			download_filename = os.path.basename(attach_file_path)
 			status = u'success'
 			message = u'下載'
+		elif request.POST.has_key('assign'):
+			getPart = EBook.objects.get(ISBN_part=request.POST['assign'])
+			user = User.objects.get(username=request.POST['username'])
+			deadline = request.POST['deadline'].split('-')
+			deadline = [ int(v) for v in deadline ]
+			deadline = timezone.datetime(deadline[0], deadline[1], deadline[2])
+			getPart.change_status(1, 'edit', user=user, deadline=deadline)
+			status = u'success'
+			message = u'指派校對成功'
 		return locals()
 	if request.method == 'GET':
 		return locals()
