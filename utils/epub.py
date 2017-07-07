@@ -10,6 +10,7 @@ def through(src, dst):
 
 	book = epub.read_epub(src)
 	epub.write_epub(dst, book, {})
+	return book
 
 def add_bookinfo(epubBook, **kwargs):
 
@@ -17,11 +18,13 @@ def add_bookinfo(epubBook, **kwargs):
 		if k in kwargs.keys():
 			del epubBook.metadata[epub.NAMESPACES['DC']][k]
 
-	epubBook.add_metadata('DC', 'title', kwargs['bookname'])
+	epubBook.set_title(kwargs['bookname'])
+	epubBook.set_language(kwargs['language'])
 	epubBook.add_metadata('DC', 'creator', kwargs['author'])
 	epubBook.add_metadata('DC', 'source', kwargs['ISBN'])
 	epubBook.add_metadata('DC', 'date', kwargs['date'])
 	epubBook.add_metadata('DC', 'publisher', kwargs['house'])
+
 	return epubBook
 
 def html2epub(part_list, dst, **kwargs):
@@ -51,10 +54,12 @@ def html2epub(part_list, dst, **kwargs):
 	book.toc = toc
 
 	book.add_item(epub.EpubNcx())
-	book.add_item(epub.EpubNav())
+	book.add_item(epub.EpubNav(file_name='Text/nav.xhtml'))
 	book.spine = ['nav'] +c_list
 
 	epub.write_epub(dst, book, {})
+
+	return book
 
 def txt2epub(src, dst, line_per_chapter=100, **kwargs):
 
@@ -81,9 +86,9 @@ def txt2epub(src, dst, line_per_chapter=100, **kwargs):
 		add_tag(f, f,)
 		add_template_tag(f, f, )
 
-	html2epub(part_list, dst, **kwargs)
+	book = html2epub(part_list, dst, **kwargs)
 
 	shutil.rmtree(temp_folder)
-
+	return book
 if __name__ == '__main__':
 	pass

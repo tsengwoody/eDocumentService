@@ -185,6 +185,7 @@ class Book(models.Model):
 					'author': self.book_info.author,
 					'date': str(self.book_info.date),
 					'house': self.book_info.house,
+					'language': 'zh',
 				}
 				html2epub(part_list, final_epub, **info)
 				book = epub.read_epub(final_epub)

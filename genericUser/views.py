@@ -252,6 +252,7 @@ def upload_document(request, template_name='genericUser/upload_document.html'):
 					'author': newBookInfo.author,
 					'date': str(newBookInfo.date),
 					'house': newBookInfo.house,
+					'language': 'zh',
 				}
 				txt2epub(uploadFilePath, final_file, **info)
 			except BaseException as e:
@@ -275,10 +276,10 @@ def upload_document(request, template_name='genericUser/upload_document.html'):
 					author = newBookInfo.author,
 					date = str(newBookInfo.date),
 					house = newBookInfo.house,
+					language = 'zh',
 				)
 				epub.write_epub(final_file, book, {})
 			except BaseException as e:
-				print e
 				shutil.rmtree(uploadPath)
 				status = 'error'
 				message = u'建立文件失敗'
