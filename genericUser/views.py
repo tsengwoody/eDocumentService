@@ -258,7 +258,7 @@ def upload_document(request, template_name='genericUser/upload_document.html'):
 			except BaseException as e:
 				shutil.rmtree(uploadPath)
 				status = 'error'
-				message = u'建立文件失敗'
+				message = u'建立文件失敗' +str(e)
 				return locals()
 
 		#epub
@@ -282,7 +282,7 @@ def upload_document(request, template_name='genericUser/upload_document.html'):
 			except BaseException as e:
 				shutil.rmtree(uploadPath)
 				status = 'error'
-				message = u'建立文件失敗'
+				message = u'建立文件失敗' +str(e)
 				return locals()
 
 		#建立book object和ebook object

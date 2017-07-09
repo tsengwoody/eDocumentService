@@ -14,7 +14,7 @@ def through(src, dst):
 
 def add_bookinfo(epubBook, **kwargs):
 
-	for k,v in epubBook.metadata[epub.NAMESPACES['DC']].iteritems():
+	for k in epubBook.metadata[epub.NAMESPACES['DC']].keys():
 		if k in kwargs.keys():
 			del epubBook.metadata[epub.NAMESPACES['DC']][k]
 
@@ -63,9 +63,9 @@ def html2epub(part_list, dst, **kwargs):
 
 def txt2epub(src, dst, line_per_chapter=100, **kwargs):
 
-	temp_folder = 'epub_temp'
+	temp_folder = os.path.join(os.path.dirname(src), 'epub_temp')
 	if not os.path.exists(temp_folder):
-		os.mkdir(temp_folder)
+		os.makedirs(temp_folder)
 	part_list = []
 	with io.open(src, 'r', encoding='utf-8') as fr:
 		for index, line in enumerate(fr.readlines()):
