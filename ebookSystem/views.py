@@ -425,6 +425,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 @view_permission
 @http_response
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
+	users = User.objects.all()
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
 	except:

@@ -1,4 +1,4 @@
-{% load staticfiles %}
+﻿{% load staticfiles %}
 {% block style %}
 
 <link href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
@@ -99,13 +99,10 @@ $( document ).ready(function() {
                         選擇使用者
                     </label>
                     <select type="text" class="form-control" id="ba_select_users">
-                        {% for user in users %}
-                            <option value="{{ user }}">{{ user }}</option>
-                        {% endfor %}
                         <option value="">請選擇使用者</option>
-                        <option value="qwe">qwe</option>
-                        <option value="asd">asd</option>
-                        <option value="zxc">zxc</option>
+                        {% for user in users %}
+                            <option value="{{ user.username }}">{{ user.username }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
@@ -116,12 +113,12 @@ $( document ).ready(function() {
                     <input type="text" class="form-control" id="ba_input_date" placeholder="YYYY-mm-dd">
                 </div>
  
-                <div class="form-group form-inline text-center">
+<!--                <div class="form-group form-inline text-center">
                     <label for="ba_input_password">
                         輸入密碼
                     </label>
                     <input type="password" class="form-control" id="ba_input_password">
-                </div>
+                </div>-->
 
             </div>
 
