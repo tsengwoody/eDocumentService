@@ -8,6 +8,7 @@
 {% endblock %}
 {% block content %}
 {% include 'utils/get_book.html' %}
+{% include 'utils/book_assign.html' %}
 {% include 'utils/dialog.html' %}
 <legend><h3>{{ book }}資訊</h3></legend>
 <ul >
@@ -45,7 +46,7 @@
 			</td>
 			{% elif part.status == 1 %}
 			<td>
-				<button type="button" class="btn btn-default" id="assign_id" name="assign" data-whatever="assign" data-toggle="modal" data-target="#getBookModal" data-isbn={{part.ISBN_part}} value={{part.ISBN_part}}>指派</button>
+				<button type="button" class="btn btn-default" id="assign_id" name="assign" data-whatever="assign" data-toggle="modal" data-target="#bookAssignModal" data-isbn={{part.ISBN_part}} value={{part.ISBN_part}}>指派</button>
 			</td>
 			<td></td>
 			{% else %}

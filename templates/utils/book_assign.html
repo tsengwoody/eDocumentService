@@ -1,0 +1,135 @@
+{% load staticfiles %}
+{% block style %}
+
+<link href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
+<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+ <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
+
+
+ <script language="javascript">
+
+$( document ).ready(function() {
+    
+    $('#bookAssignModal').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget) // Button that triggered the modal
+          $('#ba_button_assign').val(button.data('isbn'));
+          type=button.data('whatever') // Extract info from data-* attributes 
+    });
+    
+    $("#ba_input_date").datepicker({
+        dateFormat: "yy-mm-dd",
+    });
+    $("#ba_input_date").keypress(function(e){
+      code = (e.keyCode ? e.keyCode : e.which);
+      if (code == 13){
+        e.preventDefault();
+      }
+    });
+
+    $("#ba_input_password").keypress(function(e){
+      code = (e.keyCode ? e.keyCode : e.which);
+      if (code == 13){
+        e.preventDefault();
+      }
+    });
+
+    $('#ba_button_assign').on("click",function(event){
+
+        var transferData={};
+        transferData['username']=$('#ba_select_users').find('option:selected').val();
+        transferData['deadline']=$('#ba_input_date').val();
+        transferData['password']=$('#ba_input_password').val();
+        transferData['assign']=$(this).val();
+        console.log(transferData);
+
+        $.ajax({
+            url: ".",
+            type: "POST",
+            data: transferData,
+            beforeSend:function(jqXHR, settings){
+                jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+                $('#id_get_otp_load').show();
+            },
+            success: function(json) {
+                alertDialogNoReload(json);
+                $('#bookAssignModal').modal('toggle');
+                $('#id_get_otp_load').hide();
+                $('#ba_select_users').find('option').prop('selected', false);
+                $('#ba_input_date').val('')
+                $('#ba_input_password').val('')
+            },
+            error: function(xhr, errmsg, err) {
+                alert(xhr.status + ": " + xhr.responseText);
+                console.log(xhr.status + ": " + xhr.responseText);
+                $('#id_get_otp_load').hide();
+                $('#ba_select_users').find('option').prop('selected', false);
+                $('#ba_input_date').val('')
+                $('#ba_input_password').val('')
+            }
+        });
+
+    });
+ });
+ </script>
+
+ <style type="text/css">
+    .modal-content{
+        background-color: #f5f5f5;
+    }
+</style>
+
+{% endblock %}
+
+<div class="modal fade" id="bookAssignModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content alert-info">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">指派使用者</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="form-group form-inline text-center">
+                    <label for="ba_select_users">
+                        選擇使用者
+                    </label>
+                    <select type="text" class="form-control" id="ba_select_users">
+                        {% for user in users %}
+                            <option value="{{ user }}">{{ user }}</option>
+                        {% endfor %}
+                        <option value="">請選擇使用者</option>
+                        <option value="qwe">qwe</option>
+                        <option value="asd">asd</option>
+                        <option value="zxc">zxc</option>
+                    </select>
+                </div>
+
+                <div class="form-group form-inline text-center">
+                    <label for="ba_input_date">
+                        輸入時間
+                    </label>
+                    <input type="text" class="form-control" id="ba_input_date" placeholder="YYYY-mm-dd">
+                </div>
+ 
+                <div class="form-group form-inline text-center">
+                    <label for="ba_input_password">
+                        輸入密碼
+                    </label>
+                    <input type="password" class="form-control" id="ba_input_password">
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_otp_load" />
+                <button type="button" class="btn btn-primary" id="ba_button_assign">指派</button>
+            </div>
+            
+        </div>
+    </div>
+</div>
