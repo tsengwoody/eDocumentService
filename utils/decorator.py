@@ -50,12 +50,19 @@ def http_response(view):
 			if 'extra_list' not in rend_dict:
 				rend_dict['extra_list'] = []
 			response = {}
-			response['status'] = rend_dict['status']
-			response['message'] = rend_dict['message']
 			if 'redirect_to' in rend_dict:
 				response['redirect_to'] = rend_dict['redirect_to']
-			if 'permission_denied' in rend_dict:
+			elif 'permission_denied' in rend_dict:
 				response['permission_denied'] = rend_dict['permission_denied']
+			elif 'download_path' in rend_dict:
+				print 'DO'
+				with open(rend_dict['download_path'], 'rb') as content_file:
+					response = HttpResponse(content=content_file, )
+				response['Content-Type'] = 'application/octet-stream'
+				response['Content-Disposition'] = u'attachment; filename="{0}"'.format(rend_dict['download_filename']).encode('utf-8')
+				return response
+			response['status'] = rend_dict['status']
+			response['message'] = rend_dict['message']
 			for key in rend_dict['extra_list']:
 				response[key] = rend_dict[key]
 			return HttpResponse(json.dumps(response), content_type="application/json")

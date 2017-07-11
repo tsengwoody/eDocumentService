@@ -3,9 +3,11 @@ certifi==2017.4.17
 chardet==3.0.3
 Django==1.10
 django-recaptcha2==1.0.0
+EbookLib==0.16
 html5lib==0.999999999
 idna==2.5
 image==1.5.5
+lxml==3.8.0
 olefile==0.44
 Pillow==4.1.1
 pyminizip==0.2.1

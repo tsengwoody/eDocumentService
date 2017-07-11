@@ -261,7 +261,7 @@ class Command(BaseCommand):
 		)
 		print response.json()['status']
 		ebook = EBook.objects.get(book=book, part=1)
-		assert ebook.change_status(1, 'edit', user=root), 'change status error'
+		assert ebook.change_status(1, 'edit', user=root, deadline='2017-12-31'), 'change status error'
 		ebook.service_hours = 90
 		ebook.save()
 		count = [0,0,1,2,3]
@@ -277,7 +277,7 @@ class Command(BaseCommand):
 		assert ebook.change_status(1, 'finish'), 'change status error'
 
 		ebook = EBook.objects.get(book=book, part=2)
-		assert ebook.change_status(1, 'edit', user=root), 'change status error'
+		assert ebook.change_status(1, 'edit', user=root, deadline='2017-12-31'), 'change status error'
 		ebook.service_hours = 80
 		count = [0,0,1,2,3]
 		for i in range(80):
