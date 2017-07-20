@@ -10,28 +10,21 @@
  <script language="javascript">
 
 $( document ).ready(function() {
-    
+
     $('#bookAssignModal').on('show.bs.modal', function (event) {
-          var button = $(event.relatedTarget) // Button that triggered the modal
-          $('#ba_button_assign').val(button.data('isbn'));
-          type=button.data('whatever') // Extract info from data-* attributes 
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        $('#ba_button_assign').val(button.data('isbn'));
+        type=button.data('whatever') // Extract info from data-* attributes 
     });
-    
+
     $("#ba_input_date").datepicker({
         dateFormat: "yy-mm-dd",
     });
     $("#ba_input_date").keypress(function(e){
-      code = (e.keyCode ? e.keyCode : e.which);
-      if (code == 13){
-        e.preventDefault();
-      }
-    });
-
-    $("#ba_input_password").keypress(function(e){
-      code = (e.keyCode ? e.keyCode : e.which);
-      if (code == 13){
-        e.preventDefault();
-      }
+        code = (e.keyCode ? e.keyCode : e.which);
+        if (code == 13){
+            e.preventDefault();
+        }
     });
 
     $('#ba_button_assign').on("click",function(event){
@@ -39,7 +32,6 @@ $( document ).ready(function() {
         var transferData={};
         transferData['username']=$('#ba_select_users').find('option:selected').val();
         transferData['deadline']=$('#ba_input_date').val();
-        transferData['password']=$('#ba_input_password').val();
         transferData['assign']=$(this).val();
         console.log(transferData);
 
@@ -52,12 +44,11 @@ $( document ).ready(function() {
                 $('#id_get_otp_load').show();
             },
             success: function(json) {
-                alertDialogNoReload(json);
+                alertDialog(json);
                 $('#bookAssignModal').modal('toggle');
                 $('#id_get_otp_load').hide();
                 $('#ba_select_users').find('option').prop('selected', false);
                 $('#ba_input_date').val('')
-                $('#ba_input_password').val('')
             },
             error: function(xhr, errmsg, err) {
                 alert(xhr.status + ": " + xhr.responseText);
@@ -65,7 +56,6 @@ $( document ).ready(function() {
                 $('#id_get_otp_load').hide();
                 $('#ba_select_users').find('option').prop('selected', false);
                 $('#ba_input_date').val('')
-                $('#ba_input_password').val('')
             }
         });
 
@@ -113,13 +103,6 @@ $( document ).ready(function() {
                     <input type="text" class="form-control" id="ba_input_date" placeholder="YYYY-mm-dd">
                 </div>
  
-<!--                <div class="form-group form-inline text-center">
-                    <label for="ba_input_password">
-                        輸入密碼
-                    </label>
-                    <input type="password" class="form-control" id="ba_input_password">
-                </div>-->
-
             </div>
 
             <div class="modal-footer">

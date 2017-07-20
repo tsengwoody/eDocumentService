@@ -27,7 +27,7 @@ function downloadbook(me){
         };
 
         //generalajax
-        generalajax(ISBN+'_'+password+'.zip',transferData);
+        generalajax(transferData);
 
         //clear
         $('#modal_downloadbook_inp_password').val('');
@@ -63,7 +63,21 @@ function generalalerterror(msg){
 }
 
 
-function generalajax(fn, transferData){
+function getdisposition(xhr){
+    var filename='';
+    var disposition = xhr.getResponseHeader('Content-Disposition');
+    if (disposition && disposition.indexOf('attachment') !== -1) {
+        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        var matches = filenameRegex.exec(disposition);
+        if (matches != null && matches[1]) {
+            filename = matches[1].replace(/['"]/g, '');
+        }
+    }
+    return filename;
+}
+
+
+function generalajax(transferData){
     $.ajax({
         url:".",
         type: "POST",
@@ -72,11 +86,12 @@ function generalajax(fn, transferData){
         beforeSend:function(jqXHR, settings){
             jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
         },
-        success: function(bdata){
-            // console.log(bdata);
+        success: function(bdata,status,xhr){
+            //console.log(bdata);
 
             if(bdata.type==='application/octet-stream'){
-                downloadfile(fn, bdata);
+                var filename=getdisposition(xhr);
+                downloadfile(filename, bdata);
             }
             else{
                 generalalerterror('密碼錯誤或準備文件失敗');
