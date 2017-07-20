@@ -24,7 +24,7 @@
 			</td>
 			<td>
 				<button type="button" class="btn btn-default" id="download_id" name="download" data-whatever="download" data-toggle="modal" data-target="#getBookModal" data-isbn={{ bookinfo.ISBN }} value={{ bookinfo.ISBN }}>下載</button>
-<!--				<button type="button" class="btn btn-default" data-whatever="download2" data-toggle="modal" data-target="#getBookModal" data-isbn={{ bookinfo.ISBN }} value={{ bookinfo.ISBN }}>下載2</button>-->
+				<button type="button" class="btn btn-default" ISBN="{{ bookinfo.ISBN }}" onclick="downloadbook(this)">下載2</button>
 			</td>
 			{% else %}
 			<td></td>

@@ -22,7 +22,6 @@
 	{% block resource%} {% endblock%}
 	{% block style %}{% endblock %}
 </head>
-	{% block tawk %}{% endblock %}
 <body>
 	{% block nav %} {% endblock %}
 	<div class="container">
@@ -80,5 +79,18 @@
 	{% endblock %}
 	<script src="{% static "ebookSystem/js/bootstrap/bootstrap.min.js" %}" type="text/javascript"></script>
 	<script src="{% static "ebookSystem/js/bootstrap/ie10-viewport-bug-workaround.js" %}" type="text/javascript"></script>
+
+	<script type="text/javascript">
+		var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+		(function(){
+		var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+		s1.async=true;
+		s1.src='https://embed.tawk.to/595dd26650fd5105d0c842ed/default';
+		s1.charset='UTF-8';
+		s1.setAttribute('crossorigin','*');
+		s0.parentNode.insertBefore(s1,s0);
+		})();
+	</script>
+
 </body>
 </html>
