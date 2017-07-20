@@ -126,9 +126,8 @@ class Event(models.Model):
 	def response(self, status ,message, user):
 		self.time_reply = timezone.now()
 		self.reviewer = user
-		if self.STATUS.has_key(status):
-			self.status = self.STATUS[status]
-		self.message = message
+		self.status = self.STATUS[status]
+		self.message = unicode(self.action) +message
 		self.save()
 
 	def __unicode__(self):
