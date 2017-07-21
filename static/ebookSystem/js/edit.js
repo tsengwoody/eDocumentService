@@ -283,7 +283,7 @@ function createHtmlEditor(){
   force_br_newlines : false,
   force_p_newlines : false,
   selector: 'textarea',  // change this value according to your HTML
-  toolbar1: 'mark | 載入全文  | 存擋 | 完成 | 關閉 |  切換版型',
+  toolbar1: '標記 | 載入全文  | 存檔 | 完成 | 關閉 |  切換版型',
   toolbar2: 'undo redo | cut copy paste | bullist numlist | table | searchreplace | fontsizeselect ',
   fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt',
   menubar: false,
@@ -294,32 +294,32 @@ function createHtmlEditor(){
         change_count++;
     });
 
-    editor.addButton('mark', {
+    editor.addButton('標記', {
       type: 'menubutton',
-      text: 'mark',
+      text: '標記',
       icon: false,
       menu: [{
-        text: 'image_mark',
+        text: '圖片標記',
         onclick: function() {
           var message = '<p><img id="'+$('#scanPageList :selected').val()+'" alt="this is a picture" height="42" width="42"></p>';
           addMark(message,editor);
           //editor.insertContent();
         }
       }, {
-        text: 'unknown_mark',
+        text: '未知標記',
         onclick: function() {
           var message = '<span class="unknown" style="color: red;" id="'+$('#scanPageList :selected').val()+'">{???}</span>';
           editor.insertContent(message);
             
         }
       },{
-        text: 'mathml_mark',
+        text: '數學標記',
         onclick: function() {
           var message = '<p><span class="mathml" style="color:blue" id="'+$('#scanPageList :selected').val()+'">mathml</span></p>';
           addMark(message,editor);
         }
       },{
-        text: 'save_mark',
+        text: '進度標記',
         onclick: function() {
           var message = '<p>|----------|</p>';
           addMark(message,editor);
@@ -340,13 +340,13 @@ function createHtmlEditor(){
 
     
 
-    editor.addButton('存擋', {
-      text: '存擋',
+    editor.addButton('存檔', {
+      text: '存檔',
       name: 'save',
       icon: false,
       onclick: function () {
         if(editor.getContent().indexOf('<p>|----------|</p>')<0)
-            alertMessageDialog('error',"未存擋成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下完成按紐");
+            alertMessageDialog('error',"未存檔成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下完成按紐");
         else{
             function_click=true;
             editor.save();
@@ -363,7 +363,7 @@ function createHtmlEditor(){
       icon: false,
       onclick: function () {
         if(editor.getContent().indexOf('<p>|----------|</p>')>0)
-            alertMessageDialog('error',"未存擋成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下存擋按紐");
+            alertMessageDialog('error',"未存檔成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下存檔按紐");
         else{
             function_click=true;
             editor.save();

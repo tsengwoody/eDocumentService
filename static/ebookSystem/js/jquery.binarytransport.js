@@ -22,6 +22,19 @@ $.ajaxTransport("+binary", function (options, originalOptions, jqXHR) {
 					var data = {};
 					data[options.dataType] = xhr.response;
 					// make callback and send data
+					// console.log(xhr.getAllResponseHeaders())
+					// console.log(xhr.getResponseHeader('Content-Disposition'));
+
+					var disposition = xhr.getResponseHeader('Content-Disposition');
+					var filename='';
+					if (disposition && disposition.indexOf('attachment') !== -1) {
+						var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+						var matches = filenameRegex.exec(disposition);
+						if (matches != null && matches[1]) {
+							filename = matches[1].replace(/['"]/g, '');
+						}
+					}
+
 					callback(xhr.status, xhr.statusText, data, xhr.getAllResponseHeaders());
 				});
 
