@@ -97,31 +97,4 @@
 </script>
 
 
-<!--{% for category, bookinfos in books_list %}
-<h4>圖書分類號：{{ category }}</h4>
-<table class="table table-striped table-hover">
-	<tr>
-		<th>ISBN</th>
-		<th>書名</th>
-		<th>裝訂冊數</th>
-		<th>版次</th>
-		<th>作者</th>
-		<th>出版社</th>
-		<th>出版日期</th>
-	</tr>
-	{% for bookinfo in bookinfos %}
-	<tr>
-		<td>{{ bookinfo.ISBN }}</td>
-		<td>{{ bookinfo.bookname }}</td>
-		<td>{{ bookinfo.bookbinding }}</td>
-		<td>{{ bookinfo.order }}</td>
-		<td>{{ bookinfo.author }}</td>
-		<td>{{ bookinfo.house }}</td>
-		<td>{{ bookinfo.date }}</td>
-	</tr>
-	{% endfor %}
-</table>
-{% endfor %}-->
-
-
 {% endblock %}
