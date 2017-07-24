@@ -26,9 +26,22 @@ def statistics(request, template_name='manager/statistics.html'):
 			editor_list = User.objects.filter(is_editor=True, date_joined__lte=month, auth_email=True, auth_phone=True,)
 			guest_list = User.objects.filter(is_guest=True, date_joined__lte=month, auth_email=True, auth_phone=True,)
 			editor_list_30 = User.objects.filter(is_editor=True, date_joined__lte=month, last_login__gt=month -datetime.timedelta(days=30), auth_email=True, auth_phone=True,)
-			finish_list = Book.objects.filter(finish_date__lte=month, upload_date__lte=month)
+			finish_list = Book.objects.filter(finish_date__lte=month, upload_date__lte=month, source='self')
+			txt_list = Book.objects.filter(upload_date__lte=month, source='txt')
+			epub_list = Book.objects.filter(upload_date__lte=month, source='epub')
 			book_list = Book.objects.filter(upload_date__lte=month)
-			result.append((month, len(editor_list), len(guest_list), len(editor_list_30), len(book_list), len(finish_list)))
+			scanbook_list = Book.objects.filter(upload_date__lte=month, source='self')
+			result.append((
+				month,
+				len(editor_list),
+				len(guest_list),
+				len(editor_list_30),
+				len(book_list),
+				len(scanbook_list),
+				len(finish_list) ,
+				len(txt_list) ,
+				len(epub_list),
+			))
 		month = datetime.date.today() -datetime.timedelta(days=30)
 		active_editor_list = User.objects.filter(is_editor=True, last_login__gt=month)
 		return locals()

@@ -196,12 +196,12 @@ def create_document(request, template_name='genericUser/create_document.html'):
 			return locals()
 		newBook.scaner = request.user
 		newBook.owner = request.user
-		if request.POST.has_key('designate'):
-			newBook.is_private = True
+		newBook.source = 'self'
 		newBook.save()
 		try:
 			newBook.create_EBook()
 		except BaseException as e:
+			newBook.delete()
 			status = 'error'
 			message = u'建立分段失敗'
 			return locals()
@@ -289,6 +289,7 @@ def upload_document(request, template_name='genericUser/upload_document.html'):
 		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path=uploadPath)
 		newBook.scaner = request.user
 		newBook.owner = request.user
+		newBook.source = request.POST['category']
 		newBook.save()
 		ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN'] + '-1', begin_page=-1, end_page=-1)
 		ebook.change_status(9, 'final')

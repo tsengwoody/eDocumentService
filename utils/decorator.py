@@ -52,10 +52,11 @@ def http_response(view):
 			response = {}
 			if 'redirect_to' in rend_dict:
 				response['redirect_to'] = rend_dict['redirect_to']
+			elif 'content' in rend_dict:
+				response['content'] = rend_dict['content']
 			elif 'permission_denied' in rend_dict:
 				response['permission_denied'] = rend_dict['permission_denied']
 			elif 'download_path' in rend_dict:
-				print 'DO'
 				with open(rend_dict['download_path'], 'rb') as content_file:
 					response = HttpResponse(content=content_file, )
 				response['Content-Type'] = 'application/octet-stream'

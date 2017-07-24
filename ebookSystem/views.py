@@ -157,23 +157,27 @@ def book_list_manager(request, template_name='ebookSystem/book_list_manager.html
 
 @http_response
 def search_book(request, template_name):
-	if request.method == 'POST' :
-		if request.POST.has_key('search_value') and not request.POST.has_key('download') and not request.POST.has_key('email'):
+	if request.method == 'POST':
+		if request.POST.has_key('search_value') and request.POST.has_key('search_type'):
 			search_value = request.POST['search_value']
 			search_type = request.POST['search_type']
 			try:
 				if search_type == 'ISBN':
 					books = Book.objects.filter(ISBN=search_value)
-				elif search_type == 'BookName':
-					books = Book.objects.select_related().filter(book_info__bookname__contains=search_value)
+				elif search_type in ['bookname', 'author', 'house']:
+					exec(
+						'books = Book.objects.select_related().filter(book_info__{0}__contains=search_value)'.format(search_type)
+					)
 				if len(books) <= 0:
 					raise SystemError('not found')
 				bookinfos = [ book.book_info for book in books ]
 				status = 'success'
 				message = u'成功查詢指定文件'
+				content = {}
+				content['bookinfo'] = [bookinfo.serialized() for bookinfo in bookinfos]
 			except:
 				status = 'error'
-				message = u'查無指定ISBN文件'
+				message = u'查無指定文件'
 		elif request.POST.has_key('email'):
 			from django.core.mail import EmailMessage
 			getBook = Book.objects.get(ISBN=request.POST['email'])

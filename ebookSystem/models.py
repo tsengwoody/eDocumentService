@@ -25,6 +25,20 @@ class BookInfo(models.Model):
 	def __unicode__(self):
 		return self.bookname
 
+	def serialized(self):
+		serialize = {}
+		for field in self._meta.fields:
+			value = getattr(self, field.name)
+			if isinstance(value, models.Model):
+				value = {'name': unicode(value), 'href': ''}
+			else:
+				try:
+					json.dumps(value)
+				except:
+					value = unicode(value)
+			serialize.update({field.name: value})
+		return serialize
+
 class Book(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
 	book_info = models.OneToOneField(BookInfo, related_name='book')
@@ -38,7 +52,12 @@ class Book(models.Model):
 	owner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='own_book_set')
 	upload_date = models.DateField(default = timezone.now)
 	is_private = models.BooleanField(default=False)
-	source = models.CharField(max_length=100, blank=True, null=True)
+	SOURCE = (
+		(u'self', u'self'),
+		(u'txt', u'txt'),
+		(u'epub', u'epub'),
+	)
+	source = models.CharField(max_length=20, choices=SOURCE)
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8, 'final': 9, }
 
