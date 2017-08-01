@@ -278,6 +278,8 @@ var function_click = false;
 var idel_min =0;
 var change_count=0;
 function createHtmlEditor(){
+
+    // Initialize TinyMCE
   tinymce.init({
   forced_root_block : "", 
   force_br_newlines : false,
@@ -324,7 +326,19 @@ function createHtmlEditor(){
           var message = '<p>|----------|</p>';
           addMark(message,editor);
         }
-      }]
+      },
+    //   {
+    //     text: '移至上一標記',
+    //     onclick: function() {
+    //         selscr_find('id_content_ifr', 'previous');
+    //     }
+    //   }, {
+    //     text: '移至下一標記',
+    //     onclick: function() {
+    //         selscr_find('id_content_ifr', 'next');
+    //     }
+    //   }
+      ]
     });
 
     editor.addButton('載入全文', {

@@ -278,14 +278,12 @@ function createHtmlEditor(){
       menu: [{
         text: '移至上一標記',
         onclick: function() {
-        //   var message = '<p><img id="'+$('#scanPageList :selected').val()+'" alt="this is a picture" height="42" width="42"></p>';
-        //   addMark(message,editor);
+            selscr_find('id_content_ifr', 'previous');
         }
       }, {
         text: '移至下一標記',
         onclick: function() {
-        //   var message = '<span class="unknown" style="color: red;" id="'+$('#scanPageList :selected').val()+'">{???}</span>';
-        //   editor.insertContent(message);
+            selscr_find('id_content_ifr', 'next');
         }
       }]
     });
