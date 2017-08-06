@@ -259,7 +259,7 @@ class Command(BaseCommand):
 			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
-		print response.json()['status']
+
 		ebook = EBook.objects.get(book=book, part=1)
 		assert ebook.change_status(1, 'edit', user=root, deadline='2017-12-31'), 'change status error'
 		ebook.service_hours = 90
@@ -274,7 +274,23 @@ class Command(BaseCommand):
 				edit_count = count[i%5],
 			)
 		assert ebook.change_status(1, 'review'), 'change status error'
-		assert ebook.change_status(1, 'finish'), 'change status error'
+		src = BASE_DIR +u'/temp/part1-finish-sp.txt'
+		shutil.copy2(src, ebook.get_path('-finish'))
+		client = Client()
+		client.login(username='root', password='root')
+		response = client.post(
+			reverse(
+				'ebookSystem:review_part',
+				kwargs = {
+					'ISBN_part': ebook.ISBN_part,
+				},
+			),
+			{
+				'review': 'success',
+				'reason': '',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
 
 		ebook = EBook.objects.get(book=book, part=2)
 		assert ebook.change_status(1, 'edit', user=root, deadline='2017-12-31'), 'change status error'
@@ -289,8 +305,23 @@ class Command(BaseCommand):
 				edit_count = count[i%5],
 			)
 		assert ebook.change_status(1, 'review'), 'change status error'
-		assert ebook.change_status(1, 'finish'), 'change status error'
-		assert ebook.change_status(1, 'sc_edit', user=root), 'change status error'
+		src = BASE_DIR +u'/temp/part1-finish-sp.txt'
+		shutil.copy2(src, ebook.get_path('-finish'))
+		client = Client()
+		client.login(username='root', password='root')
+		response = client.post(
+			reverse(
+				'ebookSystem:review_part',
+				kwargs = {
+					'ISBN_part': ebook.ISBN_part,
+				},
+			),
+			{
+				'review': 'success',
+				'reason': '',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
 
 		src = BASE_DIR +u'/temp/山羊島的藍色奇蹟.zip'
 		with open(src) as book_file:
@@ -342,13 +373,6 @@ class Command(BaseCommand):
 		book_file.close()
 		assert response.status_code == 302, 'status_code' +str(response.status_code)
 		assert len(Book.objects.all())==3, 'create book fail'
-
-		src = BASE_DIR +'/temp/part-finish.zip'
-		dst = book.path +u'/OCR'
-		with ZipFile(src, 'r') as partFile:
-			partFile.extractall(dst)
-
-		src = BASE_DIR +u'/temp/羊與鋼之森.epub'
 
 		src = BASE_DIR +'/temp/article_NVDA.zip'
 		with open(src) as fileObject:

@@ -4,6 +4,8 @@ from ebookSystem.models import *
 from .models import *
 
 EDUCATION_OPTION = (
+	(u'國小' , u'國小'),
+	(u'國中' , u'國中'),
 	(u'高中' , u'高中'),
 	(u'學士' , u'學士'),
 	(u'碩士' , u'碩士'),
@@ -103,6 +105,7 @@ class UserForm(forms.ModelForm):
 		super(UserForm, self).__init__(*args, **kwargs)
 		field_order = ['username', 'first_name', 'last_name', 'email', 'phone', 'birthday', 'education', 'is_book', 'org',]
 		self.fields = type(self.fields)((k, self.fields[k]) for k in field_order)
+		self.fields['org'].empty_label = u'其他'
 		try:
 			field_cannot_modify = []
 			if kwargs['instance'].status is not kwargs['instance'].STATUS['review']:

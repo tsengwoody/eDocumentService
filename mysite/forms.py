@@ -7,6 +7,8 @@ from django.conf import settings
 import requests
 
 EDUCATION_OPTION = (
+	(u'國小' , u'國小'),
+	(u'國中' , u'國中'),
 	(u'高中' , u'高中'),
 	(u'學士' , u'學士'),
 	(u'碩士' , u'碩士'),
@@ -111,6 +113,7 @@ class RegisterUserForm(forms.ModelForm):
 		super(RegisterUserForm, self).__init__(*args, **kwargs)
 		field_order = ['username', 'password', 'confirm_password', 'first_name', 'last_name', 'email', 'phone', 'birthday', 'education', 'is_book', 'org',]
 		self.fields = type(self.fields)((k, self.fields[k]) for k in field_order)
+		self.fields['org'].empty_label = u'其他'
 
 class FormWithCaptcha(forms.Form):
     captcha = ReCaptchaField(required=True,widget=ReCaptchaWidget())

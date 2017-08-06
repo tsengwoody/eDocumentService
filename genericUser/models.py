@@ -27,13 +27,15 @@ class User(AbstractUser):
 	phone = models.CharField(max_length=30)
 	birthday = models.DateField()
 	EDU = (
+	(u'國小' , u'國小'),
+	(u'國中' , u'國中'),
 		(u'高中' , u'高中'),
 		(u'學士' , u'學士'),
 		(u'碩士' , u'碩士'),
 	)
 	education = models.CharField(max_length=30, choices=EDU)
 	online = models.DateTimeField(default = timezone.now)
-	org = models.ForeignKey('Organization',blank=True, null=True, on_delete=models.SET_NULL, related_name='user_set')
+	org = models.ForeignKey('Organization',blank=True, null=True, on_delete=models.SET_NULL, related_name='user_set', )
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'review':2}
 	is_book = models.BooleanField(default=False)

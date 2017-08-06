@@ -34,9 +34,9 @@ class baseViewTests(TestCase):
 		rootGuest = Guest.objects.create(user=root)
 		self.client.login(username='root', password='root')
 
-class licenseViewTests(baseViewTests):
+class detailViewTests(baseViewTests):
 	def setUp(self):
-		super(licenseViewTests, self).setUp()
+		super(detailViewTests, self).setUp()
 		src = BASE_DIR +u'/temp/藍色駭客.zip'
 		with open(src) as book_file:
 			client = Client()
@@ -72,7 +72,7 @@ class licenseViewTests(baseViewTests):
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
 
-	def test_correct_case(self):
+	'''def test_detail_correct_case(self):
 		response = self.client.post(
 			reverse(
 				'ebookSystem:detail',
@@ -89,11 +89,25 @@ class licenseViewTests(baseViewTests):
 		ebook = EBook.objects.get(ISBN_part='9789573321568-1')
 		self.assertEqual(ebook.status, 2)
 		self.assertEqual(ebook.editor.username, 'root')
-		print ebook.deadline
+		print ebook.deadline'''
+
+	def test_search_correct_case(self):
+		response = self.client.post(
+			reverse(
+				'ebookSystem:search_book',
+			),
+			{
+				'search_type' :'ISBN',
+				'search_value': '9789573321568',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		print response.json()['content']
 
 	def tearDown(self):
-		book = Book.objects.get(ISBN='9789573321568')
+		super(detailViewTests, self).tearDown()
 		try:
+			book = Book.objects.get(ISBN='9789573321568')
 			shutil.rmtree(book.path)
 		except BaseException as e:
 			print(e)
