@@ -210,23 +210,6 @@ class Article(models.Model):
 		path = os.path.join(BASE_DIR, 'static') +u'/article/{0}/main_content.html'.format(self.id)
 		return PublicFile(path)
 
-class ContactUs(models.Model):
-	name = models.CharField(max_length=10)
-	email = models.EmailField()
-	subject = models.CharField(max_length=100)
-	datetime = models.DateField(default = timezone.now)
-	CATEGORY = (
-		(u'校對問題' , u'校對問題'),
-		(u'系統問題' , u'系統問題'),
-		(u'營運建議' , u'營運建議'),
-		(u'加入我們' , u'加入我們'),
-		(u'其他' , u'其他'),
-	)
-	category = models.CharField(max_length=10, choices=CATEGORY)
-	content = models.TextField()
-	def __unicode__(self):
-		return self.subject
-
 class View(models.Model):
 	namespace = models.CharField(max_length=100, )
 	url_name = models.CharField(max_length=100, )

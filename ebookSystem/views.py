@@ -684,135 +684,39 @@ def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
 	if request.method == 'GET':
 		return locals()
 
-@view_permission
+#==========
 @http_response
-def special_content(request, ISBN_part, template_name='ebookSystem/special_content.html'):
-	try:
-		part = EBook.objects.get(ISBN_part=ISBN_part)
-	except:
-		raise Http404("book does not exist")
-	sc_list = part.specialcontent_set.all().order_by('page')
-	if request.method == 'POST':
-		if request.POST.has_key('rebuild'):
-			part.delete_SpecialContent()
-			part.create_SpecialContent()
-			status = u'success'
-			message = u'重新檢查特殊內容成功'
-		if request.POST.has_key('full_write'):
-			for sc in part.specialcontent_set.all():
-				sc.write_to_file()
-			status = u'success'
-			message = u'全寫入成功'
-		if request.POST.has_key('finish'):
-			if part.is_sc_rebuild:
-				status = u'error'
-				message = u'請先進行特殊內容檢查'
-				return locals()
-			if not len(part.specialcontent_set.all()) == 0:
-				status = u'error'
-				message = u'請先完成特殊內容編輯'
-				return locals()
-			part.change_status(1, 'sc_finish')
-			status = u'success'
-			message = u'特殊內容編輯完成'
-			redirect_to = reverse('account:sc_service')
-		if request.POST.has_key('write'):
-			sc = SpecialContent.objects.get(id=request.POST['write'])
-			sc.write_to_file()
-			status = u'success'
-			message = u'寫入動作成功'
-		return locals()
-	if request.method == 'GET':
+def book_download(request, ISBN, ):
+	if request.method == 'POST' and request.is_ajax():
+		getBook = Book.objects.get(ISBN=ISBN)
+		attach_file_path = getBook.zip(request.user, request.POST['password'])
+		if not attach_file_path:
+			status = 'error'
+			message = u'準備文件失敗'
+			return locals()
+		download_path = attach_file_path
+		download_filename = os.path.basename(attach_file_path)
 		return locals()
 
-@view_permission
 @http_response
-def edit_SpecialContent(request, id, type):
-	try:
-		sc = SpecialContent.objects.get(id=id)
-	except: 
-		raise Http404("special content does not exist")
-	part = sc.ebook
-	page = sc.page
-	water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(part.book.book_info.ISBN, request.user.username)
-	[scanPageList, defaultPageURL] = part.get_image(request.user)
-	sc_list = list(SpecialContent.objects.filter(ebook=part).order_by('tag_id'))
-	total_count = len(sc_list)
-	current_count = sc_list.index(sc)
-	if page == 0:
-		show_page = 0
-		scanPageList = scanPageList[page:page+2]
-		default_page_url = water_path +u'/' +scanPageList[0]
-	elif page == part.end_page -part.begin_page:
-		show_page = 1
-		scanPageList = scanPageList[page-1:page+1]
-		default_page_url = water_path +u'/' +scanPageList[1]
-	else:
-		show_page = 1
-		scanPageList = scanPageList[page-1:page+2]
-		default_page_url = water_path +u'/' +scanPageList[1]
-	default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
-	from bs4 import BeautifulSoup
-	if type == 'mathml':
-		math_tag = BeautifulSoup(sc.content, 'html5lib').find('math')
-		editContent = str(math_tag)
-	elif type == 'image':
-		img_tag = BeautifulSoup(sc.content, 'html5lib').find('img')
-		image_path = sc.ebook.book.path +'/OCR/resource/image_' +sc.id +'.jpg'
-		image_public_path = sc.ebook.get_path('public') +'/OCR/resource/image_' +sc.id +'.jpg'
-		preview_image_url = image_public_path.replace(BASE_DIR +'/static/', '')
-		editContent = img_tag['alt']
-	elif type == 'unknown':
-		editContent = sc.content
-	template_name = 'ebookSystem/edit_{0}.html'.format(type)
-	if request.method == 'POST':
-		if request.POST.has_key('save') or request.POST.has_key('write'):
-			if type == 'image':
-				img_tag['src'] = 'resource/' +sc.id +'.jpg'
-				img_tag['alt'] = request.POST['alt']
-				sc.content = u'<p id="{0}">'.format(sc.tag_id) +unicode(img_tag) +u'</p>'
-				if not os.path.exists(os.path.dirname(image_path)):
-					os.makedirs(os.path.dirname(image_path), 0770)
-				if not os.path.exists(os.path.dirname(image_public_path)):
-					os.makedirs(os.path.dirname(image_public_path), 0770)
-				try:
-					with open(image_path, 'wb+') as dst:
-						for chunk in request.FILES['imageFile'].chunks():
-							dst.write(chunk)
-					shutil.copy2(image_path, image_public_path)
-				except:
-					status = u'error'
-					message = u'上傳影像失敗'
-					return locals()
-			elif type == 'mathml':
-				math_tag = BeautifulSoup(request.POST['content'], 'html5lib').find('math')
-				sc.content = u'<p id="{0}">'.format(sc.tag_id) +unicode(math_tag) +u'</p>'
-			elif type == 'unknown':
-				p_tag = BeautifulSoup(request.POST['content'], 'html5lib')
-				try:
-					unknown_tag = p_tag.find('span', class_='unknown')
-					remove_tag = unknown_tag.unwrap()
-				except:
-					pass
-				sc.content = unicode(p_tag)
-			sc.save()
-			status = u'success'
-			message = u'暫存'
-		if request.POST.has_key('write'):
-			sc.write_to_file()
-			status = u'success'
-			message = u'寫入'
-			redirect_to = reverse('ebookSystem:special_content', kwargs={'ISBN_part':part.ISBN_part})
-		if request.POST.has_key('download'):
-			if type == 'image':
-				download_path = part.book.path +'/source/' +request.POST['download']
-				download_filename = request.POST['download']
-			status = u'success'
-			message = u'下載'
+def ebook_download(request, ISBN_part, ):
+	if request.method == 'POST' and request.is_ajax():
+		getPart = EBook.objects.get(ISBN_part=ISBN_part)
+		if request.POST['action'] == 'view':
+			attach_file_path = getPart.get_clean_file()
+		elif request.POST['action'] == 'view_se':
+			attach_file_path = getPart.get_clean_file()
+			attach_file_path = getPart.replace()
+		elif request.POST['action'] == 'download_full':
+			attach_file_path = getPart.zip_full()
+		elif request.POST['action'] == 'download':
+			attach_file_path = getPart.zip(request.user, request.POST['password'])
+		else:
+			attach_file_path = None
+		if not attach_file_path:
+			status = 'error'
+			message = u'準備文件失敗'
+			return locals()
+		download_path = attach_file_path
+		download_filename = os.path.basename(attach_file_path)
 		return locals()
-	if request.method == 'GET':
-		return locals()
-
-#def readme(request, template_name):
-#	template_name = resolve(request.path).namespace +'/' +template_name +'_readme.html'
-#	return render(request, template_name, locals())

@@ -57,7 +57,7 @@ class detailViewTests(baseViewTests):
 				'fileObject': book_file,
 			},
 #				HTTP_X_REQUESTED_WITH='XMLHttpRequest',
-			)
+		)
 		response = client.post(
 			reverse(
 				'ebookSystem:review_document',

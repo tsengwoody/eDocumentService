@@ -534,31 +534,6 @@ def revise_content(request, template_name='genericUser/revise_content.html'):
 			message = u'搜尋到多處修政文字段落，請重新輸入並多傳送些文字'
 		return locals()
 
-
-@http_response
-def contact_us(request, template_name='genericUser/contact_us.html'):
-	ContactUsForm = modelform_factory(ContactUs, fields=('name', 'email', 'subject', 'category', 'content'))
-	contactus_category = ContactUs.CATEGORY
-	if request.method == 'POST':
-		contactUsForm = ContactUsForm(request.POST)
-		if not contactUsForm.is_valid():
-			status = 'error'
-			message = u'表單驗證失敗{0}'.format(str(contactUsForm.errors))
-			return locals()
-		contactUs = contactUsForm.save(commit=False)
-		subject = u'[{0}] {1}'.format(contactUs.category, contactUs.subject)
-		body = u'姓名:' + contactUs.name + u'\nemail:' + contactUs.email + u'\n內容：\n' + contactUs.content
-		#		email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=MANAGER)
-		#		email.send(fail_silently=False)
-		contactUs.save()
-		status = 'success'
-		message = u'成功寄送內容，我們將盡速回復'
-		redirect_to = '/'
-		return locals()
-	if request.method == 'GET':
-		contactUsForm = ContactUsForm()
-		return locals()
-
 @view_permission
 @http_response
 def serviceinfo_list(request, username, template_name='genericUser/serviceinfo_list.html'):

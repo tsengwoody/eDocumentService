@@ -25,19 +25,19 @@ class BookInfo(models.Model):
 	def __unicode__(self):
 		return self.bookname
 
-	def serialized(self):
-		serialize = {}
-		for field in self._meta.fields:
-			value = getattr(self, field.name)
-			if isinstance(value, models.Model):
-				value = {'name': unicode(value), 'href': ''}
-			else:
-				try:
-					json.dumps(value)
-				except:
-					value = unicode(value)
-			serialize.update({field.name: value})
-		return serialize
+def generic_serialized(self):
+	serialize = {}
+	for field in self._meta.fields:
+		value = getattr(self, field.name)
+		if isinstance(value, models.Model):
+			value = '{0}/{1}'.format(value.__class__.__name__, value.id)
+		else:
+			try:
+				json.dumps(value)
+			except:
+				value = unicode(value)
+		serialize.update({field.name: value})
+	return serialize
 
 class Book(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
@@ -407,63 +407,6 @@ class EBook(models.Model):
 		elif string in ['', '-edit', '-finish', '-final', ]:
 			return self.book.path +'/OCR/part{0}{1}.txt'.format(self.part, string)
 
-	def fuzzy_string_search(self, string, length=5, action=''):
-		class SliceString():
-			def __init__(self, start, end, source_content, source_index, destination_content, destination_index):
-				self.start = start
-				self.end = end
-				self.source_index = source_index
-				self.destination_index = destination_index
-				self.source_content = source_content
-				self.destination_content = destination_content
-			
-			def content_diff(self):
-				temps = []
-				for start, end in self.source_index:
-					temps.append(self.source_content[start:end])
-				for i, s in enumerate(temps):
-					if s == '':
-						temps[i] = u'□'
-				tempd = []
-				for start, end in self.destination_index:
-					tempd.append(self.destination_content[start:end])
-				for i, s in enumerate(tempd):
-					if s == '':
-						tempd[i] = u'□'
-				content_list = zip(temps, tempd)
-				return content_list
-		import re
-		import difflib
-		content = self.get_content(action)
-		headString = string[0:length]
-		tailString = string[-length:]
-		destination_content = string
-		ssl = []
-		for headSearch in re.finditer(headString, content):
-			for tailSearch in re.finditer(tailString, content):
-				[headPosition, tailPosition] = [headSearch.start(), tailSearch.end()]
-				if headPosition <= tailPosition:
-					source_content = content[headPosition:tailPosition]
-					matchList = difflib.SequenceMatcher(None, source_content, destination_content).get_matching_blocks()
-					source_index = []
-					destination_index = []
-					for match in matchList:
-						if match.size >2:
-							source_index.append(match.a)
-							source_index.append(match.a+match.size)
-							destination_index.append(match.b)
-							destination_index.append(match.b+match.size)
-					temp = []
-					for i in range(1, len(source_index)):
-						temp.append([source_index[i-1], source_index[i]])
-					source_index = temp
-					temp = []
-					for i in range(1, len(destination_index)):
-						temp.append([destination_index[i-1], destination_index[i]])
-					destination_index = temp
-					ss = SliceString(start=headPosition, end=tailPosition, source_content=source_content, source_index=source_index, destination_content=destination_content, destination_index=destination_index)
-					ssl.append(ss)
-		return ssl
 
 	def __unicode__(self):
 		return self.book.book_info.bookname+u'-part'+str(self.part)
@@ -738,46 +681,6 @@ class EBook(models.Model):
 		finish_content = content[0]
 		edit_content = content[1]
 		return [finish_content, edit_content]
-
-class SpecialContent(models.Model):
-	id = models.CharField(max_length=30, primary_key=True)
-	ebook = models.ForeignKey(EBook, on_delete=models.CASCADE)
-	tag_id = models.CharField(max_length=10)
-	page = models.IntegerField()
-	content = models.TextField()
-	is_edited = models.BooleanField(default=False)
-	type = models.IntegerField()
-	TYPE = {'image':0, 'unknown':1, 'mathml':2}
-
-	def __unicode__(self):
-		return self.id
-
-	def type_int2str(self):
-		for k, v in self.TYPE.iteritems():
-			if v == self.type:
-				return k
-		return 'unknown'
-
-	def get_url(self):
-		return '/ebookSystem/advanced/edit_{0}/{1}'.format(self.type_int2str(), self.id)
-
-	def write_to_file(self, encoding='utf-8'):
-		source = self.ebook.get_path('-sc')
-		with codecs.open(source, 'r', encoding=encoding) as sourceFile:
-			source_content = sourceFile.read()
-		soup = BeautifulSoup(source_content, 'html5lib')
-		tags = soup.find_all('p', id=self.tag_id)
-		if not len(tags) == 1:
-			return False
-		tag = tags[0]
-		nt = BeautifulSoup(self.content, 'html5lib').body.p
-		tag.replace_with(nt)
-		with codecs.open(source, 'w', encoding=encoding) as sourceFile:
-			write_content = unicode(soup)
-			soup = BeautifulSoup(write_content, 'html5lib')
-			write_content = unicode(soup)
-			sourceFile.write(write_content)
-		self.delete()
 
 class ReviseContentAction(models.Model):
 	from ebookSystem.models import EBook
