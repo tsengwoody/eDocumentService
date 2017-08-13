@@ -4,16 +4,18 @@
 MathML 編輯 demo
 {% endblock %}
 {% block style %}
-	<link rel='stylesheet' href="{% static 'ebookSystem/css/editor.css' %}">
+	<!-- <script src="{% static "ebookSystem/js/jquery/jquery.min.js" %}" ></script> -->
+	<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script src="http://www.wiris.net/demo/editor/editor"></script>
-    <script src="{% static "ebookSystem/js/jquery/jquery.min.js" %}" ></script>
-    <script language="javascript" src="{% static 'ebookSystem/js/tinymce/js/tinymce/tinymce.min.js' %}"></script>
-	<script src="{% static "ebookSystem/js/editor_app.js" %}"></script>
+	<script language="javascript" src="{% static 'ebookSystem/js/tinymce/js/tinymce/tinymce.min.js' %}"></script>
+	<!-- <link rel='stylesheet' href="{% static 'ebookSystem/css/editor.css' %}"> -->
+	<!-- <script src="{% static "ebookSystem/js/editor_app.js" %}"></script>  -->
 {% endblock %}
 
 {% block content %}
 {% csrf_token %}
-	<div>
+	<!-- <div>
 		<ul class="nav nav-tabs" role="tablist">
 	   		<li role="presentation" class="active"><a href="#normalEditorTab" aria-controls="normal" role="tab" data-toggle="tab">normal</a></li>
 			<li role="presentation"><a href="#mathEditorTab" aria-controls="math" role="tab" data-toggle="tab">math</a></li>
@@ -26,10 +28,196 @@ MathML 編輯 demo
 				<div style="height:300px" id="mathEditor"></div>
 			</div>
 		</div>
-	</div>
-	<button class="btn btn-primary" id="button_to_panel">Preview</button>
+	</div> -->
+	<!-- <button class="btn btn-primary" id="button_to_panel">Preview</button>
 	<div class="panel panel-info">
 		<div class="panel-heading">預覽</div>
 		<div class="panel-body" id="previewPanel"></div>
+	</div> -->
+
+<div id="div_editzone">
+	<div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="editor_zone_close(this)"><span aria-hidden="true">&times;</span></button>
+		<div></div>
 	</div>
+	<div>bccc</div>
+	<div>cddd</div>
+	<div>deee</div>
+</div>
+
+<script>
+
+	$(document).ready(function(){
+		
+		$('#div_editzone').children()
+			.addClass('btn btn-default')
+			.css({
+				'cursor':'pointer',
+				'display':'block',
+				'margin':'5px',
+			})
+
+		$('#div_editzone').sortable();
+		$('#div_editzone').disableSelection();
+
+	})
+	
+	function editor_zone_close(me){
+		$(me).parent().remove();
+	}
+
+	// let c=
+	// 	<div>
+    //     <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="editor_zone_close(this)"><span aria-hidden="true">&times;</span></button>
+	// 	<div></div>
+	// </div>
+
+	function editor_zone_add(){
+		$('#div_editzone').append()
+
+	}
+
+</script>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" onclick="editor_mathml_show(this)">MathML編輯器</button>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" onclick="editor_normaltext_show(this)">文字編輯器</button>
+
+<script>
+
+	let editor_mathml;
+	$(document).ready(function(){
+
+		editor_mathml = com.wiris.jsEditor.JsEditor.newInstance({'language': 'zh'});
+		editor_mathml.insertInto(document.getElementById('div_editor_mathml'));
+
+	})
+
+	function editor_mathml_show(me){
+
+		//me
+		me=$(me);
+
+		//data
+		let data=$.data(me[0],'mathml');
+		if (data===undefined){
+			data='<math></math>';
+		}
+		//onsole.log(data)
+
+		//setMathML
+		editor_mathml.setMathML(data);
+
+		//save
+		$('#btn_editor_mathml').off().on('click',function(){
+
+			//datanew
+			let datanew=editor_mathml.getMathML();
+			//console.log(datanew)
+			
+			//save
+			$.data(me[0],'mathml',datanew);
+
+			//hide
+			$('#divmadal_mathml').modal('hide');
+
+		})
+
+		//show, 先載入資料再顯示使用者體驗比較好
+		$('#divmadal_mathml').modal('show');
+
+	}
+
+</script>
+
+<div id="divmadal_mathml" class="modal fade">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+		<span style="font-size:14pt;">MathML編輯器</span>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+		<div id="div_editor_mathml"></div>
+      </div>
+      <div class="modal-footer">
+		<button id="btn_editor_mathml" type="button" class="btn btn-primary">儲存</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+	$(document).ready(function(){
+
+		tinymce.init({
+			selector: "#div_editor_normaltext",
+			plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
+			toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample'
+		});
+
+	})
+
+	function editor_normaltext_show(me){
+
+		//show, 因tinymce需先顯示才有activeEditor可操作
+		$('#divmadal_normaltext').modal('show');
+
+		//me
+		me=$(me);
+
+		//data
+		let data=$.data(me[0],'normaltext');
+		if (data===undefined){
+			data='';
+		}
+		//console.log(data)
+
+		//setContent
+		tinymce.activeEditor.setContent(data);
+
+		//save
+		$('#btn_editor_normaltext').off().on('click',function(){
+	
+			//datanew
+			let datanew=tinymce.activeEditor.getContent()
+			//console.log(datanew)
+			
+			//save
+			$.data(me[0],'normaltext',datanew);
+
+			//hide
+			$('#divmadal_normaltext').modal('hide');
+
+		})
+
+	}
+
+</script>
+
+<div id="divmadal_normaltext" class="modal fade">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+		<span style="font-size:14pt;">文字編輯器</span>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+		<div id="div_editor_normaltext"></div>
+      </div>
+      <div class="modal-footer">
+		<button id="btn_editor_normaltext" type="button" class="btn btn-primary">儲存</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
+

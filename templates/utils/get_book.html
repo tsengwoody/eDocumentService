@@ -3,107 +3,8 @@
 <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
 <script language="javascript" src="{% static 'ebookSystem/js/jquery.binarytransport.js' %}"></script>
 <script language="javascript" src="{% static 'ebookSystem/js/ajaxDownloadFile.js' %}"></script>
+<script language="javascript" src="{% static 'ebookSystem/js/ajaxDownloadBook.js' %}"></script>
 <script language="javascript">
-
-
-function downloadbook(me){
-
-    //me
-    me=$(me)
-
-    //dw
-    function dw(){
-
-        //ISBN
-        var ISBN=me.attr('ISBN');
-
-        //password
-        var password=$('#modal_downloadbook_inp_password').val();
-
-        //transferData
-        var transferData={
-            download:ISBN,
-            password:password,
-        };
-
-        //generalajax
-        generalajax(transferData);
-
-        //clear
-        $('#modal_downloadbook_inp_password').val('');
-
-        //show
-        $('#modal_downloadbook').modal('hide');
-
-    }
-
-    //click
-    $('#modal_downloadbook_btn_submit').off().on('click', dw);
-
-    //enter
-    $("#modal_downloadbook_inp_password").off().on('keypress',function(e){
-        code = (e.keyCode ? e.keyCode : e.which);
-        if (code === 13){
-            e.preventDefault();
-            dw();
-        }
-    });
-
-    //show
-    $('#modal_downloadbook').modal('show');
-
-}
-
-
-function generalalerterror(msg){
-    var json={};
-    json.status='error';
-    json.message=msg;
-    alertDialog(json);
-}
-
-
-function getdisposition(xhr){
-    var filename='';
-    var disposition = xhr.getResponseHeader('Content-Disposition');
-    if (disposition && disposition.indexOf('attachment') !== -1) {
-        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-        var matches = filenameRegex.exec(disposition);
-        if (matches != null && matches[1]) {
-            filename = matches[1].replace(/['"]/g, '');
-        }
-    }
-    return filename;
-}
-
-
-function generalajax(transferData){
-    $.ajax({
-        url:".",
-        type: "POST",
-        data: transferData,
-        dataType: "binary",
-        beforeSend:function(jqXHR, settings){
-            jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
-        },
-        success: function(bdata,status,xhr){
-            //console.log(bdata);
-
-            if(bdata.type==='application/octet-stream'){
-                var filename=getdisposition(xhr);
-                downloadfile(filename, bdata);
-            }
-            else{
-                generalalerterror('密碼錯誤或準備文件失敗');
-            }
-
-        },
-        error:function(xhr,errmsg,err){
-            generalalerterror(xhr.responseText);
-        }
-    });
-}
-
 
 $( document ).ready(function() {
     var type;
@@ -166,12 +67,15 @@ $( document ).ready(function() {
         }
     });
  });
- </script>
+
+</script>
+
  <style type="text/css">
 .modal-content{
     background-color: #f5f5f5;
 }
 </style>
+
 {% endblock %}
 
 

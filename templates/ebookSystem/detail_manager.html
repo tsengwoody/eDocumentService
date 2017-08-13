@@ -6,6 +6,7 @@
 {{ book }}管理
 {% endblock %}
 {% block content %}
+{% include 'utils/get_book.html' %}
 
 <legend><h3>{{ book }}管理</h3></legend>
 <ul>
@@ -33,17 +34,20 @@
 			<td>{{ part.editor }}</td>
 			<td>
 				{% if part.status >= 4 %}
-				<button type="submit" class="btn btn-default send_button" id="view_id" name="view" value={{part.ISBN_part}}>閱讀</button>
+				<!-- <button type="submit" class="btn btn-default send_button" id="view_id" name="view" value={{part.ISBN_part}}>閱讀</button> -->
+				<button type="button" class="btn btn-default" ISBN="{{part.ISBN_part}}" onclick="downloadbook(this, true, 'view')">閱讀</button>
 				{% endif %}
 			</td>
 			<td>
 				{% if part.status >= 4 %}
-				<button type="submit" class="btn btn-default send_button" id="view_se_id" name="view_se" value={{part.ISBN_part}}>閱讀(SE)</button>
+				<!-- <button type="submit" class="btn btn-default send_button" id="view_se_id" name="view_se" value={{part.ISBN_part}}>閱讀(SE)</button> -->
+				<button type="button" class="btn btn-default" ISBN="{{part.ISBN_part}}" onclick="downloadbook(this, true, 'view_se')">閱讀(SE)</button>
 				{% endif %}
 			</td>
 			<td>
-				<button type="submit" class="btn btn-default send_button" id="id_download" name="download" value={{part.ISBN_part}}>下載</button>
-</td>
+				<!-- <button type="submit" class="btn btn-default send_button" id="id_download" name="download" value={{part.ISBN_part}}>下載</button> -->
+				<button type="button" class="btn btn-default" ISBN="{{part.ISBN_part}}" onclick="downloadbook(this, true, 'download_full')">下載</button>
+			</td>
 			<td>
 				<div class="form-inline">
 					<div class="form-group">
