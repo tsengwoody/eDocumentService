@@ -93,6 +93,7 @@ function generalajax(url, transferData){
             //onsole.log(csrf)
 
             jqXHR.setRequestHeader('X-CSRFToken', csrf);
+            jqXHR.setRequestHeader("X-Requested-With", "XMLHttpRequest")
 
         },
         success: function(bdata,status,xhr){
