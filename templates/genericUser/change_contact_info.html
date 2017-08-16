@@ -37,16 +37,6 @@
 					</td>
 				</tr>
 				{% endfor %}
-				{% if request.user.has_editor %}
-				<tr class="editor_mode">
-					<th class="col-md-4" scope="row">
-						<label for="id_professional_field">專業領域：</label>
-					</th>
-					<td>
-						<input id="id_professional_field" maxlength="30" name="professional_field" value="{% if request.user.editor.professional_field %}{{ request.user.editor.professional_field }}{% endif %}" type="text">
-					</td>
-				</tr>
-				{% endif %}
 				{% if request.user.has_guest %}
 				<tr class="guest_mode">
 					<th class="col-md-4" scope="row">

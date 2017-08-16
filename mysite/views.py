@@ -57,7 +57,6 @@ def register(request, template_name='registration/register.html'):
 		)
 		if request.POST['role'] == 'Editor':
 			try:
-				newEditor = Editor.objects.create(user=newUser, professional_field=request.POST['professional_field'])
 				newUser.is_editor = True
 				newUser.permission.add(Permission.objects.get(codename='editor'))
 			except:

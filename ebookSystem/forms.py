@@ -1,17 +1,28 @@
 ﻿# coding: utf-8
 from django import forms
-from account.models import *
-from genericUser.models import *
-from guest.models import *
 from .models import *
 
+class BookInfoForm(forms.ModelForm):
+	class Meta:
+		model = BookInfo
+		fields = '__all__'
+
+	'''def save(self, *args, **kwargs):
+		try:
+			commit = kwargs['commit']
+		except:
+			commit = True
+		kwargs['commit'] = False
+		instance = super(BookInfoForm, self).save(*args, **kwargs)
+		if commit:
+			try:
+				newBookInfo = BookInfo.objects.get(ISBN=self.data['ISBN'])
+				print 'YA'
+			except:
+				instance.save()
+				print 'YA2'
+		return instance'''
 
 class EditForm(forms.Form):
 	content = forms.CharField()
 	page = forms.IntegerField()
-
-#	def clean_content(self):
-#		data = self.cleaned_data['content']
-#		if data.find('|----------|') == -1:
-#			raise forms.ValidationError("無法儲存檔案，您傳的資料無特殊標記無法得知校對完成位置")
-#		return data

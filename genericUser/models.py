@@ -51,13 +51,6 @@ class User(AbstractUser):
 	def __unicode__(self):
 		return self.first_name +self.last_name
 
-	def has_editor(self):
-		try:
-			self.editor
-			return True
-		except:
-			return False
-
 	def has_guest(self):
 		try:
 			self.guest

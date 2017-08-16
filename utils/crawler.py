@@ -6,15 +6,15 @@ import re
 import requests
 import urllib,urllib2
 from bs4 import BeautifulSoup
-#from mysite.settings import BASE_DIR
+from mysite.settings import BASE_DIR
 
 
-def load_post_data(source):
+def load_post_data(src):
+	import pkgutil
+	data = pkgutil.get_data(__package__, src)
+	data = data.decode('utf-8')[1:]
 	post_data = {}
-	with codecs.open(source, 'r', encoding='utf-8') as sFile:
-		line = sFile.next()
-		line = line[1:]
-		line = line.replace('\r\n','')
+	for line in data.split('\r\n'):
 		lineSplit = line.split('=')
 		if len(lineSplit) == 2:
 			(key,value) = (lineSplit[0],lineSplit[1])
@@ -25,18 +25,6 @@ def load_post_data(source):
 			key = lineSplit[0]
 			key = unicode(key).encode('utf-8')
 			post_data[key] = u''
-		for line in sFile:
-			line = line.replace('\r\n','')
-			lineSplit = line.split('=')
-			if len(lineSplit) == 2:
-				(key,value) = (lineSplit[0],lineSplit[1])
-				key = unicode(key).encode('utf-8')
-				value = unicode(value).encode('utf-8')
-				post_data[key] = value
-			if len(lineSplit) == 1:
-				key = lineSplit[0]
-				key = unicode(key).encode('utf-8')
-				post_data[key] = u''
 	return post_data
 
 def get_book_info(ISBN):
@@ -47,8 +35,7 @@ def get_book_info(ISBN):
 	for key in cookies_dict:
 		if key == 'PHPSESSID':
 			phpsessid = cookies_dict[key]
-#	post_data_file = BASE_DIR +'/utils/post_data.txt'
-	post_data_file = '/django/eDocumentService/utils/post_data.txt'
+	post_data_file = 'post_data.txt'
 	values = load_post_data(post_data_file)
 	values['FO_SearchValue0'] = ISBN
 	response = session.post(url,data=values)

@@ -9,7 +9,6 @@ from genericUser.models import *
 from guest.models import *
 
 admin.site.register(User)
-admin.site.register(Editor)
 admin.site.register(Guest)
 admin.site.register(Book)
 admin.site.register(BookInfo)

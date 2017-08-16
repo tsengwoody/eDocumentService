@@ -131,8 +131,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 LOGIN_URL = '/auth/login'
-LOGIN_REDIRECT_URL = '/account/profile'
-LOGOUT_URL = '/account/profile'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_URL = '/'
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 FILE_CHARSET='utf-8'
@@ -156,7 +156,11 @@ from django.conf import global_settings
 FILE_UPLOAD_HANDLERS = ['utils.cache.UploadProgressCachedHandler', ] + global_settings.FILE_UPLOAD_HANDLERS
 #FILE_UPLOAD_HANDLERS = ('utils.uploadFile.ProgressUploadSessionHandler', ) + global_settings.FILE_UPLOAD_HANDLERS
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+if socket.gethostname() == 'edoc':
+	EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+	EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 EMAIL_HOST='smtp.gmail.com'
 EMAIL_PORT=587
 EMAIL_HOST_USER = 'edocumentservice@gmail.com'

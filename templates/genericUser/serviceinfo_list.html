@@ -56,11 +56,7 @@
 				</select>
 			</td>
 			<td>
-				{% if ServiceInfo.user == request.user or ServiceInfo.user.org.manager == request.user %}
 				<button class="btn btn-sm btn-primary send_form_button" type="submit" id="id_exchange" name="exchange" value={{ ServiceInfo.id }}>兌換</button>
-				{% else %}
-				非時數擁有者無法兌換
-				{% endif %}
 			</td>
 
 			{% endif %}

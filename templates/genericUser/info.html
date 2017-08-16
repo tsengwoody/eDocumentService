@@ -71,16 +71,6 @@
 			</td>
 		</tr>
 		{% endfor %}
-					{% if request.user.has_editor %}
-					<tr class="editor_mode">
-						<th class="col-md-4" scope="row">
-							專業領域：
-						</th>
-						<td>
-							{{ request.user.editor.professional_field }}
-						</td>
-					</tr>
-					{% endif %}
 					{% if request.user.has_guest %}
 					<tr class="guest_mode">
 						<th class="col-md-4" scope="row">

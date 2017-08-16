@@ -4,7 +4,6 @@ from django.utils import timezone
 from mysite.settings import BASE_DIR
 from genericUser.models import User, ServiceInfo, Event
 from guest.models import Guest
-from account.models import Editor
 import glob,os
 import datetime
 import codecs

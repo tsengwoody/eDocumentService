@@ -8,7 +8,6 @@ from django.core.urlresolvers import reverse
 from django.test import Client, RequestFactory
 from django.utils import timezone
 
-from account.models import *
 from ebookSystem.models import *
 from genericUser.models import *
 from guest.models import *
@@ -35,7 +34,7 @@ class Command(BaseCommand):
 			('ebookSystem', 'detail_manager', (permission_root, )),
 			('ebookSystem', 'review_document', (permission_manager, )),
 			('ebookSystem', 'review_part', (permission_manager, )),
-			('genericUser', 'create_document', (permission_guest, )),
+			('ebookSystem', 'book_create', (permission_guest, )),
 			('genericUser', 'review_user', (permission_manager, )),
 			('genericUser', 'apply_document', (permission_guest, )),
 			('manager', 'applydocumentaction', (permission_advanced_editor, )),
@@ -76,7 +75,6 @@ class Command(BaseCommand):
 		p = ['active', 'editor', 'guest', 'manager', 'advanced_editor', 'root', 'license', ]
 		for item in p:
 			exec("root.permission.add(permission_{0})".format(item))
-		rootEditor = Editor.objects.create(user=root, professional_field=u'資訊工程學')
 		rootGuest = Guest.objects.create(user=root)
 		client = Client()
 		response = client.post(
@@ -214,7 +212,7 @@ class Command(BaseCommand):
 			client.login(username='root', password='root')
 			response = client.post(
 				reverse(
-					'genericUser:create_document'
+					'ebookSystem:book_create'
 				),
 {
 				u'ISBN': u'9789573321569',
@@ -328,7 +326,7 @@ class Command(BaseCommand):
 			client = Client()
 			client.login(username='root', password='root')
 			response = client.post(
-				reverse('genericUser:create_document'),
+				reverse('ebookSystem:book_create'),
 				{
 					u'ISBN': u'9789866104626',
 					u'author': u'多利安助川著; 卓惠娟譯',
@@ -354,7 +352,7 @@ class Command(BaseCommand):
 		client.login(username='root', password='root')
 		response = client.post(
 			reverse(
-				'genericUser:upload_document'
+				'ebookSystem:book_upload'
 			),
 			{
 				u'ISBN': u'9789863981459',

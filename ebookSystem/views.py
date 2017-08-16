@@ -91,46 +91,6 @@ def tinymce_demo(request, template_name='ebookSystem/tinymce_demo.html'):
 
 @view_permission
 @http_response
-def get_resource(request, template_name='guest/book_repository.html'):
-	if request.method == 'POST':
-		if request.POST.has_key('email'):
-			from django.core.mail import EmailMessage
-			getBook = Book.objects.get(ISBN=request.POST['email'])
-			attach_file_path = getBook.zip(request.user, request.POST['password'])
-			if not attach_file_path:
-				status = 'error'
-				message = u'準備文件失敗'
-				return locals()
-			subject = u'[文件] {0}'.format(getBook)
-			body = u'新愛的{0}您好：\n'.format(request.user.username)
-			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
-			email.attach_file(attach_file_path)
-			email.send(fail_silently=False)
-			status = 'success'
-			message = u'已寄送到您的電子信箱'
-			os.remove(attach_file_path)
-		if request.POST.has_key('download'):
-			getBook = Book.objects.get(ISBN=request.POST['download'])
-			attach_file_path = getBook.zip(request.user, request.POST['password'])
-			if not attach_file_path:
-				status = 'error'
-				message = u'準備文件失敗'
-				return locals()
-			download_path = attach_file_path
-			download_filename = os.path.basename(attach_file_path)
-		if request.POST.has_key('delete'):
-			deleteBook = Book.objects.get(ISBN=request.POST['delete'])
-			deleteBook.delete()
-			status = 'success'
-			message = u'成功刪除文件'
-		edit_book_list = request.user.own_book_set.all().filter(status__lte=Book.STATUS['review'])
-		finish_book_list = request.user.own_book_set.all().filter(status__gte=Book.STATUS['finish'])
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
-@view_permission
-@http_response
 def book_list(request, template_name='ebookSystem/book_list.html'):
 	from collections import defaultdict
 	books_list = []
@@ -194,15 +154,6 @@ def search_book(request, template_name):
 			status = 'success'
 			message = u'已寄送到您的電子信箱'
 			os.remove(attach_file_path)
-		elif request.POST.has_key('download'):
-			getBook = Book.objects.get(ISBN=request.POST['download'])
-			attach_file_path = getBook.zip(request.user, request.POST['password'])
-			if not attach_file_path:
-				status = 'error'
-				message = u'準備文件失敗'
-				return locals()
-			download_path = attach_file_path
-			download_filename = os.path.basename(attach_file_path)
 		return locals()
 	if request.method == 'GET':
 		return locals()
@@ -451,17 +402,6 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 			status = 'success'
 			message = u'已寄送到您的電子信箱'
 			os.remove(attach_file_path)
-		elif request.POST.has_key('download'):
-			getPart = EBook.objects.get(ISBN_part=request.POST['download'])
-			attach_file_path = getPart.zip(request.user, request.POST['password'])
-			if not attach_file_path:
-				status = 'error'
-				message = u'準備文件失敗'
-				return locals()
-			download_path = attach_file_path
-			download_filename = os.path.basename(attach_file_path)
-			status = u'success'
-			message = u'下載'
 		elif request.POST.has_key('assign'):
 			getPart = EBook.objects.get(ISBN_part=request.POST['assign'])
 			user = User.objects.get(username=request.POST['username'])
@@ -483,35 +423,7 @@ def detail_manager(request, book_ISBN, template_name='ebookSystem/detail_manager
 	except:
 		raise Http404("book does not exist")
 	if request.method == 'POST':
-		if request.POST.has_key('view'):
-			getPart = EBook.objects.get(ISBN_part=request.POST['view'])
-			attach_file_path = getPart.get_clean_file()
-			if not attach_file_path:
-				status = 'error'
-				message = u'準備文件失敗'
-				return locals()
-			download_path = attach_file_path
-			download_filename = os.path.basename(attach_file_path)
-		elif request.POST.has_key('view_se'):
-			getPart = EBook.objects.get(ISBN_part=request.POST['view_se'])
-			attach_file_path = getPart.get_clean_file()
-			attach_file_path = getPart.replace()
-			if not attach_file_path:
-				status = 'error'
-				message = u'準備文件失敗'
-				return locals()
-			download_path = attach_file_path
-			download_filename = os.path.basename(attach_file_path)
-		elif request.POST.has_key('download'):
-			getPart = EBook.objects.get(ISBN_part=request.POST['download'])
-			attach_file_path = getPart.zip_full()
-			if not attach_file_path:
-				status = 'error'
-				message = u'準備文件失敗'
-				return locals()
-			download_path = attach_file_path
-			download_filename = os.path.basename(attach_file_path)
-		elif request.POST.has_key('upload'):
+		if request.POST.has_key('upload'):
 			getPart = EBook.objects.get(ISBN_part=request.POST['upload'])
 			uploadFilePath = os.path.join(getPart.book.path, '{0}.zip'.format(getPart.ISBN_part))
 			with open(uploadFilePath, 'wb+') as dst:
@@ -572,9 +484,8 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 
 def edit_ajax(request, ISBN_part, *args, **kwargs):
 	user = request.user
-	response={}
 	response = {}
-	if not getattr(request.user, 'has_editor', None):
+	if not getattr(request.user, 'is_editor', None):
 		response['status'] = u'error'
 		response['message'] = u'已登出'
 	if not request.POST.has_key('online'):
@@ -719,4 +630,215 @@ def ebook_download(request, ISBN_part, ):
 			return locals()
 		download_path = attach_file_path
 		download_filename = os.path.basename(attach_file_path)
+		return locals()
+
+@http_response
+def message_send(request, template_name='ebookSystem/message_send.html', ):
+	if request.method == 'POST' and request.is_ajax():
+		from django.core.mail import EmailMessage
+		if request.POST['action'] == 'editor_send':
+			user_email_list = [ i.email for i in User.objects.filter(is_editor=True) if i.is_book and i.auth_email ]
+		if request.POST['action'] == 'guest_send':
+			user_email_list = [ i.email for i in User.objects.filter(is_guest=True) if i.is_book and i.auth_email ]
+		subject = request.POST['subject']
+		body = request.POST['body']
+		email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[SERVICE], bcc=user_email_list)
+		email.send(fail_silently=False)
+		status = 'success'
+		message = u'訊息傳送成功'
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+@view_permission
+@http_response
+def book_create(request, template_name='ebookSystem/book_create.html'):
+	if request.method == 'POST':
+		#book info 設定
+		try:
+			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
+		except:
+			bookInfoForm = BookInfoForm(request.POST)
+			if not bookInfoForm.is_valid():
+				status = 'error'
+				message = u'表單驗證失敗' + str(bookInfoForm.errors)
+				return locals()
+			newBookInfo = bookInfoForm.save()
+		try:
+			book = Book.objects.get(ISBN=request.POST['ISBN'])
+			status = 'error'
+			message = u'文件已存在'
+			return locals()
+		except:
+			pass
+
+		#上傳文件設定
+		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
+		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.zip')
+		handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
+
+		#壓縮文件測試
+		try:
+			with ZipFile(uploadFilePath, 'r') as uploadFile:
+				uploadFile.testzip()
+				uploadFile.extractall(uploadPath)
+		except:
+			shutil.rmtree(uploadPath)
+			status = 'error'
+			message = u'非正確ZIP文件'
+			return locals()
+
+		#資料夾檢查
+		from utils import validate
+		try:
+			validate.validate_folder(
+				os.path.join(uploadPath, 'OCR'),
+				os.path.join(uploadPath, 'source'),
+				50
+			)
+		except BaseException as e:
+			shutil.rmtree(uploadPath)
+			status = 'error'
+			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
+			return locals()
+
+		#建立book object
+		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path=uploadPath, page_per_part=50)
+		try:
+			newBook.set_page_count()
+		except:
+			shutil.rmtree(uploadPath)
+			status = 'error'
+			message = u'set_page_count error'
+			return locals()
+		newBook.scaner = request.user
+		newBook.owner = request.user
+		newBook.source = 'self'
+		newBook.save()
+		try:
+			newBook.create_EBook()
+		except BaseException as e:
+			newBook.delete()
+			status = 'error'
+			message = u'建立分段失敗'
+			return locals()
+		event = Event.objects.create(creater=request.user, action=newBook)
+		redirect_to = '/'
+		status = 'success'
+		message = u'成功建立並上傳文件'
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+from utils.uploadFile import handle_uploaded_file
+@view_permission
+@http_response
+def book_upload(request, template_name='ebookSystem/book_upload.html'):
+	if request.method == 'POST':
+		#book info 設定
+		try:
+			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
+		except:
+			bookInfoForm = BookInfoForm(request.POST)
+			if not bookInfoForm.is_valid():
+				status = 'error'
+				message = u'表單驗證失敗' + str(bookInfoForm.errors)
+				return locals()
+			newBookInfo = bookInfoForm.save()
+		try:
+			book = Book.objects.get(ISBN=request.POST['ISBN'])
+			status = 'error'
+			message = u'文件已存在'
+			return locals()
+		except:
+			pass
+
+		#上傳文件設定
+		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
+		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.' +request.POST['category'])
+		handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
+
+		#根據選擇上傳格式作業
+		final_file = os.path.join(uploadPath, 'OCR') + '/{0}.epub'.format(request.POST['ISBN'], )
+		#txt
+		if request.POST['category'] == 'txt':
+			from ebooklib import epub
+			from utils.epub import txt2epub
+			try:
+				os.makedirs(os.path.dirname(final_file))
+				info = {
+					'ISBN': newBookInfo.ISBN,
+					'bookname': newBookInfo.bookname,
+					'author': newBookInfo.author,
+					'date': str(newBookInfo.date),
+					'house': newBookInfo.house,
+					'language': 'zh',
+				}
+				txt2epub(uploadFilePath, final_file, **info)
+			except BaseException as e:
+				shutil.rmtree(uploadPath)
+				status = 'error'
+				message = u'建立文件失敗' +str(e)
+				return locals()
+
+		#epub
+		if request.POST['category'] == 'epub':
+			from ebooklib import epub
+			from utils.epub import through, add_bookinfo
+			try:
+				os.makedirs(os.path.dirname(final_file))
+				through(uploadFilePath, final_file)
+				book = epub.read_epub(final_file)
+				book = add_bookinfo(
+					book,
+					ISBN = newBookInfo.ISBN,
+					bookname = newBookInfo.bookname,
+					author = newBookInfo.author,
+					date = str(newBookInfo.date),
+					house = newBookInfo.house,
+					language = 'zh',
+				)
+				epub.write_epub(final_file, book, {})
+			except BaseException as e:
+				shutil.rmtree(uploadPath)
+				status = 'error'
+				message = u'建立文件失敗' +str(e)
+				return locals()
+
+		#建立book object和ebook object
+		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path=uploadPath)
+		newBook.scaner = request.user
+		newBook.owner = request.user
+		newBook.source = request.POST['category']
+		newBook.save()
+		ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN'] + '-1', begin_page=-1, end_page=-1)
+		ebook.change_status(9, 'final')
+
+		redirect_to = '/'
+		status = 'success'
+		message = u'成功建立並上傳文件'
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+from django.contrib.auth import authenticate
+@http_response
+def book_delete(request, ISBN, ):
+	if request.method == 'POST' and request.is_ajax():
+		getBook = Book.objects.get(ISBN=ISBN)
+		try:
+			user = authenticate(username=request.user.username, password=request.POST['password'])
+			if user is None:
+				raise SystemError(u'使用者驗證失敗')
+			if not getBook.owner == user:
+				raise SystemError(u'非擁有者無法刪除')
+			if getBook.source == 'self':
+				raise SystemError(u'校對書籍無法刪除')
+			getBook.delete()
+		except BaseException as e:
+			status = 'error'
+			message = u'book delete : {0}'.format(unicode(e))
+			return locals()
+		status = 'success'
+		message = u'book delete : finish'
 		return locals()

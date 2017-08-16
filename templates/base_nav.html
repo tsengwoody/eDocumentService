@@ -31,6 +31,7 @@
 						<li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
 						<li><a href="{% url 'manager:event_list' 'user' %}">審核會員</a></li>
 						<li><a href="{% url 'manager:statistics' %}">統計資訊</a></li>
+						<li><a href="{% url 'ebookSystem:message_send' %}">訊息傳送</a></li>
 						{% endif %}
 						{% if request.user.manage_org_set.all|length > 0 %}
 						<li><a href="{% url 'manager:org_manage' %}">組織管理</a></li>
@@ -47,16 +48,8 @@
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#">文件<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						{% if request.user.is_advanced_editor or request.user.is_guest %}
-						<li><a href="{% url 'genericUser:create_document' %}">自掃上傳</a></li>
-						{% endif %}
-						{% if request.user.is_guest %}
-						<li><a href="{% url 'genericUser:apply_document' %}">代掃申請</a></li>
-						{% endif %}
-						{% if request.user.is_superuser %}
-						<li><a href="{% url 'genericUser:upload_document' %}">EPUB上傳</a></li>
-						{% endif %}
-						{% if request.user.is_advanced_editor %}
-						<li><a href="{% url 'manager:applydocumentaction' %}">代掃上傳</a></li>
+						<li><a href="{% url 'ebookSystem:book_create' %}">自掃上傳</a></li>
+						<li><a href="{% url 'ebookSystem:book_upload' %}">電子檔上傳</a></li>
 						{% endif %}
 					</ul>
 				</li>

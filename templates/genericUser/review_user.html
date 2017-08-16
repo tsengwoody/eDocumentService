@@ -83,19 +83,7 @@
 {% block review_step2 %}
 <div class="col-md-10">
     <table class="table table-hover table-reflow table-striped">
-        {% if user.has_editor %}
-        <tr>
-            <td colspan=2><div class="text-center">志工</div></td>
-        </tr>
-        <tr class="editor_mode">
-            <th class="col-md-4" scope="row">
-                <label for="id_professional_field">professional field:</label>
-            </th>
-            <td class="col-md-8">
-                <p>{{ user.editor.professional_field }}</p>
-            </td>
-        </tr>
-        {% endif %} {% if user.has_guest %}
+    {% if user.has_guest %}
         <tr>
             <td colspan=2><div class="text-center">視障者</div></td>
         </tr>
@@ -123,7 +111,6 @@
                 </div>
             </td>
         </tr>
-        {% if user.has_editor %}
         <tr>
             <th>校對權限</th>
             <td><div class="switch" data-on="info" data-off="success">
@@ -131,8 +118,6 @@
                 </div>
             </td>
         </tr>
-        {% endif %} 
-        {% if user.has_guest %}
         <tr>
             <th>來賓權限</th>
             <td>
@@ -141,7 +126,6 @@
                 </div>
             </td>
         </tr>
-        {% endif %}
     </table>
 </div>
 <div class="col-md-2">

@@ -5,7 +5,6 @@ from . import views
 urlpatterns = [
 	url(r'^mathml', views.mathml, name='mathml'),
 	url(r'^tinymce_demo', views.tinymce_demo, name='tinymce_demo'),
-	url(r'^get_resource', views.get_resource, name='get_resource'),
 	url(r'^analyze_part/(?P<ISBN_part>[\d-]+)/$', views.analyze_part, name='analyze_part'),
 	url(r'^book_info/(?P<ISBN>[0-9Xx]+)/$', views.book_info, name='book_info'),
 	url(r'^book_list/$', views.book_list, name='book_list'),
@@ -23,4 +22,8 @@ urlpatterns = [
 	url(r'^search_book/$', views.search_book, {'template_name':'ebookSystem/search_book.html'}, name='search_book'),
 	url(r'^book_download/(?P<ISBN>[0-9]+)$', views.book_download, name='book_download'),
 	url(r'^ebook_download/(?P<ISBN_part>[0-9\-]+)$', views.ebook_download, name='ebook_download'),
+	url(r'^message_send$', views.message_send, name='message_send'),
+	url(r'^book_create/$', views.book_create, name='book_create'),
+	url(r'^book_upload/$', views.book_upload, name='book_upload'),
+	url(r'^book_delete/(?P<ISBN>[0-9]+)$', views.book_delete, name='book_delete'),
 ]
