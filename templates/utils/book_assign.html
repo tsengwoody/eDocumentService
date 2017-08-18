@@ -17,9 +17,14 @@ $( document ).ready(function() {
         type=button.data('whatever') // Extract info from data-* attributes 
     });
 
-    $("#ba_input_date").datepicker({
-        dateFormat: "yy-mm-dd",
-    });
+    var d=new Date();
+    var cd=d.getFullYear()+'-'+(d.getMonth() + 1)+'-'+(d.getDate()+3); //今天+3天
+    $("#ba_input_date")
+        .datepicker({
+            dateFormat: "yy-mm-dd",
+            //minDate: 0,
+        })
+        .datepicker("setDate",cd);
     $("#ba_input_date").keypress(function(e){
         code = (e.keyCode ? e.keyCode : e.which);
         if (code == 13){
