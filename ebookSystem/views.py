@@ -2,6 +2,7 @@
 import codecs
 import datetime
 from zipfile import ZipFile
+from django.core.cache import cache
 from django.core.urlresolvers import reverse, resolve
 from django.db.models import F,Q
 from django.forms import modelform_factory
@@ -22,7 +23,6 @@ import json
 import shutil
 import uuid
 from django.views.decorators.cache import cache_control
-
 
 #logging config
 import logging
@@ -599,12 +599,29 @@ def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
 @http_response
 def book_download(request, ISBN, ):
 	if request.method == 'POST' and request.is_ajax():
+		MIN_DURATION_TIME = 3*86400
 		getBook = Book.objects.get(ISBN=ISBN)
-		attach_file_path = getBook.zip(request.user, request.POST['password'])
-		if not attach_file_path:
+		try:
+			GetBookRecord.objects.get(book=getBook, user=request.user)
+		except BaseException as e:
+			try:
+				cache.get(request.user.username)['get_book']
+				status = 'error'
+				message = u'取得文件失敗：{0}天內僅能下載1本未下載過的書籍'.format(unicode(MIN_DURATION_TIME/86400))
+				return locals()
+			except BaseException as e:
+				pass
+		try:
+			attach_file_path = getBook.zip(request.user, request.POST['password'])
+		except BaseException as e:
 			status = 'error'
-			message = u'準備文件失敗'
+			message = u'準備文件失敗：{0}'.format(unicode(e))
 			return locals()
+		try:
+			GetBookRecord.objects.get(book=getBook, user=request.user)
+		except BaseException as e:
+			GetBookRecord.objects.create(book=getBook, user=request.user, )
+			cache.set(request.user.username, {'get_book': timezone.now()}, MIN_DURATION_TIME)
 		download_path = attach_file_path
 		download_filename = os.path.basename(attach_file_path)
 		return locals()
@@ -613,18 +630,19 @@ def book_download(request, ISBN, ):
 def ebook_download(request, ISBN_part, ):
 	if request.method == 'POST' and request.is_ajax():
 		getPart = EBook.objects.get(ISBN_part=ISBN_part)
-		if request.POST['action'] == 'view':
-			attach_file_path = getPart.get_clean_file()
-		elif request.POST['action'] == 'view_se':
-			attach_file_path = getPart.get_clean_file()
-			attach_file_path = getPart.replace()
-		elif request.POST['action'] == 'download_full':
-			attach_file_path = getPart.zip_full()
-		elif request.POST['action'] == 'download':
-			attach_file_path = getPart.zip(request.user, request.POST['password'])
-		else:
-			attach_file_path = None
-		if not attach_file_path:
+		try:
+			if request.POST['action'] == 'view':
+				attach_file_path = getPart.get_clean_file()
+			elif request.POST['action'] == 'view_se':
+				attach_file_path = getPart.get_clean_file()
+				attach_file_path = getPart.replace()
+			elif request.POST['action'] == 'download_full':
+				attach_file_path = getPart.zip_full()
+			elif request.POST['action'] == 'download':
+				attach_file_path = getPart.zip(request.user, request.POST['password'])
+			else:
+				attach_file_path = None
+		except BaseException as e:
 			status = 'error'
 			message = u'準備文件失敗'
 			return locals()

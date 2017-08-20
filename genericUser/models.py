@@ -98,15 +98,11 @@ class Event(models.Model):
 
 	def get_url(self):
 		from django.core.urlresolvers import reverse
-		from ebookSystem.models import Book,EBook, ApplyDocumentAction, ReviseContentAction
-		if isinstance(self.action, ApplyDocumentAction):
-			return reverse('ebookSystem:review_ApplyDocumentAction', kwargs={'id':self.action.id })
-		elif isinstance(self.action, Book):
+		from ebookSystem.models import *
+		if isinstance(self.action, Book):
 			return reverse('ebookSystem:review_document', kwargs={'book_ISBN':self.action.ISBN})
 		elif isinstance(self.action, EBook):
 			return reverse('ebookSystem:review_part', kwargs={'ISBN_part':self.action.ISBN_part})
-		elif isinstance(self.action, ReviseContentAction):
-			return reverse('ebookSystem:review_ReviseContentAction', kwargs={'id':self.action.id })
 		elif isinstance(self.action, User):
 			return reverse('genericUser:review_user', kwargs={'username':self.action.username })
 
@@ -202,6 +198,10 @@ class Article(models.Model):
 	def get_main_content(self):
 		path = os.path.join(BASE_DIR, 'static') +u'/article/{0}/main_content.html'.format(self.id)
 		return PublicFile(path)
+
+class BusinessContent(models.Model):
+	name = models.CharField(max_length=100, )
+	content = models.TextField()
 
 class View(models.Model):
 	namespace = models.CharField(max_length=100, )

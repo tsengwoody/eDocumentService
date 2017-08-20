@@ -20,6 +20,7 @@ class BookInfo(models.Model):
 	bookbinding = models.CharField(max_length=255, blank=True, null=True)
 	chinese_book_category = models.IntegerField(blank=True, null=True)
 	order = models.CharField(max_length=255, blank=True, null=True)
+	source = models.CharField(max_length=255, blank=True, null=True)
 
 	def __unicode__(self):
 		return self.bookname
@@ -181,6 +182,8 @@ class Book(models.Model):
 		if not os.path.exists(os.path.dirname(custom_zip)):
 			os.mkdir(os.path.dirname(custom_zip))
 		self.check_status()
+
+		#準備epub文件
 		if self.status == self.STATUS['final']:
 			final_epub = self.path +'/OCR/{0}.epub'.format(self.ISBN, )
 			custom_epub = self.path +'/temp/{0}_{1}.epub'.format(self.ISBN, user.username)
@@ -189,7 +192,7 @@ class Book(models.Model):
 				book.set_identifier(user.username)
 				epub.write_epub(custom_epub, book, {})
 			except BaseException as e:
-				pass
+				raise SystemError('epub create fail:' +unicode(e))
 			zip_list = [custom_epub]
 		else:
 			final_epub = self.path +'/temp/{0}_{1}.temp'.format(self.ISBN, user.username)
@@ -210,19 +213,19 @@ class Book(models.Model):
 				book.set_identifier(user.username)
 				epub.write_epub(custom_epub, book, {})
 			except BaseException as e:
-				raise e
+				raise SystemError('epub create fail (not final):' +unicode(e))
 			zip_list = [custom_epub]
+
+		#加入壓縮檔內
 		try:
 			pyminizip.compress_multiple(zip_list, custom_zip, password, 5)
 			return custom_zip
 		except BaseException as e:
-			print e
 			try:
 				os.remove(custom_zip)
 			except BaseException as e:
-				print e
-				pass
-			return False
+				raise SystemError('zip create fail remove dirname' +unicode(e))
+			raise SystemError('zip create fail:' +unicode(e))
 
 	def collect_is_finish(self):
 		is_finish = True
@@ -681,15 +684,19 @@ class EBook(models.Model):
 		edit_content = content[1]
 		return [finish_content, edit_content]
 
-class ReviseContentAction(models.Model):
-	from ebookSystem.models import EBook
-	ebook = models.ForeignKey(EBook)
-	content = models.CharField(max_length=1000)
+class GetBookRecord(models.Model):
+	
+	user = models.ForeignKey(User, related_name='getbookrecord_set')
+	book = models.ForeignKey(Book, related_name='getbookrecord_set')
+	get_time = models.DateTimeField(default = timezone.now)
 
-class ApplyDocumentAction(models.Model):
+	def __unicode__(self):
+		return u'{0}-{1}'.format(self.book, self.user)
+
+'''class ApplyDocumentAction(models.Model):
 	from genericUser.models import Organization
 	book_info = models.ForeignKey(BookInfo)
-	org = models.ForeignKey(Organization, blank=True, null=True)
+	org = models.ForeignKey(Organization, blank=True, null=True)'''
 
 class EditRecord(models.Model):
 	part = models.ForeignKey(EBook, blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')

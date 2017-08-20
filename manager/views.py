@@ -23,24 +23,24 @@ def statistics(request, template_name='manager/statistics.html'):
 		month_list.insert(0, datetime.datetime.today())
 		result = []
 		for month in month_list:
-			editor_list = User.objects.filter(is_editor=True, date_joined__lte=month, auth_email=True, auth_phone=True,)
-			guest_list = User.objects.filter(is_guest=True, date_joined__lte=month, auth_email=True, auth_phone=True,)
-			editor_list_30 = User.objects.filter(is_editor=True, date_joined__lte=month, last_login__gt=month -datetime.timedelta(days=30), auth_email=True, auth_phone=True,)
-			finish_list = Book.objects.filter(finish_date__lte=month, upload_date__lte=month, source='self')
-			txt_list = Book.objects.filter(upload_date__lte=month, source='txt')
-			epub_list = Book.objects.filter(upload_date__lte=month, source='epub')
-			book_list = Book.objects.filter(upload_date__lte=month)
-			scanbook_list = Book.objects.filter(upload_date__lte=month, source='self')
+			editor_count = User.objects.filter(is_editor=True, date_joined__lte=month, auth_email=True, auth_phone=True,).count()
+			guest_count = User.objects.filter(is_guest=True, date_joined__lte=month, auth_email=True, auth_phone=True,).count()
+			editor_count_30 = User.objects.filter(is_editor=True, date_joined__lte=month, last_login__gt=month -datetime.timedelta(days=30), auth_email=True, auth_phone=True,).count()
+			finish_count = Book.objects.filter(finish_date__lte=month, upload_date__lte=month, source='self').count()
+			txt_count = Book.objects.filter(upload_date__lte=month, source='txt').count()
+			epub_count = Book.objects.filter(upload_date__lte=month, source='epub').count()
+			book_count = Book.objects.filter(upload_date__lte=month).count()
+			scanbook_count = Book.objects.filter(upload_date__lte=month, source='self').count()
 			result.append((
 				month,
-				len(editor_list),
-				len(guest_list),
-				len(editor_list_30),
-				len(book_list),
-				len(scanbook_list),
-				len(finish_list) ,
-				len(txt_list) ,
-				len(epub_list),
+				editor_count,
+				guest_count,
+				editor_count_30,
+				book_count,
+				scanbook_count,
+				finish_count,
+				txt_count,
+				epub_count,
 			))
 		month = datetime.date.today() -datetime.timedelta(days=30)
 		active_editor_list = User.objects.filter(is_editor=True, last_login__gt=month)
@@ -54,27 +54,6 @@ def event_list(request, action):
 		events = Event.objects.filter(content_type__model=action, status=Event.STATUS['review']).exclude(creater=request.user)
 	template_name = 'manager/event_list_' +action +'.html'
 	return render(request, template_name, locals())
-
-@http_response
-def applydocumentaction(request, template_name='manager/applydocumentaction.html'):
-	if request.method == 'POST':
-		ISBN = request.POST['ISBN']
-		username = request.POST['username']
-		events = Event.objects.filter(creater__username=username, content_type__model='applydocumentaction', status=Event.STATUS['review'])
-		event_list = []
-		for event in events:
-			if event.action.book_info.ISBN == ISBN:
-				event_list.append(event)
-		if len(event_list) >= 1:
-			redirect_to = event_list[0].get_url()
-			status = u'success'
-			message = u'代掃申請項目獲取成功'
-		else:
-			status = u'error'
-			message = u'無此代掃申請項目'
-		return locals()
-	if request.method == 'GET':
-		return locals()
 
 @http_response
 def org_manage(request, template_name='manager/org_manage.html'):
