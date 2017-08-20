@@ -15,16 +15,18 @@ function checkRegister()
 function optradioChange()
 {
     $('.guest_mode').hide();
-    $('.editor_mode').hide();
+    //$('.editor_mode').hide();
     $('#id_service_guest').attr('readonly', true);
     $('input[type=radio]:checked').each(function(){
-        if($(this).val()=='Editor')
-            $('.editor_mode').show();
-        if($(this).val()=='Guest')
+        if($(this).val()=='Editor'){
+            //$('.editor_mode').show();
+        }
+        if($(this).val()=='Guest'){
             $('.guest_mode').show();
-        if($(this).val()=='service_guest_check')
+        }
+        if($(this).val()=='service_guest_check'){
             $('#id_service_guest').attr('readonly', false);
-
+        }
     });
 }
 $(document).ready(function() {

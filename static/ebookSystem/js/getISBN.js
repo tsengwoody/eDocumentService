@@ -11,6 +11,7 @@ function getBookInfo(ISBN, transferData) {
 
         },
         success: function(json) {
+            
             var str = (json.status == 'error') ? 'danger' : 'success'
             var dialog = '#' + str + 'Dialog';
             $(dialog + " .alertMessage").html(json.message);
@@ -18,6 +19,17 @@ function getBookInfo(ISBN, transferData) {
                 $(dialog + " .close").focus();
             });
             $(dialog).modal();
+
+            if(json.message==='查無資料'){
+                //$('#get_isbn').prop('disabled',true);
+                $('#show_prop')
+                    .off()
+                    .on('click',function(){
+                        $('input[type="text"][grp="changemode"]').prop('readonly',false);
+                    })
+                    .show();
+            }
+
             $('#id_bookname').val(json.bookname);
             $('#id_author').val(json.author);
             $('#id_date').val(json.date);
@@ -26,6 +38,7 @@ function getBookInfo(ISBN, transferData) {
 			$('#id_chinese_book_category').val(json.chinese_book_category);
 			$('#id_order').val(json.order);
 			$('#id_ISBN').val(json.ISBN);
+            
             //TODO: GET ISBN
             $('#id_get_isbn_load_icon').hide();
 
