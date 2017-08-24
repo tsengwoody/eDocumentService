@@ -11,6 +11,22 @@ import shutil
 from PIL import Image, ImageFont, ImageDraw
 from bs4 import BeautifulSoup, NavigableString
 
+def generic_serialized(self):
+	serialize = {}
+	for field in self._meta.fields:
+		value = getattr(self, field.name)
+		if isinstance(value, models.Model):
+			id_ = field.name +'_id'
+			field_id_value = getattr(self, id_)
+			value = '{0}/{1}'.format(value.__class__.__name__, field_id_value)
+		else:
+			try:
+				json.dumps(value)
+			except:
+				value = unicode(value)
+		serialize.update({field.name: value})
+	return serialize
+
 class BookInfo(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
 	bookname = models.CharField(max_length=255)
@@ -25,19 +41,7 @@ class BookInfo(models.Model):
 	def __unicode__(self):
 		return self.bookname
 
-def generic_serialized(self):
-	serialize = {}
-	for field in self._meta.fields:
-		value = getattr(self, field.name)
-		if isinstance(value, models.Model):
-			value = '{0}/{1}'.format(value.__class__.__name__, value.id)
-		else:
-			try:
-				json.dumps(value)
-			except:
-				value = unicode(value)
-		serialize.update({field.name: value})
-	return serialize
+	serialized = generic_serialized
 
 class Book(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
@@ -60,6 +64,16 @@ class Book(models.Model):
 	source = models.CharField(max_length=20, choices=SOURCE)
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8, 'final': 9, }
+
+	def serialized(self):
+		old_serialize = generic_serialized(self)
+		serialize = {}
+		for key in ['finish_date', 'upload_date', ]:
+			serialize.update({
+			key: old_serialize[key],
+		})
+		return serialize
+
 
 	def __unicode__(self):
 		return self.book_info.bookname

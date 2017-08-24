@@ -239,3 +239,27 @@ class book_deleteViewTests(TestCase):
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
 		self.assertEqual(len(Book.objects.all()), previous_book_count)
+
+class book_listViewTests(TestCase):
+	fixtures = ['dump.json',]
+	def setUp(self):
+		super(book_listViewTests, self).setUp()
+		client = Client()
+		client.login(username='root', password='root')
+
+	def test_book_list_correct_case(self):
+		client = Client()
+		client.login(username='root', password='root')
+		response = client.get(
+			reverse(
+				'ebookSystem:book_list',
+			),
+			{
+				'query_type': 'chinese_book_category',
+				'query_value': '8',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+#		import json
+#		for i in response.json()['content']['book']:
+#			print i

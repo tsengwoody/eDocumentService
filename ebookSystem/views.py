@@ -91,22 +91,6 @@ def tinymce_demo(request, template_name='ebookSystem/tinymce_demo.html'):
 
 @view_permission
 @http_response
-def book_list(request, template_name='ebookSystem/book_list.html'):
-	from collections import defaultdict
-	books_list = []
-	for i in range(10):
-		books = Book.objects.filter(
-			Q(book_info__chinese_book_category__startswith=str(i)),
-			Q(status__gte=Book.STATUS['finish'])
-		)
-		books_list.append((i, [ book.book_info for book in books ]))
-	if request.method == 'POST':
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
-@view_permission
-@http_response
 def book_list_manager(request, template_name='ebookSystem/book_list_manager.html'):
 	books = Book.objects.all()
 	bookinfos = [ book.book_info for book in books ]
@@ -859,4 +843,39 @@ def book_delete(request, ISBN, ):
 			return locals()
 		status = 'success'
 		message = u'book delete : finish'
+		return locals()
+
+@http_response
+def book_list(request, ):
+	if request.method == 'GET' and request.is_ajax():
+		query_type = request.GET['query_type']
+		query_value = request.GET['query_value']
+		try:
+			if query_type == 'all':
+				book_list = Book.objects.all()
+			elif query_type == 'ISBN':
+					book_list = Book.objects.filter(ISBN=query_value)
+			elif query_type in ['bookname', 'author', 'house']:
+				exec(
+					'book_list = Book.objects.select_related().filter(book_info__{0}__contains=query_value)'.format(query_type)
+				)
+			elif query_type == 'chinese_book_category':
+				book_list = Book.objects.filter(book_info__chinese_book_category__startswith=query_value)
+#			book_list = book_list.filter(status__gte=Book.STATUS['finish'])
+			status = 'success'
+			message = u'成功查詢指定文件'
+			content = {}
+			content['book'] = zip(
+				[book.serialized() for book in book_list],
+				[book.book_info.serialized() for book in book_list],
+			)
+			return locals()
+		except BaseException as e:
+			status = 'error'
+			message = u'查詢操作異常: {0}'.format(unicode(e))
+			return locals()
+
+@http_response
+def book_repository(request, template_name='ebookSystem/book_repository.html'):
+	if request.method == 'GET':
 		return locals()
