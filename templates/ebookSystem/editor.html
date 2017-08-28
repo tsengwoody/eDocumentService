@@ -7,8 +7,7 @@ MathML 編輯 demo
 	<!-- <script src="{% static "ebookSystem/js/jquery/jquery.min.js" %}" ></script> -->
 	<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script> -->
-	<!-- <script src="http://www.wiris.net/demo/editor/editor"></script> -->
+	<script language="javascript" src="{% static 'ebookSystem/js/frontendsystem.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/wiriseditor/wiriseditor.js' %}"></script>
 	<!-- 可選 TeX-AMS-MML_SVG TeX-MML-AM_CHTML -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
@@ -17,7 +16,6 @@ MathML 編輯 demo
 		});
 	</script>
 	<script language="javascript" src="{% static 'ebookSystem/js/tinymce/js/tinymce/tinymce.min.js' %}"></script>
-
 {% endblock %}
 
 {% block content %}
@@ -30,102 +28,8 @@ MathML 編輯 demo
 	}
 </style>
 
+
 <script>
-
-
-function o2j(v) {
-    //物件轉json文字
-    //單元測試為：ut_o2j
-
-    let c = '';
-    try {
-        c = JSON.stringify(v);
-        //c = JSON.stringify(v, null, '\t');
-    }
-    catch (err) {
-    }
-
-    return c;
-}
-
-
-function j2o(v) {
-    //json文字轉物件
-    //單元測試為：ut_j2o
-
-    let c = {};
-    try {
-        c = JSON.parse(v);
-    }
-    catch (err) {
-    }
-
-    return c;
-}
-
-
-function utoa(str) {
-    //任意字串轉base64字串
-    //單元測試為：ut_utoa
-
-    //btoa
-    let r = window.btoa(unescape(encodeURIComponent(str)));
-
-    return r;
-}
-
-
-function atou(str) {
-    //base64字串轉任意字串
-    //單元測試為：ut_atou
-
-    //atob
-    let r = decodeURIComponent(escape(window.atob(str)));
-
-    return r;
-}
-
-
-function o2b(obj) {
-    //物件轉base64字串
-    //單元測試為：ut_o2b
-
-    let r = '';
-    try {
-        r = utoa(o2j(obj));
-    }
-    catch (err) {
-    }
-
-    return r;
-}
-
-
-function b2o(str) {
-    //base64字串轉物件
-    //單元測試為：ut_b2o
-
-    let r = {};
-    try {
-        r = j2o(atou(str));
-    }
-    catch (err) {
-    }
-
-    return r;
-}
-
-
-function GenID() {
-    let p = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let c = "";
-    let n = 32;
-    for (let i = 0; i < n; i++) {
-       c += p.charAt(Math.floor(Math.random() * p.length));
-    }
-    return c;
-    //return Math.uuid(32);
-}
 
 
 function mathmltosvg(ele){

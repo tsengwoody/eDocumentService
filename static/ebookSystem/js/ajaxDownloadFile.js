@@ -1,3 +1,4 @@
+//已移動至frontendsystem.js記得刪除
 function downloadfile(cfn, bindata) {
 	//下載binary資料成為檔案
 	//使用標籤a與blob物件直接將bindata下載成為檔案
