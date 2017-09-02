@@ -7,51 +7,66 @@
 平台書庫
 {% endblock %}
 {% block content %}
+{% csrf_token %}
+
 <h3>平台書庫</h3>
 
 <script id="tmp_booklist_tabframe" type="text/x-custom-template">
 	<table class="table table-striped table-hover">
-		<thead>
+		<thead style="background-color:#fafafa; border-top:2px solid #eeeeee;">
 			<tr>
-				<th>ISBN</th>
-				<th>書名</th>
-				<th>裝訂冊數</th>
-				<th>版次</th>
-				<th>作者</th>
-				<th>出版社</th>
-				<th>出版日期</th>
+				<th style="text-align:center; vertical-align: top; padding:5px;">ISBN</th>
+				<th style="text-align:center; vertical-align: top; padding:5px;">書名</th>
+				<th style="text-align:center; vertical-align: top; padding:5px;">裝訂冊數</th>
+				<th style="text-align:center; vertical-align: top; padding:5px;">版次</th>
+				<th style="text-align:center; vertical-align: top; padding:5px;">作者</th>
+				<th style="text-align:center; vertical-align: top; padding:5px;">出版社</th>
+				<th style="text-align:center; vertical-align: top; padding:5px;">出版日期</th>
+				<th style="text-align:center; vertical-align: top; padding:5px;">動作</th>
 			</tr>
 		</thead>
-		<tbody id="tbody_booklist">
+		<tbody>
 		</tbody>
 	</table>
 </script>
+
 <script id="tmp_booklist_row" type="text/x-jquery-tmpl">
 	<tr>
-		<td>${ISBN}</td>
-		<td>${bookname}</td>
-		<td>${bookbinding}</td>
-		<td>${order}</td>
-		<td>${author}</td>
-		<td>${house}</td>
-		<td>${date}</td>
-		<td>${action}</td>
+		<td style="vertical-align: top; padding:5px;">${ISBN}</td>
+		<td style="vertical-align: top; padding:5px;">${bookname}</td>
+		<td style="vertical-align: top; padding:5px;">${bookbinding}</td>
+		<td style="vertical-align: top; padding:5px;">${order}</td>
+		<td style="vertical-align: top; padding:5px;">${author}</td>
+		<td style="vertical-align: top; padding:5px;">${house}</td>
+		<td style="vertical-align: top; padding:5px;">${date}</td>
+		<td style="vertical-align: top; padding:5px;">
+			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="downloadbook(this, false, 'email')">寄到信箱</button>
+			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="downloadbook(this, false, 'download')">下載</button>
+		</td>
 	</tr>
 </script>
 
-<div id="qwe">
-</div>
 
 <script>
 
 
 	_.delay(function(){
 
-		$('[name="repository_booklist_tab_grp"]').eq(0).click();
+		//mxdownloadbook
+		inicomp('mxdownloadbook');
 
-		$('#search_value').val('9789866104626')
-				
-	},100)
+		//預先顯示第1分頁
+		$('[name="repository_books_tab_grp"]').eq(0).click();
+
+		//$('#search_value').val('9789866104626')
+
+		//listcategory
+		listcategory();
+		
+		//預先顯示第1分頁
+		$('[name="repository_bookcategory_tab_grp"]').eq(0).click();
+	
+	},300)
 
 
 	function search(){
@@ -62,167 +77,34 @@
 		//search_value
 		let search_value=$('#search_value').val();
 
-		//url
-		let url='/ebookSystem/book_list';
+		//tab
+		let tab=$('#repository_books_div_查詢');
 
-		//transferData
-		let transferData={
-			'query_type':search_type,
-			'query_value':search_value
-		};
-
-		//aj_get
-		aj_get(url,transferData)
-		.done(function(o){
-			console.log(o)
-			
-			// o=[
-			// 	[
-			// 		{
-			// 			"upload_date": "2017-08-24", 
-			// 			"finish_date": "None"
-			// 		}, 
-			// 		{
-			// 			"ISBN": "9789573321569", 
-			// 			"author": "*5091*4f5b*745e.*8fea*4f5b(Jeffery Deaver)*8457;", 
-			// 			"house": "*7687*51a0", 
-			// 			"bookname": "*85cd*8272*99ed*5ba2", 
-			// 			"bookbinding": "*5e73*88dd", 
-			// 			"source": "", 
-			// 			"date": "2005- 07-01", 
-			// 			"chinese_book_category": "874", 
-			// 			"order": "*521d*7248"
-			// 		}
-			// 	],
-			// 	[
-			// 		{
-			// 			"upload_date": "2017-08-24", 
-			// 			"finish_date": "None"
-			// 		}, 
-			// 		{
-			// 			"ISBN": "9789573321569", 
-			// 			"author": "a", 
-			// 			"house": "b", 
-			// 			"bookname": "c", 
-			// 			"bookbinding": "d", 
-			// 			"source": "", 
-			// 			"date": "2005- 07-01", 
-			// 			"chinese_book_category": "874", 
-			// 			"order": "e"
-			// 		}
-			// 	],
-			// ];
-
-			//p
-			let p=[];
-			_.each(o, function(v,k){
-				p.push(v[1]);
-			})
+		//aj_booklist
+		aj_booklist(search_type,search_value)
+		.done(function(data){
 
 			//tabframe
-			$('#repository_booklist_div_查詢').html($('#tmp_booklist_tabframe').html());
+			tab.html($('#tmp_booklist_tabframe').html());
 
 			//tmpl
-			$('#tmp_booklist_row').tmpl(p).appendTo('#tbody_booklist');
+			let h=$('#tmp_booklist_row').tmpl(data).html();
 
+			//html
+			tab.find('tbody').html(h);
+
+		})
+		.fail(function(msg){
+			tab.html(msg);
 		})
 		
 	}
 
 
-</script>	
+	function listcategory(){
 
-
-<ul class="nav nav-tabs">
-	<li><a href="#repository_booklist_tab_查詢" name="repository_booklist_tab_grp" data-toggle="tab">查詢</a></li>
-	<li><a href="#repository_booklist_tab_索引" name="repository_booklist_tab_grp" data-toggle="tab">索引</a></li>
-</ul>
-
-
-<div class="tab-content" style="padding-top:20px;">
-
-	<div id="repository_booklist_tab_查詢" class="tab-pane">
-
-		<div class="form-inline" style="margin-bottom:20px;">
-			<div class="form-group">
-				<label style="margin-right:15px;"><input type="radio" name="search_type" value="ISBN" checked="true">ISBN</label>
-				<label style="margin-right:15px;"><input type="radio" name="search_type" value="bookname">書名</label>
-				<input id="search_value" class="form-control" maxlength="15" type="text">
-			</div>
-			<button type="submit" class="btn btn-primary" name="search_name" value="search" onclick="search()">搜尋</button>
-		</div>
-
-		<div id="repository_booklist_div_查詢"></div>
-
-	</div>
-
-	<div id="repository_booklist_tab_索引" class="tab-pane"></div>
-
-</div>
-
-
-
-
-<ul class="nav nav-tabs">
-
-{% for category, bookinfos in books_list %}
-
-	<li><a href="#booklist_tab_{{ category }}_div" name="booklist_tab_a_name" ics="{{ category }}" data-toggle="tab">圖書分類號：{{ category }}</a></li>
-
-{% endfor %}
-
-</ul>
-
-
-<div class="tab-content">
-
-	{% for category, bookinfos in books_list %}
-
-	<div class="tab-pane" style="margin-top:30px;" id="booklist_tab_{{ category }}_div">
-
-		{% if bookinfos|length > 0 %}
-
-			<table class="table table-striped table-hover">
-				<tr>
-					<th>ISBN</th>
-					<th>書名</th>
-					<th>裝訂冊數</th>
-					<th>版次</th>
-					<th>作者</th>
-					<th>出版社</th>
-					<th>出版日期</th>
-				</tr>
-				{% for bookinfo in bookinfos %}
-				<tr>
-					<td>{{ bookinfo.ISBN }}</td>
-					<td>{{ bookinfo.bookname }}</td>
-					<td>{{ bookinfo.bookbinding }}</td>
-					<td>{{ bookinfo.order }}</td>
-					<td>{{ bookinfo.author }}</td>
-					<td>{{ bookinfo.house }}</td>
-					<td>{{ bookinfo.date }}</td>
-				</tr>
-				{% endfor %}
-			</table>
-
-		{% else %}
-
-			<div>目前尚無書籍資料</div>
-
-		{% endif %}
-
-	</div>
-
-	{% endfor %}
-
-</div>
-
-
-<script>
-
- 	$(document).ready(function () {
-
-		var ocs={
+		//ocs
+		let ocs={
 			0:'總類',	
 			1:'哲學',	
 			2:'宗教',
@@ -235,19 +117,89 @@
 			9:'藝術'
 		}
 
-		$('a[name="booklist_tab_a_name"]').each(function(){
-			var a=$(this);
-			var ics=parseInt(a.attr('ics'));
-			var cs=ocs[ics];
-			var html=cs+'('+ics+')';
-			a.html(html);
+		//s
+		function gs(c,i){
+			return {
+				'id':'bookcategory_'+i,
+				'title':c,
+				'name':'repository_bookcategory_tab_grp',
+				'prop':'',
+			}
+		}
+		let s=[];
+		_.each(ocs,function(v,k){
+			s.push(gs(v,k));
 		})
 
-		$('a[name="booklist_tab_a_name"]').eq(0).click();
+		//page
+		let hpage=genpage(s);
+		$('#repository_books_div_索引').html(hpage);
 
-    });
+		//
+
+		//each 0~9
+		_.each(_.range(0,10),function(i){
+
+			//tab
+			let tab=$('#bookcategory_'+i);
+
+			//aj_booklist
+			aj_booklist('chinese_book_category',i)
+			.done(function(data){
+
+				//tabframe
+				tab.html($('#tmp_booklist_tabframe').html());
+
+				//tmpl
+				let h=$('#tmp_booklist_row').tmpl(data).html();
+
+				//html
+				tab.find('tbody').html(h);
+
+			})
+			.fail(function(msg){
+				tab.html(msg);
+			})
+			
+		})
+
+	}
 	
-</script>
+
+
+</script>	
+
+
+<ul class="nav nav-tabs">
+	<li><a href="#repository_books_tab_查詢" name="repository_books_tab_grp" data-toggle="tab">查詢</a></li>
+	<li><a href="#repository_books_tab_索引" name="repository_books_tab_grp" data-toggle="tab">索引</a></li>
+</ul>
+
+
+<div class="tab-content" style="padding-top:20px;">
+
+	<div id="repository_books_tab_查詢" class="tab-pane">
+
+		<div class="form-inline" style="margin-bottom:20px;">
+			<div class="form-group">
+				<label style="margin-right:15px;"><input type="radio" name="search_type" value="ISBN" checked="true">ISBN</label>
+				<label style="margin-right:15px;"><input type="radio" name="search_type" value="bookname">書名</label>
+				<input id="search_value" class="form-control" maxlength="15" type="text">
+			</div>
+			<button type="button" class="btn btn-primary" onclick="search();">搜尋</button>
+		</div>
+
+		<div id="repository_books_div_查詢"></div>
+
+	</div>
+
+	<div id="repository_books_tab_索引" class="tab-pane">
+
+		<div id="repository_books_div_索引"></div>
+
+	</div>
+
+</div>
 
 
 {% endblock %}

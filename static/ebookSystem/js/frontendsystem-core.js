@@ -109,6 +109,13 @@ function inicomp_getinfor(name){
             'pre':['tinymce','wiriseditor','mathjax']
         }
     }
+    else if(name==='mxdownloadbook'){
+        o={
+            'url':'/static/ebookSystem/comp/mxdownloadbook.html',
+            'type':'html',
+            'pre':[]
+        }
+    }
 
     return o;
 }
@@ -466,6 +473,31 @@ function alerterr(msg){
 }
 
 
+function genpage(data){
+    //產生分頁
+
+    let c='';
+    c+='<ul class="nav nav-tabs">';
+
+    //each li
+    _.each(data,function(v,k){
+        c+='<li><a href="#'+v['id']+'" name="'+v['name']+'" prop="'+v['prop']+'" data-toggle="tab">'+v['title']+'</a></li>';
+    })
+    
+    c+='</ul>';
+	
+    c+='<div class="tab-content">';
+
+    //each div
+    _.each(data,function(v,k){
+        c+='<div id="'+v['id']+'" class="tab-pane" style="margin-top:30px;"></div>';
+    })
+    
+    c+='</div>';
+
+    return c;
+}
+
 function aj_get(url, transferData){
     //ajax get
 
@@ -496,9 +528,23 @@ function aj_send(type, url, transferData){
 }
 
 
-function aj_binary(url, transferData, f){
+function aj_binary(url, transferData){
     //console.log(url)
-    
+
+    //getdisposition
+    function getdisposition(xhr){
+        let filename='';
+        let disposition = xhr.getResponseHeader('Content-Disposition');
+        if (disposition && disposition.indexOf('attachment') !== -1) {
+            let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+            let matches = filenameRegex.exec(disposition);
+            if (matches != null && matches[1]) {
+                filename = matches[1].replace(/['"]/g, '');
+            }
+        }
+        return filename;
+    }
+
     return $.ajax({
         url:url,
         type: "POST",
@@ -517,12 +563,66 @@ function aj_binary(url, transferData, f){
                 downloadfile(filename, bdata);
             }
             else{
-                generalalerterror('密碼錯誤或準備文件失敗');
+                alerterr('密碼錯誤或準備文件失敗');
             }
 
         },
         error:function(xhr,errmsg,err){
-            generalalerterror(xhr.responseText);
+            //console.log(xhr.responseText);
+            alerterr('密碼錯誤或準備文件失敗');
         }
     });
+}
+
+
+function aj_booklist(query_type, query_value){
+    //API使用book_list查找書籍資訊
+
+    //df
+    let df = $.Deferred();
+
+    //url
+    let url='/ebookSystem/book_list';
+
+    //transferData
+    let transferData={
+        'query_type':query_type,
+        'query_value':query_value
+    };
+
+    //aj_get
+    aj_get(url,transferData)
+    .done(function(data){
+        
+        if(data['status']==='success'){
+
+            //o
+            let o=data['content']['book'];
+
+            //p
+            let p=[];
+            _.each(o, function(v,k){
+                p.push(v[1]);
+            })
+
+            if(p.length>0){
+                df.resolve(p);
+            }
+            else{
+                df.reject('查無書籍資料');
+            }
+        
+        }
+        else{
+            console.log(data['message']);
+            df.reject('查無書籍資料');
+        }
+
+    })
+    .fail(function(msg){
+        console.log(msg)
+        df.reject('查無書籍資料');
+    })
+    
+    return df;
 }

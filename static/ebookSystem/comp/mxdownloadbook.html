@@ -1,0 +1,83 @@
+<script>
+
+
+    function downloadbook(me, ebook, action){
+        //書庫頁面之下載按鈕
+
+        //me
+        me=$(me)
+
+        //submit
+        $('#divmadal_downloadbook_submit').off().on('click', function(){
+
+            //ISBN
+            let ISBN=me.attr('ISBN');
+
+            //password
+            let password=$('#divmadal_downloadbook_password').val();
+
+            //transferData
+            let transferData={
+                'action':action,
+                'password':password,
+            };
+
+            //url
+            let url='';
+            if(ebook===false){
+                url='/ebookSystem/book_download/'+ISBN;
+            }
+            else{
+                url='/ebookSystem/ebook_download/'+ISBN;
+            }
+            
+            //aj_binary
+            aj_binary(url, transferData);
+
+            //clear
+            $('#divmadal_downloadbook_password').val('');
+
+            //show
+            $('#divmadal_downloadbook').modal('hide');
+
+        });
+
+        //enter
+        $("#divmadal_downloadbook_password").off().on('keypress',function(e){
+            code = (e.keyCode ? e.keyCode : e.which);
+            if (code === 13){
+                e.preventDefault();
+                $('#divmadal_downloadbook_submit').click();
+            }
+        });
+
+        //show
+        $('#divmadal_downloadbook').modal('show');
+
+    }
+
+
+</script>
+
+
+<div id="divmadal_downloadbook" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content alert-info" style="background-color: #f5f5f5;">
+            <div class="modal-header">
+                <span style="font-size:14pt;">取得書籍</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group form-inline text-center ">
+                    <label for="inputPasword">請輸入密碼</label>
+                    <input id="divmadal_downloadbook_password" type="password" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="divmadal_downloadbook_submit" type="button" class="btn btn-primary">取得</button>
+            </div>
+        </div>
+    </div>
+</div>
