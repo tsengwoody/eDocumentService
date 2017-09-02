@@ -8,13 +8,21 @@ from mysite.settings import BASE_DIR
 import os
 import datetime
 
-ContactUsKIND = (
-	(u'校對問題' , u'校對問題'),
-	(u'系統問題' , u'系統問題'),
-	(u'營運建議' , u'營運建議'),
-	(u'加入我們' , u'加入我們'),
-	(u'其他' , u'其他'),
-)
+def generic_serialized(self):
+	serialize = {}
+	for field in self._meta.fields:
+		value = getattr(self, field.name)
+		if isinstance(value, models.Model):
+			id_ = field.name +'_id'
+			field_id_value = getattr(self, id_)
+			value = '{0}/{1}'.format(value.__class__.__name__, field_id_value)
+		else:
+			try:
+				json.dumps(value)
+			except:
+				value = unicode(value)
+		serialize.update({field.name: value})
+	return serialize
 
 class PublicFile(object):
 	from mysite.settings import BASE_DIR
@@ -51,6 +59,35 @@ class User(AbstractUser):
 	def __unicode__(self):
 		return self.first_name +self.last_name
 
+	def serialized(self):
+		old_serialize = generic_serialized(self)
+		serialize = {}
+		for key in [
+			'username',
+			'first_name',
+			'last_name',
+			'email',
+			'phone',
+			'birthday',
+			'education',
+			'is_book',
+			'org',
+			'last_login',
+			'is_book',
+			'is_license',
+			'auth_phone',
+			'auth_email',
+			'is_active',
+			'is_editor',
+			'is_guest',
+			'is_manager',
+			'is_advanced_editor',
+		]:
+			serialize.update({
+			key: old_serialize[key],
+		})
+		return serialize
+
 	def has_guest(self):
 		try:
 			self.guest
@@ -74,9 +111,6 @@ class User(AbstractUser):
 		except:
 			current_ServiceInfo = None
 		return current_ServiceInfo
-
-	def custom_url(self):
-		pass
 
 class Event(models.Model):
 	creater = models.ForeignKey(User, related_name='event_creater_set')

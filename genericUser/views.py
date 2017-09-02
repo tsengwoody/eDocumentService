@@ -1,4 +1,5 @@
 ﻿# coding: utf-8
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.core.cache import cache
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
@@ -482,4 +483,60 @@ def forget(request, template='genericUser/forget.html'):
 	if request.method == 'POST':
 		return locals()
 	if request.method == 'GET':
+		return locals()
+
+#=====new=====
+
+@http_response
+def user_update(request, ID, ):
+	if request.method == 'POST' and request.is_ajax():
+		user = User.objects.get(id=ID)
+		if request.POST['action'] == 'info':
+			try:
+				userForm = UserForm(data=request.POST, instance=user)
+				if not userForm.is_valid():
+					raise SystemError(u'資訊輸入錯誤')
+				userForm.save()
+			except BaseException as e:
+				status = 'error'
+				message = u'使用者資訊更新失敗：{0}'.format(unicode(e))
+				return locals()
+			status = 'success'
+			message = u'使用者資訊更新成功'
+			return locals()
+		if request.POST['action'] == 'password':
+			try:
+				form = PasswordChangeForm(user=request.user, data=request.POST)
+				if not form.is_valid():
+					raise SystemError(u'密碼輸入錯誤')
+				form.save()
+			except BaseException as e:
+				status = 'error'
+				message = u'使用者密碼更新失敗：{0}'.format(unicode(e))
+				return locals()
+			status = 'success'
+			message = u'使用者密碼更新成功'
+			return locals()
+		if request.POST['action'] == 'role':
+			try:
+				form = RoleForm(user=request.user, data=request.POST)
+				if not form.is_valid():
+					raise SystemError(u'角色權限設定失敗')
+				form.save()
+			except BaseException as e:
+				status = 'error'
+				message = u'角色權限設定失敗：{0}'.format(unicode(e))
+				return locals()
+			status = 'success'
+			message = u'角色權限設定成功'
+			return locals()
+
+@http_response
+def user_view(request, ID, ):
+	if request.method == 'POST' and request.is_ajax():
+		user = User.objects.get(id=ID)
+		content = {}
+		content['user'] = user.serialized()
+		status = 'success'
+		message = u'使用者查詢成功'
 		return locals()

@@ -22,4 +22,6 @@ urlpatterns = [
 	url(r'^review_user/(?P<username>[\w-]+)/$', views.review_user, name='review_user'),
 	url(r'^revise_content/$', views.revise_content, name='revise_content'),
 	url(r'^verify_contact_info/$', views.verify_contact_info, name='verify_contact_info'),
+	url(r'^user_update/(?P<ID>\d+)/$', views.user_update, name='user_update'),
+	url(r'^user_view/(?P<ID>\d+)/$', views.user_view, name='user_view'),
 ]

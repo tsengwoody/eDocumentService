@@ -260,6 +260,6 @@ class book_listViewTests(TestCase):
 			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
-#		import json
-#		for i in response.json()['content']['book']:
-#			print i
+		import json
+		for i in response.json()['content']['book']:
+			print i

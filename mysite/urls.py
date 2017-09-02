@@ -17,13 +17,12 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from . import views
-from django.contrib.sitemaps import GenericSitemap
-from django.contrib.sitemaps.views import sitemap
+from django.views.static import serve
 
 urlpatterns = [
 	url(r'^$', views.home, name='home'),
 	url(r'^(?P<app_name>\w+)/(?P<template_name>\w+)/readme/$', views.readme, name='readme'),
-	url(r'^locale$', views.view_locale, name='locale'),
+#	url(r'^file/(?P<path>.*)$', serve, {'document_root': 'file/'}),
 	url(r'^admin/', include(admin.site.urls)),
 	url(r'^account/', include('account.urls', namespace="account", app_name="account")),
 	url(r'^ebookSystem/', include('ebookSystem.urls', namespace="ebookSystem")),

@@ -165,13 +165,3 @@ def password_change(request, template_name='registration/password_change_form.ht
 def readme(request, app_name, template_name):
 	template_name = app_name +'/' +template_name +'_readme.html'
 	return render(request, template_name, locals())
-
-import locale
-import sys
-
-def view_locale(request):
-	loc_info = "getlocale: " + str(locale.getlocale()) + \
-		"<br/>getdefaultlocale(): " + str(locale.getdefaultlocale()) + \
-		"<br/>fs_encoding: " + str(sys.getfilesystemencoding()) + \
-		"<br/>sys default encoding: " + str(sys.getdefaultencoding())
-	return HttpResponse(loc_info)

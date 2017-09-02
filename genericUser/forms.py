@@ -13,18 +13,7 @@ EDUCATION_OPTION = (
 
 EMPTY_OPTION = (('', u'---------'),)
 
-'''class BookInfoForm(forms.ModelForm):
-	class Meta:
-		model = BookInfo
-		exclude = ['ISBN']'''
-
-'''class ContactUsForm(forms.ModelForm):
-	class Meta:
-		model = ContactUs
-		exclude = ['datetime']'''
-
 class UserForm(forms.ModelForm):
-
 	class Meta:
 		model = User
 		fields = ['username', 'email', 'first_name', 'last_name', 'phone', 'birthday', 'education', 'is_book', 'org',]
@@ -119,3 +108,8 @@ class UserForm(forms.ModelForm):
 					field.can_modify = True
 		except:
 			pass
+
+class RoleForm(forms.ModelForm):
+	class Meta:
+		model = User
+		fields = ['is_active', 'is_editor', 'is_guest', ]

@@ -3,6 +3,7 @@ import codecs
 import datetime
 from zipfile import ZipFile
 from django.core.cache import cache
+from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse, resolve
 from django.db.models import F,Q
 from django.forms import modelform_factory
@@ -606,8 +607,18 @@ def book_download(request, ISBN, ):
 		except BaseException as e:
 			GetBookRecord.objects.create(book=getBook, user=request.user, )
 			cache.set(request.user.username, {'get_book': timezone.now()}, MIN_DURATION_TIME)
-		download_path = attach_file_path
-		download_filename = os.path.basename(attach_file_path)
+		if request.POST['action'] == 'download':
+			download_path = attach_file_path
+			download_filename = os.path.basename(attach_file_path)
+		elif request.POST['action'] == 'email':
+			subject = u'[文件] {0}'.format(getBook)
+			body = u'新愛的{0}您好：\n'.format(request.user.username)
+			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
+			email.attach_file(attach_file_path)
+			email.send(fail_silently=False)
+			status = 'success'
+			message = u'已寄送到您的電子信箱'
+#		os.remove(attach_file_path)
 		return locals()
 
 @http_response
