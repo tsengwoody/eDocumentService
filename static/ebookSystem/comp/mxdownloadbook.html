@@ -21,18 +21,26 @@
                 'action':action,
                 'password':password,
             };
+            //console.log(transferData)
 
-            //url
-            let url='';
+            //aj
+            let url;
             if(ebook===false){
                 url='/ebookSystem/book_download/'+ISBN;
+                if(action==='download'){
+                    console.log('aj_binary',ebook,url,transferData)
+                    aj_binary(url, transferData);
+                }
+                else{
+                    console.log('aj_post',ebook,url,transferData)
+                    aj_post(url, transferData);
+                }
             }
             else{
+                console.log('aj_post',ebook,url,transferData)
                 url='/ebookSystem/ebook_download/'+ISBN;
+                aj_post(url, transferData);
             }
-            
-            //aj_binary
-            aj_binary(url, transferData);
 
             //clear
             $('#divmadal_downloadbook_password').val('');

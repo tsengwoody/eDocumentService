@@ -121,6 +121,24 @@ function inicomp_getinfor(name){
 }
 
 
+function cint(v) {
+    //轉整數
+
+    if ($.isNumeric(v)) {
+        return _.round(v);
+    }
+
+    return 0;
+}
+
+
+function cstr(v) {
+    //轉字串
+
+    return String(v);
+}
+
+
 function isundefined(v) {
     //判斷是否為undefined
 
@@ -473,7 +491,7 @@ function alerterr(msg){
 }
 
 
-function genpage(data){
+function pagetab_initial(data){
     //產生分頁
 
     let c='';
@@ -490,13 +508,98 @@ function genpage(data){
 
     //each div
     _.each(data,function(v,k){
-        c+='<div id="'+v['id']+'" class="tab-pane" style="margin-top:30px;"></div>';
+        c+='<div id="'+v['id']+'" class="tab-pane" style="margin:20px;"></div>';
     })
     
     c+='</div>';
 
     return c;
 }
+
+
+function pagin_initial(tabid){
+    //添加表格分頁功能
+
+    //tab
+    let tab=$('#'+tabid);
+
+    //trs
+    let trs=tab.find('tbody').find('tr');
+
+    //numrow
+    let numrow=trs.length;
+
+    //numperpage
+    let numperpage=10;
+
+    //numpage
+    let numpage=Math.ceil(numrow/numperpage);
+
+    let c='';
+    c+='<div style="text-align:center;">';
+    c+='<ul id="'+tabid+'_pagination" class="pagination" style="margin:0px;" tabid="'+tabid+'" pagenow="1" numrow="'+numrow+'" numperpage="'+numperpage+'" numpage="'+numpage+'">';
+    c+='<li class="prev" style="cursor:pointer;"><a onclick="pagin_change(\''+tabid+'\',\'-1\')">«</a></li>';
+    c+='<li class=""><a >1 / '+numpage+'</a></li>';
+    c+='<li class="next" style="cursor:pointer;"><a onclick="pagin_change(\''+tabid+'\',\'+1\')">»</a></li>';
+    c+='</ul>';
+    c+='</div>';
+    
+    //after
+    tab.after(c);
+
+    //change
+    pagin_change(tabid,1)
+
+}
+
+
+function pagin_change(tabid,oper){
+    //表格分頁切換
+
+    let tab=$('#'+tabid);
+    let pag=$('#'+tabid+'_pagination');
+    let pagenow=cint(pag.attr('pagenow'));
+    let numperpage=cint(pag.attr('numperpage'));
+    let numpage=cint(pag.attr('numpage'));
+
+    //pagenow
+    if(String(oper)==='+1'){
+        pagenow+=1;
+    }
+    else if(String(oper)==='-1'){
+        pagenow-=1;
+    }
+    else{
+        pagenow=cint(oper);
+    }
+
+    //check
+    pagenow=Math.max(pagenow,1);
+    pagenow=Math.min(pagenow,numpage);
+
+    //save
+    pag.attr('pagenow',pagenow);
+
+    //show
+    pag.find('li').eq(1).find('a').html(pagenow+' / '+numpage);
+
+    //trs
+    let trs=tab.find('tbody').find('tr');
+    
+    //each
+    trs.each(function(i){
+        let tr=$(this);
+        let j=i+1;
+        if( j >= numperpage*(pagenow-1)+1 && j <= numperpage*(pagenow)){
+            tr.show();
+        }
+        else{
+            tr.hide();
+        }
+    })
+
+}
+
 
 function aj_get(url, transferData){
     //ajax get
@@ -603,6 +706,18 @@ function aj_booklist(query_type, query_value){
             let p=[];
             _.each(o, function(v,k){
                 p.push(v[1]);
+                // p.push(v[1]);
+                // p.push(v[1]);
+                // p.push(v[1]);
+                // p.push(v[1]);
+                // p.push(v[1]);
+                // p.push(v[1]);
+                // p.push(v[1]);
+                // p.push(v[1]);
+                // p.push(v[1]);
+                // p.push(v[1]);
+                // p.push(v[1]);
+                // p.push(v[1]);
             })
 
             if(p.length>0){
