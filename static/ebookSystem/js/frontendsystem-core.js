@@ -666,13 +666,16 @@ function aj_binary(url, transferData){
                 downloadfile(filename, bdata);
             }
             else{
-                alerterr('密碼錯誤或準備文件失敗');
+                let msg='data is not file';
+                console.log('success get error',msg);
+                alerterr(msg);
             }
 
         },
         error:function(xhr,errmsg,err){
-            //console.log(xhr.responseText);
-            alerterr('密碼錯誤或準備文件失敗');
+            let data=j2o(xhr.responseText);
+            console.log('ajax error',data['message']);
+            alerterr(data['message']);
         }
     });
 }

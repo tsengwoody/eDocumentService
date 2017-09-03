@@ -62,24 +62,29 @@
         //show
         $('#divmadal_downloadbook').modal('show');
 
+        //focus
+        // _.delay(function(){
+        //     $('#divmadal_downloadbook_password').focus();
+        // },500)
+
     }
 
 
 </script>
 
 
-<div id="divmadal_downloadbook" class="modal fade">
+<div id="divmadal_downloadbook" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmadal_downloadbook_title" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content alert-info" style="background-color: #f5f5f5;">
             <div class="modal-header">
-                <span style="font-size:14pt;">取得書籍</span>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
+                <h4 id="divmadal_downloadbook_title" class="modal-title">取得書籍</h4>
             </div>
             <div class="modal-body">
-                <div class="form-group form-inline text-center ">
-                    <label for="inputPasword">請輸入密碼</label>
+                <div class="form-group form-inline text-center">
+                    <label for="divmadal_downloadbook_password">請輸入密碼</label>
                     <input id="divmadal_downloadbook_password" type="password" class="form-control">
                 </div>
             </div>
