@@ -20,11 +20,10 @@
 		<td>{{ bookinfo.date }}</td>
 			{% if request.user.is_guest and request.user.has_guest and bookinfo.book.status >= 4 %}
 			<td>
-				<button type="button" class="btn btn-default" id="email_id" name="email" data-target="#getBookModal" data-toggle="modal" data-whatever="email" data-isbn={{ bookinfo.ISBN }}  value={{ bookinfo.ISBN }}>寄到信箱</button>
+				<button type="button" class="btn btn-default" ISBN="{{ bookinfo.ISBN }}" onclick="receivebook(this, false, 'email')">寄到信箱</button>
 			</td>
 			<td>
-				<!-- <button type="button" class="btn btn-default" id="download_id" name="download" data-whatever="download" data-toggle="modal" data-target="#getBookModal" data-isbn={{ bookinfo.ISBN }} value={{ bookinfo.ISBN }}>下載</button>  -->
-				<button type="button" class="btn btn-default" ISBN="{{ bookinfo.ISBN }}" onclick="downloadbook(this, false, '')">下載</button>
+				<button type="button" class="btn btn-default" ISBN="{{ bookinfo.ISBN }}" onclick="receivebook(this, false, 'download')">下載</button>
 			</td>
 			{% else %}
 			<td></td>

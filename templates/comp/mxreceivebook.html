@@ -1,8 +1,8 @@
 <script>
 
 
-    function downloadbook(me, ebook, action){
-        //書庫頁面之下載按鈕
+    function receivebook(me, ebook, action){
+        //下載書籍或email寄送
 
         //me
         me=$(me)
@@ -25,22 +25,39 @@
 
             //aj
             let url;
+            let df;
             if(ebook===false){
                 url='/ebookSystem/book_download/'+ISBN;
                 if(action==='download'){
                     console.log('aj_binary',ebook,url,transferData)
-                    aj_binary(url, transferData);
+                    df=aj_binary(url, transferData);
                 }
                 else{
                     console.log('aj_post',ebook,url,transferData)
-                    aj_post(url, transferData);
+                    df=aj_post(url, transferData);
                 }
             }
             else{
-                console.log('aj_post',ebook,url,transferData)
                 url='/ebookSystem/ebook_download/'+ISBN;
-                aj_post(url, transferData);
+                if(action==='download'){
+                    console.log('aj_binary',ebook,url,transferData)
+                    df=aj_binary(url, transferData);
+                }
+                else{
+                    console.log('aj_post',ebook,url,transferData)
+                    df=aj_post(url, transferData);
+                }
             }
+
+            //df
+            df
+            .done(function(data){
+                alertmessage(data['status'], data['message']);
+            })
+            .fail(function(data){
+                alertmessage(data['status'], data['message']);
+            })
+
 
             //clear
             $('#divmadal_downloadbook_password').val('');
@@ -51,24 +68,27 @@
         });
 
         //enter
-        $("#divmadal_downloadbook_password").off().on('keypress',function(e){
-            code = (e.keyCode ? e.keyCode : e.which);
-            if (code === 13){
-                e.preventDefault();
+        $("#divmadal_downloadbook_password").off().on('keypress',function(event){
+            if (event.which===13) {
+                event.preventDefault();
                 $('#divmadal_downloadbook_submit').click();
             }
+            // code = (e.keyCode ? e.keyCode : e.which);
+            // if (code === 13){
+            //     e.preventDefault();
+            //     $('#divmadal_downloadbook_submit').click();
+            // }
         });
 
         //show
         $('#divmadal_downloadbook').modal('show');
 
-        //focus
-        // _.delay(function(){
-        //     $('#divmadal_downloadbook_password').focus();
-        // },500)
-
+        //autofocus
+        _.delay(function(){
+            $('#divmadal_downloadbook_password').focus();
+        },500)
+        
     }
-
 
 </script>
 
@@ -82,10 +102,12 @@
                 </button>
                 <h4 id="divmadal_downloadbook_title" class="modal-title">取得書籍</h4>
             </div>
-            <div class="modal-body">
+            <div style="padding:40px 10px 20px 10px; background-color:#fafafa;">
                 <div class="form-group form-inline text-center">
-                    <label for="divmadal_downloadbook_password">請輸入密碼</label>
-                    <input id="divmadal_downloadbook_password" type="password" class="form-control">
+                    <label>
+                        <span>請輸入密碼</span>
+                        <input id="divmadal_downloadbook_password" type="password" class="form-control">
+                    </label>
                 </div>
             </div>
             <div class="modal-footer">
@@ -94,3 +116,4 @@
         </div>
     </div>
 </div>
+

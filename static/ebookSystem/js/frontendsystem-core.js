@@ -1,124 +1,123 @@
-﻿let comploader={}; //全域組件載入紀錄
+﻿// let comploader={}; //全域組件載入紀錄
 
 
-function inicomp(name){
-    //初始化組件
-    let df = $.Deferred();
+// function inicomp(name){
+//     //初始化組件
+//     let df = $.Deferred();
 
-    //infor
-    let o=inicomp_getinfor(name);
+//     //infor
+//     let o=inicomp_getinfor(name);
 
-    //pre
-    let dfs=[];
-    if(o['pre'].length>0){
-        for(let c of o['pre']){
-            let s=inicomp(c);
-            dfs.push(s);
-        }
-    }
+//     //pre
+//     let dfs=[];
+//     if(o['pre'].length>0){
+//         for(let c of o['pre']){
+//             let s=inicomp(c);
+//             dfs.push(s);
+//         }
+//     }
 
-    //each
-    Promise.all(dfs)
-    .then(function(){
+//     //each
+//     Promise.all(dfs)
+//     .then(function(){
 
-        //core
-        return inicomp_load(name);
+//         //core
+//         return inicomp_load(name);
 
-    })
-    .then(function(){
-        df.resolve();
-    })
+//     })
+//     .then(function(){
+//         df.resolve();
+//     })
 
-    return df;
-}
-
-
-function inicomp_load(name){
-    //載入組件
-    let df = $.Deferred();
-
-    if(haskey(comploader,name)){
-        df.resolve();
-    }
-    else{
-        let o=inicomp_getinfor(name);
-        let timetag='?'+Date.now();
-        timetag='';
-
-        if(o['type']==='js'){
-            $.getScript(o['url']+timetag)
-            .done(function(){
-                console.log('load: '+name+'['+o['type']+']')
-
-                //true
-                comploader[name]=true;
-
-                df.resolve();
-            })
-        }
-        else if(o['type']==='html'){
-            $.get(o['url']+timetag)
-            .done(function(h){
-                console.log('load: '+name+'['+o['type']+']')
-
-                //append
-                $('body').append(h);
-
-                //true
-                comploader[name]=true;
-
-                df.resolve();
-            })
-        }
-
-    }
-
-    return df;
-}
+//     return df;
+// }
 
 
-function inicomp_getinfor(name){
-    //取得組件資訊
+// function inicomp_load(name){
+//     //載入組件
+//     let df = $.Deferred();
 
-    let o;
-    if(name==='tinymce'){
-        o={
-            'url':'https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.6.6/tinymce.min.js',
-            'type':'js',
-            'pre':[]
-        }
-    }
-    else if(name==='wiriseditor'){
-        o={
-            'url':'/static/ebookSystem/js/wiriseditor/wiriseditor.js',
-            'type':'js',
-            'pre':[]
-        }
-    }
-    else if(name==='mathjax'){
-        o={
-            'url':'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG', //總套件62.9mb太大，直接用cdn
-            'type':'js',
-            'pre':[]
-        }
-    }
-    else if(name==='mxeditor'){
-        o={
-            'url':'/static/ebookSystem/comp/mxeditor.html',
-            'type':'html',
-            'pre':['tinymce','wiriseditor','mathjax']
-        }
-    }
-    else if(name==='mxdownloadbook'){
-        o={
-            'url':'/static/ebookSystem/comp/mxdownloadbook.html',
-            'type':'html',
-            'pre':[]
-        }
-    }
+//     if(haskey(comploader,name)){
+//         df.resolve();
+//     }
+//     else{
+//         let o=inicomp_getinfor(name);
+//         let timetag='?'+Date.now();
 
-    return o;
-}
+//         if(o['type']==='js'){
+//             $.getScript(o['url']+timetag)
+//             .done(function(){
+//                 console.log('load: '+name+'['+o['type']+']')
+
+//                 //true
+//                 comploader[name]=true;
+
+//                 df.resolve();
+//             })
+//         }
+//         else if(o['type']==='html'){
+//             $.get(o['url']+timetag)
+//             .done(function(h){
+//                 console.log('load: '+name+'['+o['type']+']')
+
+//                 //append
+//                 $('body').append(h);
+
+//                 //true
+//                 comploader[name]=true;
+
+//                 df.resolve();
+//             })
+//         }
+
+//     }
+
+//     return df;
+// }
+
+
+// function inicomp_getinfor(name){
+//     //取得組件資訊
+
+//     let o;
+//     if(name==='tinymce'){
+//         o={
+//             'url':'https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.6.6/tinymce.min.js',
+//             'type':'js',
+//             'pre':[]
+//         }
+//     }
+//     else if(name==='wiriseditor'){
+//         o={
+//             'url':'/static/ebookSystem/js/wiriseditor/wiriseditor.js',
+//             'type':'js',
+//             'pre':[]
+//         }
+//     }
+//     else if(name==='mathjax'){
+//         o={
+//             'url':'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG', //總套件62.9mb太大，直接用cdn
+//             'type':'js',
+//             'pre':[]
+//         }
+//     }
+//     else if(name==='mxeditor'){
+//         o={
+//             'url':'/static/ebookSystem/comp/mxeditor.html',
+//             'type':'html',
+//             'pre':['tinymce','wiriseditor','mathjax']
+//         }
+//     }
+//     else if(name==='mxdownloadbook'){
+//         o={
+//             'url':'/static/ebookSystem/comp/mxdownloadbook.html',
+//             'type':'html',
+//             'pre':[]
+//         }
+//     }
+
+//     return o;
+// }
 
 
 function cint(v) {
@@ -419,6 +418,31 @@ function b2o(str) {
     return r;
 }
 
+function blob2str(bdata){
+    //blob轉字串
+
+    //df
+    let df = $.Deferred();
+
+    //reader
+    let reader = new FileReader();
+
+    //loadend
+    reader.addEventListener('loadend',function(event){
+
+        //result
+        let text=event.srcElement.result;
+
+        //resolve
+        df.resolve(text);
+
+    });
+
+    //readAsText
+    reader.readAsText(bdata);
+
+    return df;
+}
 
 function GenID() {
     let p = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -532,15 +556,20 @@ function pagin_initial(tabid){
     //numperpage
     let numperpage=10;
 
+    //check
+    if(numrow<=numperpage){
+        return;
+    }
+
     //numpage
     let numpage=Math.ceil(numrow/numperpage);
 
     let c='';
     c+='<div style="text-align:center;">';
     c+='<ul id="'+tabid+'_pagination" class="pagination" style="margin:0px;" tabid="'+tabid+'" pagenow="1" numrow="'+numrow+'" numperpage="'+numperpage+'" numpage="'+numpage+'">';
-    c+='<li class="prev" style="cursor:pointer;"><a onclick="pagin_change(\''+tabid+'\',\'-1\')">«</a></li>';
+    c+='<li class="prev" style="cursor:pointer;"><a onclick="pagin_change(\''+tabid+'\',\'-1\')">上一頁</a></li>';
     c+='<li class=""><a >1 / '+numpage+'</a></li>';
-    c+='<li class="next" style="cursor:pointer;"><a onclick="pagin_change(\''+tabid+'\',\'+1\')">»</a></li>';
+    c+='<li class="next" style="cursor:pointer;"><a onclick="pagin_change(\''+tabid+'\',\'+1\')">下一頁</a></li>';
     c+='</ul>';
     c+='</div>';
     
@@ -616,9 +645,13 @@ function aj_post(url, transferData){
 
 
 function aj_send(type, url, transferData){
-    //ajax
+    //ajax傳送訊息
 
-    return $.ajax({
+    //df
+    let df = $.Deferred();
+
+    //ajax
+    $.ajax({
         url:url,
         type: type,
         data: transferData,
@@ -627,12 +660,51 @@ function aj_send(type, url, transferData){
             jqXHR.setRequestHeader('X-CSRFToken', csrf);
             jqXHR.setRequestHeader("X-Requested-With", "XMLHttpRequest")
         }
-    });
+    })
+    .done(function(data){
+
+        if(data['status']==='success'){
+            df.resolve(data);
+        }
+        else if(data['status']==='error'){
+            df.reject(data);
+        }
+        else{
+            console.log('aj_send: data.status error');
+            console.log(data);
+
+            //reject
+            let res={
+                'status':'error',
+                'message':'伺服器非預期回應: '+o2j(data),
+            };
+            df.reject(res);
+        }
+
+    })
+    .fail(function(xhr){
+        console.log('aj_send: ajax error');
+        console.log(xhr);
+        console.log(xhr.responseText);
+
+        //reject
+        let res={
+            'status':'error',
+            'message':'伺服器錯誤回應: '+xhr.responseText,
+        };
+        df.reject(res);
+
+    })
+
+    return df;
 }
 
 
 function aj_binary(url, transferData){
-    //console.log(url)
+    //ajax下載binary檔案
+
+    //df
+    let df = $.Deferred();
 
     //getdisposition
     function getdisposition(xhr){
@@ -648,7 +720,8 @@ function aj_binary(url, transferData){
         return filename;
     }
 
-    return $.ajax({
+    //ajax
+    $.ajax({
         url:url,
         type: "POST",
         data: transferData,
@@ -657,27 +730,58 @@ function aj_binary(url, transferData){
             let csrf=$('input[name=csrfmiddlewaretoken]').val();
             jqXHR.setRequestHeader('X-CSRFToken', csrf);
             jqXHR.setRequestHeader("X-Requested-With", "XMLHttpRequest")
-        },
-        success: function(bdata,status,xhr){
-            //console.log(bdata);
-
-            if(bdata.type==='application/octet-stream'){
-                let filename=getdisposition(xhr);
-                downloadfile(filename, bdata);
-            }
-            else{
-                let msg='data is not file';
-                console.log('success get error',msg);
-                alerterr(msg);
-            }
-
-        },
-        error:function(xhr,errmsg,err){
-            let data=j2o(xhr.responseText);
-            console.log('ajax error',data['message']);
-            alerterr(data['message']);
         }
-    });
+    })
+    .done(function(bdata,status,xhr){
+
+        if(bdata.type==='application/octet-stream'){
+
+            //downloadfile
+            let filename=getdisposition(xhr);
+            downloadfile(filename, bdata);
+
+            //resolve
+            let res={
+                'status':'success',
+                'message':'下載檔案成功',
+            };
+            df.resolve(res);
+
+        }
+        else{
+            console.log('aj_binary: bdata.type error');
+            console.log(bdata);
+            console.log(status);
+            console.log(xhr);
+
+            //blob to string
+            blob2str(bdata)
+            .done(function(msg){
+
+                //reject
+                let res=j2o(msg); //為json訊息
+                df.reject(res);
+
+            })
+
+        }
+
+    })
+    .fail(function(xhr){
+        console.log('aj_binary: ajax error');
+        console.log(xhr);
+        console.log(xhr.responseText); //會沒有responseText, 只好回傳xhr文字
+
+        //reject
+        let res={
+            'status':'error',
+            'message':'伺服器錯誤回應: '+o2j(xhr),
+        };
+        df.reject(res);
+
+    })
+
+    return df;
 }
 
 
@@ -732,7 +836,7 @@ function aj_booklist(query_type, query_value){
         
         }
         else{
-            console.log(data['message']);
+            //console.log(data['message']);
             df.reject('查無書籍資料');
         }
 

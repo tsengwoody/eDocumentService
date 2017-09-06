@@ -39,11 +39,11 @@
 			<td>{{part.deadline}}</td>
 			{% if request.user.is_guest and request.user.has_guest and part.status == 4 and part.book.status < 4 %}
 			<td>
-				<button type="button" class="btn btn-default" id="email_id" name="email" data-target="#getBookModal" data-toggle="modal" data-whatever="email" data-isbn={{part.ISBN_part}}  value={{part.ISBN_part}}>寄到信箱</button>
+				 <!-- <button type="button" class="btn btn-default" id="email_id" name="email" data-target="#getBookModal" data-toggle="modal" data-whatever="email" data-isbn={{part.ISBN_part}}  value={{part.ISBN_part}}>寄到信箱</button>  -->
+				<button type="button" class="btn btn-default" ISBN="{{ part.ISBN_part }}" onclick="receivebook(this, true, 'email')">寄到信箱</button>
 			</td>
 			<td>
-				<!-- <button type="button" class="btn btn-default" id="download_id" name="download" data-whatever="download" data-toggle="modal" data-target="#getBookModal" data-isbn={{part.ISBN_part}} value={{part.ISBN_part}}>下載</button> -->
-				<button type="button" class="btn btn-default" ISBN="{{part.ISBN_part}}" onclick="downloadbook(this, false, 'download')">下載</button>
+				<button type="button" class="btn btn-default" ISBN="{{ part.ISBN_part }}" onclick="receivebook(this, true, 'download')">下載</button>
 			</td>
 			{% elif part.status == 1 %}
 			<td>
@@ -58,4 +58,5 @@
 		{% endfor %}
 	</table>
 </form>
+
 {% endblock %}

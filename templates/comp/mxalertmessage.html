@@ -1,0 +1,72 @@
+<script>
+
+
+    function alertmessage(kind, message){
+        //提示訊息
+
+        //kind
+        let icon='';
+        if(kind==='success'){
+            icon='<span class="glyphicon glyphicon-ok" style="color:#22ff66;"></span>';
+        }
+        else if(kind==='error'){
+            icon='<span class="glyphicon glyphicon-remove" style="color:#ff2266;"></span>';
+        }
+        else{
+            console.log('alertmessage: kind error: '+kind)
+            return;
+        }
+         $('#divmadal_alertmessage_icon').html(icon);
+
+        //message
+        if(message===''){
+            console.log('alertmessage: message empty')
+            return;
+        }
+        $('#divmadal_alertmessage_msg').html(message);
+
+        //ok
+        $('#divmadal_alertmessage_ok').off().on('click', function(){
+
+            //show
+            $('#divmadal_alertmessage').modal('hide');
+
+        });
+
+        //show
+        $('#divmadal_alertmessage').modal('show');
+
+        //autofocus
+        _.delay(function(){
+            $('#divmadal_alertmessage_msg').focus();
+        },500)
+        
+    }
+
+</script>
+
+
+<div id="divmadal_alertmessage" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmadal_alertmessage_title" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content alert-info" style="background-color: #f5f5f5;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 id="divmadal_alertmessage_title" class="modal-title">系統訊息</h4>
+            </div>
+            <div style="padding:40px 20px; background-color:#fafafa;">
+                <table>
+                    <tr>
+                        <td id="divmadal_alertmessage_icon" style="font-size:30pt; padding-right:15px;"></td>
+                        <td id="divmadal_alertmessage_msg" style="font-size:12pt;" tabindex="0"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button id="divmadal_alertmessage_ok" type="button" class="btn btn-primary">確定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
