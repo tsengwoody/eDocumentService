@@ -532,11 +532,7 @@ def user_update(request, ID, ):
 			return locals()
 
 @http_response
-def user_view(request, ID, ):
-	if request.method == 'POST' and request.is_ajax():
-		user = User.objects.get(id=ID)
-		content = {}
-		content['user'] = user.serialized()
-		status = 'success'
-		message = u'使用者查詢成功'
+def user_manager(request, template_name='genericUser/user_manager.html'):
+	if request.method == 'GET':
+		user_list = User.objects.filter(is_book=True)
 		return locals()

@@ -23,5 +23,5 @@ urlpatterns = [
 	url(r'^revise_content/$', views.revise_content, name='revise_content'),
 	url(r'^verify_contact_info/$', views.verify_contact_info, name='verify_contact_info'),
 	url(r'^user_update/(?P<ID>\d+)/$', views.user_update, name='user_update'),
-	url(r'^user_view/(?P<ID>\d+)/$', views.user_view, name='user_view'),
+	url(r'^user_manager/$', views.user_manager, name='user_manager'),
 ]

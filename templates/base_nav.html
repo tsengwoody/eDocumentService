@@ -31,6 +31,7 @@
 						<li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
 						<li><a href="{% url 'manager:event_list' 'user' %}">審核會員</a></li>
 						<li><a href="{% url 'manager:statistics' %}">統計資訊</a></li>
+						<li><a href="{% url 'genericUser:user_manager' %}">使用者管理</a></li>
 						<li><a href="{% url 'ebookSystem:message_send' %}">訊息傳送</a></li>
 						{% endif %}
 						{% if request.user.manage_org_set.all|length > 0 %}
@@ -45,16 +46,18 @@
 					</ul>
 				</li>
 				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#">文件<span class="caret"></span></a>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">文件上傳<span class="caret"></span></a>
 					<ul class="dropdown-menu">
-						{% if request.user.is_advanced_editor or request.user.is_guest %}
-						<li><a href="{% url 'ebookSystem:book_create' %}">自掃上傳</a></li>
+						{% if request.user.is_guest %}
+						<li><a href="{% url 'ebookSystem:book_create' %}">掃描檔上傳</a></li>
+						{% endif %}
+						{% if request.user.is_manager %}
 						<li><a href="{% url 'ebookSystem:book_upload' %}">電子檔上傳</a></li>
 						{% endif %}
 					</ul>
 				</li>
 				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#">校對<span class="caret"></span></a>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">校對服務<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 					{% if request.user.is_editor %}
 					<li><a href="{% url 'account:service' %}">一般校對</a></li>
@@ -65,7 +68,7 @@
 					</ul>
 				</li>
 				{% if request.user.is_guest %}
-				<li><a href="{% url 'guest:book_repository' %}">書庫</a></li>
+				<li><a href="{% url 'guest:book_repository' %}">校對進度</a></li>
 				{% endif %}
 				{% if request.user.is_superuser %}
 				<li><a href="{% url 'account:an_service' %}">分析</a></li>
@@ -81,11 +84,11 @@
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user">帳號<span class="caret"></span></a>
 					<ul class="dropdown-menu">
-						<li><a href="{% url 'genericUser:event_list' %}">消息</a></li>
+						<li><a href="{% url 'genericUser:event_list' %}">平台消息</a></li>
 						{% if request.user.is_editor %}
-						<li><a href="{% url 'genericUser:serviceinfo_list' request.user.username %}">時數</a></li>
+						<li><a href="{% url 'genericUser:serviceinfo_list' request.user.username %}">服務時數</a></li>
 						{% endif %}
-						<li><a href="{% url 'genericUser:info' %}">設定</a></li>
+						<li><a href="{% url 'genericUser:info' %}">個人資料</a></li>
 					</ul>
 				</li>
 				<li><a href="{% url 'logout' %}"><span class="glyphicon  glyphicon-log-out"></span>登出</a></li>

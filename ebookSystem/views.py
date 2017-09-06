@@ -601,12 +601,13 @@ def book_download(request, ISBN, ):
 		except BaseException as e:
 			status = 'error'
 			message = u'準備文件失敗：{0}'.format(unicode(e))
+			print message
 			return locals()
 		try:
 			GetBookRecord.objects.get(book=getBook, user=request.user)
 		except BaseException as e:
 			GetBookRecord.objects.create(book=getBook, user=request.user, )
-			cache.set(request.user.username, {'get_book': timezone.now()}, MIN_DURATION_TIME)
+#			cache.set(request.user.username, {'get_book': timezone.now()}, MIN_DURATION_TIME)
 		if request.POST['action'] == 'download':
 			download_path = attach_file_path
 			download_filename = os.path.basename(attach_file_path)
@@ -758,11 +759,19 @@ def book_upload(request, template_name='ebookSystem/book_upload.html'):
 				message = u'表單驗證失敗' + str(bookInfoForm.errors)
 				return locals()
 			newBookInfo = bookInfoForm.save()
+
+		#判斷是否上傳
+		source_priority = {
+			'self': 0,
+			'txt': 1,
+			'epub': 2,
+		}
 		try:
 			book = Book.objects.get(ISBN=request.POST['ISBN'])
-			status = 'error'
-			message = u'文件已存在'
-			return locals()
+			if source_priority[request.POST['category']] <= source_priority[book.source]:
+				status = 'error'
+				message = u'文件已存在'
+				return locals()
 		except:
 			pass
 
@@ -823,6 +832,7 @@ def book_upload(request, template_name='ebookSystem/book_upload.html'):
 		newBook.scaner = request.user
 		newBook.owner = request.user
 		newBook.source = request.POST['category']
+		newBook.finish_date = timezone.now()
 		newBook.save()
 		ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN'] + '-1', begin_page=-1, end_page=-1)
 		ebook.change_status(9, 'final')
@@ -872,6 +882,10 @@ def book_list(request, ):
 				)
 			elif query_type == 'chinese_book_category':
 				book_list = Book.objects.filter(book_info__chinese_book_category__startswith=query_value)
+			elif query_type == 'newest':
+				book_list = Book.objects.all().order_by('finish_date')
+			elif query_type == 'hottest':
+				pass
 #			book_list = book_list.filter(status__gte=Book.STATUS['finish'])
 			status = 'success'
 			message = u'成功查詢指定文件'

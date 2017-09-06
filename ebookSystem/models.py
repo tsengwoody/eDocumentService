@@ -191,7 +191,7 @@ class Book(models.Model):
 		import pyminizip
 		user = authenticate(username=user.username, password=password)
 		if user is None:
-			return False
+			raise SystemError(u'密碼輸入不正確')
 		custom_zip = self.path +'/temp/{0}_{1}.zip'.format(self.ISBN, user.username)
 		if not os.path.exists(os.path.dirname(custom_zip)):
 			os.mkdir(os.path.dirname(custom_zip))

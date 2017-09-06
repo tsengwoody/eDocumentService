@@ -1,0 +1,30 @@
+﻿{% extends "base_nav.html" %}
+{% load staticfiles %}
+{% block title %}
+使用者管理
+{% endblock %}
+
+{% block content %}
+<h3>使用者管理</h3>
+<table>
+	<tr>
+		<th>使用者名稱</th>
+		<th>姓名</th>
+		<th>郵件</th>
+		<th>手機</th>
+		<th>最後上線時間</th>
+		<th colspan="2">動作</th>
+	</tr>
+	{% for user in user_list %}
+	<tr>
+		<td>{{ user.username }}</td>
+		<td>{{ user.first_name }}{{ user.last_name }}</td>
+		<td>{{ user.email }}</td>
+		<td>{{ user.phone }}</td>
+		<td>{{ user.last_login }}</td>
+		<td>活動紀錄</td>
+		<td>權限設定</td>
+	</tr>
+	{% endfor %}
+</table>
+{% endblock %}

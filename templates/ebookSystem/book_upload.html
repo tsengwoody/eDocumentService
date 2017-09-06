@@ -1,6 +1,6 @@
 ﻿{% extends "base_nav.html" %}
 {% block title %}
-上傳文件
+電子檔上傳
 {% endblock %}
 {% block style %}
 {% load staticfiles %}
@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block header %}
-上傳文件
+電子檔上傳
 {% endblock %}
 {% block content %}
 
@@ -21,7 +21,7 @@
 			{{ bookForm.errors }}
 		</div>
 	{% endif %}
-	<h3><legend>上傳文件</legend></h3>
+	<h3><legend>電子檔上傳</legend></h3>
 	{% include 'utils/upload_dialog.html' %}
 	{% include 'ebookSystem/BookInfo_input.html' %}
 	<div class="form-group">
