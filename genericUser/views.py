@@ -536,3 +536,51 @@ def user_manager(request, template_name='genericUser/user_manager.html'):
 	if request.method == 'GET':
 		user_list = User.objects.filter(is_book=True)
 		return locals()
+
+@http_response
+def announcement_list(request, template_name='genericUser/announcement_list.html'):
+	announcement_list = Announcement.objects.all()
+	if request.method == 'GET':
+		status = 'success'
+		message = u''
+		return locals()
+
+@http_response
+def announcement(request, ID, template_name='genericUser/announcement.html'):
+	try:
+		announcement = Announcement.objects.get(id=ID)
+	except:
+		raise Http404("announcement does not exist")
+	AnnouncementForm = modelform_factory(Announcement, fields=['category', 'title', 'content', ])
+	if request.method == 'POST':
+		form = AnnouncementForm(request.POST, instance=announcement)
+		if not form.is_valid():
+			status = 'error'
+			message = u'表單驗證失敗' + unicode(form.errors)
+			return locals()
+		form.save()
+		status = 'success'
+		message = u'成功新增公告'
+		return locals()
+	elif request.method == 'GET':
+		status = 'success'
+		message = u''
+		return locals()
+
+@http_response
+def announcement_create(request, template_name='genericUser/announcement_create.html'):
+	AnnouncementForm = modelform_factory(Announcement, fields=['category', 'title', 'content', ])
+	if request.method == 'POST':
+		form = AnnouncementForm(request.POST)
+		if not form.is_valid():
+			status = 'error'
+			message = u'表單驗證失敗' + unicode(form.errors)
+			return locals()
+		form.save()
+		status = 'success'
+		message = u'成功修改公告'
+		return locals()
+	elif request.method == 'GET':
+		status = 'success'
+		message = u''
+		return locals()

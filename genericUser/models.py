@@ -196,6 +196,20 @@ class ServiceInfo(models.Model):
 			character_count = character_count +i
 		return character_count
 
+class Announcement(models.Model):
+	title = models.CharField(max_length=100)
+	content = models.TextField()
+	datetime = models.DateField(default = timezone.now)
+	CATEGORY = (
+		(u'平台消息' , u'平台消息'),
+		(u'新書推薦' , u'新書推薦'),
+		(u'志工快訊' , u'志工快訊'),
+	)
+	category = models.CharField(max_length=10, choices=CATEGORY)
+
+	def __unicode__(self):
+		return self.title
+
 class Article(models.Model):
 	author = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='article_set')
 	subject = models.CharField(max_length=100)

@@ -92,14 +92,17 @@ class user_viewViewTests(TestCase):
 		user = User.objects.get(id=1)
 		response = client.post(
 			reverse(
-				'genericUser:user_view',
+				'genericUser:user_update',
 				kwargs = {
 					'ID': user.id,
 				},
 			),
+			{
+				'action': 'info',
+			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
-		self.assertEqual(		response.json()['content']['user'], user.serialized())
+#		self.assertEqual(		response.json()['content']['user'], user.serialized())
 
 	def test_user_update_action_password_correct_case(self):
 		client = Client()
@@ -143,3 +146,23 @@ class user_viewViewTests(TestCase):
 		)
 		user = User.objects.get(id=1)
 		self.assertEqual(user.is_editor, True)
+
+class announcement_createViewTests(TestCase):
+	fixtures = ['dump.json',]
+
+	def test_announcement_create_correct_case(self):
+		client = Client()
+		client.login(username='root', password='root')
+		previous_count = len(Announcement.objects.all())
+		response = client.post(
+			reverse(
+				'genericUser:announcement_create'
+			),
+			{
+				'title': u'title',
+				'content': u'<p>content_p1</p><p>content_p2</p>',
+				'category': u'志工快訊',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		self.assertEqual(len(Announcement.objects.all()), previous_count +1)

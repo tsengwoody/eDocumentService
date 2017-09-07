@@ -1,0 +1,14 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+{{ announcement.title }} | 公告
+{% endblock %}
+{% block header %}
+{{ announcement.title }} | 公告
+{% endblock %}
+{% block content %}
+<form action="" method="post" role="form" >
+	{% csrf_token %} 
+	<h3>{{ announcement.title }}</h3>
+	<hr />
+</form>
+{% endblock %}

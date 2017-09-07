@@ -214,17 +214,17 @@ class Command(BaseCommand):
 				reverse(
 					'ebookSystem:book_create'
 				),
-{
-				u'ISBN': u'9789573321569',
-				u'author': u'傑佛瑞.迪佛(Jeffery Deaver)著; 宋瑛堂譯',
-				u'house': u'皇冠',
-				u'bookname': u'藍色駭客',
-				u'date': u'2005-07-01',
-				u'bookbinding': '平裝',
-				u'chinese_book_category': '874',
-				u'order': '初版',
-				'fileObject': book_file,
-			},
+				{
+					u'ISBN': u'9789573321569',
+					u'author': u'傑佛瑞.迪佛(Jeffery Deaver)著; 宋瑛堂譯',
+					u'house': u'皇冠',
+					u'bookname': u'藍色駭客',
+					u'date': u'2005-07-01',
+					u'bookbinding': '平裝',
+					u'chinese_book_category': '874',
+					u'order': '初版',
+					'fileObject': book_file,
+				},
 #				HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 			)
 
@@ -379,4 +379,19 @@ class Command(BaseCommand):
 		request.user = root
 		response = article_create(request)
 		assert len(Article.objects.all()) == 1, 'create Article fail'
-	
+		
+		client = Client()
+		client.login(username='root', password='root')
+		previous_count = len(Announcement.objects.all())
+		response = client.post(
+			reverse(
+				'genericUser:announcement_create'
+			),
+			{
+				'title': u'title',
+				'content': u'<p>content_p1</p><p>content_p2</p>',
+				'category': u'志工快訊',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		assert len(Announcement.objects.all()) == previous_count +1, 'create announcement fail'
