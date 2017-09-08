@@ -33,7 +33,7 @@
 						<li><a href="{% url 'manager:statistics' %}">統計資訊</a></li>
 						<li><a href="{% url 'genericUser:user_manager' %}">使用者管理</a></li>
 						<li><a href="{% url 'ebookSystem:message_send' %}">訊息傳送</a></li>
-						<li><a href="{% url 'genericUser:announcement_create' %}">公告發怖</a></li>
+						<li><a href="{% url 'genericUser:announcement_create' %}">公告發佈</a></li>
 						{% endif %}
 						{% if request.user.manage_org_set.all|length > 0 %}
 						<li><a href="{% url 'manager:org_manage' %}">組織管理</a></li>

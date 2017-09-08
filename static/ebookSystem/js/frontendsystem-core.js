@@ -476,42 +476,25 @@ function downloadfile(cfn, bindata) {
 
 
 function alertDialog(json) {
-    //原ajaxSubmit.js的alertDialog
-    
-    var str=(json.status=='error')?'danger':'success'
-    var dialog='#'+str+'Dialog';
-    $(dialog+" .alertMessage").html(json.message);
-    $(dialog).on('shown.bs.modal', function () {
-        $(dialog+" .close").focus();
-    });
-    $(dialog).modal();
-    $(dialog).on('hide.bs.modal', function () {
-        if(json.hasOwnProperty('redirect_to'))
+    //原ajaxSubmit.js的alertDialog, 強制轉用alertmessage
+
+    //alertmessage
+    alertmessage(json.status, json.message)
+    .done(function(){
+        if(haskey(json,'redirect_to')){
+
+            //redirect
             window.location.href = json.redirect_to; 
-        else
-            if(json.status!='error')
-                location.reload();
-    });
-}
 
+        }
+        else if(json.status!='error'){
 
-function alertok(msg){
-    //alertDialog顯示ok訊息, 需引用utils/dialog.html
+            //reload
+            location.reload();
 
-    let json={};
-    json.status='success';
-    json.message=msg;
-    alertDialog(json);
-}
+        }
+    })
 
-
-function alerterr(msg){
-    //alertDialog顯示error訊息, 需引用utils/dialog.html
-
-    let json={};
-    json.status='error';
-    json.message=msg;
-    alertDialog(json);
 }
 
 

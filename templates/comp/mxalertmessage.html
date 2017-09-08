@@ -4,6 +4,12 @@
     function alertmessage(kind, message){
         //提示訊息
 
+        //df
+        let df = $.Deferred();
+
+        //div
+        let div=$('#divmadal_alertmessage');
+
         //kind
         let icon='';
         if(kind==='success'){
@@ -29,18 +35,27 @@
         $('#divmadal_alertmessage_ok').off().on('click', function(){
 
             //show
-            $('#divmadal_alertmessage').modal('hide');
+            div.modal('hide');
 
         });
 
+        //hidden event
+        div.off().on('hidden.bs.modal', function () {
+
+            //resolve
+            df.resolve();
+
+        })
+
         //show
-        $('#divmadal_alertmessage').modal('show');
+        div.modal('show');
 
         //autofocus
         _.delay(function(){
             $('#divmadal_alertmessage_msg').focus();
         },500)
         
+        return df;
     }
 
 </script>

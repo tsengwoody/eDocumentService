@@ -3,15 +3,9 @@
 {% block title %}
 訊息傳送
 {% endblock %}
-{% block style %}
-	<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-	<script language="javascript" src="{% static 'ebookSystem/js/frontendsystem.js' %}"></script>
-{% endblock %}
 {% block content %}
 {% include 'utils/dialog.html' %}
 {% csrf_token %}
-
 
 <script>
 
@@ -19,6 +13,16 @@
 		let action=$('input[name="grp_user"]:checked').val();
 		let subject=$('#inp_subject').val();
 		let body=$('#ta_body').val();
+
+		//check
+		if(cstr(subject)===''){
+			alertmessage('error', '主旨不能為空');
+			return;
+		}
+		if(cstr(body)===''){
+			alertmessage('error', '內容不能為空');
+			return;
+		}
 
 		//url
 		let url='/ebookSystem/message_send';
@@ -29,69 +33,68 @@
 			'subject':subject,
 			'body':body,
 		};
-
+		
 		//aj_post
 		aj_post(url, transferData)
 		.done(function(data){
 			//console.log(data)
 
-			if(data['message']==='訊息傳送成功'){
-				alertok(data['message']);
-			}
-			else{
-				alerterr(data['message']);
-			}
+			//clear
+			$('input[name="grp_user"]').eq(0).prop('checked',true);
+			$('#inp_subject,#ta_body').val('');
+
+			//alertDialog
+			alertDialog(data);
 
 		})
-		.fail(function(xhr){
-			//console.log(xhr)
+		.fail(function(data){
+			//console.log(data)
 
-			alerterr(xhr.status+": "+xhr.responseText);
+			//alertDialog
+			alertDialog(data);
+
 		})
 
 	}
 
 </script>
 
-
 <h3>訊息傳送</h3>
-
 
 <div class="form-horizontal">
 
 	<div class="form-group">
-		<label class="control-label col-sm-1">對象</label>
+		<label class="control-label col-sm-1"><font style="color:red">*</font>對象</label>
 		<div class="col-sm-11">
-			<label class="radio-inline">
-				<input type="radio" name="grp_user" value="editor_send" checked>志工
+			<label for="inp_user_v" class="radio-inline">
+				<input id="inp_user_v" type="radio" name="grp_user" value="editor_send" checked>志工
 			</label>
-			<label class="radio-inline">
-				<input type="radio" name="grp_user" value="guest_send">視障者
+			<label for="inp_user_d" class="radio-inline">
+				<input id="inp_user_d" type="radio" name="grp_user" value="guest_send">視障者
 			</label>
 		</div>
 	</div>
 
 	<div class="form-group">
-		<label class="control-label col-sm-1">主旨</label>
+		<label for="inp_subject" class="control-label col-sm-1"><font style="color:red">*</font>主旨</label>
 		<div class="col-sm-11">
 			<input id="inp_subject" type="text" class="form-control" placeholder="">
 		</div>
 	</div>
 
 	<div class="form-group">
-		<label class="control-label col-sm-1">內容</label>
+		<label for="ta_body" class="control-label col-sm-1"><font style="color:red">*</font>內容</label>
 		<div class="col-sm-11">
-			<textarea id="ta_body" class="form-control" rows="10"></textarea>
+			<textarea id="ta_body" class="form-control" style="resize:none;" rows="10"></textarea>
 		</div>
 	</div>
 
     <div class="form-group">        
       <div class="col-sm-offset-1 col-sm-11">
-        <button id="btn_send" type="button" class="btn btn-default" onclick="message_send()">傳送</button>
+        <button id="btn_send" type="button" class="btn btn-primary" onclick="message_send()">傳送</button>
       </div>
 	</div>
 	
 </div>
-
 
 {% endblock %}

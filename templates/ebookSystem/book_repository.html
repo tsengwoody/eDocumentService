@@ -55,9 +55,6 @@
 
 	_.delay(function(){
 
-		//mxdownloadbook
-		//inicomp('mxdownloadbook');
-
 		//預先顯示第1分頁
 		$('[name="repository_books_tab_grp"]').eq(0).click();
 
@@ -92,9 +89,19 @@
 			//datatable
 			bk_datatable(div,data,'tab_result');
 
+			//alertmessage
+			alertmessage('success', '查詢成功，共取得 '+data.length+' 筆資料')
+
 		})
 		.fail(function(msg){
+
+			//msg
 			div.html(msg);
+
+			//alertmessage
+			alertmessage('error', msg)
+
+
 		})
 		
 	}
@@ -232,9 +239,15 @@
 
 		<div class="form-inline" style="margin-bottom:20px;">
 			<div class="form-group">
-				<label style="margin-right:15px;"><input type="radio" name="search_type" value="ISBN" checked="true">ISBN</label>
-				<label style="margin-right:15px;"><input type="radio" name="search_type" value="bookname">書名</label>
-				<input id="search_value" class="form-control" maxlength="15" type="text">
+				<label for="inp_ISBN" style="margin-right:15px;">
+					<input id="inp_ISBN" type="radio" name="search_type" value="ISBN" checked="true">
+					ISBN
+				</label>
+				<label for="inp_bookname" style="margin-right:15px;">
+					<input id="inp_bookname" type="radio" name="search_type" value="bookname">
+					書名
+				</label>
+				<input id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊" maxlength="15">
 			</div>
 			<button type="button" class="btn btn-primary" onclick="search();">搜尋</button>
 		</div>

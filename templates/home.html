@@ -63,10 +63,10 @@
 				{% for article in article_list|slice:":5" %}
 				<p><a class="btn btn-link" role="button" href="{% url 'genericUser:article/content' article.id %}">{{ article.datetime }} {{ article.subject }}</a></p>
 				{% endfor %}
-				<a href='{% url 'genericUser:announcement_list' %}'>公告列表</a>
-				<!--<div class="pull-right">
-					<p><a class="btn btn-default center" href="#" role="button">閱讀更多 »</a></p>
-				</div>-->
+				<!-- <a href='{% url 'genericUser:announcement_list' %}'>公告列表</a> -->
+				<div class="pull-right">
+					<p><a class="btn btn-default center" href="{% url "genericUser:announcement_list" %}" role="button">公告列表 »</a></p>
+				</div>
 			</div>
 		</div>
 	</div>
