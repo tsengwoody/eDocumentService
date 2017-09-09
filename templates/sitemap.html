@@ -1,0 +1,26 @@
+﻿{% extends "base_nav.html" %}
+{% load staticfiles %}
+{% block title %}
+網站導覽
+{% endblock %}
+{% block header %}
+網站導覽
+{% endblock %}
+{% block content %}
+<h3>網站導覽</h3>
+<ul>
+	<li>1.管理
+		<ul>
+			<li><a href="">1.1.審核上傳文件</a></li>
+			<li><a href="">1.2.審核會員</a></li>
+		</ul>
+	</li>
+	<li>2.文件
+		<ul>
+			<li><a href="">2.1.掃描檔上傳</a></li>
+			<li><a href="">2.2.電子檔上傳</a></li>
+		</ul>
+	</li>
+</ul>
+<!--以此類推，並動態從上方功能選單產生-->
+{% endblock %}

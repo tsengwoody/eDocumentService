@@ -584,11 +584,11 @@ def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
 @http_response
 def book_download(request, ISBN, ):
 	if request.method == 'POST' and request.is_ajax():
+		DOWNLOAD_MIN_DURATION_TIME = 86400
 		MIN_DURATION_TIME = 3*86400
 		getBook = Book.objects.get(ISBN=ISBN)
-		try:
-			GetBookRecord.objects.get(book=getBook, user=request.user)
-		except BaseException as e:
+		gbr = GetBookRecord.objects.filter(book=getBook, user=request.user)
+		if len(gbr) <= 0:
 			try:
 				cache.get(request.user.username)['get_book']
 				status = 'error'
@@ -596,18 +596,30 @@ def book_download(request, ISBN, ):
 				return locals()
 			except BaseException as e:
 				pass
+		else:
+			try:
+				cache.get(request.user.username)['get_book']
+				status = 'error'
+				message = u'取得文件失敗：{0}天內僅能下載1本書籍'.format(unicode(DOWNLOAD_MIN_DURATION_TIME/86400))
+				return locals()
+			except BaseException as e:
+				pass
+
+		#準備所需文件
 		try:
 			attach_file_path = getBook.zip(request.user, request.POST['password'])
 		except BaseException as e:
 			status = 'error'
 			message = u'準備文件失敗：{0}'.format(unicode(e))
-			print message
 			return locals()
-		try:
-			GetBookRecord.objects.get(book=getBook, user=request.user)
-		except BaseException as e:
-			GetBookRecord.objects.create(book=getBook, user=request.user, )
-#			cache.set(request.user.username, {'get_book': timezone.now()}, MIN_DURATION_TIME)
+
+		GetBookRecord.objects.create(book=getBook, user=request.user, )
+		if len(gbr) <= 0:
+			cache.set(request.user.username, {'get_book': timezone.now()}, MIN_DURATION_TIME)
+		else:
+			pass
+#			cache.set(request.user.username, {'get_book': timezone.now()}, DOWNLOAD_MIN_DURATION_TIME)
+
 		if request.POST['action'] == 'download':
 			download_path = attach_file_path
 			download_filename = os.path.basename(attach_file_path)
@@ -619,7 +631,13 @@ def book_download(request, ISBN, ):
 			email.send(fail_silently=False)
 			status = 'success'
 			message = u'已寄送到您的電子信箱'
-#		os.remove(attach_file_path)
+
+		#刪除暫存檔
+		try:
+			os.remove(attach_file_path)
+		except BaseException as e:
+			pass
+
 		return locals()
 
 @http_response

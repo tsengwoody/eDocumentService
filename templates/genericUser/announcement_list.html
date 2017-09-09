@@ -9,19 +9,23 @@
 <h3>公告列表</h3>
 <form action="" method="post">
 {% csrf_token %}
+
+{% for announcement_list in announcement_lists %}
+<h3>{{ announcement_list.0 }}</h3>
 <table class="table table-striped table-hover">
 	<tr>
-		<th>類別</th>
 		<th>標題</th>
 		<th>發怖日期</th>
+		<th>動作</th>
 	</tr>
-	{% for announcement in announcement_list %}
+	{% for announcement in announcement_list.1 %}
 	<tr>
-		<td>{{ announcement.category }}</td>
-		<td><a href="{% url 'genericUser:announcement' announcement.id %}">{{ announcement.title }}</a></td>
-		<td>{{ announcement.datetime }}</td>
-		</tr>
-		{% endfor %}
+		<td>{{ announcement.title }}</td>
+		<td>{{ announcement.datetime.year }}年{{ announcement.datetime.month }}月{{ announcement.datetime.day }}日</td>
+		<td><a class="btn btn-link" role="button" href="{% url 'genericUser:announcement' announcement.id %}">閱讀全文</a>
+	</tr>
+	{% endfor %}
 	</table>
+{% endfor %}
 </form>
 {% endblock %}

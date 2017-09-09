@@ -60,8 +60,8 @@
 		<div class="panel panel-success">
 			<div class="panel-heading">最新消息</div>
 			<div class="panel-body">
-				{% for article in article_list|slice:":5" %}
-				<p><a class="btn btn-link" role="button" href="{% url 'genericUser:article/content' article.id %}">{{ article.datetime }} {{ article.subject }}</a></p>
+				{% for announcement in announcement_list|slice:":5" %}
+				<p><a class="btn btn-link" role="button" href="{% url 'genericUser:announcement' announcement.id %}">{{ announcement.datetime }} {{ announcement.title }}</a></p>
 				{% endfor %}
 				<!-- <a href='{% url 'genericUser:announcement_list' %}'>公告列表</a> -->
 				<div class="pull-right">

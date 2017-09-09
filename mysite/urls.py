@@ -21,6 +21,7 @@ from django.views.static import serve
 
 urlpatterns = [
 	url(r'^$', views.home, name='home'),
+	url(r'^sitemap$', views.sitemap, name='sitemap'),
 	url(r'^(?P<app_name>\w+)/(?P<template_name>\w+)/readme/$', views.readme, name='readme'),
 #	url(r'^file/(?P<path>.*)$', serve, {'document_root': 'file/'}),
 	url(r'^admin/', include(admin.site.urls)),

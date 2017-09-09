@@ -21,8 +21,7 @@
 				{% for field in userForm %}
 				<tr>
 					<th class="col-md-4" scope="row">
-						<label for="{{ field.id_for_label }}">
-							{% if field.field.widget.is_required %}<font style="color:red">*</font>{% endif %}{{ field.label }}:</label>
+						<label for="{{ field.id_for_label }}">{{ field.label }}:</label>
 					</th>
 					<td class="col-md-8">
 						{% if field.can_modify %}

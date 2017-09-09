@@ -239,15 +239,21 @@
 
 		<div class="form-inline" style="margin-bottom:20px;">
 			<div class="form-group">
+				<div>
 				<label for="inp_ISBN" style="margin-right:15px;">
 					<input id="inp_ISBN" type="radio" name="search_type" value="ISBN" checked="true">
 					ISBN
 				</label>
+				</div>
+				<div>
 				<label for="inp_bookname" style="margin-right:15px;">
 					<input id="inp_bookname" type="radio" name="search_type" value="bookname">
 					書名
 				</label>
+				</div>
+				<div>
 				<input id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊" maxlength="15">
+				</div>
 			</div>
 			<button type="button" class="btn btn-primary" onclick="search();">搜尋</button>
 		</div>

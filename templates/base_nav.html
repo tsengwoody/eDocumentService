@@ -41,7 +41,6 @@
 						{% if request.user.is_superuser %}
 						<li><a href="{% url 'manager:event_list' 'ebook' %}">審核校對文件</a></li>
 						<li><a href="{% url 'manager:event_list' 'applydocumentaction' %}">代掃申請列表</a></li>
-						<li><a href="{% url 'genericUser:article/create' %}">訊息發佈</a></li>
 						<li><a href="{% url 'ebookSystem:book_list_manager' %}">書籍管理</a></li>
 						{% endif %}
 					</ul>

@@ -62,11 +62,13 @@
 			<td class="col-md-8">
 				{{ field.value }}
 				{% if field.name == 'email' or field.name == 'phone' %}
+				<div>
 				{% if field.name == 'email' and not userForm.instance.auth_email or field.name == 'phone' and not userForm.instance.auth_phone %}
 				<button class="btn-xs btn-warning" type="button" value="{{ field.name }}" data-toggle="modal" data-target="#otpModal" data-whatever="{{ field.name }}" data-sendto="{{ field.value }}">驗證</button>
 				{% else %}
 				<button class="btn-xs btn-success disabled"  type="button" value="{{ field.name }}" data-toggle="modal" data-target="#otpModal" data-whatever="{{ field.name }}" data-sendto="{{ field.value }}" disabled>已驗證</button>
 				{% endif %}
+				</div>
 				{% endif %}
 			</td>
 		</tr>

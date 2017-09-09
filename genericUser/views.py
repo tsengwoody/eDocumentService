@@ -539,7 +539,10 @@ def user_manager(request, template_name='genericUser/user_manager.html'):
 
 @http_response
 def announcement_list(request, template_name='genericUser/announcement_list.html'):
-	announcement_list = Announcement.objects.all()
+	announcement_lists = [
+		(i[0], Announcement.objects.filter(category=i[0]))
+		for i in Announcement.CATEGORY
+	]
 	if request.method == 'GET':
 		status = 'success'
 		message = u''

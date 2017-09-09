@@ -10,5 +10,8 @@
 	{% csrf_token %} 
 	<h3>{{ announcement.title }}</h3>
 	<hr />
+{% autoescape off %}
+{{ announcement.content }}
+{% endautoescape %}
 </form>
 {% endblock %}
