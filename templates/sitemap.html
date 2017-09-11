@@ -7,20 +7,74 @@
 網站導覽
 {% endblock %}
 {% block content %}
+
+<script>
+
+	function connclick(me){
+		//a元素觸發連結href得針對原生dom
+		me=$(me);
+		let sid=me.attr('sid');
+		$('a[connsid="'+sid+'"]')[0].click(); 
+	}
+
+	$(document).ready(function(){
+		let sid=0;
+		let c='';
+
+		//each
+		let imu=0;
+		$('#navbar').find('ul').eq(0).children('li').each(function(){
+			let me=$(this);
+			c+='<li style="margin-top:10px;">';
+
+			//mu
+			let omu=me.children('a');
+			let mu=omu.text();
+			imu++;
+			sid++;
+
+			//add connsid
+			omu.attr('connsid',sid);
+
+			//a
+			c+='<a sid="'+sid+'" style="cursor:pointer;" onclick="connclick(this);">'+imu+'. '+mu+'</a>';
+
+			//muchd
+			let imuchd=0;
+			let lis=me.find('ul li');
+			if(lis.length>0){
+				c+='<ul>';
+
+				//each
+				lis.each(function(){
+					let omuchd=$(this).children('a');
+					let muchd=omuchd.text();
+					imuchd++;
+					sid++;
+
+					//add connsid
+					omuchd.attr('connsid',sid);
+
+					//a
+					c+='<li><a sid="'+sid+'" style="cursor:pointer;" onclick="connclick(this);">'+imu+'.'+imuchd+'. '+muchd+'</a></li>';
+
+				})
+
+				c+='</ul>';
+			}
+
+			c+='</li>';
+		})
+
+		//ul_sitemap
+		$('#ul_sitemap').html(c);
+
+	});
+
+</script>
+
 <h3>網站導覽</h3>
-<ul>
-	<li>1.管理
-		<ul>
-			<li><a href="">1.1.審核上傳文件</a></li>
-			<li><a href="">1.2.審核會員</a></li>
-		</ul>
-	</li>
-	<li>2.文件
-		<ul>
-			<li><a href="">2.1.掃描檔上傳</a></li>
-			<li><a href="">2.2.電子檔上傳</a></li>
-		</ul>
-	</li>
-</ul>
-<!--以此類推，並動態從上方功能選單產生-->
+
+<ul id="ul_sitemap"></ul>
+
 {% endblock %}

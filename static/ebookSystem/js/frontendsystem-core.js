@@ -418,6 +418,7 @@ function b2o(str) {
     return r;
 }
 
+
 function blob2str(bdata){
     //blob轉字串
 
@@ -431,7 +432,7 @@ function blob2str(bdata){
     reader.addEventListener('loadend',function(event){
 
         //result
-        let text=event.srcElement.result;
+        let text=event.target.result; //srcElement非標準屬性格式, 需改target
 
         //resolve
         df.resolve(text);
@@ -443,6 +444,7 @@ function blob2str(bdata){
 
     return df;
 }
+
 
 function GenID() {
     let p = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -498,6 +500,15 @@ function alertDialog(json) {
 }
 
 
+function keyspace2enter(event,me){
+    //空白space鍵轉click, 因瀏覽器中nvda使用space點擊無法觸發完整click事件
+    //console.log(event.keyCode)
+    if(event.keyCode===32){
+        $(me).click();
+    }
+}
+
+
 function pagetab_initial(data){
     //產生分頁
 
@@ -506,7 +517,7 @@ function pagetab_initial(data){
 
     //each li
     _.each(data,function(v,k){
-        c+='<li><a href="#'+v['id']+'" name="'+v['name']+'" prop="'+v['prop']+'" data-toggle="tab">'+v['title']+'</a></li>';
+        c+='<li><a onkeydown="keyspace2enter(event,this);" href="#'+v['id']+'" name="'+v['name']+'" prop="'+v['prop']+'" data-toggle="tab">'+v['title']+'</a></li>';
     })
     
     c+='</ul>';
