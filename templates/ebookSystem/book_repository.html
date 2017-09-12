@@ -45,6 +45,7 @@
 		<td style="vertical-align: top; padding:5px;">
 			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="receivebook(this, false, 'email')">寄到信箱</button>
 			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="receivebook(this, false, 'download')">下載</button>
+			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="assignbook(this, false, 'download')">test</button>
 		</td>
 	</tr>
 </script>
@@ -55,16 +56,14 @@
 
 	_.delay(function(){
 
-		//預先顯示第1分頁
-		$('[name="repository_books_tab_grp"]').eq(0).click();
+		//主分頁
+		//$('[name="repository_books_tab_grp"]').eq(0).click(); //預先顯示第1分頁
 
 		//listrecommend
 		listrecommend();
-		$('[name="repository_bookrecommend_tab_grp"]').eq(0).click(); //預先顯示第1分頁
 
 		//listcategory
 		listcategory();
-		$('[name="repository_bookcategory_tab_grp"]').eq(0).click(); //預先顯示第1分頁
 
 		//$('#search_value').val('9789866104626')
 
@@ -215,15 +214,15 @@
 
 
 <ul class="nav nav-tabs">
-	<li><a href="#repository_books_tab_書籍推薦" name="repository_books_tab_grp" data-toggle="tab">書籍推薦</a></li>
-	<li><a href="#repository_books_tab_索引" name="repository_books_tab_grp" data-toggle="tab">索引</a></li>
-	<li><a href="#repository_books_tab_查詢" name="repository_books_tab_grp" data-toggle="tab">查詢</a></li>
+	<li class="active"><a href="#repository_books_tab_書籍推薦" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="true" onclick="pagetab_subtabfix(this);">書籍推薦</a></li>
+	<li><a href="#repository_books_tab_索引" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">索引</a></li>
+	<li><a href="#repository_books_tab_查詢" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">查詢</a></li>
 </ul>
 
 
 <div class="tab-content" style="padding:20px 0px;">
 
-	<div id="repository_books_tab_書籍推薦" class="tab-pane">
+	<div id="repository_books_tab_書籍推薦" class="tab-pane active">
 
 		<div id="repository_books_div_書籍推薦"></div>
 

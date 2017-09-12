@@ -516,8 +516,12 @@ function pagetab_initial(data){
     c+='<ul class="nav nav-tabs">';
 
     //each li
+    let li_active='active';
+    let li_expanded='true';
     _.each(data,function(v,k){
-        c+='<li><a onkeydown="keyspace2enter(event,this);" href="#'+v['id']+'" name="'+v['name']+'" prop="'+v['prop']+'" data-toggle="tab">'+v['title']+'</a></li>';
+        c+='<li class="'+li_active+'"><a onkeydown="keyspace2enter(event,this);" href="#'+v['id']+'" name="'+v['name']+'" prop="'+v['prop']+'" data-toggle="tab" aria-expanded="'+li_expanded+'">'+v['title']+'</a></li>';
+        li_active='';
+        li_expanded='false';
     })
     
     c+='</ul>';
@@ -525,13 +529,36 @@ function pagetab_initial(data){
     c+='<div class="tab-content">';
 
     //each div
+    let div_active='active';
     _.each(data,function(v,k){
-        c+='<div id="'+v['id']+'" class="tab-pane" style="margin:20px;"></div>';
+        c+='<div id="'+v['id']+'" class="tab-pane '+div_active+'" style="margin-top:20px;"></div>';
+        div_active='';
     })
     
     c+='</div>';
 
     return c;
+}
+
+
+function pagetab_subtabfix(me){
+    //修正多層分頁會於上層切換分頁時，導致次分頁aria-expanded都被改為ture，使nvda無法順利讀取
+
+    //me
+    me=$(me);
+
+    //jid
+    let jid=me.attr('href');
+
+    //使用delay延遲強制變更aria-expanded屬性值
+    _.delay(function(){
+        $(jid).find('ul[class="nav nav-tabs"]').find('li').each(function(){
+            let li=$(this);
+            let expanded=li.hasClass('active');
+            li.find('a').attr('aria-expanded',expanded);
+        })
+    },50)
+
 }
 
 
@@ -664,8 +691,8 @@ function aj_send(type, url, transferData){
             df.reject(data);
         }
         else{
-            console.log('aj_send: data.status error');
-            console.log(data);
+            //console.log('aj_send: data.status error');
+            //console.log(data);
 
             //reject
             let res={
@@ -677,9 +704,9 @@ function aj_send(type, url, transferData){
 
     })
     .fail(function(xhr){
-        console.log('aj_send: ajax error');
-        console.log(xhr);
-        console.log(xhr.responseText);
+        //console.log('aj_send: ajax error');
+        //console.log(xhr);
+        //console.log(xhr.responseText);
 
         //reject
         let res={
@@ -743,10 +770,10 @@ function aj_binary(url, transferData){
 
         }
         else{
-            console.log('aj_binary: bdata.type error');
-            console.log(bdata);
-            console.log(status);
-            console.log(xhr);
+            // console.log('aj_binary: bdata.type error');
+            // console.log(bdata);
+            // console.log(status);
+            // console.log(xhr);
 
             //blob to string
             blob2str(bdata)
@@ -762,9 +789,9 @@ function aj_binary(url, transferData){
 
     })
     .fail(function(xhr){
-        console.log('aj_binary: ajax error');
-        console.log(xhr);
-        console.log(xhr.responseText); //會沒有responseText, 只好回傳xhr文字
+        // console.log('aj_binary: ajax error');
+        // console.log(xhr);
+        // console.log(xhr.responseText); //會沒有responseText, 只好回傳xhr文字
 
         //reject
         let res={
@@ -836,7 +863,7 @@ function aj_booklist(query_type, query_value){
 
     })
     .fail(function(msg){
-        console.log(msg)
+        //console.log(msg)
         df.reject('查無書籍資料');
     })
     

@@ -29,22 +29,22 @@
             if(ebook===false){
                 url='/ebookSystem/book_download/'+ISBN;
                 if(action==='download'){
-                    console.log('aj_binary',ebook,url,transferData)
+                    //console.log('aj_binary',ebook,url,transferData)
                     df=aj_binary(url, transferData);
                 }
                 else{
-                    console.log('aj_post',ebook,url,transferData)
+                    //console.log('aj_post',ebook,url,transferData)
                     df=aj_post(url, transferData);
                 }
             }
             else{
                 url='/ebookSystem/ebook_download/'+ISBN;
                 if(action==='download'){
-                    console.log('aj_binary',ebook,url,transferData)
+                    //console.log('aj_binary',ebook,url,transferData)
                     df=aj_binary(url, transferData);
                 }
                 else{
-                    console.log('aj_post',ebook,url,transferData)
+                    //console.log('aj_post',ebook,url,transferData)
                     df=aj_post(url, transferData);
                 }
             }
