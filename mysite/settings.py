@@ -33,8 +33,13 @@ else:
 if DEBUG is False:
     #ALLOWED_HOSTS = ['www.edocumentservice.org', '104.155.204.241']
     ALLOWED_HOSTS = ['*']
+    SECURE_SSL_REDIRECT = True
 else:
     ALLOWED_HOSTS = []
+
+if socket.gethostname() == 'edoc':
+    SECURE_SSL_REDIRECT = True
+
 ADMINS = [
 #    ('woody', 'tsengwoody.tw@gmail.com'),
 #    ('amy', 't101598002@ntut.edu.tw'),
@@ -214,7 +219,6 @@ NOCAPTCHA = False
 DEFAULT_FROM_EMAIL = 'edocumentservice@gmail.com'
 MANAGER = ['edocumentservice@gmail.com']
 SERVICE = 'edocumentservice@gmail.com'
-SITE_ID = 1
 TIME_ZONE = 'Asia/Taipei'
 OTP_ACCOUNT='eDocService'
 OTP_PASSWORD='1qaz2wsx3edc'

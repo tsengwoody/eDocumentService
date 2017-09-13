@@ -102,11 +102,6 @@ def login(request, template_name='registration/login.html', authentication_form=
 	"""
 	Displays the login form and handles the login action.
 	"""
-	try:
-		UUID = locals()['kwargs']['UUID']
-		code = cache.get(UUID)
-	except:
-		pass
 	if request.method == 'GET':
 		form = authentication_form(request)
 		captcha=FormWithCaptcha();
@@ -120,6 +115,7 @@ def login(request, template_name='registration/login.html', authentication_form=
 #			return locals()
 		if not form.is_valid():
 			status = 'error'
+			message = u'帳號或密碼錯誤，請重新輸入'
 			message = u'表單驗證失敗，' + str(form.errors)
 			return locals()
 
@@ -150,7 +146,8 @@ def password_change(request, template_name='registration/password_change_form.ht
 		form = password_change_form(user=request.user, data=request.POST)
 		if not form.is_valid():
 			status = 'error'
-			message = u'表單驗證失敗' +str(form.errors)
+			message = u'舊密碼或新密碼輸入錯誤'
+#			message = u'表單驗證失敗' +str(form.errors)
 			return locals()
 		form.save()
 		# Updating the password logs out all other sessions for the user
