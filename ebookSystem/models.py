@@ -699,10 +699,10 @@ class EBook(models.Model):
 		return [finish_content, edit_content]
 
 class GetBookRecord(models.Model):
-	
 	user = models.ForeignKey(User, related_name='getbookrecord_set')
 	book = models.ForeignKey(Book, related_name='getbookrecord_set')
 	get_time = models.DateTimeField(default = timezone.now)
+	get_ip = models.GenericIPAddressField()
 
 	def __unicode__(self):
 		return u'{0}-{1}'.format(self.book, self.user)

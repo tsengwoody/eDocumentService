@@ -584,23 +584,21 @@ def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
 @http_response
 def book_download(request, ISBN, ):
 	if request.method == 'POST' and request.is_ajax():
+		if not request.user.is_guest:
+				status = 'error'
+				message = u'取得文件失敗：您並非視障者權限'
+				return locals()
+
 		DOWNLOAD_MIN_DURATION_TIME = 86400
-		MIN_DURATION_TIME = 3*86400
+		MIN_DURATION_TIME = 86400
 		getBook = Book.objects.get(ISBN=ISBN)
 		gbr = GetBookRecord.objects.filter(book=getBook, user=request.user)
-		if len(gbr) <= 0:
+#		if len(gbr) <= 0:
+		if not getBook.owner == request.user and len(gbr) <= 0:
 			try:
-				cache.get(request.user.username)['get_book']
+				allow_download = cache.get(request.user.username)['get_book']
 				status = 'error'
-				message = u'取得文件失敗：{0}天內僅能下載1本未下載過的書籍'.format(unicode(MIN_DURATION_TIME/86400))
-				return locals()
-			except BaseException as e:
-				pass
-		else:
-			try:
-				cache.get(request.user.username)['get_book']
-				status = 'error'
-				message = u'取得文件失敗：{0}天內僅能下載1本書籍'.format(unicode(DOWNLOAD_MIN_DURATION_TIME/86400))
+				message = u'取得文件失敗：1天內僅能下載1本新書，下次可下載的時間為{0}'.format(allow_download)
 				return locals()
 			except BaseException as e:
 				pass
@@ -612,13 +610,6 @@ def book_download(request, ISBN, ):
 			status = 'error'
 			message = u'準備文件失敗：{0}'.format(unicode(e))
 			return locals()
-
-		GetBookRecord.objects.create(book=getBook, user=request.user, )
-		if len(gbr) <= 0:
-			cache.set(request.user.username, {'get_book': timezone.now()}, MIN_DURATION_TIME)
-		else:
-			pass
-#			cache.set(request.user.username, {'get_book': timezone.now()}, DOWNLOAD_MIN_DURATION_TIME)
 
 		if request.POST['action'] == 'download':
 			download_path = attach_file_path
@@ -632,10 +623,12 @@ def book_download(request, ISBN, ):
 			status = 'success'
 			message = u'已寄送到您的電子信箱'
 
-		#刪除暫存檔
-		try:
-			os.remove(attach_file_path)
-		except BaseException as e:
+		from utils.other import get_client_ip
+		get_ip = get_client_ip(request)
+		GetBookRecord.objects.create(book=getBook, user=request.user, get_ip=get_ip)
+		if len(gbr) <= 0:
+			cache.set(request.user.username, {'get_book': timezone.now() +datetime.timedelta(seconds=MIN_DURATION_TIME)}, MIN_DURATION_TIME)
+		else:
 			pass
 
 		return locals()
