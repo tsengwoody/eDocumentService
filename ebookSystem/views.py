@@ -111,7 +111,7 @@ def search_book(request, template_name):
 					books = Book.objects.filter(ISBN=search_value)
 				elif search_type in ['bookname', 'author', 'house']:
 					exec(
-						'books = Book.objects.select_related().filter(book_info__{0}__contains=search_value)'.format(search_type)
+						'books = Book.objects.select_related().filter(book_info__{0}__icontains=search_value)'.format(search_type)
 					)
 				if len(books) <= 0:
 					raise SystemError('not found')
@@ -598,7 +598,7 @@ def book_download(request, ISBN, ):
 			try:
 				allow_download = cache.get(request.user.username)['get_book']
 				status = 'error'
-				message = u'取得文件失敗：1天內僅能下載1本新書，下次可下載的時間為{0}'.format(allow_download)
+				message = u'取得文件失敗：1天內僅能下載1本新書，下次可下載的時間為{0}'.format(timezone.localtime(allow_download))
 				return locals()
 			except BaseException as e:
 				pass
@@ -897,6 +897,7 @@ def book_list(request, ):
 				book_list = Book.objects.all().order_by('finish_date')
 			elif query_type == 'hottest':
 				pass
+			book_list = book_list.order_by('-book_info__date')
 #			book_list = book_list.filter(status__gte=Book.STATUS['finish'])
 			status = 'success'
 			message = u'成功查詢指定文件'
@@ -913,5 +914,12 @@ def book_list(request, ):
 
 @http_response
 def book_repository(request, template_name='ebookSystem/book_repository.html'):
+	if request.method == 'GET':
+		return locals()
+
+@http_response
+def getbookrecord_user(request, ID, template_name='ebookSystem/getbookrecord_user.html'):
+	user = User.objects.filter(id=ID)
+	gbr_list = GetBookRecord.objects.filter(user=user)
 	if request.method == 'GET':
 		return locals()

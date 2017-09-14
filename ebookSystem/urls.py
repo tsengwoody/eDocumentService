@@ -28,4 +28,5 @@ urlpatterns = [
 	url(r'^book_delete/(?P<ISBN>[0-9]+)$', views.book_delete, name='book_delete'),
 	url(r'^book_list$', views.book_list, name='book_list'),
 	url(r'^book_repository$', views.book_repository, name='book_repository'),
+	url(r'^getbookrecord_user/(?P<ID>\d+)/$', views.getbookrecord_user, name='getbookrecord_user'),
 ]

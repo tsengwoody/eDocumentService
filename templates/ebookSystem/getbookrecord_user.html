@@ -1,0 +1,31 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+下載紀錄
+{% endblock %}
+{% block header %}
+下載紀錄
+{% endblock %}
+{% block style %}
+{% load staticfiles %}
+
+<script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
+{% endblock %}
+{% block content %}
+
+	<h3>下載紀錄列表</h3>
+	<table class="table table-striped table-hover">
+		<tr>
+			<th>文件</th>
+			<th>時間</th>
+			<th>IP</th>
+		</tr>
+		{% for gbr in gbr_list %}
+		<tr>
+			<td>{{ gbr.book }}</td>
+			<td>{{ gbr.get_time }}</td>
+			<td>{{ gbr.get_ip }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+
+{% endblock %}

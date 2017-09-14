@@ -62,6 +62,7 @@ class Command(BaseCommand):
 			is_manager=True,
 			is_advanced_editor=True,
 			is_license = True,
+			is_book = True,
 			auth_email=True,
 			auth_phone=True,
 			education=u'學士',
@@ -395,3 +396,5 @@ class Command(BaseCommand):
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
 		assert len(Announcement.objects.all()) == previous_count +1, 'create announcement fail'
+		GetBookRecord.objects.create(book=book, user=root, get_ip='192.168.1.0')
+		GetBookRecord.objects.create(book=book, user=root, get_ip='192.168.1.0')

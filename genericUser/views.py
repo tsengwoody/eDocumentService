@@ -532,9 +532,14 @@ def user_update(request, ID, ):
 			return locals()
 
 @http_response
+def user_serialized(request, id):
+	return locals()
+
+@http_response
 def user_manager(request, template_name='genericUser/user_manager.html'):
 	if request.method == 'GET':
-		user_list = User.objects.filter(is_book=True)
+		editor_list = User.objects.filter(is_book=True, is_editor=True, )
+		guest_list = User.objects.filter(is_book=True, is_guest=True, )
 		return locals()
 
 @http_response
@@ -587,3 +592,7 @@ def announcement_create(request, template_name='genericUser/announcement_create.
 		status = 'success'
 		message = u''
 		return locals()
+
+@http_response
+def getbookrecord_view(request, username, template_name='genericUser/getbookrecord_view.html'):
+	return locals()
