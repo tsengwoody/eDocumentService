@@ -1,52 +1,172 @@
 ﻿{% load staticfiles %}
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="id_ISBN"><font style="color:red">*</font>ISBN:</label>
-		<div class="col-sm-3">
-		  <input type="text" class="form-control" id="id_ISBN" name="ISBN"  placeholder="請輸入正確的ISBN(10碼或13碼）" pattern="(ISBN[-]*(1[03])*[ ]*(: ){0,1})*(([0-9Xx][- ]*){13}|([0-9Xx][- ]*){10})" autofocus required>
-		</div>
-	   <input type="button" class="btn btn-default" value="取得書籍資訊" id="get_isbn">
-		 <img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_isbn_load_icon" />
-		<!-- <input type="button" class="btn btn-default" style="display: none;" value="是否人工輸入？" id="show_prop">-->
-	</div> 
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="id_bookname"><font style="color:red">*</font>書名：</label>
-		<div class="col-sm-3">
-		  <input type="text" grp="changemode" class="form-control" autofocus id="id_bookname" name="bookname" readonly="true" required>
-		</div>
+
+<script>
+
+	function BookfromISBN_default(){
+
+		//default
+		$('#id_bookname').val('');
+		$('#id_author').val('');
+		$('#id_date').val('');
+		$('#id_house').val('');
+		$('#id_bookbinding').val('');
+		$('#id_chinese_book_category').val('');
+		$('#id_order').val('');
+
+	}
+
+	function BookfromISBN_loading(){
+
+		//loading
+		$('#id_get_isbn_load_icon').show();
+		$('#get_isbn').prop('disabled',true);
+
+	}
+
+	function BookfromISBN_unloading(){
+
+		//unloading
+		$('#id_get_isbn_load_icon').hide();
+		$('#get_isbn').prop('disabled',false);
+
+	}
+
+	function BookfromISBN_get(){
+		//由ISBN取得書籍資訊
+
+		//default
+		BookfromISBN_default();
+
+		//obj, ele
+		let objISBN=$('#id_ISBN');
+		let eleISBN=objISBN[0];
+
+		//ISBN
+		let ISBN=objISBN.val();
+		//國內書籍測試(9789861343068)
+		//國外書籍測試(9780399226908,978-0399226908)
+
+		//check
+		if(!eleISBN.checkValidity()){
+			let msg=eleISBN.validationMessage; //英文訊息不使用
+			console.log(msg)
+			alertmessage('error', 'ISBN格式錯誤')
+			return;
+		}
+		if(binstr(ISBN,'-')){
+			alertmessage('error', 'ISBN格式不能含有「-」')
+			return;
+		}
+		
+		if(ISBN.length!==10 && ISBN.length!==13){
+			alertmessage('error', 'ISBN長度錯誤')
+			return;
+		}
+
+		//transferData
+		let transferData={
+			'ISBN':ISBN
+		}
+
+		//loading
+		BookfromISBN_loading();
+
+		//aj_send
+		aj_send('POST', '/ebookSystem/book_info/'+ISBN+'/', transferData)
+		.done(function(data){
+
+			//alertmessage
+			alertmessage(data['status'], data['message']);
+
+			//解開readonly屬性由使用者自行輸入
+            if(data.message==='查無資料'){
+                $('#show_prop')
+                    .off()
+                    .on('click',function(){
+                        $('input[type="text"][grp="changemode"]').prop('readonly',false);
+                    })
+                    .show();
+            }
+			else{
+
+				//show
+				//$('#id_ISBN').val(data.ISBN);
+				$('#id_bookname').val(data.bookname);
+				$('#id_author').val(data.author);
+				$('#id_date').val(data.date);
+				$('#id_house').val(data.house);
+				$('#id_bookbinding').val(data.bookbinding);
+				$('#id_chinese_book_category').val(data.chinese_book_category);
+				$('#id_order').val(data.order);
+				
+			}
+
+		})
+		.fail(function(data){
+
+			//alertmessage
+			alertmessage(data['status'], data['message']);
+
+		})
+		.always(function(){
+
+			//unloading
+			BookfromISBN_unloading();
+
+		})
+
+	}
+
+</script>
+
+<div class="form-group">
+	<label class="control-label col-sm-2" for="id_ISBN"><font style="color:red">*</font>ISBN:</label>
+	<div class="col-sm-3">
+		<input type="text" class="form-control" id="id_ISBN" name="ISBN"  placeholder="請輸入正確的ISBN(10碼或13碼）" pattern="(ISBN[-]*(1[03])*[ ]*(: ){0,1})*(([0-9Xx][- ]*){13}|([0-9Xx][- ]*){10})" autofocus required>
 	</div>
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="id_author"><font style="color:red">*</font>作者：</label>
-		<div class="col-sm-3">
-		  <input type="text" grp="changemode" class="form-control" id="id_author" name="author" readonly="true" required>
-		</div>
-	</div>  
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="id_house"><font style="color:red">*</font>出版社：</label>
-		<div class="col-sm-3">
-		  <input type="text" grp="changemode" class="form-control" id="id_house" name="house" readonly="true" required>
-		</div>
-	</div>  
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="id_date"><font style="color:red">*</font>出版日：</label>
-		<div class="col-sm-3">
-		  <input type="text" grp="changemode" class="form-control datepicker" id="id_date" name="date" placeholder="YYYY-mm-dd" required readonly="true">
-		</div>
-	</div> 
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="id_bookbinding"><font style="color:red">*</font>裝訂冊數：</label>
-		<div class="col-sm-3">
-		  <input type="text" grp="changemode" class="form-control" id="id_bookbinding" name="bookbinding" readonly="true" required>
-		</div>
-	</div>  
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="id_chinese_book_category"><font style="color:red">*</font>中文圖書分類：</label>
-		<div class="col-sm-3">
-		  <input type="text" grp="changemode" class="form-control" id="id_chinese_book_category" name="chinese_book_category" readonly="true" required>
-		</div>
-	</div>  
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="id_order"><font style="color:red">*</font>版次：</label>
-		<div class="col-sm-3">
-		  <input type="text" grp="changemode" class="form-control" id="id_order" name="order" readonly="true" required>
-		</div>
-	</div>  
+		<input type="button" class="btn btn-default" value="取得書籍資訊" id="get_isbn" onclick="BookfromISBN_get()">
+		<img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_isbn_load_icon" />
+	<!-- <input type="button" class="btn btn-default" style="display: none;" value="是否人工輸入？" id="show_prop">-->
+</div> 
+<div class="form-group">
+	<label class="control-label col-sm-2" for="id_bookname"><font style="color:red">*</font>書名：</label>
+	<div class="col-sm-3">
+		<input type="text" grp="changemode" class="form-control" autofocus id="id_bookname" name="bookname" readonly="true" required>
+	</div>
+</div>
+<div class="form-group">
+	<label class="control-label col-sm-2" for="id_author"><font style="color:red">*</font>作者：</label>
+	<div class="col-sm-3">
+		<input type="text" grp="changemode" class="form-control" id="id_author" name="author" readonly="true" required>
+	</div>
+</div>  
+<div class="form-group">
+	<label class="control-label col-sm-2" for="id_house"><font style="color:red">*</font>出版社：</label>
+	<div class="col-sm-3">
+		<input type="text" grp="changemode" class="form-control" id="id_house" name="house" readonly="true" required>
+	</div>
+</div>  
+<div class="form-group">
+	<label class="control-label col-sm-2" for="id_date"><font style="color:red">*</font>出版日：</label>
+	<div class="col-sm-3">
+		<input type="text" grp="changemode" class="form-control datepicker" id="id_date" name="date" placeholder="YYYY-mm-dd" required readonly="true">
+	</div>
+</div> 
+<div class="form-group">
+	<label class="control-label col-sm-2" for="id_bookbinding"><font style="color:red">*</font>裝訂冊數：</label>
+	<div class="col-sm-3">
+		<input type="text" grp="changemode" class="form-control" id="id_bookbinding" name="bookbinding" readonly="true" required>
+	</div>
+</div>  
+<div class="form-group">
+	<label class="control-label col-sm-2" for="id_chinese_book_category"><font style="color:red">*</font>中文圖書分類：</label>
+	<div class="col-sm-3">
+		<input type="text" grp="changemode" class="form-control" id="id_chinese_book_category" name="chinese_book_category" readonly="true" required>
+	</div>
+</div>  
+<div class="form-group">
+	<label class="control-label col-sm-2" for="id_order"><font style="color:red">*</font>版次：</label>
+	<div class="col-sm-3">
+		<input type="text" grp="changemode" class="form-control" id="id_order" name="order" readonly="true" required>
+	</div>
+</div>  

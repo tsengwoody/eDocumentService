@@ -6,7 +6,7 @@
 {% load staticfiles %}
 <link href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-<script language="javascript" src="{% static 'ebookSystem/js/getISBN.js' %}"></script>
+ <!-- <script language="javascript" src="{% static 'ebookSystem/js/getISBN.js' %}"></script> -->
 {% endblock %}
 
 {% block header %}
@@ -33,9 +33,8 @@
 	</div> 
 	<div class="form-group row">
 		<div class="col-sm-offset-2 col-sm-10">
-		   <!-- <button class="btn btn-default" type="submit" id="send_id" name="send">傳送</button>-->
-			<input type="submit" class="btn btn-primary upload" value="send" id="send_id">
-			<input type="reset" class="btn btn-danger" value="reset">
+			<input type="submit" class="btn btn-primary upload" value="送出" id="send_id">
+			<input type="reset" class="btn btn-danger" value="重置">
 		</div>
 	</div>
 </form>
