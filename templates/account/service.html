@@ -16,6 +16,7 @@
 	{% if request.user.auth_email and request.user.auth_phone %}
 	<div id="buttonGroup" style="text-align: center;">
 		<button class="btn btn-lg btn-default send_button" type="submit" id="getPart_id" name="getPart">領文件</button>
+		<div style="padding:10px; color:#ff2200; font-size:12pt;">注意：五天內未有校對動作將自動歸還文件</div>
 	</div>
 	{% endif %}
 	

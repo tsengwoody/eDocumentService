@@ -64,6 +64,12 @@
 		//listrecommend
 		listrecommend();
 
+		//listnewst
+		listnewst();
+
+		//listhottest
+		listhottest();
+
 		//listcategory
 		listcategory();
 
@@ -134,6 +140,48 @@
 		//page
 		let hpage=pagetab_initial(s);
 		$('#repository_books_div_書籍推薦').html(hpage);
+
+	}
+
+
+	function listnewst(){
+
+		//div
+		let div=$('#bookrecommend_新書上架');
+
+		//aj_booklist
+		aj_booklist('newest',5) //先5本
+		.done(function(data){
+
+			//datatable
+			bk_datatable(div,data,'tab_bookrecommend_新書上架');
+
+		})
+		.fail(function(msg){
+			div.html(msg);
+		})
+		
+
+	}
+
+
+	function listhottest(){
+
+		//div
+		let div=$('#bookrecommend_借閱排行');
+
+		//aj_booklists
+		aj_booklist('hottest',5) //先5本
+		.done(function(data){
+
+			//datatable
+			bk_datatable(div,data,'tab_bookrecommend_借閱排行');
+
+		})
+		.fail(function(msg){
+			div.html(msg);
+		})
+		
 
 	}
 

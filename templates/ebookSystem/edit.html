@@ -14,7 +14,14 @@
 <script language="javascript" src="{% static 'ebookSystem/js/edit.js' %}"></script>
 <link href="{% static "ebookSystem/css/edit.css" %}" rel="stylesheet" > 
 <script type="text/javascript"> 
-   window.history.forward("/account/profile/");
+    window.history.forward("/account/profile/");
+
+	$(function(){
+		//因現html5規範無法使用onbeforeunload複寫訊息，故改隱藏nav
+		$('nav[role="navigation"]').hide();
+		$('div.container').css('margin-top','-50px');
+	})
+
 </script>
 {% endblock %}
 

@@ -852,19 +852,19 @@ function aj_booklist(query_type, query_value){
                 df.resolve(p);
             }
             else{
-                df.reject('查無書籍資料');
+                df.reject('無書籍資料');
             }
         
         }
         else{
             //console.log(data['message']);
-            df.reject('查無書籍資料');
+            df.reject('無書籍資料');
         }
 
     })
     .fail(function(msg){
         //console.log(msg)
-        df.reject('查無書籍資料');
+        df.reject('無書籍資料');
     })
     
     return df;
