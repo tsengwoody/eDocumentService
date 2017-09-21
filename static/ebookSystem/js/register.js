@@ -5,7 +5,6 @@ function checkRegister()
         $('#id_confirm_password, #id_password').each(function() {
             this.setCustomValidity("Password Must be Matching.");
         });
-
     }else{
         $('#id_confirm_password, #id_password').each(function() {
             this.setCustomValidity("");
