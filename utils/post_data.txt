@@ -1,15 +1,12 @@
 ﻿FO_SchRe1ation0=Null
-FO_SearchField0=ISBN
+FO_SearchField0
 FO_SearchValue0
 FO_SchRe1ation1=AND
-FO_SearchField1=Author
+FO_SearchField1
 FO_SearchValue1
 FO_SchRe1ation2=AND
-FO_SearchField2=PublisherShortTitle
+FO_SearchField2
 FO_SearchValue2
 FO_Match=2
 FB_Search= 開始查詢 
 FB_clicked=FB_開始查詢
-FO_每頁筆數=10
-FO_目前頁數=1
-FB_ListOri

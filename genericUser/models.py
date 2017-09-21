@@ -59,25 +59,37 @@ class User(AbstractUser):
 	def __unicode__(self):
 		return self.first_name +self.last_name
 
-	def serialized(self):
+	def serialized(self, action):
 		old_serialize = generic_serialized(self)
 		serialize = {}
-		for key in [
-			'username',
-			'first_name',
-			'last_name',
-			'email',
-			'phone',
-			'last_login',
-			'auth_phone',
-			'auth_email',
-			'is_active',
-			'is_editor',
-			'is_guest',
-		]:
-			serialize.update({
-			key: old_serialize[key],
-		})
+		if action == 'info':
+			for key in [
+				'username',
+				'email',
+				'first_name',
+				'last_name',
+				'phone',
+				'birthday',
+				'education',
+				'is_book',
+				'org',
+			]:
+				serialize.update({
+					key: old_serialize[key],
+				})
+
+		elif action == 'role':
+			for key in [
+				'auth_phone',
+				'auth_email',
+				'is_active',
+				'is_editor',
+				'is_guest',
+			]:
+				serialize.update({
+					key: old_serialize[key],
+				})
+
 		return serialize
 
 	def has_guest(self):

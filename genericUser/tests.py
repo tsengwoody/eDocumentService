@@ -166,3 +166,22 @@ class announcement_createViewTests(TestCase):
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
 		self.assertEqual(len(Announcement.objects.all()), previous_count +1)
+
+class user_listViewTests(TestCase):
+	fixtures = ['dump.json',]
+
+	def test_announcement_create_correct_case(self):
+		client = Client()
+		client.login(username='root', password='root')
+		response = client.get(
+			reverse(
+				'genericUser:user_list'
+			),
+			{
+				'action': 'role',
+				'query_field': 'all',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+#		print response.json()['content'][0]
+#		self.assertEqual()

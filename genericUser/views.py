@@ -532,8 +532,25 @@ def user_update(request, ID, ):
 			return locals()
 
 @http_response
-def user_serialized(request, id):
-	return locals()
+def user_view(request, id):
+	if request.method == 'GET' and request.is_ajax():
+		user = User.objects.get(id=id)
+		content = user.serialized(request.GET['action'])
+		status = 'success'
+		message = u''
+		return locals()
+
+@http_response
+def user_list(request):
+	if request.method == 'GET' and request.is_ajax():
+		if request.GET['query_field'] == 'all':
+			user_list = User.objects.all()
+		else:
+			user_list = User.objects.filter(**{request.GET['query_field']: request.GET['query_value']})
+		content = [ user.serialized(request.GET['action']) for user in user_list ]
+		status = 'success'
+		message = u''
+		return locals()
 
 @http_response
 def user_manager(request, template_name='genericUser/user_manager.html'):

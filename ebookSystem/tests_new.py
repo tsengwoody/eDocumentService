@@ -29,6 +29,7 @@ class downloadViewTests(TestCase):
 			),
 			{
 				'password': 'root',
+				'action': 'download',
 			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
@@ -263,3 +264,25 @@ class book_listViewTests(TestCase):
 		import json
 		for i in response.json()['content']['book']:
 			print i
+
+class book_listViewTests(TestCase):
+	fixtures = ['dump.json',]
+	def setUp(self):
+		super(book_listViewTests, self).setUp()
+		client = Client()
+		client.login(username='root', password='root')
+
+	def test_book_list_correct_case(self):
+		client = Client()
+		client.login(username='root', password='root')
+		response = client.post(
+			reverse(
+				'ebookSystem:get_book_info_list',
+			),
+			{
+				'FO_SearchField0': 'Title',
+				'FO_SearchValue0': u'變態王子',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		print len(response.json()['bookinfo_list'])

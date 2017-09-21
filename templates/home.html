@@ -59,16 +59,20 @@
 <div style="height:1px; opacity:0.01;">
 	<div>首頁圖片說明</div>
 	<ul>
-		<li>1. 雲端千眼：我看不見書，但我想閱讀</li>
-		<li>1.1  生活裡沒有書籍，就好像大地沒有陽光；智慧裡沒有書籍，就好像鳥兒沒有翅膀。</li>
-		<li>1.2 我看不見書，但是我想閱讀。</li>
-		<li>1.3 給視障者真正的閱讀權，需要各位加入共同參與，不限時地，只需透過網路，成為視障者雲端的眼。</li>
-		<li>1.4 群眾參與，積砂成塔，邀請志工，期待你的加入。</li>
-	</ul>
-	<ul>
-		<li>2 加入我們：招募志工</li>
-		<li>2.1 我們可能無法做偉大的事，但可以用偉大的愛做小事。</li>
-		<li>2.2 We Want You, Apply Now.</li>
+		<li>雲端千眼：我看不見書，但我想閱讀
+			<ul>
+			<li>生活裡沒有書籍，就好像大地沒有陽光；智慧裡沒有書籍，就好像鳥兒沒有翅膀。</li>
+			<li>我看不見書，但是我想閱讀。</li>
+			<li>給視障者真正的閱讀權，需要各位加入共同參與，不限時地，只需透過網路，成為視障者雲端的眼。</li>
+			<li>群眾參與，積砂成塔，邀請志工，期待你的加入。</li>
+			</ul>
+		</li>
+		<li><a href="/genericUser/recruit">加入我們：招募志工</a>
+			<ul>
+			<li>我們可能無法做偉大的事，但可以用偉大的愛做小事。</li>
+			<li>We Want You, Apply Now.</li>
+			</ul>
+		</li>
 	</ul>
 </div>
 
@@ -78,7 +82,7 @@
 			<div class="panel-heading">最新消息</div>
 			<div class="panel-body">
 				{% for announcement in announcement_list|slice:":5" %}
-				<p><a class="btn btn-link" role="button" href="{% url 'genericUser:announcement' announcement.id %}">{{ announcement.datetime }} {{ announcement.title }}</a></p>
+				<p><a class="btn btn-link" role="button" href="{% url 'genericUser:announcement' announcement.id %}">{{ announcement.datetime.year }}年{{ announcement.datetime.month }}月{{ announcement.datetime.day }}日 {{ announcement.title }}</a></p>
 				{% endfor %}
 				<!-- <a href='{% url 'genericUser:announcement_list' %}'>公告列表</a> -->
 				<div class="pull-right">
