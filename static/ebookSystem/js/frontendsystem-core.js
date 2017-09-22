@@ -1053,3 +1053,8 @@ function aj_isbnnet(transferData){
 //     $('.modal:visible').length && $(document.body).addClass('modal-open');
 // });
 
+$('.modal-body').change(function(){
+    _.delay(function(){
+        $('.modal').modal('handleUpdate'); 
+    },100)
+});
