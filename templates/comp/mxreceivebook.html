@@ -1,11 +1,17 @@
 <script>
 
+    function receivebook_default(){
+        $('#divmadal_downloadbook_password').val('');
+    }
 
     function receivebook(me, ebook, action){
         //下載書籍或email寄送
 
         //me
         me=$(me)
+
+        //default
+        receivebook_default();
 
         //submit
         $('#divmadal_downloadbook_submit').off().on('click', function(){
@@ -58,11 +64,7 @@
                 alertmessage(data['status'], data['message']);
             })
 
-
-            //clear
-            $('#divmadal_downloadbook_password').val('');
-
-            //show
+            //hide
             $('#divmadal_downloadbook').modal('hide');
 
         });
@@ -73,11 +75,6 @@
                 event.preventDefault();
                 $('#divmadal_downloadbook_submit').click();
             }
-            // code = (e.keyCode ? e.keyCode : e.which);
-            // if (code === 13){
-            //     e.preventDefault();
-            //     $('#divmadal_downloadbook_submit').click();
-            // }
         });
 
         //show

@@ -342,6 +342,11 @@ function haskey(obj, key) {
 }
 
 
+function prt(o){
+    console.log(o2j(o));
+}
+
+
 function o2j(v) {
     //物件轉json文字
 
@@ -509,8 +514,72 @@ function keyspace2enter(event,me){
 }
 
 
-function pagetab_initial(data){
-    //產生分頁
+function dict2grid(ar,tabid){
+    //字典陣列轉出基本table
+
+    //head
+    let head=ar[0];
+    head=_.keys(head);
+
+    //c
+    let c='';
+    c+='<table id="'+tabid+'">';
+    c+='<thead>';
+    _.each(head,function(key){
+        c+='<th>'+key+'</th>';
+    })
+    c+='</thead>';
+    c+='<tbody>';
+    _.each(ar,function(v,k){
+        c+='<tr>';
+        _.each(head,function(key){
+            c+='<td>'+v[key]+'</td>';
+        })
+        c+='</tr>';
+    })
+    c+='</tbody>';
+    c+='</table>';
+
+    return c;
+}
+
+
+function grid2bstable(tabid){
+    //基本table賦予class與sytle
+
+    //tab
+    let tab=$('#'+tabid);
+
+    //table
+    tab.addClass('table table-striped table-hover').css({
+        'margin':'10px 0px',
+        //'white-space':'nowrap',
+    });
+
+    //thead
+    tab.find('thead').css({
+        'background-color':'#eee',
+        'border-top':'2px solid #ddd',
+    });
+
+    //th
+    tab.find('th').css({
+        'text-align':'center',
+        'vertical-align':'top',
+        'padding':'10px 0px',
+    });
+
+    //td
+    tab.find('td').css({
+        'vertical-align':'top',
+        'padding':'5px',
+    });
+
+}
+
+
+function pagetab(data){
+    //產生分頁頁籤
 
     let c='';
     c+='<ul class="nav nav-tabs">';
@@ -562,7 +631,7 @@ function pagetab_subtabfix(me){
 }
 
 
-function pagin_initial(tabid){
+function pagin(tabid){
     //添加表格分頁功能
 
     //tab
@@ -630,8 +699,17 @@ function pagin_change(tabid,oper){
     //save
     pag.attr('pagenow',pagenow);
 
-    //show
+    //show pagenow
     pag.find('li').eq(1).find('a').html(pagenow+' / '+numpage);
+
+    //disabled li
+    pag.find('li').removeClass('disabled');
+    if(pagenow===1){
+        pag.find('li').eq(0).addClass('disabled');
+    }
+    else if(pagenow===numpage){
+        pag.find('li').eq(2).addClass('disabled');
+    }
 
     //trs
     let trs=tab.find('tbody').find('tr');
@@ -813,7 +891,7 @@ function aj_booklist(query_type, query_value){
     let df = $.Deferred();
 
     //url
-    let url='/ebookSystem/book_list';
+    let url='/ebookSystem/book_list'; //post會加「/」而get不會
 
     //transferData
     let transferData={
@@ -869,3 +947,109 @@ function aj_booklist(query_type, query_value){
     
     return df;
 }
+
+
+function aj_isbnnet(transferData){
+    //API使用get_book_info_list查找[全國新書資訊網]書籍資訊
+
+    //df
+    let df = $.Deferred();
+
+    //url
+    let url='/ebookSystem/get_book_info_list/'; //post會加「/」而get不會
+
+    //transferData
+    // let transferData={
+    //     'FO_SchRe1ation0':'Null',
+    //     'FO_SearchField0':'Title',
+    //     'FO_SearchValue0':'新手媽媽',
+    //     'FO_SchRe1ation1':'AND',
+    //     'FO_SearchField1':'',
+    //     'FO_SearchValue1':'',
+    //     'FO_SchRe1ation2':'AND',
+    //     'FO_SearchField2':'',
+    //     'FO_SearchValue2':'',
+    // };
+
+    //aj_post
+    aj_post(url,transferData)
+    .done(function(data){
+        //console.log(data)
+
+        if(data['status']==='success'){
+
+            //o
+            let o=data['bookinfo_list'];
+
+            //p
+            let p=[];
+            _.each(o, function(v,k){
+                let r={
+                    // 'ISBN':v[0],
+                    // 'bookname':v[1], //書名
+                    // 'author':v[2], //作者
+                    // 'house':v[3], //出版社/出版機構
+                    // 'date':v[4], //出版日期
+                    // 'bookbinding':v[5], //裝訂冊數/裝訂方式
+                    // 'classnumber':v[6], //圖書類號
+                    // 'order':v[7], //版次/出版版次	
+                    'ISBN':v[0],
+                    '書名':v[1],
+                    '作者':v[2],
+                    '出版社':v[3], 
+                    '出版日期':v[4],
+                    '裝訂方式':v[5],
+                    '圖書類號':v[6],
+                    '版次':v[7],
+                };
+                p.push(r);
+            })
+
+            if(p.length>0){
+                df.resolve(p);
+            }
+            else{
+                df.reject('無書籍資料');
+            }
+        
+        }
+        else{
+            //console.log(data['message']);
+            df.reject('無書籍資料');
+        }
+
+    })
+    .fail(function(msg){
+        //console.log(msg)
+        df.reject('無書籍資料');
+    })
+    
+    return df;
+}
+
+
+//bootstrap Backdrop z-index fix
+//https://stackoverflow.com/questions/19305821/multiple-modals-overlay
+$(document).on('show.bs.modal', '.modal', function () {
+    //This solution uses a setTimeout because the .modal-backdrop isn't created when the event show.bs.modal is triggered.
+
+    //zIndex
+    let zIndex = Math.max.apply(null, Array.prototype.map.call(document.querySelectorAll('*'), function(el) {
+        return +el.style.zIndex;
+    })) + 10;
+
+    //z-index
+    $(this).css('z-index', zIndex);
+
+    //fix backdrop
+    setTimeout(function() {
+        $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+    }, 0);
+
+});
+$(document).on('hidden.bs.modal', '.modal', function () {
+    //Scrollbar fix, If you have a modal on your page that exceeds the browser height, then you can't scroll in it when closing an second modal. To fix this add:
+    
+    $('.modal:visible').length && $(document.body).addClass('modal-open');
+});
+

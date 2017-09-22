@@ -55,28 +55,27 @@
 
 <script>
 
+	$(function(){
+		$.when(dffesc)
+		.done(function(){
 
-	_.delay(function(){
+			//主分頁
+			//$('[name="repository_books_tab_grp"]').eq(0).click(); //預先顯示第1分頁
 
-		//主分頁
-		//$('[name="repository_books_tab_grp"]').eq(0).click(); //預先顯示第1分頁
+			//listrecommend
+			listrecommend();
 
-		//listrecommend
-		listrecommend();
+			//listnewst
+			listnewst();
 
-		//listnewst
-		listnewst();
+			//listhottest
+			listhottest();
 
-		//listhottest
-		listhottest();
+			//listcategory
+			listcategory();
 
-		//listcategory
-		listcategory();
-
-		//$('#search_value').val('9789866104626')
-
-	},300)
-
+		});
+	})
 
 	function search(){
 
@@ -138,7 +137,7 @@
 		})
 
 		//page
-		let hpage=pagetab_initial(s);
+		let hpage=pagetab(s);
 		$('#repository_books_div_書籍推薦').html(hpage);
 
 	}
@@ -217,7 +216,7 @@
 		})
 
 		//page
-		let hpage=pagetab_initial(s);
+		let hpage=pagetab(s);
 		$('#repository_books_div_索引').html(hpage);
 
 		//each 0~9
@@ -255,7 +254,7 @@
 		div.find('table').attr('id',tabid);
 
 		//pagin
-		pagin_initial(tabid);
+		pagin(tabid);
 
 	}
 

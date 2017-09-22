@@ -117,6 +117,30 @@
 
 	}
 
+	function BookfromISBNnet_get(){
+		//由全國新書資訊網ISBNnet取得書籍資訊
+
+		//default
+		BookfromISBN_default();
+
+		//findbook
+		findbook()
+		.done(function(data){
+
+			//show
+			$('#id_ISBN').val(data['ISBN']);
+			$('#id_bookname').val(data['書名']);
+			$('#id_author').val(data['作者']);
+			$('#id_date').val(data['出版日期']);
+			$('#id_house').val(data['出版社']);
+			$('#id_bookbinding').val(data['裝訂方式']);
+			$('#id_chinese_book_category').val(data['圖書類號']);
+			$('#id_order').val(data['版次']);
+			
+		})
+		
+	}
+
 </script>
 
 <div class="form-group">
@@ -124,8 +148,9 @@
 	<div class="col-sm-3">
 		<input type="text" class="form-control" id="id_ISBN" name="ISBN"  placeholder="請輸入正確的ISBN(10碼或13碼）" pattern="(ISBN[-]*(1[03])*[ ]*(: ){0,1})*(([0-9Xx][- ]*){13}|([0-9Xx][- ]*){10})" autofocus required>
 	</div>
-		<input type="button" class="btn btn-default" value="取得書籍資訊" id="get_isbn" onclick="BookfromISBN_get()">
+		<input id="get_isbn" type="button" class="btn btn-default" value="取得書籍資訊" onclick="BookfromISBN_get()">
 		<img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_isbn_load_icon" />
+		<input id="get_book_isbnnet" type="button" class="btn btn-default" value="更多查詢方式" onclick="BookfromISBNnet_get()">
 		<a type="button" class="btn btn-default" href="http://isbn.ncl.edu.tw/NCL_ISBNNet/H30_SearchBooks.php?PHPSESSID=3ovphpac0m41ducm3iiak2sfe5&Pact=DisplayAll" target="_blank" id="to_ISBNNet">國家圖書館書目資料查詢</a>
 	<!-- <input type="button" class="btn btn-default" style="display: none;" value="是否人工輸入？" id="show_prop">-->
 </div> 

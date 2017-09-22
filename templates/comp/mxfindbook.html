@@ -1,0 +1,270 @@
+<script>
+
+    function findbook_default(){
+
+        //預設下拉式選單與清空輸入框
+        let p=$('#divmadal_findbook');
+        p.find('select option:eq(0)').prop('selected',true);
+        p.find('input[type="text"]').val('');
+        p.find('div.modal-dialog').css('width','');
+
+        //顯示查尋頁與隱藏挑選頁
+        $('#divmadal_findbook_page_find').show();
+        $('#divmadal_findbook_page_pick').hide();
+
+        //顯示查詢按鈕與隱藏挑選按鈕
+        $('#divmadal_findbook_find').show();
+        $('#divmadal_findbook_pick').hide();
+
+        //unloading
+        findbook_unloading();
+
+        //$('#FO_SearchValue0').val('新手媽媽')
+
+    }
+
+    function findbook_highlightpick(me){
+        //高亮選擇之書籍列
+
+        me=$(me);
+        me.parents('tbody').eq(0).find('tr').css('background-color','');
+        me.parents('tr').eq(0).css('background-color','#bbccee');
+    }
+
+    function findbook_loading(){
+        //loading
+
+        $('#divmadal_findbook_loader').show();
+        $('#divmadal_findbook_find').prop('disabled',true);
+    }
+
+    function findbook_unloading(){
+        //unloading
+
+        $('#divmadal_findbook_loader').hide();
+        $('#divmadal_findbook_find').prop('disabled',false);
+    }
+
+    function findbook(){
+        //查找[全國新書資訊網ISBNnet]書籍資訊
+
+        //df
+        let df = $.Deferred();
+
+        //default
+        findbook_default();
+
+        //bs
+        let bs=[];
+
+        //find
+        $('#divmadal_findbook_find').off().on('click', function(){
+
+            //transferData
+            let transferData={
+                'FO_SchRe1ation0':'Null',
+                'FO_SearchField0':$('#FO_SearchField0').find('option:selected').val(),
+                'FO_SearchValue0':$('#FO_SearchValue0').val(),
+                'FO_SchRe1ation1':$('#FO_SchRe1ation1').find('option:selected').val(),
+                'FO_SearchField1':$('#FO_SearchField1').find('option:selected').val(),
+                'FO_SearchValue1':$('#FO_SearchValue1').val(),
+                'FO_SchRe1ation2':$('#FO_SchRe1ation2').find('option:selected').val(),
+                'FO_SearchField2':$('#FO_SearchField2').find('option:selected').val(),
+                'FO_SearchValue2':$('#FO_SearchValue2').val(),
+            };
+
+            //check
+            if(transferData['FO_SearchValue0']===''){
+                alertmessage('error', '至少需輸入一種查詢資訊');
+                return;
+            }
+
+            //loading
+            findbook_loading();
+
+            //aj_isbnnet
+            aj_isbnnet(transferData)
+            .done(function(data){
+
+                //bs, add radio
+                _.each(data,function(v,k){
+                    let b={};
+                    b['勾選']='<input type="radio" name="divmadal_findbook_page_pick_inpgrp" index="'+k+'" onclick="findbook_highlightpick(this)">';
+                    _.each(v,function(vv,kk){
+                        b[kk]=vv;
+                    })
+                    bs.push(b);
+                })
+
+                //切換顯示
+                $('#divmadal_findbook_page_find').hide();
+                $('#divmadal_findbook_page_pick').fadeIn();
+                $('#divmadal_findbook_find').hide();
+                $('#divmadal_findbook_pick').fadeIn();
+                $('#divmadal_findbook').find('div.modal-dialog').css('width','90%');
+
+                //table
+                let tabid='divmadal_findbook_page_pick_list_table';
+                let h=dict2grid(bs,tabid);
+                $('#divmadal_findbook_page_pick_list').html(h);
+
+                //table style
+                grid2bstable(tabid);
+                        
+                //table pagin
+                pagin(tabid);
+
+                //checked first
+                $('input[type="radio"][name="divmadal_findbook_page_pick_inpgrp"]').eq(0).click();
+
+            })
+            .fail(function(data){
+                alertmessage('error', data);
+            })
+            .always(function(){
+
+                //unloading
+                findbook_unloading();
+            })
+            
+        });
+
+        //pick
+        $('#divmadal_findbook_pick').off().on('click', function(){
+
+            //index
+            let index=$('input[type="radio"][name="divmadal_findbook_page_pick_inpgrp"]:checked').attr('index');
+
+            //resolve
+            df.resolve(bs[index]);
+
+            //hide
+            $('#divmadal_findbook').modal('hide');
+
+        });
+
+        //cancel
+        $('#divmadal_findbook_cancel').off().on('click', function(){
+
+            //reject
+            df.reject();
+
+            //hide
+            $('#divmadal_findbook').modal('hide');
+
+        });
+
+        //enter
+        $('input[type="text"]').off().on('keypress',function(event){
+            if (event.which===13) {
+                event.preventDefault();
+                $('#divmadal_findbook_find').click();
+            }
+        });
+
+        //show
+        $('#divmadal_findbook').modal('show');
+
+        //autofocus
+        _.delay(function(){
+            $('#FO_SearchValue0').focus();
+        },500)
+        
+        return df;
+    }
+
+</script>
+
+<div id="divmadal_findbook" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmadal_findbook_title" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content alert-info" style="background-color: #f5f5f5;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 id="divmadal_findbook_title" class="modal-title">由全國新書資訊網取得書籍資訊</h4>
+            </div>
+            <div style="padding:20px; background-color:#fafafa;">
+
+                <div id="divmadal_findbook_page_find" style="padding:10px;">
+
+                    <div class="form-group form-inline">
+                        <span style="display:inline-block; text-align:right; width:100px; margin-right:10px;">尋找：</span>
+                        <span>在</span>
+                        <select id="FO_SearchField0" class="form-control">
+                            <option value="Title" selected="">書名</option>
+                            <option value="Author">作者</option>
+                            <option value="PublisherShortTitle">出版者</option>
+                            <option value="SubjHeading">標題(主題詞)</option>
+                            <option value="SerialTitle">叢書名</option>
+                            <option value="ClassNo">分類號</option>
+                            <option value="ISBN">ISBN</option>
+                            <option value="Date_Sales">確認出版年月</option>
+                            <option value="PubMonth_Pre">預計出版年月</option>
+                        </select>
+                        <span>為</span>
+                        <input id="FO_SearchValue0" class="form-control" type="text">
+                    </div>
+
+                    <div class="form-group form-inline">
+                        <select id="FO_SchRe1ation1" class="form-control" style="width:100px; margin-right:10px;">
+                            <option value="AND" selected>與(AND)</option>
+                            <option value="OR">或(OR)</option>
+                            <option value="NOT">非(NOT)</option>
+                        </select>
+                        <span>在</span>
+                        <select id="FO_SearchField1" class="form-control">
+                            <option value="Title" selected="">書名</option>
+                            <option value="Author">作者</option>
+                            <option value="PublisherShortTitle">出版者</option>
+                            <option value="SubjHeading">標題(主題詞)</option>
+                            <option value="SerialTitle">叢書名</option>
+                            <option value="ClassNo">分類號</option>
+                            <option value="ISBN">ISBN</option>
+                            <option value="Date_Sales">確認出版年月</option>
+                            <option value="PubMonth_Pre">預計出版年月</option>
+                        </select>
+                        <span>為</span>
+                        <input id="FO_SearchValue1" class="form-control" type="text">
+                    </div>
+                    
+                    <div class="form-group form-inline">
+                        <select id="FO_SchRe1ation2" class="form-control" style="width:100px; margin-right:10px;">
+                            <option value="AND" selected>與(AND)</option>
+                            <option value="OR">或(OR)</option>
+                            <option value="NOT">非(NOT)</option>
+                        </select>
+                        <span>在</span>
+                        <select id="FO_SearchField2" class="form-control">
+                            <option value="Title" selected="">書名</option>
+                            <option value="Author">作者</option>
+                            <option value="PublisherShortTitle">出版者</option>
+                            <option value="SubjHeading">標題(主題詞)</option>
+                            <option value="SerialTitle">叢書名</option>
+                            <option value="ClassNo">分類號</option>
+                            <option value="ISBN">ISBN</option>
+                            <option value="Date_Sales">確認出版年月</option>
+                            <option value="PubMonth_Pre">預計出版年月</option>
+                        </select>
+                        <span>為</span>
+                        <input id="FO_SearchValue2" class="form-control" type="text">
+                    </div>
+                
+                </div>
+
+                <div id="divmadal_findbook_page_pick">
+                    <h4>請由下列書籍清單中勾選欲上傳之書籍：</h4>
+                    <div id="divmadal_findbook_page_pick_list" style="overflow-x:auto;"></div>
+                </div>
+    
+            </div>
+            <div class="modal-footer">
+                <button id="divmadal_findbook_find" type="button" class="btn btn-primary">取得</button>
+                <img id="divmadal_findbook_loader" src="/static/ebookSystem/img/load.gif" style="display: none;" width="30px" height="30px"/>
+                <button id="divmadal_findbook_pick" type="button" class="btn btn-primary">確定</button>
+                <button id="divmadal_findbook_cancel" type="button" class="btn btn-danger">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
