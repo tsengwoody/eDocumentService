@@ -1027,34 +1027,3 @@ function aj_isbnnet(transferData){
     return df;
 }
 
-
-// //bootstrap Backdrop z-index fix
-// //https://stackoverflow.com/questions/19305821/multiple-modals-overlay
-// $(document).on('show.bs.modal', '.modal', function () {
-//     //This solution uses a setTimeout because the .modal-backdrop isn't created when the event show.bs.modal is triggered.
-
-//     //zIndex
-//     let zIndex = Math.max.apply(null, Array.prototype.map.call(document.querySelectorAll('*'), function(el) {
-//         return +el.style.zIndex;
-//     })) + 10;
-
-//     //z-index
-//     $(this).css('z-index', zIndex);
-
-//     //fix backdrop
-//     setTimeout(function() {
-//         $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
-//     }, 0);
-
-// });
-// $(document).on('hidden.bs.modal', '.modal', function () {
-//     //Scrollbar fix, If you have a modal on your page that exceeds the browser height, then you can't scroll in it when closing an second modal. To fix this add:
-    
-//     $('.modal:visible').length && $(document.body).addClass('modal-open');
-// });
-
-$('.modal-body').change(function(){
-    _.delay(function(){
-        $('.modal').modal('handleUpdate'); 
-    },100)
-});

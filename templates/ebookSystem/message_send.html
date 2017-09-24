@@ -10,6 +10,8 @@
 <script>
 
 	function message_send(){
+
+		//save
 		let action=$('input[name="grp_user"]:checked').val();
 		let subject=$('#inp_subject').val();
 		let body=$('#ta_body').val();
@@ -90,9 +92,9 @@
 	</div>
 
     <div class="form-group">        
-      <div class="col-sm-offset-1 col-sm-11">
-        <button id="btn_send" type="button" class="btn btn-primary" onclick="message_send()">傳送</button>
-      </div>
+    	<div class="col-sm-offset-1 col-sm-11">
+    		<button id="btn_send" type="button" class="btn btn-primary" onclick="message_send()">傳送</button>
+    	</div>
 	</div>
 	
 </div>

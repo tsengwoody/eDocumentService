@@ -75,7 +75,8 @@
 
             //check
             if(transferData['FO_SearchValue0']===''){
-                alertmessage('error', '至少需輸入一種查詢資訊');
+                //alertmessage('error', '至少需輸入一種查詢資訊');
+                alert('至少需輸入一種查詢資訊');
                 return;
             }
 
@@ -83,8 +84,15 @@
             findbook_loading();
 
             //aj_isbnnet
+            let bdone=false;
             aj_isbnnet(transferData)
             .done(function(data){
+
+                //bdone
+                if(bdone===true){
+                    return;
+                }
+                bdone=true;
 
                 //bs, add radio
                 _.each(data,function(v,k){
@@ -119,13 +127,31 @@
 
             })
             .fail(function(data){
-                alertmessage('error', data);
+                //alertmessage('error', data);
+                alert(data);
             })
             .always(function(){
 
                 //unloading
                 findbook_unloading();
+
             })
+
+            //等待時間限制
+            _.delay(function(){
+                if(bdone===false){
+
+                    //bdone
+                    bdone=true;
+
+                    //alert
+                    alert('等待時間過長，可能是網路問題或符合結果過多，請重新輸入更多書籍資訊。');
+
+                    //unloading
+                    findbook_unloading();
+
+                }
+            },1000*60);
             
         });
 
@@ -144,13 +170,10 @@
         });
 
         //cancel
-        $('#divmadal_findbook_cancel').off().on('click', function(){
+        $('#divmadal_findbook').on('hide.bs.modal', function (e) {
 
             //reject
             df.reject();
-
-            //hide
-            $('#divmadal_findbook').modal('hide');
 
         });
 
@@ -262,7 +285,7 @@
                 <button id="divmadal_findbook_find" type="button" class="btn btn-primary">取得</button>
                 <img id="divmadal_findbook_loader" src="/static/ebookSystem/img/load.gif" style="display: none;" width="30px" height="30px"/>
                 <button id="divmadal_findbook_pick" type="button" class="btn btn-primary">確定</button>
-                <button id="divmadal_findbook_cancel" type="button" class="btn btn-danger">取消</button>
+                <button id="divmadal_findbook_cancel" type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
             </div>
         </div>
     </div>

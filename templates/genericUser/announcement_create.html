@@ -13,9 +13,79 @@
 {% endblock %}
 
 {% block content %}
+
+<script>
+
+	$(function(){
+
+		//tinymce
+		tinymce.init({
+			selector: "#id_content",
+			plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
+			toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample'
+		});
+	
+	})
+
+	function announcement_send(){
+		//公告發佈
+		//因tinymce編輯區不會自動同步內容到textarea中，故需透過getContent得到內容再存
+		//因需透過form submit功能儲存故直接隱藏id_send並以click呼叫使用
+
+		//save tinymce content
+		$('#id_content').html(tinymce.activeEditor.getContent());
+
+		//click
+		$('#id_send').click();
+
+	}
+
+</script>
+
 <form action="" method="post" class="form-horizontal" role="form"  enctype="multipart/form-data">
-{% csrf_token %} 
-	<div class="row">
+	{% csrf_token %} 
+
+	<h3>公告發佈</h3>
+
+	<div class="form-horizontal">
+
+		<div class="form-group">
+			<label for="id_category" class="control-label col-sm-1"><font style="color:red">*</font>類別</label>
+			<div class="col-sm-11">
+				<select id="id_category" class="form-control" name="category">
+					<option value="">---------</option>
+					{% for category in announcement_category %}
+					<option value="{{ category.0 }}">{{ category.1 }}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="id_title" class="control-label col-sm-1"><font style="color:red">*</font>標題</label>
+			<div class="col-sm-11">
+				<input id="id_title" class="form-control" name="title" type="text" placeholder="title" required />
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="id_content" class="control-label col-sm-1"><font style="color:red">*</font>內容</label>
+			<div class="col-sm-11">
+				<textarea id="id_content" name="content" maxlength="30"></textarea>
+			</div>
+		</div>
+
+		<div class="form-group">        
+			<div class="col-sm-offset-1 col-sm-11">
+				<input id="id_combine" type="button" class="btn btn-primary" value="發佈" onclick="announcement_send()">
+				<input id="id_send" type="submit" class="btn btn-primary" value="發佈" style="display:none;">
+				<a class="btn btn-danger" role="button" href = "/">取消</a>
+			</div>
+		</div>
+		
+	</div>
+
+	<!-- <div class="row">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -42,20 +112,21 @@
 					<div class="form-group">
 						<label for="id_content" class="control-label col-sm-2"><font style="color:red">*</font>內容</label>
 						<div class="col-sm-10">
-							<!-- <input id="id_content"  maxlength="30" name="content" type="textarea"> -->
-							<textarea id="id_content" class="form-control" style="resize:none;" rows="10"></textarea>
+							<textarea id="id_content" name="content" maxlength="30"></textarea>
 						</div>
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<input type="submit" class="btn btn-primary" value="發佈" id="id_send">
+							<input id="id_combine" type="button" class="btn btn-primary" value="發佈" onclick="announcement_create()">
+							<input id="id_send" type="submit" class="btn btn-primary" value="發佈" style="display:none;">
 							<a class="btn btn-danger" role="button" href = "/">取消</a>
 						</div>
 					</div>
 				 </div>
 			</div>
 	 	</div>
-	 </div>
+	 </div> -->
+
 </form>
 
 {% endblock %}
