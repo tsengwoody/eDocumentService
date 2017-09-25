@@ -166,4 +166,5 @@ def password_change(request, template_name='registration/password_change_form.ht
 
 @http_response
 def social_auth_test(request, template_name='social_auth_test.html'):
+	fb_association = request.user.social_auth.filter(provider='facebook')
 	return locals()

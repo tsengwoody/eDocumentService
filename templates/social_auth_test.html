@@ -5,10 +5,21 @@
 {% endblock %}
 {% block content %}
 <h3>社群帳號測試</h3>
-<a href="{% url "social:begin" "facebook" %}">以 facebook 登錄</a>
-<a href="{% url "social:complete" "facebook" %}">以 facebook 完成</a>
-<a href="{% url "social:disconnect" "facebook" %}">以 facebook 解除綁定</a>
-{% for association in request.user.social_auth_set.all %}
-<a href="{% url "social:disconnect_individual" "facebook" "{{ association.id }}" %}">以 facebook 解除特定綁定</a>
-{% endfor %}
+<button><a href="{% url "social:begin" "facebook" %}">以 facebook 登錄</a></button>
+<button><a href="{% url "social:disconnect" "facebook" %}">解除 facebook 綁定</a></button>
+<table>
+	<tr>
+		<th>連結帳號</th>
+		<th>uid</th>
+		<th>動作</th>
+	</tr>
+		{% for association in fb_association %}
+	<tr>
+		<td><a href="https://www.facebook.com/{{ association.uid }}" >facebook 頁面</a></td>
+		<td>{{ association.uid }}</td>
+		<td><button><a href="{% url "social:disconnect_individual" "facebook" association.id %}">解除此綁定</a></button></td>
+	</tr>
+		{% endfor %}
+</table>
+
 {% endblock %}
