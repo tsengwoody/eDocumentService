@@ -164,6 +164,6 @@ def password_change(request, template_name='registration/password_change_form.ht
 		form = password_change_form(user=request.user)
 		return locals()
 
-def readme(request, app_name, template_name):
-	template_name = app_name +'/' +template_name +'_readme.html'
-	return render(request, template_name, locals())
+@http_response
+def social_auth_test(request, template_name='social_auth_test.html'):
+	return locals()

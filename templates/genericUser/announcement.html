@@ -13,5 +13,9 @@
 {% autoescape off %}
 {{ announcement.content }}
 {% endautoescape %}
+{% if request.user.is_manager %}
+<button name="update" value="{{ announcement.id }}">修改</button>
+<button name="delete" value="{{ announcement.id }}">刪除</button>
+{% endif %}
 </form>
 {% endblock %}

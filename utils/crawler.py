@@ -41,6 +41,7 @@ def get_book_info(ISBN):
 			phpsessid = cookies_dict[key]
 	post_data_file = 'post_data.txt'
 	values = load_post_data(post_data_file)
+	values['FO_SearchField0'] = 'ISBN'
 	values['FO_SearchValue0'] = ISBN
 	response = session.post(url,data=values)
 
@@ -131,6 +132,8 @@ def get_bookinfo_list(query_dict):
 	pattern = re.compile(ur'找到 (\d{1,}) 筆')
 	record_count = pattern.search(res).group(1)
 	record_count = int(record_count)
+	if record_count > 100:
+		raise SystemError(u'查詢回傳大量資料，請縮小查詢範圍')
 
 	bookinfo_list = []
 	for i in range(record_count):

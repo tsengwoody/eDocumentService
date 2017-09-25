@@ -57,11 +57,11 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 #    'django.contrib.sites',
 #    'django.contrib.sitemaps',
+    'social_django',
     'account',
     'ebookSystem',
     'genericUser',
     'guest',
-    'manager',
     'snowpenguin.django.recaptcha2',
 )
 
@@ -222,3 +222,14 @@ SERVICE = 'edocumentservice@gmail.com'
 TIME_ZONE = 'Asia/Taipei'
 OTP_ACCOUNT='eDocService'
 OTP_PASSWORD='1qaz2wsx3edc'
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.twitter.TwitterOAuth',
+)
+
+SOCIAL_AUTH_FACEBOOK_KEY = '1189524877843083'
+SOCIAL_AUTH_FACEBOOK_SECRET = '628d5279b09b4d7a3a1fc4fe7c913752'

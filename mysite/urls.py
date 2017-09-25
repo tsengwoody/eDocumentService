@@ -22,9 +22,10 @@ from django.views.static import serve
 urlpatterns = [
 	url(r'^$', views.home, name='home'),
 	url(r'^sitemap$', views.sitemap, name='sitemap'),
-	url(r'^(?P<app_name>\w+)/(?P<template_name>\w+)/readme/$', views.readme, name='readme'),
 #	url(r'^file/(?P<path>.*)$', serve, {'document_root': 'file/'}),
 	url(r'^admin/', include(admin.site.urls)),
+	url(r'social-auth/', include('social_django.urls', namespace='social')),
+	url(r'^social_auth_test$', views.social_auth_test, name='social-auth_test'),
 	url(r'^account/', include('account.urls', namespace="account", app_name="account")),
 	url(r'^ebookSystem/', include('ebookSystem.urls', namespace="ebookSystem")),
 	url(r'^genericUser/', include('genericUser.urls', namespace="genericUser")),

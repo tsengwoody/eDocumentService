@@ -19,11 +19,11 @@
 	{% for editor in editor_list %}
 	<tr>
 		<td>{{ editor.username }}</td>
-		<td>{{ editor.first_name }}{{ user.last_name }}</td>
+		<td>{{ editor.first_name }}{{ editor.last_name }}</td>
 		<td>{{ editor.email }}</td>
 		<td>{{ editor.phone }}</td>
 		<td>{{ editor.last_login }}</td>
-		<td>權限設定</td>
+		<td><button name="user_update_info" value="{{ editor.id }}">權限設定</button></td>
 		<td><a href="{%url 'genericUser:serviceinfo_list' editor.username %}">服務紀錄</a></td>
 	</tr>
 	{% endfor %}
@@ -46,7 +46,7 @@
 		<td>{{ guest.email }}</td>
 		<td>{{ guest.phone }}</td>
 		<td>{{ guest.last_login }}</td>
-		<td>權限設定</td>
+		<td><button name="user_update_info" value="{{ guest.id }}">權限設定</button></td>
 		<td>手冊查閱</td>
 		<td><a href="{%url 'ebookSystem:getbookrecord_user' request.user.id %}">下載紀錄</a></td>
 	</tr>

@@ -445,7 +445,7 @@ def get_book_info_list(request, template_name='ebookSystem/book_info.html'):
 		except BaseException as e:
 			print e
 			status = 'error'
-			message = u'查詢書籍錯誤'
+			message = u'查詢書籍錯誤。{0}'.format(unicode(e))
 			return locals()
 		status = 'success'
 		if len(bookinfo_list) >0:
@@ -505,8 +505,8 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 	if request.method == 'POST':
 		Token = request.session.get('postToken',default=None)
 		userToken = request.POST['postToken']
-		print ("Token %d",Token)
-		print (" userToken %d",userToken)
+#		print ("Token %d",Token)
+#		print (" userToken %d",userToken)
 		if  userToken !=Token:
 			raise Http404("請勿重覆傳送")
 		content = request.POST['content']
@@ -544,10 +544,9 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 		del request.session['postToken']
 		postToken = uuid.uuid1().hex
 		request.session['postToken'] = postToken
-		print request.session.get('postToken',default=None)
+#		print request.session.get('postToken',default=None)
 		return locals()
 	if request.method == 'GET':
-		print 'get'
 		postToken = uuid.uuid1().hex
 		request.session['postToken'] = postToken
 		return locals()
@@ -870,50 +869,48 @@ def book_list(request, ):
 	if request.method == 'GET' and request.is_ajax():
 		query_type = request.GET['query_type']
 		query_value = request.GET['query_value']
+
+		if query_type == 'all':
+			book_list = Book.objects.all()
+		elif query_type == 'ISBN':
+				book_list = Book.objects.filter(ISBN=query_value)
+		elif query_type in ['bookname', 'author', 'house']:
+#			books = Book.objects.select_related().filter(**{'book_info__{0}__icontains'.format(query_type): query_value})
+			exec(
+				'book_list = Book.objects.select_related().filter(book_info__{0}__contains=query_value)'.format(query_type)
+			)
+		elif query_type == 'chinese_book_category':
+			book_list = Book.objects.filter(book_info__chinese_book_category__startswith=query_value)
 		try:
-			if query_type == 'all':
-				book_list = Book.objects.all()
-			elif query_type == 'ISBN':
-					book_list = Book.objects.filter(ISBN=query_value)
-			elif query_type in ['bookname', 'author', 'house']:
-#				books = Book.objects.select_related().filter(**{'book_info__{0}__icontains'.format(query_type): query_value})
-				exec(
-					'book_list = Book.objects.select_related().filter(book_info__{0}__contains=query_value)'.format(query_type)
-				)
-			elif query_type == 'chinese_book_category':
-				book_list = Book.objects.filter(book_info__chinese_book_category__startswith=query_value)
-			elif query_type == 'newest':
-				book_list = Book.objects.all().order_by('finish_date')
-			elif query_type == 'hottest':
-				from django.db.models import Count
-				begin_day = timezone.now() -datetime.timedelta(days=30)
-				end_day = timezone.now()
-				r = GetBookRecord.objects.filter(get_time__gt=begin_day, get_time__lt=end_day).values('book').annotate(count=Count('book'))
-				import heapq
-				hottest = heapq.nlargest(request.GET['query_value'], r, key=lambda s: s['count'])
-				status = 'success'
-				message = u'成功查詢指定文件'
-				content = {}
-				content['book'] = zip(
-					[Book.objects.get(ISBN=i['book']).serialized() for i in hottest],
-					[Book.objects.get(ISBN=i['book']).book_info.serialized() for i in hottest],
-				)
-				return locals()
 			book_list = book_list.order_by('-book_info__date')
 			book_list = book_list.filter(status__gte=Book.STATUS['finish'])
+		except:
+			pass
+		if query_type == 'newest':
+			book_list = Book.objects.filter(status__gte=Book.STATUS['finish']).order_by('-finish_date', '-book_info__date')[0:10]
+		elif query_type == 'hottest':
+			from django.db.models import Count
+			begin_day = timezone.now() -datetime.timedelta(days=30)
+			end_day = timezone.now()
+			r = GetBookRecord.objects.filter(get_time__gt=begin_day, get_time__lt=end_day).values('book').annotate(count=Count('book'))
+			import heapq
+			hottest = heapq.nlargest(int(request.GET['query_value']), r, key=lambda s: s['count'])
 			status = 'success'
 			message = u'成功查詢指定文件'
 			content = {}
 			content['book'] = zip(
-				[book.serialized() for book in book_list],
-				[book.book_info.serialized() for book in book_list],
+				[Book.objects.get(ISBN=i['book']).serialized() for i in hottest],
+				[Book.objects.get(ISBN=i['book']).book_info.serialized() for i in hottest],
 			)
 			return locals()
-		except BaseException as e:
-			print e
-			status = 'error'
-			message = u'查詢操作異常: {0}'.format(unicode(e))
-			return locals()
+		status = 'success'
+		message = u'成功查詢指定文件'
+		content = {}
+		content['book'] = zip(
+			[book.serialized() for book in book_list],
+			[book.book_info.serialized() for book in book_list],
+		)
+		return locals()
 
 @http_response
 def book_repository(request, template_name='ebookSystem/book_repository.html'):

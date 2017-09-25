@@ -25,16 +25,13 @@ import urllib, urllib2
 @http_response
 def retrieve_password(request, template_name='genericUser/retrieve_password.html'):
 	if request.method == 'POST':
-		if request.POST.has_key('type') and request.POST['type'] == 'password':
-			if not (request.POST.has_key('username') and request.POST.has_key('email') and request.POST.has_key('birthday')):
-				status = 'error'
-				message = u'資料不完整'
-				return locals()
+		print request.POST['rpw_email']
+		if not request.POST['username']=='':
 			try:
-				birthday = request.POST['birthday'].split('-')
+				birthday = request.POST['rpw_birthday'].split('-')
 				birthday = [ int(i) for i in birthday ]
 				birthday = datetime.date(birthday[0], birthday[1], birthday[2])
-				user = User.objects.get(username=request.POST['username'], email=request.POST['email'], birthday=birthday)
+				user = User.objects.get(username=request.POST['username'], email=request.POST['rpw_email'], birthday=birthday)
 			except:
 				status = 'error'
 				message = u'無法取得使用者資料，請確認填寫的資料是否無誤'
@@ -56,16 +53,12 @@ def retrieve_password(request, template_name='genericUser/retrieve_password.html
 			message = u'成功重設密碼，請至信箱取得'
 			redirect_to = reverse('login')
 			return locals()
-		elif request.POST.has_key('type') and request.POST['type'] == 'username':
-			if not (request.POST.has_key('email') and request.POST.has_key('birthday')):
-				status = 'error'
-				message = u'資料不完整'
-				return locals()
+		else:
 			try:
-				birthday = request.POST['birthday'].split('-')
+				birthday = request.POST['rusr_birthday'].split('-')
 				birthday = [ int(i) for i in birthday ]
 				birthday = datetime.date(birthday[0], birthday[1], birthday[2])
-				user = User.objects.get(email=request.POST['email'], birthday=birthday)
+				user = User.objects.get(email=request.POST['rusr_email'], birthday=birthday)
 			except:
 				status = 'error'
 				message = u'無法取得使用者資料，請確認填寫的資料是否無誤'
@@ -79,7 +72,7 @@ def retrieve_password(request, template_name='genericUser/retrieve_password.html
 				message = u'傳送郵件失敗'
 				return locals()
 			status = 'success'
-			message = u'已將username寄至註冊信箱'
+			message = u'已將帳號使用者名稱寄至註冊信箱'
 			return locals()
 	if request.method == 'GET':
 		return locals()
@@ -594,6 +587,7 @@ def announcement(request, ID, template_name='genericUser/announcement.html'):
 
 @http_response
 def announcement_create(request, template_name='genericUser/announcement_create.html'):
+	announcement_category = Announcement.CATEGORY
 	AnnouncementForm = modelform_factory(Announcement, fields=['category', 'title', 'content', ])
 	if request.method == 'POST':
 		form = AnnouncementForm(request.POST)

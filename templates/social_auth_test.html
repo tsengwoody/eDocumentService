@@ -1,0 +1,14 @@
+﻿{% extends "base_nav.html" %}
+{% load staticfiles %}
+{% block title %}
+社群帳號測試
+{% endblock %}
+{% block content %}
+<h3>社群帳號測試</h3>
+<a href="{% url "social:begin" "facebook" %}">以 facebook 登錄</a>
+<a href="{% url "social:complete" "facebook" %}">以 facebook 完成</a>
+<a href="{% url "social:disconnect" "facebook" %}">以 facebook 解除綁定</a>
+{% for association in request.user.social_auth_set.all %}
+<a href="{% url "social:disconnect_individual" "facebook" "{{ association.id }}" %}">以 facebook 解除特定綁定</a>
+{% endfor %}
+{% endblock %}
