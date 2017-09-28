@@ -90,7 +90,7 @@ def register(request, template_name='registration/register.html'):
 		else:
 			pass
 		status = 'success'
-		message = u'註冊成功，請進行通訊資料驗證'
+		message = u'資料填寫成功，需完成電子信箱與聯絡電話驗證才算完成註冊'
 		redirect_to = reverse('genericUser:info')
 		return locals()
 	if request.method == 'GET':

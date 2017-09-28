@@ -83,54 +83,6 @@ def user_guide(request, template_name='genericUser/user_guide.html'):
 def recruit(request, template_name='genericUser/recruit.html'):
 	return render(request, template_name, locals())
 
-@http_response
-def article_content(request, id, template_name='genericUser/article/content.html'):
-	try:
-		article = Article.objects.get(id=id)
-	except:
-		raise Http404("article does not exist")
-	if request.method == 'POST':
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
-
-@view_permission
-@http_response
-def article_create(request, template_name='genericUser/article/create.html'):
-	ArticleForm = modelform_factory(Article, fields=('author', 'subject', 'category'))
-	article_category = Article.CATEGORY
-	if request.method == 'POST':
-		articleForm = ArticleForm(request.POST)
-		if not articleForm.is_valid():
-			status = 'error'
-			message = u'表單驗證失敗' + str(articleForm.errors)
-			return locals()
-		article = articleForm.save(commit=False)
-		article.author = request.user
-		article.save()
-		src = BASE_DIR + '/static/article/{0}/article.zip'.format(article.id)
-		dst = os.path.dirname(src)
-		if not os.path.exists(dst):
-			os.makedirs(dst, 0770)
-		try:
-			with open(src, 'wb+') as zipFile:
-				for chunk in request.FILES['zipFile'].chunks():
-					zipFile.write(chunk)
-		except:
-			pass
-		with ZipFile(src, 'r') as zipFile:
-			zipFile.extractall(dst)
-		add_base_url(os.path.join(dst, 'main_content.html'), article.id)
-		status = 'success'
-		message = u'成功新增文章'
-		redirect_to = '/'
-		return locals()
-	if request.method == 'GET':
-		articleForm = ArticleForm()
-		return locals()
-
-
 def upload_progress(request):
 	"""
 	Return JSON object with information about the progress of an upload.
@@ -205,33 +157,6 @@ def license(request, template_name='genericUser/license.html'):
 def func_desc(request, template_name='genericUser/func_desc.html'):
 	return render(request, template_name, locals())
 
-
-def security(request, template_name='genericUser/security.html'):
-	return render(request, template_name, locals())
-
-
-@view_permission
-@http_response
-def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
-	if len(ISBN) == 10 and not ISBN10_check(ISBN):
-		status = u'error'
-		message = u'ISBN10碼錯誤'
-		return locals()
-	if len(ISBN) == 13 and not ISBN13_check(ISBN):
-		status = u'error'
-		message = u'ISBN13碼錯誤'
-		return locals()
-	if len(ISBN) == 10:
-		ISBN = ISBN10_to_ISBN13(ISBN)
-	[status, bookname, author, house, date, bookbinding, chinese_book_category, order] = get_book_info(ISBN)
-	if status == 'success':
-		message = u'成功取得資料'
-	else:
-		message = u'查無資料'
-	extra_list = ['bookname', 'author', 'house', 'date', 'bookbinding', 'chinese_book_category', 'order', 'ISBN']
-	return locals()
-
-
 @view_permission
 @http_response
 def review_user(request, username, template_name='genericUser/review_user.html'):
@@ -266,7 +191,6 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 				event.response(status='error', message=request.POST['reason'], user=request.user)
 		return locals()
 
-
 @http_response
 def info(request, template_name):
 	user = request.user
@@ -291,7 +215,6 @@ def info(request, template_name):
 		return locals()
 	if request.method == 'GET':
 		return locals()
-
 
 @http_response
 def change_contact_info(request, template_name):
@@ -331,36 +254,6 @@ def change_contact_info(request, template_name):
 		return locals()
 	if request.method == 'GET':
 		userForm = UserForm(instance=request.user)
-		return locals()
-
-@view_permission
-@http_response
-def revise_content(request, template_name='genericUser/revise_content.html'):
-	user = request.user
-	if request.method == 'GET':
-		return locals()
-	if request.method == 'POST':
-		if not (request.POST['book_ISBN'] != '' and request.POST['content'] != '' and request.POST['part'] != ''):
-			status = 'error'
-			message = u'表單填寫錯誤'
-			return locals()
-		book_ISBN = request.POST['book_ISBN']
-		part = request.POST['part']
-		content = request.POST['content']
-		ISBN_part = request.POST['book_ISBN'] + '-' + request.POST['part']
-		ebook = EBook.objects.get(ISBN_part=ISBN_part)
-		result = ebook.fuzzy_string_search(string=content, length=10, action='-final')
-		if len(result) == 1:
-			status = 'success'
-			message = u'成功搜尋到修政文字段落'
-			reviseContentAction = ReviseContentAction.objects.create(ebook=ebook, content=content)
-			event = Event.objects.create(creater=user, action=reviseContentAction)
-		elif len(result) == 0:
-			status = 'error'
-			message = u'搜尋不到修政文字段落，請重新輸入並多傳送些文字'
-		else:
-			status = 'error'
-			message = u'搜尋到多處修政文字段落，請重新輸入並多傳送些文字'
 		return locals()
 
 @view_permission
@@ -469,13 +362,6 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 			else:
 				status = u'error'
 				message = u'手機驗證碼不符'
-		return locals()
-
-@http_response
-def forget(request, template='genericUser/forget.html'):
-	if request.method == 'POST':
-		return locals()
-	if request.method == 'GET':
 		return locals()
 
 #=====new=====
@@ -602,6 +488,58 @@ def announcement_create(request, template_name='genericUser/announcement_create.
 	elif request.method == 'GET':
 		status = 'success'
 		message = u''
+		return locals()
+
+@http_response
+def qanda_create(request, ):
+	QAndAForm = modelform_factory(QAndA, fields=['question', 'answer', ])
+	if request.method == 'POST' and request.is_ajax():
+		form = QAndAForm(request.POST)
+		if not form.is_valid():
+			status = 'error'
+			message = u'表單驗證失敗' + unicode(form.errors)
+			return locals()
+		form.save()
+		status = 'success'
+		message = u'成功建立Q&A'
+		return locals()
+
+@http_response
+def qanda_update(request, id):
+	QAndAForm = modelform_factory(QAndA, fields=['question', 'answer', ])
+	if request.method == 'POST' and request.is_ajax():
+		qanda = QAndA.objects.get(id=id)
+		form = QAndAForm(request.POST, instance=qanda)
+		if not form.is_valid():
+			status = 'error'
+			message = u'表單驗證失敗' + unicode(form.errors)
+			return locals()
+		form.save()
+		status = 'success'
+		message = u'成功修改Q&A'
+		return locals()
+
+@http_response
+def qanda_delete(request, id):
+	QAndAForm = modelform_factory(QAndA, fields=['question', 'answer', ])
+	if request.method == 'POST' and request.is_ajax():
+		qanda = QAndA.objects.get(id=id)
+		qanda.delete()
+		status = 'success'
+		message = u'成功刪除Q&A'
+		return locals()
+
+@http_response
+def qanda_list(request, ):
+	if request.method == 'GET' and request.is_ajax():
+		content = [ i.serialized() for i in QAndA.objects.all()]
+		status = 'success'
+		message = u'成功刪除Q&A'
+		return locals()
+
+@http_response
+def qanda_main(request, template_name='genericUser/qanda_main.html'):
+	if request.method == 'GET':
 		return locals()
 
 @http_response

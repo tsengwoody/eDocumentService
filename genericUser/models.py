@@ -222,34 +222,14 @@ class Announcement(models.Model):
 	def __unicode__(self):
 		return self.title
 
-class Article(models.Model):
-	author = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='article_set')
-	subject = models.CharField(max_length=100)
-	datetime = models.DateField(default = timezone.now)
-	CATEGORY = (
-		(u'公告' , u'公告'),
-		(u'文件' , u'文件'),
-	)
-	category = models.CharField(max_length=10, choices=CATEGORY)
-	path = models.CharField(max_length=255, blank=True, null=True)
+class QAndA(models.Model):
+	question = models.TextField()
+	answer = models.TextField()
+
+	serialized = generic_serialized
 
 	def __unicode__(self):
-		return self.subject
-
-	def get_attachment(self):
-		path = os.path.join(BASE_DIR, 'static') +u'/article/{0}/attachment'.format(self.id)
-		try:
-			attachment_list = os.listdir(path)
-		except:
-			attachment_list = []
-		publicFile_list = []
-		for attachment in attachment_list:
-			publicFile_list.append(PublicFile(os.path.join(path, attachment)))
-		return publicFile_list
-
-	def get_main_content(self):
-		path = os.path.join(BASE_DIR, 'static') +u'/article/{0}/main_content.html'.format(self.id)
-		return PublicFile(path)
+		return self.id
 
 class BusinessContent(models.Model):
 	name = models.CharField(max_length=100, )

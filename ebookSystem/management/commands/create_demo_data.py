@@ -373,14 +373,6 @@ class Command(BaseCommand):
 		assert response.status_code == 302, 'status_code' +str(response.status_code)
 		assert len(Book.objects.all())==3, 'create book fail'
 
-		src = BASE_DIR +'/temp/article_NVDA.zip'
-		with open(src) as fileObject:
-			factory = RequestFactory()
-			request = factory.post(reverse('genericUser:article/create'), {u'subject':u'NVDA使用者手冊', u'category':u'文件', u'zipFile':fileObject })
-		request.user = root
-		response = article_create(request)
-		assert len(Article.objects.all()) == 1, 'create Article fail'
-		
 		client = Client()
 		client.login(username='root', password='root')
 		previous_count = len(Announcement.objects.all())
@@ -398,3 +390,6 @@ class Command(BaseCommand):
 		assert len(Announcement.objects.all()) == previous_count +1, 'create announcement fail'
 		GetBookRecord.objects.create(book=book, user=root, get_ip='192.168.1.0')
 		GetBookRecord.objects.create(book=book, user=root, get_ip='192.168.1.0')
+
+		QAndA.objects.create(question='<p>question 1</p>', answer='<p>answer 1</p>', )
+		QAndA.objects.create(question='<p>question 2</p>', answer='<p>answer 2</p>', )
