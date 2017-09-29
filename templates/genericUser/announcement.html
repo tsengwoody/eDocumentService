@@ -6,16 +6,189 @@
 {{ announcement.title }} | 公告
 {% endblock %}
 {% block content %}
+
+<script>
+
+	$(function(){
+
+		//view
+		announcement_change('view');
+
+		//btn
+		$('#id_toedit').show();
+		$('#id_save, #id_cancel, #id_delete').hide();
+
+	})
+
+	function announcement_change(mode){
+		//公告模式切換
+
+		if(mode==='view'){
+			//顯示
+			$('[mode="ori"]').show();
+			$('[mode="mod"]').hide();
+		}
+		else{
+
+			//編修
+			$('[mode="ori"]').hide();
+			$('[mode="mod"]').show();
+
+			//btn
+			$('#id_toedit').hide();
+			$('#id_save, #id_cancel, #id_delete').show();
+
+			//title
+			let t=$('[mode="ori"][kind="title"]').html();
+			$('[mode="mod"][kind="title"]').val(t);
+
+			//category
+			let c=$('[mode="ori"][kind="category"]').html();
+			let o=$('[mode="mod"][kind="category"]').find('option');
+			o.prop('selected',false);
+			o.filter('[value="'+c+'"]').prop('selected',true);
+
+			//content
+			let n=$('[mode="ori"][kind="content"]').html();
+			
+			//tinymce
+			tinymce.init({
+				selector: "#id_content",
+				language:"zh_TW",
+				plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
+				toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample',
+				setup: function (editor) {
+					editor.on('init', function () {
+
+						//setContent
+						tinymce.activeEditor.setContent(n);
+
+					});
+				}
+			});
+		
+
+		}
+
+	}
+
+	function announcement_save(me){
+		//save
+		announcement_operate(me,'save');
+	}
+
+	function announcement_delete(me){
+		//delete
+		alertconfirm('是否確定刪除?')
+		.done(function(){
+			announcement_operate(me,'delete');
+		})
+	}
+
+	function announcement_operate(me,mode){
+		//公告編修或刪除
+
+		//me
+		me=$(me);
+
+		//aid
+		let aid=me.attr('aid');
+
+		//transferData
+		let transferData={
+			'title':$('[mode="mod"][kind="title"]').val(),
+			'category':$('[mode="mod"][kind="category"]').find('option:selected').val(),
+			'content':tinymce.activeEditor.getContent(),
+		};
+
+		//mode
+		if(mode==='save'){
+			transferData['update']=aid;
+		}
+		else if(mode==='delete'){
+			transferData['delete']=aid;
+		}
+		else{
+			console.log('mode error');
+			return;
+		}
+		//console.log(transferData)
+		
+		//url
+		let url='.';
+
+		//aj_post aj_delete
+		aj_post(url, transferData)
+		.done(function(data){
+			console.log('done',data)
+			alertmessage(data['status'], data['message']);
+		    //alertDialog(data);
+		})
+		.fail(function(data){
+			console.log('fail',data)
+		    alertmessage(data['status'], data['message']);
+		})
+		
+
+	}
+
+</script>
+
 <form action="" method="post" role="form" >
 	{% csrf_token %} 
-	<h3>{{ announcement.title }}</h3>
-	<hr />
-{% autoescape off %}
-{{ announcement.content }}
-{% endautoescape %}
-{% if request.user.is_manager %}
-<button name="update" value="{{ announcement.id }}">修改</button>
-<button name="delete" value="{{ announcement.id }}">刪除</button>
-{% endif %}
+
+	<h3>公告資訊</h3>
+
+    <div class="form-horizontal">
+
+        <div class="form-group">
+            <label for="id_category" class="control-label col-sm-1"><font style="color:red">*</font>類別</label>
+            <div class="col-sm-11">
+				<div kind="category" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">{{announcement.category}}</div>
+				<select id="id_category" kind="category" mode="mod" class="form-control">
+					<option value="">---------</option>
+					<option value="平台消息">平台消息</option>
+					<option value="新書推薦">新書推薦</option>
+					<option value="志工快訊">志工快訊</option>
+				</select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="id_title" class="control-label col-sm-1"><font style="color:red">*</font>標題</label>
+            <div class="col-sm-11">
+				<div kind="title" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">{{ announcement.title }}</div>
+                <input id="id_title" kind="title" mode="mod" class="form-control" type="text"/>
+            </div>
+        </div>
+
+		{% autoescape off %}
+        <div class="form-group">
+            <label for="id_content" class="control-label col-sm-1"><font style="color:red">*</font>內容</label>
+            <div class="col-sm-11">
+				<div kind="content" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">
+					{{ announcement.content }}
+				</div>
+				<div id="id_content" kind="content" mode="mod" class="form-control" >{{ announcement.content }}</div>
+            </div>
+        </div>
+		{% endautoescape %}
+
+        <div class="form-group">        
+            <div class="col-sm-offset-1 col-sm-11">
+
+				{% if request.user.is_manager %}
+				<input id="id_toedit" type="button" class="btn btn-primary" value="進行修改" onclick="announcement_change('edit');">
+				<input id="id_save" type="button" class="btn btn-primary" value="儲存" aid="{{ announcement.id }}" onclick="announcement_save(this);">
+				<input id="id_cancel" type="button" class="btn btn-default" value="取消" onclick="window.location.reload();">
+				<input id="id_delete" type="button" class="btn btn-danger" value="刪除" aid="{{ announcement.id }}" onclick="announcement_delete(this);">
+				{% endif %}
+
+            </div>
+        </div>
+        
+    </div>
+
 </form>
+
 {% endblock %}

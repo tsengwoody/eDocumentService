@@ -17,57 +17,100 @@
 		$('a[connsid="'+sid+'"]')[0].click(); 
 	}
 
-	$(document).ready(function(){
-		let sid=0;
+	function addchild(me){
+
+		//o
+		let o=me.children('a');
+
+		//sid
+		let sid=_.uniqueId();
+
+		//add connsid
+		o.attr('connsid',sid);
+
+		//s
+		let s={
+			'text':o.text(),
+			'sid':sid,
+			'data':[],
+		};
+
+		return s
+	}
+
+	function addparent(me){
+	
+		//o
+		let o=me.children('a');
+
+		//sid
+		let sid=_.uniqueId();
+
+		//add connsid
+		o.attr('connsid',sid);
+
+		//lis
+		let ss=[];
+		let lis=me.find('ul li').each(function(){
+			let oo=$(this);
+			ss.push(addchild(oo));
+		})
+
+		//push
+		let s={
+			'text':o.text(),
+			'sid':sid,
+			'data':ss,
+		};
+
+		return s;
+	}
+
+	function genmap(s){
+
+		//c
 		let c='';
-
-		//each
-		let imu=0;
-		$('#navbar').find('ul').eq(0).children('li').each(function(){
-			let me=$(this);
+		_.each(s,function(v,k){
 			c+='<li style="margin-top:10px;">';
+			c+='<a sid="'+v['sid']+'" style="cursor:pointer;" onclick="connclick(this);">'+(k+1)+'. '+v['text']+'</a>';
 
-			//mu
-			let omu=me.children('a');
-			let mu=omu.text();
-			imu++;
-			sid++;
-
-			//add connsid
-			omu.attr('connsid',sid);
-
-			//a
-			c+='<a sid="'+sid+'" style="cursor:pointer;" onclick="connclick(this);">'+imu+'. '+mu+'</a>';
-
-			//muchd
-			let imuchd=0;
-			let lis=me.find('ul li');
-			if(lis.length>0){
-				c+='<ul>';
-
-				//each
-				lis.each(function(){
-					let omuchd=$(this).children('a');
-					let muchd=omuchd.text();
-					imuchd++;
-					sid++;
-
-					//add connsid
-					omuchd.attr('connsid',sid);
-
-					//a
-					c+='<li><a sid="'+sid+'" style="cursor:pointer;" onclick="connclick(this);">'+imu+'.'+imuchd+'. '+muchd+'</a></li>';
-
+			if(v['data'].length>0){
+				_.each(v['data'],function(vv,kk){
+					c+='<ul>';
+					c+='<li><a sid="'+vv['sid']+'" style="cursor:pointer;" onclick="connclick(this);">'+(k+1)+'.'+(kk+1)+'. '+vv['text']+'</a></li>';
+					c+='</ul>';
 				})
-
-				c+='</ul>';
 			}
 
 			c+='</li>';
 		})
 
-		//ul_sitemap
-		$('#ul_sitemap').html(c);
+		return c;
+	}
+
+	$(document).ready(function(){
+
+		//s
+		let s=[];
+
+		//logo
+		let logo=$('div.navbar-header');
+		s.push(addchild(logo));
+		
+		//navbar-nav
+		$('ul[class="nav navbar-nav"]').children('li').each(function(){
+			let me=$(this);
+			s.push(addparent(me));
+		})
+
+		//navbar-right
+		$('ul[class="nav navbar-nav navbar-right"]').children('li').eq(0).each(function(){
+			let me=$(this);
+			s.push(addparent(me));
+		})
+
+		//html
+		$('#ul_sitemap').html(genmap(s));
 
 	});
 

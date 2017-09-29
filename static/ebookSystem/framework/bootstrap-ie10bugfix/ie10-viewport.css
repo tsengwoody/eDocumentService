@@ -1,0 +1,13 @@
+/*!
+ * IE10 viewport hack for Surface/desktop Windows 8 bug.
+ * For devices running Windows Phone 8 versions older than Update 3 (a.k.a. GDR3) 
+ * you'll need to include the following CSS to work around the bug.
+ * For details, see http://getbootstrap.com/getting-started/#support-ie10-width
+ */
+
+@-webkit-viewport   { width: device-width; }
+@-moz-viewport      { width: device-width; }
+@-ms-viewport       { width: device-width; }
+@-o-viewport        { width: device-width; }
+@viewport           { width: device-width; }
+

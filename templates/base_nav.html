@@ -86,7 +86,7 @@
 			<ul class="nav navbar-nav navbar-right">
 				{% if request.user.is_authenticated %}
 				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user">帳號<span class="caret"></span></a>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>帳號<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li><a href="{% url 'genericUser:event_list' %}">平台消息</a></li>
 						{% if request.user.is_editor %}
@@ -100,10 +100,8 @@
 				<li><a href="{% url 'login' %}"><span class="glyphicon  glyphicon-log-out">登入</a></li>
 				<li><a href="{% url 'register' %}"><span class="glyphicon glyphicon-user">註冊</a></li>
 				{% endif %}
-			</ul>
-			<ul>
 				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user">關於<span class="caret"></span></a>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">關於</a>
 					<ul class="dropdown-menu">
 						<li><a href="">平台使用指南</a></li>
 						<li><a href="">平台Q&A</a></li>

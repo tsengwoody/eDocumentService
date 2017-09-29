@@ -834,6 +834,13 @@ function aj_post(url, transferData){
 }
 
 
+function aj_delete(url, transferData){
+    //ajax post
+
+    return aj_send('DELETE', url, transferData);
+}
+
+
 function aj_send(type, url, transferData){
     //ajax傳送訊息
 
