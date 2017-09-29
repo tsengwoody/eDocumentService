@@ -464,7 +464,7 @@ def announcement(request, ID, template_name='genericUser/announcement.html'):
 			return locals()
 		form.save()
 		status = 'success'
-		message = u'成功新增公告'
+		message = u'成功修改公告'
 		return locals()
 	elif request.method == 'GET':
 		status = 'success'
@@ -483,11 +483,39 @@ def announcement_create(request, template_name='genericUser/announcement_create.
 			return locals()
 		form.save()
 		status = 'success'
+		message = u'成功新增公告'
+		return locals()
+	elif request.method == 'GET':
+		status = 'success'
+		message = u''
+		return locals()
+
+@http_response
+def announcement_update(request, id, ):
+	AnnouncementForm = modelform_factory(Announcement, fields=['category', 'title', 'content', ])
+	if request.method == 'POST':
+		announcement = Announcement.objects.get(id=id)
+		form = AnnouncementForm(request.POST, instance=announcement)
+		if not form.is_valid():
+			status = 'error'
+			message = u'表單驗證失敗' + unicode(form.errors)
+			return locals()
+		form.save()
+		status = 'success'
 		message = u'成功修改公告'
 		return locals()
 	elif request.method == 'GET':
 		status = 'success'
 		message = u''
+		return locals()
+
+@http_response
+def announcement_delete(request, id):
+	if request.method == 'POST' and request.is_ajax():
+		announcement = Announcement.objects.get(id=id)
+		announcement.delete()
+		status = 'success'
+		message = u'成功刪除Q&A'
 		return locals()
 
 @http_response
@@ -521,7 +549,6 @@ def qanda_update(request, id):
 
 @http_response
 def qanda_delete(request, id):
-	QAndAForm = modelform_factory(QAndA, fields=['question', 'answer', ])
 	if request.method == 'POST' and request.is_ajax():
 		qanda = QAndA.objects.get(id=id)
 		qanda.delete()

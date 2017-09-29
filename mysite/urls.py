@@ -22,6 +22,7 @@ from django.views.static import serve
 urlpatterns = [
 	url(r'^$', views.home, name='home'),
 	url(r'^sitemap$', views.sitemap, name='sitemap'),
+	url(r'^error_social_auth$', views.error_social_auth, name='error_social_auth'),
 #	url(r'^file/(?P<path>.*)$', serve, {'document_root': 'file/'}),
 	url(r'^admin/', include(admin.site.urls)),
 	url(r'social-auth/', include('social_django.urls', namespace='social')),

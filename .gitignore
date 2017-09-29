@@ -12,3 +12,4 @@ venv/
 auto.sh
 .idea
 ebookSystem/fixtures
+social_django/
