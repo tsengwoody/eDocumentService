@@ -837,7 +837,7 @@ function aj_post(url, transferData){
 function aj_delete(url, transferData){
     //ajax post
 
-    return aj_send('DELETE', url, transferData);
+    return aj_send('delete', url, transferData);
 }
 
 

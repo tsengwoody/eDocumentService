@@ -28,7 +28,7 @@
 			$('[mode="ori"]').show();
 			$('[mode="mod"]').hide();
 		}
-		else{
+		else if(mode==='edit'){
 
 			//編修
 			$('[mode="ori"]').hide();
@@ -67,14 +67,17 @@
 				}
 			});
 		
-
+		}
+		else{
+			console.log('mode error');
+			return;
 		}
 
 	}
 
-	function announcement_save(me){
-		//save
-		announcement_operate(me,'save');
+	function announcement_update(me){
+		//update
+		announcement_operate(me,'update');
 	}
 
 	function announcement_delete(me){
@@ -101,31 +104,30 @@
 			'content':tinymce.activeEditor.getContent(),
 		};
 
+		//url
+		let url;
+
 		//mode
-		if(mode==='save'){
-			transferData['update']=aid;
+		if(mode==='update'){
+			url='/genericUser/announcement_update/'+aid+'/';
 		}
 		else if(mode==='delete'){
-			transferData['delete']=aid;
+			url='/genericUser/announcement_delete/'+aid+'/';
 		}
 		else{
 			console.log('mode error');
 			return;
 		}
-		//console.log(transferData)
 		
-		//url
-		let url='.';
-
-		//aj_post aj_delete
+		//aj_post
 		aj_post(url, transferData)
 		.done(function(data){
-			console.log('done',data)
-			alertmessage(data['status'], data['message']);
-		    //alertDialog(data);
+			alertmessage(data['status'], data['message'])
+			.done(function(){
+				 window.location='/genericUser/announcement_list';
+			})
 		})
 		.fail(function(data){
-			console.log('fail',data)
 		    alertmessage(data['status'], data['message']);
 		})
 		
@@ -179,7 +181,7 @@
 
 				{% if request.user.is_manager %}
 				<input id="id_toedit" type="button" class="btn btn-primary" value="進行修改" onclick="announcement_change('edit');">
-				<input id="id_save" type="button" class="btn btn-primary" value="儲存" aid="{{ announcement.id }}" onclick="announcement_save(this);">
+				<input id="id_save" type="button" class="btn btn-primary" value="儲存" aid="{{ announcement.id }}" onclick="announcement_update(this);">
 				<input id="id_cancel" type="button" class="btn btn-default" value="取消" onclick="window.location.reload();">
 				<input id="id_delete" type="button" class="btn btn-danger" value="刪除" aid="{{ announcement.id }}" onclick="announcement_delete(this);">
 				{% endif %}
