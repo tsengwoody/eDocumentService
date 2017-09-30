@@ -104,7 +104,7 @@
 		})
 
 		//navbar-right
-		$('ul[class="nav navbar-nav navbar-right"]').children('li').eq(0).each(function(){
+		$('ul[class="nav navbar-nav navbar-right"]').children('li:eq(0),li:eq(2)').each(function(){
 			let me=$(this);
 			s.push(addparent(me));
 		})

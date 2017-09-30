@@ -22,6 +22,7 @@
 	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-pp.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/lodash-4.17.4.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/bluebird-3.5.0.js' %}"></script>
+	<script language="javascript" src="{% static 'ebookSystem/js/Math.uuid.js' %}"></script>
 
 	<link href="{% static "ebookSystem/css/frontendsystem.css" %}" rel="stylesheet" > 
 	<script language="javascript" src="{% static 'ebookSystem/js/frontendsystem.js' %}"></script>
@@ -71,6 +72,7 @@
 	{% include 'comp/mxfindbook.html' %}
 	{% include 'comp/mxalertmessage.html' %}
 	{% include 'comp/mxalertconfirm.html' %}
+	{% include 'comp/mxuserpermission.html' %}
 
 	{% block nav %} {% endblock %}
 

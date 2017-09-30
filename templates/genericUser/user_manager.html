@@ -3,53 +3,63 @@
 {% block title %}
 使用者管理
 {% endblock %}
-
 {% block content %}
-<h3>使用者管理</h3>
-<h4>志工</h4>
-<table>
-	<tr>
-		<th>使用者名稱</th>
-		<th>姓名</th>
-		<th>郵件</th>
-		<th>手機</th>
-		<th>最後上線時間</th>
-		<th colspan="2">動作</th>
-	</tr>
-	{% for editor in editor_list %}
-	<tr>
-		<td>{{ editor.username }}</td>
-		<td>{{ editor.first_name }}{{ editor.last_name }}</td>
-		<td>{{ editor.email }}</td>
-		<td>{{ editor.phone }}</td>
-		<td>{{ editor.last_login }}</td>
-		<td><button name="user_update_info" value="{{ editor.id }}">權限設定</button></td>
-		<td><a href="{%url 'genericUser:serviceinfo_list' editor.username %}">服務紀錄</a></td>
-	</tr>
-	{% endfor %}
-</table>
 
-<h4>視障者</h4>
-<table>
-	<tr>
-		<th>使用者名稱</th>
-		<th>姓名</th>
-		<th>郵件</th>
-		<th>手機</th>
-		<th>最後上線時間</th>
-		<th colspan="3">動作</th>
-	</tr>
-	{% for guest in guest_list %}
-	<tr>
-		<td>{{ guest.username }}</td>
-		<td>{{ guest.first_name }}{{ user.last_name }}</td>
-		<td>{{ guest.email }}</td>
-		<td>{{ guest.phone }}</td>
-		<td>{{ guest.last_login }}</td>
-		<td><button name="user_update_info" value="{{ guest.id }}">權限設定</button></td>
-		<td>手冊查閱</td>
-		<td><a href="{%url 'ebookSystem:getbookrecord_user' request.user.id %}">下載紀錄</a></td>
-	</tr>
-	{% endfor %}
-</table>
+<h3>使用者管理</h3>
+
+<div class="panel panel-default">
+	<div class="panel-heading" style="font-size:14pt;">志工</div>
+	<div class="panel-body">
+		<table class="table">
+			<tr>
+				<th>使用者名稱</th>
+				<th>姓名</th>
+				<th>郵件</th>
+				<th>手機</th>
+				<th>最後上線時間</th>
+				<th colspan="2">動作</th>
+			</tr>
+			{% for editor in editor_list %}
+			<tr>
+				<td>{{ editor.username }}</td>
+				<td>{{ editor.first_name }}{{ editor.last_name }}</td>
+				<td>{{ editor.email }}</td>
+				<td>{{ editor.phone }}</td>
+				<td>{{ editor.last_login }}</td>
+				<td><button class="btn btn-warning" type="button" name="user_update_info" value="{{ editor.id }}">權限設定</button></td>
+				<td><a class="btn btn-default" style="padding:6px 12px;" href="{%url 'genericUser:serviceinfo_list' editor.username %}">服務紀錄</a></td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+</div>
+
+<div class="panel panel-default">
+	<div class="panel-heading" style="font-size:14pt;">視障者</div>
+	<div class="panel-body">
+		<table class="table">
+			<tr>
+				<th>使用者名稱</th>
+				<th>姓名</th>
+				<th>郵件</th>
+				<th>手機</th>
+				<th>最後上線時間</th>
+				<th colspan="3">動作</th>
+			</tr>
+			{% for guest in guest_list %}
+			<tr>
+				<td>{{ guest.username }}</td>
+				<td>{{ guest.first_name }}{{ user.last_name }}</td>
+				<td>{{ guest.email }}</td>
+				<td>{{ guest.phone }}</td>
+				<td>{{ guest.last_login }}</td>
+				<td><button class="btn btn-warning" type="button" name="user_update_info" value="{{ guest.id }}">權限設定</button></td>
+				<td>手冊查閱</td>
+				<td><a class="btn btn-default" style="padding:6px 12px;" href="{%url 'ebookSystem:getbookrecord_user' request.user.id %}">下載紀錄</a></td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+</div>
+
 {% endblock %}

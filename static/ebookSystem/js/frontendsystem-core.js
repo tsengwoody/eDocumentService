@@ -138,6 +138,13 @@ function cstr(v) {
 }
 
 
+function cstrtrim(v){
+    //轉字串並刪除前後空白
+
+    return String(v).trim();
+}
+
+
 function isundefined(v) {
     //判斷是否為undefined
 
@@ -210,6 +217,25 @@ function iser(v) {
     }
     return false;
 }
+
+
+function isarrer(ar){
+    //陣列元素是否皆為iser
+
+    return _.every(ar, function(v){
+        return iser(v);
+    })
+}
+
+
+function isobjvalueer(obj){
+    //字典物件內值是否皆為iser
+
+    return _.every(_.values(obj), function(v){
+        return iser(v);
+    })
+}
+
 
 
 function iselmexist(id) {
@@ -452,14 +478,7 @@ function blob2str(bdata){
 
 
 function GenID() {
-    let p = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let c = "";
-    let n = 32;
-    for (let i = 0; i < n; i++) {
-       c += p.charAt(Math.floor(Math.random() * p.length));
-    }
-    return c;
-    //return Math.uuid(32);
+    return Math.uuid(32);
 }
 
 
@@ -1122,6 +1141,72 @@ function aj_isbnnet(transferData){
         df.reject('無書籍資料');
     })
     
+    return df;
+}
+
+function aj_announcement(mode,aid,transferData){
+    //公告API新增、更新、刪除
+
+    //df
+    let df = $.Deferred();
+
+    //url
+    let url;
+    if(mode==='create'){
+        //create不用給aid
+        url='/genericUser/announcement_create'; //不能於最後有反斜線
+    }
+    else if(mode==='update'){
+        url='/genericUser/announcement_update/'+aid+'/';
+    }
+    else if(mode==='delete'){
+        url='/genericUser/announcement_delete/'+aid+'/';
+    }
+    else{
+
+        //reject
+        df.reject({'status':'error','message':' mode error'});
+        
+        return df;
+    }
+    
+    //check
+	let err=[];
+    if(iser(transferData.title)){
+        err.push('標題不能為空');
+    }
+    if(iser(transferData.category)){
+        err.push('類別需選擇其中一種');
+    }
+    if(iser(transferData.content)){
+        err.push('內容不能為空');
+    }
+    if(err.length>0){
+
+        //msg
+        let msg=_.chain(err)
+        .map(function(v,k){
+            return '<div style="margin-top:5px;">'+cstr(k+1)+': '+v+'</div>';
+        })
+        .join('')
+        .value();
+        msg='<div>輸入錯誤訊息如下：</div>'+msg;
+        
+        //reject
+        df.reject({'status':'error','message':msg});
+
+        return df;
+    }
+
+    //aj_post
+    aj_post(url, transferData)
+    .done(function(data){
+        df.resolve(data);
+    })
+    .fail(function(data){
+        df.reject(data);
+    })
+
     return df;
 }
 

@@ -8,6 +8,7 @@
 {% block content %}
 
 <script>
+	let announcement_transferData_temp;
 
 	$(function(){
 
@@ -15,8 +16,8 @@
 		announcement_change('view');
 
 		//btn
-		$('#id_toedit').show();
-		$('#id_save, #id_cancel, #id_delete').hide();
+		$('#id_tolist, #id_toedit').show();
+		$('#id_update, #id_cancel, #id_delete').hide();
 
 	})
 
@@ -35,8 +36,8 @@
 			$('[mode="mod"]').show();
 
 			//btn
-			$('#id_toedit').hide();
-			$('#id_save, #id_cancel, #id_delete').show();
+			$('#id_tolist, #id_toedit').hide();
+			$('#id_update, #id_cancel, #id_delete').show();
 
 			//title
 			let t=$('[mode="ori"][kind="title"]').html();
@@ -63,10 +64,13 @@
 						//setContent
 						tinymce.activeEditor.setContent(n);
 
+						//save
+						announcement_transferData_temp=announcement_save();
+					
 					});
 				}
 			});
-		
+
 		}
 		else{
 			console.log('mode error');
@@ -75,13 +79,68 @@
 
 	}
 
+	function announcement_save(){
+		//儲存資料
+		
+		//title
+		let title=cstrtrim($('[mode="mod"][kind="title"]').val());
+
+		//category
+		let category=cstrtrim($('[mode="mod"][kind="category"]').find('option:selected').val());
+
+		//content
+		let content=cstrtrim(tinymce.activeEditor.getContent());
+
+		//transferData
+		let transferData={
+			'title':title,
+			'category':category,
+			'content':content,
+		};
+
+		return transferData;
+	}
+
+	function announcement_cancel(){
+		//取消離開檢核
+
+		//transferData
+		let transferData=announcement_save();
+		
+		//check
+		if(!announcement_checkdata_equal()){
+			alertconfirm('資料已變更，是否確定取消?')
+			.done(function(){
+				//重新整理
+				window.location.reload();
+			})
+		}
+		else{
+			//重新整理
+			window.location.reload();
+		}
+
+	}
+
+	function announcement_checkdata_equal(){
+		//檢核資料是否相同
+
+		//transferData
+		let transferData=announcement_save();
+
+		//return
+		return _.isEqual(announcement_transferData_temp, transferData);
+	}
+
 	function announcement_update(me){
 		//update
+
 		announcement_operate(me,'update');
 	}
 
 	function announcement_delete(me){
 		//delete
+
 		alertconfirm('是否確定刪除?')
 		.done(function(){
 			announcement_operate(me,'delete');
@@ -97,100 +156,88 @@
 		//aid
 		let aid=me.attr('aid');
 
-		//transferData
-		let transferData={
-			'title':$('[mode="mod"][kind="title"]').val(),
-			'category':$('[mode="mod"][kind="category"]').find('option:selected').val(),
-			'content':tinymce.activeEditor.getContent(),
-		};
-
-		//url
-		let url;
-
-		//mode
+		//check same
 		if(mode==='update'){
-			url='/genericUser/announcement_update/'+aid+'/';
+			if(announcement_checkdata_equal()){
+				alertmessage('error', '資料未有更動');
+				return;
+			}
 		}
-		else if(mode==='delete'){
-			url='/genericUser/announcement_delete/'+aid+'/';
-		}
-		else{
-			console.log('mode error');
-			return;
-		}
-		
-		//aj_post
-		aj_post(url, transferData)
+
+		//transferData
+		let transferData=announcement_save();
+
+		//aj_announcement
+		aj_announcement(mode,aid,transferData)
 		.done(function(data){
 			alertmessage(data['status'], data['message'])
 			.done(function(){
-				 window.location='/genericUser/announcement_list';
+				//自動轉址回公告列表
+				window.location='/genericUser/announcement_list';
 			})
 		})
 		.fail(function(data){
 		    alertmessage(data['status'], data['message']);
 		})
 		
-
 	}
 
 </script>
 
-<form action="" method="post" role="form" >
-	{% csrf_token %} 
+{% csrf_token %} 
 
-	<h3>公告資訊</h3>
+<h3>公告資訊</h3>
 
-    <div class="form-horizontal">
+<div class="form-horizontal">
 
-        <div class="form-group">
-            <label for="id_category" class="control-label col-sm-1"><font style="color:red">*</font>類別</label>
-            <div class="col-sm-11">
-				<div kind="category" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">{{announcement.category}}</div>
-				<select id="id_category" kind="category" mode="mod" class="form-control">
-					<option value="">---------</option>
-					<option value="平台消息">平台消息</option>
-					<option value="新書推薦">新書推薦</option>
-					<option value="志工快訊">志工快訊</option>
-				</select>
-            </div>
-        </div>
+	<div class="form-group">
+		<label for="id_category" class="control-label col-sm-1"><font style="color:red">*</font>類別</label>
+		<div class="col-sm-11">
+			<div kind="category" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">{{announcement.category}}</div>
+			<select id="id_category" kind="category" mode="mod" class="form-control">
+				<option value="">---------</option>
+				<option value="平台消息">平台消息</option>
+				<option value="新書推薦">新書推薦</option>
+				<option value="志工快訊">志工快訊</option>
+			</select>
+		</div>
+	</div>
 
-        <div class="form-group">
-            <label for="id_title" class="control-label col-sm-1"><font style="color:red">*</font>標題</label>
-            <div class="col-sm-11">
-				<div kind="title" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">{{ announcement.title }}</div>
-                <input id="id_title" kind="title" mode="mod" class="form-control" type="text"/>
-            </div>
-        </div>
+	<div class="form-group">
+		<label for="id_title" class="control-label col-sm-1"><font style="color:red">*</font>標題</label>
+		<div class="col-sm-11">
+			<div kind="title" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">{{ announcement.title }}</div>
+			<input id="id_title" kind="title" mode="mod" class="form-control" type="text"/>
+		</div>
+	</div>
 
-		{% autoescape off %}
-        <div class="form-group">
-            <label for="id_content" class="control-label col-sm-1"><font style="color:red">*</font>內容</label>
-            <div class="col-sm-11">
-				<div kind="content" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">
-					{{ announcement.content }}
-				</div>
-				<div id="id_content" kind="content" mode="mod" class="form-control" >{{ announcement.content }}</div>
-            </div>
-        </div>
-		{% endautoescape %}
+	{% autoescape off %}
+	<div class="form-group">
+		<label for="id_content" class="control-label col-sm-1"><font style="color:red">*</font>內容</label>
+		<div class="col-sm-11">
+			<div kind="content" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">
+				{{ announcement.content }}
+			</div>
+			<div id="id_content" kind="content" mode="mod" class="form-control" >{{ announcement.content }}</div>
+		</div>
+	</div>
+	{% endautoescape %}
 
-        <div class="form-group">        
-            <div class="col-sm-offset-1 col-sm-11">
+	<div class="form-group">        
+		<div class="col-sm-offset-1 col-sm-11">
 
-				{% if request.user.is_manager %}
-				<input id="id_toedit" type="button" class="btn btn-primary" value="進行修改" onclick="announcement_change('edit');">
-				<input id="id_save" type="button" class="btn btn-primary" value="儲存" aid="{{ announcement.id }}" onclick="announcement_update(this);">
-				<input id="id_cancel" type="button" class="btn btn-default" value="取消" onclick="window.location.reload();">
-				<input id="id_delete" type="button" class="btn btn-danger" value="刪除" aid="{{ announcement.id }}" onclick="announcement_delete(this);">
-				{% endif %}
+			<button id="id_tolist" type="button" class="btn btn-default" onclick="window.location='/genericUser/announcement_list'">返回公告列表</button>
 
-            </div>
-        </div>
-        
-    </div>
+			{% if request.user.is_manager %}
+			<button id="id_toedit" type="button" class="btn btn-primary" onclick="announcement_change('edit');">進行修改</button>
+			<button id="id_update" type="button" class="btn btn-primary" aid="{{ announcement.id }}" onclick="announcement_update(this);">儲存</button>
+			<button id="id_cancel" type="button" class="btn btn-default" onclick="announcement_cancel();">取消</button>
+			<button id="id_delete" type="button" class="btn btn-danger" aid="{{ announcement.id }}" onclick="announcement_delete(this);">刪除</button>
+			{% endif %}
 
-</form>
+		</div>
+	</div>
+	
+</div>
 
 {% endblock %}
