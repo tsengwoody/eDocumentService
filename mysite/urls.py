@@ -18,12 +18,12 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from . import views
 from django.views.static import serve
+from .settings import BASE_DIR
 
 urlpatterns = [
 	url(r'^$', views.home, name='home'),
 	url(r'^sitemap$', views.sitemap, name='sitemap'),
 	url(r'^error_social_auth$', views.error_social_auth, name='error_social_auth'),
-#	url(r'^file/(?P<path>.*)$', serve, {'document_root': 'file/'}),
 	url(r'^admin/', include(admin.site.urls)),
 	url(r'social-auth/', include('social_django.urls', namespace='social')),
 	url(r'^social_auth_test$', views.social_auth_test, name='social-auth_test'),
@@ -38,3 +38,9 @@ urlpatterns = [
 	url(r'^auth/logout/$', views.logout_user, name='logout'),
 #	url(r'^auth/', include('django.contrib.auth.urls',)),
 ]
+
+import socket
+if not socket.gethostname() == 'edoc':
+	urlpatterns = urlpatterns +[
+		url(r'^file/(?P<path>.*)$', serve, {'document_root': BASE_DIR +'/file/'}),
+	]

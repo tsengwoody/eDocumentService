@@ -26,18 +26,13 @@ SECRET_KEY = 'e_#e-byj7#a+$v7#wmocwd8wp)+&wajk0axt70dl@)nsx!*glq'
 # SECURITY WARNING: don't run with debug turned on in production!
 import socket
 if socket.gethostname() == 'edoc':
-	DEBUG = False
+    DEBUG = False
 else:
-	DEBUG = True
+    DEBUG = True
 
-if DEBUG is False:
-    #ALLOWED_HOSTS = ['www.edocumentservice.org', '104.155.204.241']
-    ALLOWED_HOSTS = ['*']
-    SECURE_SSL_REDIRECT = True
-else:
-    ALLOWED_HOSTS = []
 
 if socket.gethostname() == 'edoc':
+    ALLOWED_HOSTS = ['www.edocumentservice.org', '104.155.204.241']
     SECURE_SSL_REDIRECT = True
 
 ADMINS = [
@@ -100,14 +95,7 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-if DEBUG is True:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
-else:
+if socket.gethostname() == 'edoc':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -116,6 +104,13 @@ else:
             'PASSWORD': 'eDocDB!@#',
             'HOST': '127.0.0.1',
             'PORT': '3306',
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
 
@@ -166,14 +161,6 @@ if socket.gethostname() == 'edoc':
 else:
 	EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-EMAIL_HOST='smtp.gmail.com'
-EMAIL_PORT=587
-EMAIL_HOST_USER = 'edocumentservice@gmail.com'
-EMAIL_HOST_PASSWORD = 'cozpzzyyuetvhxwe'
-EMAIL_USE_TLS = True
-SERVICE = 'edocumentservice@gmail.com'
-#smtp.mail.yahoo.com
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -220,8 +207,6 @@ DEFAULT_FROM_EMAIL = 'edocumentservice@gmail.com'
 MANAGER = ['edocumentservice@gmail.com']
 SERVICE = 'edocumentservice@gmail.com'
 TIME_ZONE = 'Asia/Taipei'
-OTP_ACCOUNT='eDocService'
-OTP_PASSWORD='1qaz2wsx3edc'
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -231,8 +216,4 @@ AUTHENTICATION_BACKENDS = (
     'social_core.backends.twitter.TwitterOAuth',
 )
 
-SOCIAL_AUTH_FACEBOOK_KEY = '1189524877843083'
-SOCIAL_AUTH_FACEBOOK_SECRET = '628d5279b09b4d7a3a1fc4fe7c913752'
-
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '567709676389-3r1b35bnmvp4rg6kggjd43vks99ermpn.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'tFdd71Hbp6JyDfcqxmpTsvFN'
+from .account_info import *

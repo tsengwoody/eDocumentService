@@ -6,10 +6,11 @@ file/
 log/
 static/ebookSystem/document/
 static/ebookSystem/disability_card/
-static/article/
+static/readium/
 temp/
 venv/
 auto.sh
 .idea
 ebookSystem/fixtures
 social_django/
+mysite/account_info.py

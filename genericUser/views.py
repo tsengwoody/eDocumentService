@@ -323,7 +323,6 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 				OTP_ACCOUNT, OTP_PASSWORD, request.user.phone, urllib.quote(data.encode('big5')))
 			session = requests.Session()
 			response = session.get(url)
-			print(response.text.split('=')[1])
 			if response.text.split('=')[1] > 0:
 				status = 'success'
 				message = u'已寄送到您的手機'
