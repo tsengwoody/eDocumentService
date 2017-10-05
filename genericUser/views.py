@@ -196,6 +196,8 @@ def info(request, template_name):
 	user = request.user
 	DCDir = BASE_DIR + '/static/ebookSystem/disability_card/{0}'.format(request.user.username)
 	DCDir_url = DCDir.replace(BASE_DIR + '/static/', '')
+	facebook_association = request.user.social_auth.filter(provider='facebook')
+	google_association = request.user.social_auth.filter(provider='google')
 	userForm = UserForm(instance=request.user)
 	if request.method == 'POST':
 		if request.POST.has_key('email') and (not request.user.email == request.POST['email']):
@@ -433,8 +435,7 @@ def user_list(request):
 @http_response
 def user_manager(request, template_name='genericUser/user_manager.html'):
 	if request.method == 'GET':
-		editor_list = User.objects.filter(is_book=True, is_editor=True, )
-		guest_list = User.objects.filter(is_book=True, is_guest=True, )
+		user_list = User.objects.filter(is_book=True)
 		return locals()
 
 @http_response

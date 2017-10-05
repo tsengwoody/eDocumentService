@@ -7,9 +7,170 @@ import re
 import requests
 import urllib,urllib2
 from bs4 import BeautifulSoup
-#from mysite.settings import BASE_DIR
+from selenium import webdriver
 
 
+#=====douban=====
+def get_douban_bookinfo(ISBN):
+	browser = webdriver.PhantomJS()
+	url = u'https://book.douban.com/subject_search'
+	values = {}
+	values['search_text'] = ISBN.encode('utf-8')
+	data = urllib.urlencode(values) 
+	url = url + "?"+data
+	browser.get(url)
+
+	soup = BeautifulSoup(browser.page_source, 'html5lib')
+	browser.quit()
+
+	url_list = [i['href'] for i in soup.find_all("a", class_="title-text")]
+
+	for url in url_list:
+		session = requests.Session()
+		response = session.get(url)
+		response.encoding = 'utf-8'
+		res = response.text
+		soup = BeautifulSoup(res, 'html5lib')
+		pattern = re.compile(ur'ISBN')
+		item = soup.find("span", text=pattern)
+		get_ISBN = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
+		if get_ISBN == ISBN:
+			break
+
+	bookname_soup = soup.find('span', property="v:itemreviewed")
+	bookname = unicode(bookname_soup.string)
+
+	info = soup.find("div", id='info')
+	item = info.find_all('span')
+
+	try:
+		pattern = re.compile(ur'副标题')
+		item = soup.find("span", text=pattern)
+		subtitle = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
+		bookname = u'{0}, {1}'.format(bookname, subtitle)
+	except:
+		pass
+	try:
+		pattern = re.compile(ur'原作名')
+		item = soup.find("span", text=pattern)
+		orgtitle = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
+		bookname = u'{0}; {1}'.format(bookname, orgtitle)
+	except:
+		pass
+
+	pattern = re.compile(ur'作者')
+	item = soup.find("span", text=pattern)
+	author = unicode(item.next_sibling.next_sibling.string).replace(' ', '').replace('\n', '')
+
+	try:
+		pattern = re.compile(ur'译者')
+		item = soup.find("span", text=pattern)
+		translator = unicode(item.next_sibling.next_sibling.string).replace(' ', '').replace('\n', '')
+		author = u'{0}著; {1}译'.format(author, translator)
+	except:
+		pass
+
+	pattern = re.compile(ur'出版社')
+	item = soup.find("span", text=pattern)
+	house = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
+
+	pattern = re.compile(ur'出版年')
+	item = soup.find("span", text=pattern)
+	date = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
+	year = int(date.split('-')[0])
+	month = int(date.split('-')[1])
+	date = unicode(datetime.date(year,month,1))
+
+	pattern = re.compile(ur'装帧')
+	item = soup.find("span", text=pattern)
+	bookbinding = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
+	return [get_ISBN, bookname, author, house, date, bookbinding]
+
+def get_douban_bookinfo_list(query_text):
+	browser = webdriver.PhantomJS()
+	url = u'https://book.douban.com/subject_search'
+	values = {}
+	values['search_text'] = query_text.encode('utf-8')
+	data = urllib.urlencode(values) 
+	url = url + "?"+data
+	browser.get(url)
+
+	soup = BeautifulSoup(browser.page_source, 'html5lib')
+	browser.quit()
+
+	url_list = [i['href'] for i in soup.find_all("a", class_="title-text")]
+	bookinfo_list = []
+	for url in url_list:
+		session = requests.Session()
+		response = session.get(url)
+		response.encoding = 'utf-8'
+		res = response.text
+		soup = BeautifulSoup(res, 'html5lib')
+		info = soup.find("div", id='info')
+		item = info.find_all('span')
+
+		try:
+			pattern = re.compile(ur'ISBN')
+			item = soup.find("span", text=pattern)
+			get_ISBN = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
+
+			#==========
+			bookname_soup = soup.find('span', property="v:itemreviewed")
+			bookname = unicode(bookname_soup.string)
+
+			try:
+				pattern = re.compile(ur'副标题')
+				item = soup.find("span", text=pattern)
+				subtitle = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
+				bookname = u'{0}, {1}'.format(bookname, subtitle)
+			except:
+				pass
+			try:
+				pattern = re.compile(ur'原作名')
+				item = soup.find("span", text=pattern)
+				orgtitle = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
+				bookname = u'{0}; {1}'.format(bookname, orgtitle)
+			except:
+				pass
+
+			pattern = re.compile(ur'作者')
+			item = soup.find("span", text=pattern)
+			author = unicode(item.next_sibling.next_sibling.string).replace(' ', '').replace('\n', '')
+
+			try:
+				pattern = re.compile(ur'译者')
+				item = soup.find("span", text=pattern)
+				translator = unicode(item.next_sibling.next_sibling.string).replace(' ', '').replace('\n', '')
+				author = u'{0}; {1}译'.format(author, translator)
+			except:
+				pass
+
+			pattern = re.compile(ur'出版社')
+			item = soup.find("span", text=pattern)
+			house = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
+
+			pattern = re.compile(ur'出版年')
+			item = soup.find("span", text=pattern)
+			date = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
+			year = int(date.split('-')[0])
+			month = int(date.split('-')[1])
+			date = unicode(datetime.date(year,month,1))
+			#==========
+		except BaseException as e:
+			continue
+
+		try:
+			pattern = re.compile(ur'装帧')
+			item = soup.find("span", text=pattern)
+			bookbinding = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
+		except BaseException as e:
+			bookbinding = ''
+
+		bookinfo_list.append((get_ISBN, bookname, author, house, date, bookbinding,))
+
+	return bookinfo_list
+
+#=====NCL=====
 def load_post_data(src):
 	'''import pkgutil
 	data = pkgutil.get_data(__package__, src)
@@ -31,7 +192,7 @@ def load_post_data(src):
 			post_data[key] = u''
 	return post_data
 
-def get_book_info(ISBN):
+def get_ncl_bookinfo(ISBN):
 	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/H30_SearchBooks.php'
 	session = requests.Session()
 	response = session.get(url)
@@ -75,21 +236,15 @@ def get_book_info(ISBN):
 		if get_ISBN == ISBN:
 			break
 
-	try:
-		bookname = unicode(data_tags[1].string).replace(u' ', '')
-		author = unicode(data_tags[3].string).replace(u' ', '')
-		house = unicode(data_tags[5].string).replace(u' ', '')
-		date = unicode(advance_info[4].string).replace(u' ', '')
-		year = int(date.split('/')[0]) +1911
-		month = int(date.split('/')[1])
-		date = unicode(datetime.date(year,month,1))
-		status = u'success'
-	except BaseException as e:
-		bookname=''
-		author=''
-		house=''
-		date=''
-		status = u'error'
+
+	bookname = unicode(data_tags[1].string).replace(u' ', '')
+	author = unicode(data_tags[3].string).replace(u' ', '')
+	house = unicode(data_tags[5].string).replace(u' ', '')
+	date = unicode(advance_info[4].string).replace(u' ', '')
+	year = int(date.split('/')[0]) +1911
+	month = int(date.split('/')[1])
+	date = unicode(datetime.date(year,month,1))
+
 	try:
 		bookbinding = unicode(advance_info[0].string).replace(u' ', '')
 		pattern = re.compile(r'\((.*)\)')
@@ -106,9 +261,10 @@ def get_book_info(ISBN):
 		order = unicode(data_tags[7].string).replace(u' ', '')
 	except BaseException as e:
 		order = ''
-	return [status, bookname, author, house, date, bookbinding, chinese_book_category, order]
 
-def get_bookinfo_list(query_dict):
+	return [get_ISBN, bookname, author, house, date, bookbinding, chinese_book_category, order]
+
+def get_ncl_bookinfo_list(query_dict):
 	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/H30_SearchBooks.php'
 	session = requests.Session()
 	response = session.get(url)
@@ -210,9 +366,12 @@ def ISBN10_to_ISBN13(ISBN):
 
 import sys
 if __name__ == '__main__':
-#	book_info = get_book_info(sys.argv[1])
-	bookinfo_list = get_bookinfo_list({
-		'FO_SearchField0': 'Title',
-		'FO_SearchValue0': u'變態王子',
-	})
-	print len(bookinfo_list)
+	r = get_ncl_bookinfo(u'9789573321569')
+	print r[1]
+	r = get_douban_bookinfo(u'9789571073125')
+	print r[1]
+	r = get_douban_bookinfo(u'9787801871527')
+	print r[1]
+	r_list = get_douban_bookinfo_list(u'天藍色')
+	for i in r_list:
+		print i[1]

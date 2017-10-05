@@ -32,7 +32,7 @@ else:
 
 
 if socket.gethostname() == 'edoc':
-    ALLOWED_HOSTS = ['www.edocumentservice.org', '104.155.204.241']
+    ALLOWED_HOSTS = ['edocumentservice.org', 'www.edocumentservice.org', '104.155.204.241']
     SECURE_SSL_REDIRECT = True
 
 ADMINS = [

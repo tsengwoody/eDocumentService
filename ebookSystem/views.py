@@ -415,45 +415,76 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 		return locals()
 	if len(ISBN) == 10:
 		ISBN = ISBN10_to_ISBN13(ISBN)
-	[status, bookname, author, house, date, bookbinding, chinese_book_category, order] = get_book_info(ISBN)
-	if status == 'success':
-		message = u'成功取得資料'
-	else:
-		message = u'查無資料'
-	extra_list = ['bookname', 'author', 'house', 'date', 'ISBN', 'bookbinding', 'chinese_book_category', 'order']
+
+	if request.POST['source'] == 'NCL':
+		#=====NCL=====
+		try:
+			[ISBN, bookname, author, house, date, bookbinding, chinese_book_category, order] = get_ncl_bookinfo(ISBN)
+			source = 'NCL'
+		except BaseException as e:
+			status = 'error'
+			message = u'查無資料'
+			return locals()
+
+	elif request.POST['source'] == 'douban':
+		#=====douban=====
+		try:
+			[ISBN, bookname, author, house, date, bookbinding,] = get_douban_bookinfo(ISBN)
+			chinese_book_category, order = ('', '')
+			source = 'douban'
+		except BaseException as e:
+			status = 'error'
+			message = u'查無資料'
+			return locals()
+
+	status = 'success'
+	message = u'成功取得資料'
+	extra_list = ['bookname', 'author', 'house', 'date', 'ISBN', 'bookbinding', 'chinese_book_category', 'order', 'source']
 	return locals()
 
 @http_response
 def get_book_info_list(request, template_name='ebookSystem/book_info.html'):
 	if request.method == 'POST' and request.is_ajax():
 
-		p_logic = re.compile(r'FO_SchRe1ation(?P<count>\d+)')
-		p_field = re.compile(r'FO_SearchField(?P<count>\d+)')
-		p_value = re.compile(r'FO_SearchValue(?P<count>\d+)')
+		if request.POST['source'] == 'NCL':
 
-		query_dict = {}
+			p_logic = re.compile(r'FO_SchRe1ation(?P<count>\d+)')
+			p_field = re.compile(r'FO_SearchField(?P<count>\d+)')
+			p_value = re.compile(r'FO_SearchValue(?P<count>\d+)')
 
-		for k,v in request.POST.iteritems():
-			search_logic = p_logic.search(k)
-			search_field = p_field.search(k)
-			search_value = p_value.search(k)
-			if search_logic or search_field or search_value:
-				query_dict[k] = v
+			query_dict = {}
+			for k,v in request.POST.iteritems():
+				search_logic = p_logic.search(k)
+				search_field = p_field.search(k)
+				search_value = p_value.search(k)
+				if search_logic or search_field or search_value:
+					query_dict[k] = v
 
-		try:
-			bookinfo_list = get_bookinfo_list(query_dict)
-		except BaseException as e:
-			print e
-			status = 'error'
-			message = u'查詢書籍錯誤。{0}'.format(unicode(e))
-			return locals()
+			try:
+				bookinfo_list = get_ncl_bookinfo_list(query_dict)
+				source = 'NCL'
+			except BaseException as e:
+				status = 'error'
+				message = u'查詢書籍錯誤。{0}'.format(unicode(e))
+				return locals()
+
+		elif request.POST['source'] == 'douban':
+			try:
+				bookinfo_list = get_douban_bookinfo_list(request.POST['search_query'])
+				source = 'douban'
+			except BaseException as e:
+				status = 'error'
+				message = u'查詢書籍錯誤。{0}'.format(unicode(e))
+				return locals()
+
 		status = 'success'
 		if len(bookinfo_list) >0:
 			message = u'查無指定書籍'
 		else:
 			message = u'查詢書籍成功'
-		extra_list = ['bookinfo_list']
+		extra_list = ['bookinfo_list', 'source']
 		return locals()
+
 
 def edit_ajax(request, ISBN_part, *args, **kwargs):
 	user = request.user

@@ -99,4 +99,41 @@
 		</div>
 	</div>
 </div>
+
+<h3>社群帳號綁定</h3>
+<h4>facebook</h4>
+<button><a href="{% url "social:begin" "facebook" %}">以 facebook 帳號綁定平台帳號</a></button>
+<button><a href="{% url "social:disconnect" "facebook" %}">解除 facebook 帳號綁定</a></button>
+<table>
+	<tr>
+		<th>連結帳號</th>
+		<th>uid</th>
+		<th>動作</th>
+	</tr>
+		{% for association in facebook_association %}
+	<tr>
+		<td><a href="https://www.facebook.com/{{ association.uid }}" >facebook 頁面</a></td>
+		<td>{{ association.uid }}</td>
+		<td><button><a href="{% url "social:disconnect_individual" "facebook" association.id %}">解除此綁定</a></button></td>
+	</tr>
+		{% endfor %}
+</table>
+
+<h4>google</h4>
+<button><a href="{% url "social:begin" "google-oauth2" %}">以 google 帳號綁定平台帳號</a></button>
+<button><a href="{% url "social:disconnect" "google-oauth2" %}">解除 google 帳號綁定</a></button>
+<table>
+	<tr>
+		<th>連結帳號</th>
+		<th>uid</th>
+		<th>動作</th>
+	</tr>
+		{% for association in google_association %}
+	<tr>
+		<td><a href="https://www.facebook.com/{{ association.uid }}" >facebook 頁面</a></td>
+		<td>{{ association.uid }}</td>
+		<td><button><a href="{% url "social:disconnect_individual" "facebook" association.id %}">解除此綁定</a></button></td>
+	</tr>
+		{% endfor %}
+</table>
 {% endblock %}

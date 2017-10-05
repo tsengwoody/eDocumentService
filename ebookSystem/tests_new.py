@@ -280,9 +280,31 @@ class book_listViewTests(TestCase):
 				'ebookSystem:get_book_info_list',
 			),
 			{
+				'source': 'NCL',
 				'FO_SearchField0': 'Title',
 				'FO_SearchValue0': u'變態王子',
 			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
 		print len(response.json()['bookinfo_list'])
+		print response.json()['source']
+
+class book_infoViewTests(TestCase):
+	fixtures = ['dump.json',]
+
+	def test_bookinfo_correct_case(self):
+		client = Client()
+		client.login(username='root', password='root')
+		response = client.post(
+			reverse(
+				'ebookSystem:book_info',
+				kwargs = {
+					'ISBN': '9787801871527',
+				},
+			),
+			{
+				'source': 'douban',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		print response.json()['bookname']
