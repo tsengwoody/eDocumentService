@@ -9,11 +9,30 @@
 {% load staticfiles %}
 <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
 <script language="javascript" src="{% static 'ebookSystem/js/getOTP.js' %}"></script>
+
 <style type="text/css">
 #otpModal .modal-content{
 	background-color: #f5f5f5;
 }
 </style>
+
+<script>
+
+	function forcepost(me){
+		me=$(me);
+		let href=me.attr('href');
+		aj_post(href, {})
+		.done(function(data){
+			console.log(data);
+		})
+		.fail(function(data){
+			console.log(data);
+		})
+		return false; 
+	}
+
+</script>
+
 {% endblock %}
 {% block content %}
 {% csrf_token %}
@@ -105,18 +124,25 @@
 <button><a href="{% url "social:begin" "facebook" %}">以 facebook 帳號綁定平台帳號</a></button>
 <button><a href="{% url "social:disconnect" "facebook" %}">解除 facebook 帳號綁定</a></button>
 <table>
-	<tr>
-		<th>連結帳號</th>
-		<th>uid</th>
-		<th>動作</th>
-	</tr>
+	<thead>
+		<tr>
+			<th>連結帳號</th>
+			<th>uid</th>
+			<th>動作</th>
+		</tr>
+	</thead>
+	<tbody>
 		{% for association in facebook_association %}
-	<tr>
-		<td><a href="https://www.facebook.com/{{ association.uid }}" >facebook 頁面</a></td>
-		<td>{{ association.uid }}</td>
-		<td><button><a href="{% url "social:disconnect_individual" "facebook" association.id %}">解除此綁定</a></button></td>
-	</tr>
+		<tr>
+			<td><a href="https://www.facebook.com/{{ association.uid }}" >facebook 頁面</a></td>
+			<td>{{ association.uid }}</td>
+			<td>
+				<!-- <button><a href="{% url "social:disconnect_individual" "facebook" association.id %}">解除此綁定</a></button> -->
+				<button><a href="{% url "social:disconnect_individual" "facebook" association.id %}" onclick="return forcepost(this)">解除此綁定</a></button>
+			</td>
+		</tr>
 		{% endfor %}
+	</tbody>
 </table>
 
 <h4>google</h4>
@@ -132,7 +158,7 @@
 	<tr>
 		<td><a href="https://www.facebook.com/{{ association.uid }}" >facebook 頁面</a></td>
 		<td>{{ association.uid }}</td>
-		<td><button><a href="{% url "social:disconnect_individual" "facebook" association.id %}">解除此綁定</a></button></td>
+		<td><button><a href="{% url "social:disconnect_individual" "facebook" association.id %}" onclick="return forcepost(this)">解除此綁定</a></button></td>
 	</tr>
 		{% endfor %}
 </table>
