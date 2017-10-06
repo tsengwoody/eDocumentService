@@ -66,7 +66,7 @@ def get_douban_bookinfo(ISBN):
 		pattern = re.compile(ur'译者')
 		item = soup.find("span", text=pattern)
 		translator = unicode(item.next_sibling.next_sibling.string).replace(' ', '').replace('\n', '')
-		author = u'{0}著; {1}译'.format(author, translator)
+		author = u'{0}作; {1}译'.format(author, translator)
 	except:
 		pass
 
@@ -141,7 +141,7 @@ def get_douban_bookinfo_list(query_text):
 				pattern = re.compile(ur'译者')
 				item = soup.find("span", text=pattern)
 				translator = unicode(item.next_sibling.next_sibling.string).replace(' ', '').replace('\n', '')
-				author = u'{0}; {1}译'.format(author, translator)
+				author = u'{0}作; {1}译'.format(author, translator)
 			except:
 				pass
 

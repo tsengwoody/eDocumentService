@@ -39,8 +39,6 @@ urlpatterns = [
 #	url(r'^auth/', include('django.contrib.auth.urls',)),
 ]
 
-import socket
-if not socket.gethostname() == 'edoc':
-	urlpatterns = urlpatterns +[
-		url(r'^file/(?P<path>.*)$', serve, {'document_root': BASE_DIR +'/file/'}),
-	]
+urlpatterns = urlpatterns +[
+	url(r'^epub/(?P<path>.*)$', serve, {'document_root': BASE_DIR +'/file/ebookSystem/document/'}),
+]

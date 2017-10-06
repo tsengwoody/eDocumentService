@@ -419,7 +419,7 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 	if request.POST['source'] == 'NCL':
 		#=====NCL=====
 		try:
-			[ISBN, bookname, author, house, date, bookbinding, chinese_book_category, order] = get_ncl_bookinfo(ISBN)
+			[ISBN, bookname, author, house, date, bookbinding, chinese_book_category, order] = get_ncl_bookinfo(request.POST['ISBN'])
 			source = 'NCL'
 		except BaseException as e:
 			status = 'error'
@@ -429,7 +429,7 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 	elif request.POST['source'] == 'douban':
 		#=====douban=====
 		try:
-			[ISBN, bookname, author, house, date, bookbinding,] = get_douban_bookinfo(ISBN)
+			[ISBN, bookname, author, house, date, bookbinding,] = get_douban_bookinfo(request.POST['ISBN'])
 			chinese_book_category, order = ('', '')
 			source = 'douban'
 		except BaseException as e:
@@ -953,4 +953,12 @@ def getbookrecord_user(request, ID, template_name='ebookSystem/getbookrecord_use
 	user = User.objects.filter(id=ID)
 	gbr_list = GetBookRecord.objects.filter(user=user)
 	if request.method == 'GET':
+		return locals()
+
+@http_response
+def epub(request, ISBN):
+	book = Book.objects.get(ISBN=ISBN)
+	if request.method == 'GET':
+		download_path = book.path +'/OCR/{0}.epub'.format(ISBN)
+		download_filename = os.path.basename(download_path)
 		return locals()

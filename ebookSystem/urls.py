@@ -29,4 +29,5 @@ urlpatterns = [
 	url(r'^book_list$', views.book_list, name='book_list'),
 	url(r'^book_repository$', views.book_repository, name='book_repository'),
 	url(r'^getbookrecord_user/(?P<ID>\d+)/$', views.getbookrecord_user, name='getbookrecord_user'),
+	url(r'^epub/(?P<ISBN>[0-9Xx]+)/$', views.epub, name='epub'),
 ]

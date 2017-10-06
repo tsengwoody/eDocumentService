@@ -78,7 +78,6 @@ def http_response(view):
 					response = HttpResponse(content=content_file, )
 				response['Content-Type'] = 'application/octet-stream'
 				response['Content-Disposition'] = u'attachment; filename="{0}"'.format(rend_dict['download_filename']).encode('utf-8')
-				print len(response)
 				return response
 			else:
 				return render(request, rend_dict['template_name'], rend_dict)

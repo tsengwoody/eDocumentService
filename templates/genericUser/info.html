@@ -119,6 +119,7 @@
 	</div>
 </div>
 
+{% if request.user.is_superuser %}
 <h3>社群帳號綁定</h3>
 <h4>facebook</h4>
 <button><a href="{% url "social:begin" "facebook" %}">以 facebook 帳號綁定平台帳號</a></button>
@@ -162,4 +163,6 @@
 	</tr>
 		{% endfor %}
 </table>
+{% endif %}
+
 {% endblock %}

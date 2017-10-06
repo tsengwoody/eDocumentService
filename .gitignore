@@ -14,3 +14,4 @@ auto.sh
 ebookSystem/fixtures
 social_django/
 mysite/account_info.py
+ghostdriver.log
