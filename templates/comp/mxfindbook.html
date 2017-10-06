@@ -16,10 +16,13 @@
         $('#divmadal_findbook_find').show();
         $('#divmadal_findbook_pick').hide();
 
+        //預設簡易查詢
+        $('li[name="divmadal_findbook_tab_grp"]').eq(0).children().click();
+        
+        //$('#mixvalue').val('9789573329466') //蔡康永愛情短信
+
         //unloading
         findbook_unloading();
-
-        //$('#FO_SearchValue0').val('新手媽媽')
 
     }
 
@@ -45,8 +48,49 @@
         $('#divmadal_findbook_find').prop('disabled',false);
     }
 
+    function findbook_easy(){
+        //easy查找書籍資訊
+
+        //transferData
+        let transferData=$('#mixvalue').val();
+
+        //check
+        if(transferData===''){
+            alert('尚未輸入查詢資訊');
+            return null;
+        }
+
+        return transferData;
+    }
+
+    function findbook_adv(){
+        //adv查找書籍資訊
+
+        //transferData
+        let transferData={
+            'FO_SchRe1ation0':'Null',
+            'FO_SearchField0':$('#FO_SearchField0').find('option:selected').val(),
+            'FO_SearchValue0':$('#FO_SearchValue0').val(),
+            'FO_SchRe1ation1':$('#FO_SchRe1ation1').find('option:selected').val(),
+            'FO_SearchField1':$('#FO_SearchField1').find('option:selected').val(),
+            'FO_SearchValue1':$('#FO_SearchValue1').val(),
+            'FO_SchRe1ation2':$('#FO_SchRe1ation2').find('option:selected').val(),
+            'FO_SearchField2':$('#FO_SearchField2').find('option:selected').val(),
+            'FO_SearchValue2':$('#FO_SearchValue2').val(),
+        };
+
+        //check
+        if(transferData['FO_SearchValue0']==='' && transferData['FO_SearchValue1']==='' && transferData['FO_SearchValue2']===''){
+            //alertmessage('error', '至少需輸入一種查詢資訊');
+            alert('至少需輸入一種查詢資訊');
+            return null;
+        }
+
+        return transferData;
+    }
+
     function findbook(){
-        //查找[全國新書資訊網ISBNnet]書籍資訊
+        //查找更多書籍資訊
 
         //df
         let df = $.Deferred();
@@ -60,39 +104,41 @@
         //find
         $('#divmadal_findbook_find').off().on('click', function(){
 
-            //transferData
-            let transferData={
-                'FO_SchRe1ation0':'Null',
-                'FO_SearchField0':$('#FO_SearchField0').find('option:selected').val(),
-                'FO_SearchValue0':$('#FO_SearchValue0').val(),
-                'FO_SchRe1ation1':$('#FO_SchRe1ation1').find('option:selected').val(),
-                'FO_SearchField1':$('#FO_SearchField1').find('option:selected').val(),
-                'FO_SearchValue1':$('#FO_SearchValue1').val(),
-                'FO_SchRe1ation2':$('#FO_SchRe1ation2').find('option:selected').val(),
-                'FO_SearchField2':$('#FO_SearchField2').find('option:selected').val(),
-                'FO_SearchValue2':$('#FO_SearchValue2').val(),
-            };
+            //mode
+            let mode=$('li[name="divmadal_findbook_tab_grp"].active').attr('mode');
 
-            //check
-            if(transferData['FO_SearchValue0']===''){
-                //alertmessage('error', '至少需輸入一種查詢資訊');
-                alert('至少需輸入一種查詢資訊');
+            //transferData
+            let transferData=null;
+            if(mode==='easy'){
+                transferData=findbook_easy();
+            }
+            else if(mode==='adv'){
+                transferData=findbook_adv();
+            }
+            if(transferData===null){
                 return;
             }
 
             //loading
             findbook_loading();
 
-            //aj_isbnnet
+            //df
+            let df;
             let bdone=false;
-            aj_isbnnet(transferData)
-            .done(function(data){
+            if(mode==='easy'){
+                df=aj_isbnnet_and_douban(transferData);
+            }
+            else if(mode==='adv'){
+                df=aj_isbnnet(transferData);
+            }
+            
+            //done
+            df.done(function(data){
 
                 //bdone
                 if(bdone===true){
                     return;
                 }
-                bdone=true;
 
                 //bs, add radio
                 _.each(data,function(v,k){
@@ -131,6 +177,9 @@
                 alert(data);
             })
             .always(function(){
+
+                //bdone
+                bdone=true;
 
                 //unloading
                 findbook_unloading();
@@ -190,7 +239,7 @@
 
         //autofocus
         _.delay(function(){
-            $('#FO_SearchValue0').focus();
+            $('#mixvalue').focus();
         },500)
         
         return df;
@@ -205,74 +254,95 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 id="divmadal_findbook_title" class="modal-title">由全國新書資訊網取得書籍資訊</h4>
+                <h4 id="divmadal_findbook_title" class="modal-title">更多查詢書籍資訊</h4>
             </div>
-            <div style="padding:20px; background-color:#fafafa;">
+            <div style="padding:20px; background-color: #fff;">
 
-                <div id="divmadal_findbook_page_find" style="padding:10px;">
+                <div id="divmadal_findbook_page_find">
 
-                    <div class="form-group form-inline">
-                        <span style="display:inline-block; text-align:right; width:100px; margin-right:10px;">尋找：</span>
-                        <span>在</span>
-                        <select id="FO_SearchField0" class="form-control">
-                            <option value="Title" selected="">書名</option>
-                            <option value="Author">作者</option>
-                            <option value="PublisherShortTitle">出版者</option>
-                            <option value="SubjHeading">標題(主題詞)</option>
-                            <option value="SerialTitle">叢書名</option>
-                            <option value="ClassNo">分類號</option>
-                            <option value="ISBN">ISBN</option>
-                            <option value="Date_Sales">確認出版年月</option>
-                            <option value="PubMonth_Pre">預計出版年月</option>
-                        </select>
-                        <span>為</span>
-                        <input id="FO_SearchValue0" class="form-control" type="text">
+                    <ul class="nav nav-tabs">
+                        <li class="active" name="divmadal_findbook_tab_grp" mode="easy"><a href="#divmadal_findbook_tab_easy" data-toggle="tab" aria-expanded="true">簡易查詢</a></li>
+                        <li name="divmadal_findbook_tab_grp" mode="adv"><a href="#divmadal_findbook_tab_adv" data-toggle="tab" aria-expanded="false">進階查詢</a></li>
+                    </ul>
+
+                    <div class="tab-content" style="background-color:#fff;">
+
+                        <div id="divmadal_findbook_tab_easy" class="tab-pane active">
+                            <div style="margin:20px 0px 10px 0px;">輸入書籍ISBN或書名進行查詢：</div>
+                            
+                            <input id="mixvalue" type="text" class="form-control">
+
+                        </div>
+
+                        <div id="divmadal_findbook_tab_adv" class="tab-pane">
+                            <div style="margin:20px 0px;">輸入書籍相關資訊與條件進行查詢：</div>
+
+                            <div class="form-group form-inline">
+                                <span style="display:inline-block; text-align:right; width:100px; margin-right:10px;">尋找：</span>
+                                <span>在</span>
+                                <select id="FO_SearchField0" class="form-control">
+                                    <option value="Title" selected="">書名</option>
+                                    <option value="Author">作者</option>
+                                    <option value="PublisherShortTitle">出版者</option>
+                                    <option value="SubjHeading">標題(主題詞)</option>
+                                    <option value="SerialTitle">叢書名</option>
+                                    <option value="ClassNo">分類號</option>
+                                    <option value="ISBN">ISBN</option>
+                                    <option value="Date_Sales">確認出版年月</option>
+                                    <option value="PubMonth_Pre">預計出版年月</option>
+                                </select>
+                                <span>為</span>
+                                <input id="FO_SearchValue0" class="form-control" type="text">
+                            </div>
+
+                            <div class="form-group form-inline">
+                                <select id="FO_SchRe1ation1" class="form-control" style="width:100px; margin-right:10px;">
+                                    <option value="AND" selected>與(AND)</option>
+                                    <option value="OR">或(OR)</option>
+                                    <option value="NOT">非(NOT)</option>
+                                </select>
+                                <span>在</span>
+                                <select id="FO_SearchField1" class="form-control">
+                                    <option value="Title" selected="">書名</option>
+                                    <option value="Author">作者</option>
+                                    <option value="PublisherShortTitle">出版者</option>
+                                    <option value="SubjHeading">標題(主題詞)</option>
+                                    <option value="SerialTitle">叢書名</option>
+                                    <option value="ClassNo">分類號</option>
+                                    <option value="ISBN">ISBN</option>
+                                    <option value="Date_Sales">確認出版年月</option>
+                                    <option value="PubMonth_Pre">預計出版年月</option>
+                                </select>
+                                <span>為</span>
+                                <input id="FO_SearchValue1" class="form-control" type="text">
+                            </div>
+                            
+                            <div class="form-group form-inline">
+                                <select id="FO_SchRe1ation2" class="form-control" style="width:100px; margin-right:10px;">
+                                    <option value="AND" selected>與(AND)</option>
+                                    <option value="OR">或(OR)</option>
+                                    <option value="NOT">非(NOT)</option>
+                                </select>
+                                <span>在</span>
+                                <select id="FO_SearchField2" class="form-control">
+                                    <option value="Title" selected="">書名</option>
+                                    <option value="Author">作者</option>
+                                    <option value="PublisherShortTitle">出版者</option>
+                                    <option value="SubjHeading">標題(主題詞)</option>
+                                    <option value="SerialTitle">叢書名</option>
+                                    <option value="ClassNo">分類號</option>
+                                    <option value="ISBN">ISBN</option>
+                                    <option value="Date_Sales">確認出版年月</option>
+                                    <option value="PubMonth_Pre">預計出版年月</option>
+                                </select>
+                                <span>為</span>
+                                <input id="FO_SearchValue2" class="form-control" type="text">
+                            </div>
+                        
+                        </div>
+
                     </div>
 
-                    <div class="form-group form-inline">
-                        <select id="FO_SchRe1ation1" class="form-control" style="width:100px; margin-right:10px;">
-                            <option value="AND" selected>與(AND)</option>
-                            <option value="OR">或(OR)</option>
-                            <option value="NOT">非(NOT)</option>
-                        </select>
-                        <span>在</span>
-                        <select id="FO_SearchField1" class="form-control">
-                            <option value="Title" selected="">書名</option>
-                            <option value="Author">作者</option>
-                            <option value="PublisherShortTitle">出版者</option>
-                            <option value="SubjHeading">標題(主題詞)</option>
-                            <option value="SerialTitle">叢書名</option>
-                            <option value="ClassNo">分類號</option>
-                            <option value="ISBN">ISBN</option>
-                            <option value="Date_Sales">確認出版年月</option>
-                            <option value="PubMonth_Pre">預計出版年月</option>
-                        </select>
-                        <span>為</span>
-                        <input id="FO_SearchValue1" class="form-control" type="text">
-                    </div>
-                    
-                    <div class="form-group form-inline">
-                        <select id="FO_SchRe1ation2" class="form-control" style="width:100px; margin-right:10px;">
-                            <option value="AND" selected>與(AND)</option>
-                            <option value="OR">或(OR)</option>
-                            <option value="NOT">非(NOT)</option>
-                        </select>
-                        <span>在</span>
-                        <select id="FO_SearchField2" class="form-control">
-                            <option value="Title" selected="">書名</option>
-                            <option value="Author">作者</option>
-                            <option value="PublisherShortTitle">出版者</option>
-                            <option value="SubjHeading">標題(主題詞)</option>
-                            <option value="SerialTitle">叢書名</option>
-                            <option value="ClassNo">分類號</option>
-                            <option value="ISBN">ISBN</option>
-                            <option value="Date_Sales">確認出版年月</option>
-                            <option value="PubMonth_Pre">預計出版年月</option>
-                        </select>
-                        <span>為</span>
-                        <input id="FO_SearchValue2" class="form-control" type="text">
-                    </div>
-                
                 </div>
 
                 <div id="divmadal_findbook_page_pick">

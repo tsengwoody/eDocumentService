@@ -5,6 +5,39 @@
 {% endblock %}
 {% block content %}
 
+<script>
+
+	$(function(){
+
+		$.when(dffesc)
+		.done(function(){
+			getuserview_list()
+		})
+		
+	})
+
+	function getuserview_list(){
+
+		let url='/genericUser/view_list';
+
+		let transferData={
+			'query_field':'all',
+			'action':'role',
+		};
+
+		//aj_get
+		aj_get(url, transferData)
+		.done(function(data){
+			console.log(data);
+		})
+		.fail(function(data){
+			console.log(data);
+		})
+
+	}
+
+</script>
+
 <h3>使用者管理</h3>
 
 <div class="panel panel-default">

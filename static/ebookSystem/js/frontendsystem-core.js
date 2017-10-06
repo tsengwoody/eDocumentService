@@ -134,6 +134,9 @@ function cint(v) {
 function cstr(v) {
     //轉字串
 
+    if(iser(v)){
+        return '';
+    }
     return String(v);
 }
 
@@ -1067,7 +1070,95 @@ function aj_booklist(query_type, query_value){
 
 
 function aj_isbnnet(transferData){
-    //API使用get_book_info_list查找[全國新書資訊網]書籍資訊
+    //查找[全國新書資訊網]書籍資訊
+
+    return aj_querybooklist('NCL',transferData);
+}
+
+
+function aj_douban(value){
+    //用value查找[豆瓣]書籍資訊
+
+    let transferData={
+        'search_query':value,
+    };
+    return aj_querybooklist('douban',transferData);
+}
+
+
+function aj_isbnnet_and_douban(value){
+    //用value查找[全國新書資訊網]與[豆瓣]書籍資訊
+
+    //df
+    let df = $.Deferred();
+
+    //count
+    let df_isbnnet=$.Deferred();
+    let df_douban=$.Deferred();
+    let d_isbnnet=[];
+    let d_douban=[];
+
+    //aj_isbnnet
+    let transferData={
+        'FO_SchRe1ation0':'Null',
+        'FO_SearchField0':'Title',
+        'FO_SearchValue0':value,
+        'FO_SchRe1ation1':'OR',
+        'FO_SearchField1':'ISBN',
+        'FO_SearchValue1':value,
+        'FO_SchRe1ation2':'AND',
+        'FO_SearchField2':'',
+        'FO_SearchValue2':'',
+    };
+    aj_isbnnet(transferData)
+    .done(function(data){
+        console.log('aj_isbnnet done ',data)
+        d_isbnnet=data;
+    })
+    .fail(function(data){
+        console.log('aj_isbnnet fail',data)
+    })
+    .always(function(){
+        df_isbnnet.resolve();
+    })
+
+    //aj_douban
+    aj_douban(value)
+    .done(function(data){
+        console.log('aj_douban done ',data)
+        d_douban=data;
+    })
+    .fail(function(data){
+        console.log('aj_douban fail ',data)
+    })
+    .always(function(){
+        df_douban.resolve();
+    })
+
+    //when
+    $.when(df_isbnnet,df_douban)
+    .done(function(){
+
+        //r
+        let r=[];
+        _.each(d_isbnnet,function(v){
+            r.push(v);
+        })
+        _.each(d_douban,function(v){
+            r.push(v);
+        })
+
+        //resolve
+        df.resolve(r);
+
+    })
+   
+    return df;
+}
+
+
+function aj_querybooklist(source,transferData){
+    //使用get_book_info_list API
 
     //df
     let df = $.Deferred();
@@ -1087,6 +1178,7 @@ function aj_isbnnet(transferData){
     //     'FO_SearchField2':'',
     //     'FO_SearchValue2':'',
     // };
+    transferData['source']=source;
 
     //aj_post
     aj_post(url,transferData)
@@ -1110,14 +1202,15 @@ function aj_isbnnet(transferData){
                     // 'bookbinding':v[5], //裝訂冊數/裝訂方式
                     // 'classnumber':v[6], //圖書類號
                     // 'order':v[7], //版次/出版版次	
-                    'ISBN':v[0],
-                    '書名':v[1],
-                    '作者':v[2],
-                    '出版社':v[3], 
-                    '出版日期':v[4],
-                    '裝訂方式':v[5],
-                    '圖書類號':v[6],
-                    '版次':v[7],
+                    'ISBN':cstr(v[0]),
+                    '書名':cstr(v[1]),
+                    '作者':cstr(v[2]),
+                    '出版社':cstr(v[3]), 
+                    '出版日期':cstr(v[4]),
+                    '裝訂方式':cstr(v[5]),
+                    '圖書類號':cstr(v[6]),
+                    '版次':cstr(v[7]),
+                    '來源':cstr(source),
                 };
                 p.push(r);
             })

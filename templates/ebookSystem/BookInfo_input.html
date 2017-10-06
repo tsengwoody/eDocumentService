@@ -65,7 +65,8 @@
 
 		//transferData
 		let transferData={
-			'ISBN':ISBN
+			'ISBN':ISBN,
+			'source':'NCL',
 		}
 
 		//loading
@@ -88,6 +89,7 @@
                     .show();
             }
 			else{
+				console.log(data)
 
 				//show
 				//$('#id_ISBN').val(data.ISBN);
@@ -98,6 +100,7 @@
 				$('#id_bookbinding').val(data.bookbinding);
 				$('#id_chinese_book_category').val(data.chinese_book_category);
 				$('#id_order').val(data.order);
+				$('#id_source').val(data.source);
 				
 			}
 
@@ -136,6 +139,7 @@
 			$('#id_bookbinding').val(data['裝訂方式']);
 			$('#id_chinese_book_category').val(data['圖書類號']);
 			$('#id_order').val(data['版次']);
+			$('#id_source').val(data['來源']);
 			
 		})
 		
@@ -195,4 +199,11 @@
 	<div class="col-sm-3">
 		<input type="text" grp="changemode" class="form-control" id="id_order" name="order" readonly="true">
 	</div>
-</div>  
+</div>
+<div class="form-group">
+	<label class="control-label col-sm-2" for="id_source"><font style="color:red">*</font>來源：</label>
+	<div class="col-sm-3">
+		<input type="text" grp="changemode" class="form-control" id="id_source" name="order" readonly="true">
+	</div>
+</div>
+

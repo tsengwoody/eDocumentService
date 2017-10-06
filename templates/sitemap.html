@@ -73,13 +73,11 @@
 		_.each(s,function(v,k){
 			c+='<li style="margin-top:10px;">';
 			c+='<a sid="'+v['sid']+'" style="cursor:pointer;" onclick="connclick(this);">'+(k+1)+'. '+v['text']+'</a>';
-
+			
 			if(v['data'].length>0){
 				c+='<ul>';
 				_.each(v['data'],function(vv,kk){
-
 					c+='<li><a sid="'+vv['sid']+'" style="cursor:pointer;" onclick="connclick(this);">'+(k+1)+'.'+(kk+1)+'. '+vv['text']+'</a></li>';
-
 				})
 				c+='</ul>';
 			}
