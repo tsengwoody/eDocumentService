@@ -74,7 +74,7 @@
 			alertmessage('success', '查詢成功');
 
 			//show
-			//$('#id_ISBN').val(data['ISBN']);
+			$('#id_ISBN').val(data['ISBN']); //若查詢ISBN10會自動轉ISBN13，故要重新更新
 			$('#id_bookname').val(data['書名']);
 			$('#id_author').val(data['作者']);
 			$('#id_date').val(data['出版日期']);
