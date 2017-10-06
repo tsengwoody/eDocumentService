@@ -63,52 +63,40 @@
 			return;
 		}
 
-		//transferData
-		let transferData={
-			'ISBN':ISBN,
-			'source':'NCL',
-		}
-
 		//loading
 		BookfromISBN_loading();
 
-		//aj_send
-		aj_send('POST', '/ebookSystem/book_info/'+ISBN+'/', transferData)
+		//aj_isbnnetanddouban_ISBN
+		aj_isbnnetanddouban_ISBN(ISBN)
 		.done(function(data){
 
 			//alertmessage
-			alertmessage(data['status'], data['message']);
+			alertmessage('success', '查詢成功');
 
-			//解開readonly屬性由使用者自行輸入
-            if(data.message==='查無資料'){
-                $('#show_prop')
-                    .off()
-                    .on('click',function(){
-                        $('input[type="text"][grp="changemode"]').prop('readonly',false);
-                    })
-                    .show();
-            }
-			else{
-				console.log(data)
-
-				//show
-				//$('#id_ISBN').val(data.ISBN);
-				$('#id_bookname').val(data.bookname);
-				$('#id_author').val(data.author);
-				$('#id_date').val(data.date);
-				$('#id_house').val(data.house);
-				$('#id_bookbinding').val(data.bookbinding);
-				$('#id_chinese_book_category').val(data.chinese_book_category);
-				$('#id_order').val(data.order);
-				$('#id_source').val(data.source);
-				
-			}
+			//show
+			//$('#id_ISBN').val(data['ISBN']);
+			$('#id_bookname').val(data['書名']);
+			$('#id_author').val(data['作者']);
+			$('#id_date').val(data['出版日期']);
+			$('#id_house').val(data['出版社']);
+			$('#id_bookbinding').val(data['裝訂方式']);
+			$('#id_chinese_book_category').val(data['圖書類號']);
+			$('#id_order').val(data['版次']);
+			$('#id_source').val(data['來源']);
 
 		})
 		.fail(function(data){
 
 			//alertmessage
-			alertmessage(data['status'], data['message']);
+			alertmessage('error', data);
+
+			//解開readonly屬性由使用者自行輸入
+			$('#show_prop')
+				.off()
+				.on('click',function(){
+					$('input[type="text"][grp="changemode"]').prop('readonly',false);
+				})
+				.show();
 
 		})
 		.always(function(){

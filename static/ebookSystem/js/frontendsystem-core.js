@@ -1069,6 +1069,61 @@ function aj_booklist(query_type, query_value){
 }
 
 
+function aj_isbnnet_ISBN(ISBN){
+    //使用book_info API
+
+    //df
+    let df = $.Deferred();
+
+    //transferData
+    let transferData={
+        'ISBN':ISBN,
+        'source':'NCL',
+    }
+
+    //aj_send
+    aj_send('POST', '/ebookSystem/book_info/'+ISBN+'/', transferData)
+    .done(function(data){
+
+        //message
+        if(data.message==='查無資料'){
+
+            //reject
+            df.reject(data);
+
+        }
+        else{
+
+            //book
+            let book={
+                'ISBN':cstr(data.ISBN),
+                '書名':cstr(data.bookname),
+                '作者':cstr(data.author),
+                '出版社':cstr(data.house), 
+                '出版日期':cstr(data.date),
+                '裝訂方式':cstr(data.bookbinding),
+                '圖書類號':cstr(data.chinese_book_category),
+                '版次':cstr(data.order),
+                '來源':cstr('NCL'),
+            };
+
+            //resolve
+            df.resolve(book);
+            
+        }
+
+    })
+    .fail(function(data){
+
+        //reject
+        df.reject(data);
+
+    })
+
+    return df;
+}
+
+
 function aj_isbnnet(transferData){
     //查找[全國新書資訊網]書籍資訊
 
@@ -1086,13 +1141,87 @@ function aj_douban(value){
 }
 
 
-function aj_isbnnet_and_douban(value){
+function aj_isbnnetanddouban_ISBN(ISBN){
+    //用ISBN查找[全國新書資訊網]與[豆瓣]書籍資訊
+
+    //df
+    let df = $.Deferred();
+
+    //df, d
+    let df_isbnnet=$.Deferred();
+    let df_douban=$.Deferred();
+    let d_isbnnet=[];
+    let d_douban=[];
+
+    aj_isbnnet_ISBN(ISBN)
+    .done(function(data){
+        console.log('aj_isbnnet done ',data)
+        d_isbnnet=[data]; //回傳為單一物件轉陣列
+
+        //NCL優先，直接略過豆瓣查詢
+        df_douban.resolve(); 
+
+    })
+    .fail(function(data){
+        console.log('aj_isbnnet fail',data)
+    })
+    .always(function(){
+        df_isbnnet.resolve();
+    })
+
+    //aj_douban
+    aj_douban(ISBN)
+    .done(function(data){
+        console.log('aj_douban done ',data)
+        d_douban=data;
+    })
+    .fail(function(data){
+        console.log('aj_douban fail ',data)
+    })
+    .always(function(){
+        df_douban.resolve();
+    })
+
+    //when
+    $.when(df_isbnnet,df_douban)
+    .done(function(){
+
+        //r
+        let r=[];
+        _.each(d_isbnnet,function(v){
+            r.push(v);
+        })
+        _.each(d_douban,function(v){
+            r.push(v);
+        })
+
+        //no date
+        if(r.length===0){
+
+            //reject
+            df.reject('無書籍資料');
+
+        }
+        else{
+
+            //resolve
+            df.resolve(r[0]); //只針對合併後第一本回傳，有NCL時，豆瓣會因回傳較慢被直接取消
+
+        }
+
+    })
+   
+    return df;
+}
+
+
+function aj_isbnnetanddouban(value){
     //用value查找[全國新書資訊網]與[豆瓣]書籍資訊
 
     //df
     let df = $.Deferred();
 
-    //count
+    //df, d
     let df_isbnnet=$.Deferred();
     let df_douban=$.Deferred();
     let d_isbnnet=[];
@@ -1148,8 +1277,19 @@ function aj_isbnnet_and_douban(value){
             r.push(v);
         })
 
-        //resolve
-        df.resolve(r);
+        //no date
+        if(r.length===0){
+
+            //reject
+            df.reject('無書籍資料');
+
+        }
+        else{
+
+            //resolve
+            df.resolve(r);
+
+        }
 
     })
    
