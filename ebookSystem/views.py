@@ -962,3 +962,33 @@ def epub(request, ISBN):
 		download_path = book.path +'/OCR/{0}.epub'.format(ISBN)
 		download_filename = os.path.basename(download_path)
 		return locals()
+
+@http_response
+def library_view(request, template_name='ebookSystem/library_view_test.html'):
+	if request.method == 'GET':
+		if not request.user.is_guest:
+			status = 'error'
+			message = ''
+			return locals()
+		book = Book.objects.get(ISBN=request.GET['ISBN'])
+		if not book.status == book.STATUS['final']:
+			final_epub = book.path +'/OCR/{0}.epub'.format(book.ISBN)
+			try:
+				part_list = [ file.get_clean_file() for file in book.ebook_set.all() ]
+				from utils.epub import html2epub
+				info = {
+					'ISBN': book.book_info.ISBN,
+					'bookname': book.book_info.bookname,
+					'author': book.book_info.author,
+					'date': str(book.book_info.date),
+					'house': book.book_info.house,
+					'language': 'zh',
+				}
+				html2epub(part_list, final_epub, **info)
+			except BaseException as e:
+				raise SystemError('epub create fail (not final):' +unicode(e))
+
+		path = '{0}/OCR/{0}.epub'.format(book.ISBN)
+		import base64
+		base64_path = base64.b64encode(path)
+		return locals()

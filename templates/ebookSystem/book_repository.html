@@ -47,7 +47,7 @@
 			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="receivebook(this, false, 'email')">寄到信箱</button>
 			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="receivebook(this, false, 'download')">下載</button>
 			{% if request.user.is_superuser %}
-			<a class="btn btn-link" role="button" href="/static/readium/cloud-reader-lite/index.html?epub=/epub/${ISBN}/OCR/${ISBN}.epub" >閱讀</a>
+			<a class="btn btn-link" role="button" href="{%url 'ebookSystem:library_view' %}?ISBN=${ISBN}" >閱讀</a>
 			{% endif %}
 			{% endif %}
 		</td>

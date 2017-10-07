@@ -1,0 +1,34 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+{{ book.book_info.bookname }} | 閱讀
+{% endblock %}
+{% block resource%}
+    <script type="text/javascript" src="/static/ebookSystem/js/jquery/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="/static/ebookSystem/js/frontendsystem-core.js"></script>
+    
+    <script type="text/javascript">
+        $(function(){
+
+            //let p=urlparam();
+            //document.title=decodeURIComponent(p.bookname);
+
+            $('html, body, iframe').css({
+                margin: 0,
+                padding: 0,
+                border: 0,
+                width: '100%',
+                height: '100%',
+                overflowY: 'hidden',
+            });
+
+            $('iframe').attr('src','/static/ebookSystem/framework/readium/cloud-reader-lite/index.html?timetag='+Date.now()+'&view={{ base64_path }}')
+
+        })
+    </script>
+{% endblock%}
+{% block header %}
+{{ book.bookname }}
+{% endblock %}
+{% block content %}
+<iframe></iframe>
+{% endblock %}

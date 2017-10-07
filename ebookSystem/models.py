@@ -185,32 +185,20 @@ class Book(models.Model):
 		except BaseException as e:
 			raise e
 
-	def zip(self, user, password):
-		from django.contrib.auth import authenticate
-		from ebooklib import epub
-		import pyminizip
-		user = authenticate(username=user.username, password=password)
-		if user is None:
-			raise SystemError(u'密碼輸入不正確')
-		custom_zip = self.path +'/temp/{0}_{1}.zip'.format(self.ISBN, user.username)
-		if not os.path.exists(os.path.dirname(custom_zip)):
-			os.mkdir(os.path.dirname(custom_zip))
+	def custom_epub_create(self, custom_epub, user):
 		self.check_status()
-
 		#準備epub文件
+		from ebooklib import epub
 		if self.status == self.STATUS['final']:
-			final_epub = self.path +'/OCR/{0}.epub'.format(self.ISBN, )
-			custom_epub = self.path +'/temp/{0}_{1}.epub'.format(self.ISBN, user.username)
+			final_epub = self.path +'/OCR/{0}.epub'.format(self.ISBN)
 			try:
 				book = epub.read_epub(final_epub)
 				book.set_identifier(user.username)
 				epub.write_epub(custom_epub, book, {})
 			except BaseException as e:
 				raise SystemError('epub create fail:' +unicode(e))
-			zip_list = [custom_epub]
 		else:
-			final_epub = self.path +'/temp/{0}_{1}.temp'.format(self.ISBN, user.username)
-			custom_epub = self.path +'/temp/{0}_{1}.epub'.format(self.ISBN, user.username)
+			final_epub = self.path +'/temp/{0}.temp'.format(self.ISBN)
 			try:
 				part_list = [ file.get_clean_file() for file in self.ebook_set.all() ]
 				from utils.epub import html2epub
@@ -228,9 +216,24 @@ class Book(models.Model):
 				epub.write_epub(custom_epub, book, {})
 			except BaseException as e:
 				raise SystemError('epub create fail (not final):' +unicode(e))
-			zip_list = [custom_epub]
+
+		return custom_epub
+
+	def zip(self, user, password):
+		from django.contrib.auth import authenticate
+		user = authenticate(username=user.username, password=password)
+		if user is None:
+			raise SystemError(u'密碼輸入不正確')
+
+		custom_epub = self.path +'/temp/{0}_{1}.epub'.format(self.ISBN, user.username)
+		if not os.path.exists(os.path.dirname(custom_epub)):
+			os.mkdir(os.path.dirname(custom_epub))
+		custom_epub = self.custom_epub_create(custom_epub, user)
 
 		#加入壓縮檔內
+		import pyminizip
+		custom_zip = self.path +'/temp/{0}_{1}.zip'.format(self.ISBN, user.username)
+		zip_list = [custom_epub]
 		try:
 			pyminizip.compress_multiple(zip_list, custom_zip, password, 5)
 			return custom_zip
@@ -707,10 +710,34 @@ class GetBookRecord(models.Model):
 	def __unicode__(self):
 		return u'{0}-{1}'.format(self.book, self.user)
 
-'''class ApplyDocumentAction(models.Model):
-	from genericUser.models import Organization
-	book_info = models.ForeignKey(BookInfo)
-	org = models.ForeignKey(Organization, blank=True, null=True)'''
+class LibraryRecord(models.Model):
+	user = models.ForeignKey(User, related_name='libraryrecord_set')
+	book = models.ForeignKey(Book, related_name='libraryrecord_set')
+	check_out_time = models.DateTimeField(blank=True, null=True)
+	check_in_time = models.DateTimeField(blank=True, null=True)
+	status = models.BooleanField(default=False)
+
+	def __unicode__(self):
+		return u'{0}-{1}'.format(self.book, self.user)
+
+	def check_out(self):
+		self.check_out_time = timezone.now()
+		self.status = True
+		self.save()
+
+		custom_epub = BASE_DIR +'/file/ebookSystem/library/{0}.epub'.format(self.id)
+		if not os.path.exists(os.path.dirname(custom_epub)):
+			os.mkdir(os.path.dirname(custom_epub))
+		custom_epub = self.book.custom_epub_create(custom_epub, self.user)
+		return custom_epub
+
+	def check_in(self):
+		self.check_in_time = timezone.now()
+		self.status = False
+		self.save()
+		custom_epub = BASE_DIR +'/file/ebookSystem/library/{0}.epub'.format(self.id)
+		shutil.rmtree(custom_epub)
+		return 1
 
 class EditRecord(models.Model):
 	part = models.ForeignKey(EBook, blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')

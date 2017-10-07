@@ -8,11 +8,11 @@ import requests
 import urllib,urllib2
 from bs4 import BeautifulSoup
 from selenium import webdriver
-
+LOG_DIR = os.path.dirname(os.path.abspath(__file__))
 
 #=====douban=====
 def get_douban_bookinfo(ISBN):
-	browser = webdriver.PhantomJS()
+	browser = webdriver.PhantomJS(service_log_path=LOG_DIR +'/ghostdriver.log')
 	url = u'https://book.douban.com/subject_search'
 	values = {}
 	values['search_text'] = ISBN.encode('utf-8')
@@ -87,7 +87,7 @@ def get_douban_bookinfo(ISBN):
 	return [get_ISBN, bookname, author, house, date, bookbinding]
 
 def get_douban_bookinfo_list(query_text):
-	browser = webdriver.PhantomJS()
+	browser = webdriver.PhantomJS(service_log_path=LOG_DIR +'/ghostdriver.log')
 	url = u'https://book.douban.com/subject_search'
 	values = {}
 	values['search_text'] = query_text.encode('utf-8')
@@ -367,8 +367,6 @@ def ISBN10_to_ISBN13(ISBN):
 import sys
 if __name__ == '__main__':
 	r = get_ncl_bookinfo(u'9789573321569')
-	print r[1]
-	r = get_douban_bookinfo(u'9789571073125')
 	print r[1]
 	r = get_douban_bookinfo(u'9787801871527')
 	print r[1]
