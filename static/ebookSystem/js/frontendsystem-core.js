@@ -120,6 +120,27 @@
 // }
 
 
+function urlparam() {
+    //解析網址參數
+
+    //url
+    let url = location.search;
+
+    //ar
+    let ar = {};
+    if (url.indexOf("?") != -1) {
+        var param = url.split("?");
+        var data = param[1].split("&");
+        for (let i = 0; i < data.length; i++) {
+            var s = data[i].split("=");
+            ar[s[0]] = s[1];
+        }
+    }
+    
+    return ar;
+}
+
+
 function cint(v) {
     //轉整數
 
