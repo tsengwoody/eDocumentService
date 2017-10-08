@@ -722,6 +722,7 @@ class LibraryRecord(models.Model):
 
 	def check_out(self):
 		self.check_out_time = timezone.now()
+		self.check_in_time = self.check_out_time +datetime.timedelta(days=30)
 		self.status = True
 		self.save()
 
@@ -737,7 +738,7 @@ class LibraryRecord(models.Model):
 		self.save()
 		custom_epub = BASE_DIR +'/file/ebookSystem/library/{0}.epub'.format(self.id)
 		shutil.rmtree(custom_epub)
-		return 1
+		return custom_epub
 
 class EditRecord(models.Model):
 	part = models.ForeignKey(EBook, blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')

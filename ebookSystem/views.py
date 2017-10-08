@@ -39,11 +39,6 @@ fh.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(fh)
 
-#class book_list(generic.ListView):
-#	model = Book
-#	def get_queryset(self):
-#		return Book.objects.order_by('-ISBN')
-
 @http_response
 def mathml(request, template_name='ebookSystem/editor.html'):
 	if request.method == 'POST':
@@ -223,28 +218,6 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 			for event in events:
 				event.response(status='error', message=request.POST['reason'], user=request.user)
 		redirect_to = reverse('manager:event_list', kwargs={'action':'ebook' })
-		return locals()
-
-@view_permission
-@http_response
-def review_ReviseContentAction(request, id, template_name='ebookSystem/review_ReviseContentAction.html'):
-	try:
-		action = ReviseContentAction.objects.get(id=id)
-	except:
-		raise Http404("book does not exist")
-	result = action.ebook.fuzzy_string_search(string = action.content, length=10, action='-final')
-	if request.method == 'GET':
-		if len(result) == 1:
-			status = 'success'
-			message = u'成功搜尋到修政文字段落'
-		elif len(result) == 0:
-			status = 'error'
-			message = u'搜尋不到修政文字段落，請重新輸入並多傳送些文字'
-		else:
-			status = 'error'
-			message = u'搜尋到多處修政文字段落，請重新輸入並多傳送些文字'
-		return locals()
-	if request.method == 'POST':
 		return locals()
 
 @view_permission
@@ -991,4 +964,26 @@ def library_view(request, template_name='ebookSystem/library_view_test.html'):
 		path = '{0}/OCR/{0}.epub'.format(book.ISBN)
 		import base64
 		base64_path = base64.b64encode(path)
+		return locals()
+
+@http_response
+def book_saelf(request, template_name='ebookSystem/book_saelf.html'):
+	if request.method == 'GET':
+		lr_out_list = LibraryRecord.objects.filter(user=request.user, status=True)
+		lr_in_list = LibraryRecord.objects.filter(user=request.user, status=False)
+		return locals()
+
+@http_response
+def library_action(request, ):
+	if request.method == 'POST' and request.is_ajax():
+		if request.POST['action'] == 'check_out':
+			book = Book.objects.get(ISBN=request.POST['ISBN'])
+			lr = LibraryRecord.objects.create(user=request.user, book=book)
+			lr.check_out()
+			status = 'success'
+			message = u'成功借閱書籍{0}'.format(book)
+		elif request.POST['action'] == 'check_in':
+			lr.check_in()
+			status = 'success'
+			message = u'成功歸還書籍{0}'.format(book)
 		return locals()

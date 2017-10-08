@@ -1,0 +1,46 @@
+﻿{% extends "base_nav.html" %}
+{% load staticfiles %}
+{% block title %}
+借閱書櫃
+{% endblock %}
+{% block header %}
+借閱書櫃
+{% endblock %}
+{% block content %}
+
+<h3>借閱書櫃</h3>
+<h4>正借閱書籍</h4>
+<table>
+	<tr>
+		<th>書名</th>
+		<th>借出日期</th>
+		<th>到期日期</th>
+		<th colspan="2">動作</th>
+	</tr>
+	{% for lr in lr_out_list %}
+	<tr>
+		<td>{{ lr.book }}</td>
+		<td>{{ lr.check_out_time }}</td>
+		<td>{{ lr.check_in_time }}</td>
+		<td><a class="btn btn-link" role="button" href="{%url 'ebookSystem:library_view' %}?ISBN={{ lr.book.ISBN }}" >閱讀</a></td>
+		<td><button type="button" class="btn btn-default" id={{ lr.id }} onclick="library_action(this, false, 'check_in')">歸還</button></td>
+	</tr>
+{% endfor %}
+</table>
+
+<h4>借閱歷史紀錄</h4>
+<table>
+	<tr>
+		<th>書名</th>
+		<th>借出日期</th>
+		<th>歸還日期</th>
+	</tr>
+	{% for lr in lr_in_list %}
+	<tr>
+		<td>{{ lr.book }}</td>
+		<td>{{ lr.check_out_time }}</td>
+		<td>{{ lr.check_in_time }}</td>
+	</tr>
+{% endfor %}
+</table>
+{% endblock %}

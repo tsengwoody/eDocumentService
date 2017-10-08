@@ -74,6 +74,7 @@
 				</li>
 				{% if request.user.is_guest %}
 				<li><a href="{% url 'guest:book_repository' %}">校對進度</a></li>
+				<li><a href="{% url 'ebookSystem:book_saelf' %}">借閱書櫃</a></li>
 				{% endif %}
 				{% if request.user.is_superuser %}
 				<li><a href="{% url 'account:an_service' %}">分析</a></li>

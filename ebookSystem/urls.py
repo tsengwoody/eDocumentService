@@ -18,7 +18,6 @@ urlpatterns = [
 	url(r'^review_document/(?P<book_ISBN>[0-9]+)/$', views.review_document, name='review_document'),
 	url(r'^review_part/(?P<ISBN_part>[\d-]+)/$', views.review_part, name='review_part'),
 	url(r'^review_ApplyDocumentAction/(?P<id>[\d-]+)/$', views.review_ApplyDocumentAction, name='review_ApplyDocumentAction'),
-	url(r'^review_ReviseContentAction/(?P<id>[\d-]+)/$', views.review_ReviseContentAction, name='review_ReviseContentAction'),
 #
 	url(r'^book_download/(?P<ISBN>[0-9]+)$', views.book_download, name='book_download'),
 	url(r'^ebook_download/(?P<ISBN_part>[0-9\-]+)$', views.ebook_download, name='ebook_download'),
@@ -31,4 +30,6 @@ urlpatterns = [
 	url(r'^getbookrecord_user/(?P<ID>\d+)/$', views.getbookrecord_user, name='getbookrecord_user'),
 	url(r'^epub/(?P<ISBN>[0-9Xx]+)/$', views.epub, name='epub'),
 	url(r'^library_view$', views.library_view, name='library_view'),
+	url(r'^library_action$', views.library_action, name='library_action'),
+	url(r'^book_saelf$', views.book_saelf, name='book_saelf'),
 ]

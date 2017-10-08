@@ -44,11 +44,9 @@
 		<td style="vertical-align: top; padding:5px;">${date}</td>
 		<td style="vertical-align: top; padding:5px;">
 			{% if request.user.is_guest %}
-			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="receivebook(this, false, 'email')">寄到信箱</button>
-			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="receivebook(this, false, 'download')">下載</button>
-			{% if request.user.is_superuser %}
 			<a class="btn btn-link" role="button" href="{%url 'ebookSystem:library_view' %}?ISBN=${ISBN}" >閱讀</a>
-			{% endif %}
+			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="receivebook(this, false, 'download')">下載</button>
+			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="library_action(this, false, 'check_out')">借閱</button>
 			{% endif %}
 		</td>
 	</tr>

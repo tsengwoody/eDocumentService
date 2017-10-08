@@ -393,3 +393,18 @@ class Command(BaseCommand):
 
 		QAndA.objects.create(question='<p>question 1</p>', answer='<p>answer 1</p>', )
 		QAndA.objects.create(question='<p>question 2</p>', answer='<p>answer 2</p>', )
+
+		client = Client()
+		client.login(username='root', password='root')
+		previous_count = len(LibraryRecord.objects.all())
+		response = client.post(
+			reverse(
+				'ebookSystem:library_action'
+			),
+			{
+				'ISBN': '9789863981459',
+				'action': 'check_out',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		assert len(LibraryRecord.objects.all()) == previous_count +1, 'create announcement fail'
