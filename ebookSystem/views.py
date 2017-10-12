@@ -970,7 +970,7 @@ def library_view(request, template_name='ebookSystem/library_view_test.html'):
 				raise SystemError('epub create fail (not final):' +unicode(e))
 
 		token = uuid.uuid4().hex
-		cache.set('token.' +request.user.id, token, 100)
+		#cache.set('token.' +request.user.id, token, 100)
 		path = book.ISBN
 		import base64
 		base64_path = base64.b64encode(path)
