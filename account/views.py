@@ -13,7 +13,6 @@ from utils.decorator import *
 import datetime
 GET_MAX_PART = 3
 
-@view_permission
 @http_response
 def service(request, template_name='account/service.html'):
 	editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
@@ -113,7 +112,6 @@ def service(request, template_name='account/service.html'):
 	if request.method == 'GET':
 		return locals()
 
-@view_permission
 @http_response
 def sc_service(request, template_name='account/sc_service.html'):
 	sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(status=EBook.STATUS['sc_edit'])

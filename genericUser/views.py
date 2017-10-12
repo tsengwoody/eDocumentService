@@ -101,8 +101,6 @@ def upload_progress(request):
 	else:
 		return HttpResponseServerError('Server Error: You must provide X-Progress-ID header or query param.')
 
-
-@view_permission
 @http_response
 def apply_document(request, template_name='genericUser/apply_document.html'):
 	BookInfoForm = modelform_factory(BookInfo, fields=('bookname', 'author', 'house', 'date', 'bookbinding', 'chinese_book_category', 'order'))
@@ -128,7 +126,7 @@ def apply_document(request, template_name='genericUser/apply_document.html'):
 	if request.method == 'GET':
 		return locals()
 
-@view_permission
+@user_category_check(['manager'])
 def event_list(request):
 	events = Event.objects.filter(creater=request.user)
 	template_name = 'genericUser/event_list.html'
@@ -157,7 +155,7 @@ def license(request, template_name='genericUser/license.html'):
 def func_desc(request, template_name='genericUser/func_desc.html'):
 	return render(request, template_name, locals())
 
-@view_permission
+@user_category_check(['manager'])
 @http_response
 def review_user(request, username, template_name='genericUser/review_user.html'):
 	try:
@@ -258,7 +256,6 @@ def change_contact_info(request, template_name):
 		userForm = UserForm(instance=request.user)
 		return locals()
 
-@view_permission
 @http_response
 def serviceinfo_list(request, username, template_name='genericUser/serviceinfo_list.html'):
 	try:

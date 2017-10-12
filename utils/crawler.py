@@ -227,42 +227,43 @@ def get_ncl_bookinfo(ISBN):
 		data_tags = soup.find_all('td', class_=u'資料列_1')
 		advance_info = data_tags[14:]
 
-		get_ISBN = unicode(advance_info[0].string).replace(u' ', '')
-		pattern = re.compile(r'(\d{13,13}).*')
-		try:
-			get_ISBN = pattern.search(get_ISBN).group(1)
-		except:
-			get_ISBN = ''
-		if get_ISBN == ISBN:
-			break
+		for j in range(len(advance_info)):
+			get_ISBN = unicode(advance_info[j*7 +0].string).replace(u' ', '')
+			pattern = re.compile(r'(\d{13,13}).*')
+			try:
+				get_ISBN = pattern.search(get_ISBN).group(1)
+			except:
+				get_ISBN = ''
+			if not get_ISBN == ISBN:
+				continue
 
+			bookname = unicode(data_tags[1].string).replace(u' ', '')
+			author = unicode(data_tags[3].string).replace(u' ', '')
+			house = unicode(data_tags[5].string).replace(u' ', '')
+			date = unicode(advance_info[j*7 +4].string).replace(u' ', '')
+			year = int(date.split('/')[0]) +1911
+			month = int(date.split('/')[1])
+			date = unicode(datetime.date(year,month,1))
 
-	bookname = unicode(data_tags[1].string).replace(u' ', '')
-	author = unicode(data_tags[3].string).replace(u' ', '')
-	house = unicode(data_tags[5].string).replace(u' ', '')
-	date = unicode(advance_info[4].string).replace(u' ', '')
-	year = int(date.split('/')[0]) +1911
-	month = int(date.split('/')[1])
-	date = unicode(datetime.date(year,month,1))
+			try:
+				bookbinding = unicode(advance_info[j*7 +0].string).replace(u' ', '')
+				pattern = re.compile(r'\((.*)\)')
+				bookbinding = pattern.search(bookbinding).group(1)
+			except BaseException as e:
+				bookbinding = ''
+			try:
+				chinese_book_category = unicode(data_tags[9].string).replace(u' ', '')
+				pattern = re.compile(r'(\d{3,3}).*')
+				chinese_book_category = pattern.search(chinese_book_category).group(1)
+			except BaseException as e:
+				chinese_book_category = ''
+			try:
+				order = unicode(data_tags[7].string).replace(u' ', '')
+			except BaseException as e:
+				order = ''
+			return [get_ISBN, bookname, author, house, date, bookbinding, chinese_book_category, order]
 
-	try:
-		bookbinding = unicode(advance_info[0].string).replace(u' ', '')
-		pattern = re.compile(r'\((.*)\)')
-		bookbinding = pattern.search(bookbinding).group(1)
-	except BaseException as e:
-		bookbinding = ''
-	try:
-		chinese_book_category = unicode(data_tags[9].string).replace(u' ', '')
-		pattern = re.compile(r'(\d{3,3}).*')
-		chinese_book_category = pattern.search(chinese_book_category).group(1)
-	except BaseException as e:
-		chinese_book_category = ''
-	try:
-		order = unicode(data_tags[7].string).replace(u' ', '')
-	except BaseException as e:
-		order = ''
-
-	return [get_ISBN, bookname, author, house, date, bookbinding, chinese_book_category, order]
+	return []
 
 def get_ncl_bookinfo_list(query_dict):
 	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/H30_SearchBooks.php'
@@ -301,38 +302,39 @@ def get_ncl_bookinfo_list(query_dict):
 		data_tags = soup.find_all('td', class_=u'資料列_1')
 		advance_info = data_tags[14:]
 
-		try:
-			get_ISBN = unicode(advance_info[0].string).replace(u' ', '')
-			pattern = re.compile(r'(\d{13,13}).*')
-			get_ISBN = pattern.search(get_ISBN).group(1)
-			bookname = unicode(data_tags[1].string).replace(u' ', '')
-			author = unicode(data_tags[3].string).replace(u' ', '')
-			house = unicode(data_tags[5].string).replace(u' ', '')
-			date = unicode(advance_info[4].string).replace(u' ', '')
-			year = int(date.split('/')[0]) +1911
-			month = int(date.split('/')[1])
-			date = unicode(datetime.date(year,month,1))
-		except BaseException as e:
-			continue
+		for j in range(len(advance_info)):
+			try:
+				get_ISBN = unicode(advance_info[7*j +0].string).replace(u' ', '')
+				pattern = re.compile(r'(\d{13,13}).*')
+				get_ISBN = pattern.search(get_ISBN).group(1)
+				bookname = unicode(data_tags[1].string).replace(u' ', '')
+				author = unicode(data_tags[3].string).replace(u' ', '')
+				house = unicode(data_tags[5].string).replace(u' ', '')
+				date = unicode(advance_info[j*7 +4].string).replace(u' ', '')
+				year = int(date.split('/')[0]) +1911
+				month = int(date.split('/')[1])
+				date = unicode(datetime.date(year,month,1))
+			except BaseException as e:
+				continue
 
-		try:
-			bookbinding = unicode(advance_info[0].string).replace(u' ', '')
-			pattern = re.compile(r'\((.*)\)')
-			bookbinding = pattern.search(bookbinding).group(1)
-		except BaseException as e:
-			bookbinding = ''
-		try:
-			chinese_book_category = unicode(data_tags[9].string).replace(u' ', '')
-			pattern = re.compile(r'(\d{3,3}).*')
-			chinese_book_category = pattern.search(chinese_book_category).group(1)
-		except BaseException as e:
-			chinese_book_category = ''
-		try:
-			order = unicode(data_tags[7].string).replace(u' ', '')
-		except BaseException as e:
-			order = ''
+			try:
+				bookbinding = unicode(advance_info[j*7 +0].string).replace(u' ', '')
+				pattern = re.compile(r'\((.*)\)')
+				bookbinding = pattern.search(bookbinding).group(1)
+			except BaseException as e:
+				bookbinding = ''
+			try:
+				chinese_book_category = unicode(data_tags[9].string).replace(u' ', '')
+				pattern = re.compile(r'(\d{3,3}).*')
+				chinese_book_category = pattern.search(chinese_book_category).group(1)
+			except BaseException as e:
+				chinese_book_category = ''
+			try:
+				order = unicode(data_tags[7].string).replace(u' ', '')
+			except BaseException as e:
+				order = ''
 
-		bookinfo_list.append((get_ISBN, bookname, author, house, date, bookbinding, chinese_book_category, order, ))
+			bookinfo_list.append((get_ISBN, bookname, author, house, date, bookbinding, chinese_book_category, order, ))
 
 	return bookinfo_list
 

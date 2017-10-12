@@ -1,10 +1,55 @@
 ﻿# coding: utf-8
 from django.core.urlresolvers import reverse, resolve
-from django.http import HttpResponse,HttpResponseRedirect
+from django.http import HttpResponse,HttpResponseRedirect, FileResponse
 from django.shortcuts import render
 import json
 
 from genericUser.models import View
+
+def user_category_check(category):
+	def user_category_out(view):
+		def user_category_in(request, *args, **kwargs):
+			response = {}
+			if not request.user.is_authenticated():
+				template_name = 'user_category_check.html'
+				redirect_to = reverse('login')
+				status = 'error'
+				message = u'您尚未登錄'
+				response['redirect_to'] = redirect_to
+				response['status'] = status
+				response['message'] = message
+				if request.is_ajax():
+					return HttpResponse(json.dumps(response), content_type="application/json")
+				else:
+					return render(request, template_name, locals())
+			if 'user' in category and request.user.authentication():
+				return view(request, *args, **kwargs)
+			for permission in [
+				'editor',
+				'guest',
+				'manager',
+				'advanced_editor',
+				'staff',
+				'superuser',
+			]:
+				if permission in category and getattr(request.user, 'is_' +permission):
+					return view(request, *args, **kwargs)
+
+			#無權限
+			template_name = 'user_category_check.html'
+			redirect_to = reverse('login')
+			status = 'error'
+			message = u'帳號無權限'
+			response['redirect_to'] = redirect_to
+			response['status'] = status
+			response['message'] = message
+			if request.is_ajax():
+				return HttpResponse(json.dumps(response), content_type="application/json")
+			else:
+				return render(request, template_name, locals())
+
+		return user_category_in
+	return user_category_out
 
 def view_permission(view):
 	def decorator(request, *args, **kwargs):
@@ -57,9 +102,8 @@ def http_response(view):
 			elif 'permission_denied' in rend_dict:
 				response['permission_denied'] = rend_dict['permission_denied']
 			elif 'download_path' in rend_dict:
-				with open(rend_dict['download_path'], 'rb') as content_file:
-					response = HttpResponse(content=content_file, )
-				response['Content-Type'] = 'application/octet-stream'
+				fullpath = rend_dict['download_path']
+				response = FileResponse(open(fullpath, 'rb'), content_type='application/octet-stream')
 				response['Content-Disposition'] = u'attachment; filename="{0}"'.format(rend_dict['download_filename']).encode('utf-8')
 				return response
 			response['status'] = rend_dict['status']
@@ -74,9 +118,8 @@ def http_response(view):
 			elif 'redirect_to' in rend_dict:
 				return HttpResponseRedirect(rend_dict['redirect_to'])
 			elif 'download_path' in rend_dict:
-				with open(rend_dict['download_path'], 'rb') as content_file:
-					response = HttpResponse(content=content_file, )
-				response['Content-Type'] = 'application/octet-stream'
+				fullpath = rend_dict['download_path']
+				response = FileResponse(open(fullpath, 'rb'), content_type='application/octet-stream')
 				response['Content-Disposition'] = u'attachment; filename="{0}"'.format(rend_dict['download_filename']).encode('utf-8')
 				return response
 			else:

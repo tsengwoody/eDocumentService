@@ -85,7 +85,7 @@ def tinymce_demo(request, template_name='ebookSystem/tinymce_demo.html'):
 		message = u'get'
 		return locals()
 
-@view_permission
+@user_category_check(['superuser'])
 @http_response
 def book_list_manager(request, template_name='ebookSystem/book_list_manager.html'):
 	books = Book.objects.all()
@@ -95,7 +95,7 @@ def book_list_manager(request, template_name='ebookSystem/book_list_manager.html
 	if request.method == 'GET':
 		return locals()
 
-@view_permission
+@user_category_check(['manager'])
 @http_response
 def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
 	try:
@@ -134,7 +134,6 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		redirect_to = reverse('manager:event_list', kwargs={'action':'book' })
 		return locals()
 
-@view_permission
 @http_response
 def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.html'):
 	try:
@@ -189,7 +188,7 @@ def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.htm
 			redirect_to = reverse('account:an_service')
 			return locals()
 
-@view_permission
+@user_category_check(['manager'])
 @http_response
 def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'):
 	try:
@@ -220,7 +219,6 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 		redirect_to = reverse('manager:event_list', kwargs={'action':'ebook' })
 		return locals()
 
-@view_permission
 @http_response
 def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_ApplyDocumentAction.html'):
 	from utils.uploadFile import handle_uploaded_file
@@ -292,7 +290,6 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 	if request.method == 'GET':
 		return locals()
 
-@view_permission
 @http_response
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	users = User.objects.all()
@@ -330,7 +327,7 @@ def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	if request.method == 'GET':
 		return locals()
 
-@view_permission
+@user_category_check(['manager'])
 @http_response
 def detail_manager(request, book_ISBN, template_name='ebookSystem/detail_manager.html'):
 	try:
@@ -364,7 +361,6 @@ def detail_manager(request, book_ISBN, template_name='ebookSystem/detail_manager
 	if request.method == 'GET':
 		return locals()
 
-@view_permission
 @http_response
 def edit_log(request, ISBN_part, template_name='ebookSystem/edit_log.html'):
 	try:
@@ -490,7 +486,6 @@ def edit_ajax(request, ISBN_part, *args, **kwargs):
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 @cache_control(no_store=True, no_cache=True, max_age=0)
-@view_permission
 @http_response
 def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args, **kwargs):
 	logger.info('{}/edit\t{}'.format(request.user, resolve(request.path).namespace))
@@ -555,7 +550,6 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 		request.session['postToken'] = postToken
 		return locals()
 
-@view_permission
 @http_response
 def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
 	try:
@@ -572,6 +566,7 @@ def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
 		return locals()
 
 #==========
+@user_category_check(['guest'])
 @http_response
 def book_download(request, ISBN, ):
 	if request.method == 'POST' and request.is_ajax():
@@ -666,7 +661,6 @@ def message_send(request, template_name='ebookSystem/message_send.html', ):
 	if request.method == 'GET':
 		return locals()
 
-@view_permission
 @http_response
 def book_create(request, template_name='ebookSystem/book_create.html'):
 	if request.method == 'POST':
@@ -747,7 +741,8 @@ def book_create(request, template_name='ebookSystem/book_create.html'):
 		return locals()
 
 from utils.uploadFile import handle_uploaded_file
-@view_permission
+
+@user_category_check(['manager'])
 @http_response
 def book_upload(request, template_name='ebookSystem/book_upload.html'):
 	if request.method == 'POST':
@@ -847,6 +842,7 @@ def book_upload(request, template_name='ebookSystem/book_upload.html'):
 		return locals()
 
 from django.contrib.auth import authenticate
+@user_category_check(['manager'])
 @http_response
 def book_delete(request, ISBN, ):
 	if request.method == 'POST' and request.is_ajax():
@@ -928,13 +924,25 @@ def getbookrecord_user(request, ID, template_name='ebookSystem/getbookrecord_use
 	if request.method == 'GET':
 		return locals()
 
-@http_response
+import mimetypes
+import os
+from django.http import FileResponse, Http404, HttpResponse, HttpResponseNotModified
+
 def epub(request, ISBN):
 	book = Book.objects.get(ISBN=ISBN)
-	if request.method == 'GET':
-		download_path = book.path +'/OCR/{0}.epub'.format(ISBN)
-		download_filename = os.path.basename(download_path)
-		return locals()
+#	fullpath = book.path +'/OCR/{0}.epub'.format(book.ISBN)
+	fullpath = '/django/eDocumentService/file/ebookSystem/document/9789863981459/OCR/9789863981459.epub'
+
+	statobj = os.stat(fullpath)
+	content_type, encoding = mimetypes.guess_type(fullpath)
+	content_type = content_type or 'application/octet-stream'
+	response = FileResponse(open(fullpath, 'rb'), content_type=content_type)
+#	response["Last-Modified"] = http_date(statobj.st_mtime)
+#	if stat.S_ISREG(statobj.st_mode):
+#		response["Content-Length"] = statobj.st_size
+	if encoding:
+		response["Content-Encoding"] = encoding
+	return response
 
 @http_response
 def library_view(request, template_name='ebookSystem/library_view_test.html'):
@@ -961,7 +969,9 @@ def library_view(request, template_name='ebookSystem/library_view_test.html'):
 			except BaseException as e:
 				raise SystemError('epub create fail (not final):' +unicode(e))
 
-		path = '{0}/OCR/{0}.epub'.format(book.ISBN)
+		token = uuid.uuid4().hex
+		cache.set('token.' +request.user.id, token, 100)
+		path = book.ISBN
 		import base64
 		base64_path = base64.b64encode(path)
 		return locals()

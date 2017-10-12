@@ -140,7 +140,6 @@ def logout_user(request, template_name='registration/logged_out.html'):
 	auth_logout(request)
 	return render(request, template_name, locals())
 
-@view_permission
 @http_response
 def password_change(request, template_name='registration/password_change_form.html', password_change_form=PasswordChangeForm):
 	if request.method == "POST":

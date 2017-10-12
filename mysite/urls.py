@@ -1,29 +1,58 @@
 """mysite URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.8/topics/http/urls/
+	https://docs.djangoproject.com/en/1.8/topics/http/urls/
 Examples:
 Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
+	1. Add an import:  from my_app import views
+	2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
 Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
+	1. Add an import:  from other_app.views import Home
+	2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
 Including another URLconf
-    1. Add an import:  from blog import urls as blog_urls
-    2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
+	1. Add an import:  from blog import urls as blog_urls
+	2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from . import views
-from django.views.static import serve
 from .settings import BASE_DIR
+
+#============
+import mimetypes
+import os
+import stat
+
+from django.http import (
+	FileResponse, Http404, HttpResponse, HttpResponseNotModified,
+	HttpResponseRedirect,
+)
+
+def epub(request, ISBN, document_root=None, show_indexes=False):
+	from ebookSystem.models import Book
+	book = Book.objects.get(ISBN=ISBN)
+	fullpath = book.path +'/OCR/{0}.epub'.format(book.ISBN)
+	if not os.path.exists(fullpath):
+		raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
+	# Respect the If-Modified-Since header.
+	statobj = os.stat(fullpath)
+	content_type, encoding = mimetypes.guess_type(fullpath)
+	content_type = content_type or 'application/octet-stream'
+	response = FileResponse(open(fullpath, 'rb'), content_type=content_type)
+#	response["Last-Modified"] = http_date(statobj.st_mtime)
+#	if stat.S_ISREG(statobj.st_mode):
+#		response["Content-Length"] = statobj.st_size
+	if encoding:
+		response["Content-Encoding"] = encoding
+	return response
+#============
 
 urlpatterns = [
 	url(r'^$', views.home, name='home'),
 	url(r'^sitemap$', views.sitemap, name='sitemap'),
 	url(r'^error_social_auth$', views.error_social_auth, name='error_social_auth'),
+	url(r'^epub/(?P<ISBN>[0-9]{13,13})/$', epub),
 	url(r'^admin/', include(admin.site.urls)),
 	url(r'social-auth/', include('social_django.urls', namespace='social')),
 	url(r'^social_auth_test$', views.social_auth_test, name='social-auth_test'),
@@ -37,8 +66,4 @@ urlpatterns = [
 	url(r'^auth/login/$', views.login, name='login'),
 	url(r'^auth/logout/$', views.logout_user, name='logout'),
 #	url(r'^auth/', include('django.contrib.auth.urls',)),
-]
-
-urlpatterns = urlpatterns +[
-	url(r'^epub/(?P<path>.*)$', serve, {'document_root': BASE_DIR +'/file/ebookSystem/document/'}),
 ]
