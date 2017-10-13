@@ -26,6 +26,18 @@
 </body>
 
 <script>
+
+    function removeitembyclass(cs){
+        let t = setInterval(function(){ 
+            if($('button[class="'+cs+'"]')){
+                $('button[class="'+cs+'"]').remove();
+            }
+            else{
+                clearInterval(t);
+            }
+        }, 10);
+    }
+
     $(function(){
 
         let p=urlparam();
@@ -34,7 +46,6 @@
             let a=p.view;
             let u=atou(a);
             let root = document.location.origin;
-            //epubLibraryPath=root+'/epub/'+u;
             epubLibraryPath=u;
             window.location.replace('index.html?epub='+epubLibraryPath);
         }
@@ -96,15 +107,13 @@
             }
         });
 
-        let t = setInterval(function(){ 
-            if($('button[class="btn icon-shareUrl"]')){
-                $('button[class="btn icon-shareUrl"]').remove();
-            }
-            else{
-                clearInterval(t);
-            }
-        }, 10);
+        //removeitembyclass
+        removeitembyclass('btn icon-shareUrl');
+        removeitembyclass('btn icon-library');
+        removeitembyclass('btn icon-full-screen');
+
     })
+
 </script>
 
 </html>

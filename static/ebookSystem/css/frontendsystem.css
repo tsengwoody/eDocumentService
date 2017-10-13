@@ -1,15 +1,49 @@
 .loader {
-  display: inline-block;
-  border: 5px solid #f3f3f3;
-  animation: spin 1s linear infinite;
-  animation: spin 1s linear infinite;
-  border-top: 5px solid #555;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
+	display: inline-block;
+	border: 5px solid #f3f3f3;
+	animation: spin 1s linear infinite;
+	animation: spin 1s linear infinite;
+	border-top: 5px solid #555;
+	border-radius: 50%;
+	width: 50px;
+	height: 50px;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 736px) {
+
+	.table-rwd{
+		min-width: 100%;
+	}
+
+	/*針對tr去做隱藏*/
+	.tr-only-hide {
+		display: none !important;
+	}
+
+	/*讓tr變成區塊主要讓他有個區塊*/
+	.table-rwd tr{
+		display: block;
+		margin-bottom: 10px;
+	}
+
+	.table-rwd td {
+		display: block;
+		width: 100%;
+		text-align: left;
+		overflow: hidden;
+		border-bottom:'1px solid #ddd';
+	}
+
+	.table-rwd td:before {
+		content: attr(data-th) ": ";
+		display: inline-block;
+		margin-right: 5px;
+		font-weight: bold;
+	}
+
 }

@@ -14,17 +14,17 @@
 
 
 <script id="tmp_booklist_tabframe" type="text/x-custom-template">
-	<table class="table table-striped table-hover" style="margin:10px 0px;">
-		<thead style="background-color:#eee; border-top:2px solid #ddd;">
+	<table>
+		<thead>
 			<tr>
-				<th style="text-align:center; vertical-align: top; padding:10px 0px;">ISBN</th>
-				<th style="text-align:center; vertical-align: top; padding:10px 0px;">書名</th>
-				<th style="text-align:center; vertical-align: top; padding:10px 0px;">裝訂冊數</th>
-				<th style="text-align:center; vertical-align: top; padding:10px 0px;">版次</th>
-				<th style="text-align:center; vertical-align: top; padding:10px 0px;">作者</th>
-				<th style="text-align:center; vertical-align: top; padding:10px 0px;">出版社</th>
-				<th style="text-align:center; vertical-align: top; padding:10px 0px;">出版日期</th>
-				<th style="text-align:center; vertical-align: top; padding:10px 0px;">動作</th>
+				<th>ISBN</th>
+				<th>書名</th>
+				<th>裝訂冊數</th>
+				<th>版次</th>
+				<th>作者</th>
+				<th>出版社</th>
+				<th>出版日期</th>
+				<th>動作</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -35,14 +35,14 @@
 
 <script id="tmp_booklist_row" type="text/x-jquery-tmpl">
 	<tr>
-		<td style="vertical-align: top; padding:5px;">${ISBN}</td>
-		<td style="vertical-align: top; padding:5px;">${bookname}</td>
-		<td style="vertical-align: top; padding:5px;">${bookbinding}</td>
-		<td style="vertical-align: top; padding:5px;">${order}</td>
-		<td style="vertical-align: top; padding:5px;">${author}</td>
-		<td style="vertical-align: top; padding:5px;">${house}</td>
-		<td style="vertical-align: top; padding:5px;">${date}</td>
-		<td style="vertical-align: top; padding:5px;">
+		<td>${ISBN}</td>
+		<td>${bookname}</td>
+		<td>${bookbinding}</td>
+		<td>${order}</td>
+		<td>${author}</td>
+		<td>${house}</td>
+		<td>${date}</td>
+		<td>
 			{% if request.user.is_guest %}
 			<a class="btn btn-link" role="button" href="{%url 'ebookSystem:library_view' %}?ISBN=${ISBN}" target="_blank" title="閱讀(另開新視窗)" >閱讀</a>
 			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="receivebook(this, false, 'download')">下載</button>
@@ -253,6 +253,9 @@
 		//set tabid
 		div.find('table').attr('id',tabid);
 
+		//table style
+		grid2bstable(tabid);
+				
 		//pagin
 		pagin(tabid);
 
