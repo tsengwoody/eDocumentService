@@ -943,7 +943,7 @@ def epub(request, ISBN):
 	return response
 
 @http_response
-def library_view(request, template_name='ebookSystem/library_view_test.html'):
+def library_view(request, template_name='ebookSystem/library_view.html'):
 	if request.method == 'GET':
 		if not request.user.is_guest:
 			status = 'error'
