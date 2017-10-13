@@ -244,8 +244,8 @@ def change_contact_info(request, template_name):
 		except:
 			pass
 		try:
-			[status, message] = handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_front.jpg'), request.FILES['disability_card_front'])
-			[status, message] = handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_back.jpg'), request.FILES['disability_card_back'])
+			handle_uploaded_file(request.user.disability_card_front, request.FILES['disability_card_front'])
+			handle_uploaded_file(request.user.disability_card_back, request.FILES['disability_card_front'])
 		except:
 			pass
 		status = u'success'
@@ -381,7 +381,7 @@ def user_update(request, ID, ):
 			status = 'success'
 			message = u'使用者資訊更新成功'
 			return locals()
-		if request.POST['action'] == 'password':
+		elif request.POST['action'] == 'password':
 			try:
 				form = PasswordChangeForm(user=request.user, data=request.POST)
 				if not form.is_valid():
@@ -394,7 +394,7 @@ def user_update(request, ID, ):
 			status = 'success'
 			message = u'使用者密碼更新成功'
 			return locals()
-		if request.POST['action'] == 'role':
+		elif request.POST['action'] == 'role':
 			try:
 				form = RoleForm(user=request.user, data=request.POST)
 				if not form.is_valid():
@@ -406,6 +406,18 @@ def user_update(request, ID, ):
 				return locals()
 			status = 'success'
 			message = u'角色權限設定成功'
+			return locals()
+
+		elif request.POST['action'] == 'disability_card':
+			try:
+				handle_uploaded_file(user.disability_card_front, request.FILES['front'])
+				handle_uploaded_file(user.disability_card_back, request.FILES['back'])
+			except BaseException as e:
+				status = 'error'
+				message = u'身障手冊上傳失敗：{0}'.format(unicode(e))
+				return locals()
+			status = 'success'
+			message = u'身障手冊上傳成功'
 			return locals()
 
 @http_response

@@ -72,8 +72,8 @@ def register(request, template_name='registration/register.html'):
 		elif request.POST['role'] == 'Guest':
 			try:
 				DCDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(newUser.username)
-				[status, message] = handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_front.jpg'), request.FILES['disability_card_front'])
-				[status, message] = handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_back.jpg'), request.FILES['disability_card_back'])
+				handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_front.jpg'), request.FILES['disability_card_front'])
+				handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_back.jpg'), request.FILES['disability_card_back'])
 				newGuest = Guest.objects.create(user=newUser)
 			except:
 				newUser.delete()

@@ -29,7 +29,8 @@ from django.http import (
 	HttpResponseRedirect,
 )
 
-def epub(request, ISBN, document_root=None, show_indexes=False):
+from django.core.cache import cache
+def epub(request, ISBN, token, document_root=None, show_indexes=False):
 	from ebookSystem.models import Book
 	book = Book.objects.get(ISBN=ISBN)
 	fullpath = book.path +'/OCR/{0}.epub'.format(book.ISBN)
@@ -45,14 +46,15 @@ def epub(request, ISBN, document_root=None, show_indexes=False):
 #		response["Content-Length"] = statobj.st_size
 	if encoding:
 		response["Content-Encoding"] = encoding
-	return response
+	if token == cache.get('token.' +str(request.user.id)):
+		return response
 #============
 
 urlpatterns = [
 	url(r'^$', views.home, name='home'),
 	url(r'^sitemap$', views.sitemap, name='sitemap'),
 	url(r'^error_social_auth$', views.error_social_auth, name='error_social_auth'),
-	url(r'^epub/(?P<ISBN>[0-9]{13,13})/$', epub),
+	url(r'^epub/(?P<ISBN>[0-9]{13,13})/(?P<token>[abcdef0-9]{32,32})/$', epub),
 	url(r'^admin/', include(admin.site.urls)),
 	url(r'social-auth/', include('social_django.urls', namespace='social')),
 	url(r'^social_auth_test$', views.social_auth_test, name='social-auth_test'),

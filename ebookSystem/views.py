@@ -19,6 +19,7 @@ from mysite.settings import BASE_DIR, SERVICE
 from utils.analysis import *
 from utils.crawler import *
 from utils.decorator import *
+from utils.uploadFile import handle_uploaded_file
 import os
 import json
 import shutil
@@ -221,7 +222,6 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 
 @http_response
 def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_ApplyDocumentAction.html'):
-	from utils.uploadFile import handle_uploaded_file
 	try:
 		action = ApplyDocumentAction.objects.get(id=id)
 		event = Event.objects.get(content_type__model='applydocumentaction', object_id=action.id, status=Event.STATUS['review'])
@@ -242,7 +242,7 @@ def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_Ap
 			status = 'error'
 			message = u'文件已存在'
 			return locals()
-		[status, message] = handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
+		handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
 		#壓縮文件測試
 		try:
 			with ZipFile(uploadFilePath, 'r') as uploadFile:
@@ -740,8 +740,6 @@ def book_create(request, template_name='ebookSystem/book_create.html'):
 	if request.method == 'GET':
 		return locals()
 
-from utils.uploadFile import handle_uploaded_file
-
 @user_category_check(['manager'])
 @http_response
 def book_upload(request, template_name='ebookSystem/book_upload.html'):
@@ -970,8 +968,8 @@ def library_view(request, template_name='ebookSystem/library_view_test.html'):
 				raise SystemError('epub create fail (not final):' +unicode(e))
 
 		token = uuid.uuid4().hex
-		#cache.set('token.' +request.user.id, token, 100)
-		path = book.ISBN
+		cache.set('token.' +str(request.user.id), token, 10)
+		path = '/epub/' +book.ISBN +'/' +token
 		import base64
 		base64_path = base64.b64encode(path)
 		return locals()

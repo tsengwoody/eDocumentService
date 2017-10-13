@@ -56,6 +56,11 @@ class User(AbstractUser):
 	auth_email = models.BooleanField(default=False)
 	auth_phone = models.BooleanField(default=False)
 
+	def __init__(self, *args, **kwargs):
+		super(User, self).__init__(*args, **kwargs)
+		self.disability_card_front = BASE_DIR +'/static/ebookSystem/disability_card/{0}/{0}_front.jpg'.format(self.username)
+		self.disability_card_back = BASE_DIR +'/static/ebookSystem/disability_card/{0}/{0}_back.jpg'.format(self.username)
+
 	def __unicode__(self):
 		return self.first_name +self.last_name
 
@@ -64,6 +69,7 @@ class User(AbstractUser):
 		serialize = {}
 		if action == 'info':
 			for key in [
+				'id',
 				'username',
 				'email',
 				'first_name',
@@ -80,6 +86,7 @@ class User(AbstractUser):
 
 		elif action == 'role':
 			for key in [
+				'id',
 				'auth_phone',
 				'auth_email',
 				'is_active',
@@ -89,6 +96,17 @@ class User(AbstractUser):
 				serialize.update({
 					key: old_serialize[key],
 				})
+
+		elif action == 'disability_card':
+			with open(self.disability_card_front, 'rb') as f:
+				front = f.read()
+			with open(self.disability_card_back, 'rb') as f:
+				back = f.read()
+			serialize = {
+				'id': self.id,
+				'front': front,
+				'back': back,
+			}
 
 		return serialize
 
