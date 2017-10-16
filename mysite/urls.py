@@ -46,8 +46,9 @@ def epub(request, ISBN, token, document_root=None, show_indexes=False):
 #		response["Content-Length"] = statobj.st_size
 	if encoding:
 		response["Content-Encoding"] = encoding
-	if token == cache.get('token.' +str(request.user.id)):
-		return response
+#	if token == cache.get('token.' +str(request.user.id)):
+	print 'YA'
+	return response
 #============
 
 urlpatterns = [
