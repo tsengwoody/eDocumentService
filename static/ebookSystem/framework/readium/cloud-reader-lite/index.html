@@ -72,8 +72,8 @@
             if(haskey(p,'view')){
                 let a=p.view;
                 let u=atou(a);
-                //let root = document.location.origin;
-                epubLibraryPath=u;
+                let root = document.location.origin;
+                epubLibraryPath=root+u;
                 window.location.replace('index.html?epub='+epubLibraryPath);
             }
             
