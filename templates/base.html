@@ -24,13 +24,6 @@
 	<script language="javascript" src="{% static 'ebookSystem/js/bluebird-3.5.0.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/Math.uuid.js' %}"></script>
 
-	<!-- frontendsystem.css -->
-	<!-- <link href="{% static "ebookSystem/css/frontendsystem.css" %}" rel="stylesheet" > -->
-	<link href="/static/ebookSystem/css/frontendsystem.css?v=0.2" rel="stylesheet">
-
-	<!-- frontendsystem.js -->
-	<script language="javascript" src="{% static 'ebookSystem/js/frontendsystem.js' %}"></script>
-
 	<!-- bootstrap, 3.3.7時NVDA會讀不到modal-->
  	<link href="{% static "ebookSystem/framework/bootstrap-3.3.4/css/bootstrap.min.css" %}" rel="stylesheet" >
 	<script src="{% static "ebookSystem/framework/bootstrap-3.3.4/js/bootstrap.min.js" %}" type="text/javascript"></script>
@@ -46,14 +39,48 @@
 	<!-- tinymce -->
 	<script language="javascript" src="{% static 'ebookSystem/framework/tinymce-4.6.7/js/tinymce/tinymce.min.js' %}"></script>
 
-	<!-- <script src="{% static "ebookSystem/js/bootstrap/ie-emulation-modes-warning.js" %}" type="text/javascript"></script>
-	<script src="{% static "ebookSystem/js/bootstrap/ie10-viewport-bug-workaround.js" %}" type="text/javascript"></script> -->
-
 	<title>{% block title %}{% endblock %} | 雲端千眼平台</title>
 	{% block resource%} {% endblock%}
 	{% block style %}{% endblock %}
-</head>
 
+	<script type="text/javascript">
+
+        //hash(採時間戳)，全域變數，載入模板也需要
+        let chash = '?' + Date.now();
+
+        //使用document.write做靜態加載
+        function commoncssjsadd() {
+
+            //ltcss
+            let ltcss = [];
+            ltcss.push('/static/ebookSystem/css/frontendsystem.css');
+
+            //ltjs
+            let ltjs = [];
+            ltjs.push('/static/ebookSystem/js/frontendsystem.js');
+
+            function comadd_css(href) {
+                return '<link rel="stylesheet" href="' + href + '"\>';
+            }
+            function comadd_js(src) {
+                return '<script src="' + src + '"\><\/script>';
+            }
+
+            let c = '';
+            for (let i = 0; i < ltcss.length; i++) {
+                c += comadd_css(ltcss[i] + chash);
+            }
+            for (let i = 0; i < ltjs.length; i++) {
+                c += comadd_js(ltjs[i] + chash);
+            }
+
+            return c;
+        }
+        document.write(commoncssjsadd());
+
+	</script>
+
+</head>
 <body>
 	<div user_id="{{ request.user.id }}"></div>
 	{% block tawk %}

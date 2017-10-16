@@ -10,9 +10,6 @@
 {% csrf_token %}
 
 
-<h3>平台書庫</h3>
-
-
 <script id="tmp_booklist_tabframe" type="text/x-custom-template">
 	<table>
 		<thead>
@@ -24,7 +21,9 @@
 				<th>作者</th>
 				<th>出版社</th>
 				<th>出版日期</th>
+				{% if request.user.is_guest %}
 				<th>動作</th>
+				{% endif %}
 			</tr>
 		</thead>
 		<tbody>
@@ -42,42 +41,43 @@
 		<td>${author}</td>
 		<td>${house}</td>
 		<td>${date}</td>
+		{% if request.user.is_guest %}
 		<td>
-			{% if request.user.is_guest %}
-			<a class="btn btn-link" role="button" href="{%url 'ebookSystem:library_view' %}?ISBN=${ISBN}" target="blank" title="閱讀(另開新視窗)" >閱讀</a>
+			<a class="btn btn-default" role="button" href="{%url 'ebookSystem:library_view' %}?ISBN=${ISBN}" target="_blank" title="閱讀(另開新視窗)">閱讀</a>
 			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="receivebook(this, false, 'download')">下載</button>
-			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="library_action(this, false, 'check_out')">借閱</button>
-			{% endif %}
+			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="aj_borrowbook(this, 'check_out')">借閱</button>
 		</td>
+		{% endif %}
 	</tr>
 </script>
 
 
 <script>
 
+
 	$(function(){
-		$.when(dffesc)
-		.done(function(){
+		//初始化頁面
 
-			//主分頁
-			//$('[name="repository_books_tab_grp"]').eq(0).click(); //預先顯示第1分頁
+		//主分頁
+		//$('[name="repository_books_tab_grp"]').eq(0).click(); //預先顯示第1分頁
 
-			//listrecommend
-			listrecommend();
+		//listrecommend
+		listrecommend();
 
-			//listnewst
-			listnewst();
+		//listnewst
+		listnewst();
 
-			//listhottest
-			listhottest();
+		//listhottest
+		listhottest();
 
-			//listcategory
-			listcategory();
+		//listcategory
+		listcategory();
 
-		});
 	})
 
+
 	function search(){
+		//查詢ISBN或書名
 
 		//search_type
 		let search_type=$('[name="search_type"]:checked').val();
@@ -114,6 +114,7 @@
 
 
 	function listrecommend(){
+		//顯示書籍推薦分頁
 
 		//ocs
 		let ocs={
@@ -144,6 +145,7 @@
 
 
 	function listnewst(){
+		//顯示新書上架
 
 		//div
 		let div=$('#bookrecommend_新書上架');
@@ -165,6 +167,7 @@
 
 
 	function listhottest(){
+		//顯示借閱排行
 
 		//div
 		let div=$('#bookrecommend_借閱排行');
@@ -186,7 +189,8 @@
 
 
 	function listcategory(){
-
+		//顯示索引
+		
 		//ocs
 		let ocs={
 			0:'總類',	
@@ -243,6 +247,7 @@
 	
 
 	function bk_datatable(div,data,tabid){
+		//以表格顯示資訊
 
 		//tabframe
 		div.html($('#tmp_booklist_tabframe').html());
@@ -263,6 +268,9 @@
 
 
 </script>	
+
+
+<h3>平台書庫</h3>
 
 
 <ul class="nav nav-tabs">

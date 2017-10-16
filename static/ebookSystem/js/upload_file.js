@@ -58,23 +58,23 @@ function showProgress(uuid)
         }
     });
 }
-function alertDialog(json) {
-    console.log(json.status);
-    var str=(json.status=='error')?'danger':'success'
-    var dialog='#'+str+'Dialog';
-    $(dialog+" .alertMessage").html(json.message);
-    $(dialog).on('shown.bs.modal', function () {
-        $(dialog+" .close").focus();
-    });
-    $(dialog).modal();
-    $(dialog).on('hide.bs.modal', function () {
-        if(json.hasOwnProperty('redirect_to'))
-            window.location.href = json.redirect_to; 
-        else
-            if(json.status!='error')
-                location.reload();
-    });
-}
+// function alertDialog(json) {
+//     console.log(json.status);
+//     var str=(json.status=='error')?'danger':'success'
+//     var dialog='#'+str+'Dialog';
+//     $(dialog+" .alertMessage").html(json.message);
+//     $(dialog).on('shown.bs.modal', function () {
+//         $(dialog+" .close").focus();
+//     });
+//     $(dialog).modal();
+//     $(dialog).on('hide.bs.modal', function () {
+//         if(json.hasOwnProperty('redirect_to'))
+//             window.location.href = json.redirect_to; 
+//         else
+//             if(json.status!='error')
+//                 location.reload();
+//     });
+// }
 // This function gets cookie with a given name
 function getCookie(name) {
     var cookieValue = null;

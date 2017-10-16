@@ -84,22 +84,6 @@ function alertDialogNoReload(json) {
 //                 location.reload();
 //     });
 // }
-
-function alertDialog(json) {
-    //強制轉用alertmessage
-    console.log('alertDialog')
-    console.log(json)
-    alertmessage(json.status, json.message)
-    .done(function(){
-        console.log('alertDialog done')
-        if(haskey(json,'redirect_to')){
-            console.log('alertDialog redirect_to')
-            window.location.href = json.redirect_to; 
-        }
-    })
-
-}
-
 // This function gets cookie with a given name
 function getCookie(name) {
     var cookieValue = null;
