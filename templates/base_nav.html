@@ -105,14 +105,14 @@
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#">關於</a>
 					<ul class="dropdown-menu">
-						<li><a href="">平台使用指南</a></li>
-						<li><a href="">平台Q&A</a></li>
+						<li><a href="{% url 'about' 'user_guide' %}">平台使用指南</a></li>
+						<li><a href="{% url 'about' 'qanda' %}">平台Q&A</a></li>
 						<li><a href="">聯絡資訊</a></li>
-						<li><a href="">使用者條款</a></li>
+						<li><a href="">服務條款</a></li>
 						<li><a href="">隱私與資訊安全</a></li>
 						<li><a href="">平台濫觴</a></li>
-						<li><a href="">開發資訊</a></li>
-						<li><a href="">營運組織</a></li>
+						<li><a href="{% url 'about' 'development' %}">開發資訊</a></li>
+						<li><a href="https://www.forblind.org.tw/" target="blank" title="(另開新視窗)">營運組織</a></li>
 					</ul>
 				</li>
 			</ul>

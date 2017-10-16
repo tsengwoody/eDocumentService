@@ -6,6 +6,8 @@ from django.core.urlresolvers import reverse
 from django.forms import modelform_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_list_or_404, redirect
+from django.template.loader import get_template
+from django.template import Context
 from django.utils import timezone
 from ebookSystem.models import *
 from guest.models import Guest
@@ -304,7 +306,8 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 				vcode = cache.get(request.user.email)['vcode']
 			from django.core.mail import EmailMessage
 			subject = u'[驗證] {0} 信箱驗證碼'.format(request.user.username)
-			body = u'親愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
+			t = get_template('email/email_validate.txt')
+			body = t.render(Context(locals()))
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
 			email.send(fail_silently=False)
 			status = 'success'
@@ -317,9 +320,11 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 				cache.set(request.user.phone, {'vcode': vcode}, 600)
 			else:
 				vcode = cache.get(request.user.phone)['vcode']
-			data = u'親愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
+			t = get_template('email/phone_validate.txt')
+			data = t.render(Context(locals()))
 			url = 'https://api2.kotsms.com.tw/kotsmsapi-1.php?username={0}&password={1}&dstaddr={2}&smbody={3}'.format(
-				OTP_ACCOUNT, OTP_PASSWORD, request.user.phone, urllib.quote(data.encode('big5')))
+				OTP_ACCOUNT, OTP_PASSWORD, request.user.phone, urllib.quote(data.encode('big5'))
+			)
 			session = requests.Session()
 			response = session.get(url)
 			if response.text.split('=')[1] > 0:

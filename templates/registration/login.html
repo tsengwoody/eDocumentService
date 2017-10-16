@@ -26,7 +26,7 @@
 {% endif %}
 <div>
 	<form class="form-horizontal" role="form" method="post" action="">
-
+		{% csrf_token %} {% include 'utils/upload_dialog.html' %}
 		<div class="form-group text-center">
 			<h2 class="">登錄</h2>
 		</div>

@@ -27,6 +27,10 @@ fh.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(fh)
 
+@http_response
+def about(request, name):
+	template_name='about/{0}.html'.format(name)
+	return locals()
 
 @http_response
 def home(request, template_name='home.html'):
@@ -162,11 +166,6 @@ def password_change(request, template_name='registration/password_change_form.ht
 	if request.method == "GET":
 		form = password_change_form(user=request.user)
 		return locals()
-
-@http_response
-def social_auth_test(request, template_name='social_auth_test.html'):
-	fb_association = request.user.social_auth.filter(provider='facebook')
-	return locals()
 
 @http_response
 def error_social_auth(request, template_name='error_social_auth.html'):
