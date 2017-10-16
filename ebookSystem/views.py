@@ -991,7 +991,8 @@ def library_action(request, ):
 			status = 'success'
 			message = u'成功借閱書籍{0}'.format(book)
 		elif request.POST['action'] == 'check_in':
+			lr = LibraryRecord.objects.get(id=request.POST['id'])
 			lr.check_in()
 			status = 'success'
-			message = u'成功歸還書籍{0}'.format(book)
+			message = u'成功歸還書籍{0}'.format(lr.book)
 		return locals()
