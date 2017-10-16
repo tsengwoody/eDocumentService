@@ -1499,7 +1499,7 @@ function aj_borrowbook(me,action){
     //使用library_action API進行借還閱
 
     //df
-    let df = $.Deferred();
+    //let df = $.Deferred();
 
     //me
     me=$(me);
@@ -1518,23 +1518,23 @@ function aj_borrowbook(me,action){
         transferData['id']=me.attr('id');
     }
     else{
-
-        //reject
-        df.reject({'status':'error','message':' mode error'});
-        
-        return df;
+        //df.reject({'status':'error','message':' mode error'});
+        //return df;
     }
 
     //aj_post
     aj_post(url, transferData)
     .done(function(data){
         alertmessage(data.status, data.message);
-        df.resolve(data);
+        if(action==='check_in'){
+            location.reload(); //歸還需重新載入網頁以更新資訊
+        }
+        //df.resolve(data);
     })
     .fail(function(data){
         alertmessage(data.status, data.message);
-        df.reject(data);
+        //df.reject(data);
     })
 
-    return df;
+    //return df;
 }
