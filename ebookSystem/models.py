@@ -737,7 +737,7 @@ class LibraryRecord(models.Model):
 		self.status = False
 		self.save()
 		custom_epub = BASE_DIR +'/file/ebookSystem/library/{0}.epub'.format(self.id)
-		shutil.rmtree(custom_epub)
+		os.remove(custom_epub)
 		return custom_epub
 
 class EditRecord(models.Model):
