@@ -112,4 +112,4 @@ class UserForm(forms.ModelForm):
 class RoleForm(forms.ModelForm):
 	class Meta:
 		model = User
-		fields = ['is_active', 'is_editor', 'is_guest', ]
+		fields = ['is_active', 'is_editor', 'is_guest', 'auth_email', 'auth_phone']

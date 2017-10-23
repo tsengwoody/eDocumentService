@@ -392,7 +392,7 @@ def user_update(request, ID, ):
 			return locals()
 		elif request.POST['action'] == 'password':
 			try:
-				form = PasswordChangeForm(user=request.user, data=request.POST)
+				form = PasswordChangeForm(instance=request.user, data=request.POST)
 				if not form.is_valid():
 					raise SystemError(u'密碼輸入錯誤')
 				form.save()
@@ -405,7 +405,7 @@ def user_update(request, ID, ):
 			return locals()
 		elif request.POST['action'] == 'role':
 			try:
-				form = RoleForm(user=request.user, data=request.POST)
+				form = RoleForm(instance=request.user, data=request.POST)
 				if not form.is_valid():
 					raise SystemError(u'角色權限設定失敗')
 				form.save()
