@@ -986,6 +986,15 @@ def library_action(request, ):
 	if request.method == 'POST' and request.is_ajax():
 		if request.POST['action'] == 'check_out':
 			book = Book.objects.get(ISBN=request.POST['ISBN'])
+			lr_user = request.user.libraryrecord_set.filter(status=True)
+			if len(lr_user) >5:
+				status = 'error'
+				message = u'已到達借閱上限，同時可借閱書量為5本，請先歸還書籍再借閱'
+				return locals()
+			if len(lr_user.filter(book=book)) >0:
+				status = 'error'
+				message = u'已在借閱書櫃無需再借閱'
+				return locals()
 			lr = LibraryRecord.objects.create(user=request.user, book=book)
 			lr.check_out()
 			status = 'success'

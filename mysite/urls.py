@@ -47,7 +47,6 @@ def epub(request, ISBN, token, document_root=None, show_indexes=False):
 	if encoding:
 		response["Content-Encoding"] = encoding
 #	if token == cache.get('token.' +str(request.user.id)):
-	print 'YA'
 	return response
 #============
 

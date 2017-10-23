@@ -3,6 +3,7 @@ from django.test import TestCase, TransactionTestCase
 # Create your tests here.
 
 from django.contrib.auth import authenticate
+from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import Client, RequestFactory
 
@@ -170,7 +171,7 @@ class announcement_createViewTests(TestCase):
 class user_listViewTests(TestCase):
 	fixtures = ['dump.json',]
 
-	def test_announcement_create_correct_case(self):
+	def test_user_list_correct_case(self):
 		client = Client()
 		client.login(username='root', password='root')
 		response = client.get(
@@ -185,3 +186,24 @@ class user_listViewTests(TestCase):
 		)
 #		print response.json()['content'][0]
 #		self.assertEqual()
+
+class serviceinfo_list_ViewTests(TestCase):
+	fixtures = ['dump.json',]
+
+	def test_serviceinfo_list_exchange_case(self):
+		client = Client()
+		client.login(username='root', password='root')
+		response = client.post(
+			reverse(
+				'genericUser:serviceinfo_list',
+				kwargs = {
+					'username': 'root',
+				}
+			),
+			{
+				'exchange': '1',
+				'org': '1',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		print mail.outbox[0].message()

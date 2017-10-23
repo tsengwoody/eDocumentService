@@ -278,9 +278,14 @@ def serviceinfo_list(request, username, template_name='genericUser/serviceinfo_l
 				exchange_serviceInfo.is_exchange = True
 				exchange_serviceInfo.org = Organization.objects.get(id=request.POST['org'])
 				exchange_serviceInfo.save()
+				subject = u'[驗證] {0} 信箱驗證碼'.format(request.user.username)
+				t = get_template('email/serviceinfo_list.txt')
+				body = t.render(Context(locals()))
+				email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[exchange_serviceInfo.org.email])
+				email.send(fail_silently=False)
 				status = u'success'
 				message = u'兌換成功'
-			except:
+			except BaseException as e:
 				status = u'error'
 				message = u'兌換失敗'
 		else:
@@ -304,7 +309,6 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 				cache.set(request.user.email, {'vcode': vcode}, 600)
 			else:
 				vcode = cache.get(request.user.email)['vcode']
-			from django.core.mail import EmailMessage
 			subject = u'[驗證] {0} 信箱驗證碼'.format(request.user.username)
 			t = get_template('email/email_validate.txt')
 			body = t.render(Context(locals()))
