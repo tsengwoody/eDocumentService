@@ -1827,8 +1827,7 @@ function aj_user_updateid(id,action,transferData){
 
     //transferData
     transferData['action']=action; //'info','role'
-    console.log(id,o2j(transferData))
-    
+console.log(transferData)    
     //aj_post
     aj_post(url, transferData)
     .done(function(data){

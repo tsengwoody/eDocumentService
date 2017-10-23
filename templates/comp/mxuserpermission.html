@@ -23,24 +23,29 @@
             //c
             let c='';
             _.each(d,function(value,head){
-                //console.log(v,k,aj_user_head2key(k))
-                let key=aj_user_head2key(head);
-
                 if(head!=='id'){
+
+                    //key
+                    let key=aj_user_head2key(head);
+
+                    //checked
+                    let checked='';
+                    if(value==='True'){
+                        checked='checked';
+                    }
+
+                    //inpid
                     let inpid='id_'+key;
-
+    
+                    //ui
                     c+='<div style="margin:15px 0px;">';
-
-                    c+='<div class="inputslide" style="display:inline-block; margin:0px 10px; cursor:pointer;" onclick="userpermission_inputchange(\''+inpid+'\')">';
-                    c+='<input type="checkbox" id="'+inpid+'" name="userpermission_grp" key="'+key+'" checked="'+value+'"/>';
-                    c+='<label for="'+inpid+'"></label>';
+                    c+='<div style="display: flex; align-items: center; justify-content: flex-start;">';
+                    c+='<input id="'+inpid+'" type="checkbox" style="margin:0px 3px 0px 0px; padding:0px; cursor:pointer;" name="userpermission_grp" key="'+key+'" '+checked+'>';
+                    c+='<label for="'+inpid+'" style="margin:0px; padding:0px; cursor:pointer;">'+head+'</label>';
+                    c+='</div>';
                     c+='</div>';
 
-                    c+='<div style="display:inline-block; cursor:pointer;" onclick="userpermission_inputchange(\''+inpid+'\')">'+head+'</div>';
-
-                    c+='</div>';
                 }
-
             })
             
             //html
@@ -65,7 +70,7 @@
                 let key=inp.attr('key');
                 transferData[key]=checked;
             })
-
+            console.log(transferData)    
             //aj_user_updateid
             aj_user_updateid(userid,'role',transferData);
 
