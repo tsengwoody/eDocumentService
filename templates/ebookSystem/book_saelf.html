@@ -17,6 +17,26 @@
 		//tabid
 		let tabid;
 
+		// //v
+		// let c=$('#srvdata_正借閱書籍').html();
+		// c=replace(c,'\r\n','');
+		// c=replace(c,'\r','');
+		// c=replace(c,'\n','');
+		// c=replace(c,'\t','');
+		// c=strdelright(c,1);
+		// c='['+c+']';
+		// let v=j2o(c);
+
+		// //arr2dict
+		// let d=arr2dict(v);
+
+		// //tabid
+		// tabid='saelf_books_table_正借閱書籍';
+
+		// //dict2grid
+		// let h=dict2grid(d,tabid);
+		// $('#saelf_books_tab_正借閱書籍').html(h);
+
 		//table style, pagin
 		tabid='saelf_books_table_正借閱書籍';
 		grid2bstable(tabid);
@@ -29,7 +49,22 @@
 
 	})
 
+
 </script>
+
+
+<!-- <script id="srvdata_正借閱書籍" type="text/x-custom-template">
+	["書名","借出日期","到期日期","url","id"],
+	{% for lr in lr_out_list %}
+	[
+		"{{ lr.book }}",
+		"{{ lr.check_out_time }}",
+		"{{ lr.check_in_time }}",
+		"{%url 'ebookSystem:library_view' %}?ISBN={{ lr.book.ISBN }}",
+		"{{ lr.id }}"
+	],
+	{% endfor %}
+</script> -->
 
 
 <h3>借閱書櫃</h3>
@@ -45,7 +80,7 @@
 
 	<div id="saelf_books_tab_正借閱書籍" class="tab-pane active">
 
-		<table id="saelf_books_table_正借閱書籍">
+		<table class="no-page" id="saelf_books_table_正借閱書籍">
 			<thead>
 				<tr>
 					<th>書名</th>
@@ -73,7 +108,7 @@
 
 	<div id="saelf_books_tab_借閱歷史紀錄" class="tab-pane">
 
-		<table id="saelf_books_table_借閱歷史紀錄">
+		<table class="no-page" id="saelf_books_table_借閱歷史紀錄">
 			<thead>
 				<tr>
 					<th>書名</th>

@@ -504,6 +504,46 @@ function blob2str(bdata){
 }
 
 
+function replace(c, t, r) {
+    //取代字串
+   
+    let o = new RegExp(t, 'g');
+    let rr = String(c).replace(o, r);
+
+    return rr;
+}
+
+
+function strleft(c, n) {
+    //取字串左邊n個字元
+    return c.substr(0, n);
+}
+
+
+function strright(c, n) {
+    //取字串右邊n個字元
+    return c.substr(c.length - n, n);
+}
+
+
+function strmid(c, s, n) {
+    //取字串中位置s開始後n個字元
+    return c.substring((s - 1), (s + n - 1));
+}
+
+
+function strdelleft(c, n) {
+    //刪除字串左邊n個字元
+    return strright(c, c.length - n);
+}
+
+
+function strdelright(c, n) {
+    //刪除字串右邊n個字元
+    return strleft(c, c.length - n);
+}
+
+
 function GenID() {
     return Math.uuid(32);
 }
@@ -557,6 +597,56 @@ function keyspace2enter(event,me){
     if(event.keyCode===32){
         $(me).click();
     }
+}
+
+
+function arr2dict(v){
+    //陣列轉字典物件
+
+    let keys=_.take(v)[0];
+    let d=_.tail(v);
+    let r=[];
+    _.each(d,function(v){
+        let rr={};
+        _.each(keys,function(k,i){
+            rr[k]=v[i];
+        })
+        r.push(rr);
+    })
+    return r;
+}
+
+
+function arrarymerge(ar1,ar2,key){
+    //合併物件陣列
+
+    //ts
+    let t1=_.map(ar1,key);
+    let t2=_.map(ar2,key);
+    let ts=_.flatten([t1,t2]);
+    ts=_.uniq(ts);
+
+    //each
+    let ar=[];
+    _.each(ts,function(tar){
+
+        //f
+        let f={};
+        f[key]=tar;
+
+        //r1,r2
+        let r1=_.find(ar1,f);
+        let r2=_.find(ar2,f);
+
+        //merge
+        let r=_.merge(r1, r2);
+
+        //push
+        ar.push(r);
+
+    })
+
+    return ar;
 }
 
 
@@ -805,6 +895,24 @@ function pagin_change(tabid,oper){
             tr.hide();
         }
     })
+
+}
+
+
+function gentable(divid,tabid,ar){
+    //於div內由資料ar快速產生有樣式與具分頁功能的table
+
+    //dict2grid
+    let h=dict2grid(ar,tabid);
+
+    //table html
+    $('#'+divid).html(h);
+
+    //table style
+    grid2bstable(tabid);
+
+    //pagin
+    pagin(tabid);
 
 }
 
@@ -1291,7 +1399,7 @@ function aj_isbnnetanddouban(value){
     };
     aj_isbnnet(transferData)
     .done(function(data){
-        console.log('aj_isbnnet done ',data)
+        console.log('aj_isbnnet done',data)
         d_isbnnet=data;
     })
     .fail(function(data){
@@ -1304,11 +1412,11 @@ function aj_isbnnetanddouban(value){
     //aj_douban
     aj_douban(value)
     .done(function(data){
-        console.log('aj_douban done ',data)
+        console.log('aj_douban done',data)
         d_douban=data;
     })
     .fail(function(data){
-        console.log('aj_douban fail ',data)
+        console.log('aj_douban fail',data)
     })
     .always(function(){
         df_douban.resolve();
@@ -1525,15 +1633,214 @@ function aj_borrowbook(me,action){
     //aj_post
     aj_post(url, transferData)
     .done(function(data){
-        alertmessage(data.status, data.message);
-        if(action==='check_in'){
-            location.reload(); //歸還需重新載入網頁以更新資訊
-        }
+        alertmessage(data.status, data.message)
+        .done(function(){
+            if(action==='check_in'){
+                location.reload(); //歸還需重新載入網頁以更新資訊
+            }
+        });
         //df.resolve(data);
     })
     .fail(function(data){
         alertmessage(data.status, data.message);
         //df.reject(data);
+    })
+
+    //return df;
+}
+
+
+function aj_user_dict(){
+    //user API key轉換資訊
+    let d={
+        'birthday':'生日',
+        'education':'教育',
+        'email':'郵件',
+        'org':'單位',
+        'phone':'手機',
+        'username':'使用者名稱',
+        'name':'姓名', //'first_name'+'last_name'
+        'auth_email':'驗證電子郵件',
+        'auth_phone':'驗證手機',
+        'is_active':'登錄權限',
+        'is_editor':'校對權限',
+        'is_guest':'來賓權限',
+    };
+    return d;
+}
+
+
+function aj_user_key2head(key){
+    //user API的key轉中文
+    let d=aj_user_dict();
+    if(haskey(d,key)){
+        return d[key];
+    }
+    return key;
+}
+
+
+function aj_user_head2key(head){
+    //user API的中文轉key
+    let d=aj_user_dict();
+    d=_.invert(d);
+    if(haskey(d,head)){
+        return d[head];
+    }
+    return head;
+}
+
+
+function aj_user_key2head_array(ar){
+    //陣列物件key轉中文
+
+    //r
+    let r=[];
+    _.each(ar,function(v,k){
+            
+        //add name
+        if(haskey(v,'first_name') && haskey(v,'last_name')){
+            v['name']=v['first_name']+v['last_name'];
+        }
+
+        //newkey
+        let o={};
+        _.each(v,function(value,key){
+            let newkey=aj_user_key2head(key);
+            o[newkey]=value;
+        })
+
+        //push
+        r.push(o);
+
+    })
+
+    return r;
+}
+
+
+function aj_user_querylist_combine(){
+    //使用API user_list結合info,role取得使用者資訊
+
+    //df
+    let df = $.Deferred();
+
+    //when
+    $.when(aj_user_querylist('info'),aj_user_querylist('role'))
+    .done(function(ar1,ar2){
+
+        //arrarymerge
+        let ar=arrarymerge(ar1,ar2,'id');
+
+        //resolve
+        df.resolve(ar);
+
+    })
+    .fail(function(msg){
+        //reject
+        df.reject(msg);
+    })
+
+    return df;
+}
+
+
+function aj_user_querylist(action){
+    //使用API user_list
+
+    //df
+    let df = $.Deferred();
+
+    //url
+    let url='/genericUser/user_list/';
+
+    //transferData
+    let transferData={
+        'query_field':'all',
+        'query_value':'',
+        'action':action, //'info','role'
+    };
+
+    //aj_get
+    aj_get(url, transferData)
+    .done(function(data){
+
+        //ar
+        let ar=aj_user_key2head_array(data['content']);
+
+        //resolve
+        df.resolve(ar);
+
+    })
+    .fail(function(data){
+        df.reject(data['message']);
+    })
+
+    return df;
+}
+
+
+function aj_user_queryid(id,action){
+    //使用API user_view
+
+    //df
+    let df = $.Deferred();
+    
+    //url
+    let url='/genericUser/user_view/'+id+'/';
+
+    //transferData
+    let transferData={
+        'action':action, //'info','role'
+    };
+
+    //aj_get
+    aj_get(url, transferData)
+    .done(function(data){
+        
+        //d
+        let d=[data['content']];
+
+        //ar
+        let ar=aj_user_key2head_array(d);
+        
+        //resolve
+        df.resolve(ar);
+
+    })
+    .fail(function(data){
+        df.reject(data['message']);
+    })
+
+    return df;
+}
+
+
+function aj_user_updateid(id,action,transferData){
+    //使用API user_update
+
+    //df
+    //let df = $.Deferred();
+    
+    //url
+    let url='/genericUser/user_update/'+id+'/';
+
+    //transferData
+    transferData['action']=action; //'info','role'
+    console.log(id,o2j(transferData))
+    
+    //aj_post
+    aj_post(url, transferData)
+    .done(function(data){
+        alertmessage(data.status, data.message)
+        .done(function(){
+            location.reload(); //重新載入網頁以更新資訊
+        });
+        //df.resolve(ar);
+    })
+    .fail(function(data){
+        alertmessage(data.status, data.message)
+        //df.reject(data['message']);
     })
 
     //return df;

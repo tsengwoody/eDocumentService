@@ -157,17 +157,9 @@
                 $('#divmadal_findbook_pick').fadeIn();
                 $('#divmadal_findbook').find('div.modal-dialog').css('width','90%');
 
-                //table
-                let tabid='divmadal_findbook_page_pick_list_table';
-                let h=dict2grid(bs,tabid);
-                $('#divmadal_findbook_page_pick_list').html(h);
-
-                //table style
-                grid2bstable(tabid);
-                        
-                //table pagin
-                pagin(tabid);
-
+                //gentable
+                gentable('divmadal_findbook_page_pick_list','divmadal_findbook_page_pick_list_table',bs);
+            
                 //checked first
                 $('input[type="radio"][name="divmadal_findbook_page_pick_inpgrp"]').eq(0).click();
 

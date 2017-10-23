@@ -4,68 +4,106 @@
 使用者管理
 {% endblock %}
 {% block content %}
+{% csrf_token %}
+
 
 <script>
 
 	$(function(){
 
-		$.when(dffesc)
-		.done(function(){
-			getuserview_list()
-		})
-		
+		// aj_user_querylist('info');
+		// aj_user_queryid(1,'info');
+		// aj_user_querylist('role');
+		// aj_user_queryid(1,'role');
+
 	})
 
-	function getuserview_list(){
 
-		let url='/genericUser/view_list';
+	function usersearch(){
+		//任意關鍵字搜尋
 
-		let transferData={
-			'query_field':'all',
-			'action':'role',
-		};
+		//query
+		let query=$('#search_value').val();
 
-		//aj_get
-		aj_get(url, transferData)
-		.done(function(data){
-			console.log(data);
+		//aj_user_querylist_combine
+		aj_user_querylist_combine()
+		.done(function(d){
+
+			//alertmessage
+			alertmessage('success', '查詢成功');
+
+			//ar
+			let ar=[];
+			_.each(d,function(v){
+
+				//o
+				let o={};
+
+				//使用者名稱,姓名,郵件,手機
+				o['使用者名稱']=v['使用者名稱'];
+				o['姓名']=v['姓名'];
+				o['郵件']=v['郵件'];
+				o['手機']=v['手機'];
+
+				//q
+				let q=v['使用者名稱']+v['姓名']+v['郵件']+v['手機'];
+
+				//動作
+				let c='';
+				c+='<button class="btn btn-default" type="button" style="margin:0px 3px 3px 0px;" onclick="userpermission('+v['id']+')">權限設定</button>';
+				c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/ebookSystem/getbookrecord_user/'+v['id']+'/">下載紀錄</a>';
+				if(v['校對權限']){
+					c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/genericUser/serviceinfo_list/root/">服務紀錄</a>';
+				}
+				if(v['來賓權限']){
+					c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="#">手冊查閱</a>';
+				}
+				o['動作']=c;
+
+				//push
+				if(binstr(q,query)){
+					ar.push(o);
+				}
+
+			})
+
+			//gentable
+			gentable('usermanager_div_查詢','usermanager_div_查詢_table',ar);
+		
 		})
-		.fail(function(data){
-			console.log(data);
+		.fail(function(msg){
+			console.log(msg)
 		})
 
 	}
 
+
 </script>
+
 
 <h3>使用者管理</h3>
 
-<div class="panel panel-default">
-	<div class="panel-heading" style="font-size:14pt;">志工</div>
-	<div class="panel-body">
-		<table class="table">
-			<tr>
-				<th>使用者名稱</th>
-				<th>姓名</th>
-				<th>郵件</th>
-				<th>手機</th>
-				<th>最後上線時間</th>
-				<th colspan="4">動作</th>
-			</tr>
-			{% for user in user_list %}
-			<tr>
-				<td>{{ user.username }}</td>
-				<td>{{ user.first_name }}{{ user.last_name }}</td>
-				<td>{{ user.email }}</td>
-				<td>{{ user.phone }}</td>
-				<td>{{ user.last_login }}</td>
-				<td><button class="btn btn-warning" type="button" name="user_update_info" value="{{ user.id }}">權限設定</button></td>
-				<td><a class="btn btn-default" style="padding:6px 12px;" href="{%url 'genericUser:serviceinfo_list' user.username %}">服務紀錄</a></td>
-				<td>手冊查閱</td>
-				<td><a class="btn btn-default" style="padding:6px 12px;" href="{%url 'ebookSystem:getbookrecord_user' user.id %}">下載紀錄</a></td>
-			</tr>
-			{% endfor %}
-		</table>
+
+<ul class="nav nav-tabs">
+	<li class="active"><a href="#usermanager_tab_查詢" name="usermanager_tab_grp" data-toggle="tab" aria-expanded="true" onclick="pagetab_subtabfix(this);">查詢</a></li>
+</ul>
+
+
+<div class="tab-content" style="padding:20px 0px;">
+
+	<div id="usermanager_tab_查詢" class="tab-pane active">
+
+		<div class="form-inline" style="margin-bottom:20px;">
+			<span>關鍵字查詢：</span>
+			<input id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊">
+			<button class="btn btn-primary" type="button" onclick="usersearch();">搜尋</button>
+		</div>
+		
+		<div id="usermanager_div_查詢"></div>
+
 	</div>
+
 </div>
+
+
 {% endblock %}

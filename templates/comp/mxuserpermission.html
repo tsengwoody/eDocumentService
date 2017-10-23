@@ -1,37 +1,79 @@
 <script>
 
 
-    function userpermission(message){
-        //顯示與編輯使用者權限
+    function userpermission_inputchange(tarid){
+        let o=$('#'+tarid);
+        o.prop('checked',!o.prop('checked'));
+    }
 
-        //df
-        let df = $.Deferred();
+
+    function userpermission(userid){
+        //顯示與編輯使用者權限
 
         //div
         let div=$('#divmadal_userpermission');
 
-        //kind
-        let icon='<span class="glyphicon glyphicon-question-sign" style="color:#ee9922;"></span>';
+        //aj_user_queryid
+        aj_user_queryid(userid,'role')
+        .done(function(data){
 
-        //html
-         $('#divmadal_userpermission_icon').html(icon);
+            let d=data[0];
+            //console.log(d)
 
-        //message
-        if(message===''){
-            console.log('userpermission: message empty')
-            return;
-        }
-        $('#divmadal_userpermission_msg').html(message);
+            //c
+            let c='';
+            _.each(d,function(value,head){
+                //console.log(v,k,aj_user_head2key(k))
+                let key=aj_user_head2key(head);
+
+                if(head!=='id'){
+                    let inpid='id_'+key;
+
+                    c+='<div style="margin:15px 0px;">';
+
+                    c+='<div class="inputslide" style="display:inline-block; margin:0px 10px; cursor:pointer;" onclick="userpermission_inputchange(\''+inpid+'\')">';
+                    c+='<input type="checkbox" id="'+inpid+'" name="userpermission_grp" key="'+key+'" checked="'+value+'"/>';
+                    c+='<label for="'+inpid+'"></label>';
+                    c+='</div>';
+
+                    c+='<div style="display:inline-block; cursor:pointer;" onclick="userpermission_inputchange(\''+inpid+'\')">'+head+'</div>';
+
+                    c+='</div>';
+                }
+
+            })
+            
+            //html
+            $('#divmadal_userpermission_list').html(c);
+
+        })
+        .fail(function(msg){
+            
+			//alertmessage
+			alertmessage('error', msg)
+
+        })
 
         //ok
         $('#divmadal_userpermission_ok').off().on('click', function(){
-            df.resolve();
+
+            //transferData
+            let transferData={};
+            $('input[name="userpermission_grp"]').each(function(){
+                let inp=$(this);
+                let checked=inp.prop('checked');
+                let key=inp.attr('key');
+                transferData[key]=checked;
+            })
+
+            //aj_user_updateid
+            aj_user_updateid(userid,'role',transferData);
+
             div.modal('hide');
         });
 
         //cancel
         $('#divmadal_userpermission_cancel').off().on('click', function () {
-            df.reject();
             div.modal('hide');
         })
 
@@ -40,10 +82,9 @@
 
         //autofocus
         _.delay(function(){
-            $('#divmadal_userpermission_msg').focus();
+            //$('#divmadal_userpermission_msg').focus();
         },500)
         
-        return df;
     }
 
 </script>
@@ -56,15 +97,12 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 id="divmadal_userpermission_title" class="modal-title">系統訊息</h4>
+                <h4 id="divmadal_userpermission_title" class="modal-title">編輯使用者權限</h4>
             </div>
-            <div style="padding:40px 20px; background-color:#fafafa;">
-                <table>
-                    <tr>
-                        <td id="divmadal_userpermission_icon" style="font-size:30pt; padding-right:15px;"></td>
-                        <td id="divmadal_userpermission_msg" style="font-size:12pt;" tabindex="0"></td>
-                    </tr>
-                </table>
+            <div style="padding:20px 20px; background-color:#fafafa;">
+
+                <div id="divmadal_userpermission_list"></div>
+
             </div>
             <div class="modal-footer">
                 <button id="divmadal_userpermission_cancel" type="button" class="btn btn-danger">取消</button>
