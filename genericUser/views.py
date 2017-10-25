@@ -430,9 +430,9 @@ def user_update(request, ID, ):
 			return locals()
 
 @http_response
-def user_view(request, id):
+def user_view(request, ID):
 	if request.method == 'GET' and request.is_ajax():
-		user = User.objects.get(id=id)
+		user = User.objects.get(id=ID)
 		content = user.serialized(request.GET['action'])
 		status = 'success'
 		message = u''
