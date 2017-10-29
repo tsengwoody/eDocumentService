@@ -29,36 +29,25 @@ class UserViewTests(TestCase):
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
 		print len(response.json()['content'])
-#		self.assertEqual(len(QAndA.objects.all()), previous_count+1)
 
-	def test_qanda_update_correct_case(self):
+	def test_user_update_correct_case(self):
 		client = Client()
 		client.login(username='root', password='root')
-		qanda = QAndA.objects.get(id=1)
+		src = BASE_DIR +u'/temp/dcb.jpg'
+		back_file = open(src)
+		src = BASE_DIR +u'/temp/dcf.jpg'
+		front_file = open(src)
 		response = client.post(
 			reverse(
-				'genericUser:qanda_update',
+				'genericUser:user_update',
 				kwargs = {
-					'id': qanda.id,
-				},
+					'ID': '1',
+				}
 			),
 			{
-				'question': '<p>question update</p>',
-				'answer': '<p>answer update</p>',
+				'action': 'disability_card',
+				'front': front_file,
+				'back': back_file,
 			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
-		qanda = QAndA.objects.get(id=1)
-		self.assertEqual(qanda.question, '<p>question update</p>')
-
-	def test_qanda_list_correct_case(self):
-		client = Client()
-		client.login(username='root', password='root')
-		qanda_list = [i.serialized() for i in QAndA.objects.all()]
-		response = client.get(
-			reverse(
-				'genericUser:qanda_list',
-			),
-			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
-		)
-		self.assertEqual(response.json()['content'], qanda_list)

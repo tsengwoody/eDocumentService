@@ -701,6 +701,10 @@ class EBook(models.Model):
 		edit_content = content[1]
 		return [finish_content, edit_content]
 
+class BookOrder(models.Model):
+	book = models.OneToOneField(Book, related_name='bookorder')
+	order = models.IntegerField()
+
 class GetBookRecord(models.Model):
 	user = models.ForeignKey(User, related_name='getbookrecord_set')
 	book = models.ForeignKey(Book, related_name='getbookrecord_set')
