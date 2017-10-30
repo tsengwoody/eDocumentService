@@ -17,6 +17,7 @@
 <script>
 
 	let voUser;
+	let u_original;
 
 	$(function(){
 
@@ -25,10 +26,10 @@
 
 		//loaddata
 		loaddata()
-		.done(function(u){
-			console.log(_.cloneDeep(u))
+		.done(function(o){
+
 			//filldata
-			filldata(u);
+			filldata(o);
 
 			//show
 			voUser.$refs.user.ch_mode('show');
@@ -88,7 +89,7 @@
 
 
 	function org_srv2ui(org){
-		org=replace(org,'Organization/','');
+		org=replace(org,'Organization/',''); //暴力改org
 		if(org==='1'){
 			org='eDocumentService';
 		}
@@ -101,7 +102,7 @@
 
 	function org_ui2srv(org){
 		if(org==='eDocumentService'){
-			org='1'; //不能傳Organization/
+			org='1'; //暴力改org
 		}
 		else{
 			org='';
@@ -113,6 +114,9 @@
 	function filldata(o){
 		//填入使用者資料
 
+		//cloneDeep
+		o=_.cloneDeep(o);
+
 		//boolean
 		_.each(o,function(v,k){
 			if(v==='True'){
@@ -123,15 +127,14 @@
 			}
 		})
 
-		//replace
-		let org=replace(o['org'],'Organization/','');
-		if(org==='1'){
-			org='eDocumentService';
-		}
-		else{
-			org='其他';
-		}
-		o['org']=org;
+		//birthday
+		o['birthday']=moment(o['birthday']).format(); //general to utc time
+
+		//u_original
+		u_original=_.cloneDeep(o);
+
+		//org_srv2ui
+		o['org']=org_srv2ui(o['org']);
 		
 		//cloneDeep
 		let p=_.cloneDeep(o);
@@ -578,8 +581,9 @@ Vue.component('vu-user', {
 		<label v-bind:class="gridclass" for="v_id_use_birthday"><font style="color:red">*</font><span>生日</span></label>
 		<div class="col-sm-3">
 			<input ref="birthday" id="v_id_use_birthday" class="form-control" type="text" v-model="s.birthday.value" v-if="s.birthday.mode==='foredit' && false">
-			<DatePicker size="large" format="yyyy-MM-dd" type="date" placeholder="選擇日期" style="width:100%;" v-model="s.birthday.value" v-if="s.birthday.mode==='foredit'"></DatePicker>
-			<div class="likebtn" v-html="s.birthday.value" v-if="s.birthday.mode==='forshow'"></div>
+			<DatePicker size="large" format="yyyy-MM-dd" type="date" placeholder="選擇日期" style="width:100%;" v-model="s.birthday.value" v-if="s.birthday.mode==='foredit' && false"></DatePicker>
+			<el-date-picker format="yyyy-MM-dd" type="date" placeholder="選擇日期" style="width:100%;" v-model="s.birthday.value" v-if="s.birthday.mode==='foredit'"></el-date-picker>
+			<div class="likebtn" v-html="cv_birthday" v-if="s.birthday.mode==='forshow'"></div>
 		</div>
 		<label class="control-label col-sm-5" for="v_id_use_birthday" style="text-align:left;" v-if="s.birthday.remark===true"><font style="color:red">請填寫生日，範例日期格式：1989-02-19</font></label>
 	</div>
@@ -698,11 +702,11 @@ Vue.component('vu-user', {
 		}
 	},
     mounted: function(){
-		//let vo=this;
+		let vo=this;
 
 		// //birthday
-		// let birthday=vo.$refs.birthday;
-		// $(birthday).datepicker({
+		// let birthday=$(vo.$refs.birthday);
+		// birthday.datepicker({
 		// 	autoclose: true,
 		// 	format: 'yyyy-mm-dd',
 		// 	language: 'zh-TW',
@@ -743,6 +747,11 @@ Vue.component('vu-user', {
 				vo.s.front.show=vo.s.role.value.is_guest;
 				vo.s.back.show=vo.s.role.value.is_guest;
 			}
+		},
+
+		cv_birthday:function(){
+			let vo=this;
+			return moment(vo.s.birthday.value).format('YYYY-MM-DD'); //general time
 		},
 
 		cv_userterms:function(){
@@ -883,7 +892,7 @@ Vue.component('vu-user', {
 			let o={};
 			_.each(vo.s,function(v,k){
 				if(k==='birthday'){
-					o[k]=moment(v.value).format('YYYY-MM-DD');
+					o[k]=moment(v.value).format('YYYY-MM-DD'); //utc to general time
 				}
 				else if(k!=='role'){
 					o[k]=v.value;
@@ -904,10 +913,13 @@ Vue.component('vu-user', {
 			checkdata('create',o)
 			.done(function(){
 			
+				//userid
+				let userid=$('div[user_id]').attr('user_id');
+
 				//org
 				o['org']=org_ui2srv(o['org']);
-
-
+				
+				//待user_create api出來(註冊)
 
 			})
 		},
@@ -918,7 +930,6 @@ Vue.component('vu-user', {
 
 			//user_save
 			let o=vo.user_save();
-			
 
 			//checkdata
 			checkdata('update',o)
@@ -930,17 +941,53 @@ Vue.component('vu-user', {
 				//org
 				o['org']=org_ui2srv(o['org']);
 
-				//omit
-				//o=_.omit(o,['mode','password','confirm_password','is_privacy','is_editor','is_guest','front','back'])
-				console.log(o)
+				//pinfo
+				function pinfo(o){
+					let p=_.cloneDeep(o);
+					return _.pick(p, ['username', 'first_name', 'last_name', 'email', 'phone', 'birthday', 'education', 'is_book', 'org']);
+				}
+				
+				//pdc
+				function pdc(o){
+					let p=_.cloneDeep(o);
+					return _.pick(p, ['front','back']);
+				}
+				
+				//o_info, o_disability_card
+				let o_info=pinfo(o);
+				let o_disability_card=pdc(o);
+				
+				//r_info, r_disability_card
+				let p=_.cloneDeep(u_original);
+				p['org']=replace(p['org'],'Organization/',''); //暴力改org
+				let r_info=pinfo(p);
+				let r_disability_card=pdc(p);
+				
+				console.log(o_info,r_info)
+				//diff
+				let diff_info=_.isEqual(o_info,r_info);
+				let diff_disability_card=_.isEqual(o_disability_card,r_disability_card);
+				if(diff_info===true && diff_disability_card===true){
+					alertmessage('error','無資訊有異動，不需變更');
+					return;
+				}
 
-				//aj_user_updateid
-				let df1=aj_user_updateid(userid,'info',_.cloneDeep(o));
-				let df2=aj_user_updateid(userid,'disability_card',_.cloneDeep(o));
-				$.when(df2,df1)
-				.done(function(d1,d2){
-					console.log(d1,d2)
-					alertmessage('success',d1['message']+', '+d2['message'])
+				//df_info
+				let df_info;
+				if(!diff_info){
+					df_info=aj_user_updateid(userid,'info',o_info);
+				}
+
+				//df_disability_card
+				let df_disability_card;
+				if(!diff_disability_card){
+					df_disability_card=aj_user_updateid(userid,'disability_card',o_disability_card);
+				}
+				
+				//when
+				$.when(df_info,df_disability_card)
+				.done(function(d_info,d_disability_card){
+					alertmessage(d_info['status'],d_info['message'])
 					.done(function(){
 						window.location.reload(); //變更成功則重新整理網頁
 					})

@@ -28,13 +28,20 @@
 	<script language="javascript" src="{% static 'ebookSystem/js/base64js.min.js' %}"></script>
 	
 	<!-- moment -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/zh-tw.js"></script>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/zh-tw.js"></script> -->
+	<script language="javascript" src="{% static 'ebookSystem/js/moment-2.19.1.js' %}"></script>
+	<script language="javascript" src="{% static 'ebookSystem/js/moment-with-locales-2.19.1.js' %}"></script>
 
 	<!-- iview -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/iview/2.6.0/styles/iview.css" />
+	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/iview/2.6.0/styles/iview.css" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/iview/2.6.0/iview.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/iview/2.6.0/locale/zh-TW.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/iview/2.6.0/locale/zh-TW.min.js"></script> -->
+
+	<!-- element-ui -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.0.1/theme-chalk/index.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.0.1/index.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.0.1/locale/zh-TW.min.js"></script>
 
 	<!-- bootstrap, 3.3.7時NVDA會讀不到modal-->
  	<link href="{% static "ebookSystem/framework/bootstrap-3.3.4/css/bootstrap.min.css" %}" rel="stylesheet" >
