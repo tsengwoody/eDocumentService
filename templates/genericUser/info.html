@@ -9,16 +9,448 @@
 {% load staticfiles %}
 <script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
 <script language="javascript" src="{% static 'ebookSystem/js/getOTP.js' %}"></script>
+{% endblock %}
+{% block content %}
+{% csrf_token %}
 
-<style type="text/css">
-#otpModal .modal-content{
-	background-color: #f5f5f5;
-}
-</style>
 
 <script>
 
+	let voUser;
+
+	$(function(){
+
+		//user_id
+		$('div[user_id]').attr('user_id',3)
+
+		//loaddata
+		loaddata()
+		.done(function(u){
+			console.log(_.cloneDeep(u))
+			//filldata
+			filldata(u);
+
+			//show
+			voUser.$refs.user.ch_mode('show');
+
+		})
+
+		//grid2bstable
+		grid2bstable('s_fackbook');
+		grid2bstable('s_google');
+
+	})
+
+
+	function loaddata(){
+		//載入數據
+		
+		let df = $.Deferred();
+
+		//userid
+		let userid=$('div[user_id]').attr('user_id');
+
+		//getcard
+		function getcard(){
+			let dff = $.Deferred();
+			aj_user_queryid(userid,'disability_card')
+			.done(function(d){
+				dff.resolve(d);
+			})
+			.fail(function(){
+				let d={};
+				dff.resolve(d);
+			})
+			return dff;
+		}
+
+		//userdata
+		let df1=aj_user_queryid(userid,'info')
+		let df2=aj_user_queryid(userid,'role')
+		//let df3=aj_user_queryid(userid,'disability_card'); //因有可能無身心障礙手冊照片
+		let df3=getcard();
+		$.when(df1,df2,df3)
+		.done(function(d1,d2,d3){
+
+			//merge
+			let d=_.merge(d1[0],d2[0],d3[0]);
+
+			//head2key
+			let u=aj_user_head2key_array([d])[0];
+
+			//resolve
+			df.resolve(u);
+
+		})
+
+		return df;
+	}
+
+
+	function org_srv2ui(org){
+		org=replace(org,'Organization/','');
+		if(org==='1'){
+			org='eDocumentService';
+		}
+		else{
+			org='其他';
+		}
+		return org;
+	}
+
+
+	function org_ui2srv(org){
+		if(org==='eDocumentService'){
+			org='1'; //不能傳Organization/
+		}
+		else{
+			org='';
+		}
+		return org;
+	}
+
+
+	function filldata(o){
+		//填入使用者資料
+
+		//boolean
+		_.each(o,function(v,k){
+			if(v==='True'){
+				o[k]=true;
+			}
+			else if(v==='False'){
+				o[k]=false;
+			}
+		})
+
+		//replace
+		let org=replace(o['org'],'Organization/','');
+		if(org==='1'){
+			org='eDocumentService';
+		}
+		else{
+			org='其他';
+		}
+		o['org']=org;
+		
+		//cloneDeep
+		let p=_.cloneDeep(o);
+
+		//divid
+		let divid='v_user';
+
+		//wrap
+		$('#'+divid).wrap('<vu-user ref="user" id="v_user" v-bind:s="s"></vu-user>');
+
+		//voUser
+		voUser = new Vue({
+			el: '#'+divid,
+			data: {
+				s:{
+					mode:'',
+					username:{
+						show:true,
+						mode:'forshow',
+						value:p.username,
+						remark:true,
+					},
+					password:{
+						show:true,
+						mode:'forshow',
+						value:p.password,
+						remark:true,
+					},
+					confirm_password:{
+						show:true,
+						mode:'forshow',
+						value:p.confirm_password,
+						remark:true,
+					},
+					first_name:{
+						show:true,
+						mode:'forshow',
+						value:p.first_name,
+						remark:true,
+					},
+					last_name:{
+						show:true,
+						mode:'forshow',
+						value:p.last_name,
+						remark:true,
+					},
+					email:{
+						show:true,
+						mode:'forshow',
+						value:p.email,
+						auth:p.auth_email,
+						remark:true,
+					},
+					phone:{
+						show:true,
+						mode:'forshow',
+						value:p.phone,
+						auth:p.auth_phone,
+						remark:true,
+					},
+					birthday:{
+						show:true,
+						mode:'forshow',
+						value:p.birthday,
+						remark:true,
+					},
+					education:{
+						show:true,
+						mode:'forshow',
+						value:p.education,
+						remark:true,
+					},
+					is_book:{
+						show:true,
+						mode:'forshow',
+						value:p.is_book,
+						remark:true,
+					},
+					org:{
+						show:true,
+						mode:'forshow',
+						value:p.org,
+						remark:true,
+					},
+					role:{
+						show:true,
+						mode:'forshow',
+						value:{
+							is_editor:p.is_editor,
+							is_guest:p.is_guest,
+						},
+						remark:true,
+					},
+					front:{
+						show:true,
+						mode:'forshow',
+						value:p.front,
+						remark:true,
+					},
+					back:{
+						show:true,
+						mode:'forshow',
+						value:p.back,
+						remark:true,
+					},
+					is_privacy:{
+						show:true,
+						mode:'forshow',
+						value:false,
+						remark:true,
+					},
+				}
+			},
+		})
+		
+	}
+
+
+	function checkdata(mode,o){
+		//檢核輸入區資料
+
+
+		let df = $.Deferred();
+		let err=[];
+
+
+		//username
+		if(mode==='create'){
+			let username=o.username;
+			if(username.length<5){
+				err.push('使用者名稱需5個字元以上');
+			}
+			else if(username.length>150){
+				err.push('使用者名稱需150個字元以下');
+			}
+			else{
+
+				let r1=/^[a-z]{1}/;
+				if (!r1.test(username)){
+					err.push('使用者名稱字首非小寫英文');
+				}
+
+				let r2=/^[a-z0-9_]+$/;
+				if (!r2.test(username)){
+					err.push('使用者名稱需使用小寫英文字母、數字或底線');
+				}
+
+			}
+		}
+	
+
+		//password
+		if(mode==='create'){
+			let password=o.password;
+			if(password.length<8){
+				err.push('密碼需8個字元以上');
+			}
+			else if(password.length>150){
+				err.push('密碼需150個字元以下');
+			}
+			else{
+
+				let r1=/^[a-zA-Z0-9_]+$/;
+				if (!r1.test(password)){
+					err.push('密碼需使用大、小寫英文字母、數字與底線');
+				}
+
+				let passwordcf=$('#id_use_confirm_password').val();
+				if (password!==passwordcf){
+					err.push('密碼與確認密碼不相符');
+				}
+
+			}
+		}
+		
+
+		//firstname
+		if(mode==='create'){
+			let firstname=o.first_name;
+			if(firstname===''){
+				err.push('姓氏不得為空');
+			}
+		}
+
+
+		//lastname
+		if(mode==='create'){
+			let lastname=o.last_name;
+			if(lastname===''){
+				err.push('名字不得為空');
+			}
+		}
+
+
+		//email
+		if(mode==='create' || mode==='update'){
+			let email=o.email;
+			if(email===''){
+				err.push('電子信箱不得為空');
+			}
+			else{
+
+				let r1=/^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
+				if (!r1.test(email)){
+					err.push('電子信箱格式錯誤');
+				}
+
+			}
+		}
+
+
+		//phone
+		if(mode==='create'){
+			let phone=o.phone;
+			if(phone===''){
+				err.push('聯絡電話不得為空');
+			}
+			else{
+
+				let r1=/^[0-9]{10}$/;
+				if (!r1.test(phone)){
+					err.push('手機號碼格式錯誤');
+				}
+
+			}
+		}
+
+
+		//birthday
+		if(mode==='create' || mode==='update'){
+			let birthday=o.birthday;
+			if(birthday===''){
+				err.push('生日不得為空');
+			}
+			else{
+
+				let r1=/^([0-9]{4})[-]{1}([0-9]{2})[-]{1}([0-9]{2})$/;
+				if (!r1.test(birthday)){
+					err.push('生日格式錯誤：a.使用年月日的順序。 b.年需使用西元年為4位數字，月與日為2位數字，不足時需補0。 c.年月日中間使用-為分隔，例(1989-02-19)。');
+				}
+
+			}
+		}
+
+
+		//education
+		if(mode==='create' || mode==='update'){
+			let education=o.education;
+			if(education==='---------'){
+				err.push('教育程度尚未選擇');
+			}
+		}
+
+
+		//org
+		if(mode==='create' || mode==='update'){
+			let org=o.org;
+			if(org==='其他'){
+				err.push('所屬單位尚未選擇');
+			}
+		}
+
+
+		//front
+		if(mode==='create' || mode==='update'){
+			if($('#id_use_guest').prop('checked')===true){
+				let front=o.front;
+				if(iser(front)){
+					err.push('身心障礙手冊正面尚未選擇正確檔案');
+				}
+			}
+		}
+		
+
+		//back
+		if(mode==='create' || mode==='update'){
+			if($('#id_use_guest').prop('checked')===true){
+				let back=o.back;
+				if(iser(back)){
+					err.push('身心障礙手冊反面尚未選擇正確檔案');
+				}
+			}
+		}
+		
+
+		//show
+		if(err.length>0){
+			//console.log(err)
+
+			//msg
+			let msg=_.chain(err)
+			.map(function(v,k){
+				return '<div style="margin-top:5px;">'+cstr(k+1)+': '+v+'</div>';
+			})
+			.join('')
+			.value();
+			msg='<div>輸入錯誤訊息如下：</div>'+msg;
+	
+			//alertmessage
+			alertmessage('error', msg);
+
+			//reject
+			df.reject();
+
+		}
+		else{
+
+			//resolve
+			df.resolve();
+
+		}
+
+		return df;
+	}
+
+
 	function forcepost(me){
+		//a元素強制post href
+
 		me=$(me);
 		let href=me.attr('href');
 		aj_post(href, {})
@@ -31,14 +463,590 @@
 		return false; 
 	}
 
+
 </script>
 
-{% endblock %}
-{% block content %}
-{% csrf_token %}
+
+<script>
+
+
+//vu-user
+Vue.component('vu-user', {
+	template: `
+<div>
+
+
+	<div class="form-group" v-if="s.username.show===true">
+		<label v-bind:class="gridclass" for="v_id_use_username"><font style="color:red">*</font><span>使用者名稱</span></label>
+		<div class="col-sm-3">
+			<input id="v_id_use_username" class="form-control" type="text" maxlength="30" v-model="s.username.value" v-if="s.username.mode==='foredit'">
+			<div class="likebtn" v-html="s.username.value" v-if="s.username.mode==='forshow'"></div>
+		</div>
+		<label class="control-label col-sm-5" for="v_id_use_username" style="text-align:left;" v-if="s.username.remark===true"><font style="color:red">請填寫使用者名稱，需使用小寫英文字母或數字，首字需為小寫英文字母</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.password.show===true">
+		<label v-bind:class="gridclass" for="v_id_use_password"><font style="color:red">*</font><span>密碼</span></label>
+		<div class="col-sm-3">
+			<input id="v_id_use_password" class="form-control" type="password" maxlength="30" v-model="s.password.value" v-if="s.password.mode==='foredit'">
+			<div class="likebtn" v-html="s.password.value" v-if="s.password.mode==='forshow'"></div>
+		</div>
+		<label class="control-label col-sm-5" for="v_id_use_password" style="text-align:left;" v-if="s.password.remark===true"><font style="color:red">請填寫密碼，需8個字元以上，且需使用英文字母、數字或底線</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.confirm_password.show===true">
+		<label v-bind:class="gridclass" for="v_id_use_confirm_password"><font style="color:red">*</font><span>確認密碼</span></label>
+		<div class="col-sm-3">
+			<input id="v_id_use_confirm_password" class="form-control" type="confirm_password" maxlength="30" v-model="s.confirm_password.value" v-if="s.confirm_password.mode==='foredit'">
+			<div class="likebtn" v-html="s.confirm_password.value" v-if="s.confirm_password.mode==='forshow'"></div>
+		</div>
+		<label class="control-label col-sm-5" for="v_id_use_confirm_password" style="text-align:left;" v-if="s.confirm_password.remark===true"><font style="color:red">請再次填寫密碼</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.first_name.show===true">
+		<label v-bind:class="gridclass" for="v_id_use_first_name"><font style="color:red">*</font><span>姓氏</span></label>
+		<div class="col-sm-3">
+			<input id="v_id_use_first_name" class="form-control" type="text" maxlength="30" v-model="s.first_name.value" v-if="s.first_name.mode==='foredit'">
+			<div class="likebtn" v-html="s.first_name.value" v-if="s.first_name.mode==='forshow'"></div>
+		</div>
+		<label class="control-label col-sm-5" for="v_id_use_first_name" style="text-align:left;" v-if="s.first_name.remark===true"><font style="color:red">請填寫中文姓氏</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.last_name.show===true">
+		<label v-bind:class="gridclass" for="v_id_use_last_name"><font style="color:red">*</font><span>名字</span></label>
+		<div class="col-sm-3">
+			<input id="v_id_use_last_name" class="form-control" type="text" maxlength="30" v-model="s.last_name.value" v-if="s.last_name.mode==='foredit'">
+			<div class="likebtn" v-html="s.last_name.value" v-if="s.last_name.mode==='forshow'"></div>
+		</div>
+		<label class="control-label col-sm-5" for="v_id_use_last_name" style="text-align:left;" v-if="s.last_name.remark===true"><font style="color:red">請填寫中文名子</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.email.show===true">
+		<label v-bind:class="gridclass" for="v_id_email"><font style="color:red">*</font><span>電子信箱</span></label>
+		<div class="col-sm-3">
+
+			<div class="input-group" v-if="s.email.mode==='forshowauth'">
+					
+				<div class="form-control" style="box-shadow:none; -webkit-box-shadow:none;" v-html="s.email.value"></div>
+
+				<span class="input-group-btn">
+					<button class="btn btn-warning" type="button" value="s.email.value" data-toggle="modal" data-target="#otpModal" data-whatever="email" v-bind:data-sendto="s.email.value" v-if="s.email.auth===false">未驗證</button>
+					<button class="btn btn-success disabled" type="button" disabled v-if="s.email.auth===true">已驗證</button>
+				</span>
+
+			</div>
+
+			<input id="v_id_email" class="form-control" type="email" maxlength="30" v-model="s.email.value" v-if="s.email.mode==='foredit'">
+			
+			<div class="likebtn" v-html="s.email.value" v-if="s.email.mode==='forshow'"></div>
+
+		</div>
+		<label class="control-label col-sm-5" for="id_use_email" style="text-align:left;" v-if="s.email.remark===true"><font style="color:red">請填寫電子信箱</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.phone.show===true">
+		<label v-bind:class="gridclass" for="v_id_phone"><font style="color:red">*</font><span>聯絡電話</span></label>
+		<div class="col-sm-3">
+
+			<div class="input-group" v-if="s.phone.mode==='forshowauth'">
+					
+				<div class="form-control" style="box-shadow:none; -webkit-box-shadow:none;" v-html="s.phone.value"></div>
+
+				<span class="input-group-btn">
+					<button class="btn btn-warning" type="button" value="s.phone.value" data-toggle="modal" data-target="#otpModal" data-whatever="phone" v-bind:data-sendto="s.phone.value" v-if="s.phone.auth===false">未驗證</button>
+					<button class="btn btn-success disabled" type="button" disabled v-if="s.phone.auth===true">已驗證</button>
+				</span>
+
+			</div>
+
+			<input id="v_id_phone" class="form-control" type="text" maxlength="30" v-model="s.phone.value" v-if="s.phone.mode==='foredit'">
+			
+			<div class="likebtn" v-html="s.phone.value" v-if="s.phone.mode==='forshow'"></div>
+
+		</div>
+		<label class="control-label col-sm-5" for="id_use_phone" style="text-align:left;" v-if="s.phone.remark===true"><font style="color:red">請填寫手機</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.birthday.show===true">
+		<label v-bind:class="gridclass" for="v_id_use_birthday"><font style="color:red">*</font><span>生日</span></label>
+		<div class="col-sm-3">
+			<input ref="birthday" id="v_id_use_birthday" class="form-control" type="text" v-model="s.birthday.value" v-if="s.birthday.mode==='foredit' && false">
+			<DatePicker size="large" format="yyyy-MM-dd" type="date" placeholder="選擇日期" style="width:100%;" v-model="s.birthday.value" v-if="s.birthday.mode==='foredit'"></DatePicker>
+			<div class="likebtn" v-html="s.birthday.value" v-if="s.birthday.mode==='forshow'"></div>
+		</div>
+		<label class="control-label col-sm-5" for="v_id_use_birthday" style="text-align:left;" v-if="s.birthday.remark===true"><font style="color:red">請填寫生日，範例日期格式：1989-02-19</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.education.show===true">
+		<label v-bind:class="gridclass" for="v_id_use_education"><font style="color:red">*</font><span>教育程度</span></label>
+		<div class="col-sm-3">
+			<select id="v_id_use_education" class="form-control" v-model="s.education.value" v-if="s.education.mode==='foredit'">
+				<option value="" selected="selected">---------</option>
+				<option value="國小">國小</option>
+				<option value="國中">國中</option>
+				<option value="高中">高中</option>
+				<option value="學士">學士</option>
+				<option value="碩士">碩士</option>
+			</select>
+			<div class="likebtn" v-html="s.education.value" v-if="s.education.mode==='forshow'"></div>
+		</div>
+		<label class="control-label col-sm-5" for="v_id_use_education" style="text-align:left;" v-if="s.education.remark===true"><font style="color:red">請選擇教育程度</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.is_book.show===true">
+		<label v-bind:class="gridclass" for="v_id_use_is_book"><font style="color:red">*</font><span>訂閱訊息</span></label>
+		<div class="col-sm-3">
+			<input id="v_id_use_is_book" type="checkbox" style="height: 30px; line-height: 30px;" v-model="s.is_book.value" v-if="s.is_book.mode==='foredit'">
+			<div class="likebtn" v-html="cv_is_book" v-if="s.is_book.mode==='forshow'"></div>
+		</div>
+		<label class="control-label col-sm-5" for="v_id_use_is_book" style="text-align:left;" v-if="s.is_book.remark===true"><font style="color:red">訂閱訊息</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.org.show===true">
+		<label v-bind:class="gridclass" for="v_id_use_org"><font style="color:red">*</font><span>所屬單位</span></label>
+		<div class="col-sm-3">
+			<select id="v_id_use_org" class="form-control" v-model="s.org.value" v-if="s.org.mode==='foredit'">
+				<option>其他</option>
+				<option>eDocumentService</option>
+			</select>
+			<div class="likebtn" v-html="s.org.value" v-if="s.org.mode==='forshow'"></div>
+		</div>
+		<label class="control-label col-sm-5" for="v_id_use_org" style="text-align:left;" v-if="s.org.remark===true"><font style="color:red">請選擇所屬單位</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.role.show===true">
+		<label v-bind:class="gridclass"><font style="color:red">*</font><span>角色</span></label>
+		<div class="col-sm-3">
+			<div v-if="s.role.mode==='foredit'">
+				<label class="radio-inline" for="v_id_use_editor">
+					<input id="v_id_use_editor" type="radio" name="v_grp_role" value="志工" v-model="role">志工
+				</label>
+				<label class="radio-inline" for="v_id_use_guest">
+					<input id="v_id_use_guest" type="radio" name="v_grp_role" value="視障者" v-model="role">視障者
+				</label>
+			</div>
+			<div class="likebtn" v-html="cv_role" v-if="s.role.mode==='forshow'"></div>
+		</div>
+		<label class="control-label col-sm-5" style="text-align:left;"><font style="color:red" v-if="s.role.remark===true">請填寫角色</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.front.show===true">
+		<label v-bind:class="gridclass" for="v_id_use_front"><font style="color:red">*</font><span>身心障礙手冊正面</span></label>
+		<div class="col-sm-3">
+			<div><img class="img-thumbnail" v-bind:src="cv_front"></div>
+			<input ref="inp_front" id="v_id_use_front" type="file" accept="image/jpg,image/jpeg" v-on:change="ch_front" v-if="s.front.mode==='foredit'">
+		</div>
+		<label class="control-label col-sm-5" for="v_id_use_front" style="text-align:left;" v-if="s.front.remark===true"><font style="color:red">請上傳身心障礙手冊正面掃描檔</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.back.show===true">
+		<label v-bind:class="gridclass" for="v_id_use_back"><font style="color:red">*</font><span>身心障礙手冊正面</span></label>
+		<div class="col-sm-3">
+			<div><img class="img-thumbnail" v-bind:src="cv_back"></div>
+			<input ref="inp_back" id="v_id_use_back" type="file" accept="image/jpg,image/jpeg" v-on:change="ch_back" v-if="s.back.mode==='foredit'">
+		</div>
+		<label class="control-label col-sm-5" for="v_id_use_back" style="text-align:left;" v-if="s.back.remark===true"><font style="color:red">請上傳身心障礙手冊正面掃描檔</font></label>
+	</div>
+
+
+	<div class="form-group" v-if="s.is_privacy.show===true">
+		<label v-bind:class="gridclass" for="v_id_userterms"><font style="color:red">*</font><span>使用者條款隱私權政策</span></label>
+		<div class="col-sm-8" v-if="s.is_privacy.mode==='foredit'">
+			<textarea id="v_id_userterms" class="form-control" style="width:100%;height: 300px; resize: none;" readonly v-html="cv_userterms"></textarea>
+			<label for="v_id_use_privacy">
+				<input id="v_id_use_privacy" type="checkbox" v-model="s.is_privacy.value">
+				<span>我同意此條款</span>
+			</label>
+		</div>
+		<div class="col-sm-3">
+			<div class="likebtn" v-html="cv_is_privacy" v-if="s.is_privacy.mode==='forshow'"></div>
+		</div>
+	</div>
+	
+
+	<div class="form-group">
+		<label v-bind:class="gridclass"></label>
+		<div class="col-sm-8">
+			<input type="button" class="btn btn-primary" value="註冊" v-on:click="user_create" v-if="s.mode==='create'">
+			<a href="/auth/password_change/" role="button" class="btn btn-primary" v-if="s.mode==='show'">修改密碼</a>
+			<input type="button" class="btn btn-primary" value="變更使用者資訊" v-on:click="ch_mode('update')" v-if="s.mode==='show'">
+			<input type="button" class="btn btn-primary" value="變更" v-on:click="user_update" v-if="s.mode==='update'">
+			<input type="button" class="btn btn-default" value="取消" onclick="window.location.reload();" v-if="s.mode==='create' || s.mode==='update'">
+		</div>
+	</div>
+
+
+</div>
+`,
+	props: ['s'],
+	data:function(){
+		return {
+			//role:'',
+		}
+	},
+    mounted: function(){
+		//let vo=this;
+
+		// //birthday
+		// let birthday=vo.$refs.birthday;
+		// $(birthday).datepicker({
+		// 	autoclose: true,
+		// 	format: 'yyyy-mm-dd',
+		// 	language: 'zh-TW',
+		// 	todayHighlight: true,
+		// });
+
+	},
+	computed:{
+
+		gridclass:function(){
+			let vo=this;
+			if(vo.s.mode==='create'){
+				return 'control-label col-sm-2 col-sm-offset-2';
+			}
+			else{
+				return 'control-label col-sm-2';
+			}
+		},
+
+		role:{
+			get:function(){
+				let vo=this;
+				if(vo.s.role.value.is_guest){
+					return '視障者';
+				}
+				return '志工';
+			},
+			set:function(v){
+				let vo=this;
+				if(v==='志工'){
+					vo.s.role.value.is_editor=true;
+					vo.s.role.value.is_guest=false;
+				}
+				else{
+					vo.s.role.value.is_editor=false;
+					vo.s.role.value.is_guest=true;	
+				}
+				vo.s.front.show=vo.s.role.value.is_guest;
+				vo.s.back.show=vo.s.role.value.is_guest;
+			}
+		},
+
+		cv_userterms:function(){
+			return $('#tmp_userterms').html();
+		},
+
+		cv_is_book:function(){
+			let vo=this;
+			if(vo.s.is_book.value){
+				return '是';
+			}
+			return '否';
+		},
+
+		cv_role:function(){
+			let vo=this;
+			let role='';
+			if(vo.s.role.value.is_editor){
+				role+='志工';
+			}
+			if(vo.s.role.value.is_guest){
+				if(role.length>0){
+					role+=', ';
+				}
+				role+='視障者';
+			}
+			return role;
+		},
+
+		cv_front:function(){
+			let vo=this;
+			if(iser(vo.s.front.value)){
+				return '';
+			}
+			let hd='data:image/jpeg;base64,';
+			let cb64=vo.s.front.value;
+			return hd+cb64;
+		},
+
+		cv_back:function(){
+			let vo=this;
+			if(iser(vo.s.back.value)){
+				return '';
+			}
+			let hd='data:image/jpeg;base64,';
+			let cb64=vo.s.back.value;
+			return hd+cb64;
+		},
+
+		cv_is_privacy:function(){
+			let vo=this;
+			if(vo.s.is_privacy.value){
+				return '是';
+			}
+			return '否';
+		},
+
+	},
+	watch: {
+        s: {
+            handler: function () {
+                // let vo = this;
+            },
+            deep: true
+        },
+	},
+    methods: {
+
+		ch_front:function(){
+			let vo=this;
+			let inp=vo.$refs.inp_front;
+			readfile(inp)
+				.done(function(bs){
+					vo.s.front.value=bin2base64(bs2barr(bs));
+				})
+		},
+
+		ch_back:function(){
+			let vo=this;
+			let inp=vo.$refs.inp_back;
+			readfile(inp)
+				.done(function(bs){
+					vo.s.back.value=bin2base64(bs2barr(bs));
+				})
+		},
+
+		ch_mode:function(mode){
+			let vo=this;
+			vo.s.mode=mode;
+			if(vo.s.mode==='create'){
+				_.each(vo.s,function(v,k){
+					vo.s[k].mode='foredit';
+					vo.s[k].remark=true;
+				})
+				vo.s['password'].show=true;
+				vo.s['confirm_password'].show=true;
+				vo.s['role'].show=true;
+				vo.s['is_privacy'].show=true;
+
+			}
+			else if(vo.s.mode==='update'){
+				_.each(vo.s,function(v,k){
+					vo.s[k].mode='foredit';
+					vo.s[k].remark=true;
+				})
+				vo.s['password'].show=false;
+				vo.s['confirm_password'].show=false;
+				vo.s['role'].show=false;
+				vo.s['is_privacy'].show=false;
+				vo.s['username'].mode='forshow';
+				vo.s['first_name'].mode='forshow';
+				vo.s['last_name'].mode='forshow';
+				vo.s['phone'].mode='forshow';
+			}
+			else{
+				_.each(vo.s,function(v,k){
+					vo.s[k].mode='forshow';
+					vo.s[k].remark=false;
+				})
+				vo.s['password'].show=false;
+				vo.s['confirm_password'].show=false;
+				vo.s['role'].show=false;
+				vo.s['is_privacy'].show=false;
+				vo.s['email'].mode='forshowauth';
+				vo.s['phone'].mode='forshowauth';
+			}
+
+			//autofocus
+			_.delay(function(){
+				$('#v_user').find('input:eq(0)').focus();
+			},300)
+
+		},
+
+		user_save:function(){
+			//儲存使用者資料
+			let vo=this;
+			let o={};
+			_.each(vo.s,function(v,k){
+				if(k==='birthday'){
+					o[k]=moment(v.value).format('YYYY-MM-DD');
+				}
+				else if(k!=='role'){
+					o[k]=v.value;
+				}
+				else{
+					o['is_editor']=v.value.is_editor;
+					o['is_guest']=v.value.is_guest;
+				}
+			})
+			return o;
+		},
+
+		user_create:function(){
+			//新增使用者資訊
+			let vo=this;
+			let o=vo.user_save();
+			console.log('user_create: ',o)
+			checkdata('create',o)
+			.done(function(){
+			
+				//org
+				o['org']=org_ui2srv(o['org']);
+
+
+
+			})
+		},
+
+		user_update:function(){
+			//變更使用者資訊
+			let vo=this;
+
+			//user_save
+			let o=vo.user_save();
+			
+
+			//checkdata
+			checkdata('update',o)
+			.done(function(){
+
+				//userid
+				let userid=$('div[user_id]').attr('user_id');
+
+				//org
+				o['org']=org_ui2srv(o['org']);
+
+				//omit
+				//o=_.omit(o,['mode','password','confirm_password','is_privacy','is_editor','is_guest','front','back'])
+				console.log(o)
+
+				//aj_user_updateid
+				let df1=aj_user_updateid(userid,'info',_.cloneDeep(o));
+				let df2=aj_user_updateid(userid,'disability_card',_.cloneDeep(o));
+				$.when(df2,df1)
+				.done(function(d1,d2){
+					console.log(d1,d2)
+					alertmessage('success',d1['message']+', '+d2['message'])
+					.done(function(){
+						window.location.reload(); //變更成功則重新整理網頁
+					})
+				})
+				.fail(function(data){
+					alertmessage(data['status'],data['message'])
+				})
+
+			})
+		},
+
+    },
+})
+
+
+</script>
+
+
+<h3 >個人資料</h3>
+
+
+<ul class="nav nav-tabs">
+	<li class="active"><a href="#user_infomation_tab_使用者資訊" name="user_infomation_tab_grp" data-toggle="tab" aria-expanded="true" onclick="pagetab_subtabfix(this);">使用者資訊</a></li>
+	<li><a href="#user_infomation_tab_社群帳號綁定" name="user_infomation_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">社群帳號綁定</a></li>
+</ul>
+
+
+<div class="tab-content" style="padding:20px 0px;">
+
+	<div id="user_infomation_tab_使用者資訊" class="tab-pane active">
+		<div class="textfornvda">使用者資訊</div>
+
+		<div id="user_infomation_div_使用者資訊" class="form-horizontal">
+
+			<div id="v_user"></div>
+
+		</div>
+
+	</div>
+
+	<div id="user_infomation_tab_社群帳號綁定" class="tab-pane">
+		<div class="textfornvda">社群帳號綁定</div>
+
+		<div id="user_infomation_div_社群帳號綁定">
+
+			{% if request.user.is_superuser %}
+			
+			<h4>facebook</h4>
+			<a class="btn btn-default" href="{% url "social:begin" "facebook" %}">以 facebook 帳號綁定平台帳號</a>
+			<a class="btn btn-default" href="{% url "social:disconnect" "facebook" %}">解除 facebook 帳號綁定</a>
+			<table id="s_fackbook">
+				<thead>
+					<tr>
+						<th>連結帳號</th>
+						<th>uid</th>
+						<th>動作</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for association in facebook_association %}
+					<tr>
+						<td><a href="https://www.facebook.com/{{ association.uid }}" >facebook 頁面</a></td>
+						<td>{{ association.uid }}</td>
+						<td>
+							<button><a href="{% url "social:disconnect_individual" "facebook" association.id %}" onclick="return forcepost(this)">解除此綁定</a></button>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			
+			<div style="height:30px;"></div>
+
+			<h4>google</h4>
+			<a class="btn btn-default" href="{% url "social:begin" "google-oauth2" %}">以 google 帳號綁定平台帳號</a>
+			<a class="btn btn-default" href="{% url "social:disconnect" "google-oauth2" %}">解除 google 帳號綁定</a>
+			<table id="s_google">
+				<thead>
+					<tr>
+						<th>連結帳號</th>
+						<th>uid</th>
+						<th>動作</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for association in google_association %}
+					<tr>
+						<td><a href="https://www.facebook.com/{{ association.uid }}" >facebook 頁面</a></td>
+						<td>{{ association.uid }}</td>
+						<td><button><a href="{% url "social:disconnect_individual" "facebook" association.id %}" onclick="return forcepost(this)">解除此綁定</a></button></td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			{% endif %}
+			
+		</div>
+
+	</div>
+
+</div>
+
+
 <div class="modal fade" id="otpModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
-		<div class="modal-content alert-info">
+		<div class="modal-content alert-info" style="background-color: #f5f5f5;">
 			<div class="modal-header ">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
@@ -69,100 +1077,70 @@
 		</div>
 	</div>
 </div>
-<div class="row">
-<h3 >個人資料</h3>
-<div class="col-md-8 col-md-offset-2">
-	<table class="table table-hover table-reflow no-page">
-		{% for field in userForm %}
-		<tr>
-			<th class="col-md-4" scope="row">
-				{{ field.label }}
-			</th>
-			<td class="col-md-8">
-				{{ field.value }}
-				{% if field.name == 'email' or field.name == 'phone' %}
-				<div>
-				{% if field.name == 'email' and not userForm.instance.auth_email or field.name == 'phone' and not userForm.instance.auth_phone %}
-				<button class="btn-xs btn-warning" type="button" value="{{ field.name }}" data-toggle="modal" data-target="#otpModal" data-whatever="{{ field.name }}" data-sendto="{{ field.value }}">驗證</button>
-				{% else %}
-				<button class="btn-xs btn-success disabled"  type="button" value="{{ field.name }}" data-toggle="modal" data-target="#otpModal" data-whatever="{{ field.name }}" data-sendto="{{ field.value }}" disabled>已驗證</button>
-				{% endif %}
-				</div>
-				{% endif %}
-			</td>
-		</tr>
-		{% endfor %}
-					{% if request.user.has_guest %}
-					<tr class="guest_mode">
-						<th class="col-md-4" scope="row">
-							身心障礙手冊正面：
-						</th>
-						<td>
-							<img src="/static/{{ DCDir_url }}/{{ request.user.username }}_front.jpg" alt="身心障礙手冊正面" style="width:100%"/>
-						</td>
-					</tr>
-					<tr class="guest_mode">
-						<th class="col-md-4" scope="row">
-							身心障礙手冊反面：
-						</th>
-						<td>
-							<img src="/static/{{ DCDir_url }}/{{ request.user.username }}_back.jpg" alt="身心障礙手冊反面" style="width:100%"/>
-						</td>
-					</tr>
-					{% endif %}
-				</table>
-				<div class="form-group row text-center">
-						<a href="{% url 'password_change' %}" role="button" class="btn btn-default">修改密碼</a>
-						<a href="{% url 'genericUser:change_contact_info' %}" role="button" class="btn btn-default">修改個人資料</a>
-				</div>
-		</div>
-	</div>
-</div>
 
-{% if request.user.is_superuser %}
-<h3>社群帳號綁定</h3>
-<h4>facebook</h4>
-<button><a href="{% url "social:begin" "facebook" %}">以 facebook 帳號綁定平台帳號</a></button>
-<button><a href="{% url "social:disconnect" "facebook" %}">解除 facebook 帳號綁定</a></button>
-<table>
-	<thead>
-		<tr>
-			<th>連結帳號</th>
-			<th>uid</th>
-			<th>動作</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% for association in facebook_association %}
-		<tr>
-			<td><a href="https://www.facebook.com/{{ association.uid }}" >facebook 頁面</a></td>
-			<td>{{ association.uid }}</td>
-			<td>
-				<!-- <button><a href="{% url "social:disconnect_individual" "facebook" association.id %}">解除此綁定</a></button> -->
-				<button><a href="{% url "social:disconnect_individual" "facebook" association.id %}" onclick="return forcepost(this)">解除此綁定</a></button>
-			</td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
 
-<h4>google</h4>
-<button><a href="{% url "social:begin" "google-oauth2" %}">以 google 帳號綁定平台帳號</a></button>
-<button><a href="{% url "social:disconnect" "google-oauth2" %}">解除 google 帳號綁定</a></button>
-<table>
-	<tr>
-		<th>連結帳號</th>
-		<th>uid</th>
-		<th>動作</th>
-	</tr>
-		{% for association in google_association %}
-	<tr>
-		<td><a href="https://www.facebook.com/{{ association.uid }}" >facebook 頁面</a></td>
-		<td>{{ association.uid }}</td>
-		<td><button><a href="{% url "social:disconnect_individual" "facebook" association.id %}" onclick="return forcepost(this)">解除此綁定</a></button></td>
-	</tr>
-		{% endfor %}
-</table>
-{% endif %}
+<script id="tmp_userterms" type="text">*使用者條款
+
+eDocumentService雲端千眼平台(以下簡稱「本站」)係依據本條款提供特定身心障礙者出版品重製服務。當您使用本服務時，即表示您已閱讀、瞭解並同意接受此條款之所有內容。本站有權於任何時間修改或變更此條款之內容，若您於任何修改或變更後繼續使用本服務，視為您已閱讀、瞭解並同意接受該等修改或變更。如果您不同意此條款的內容，您應立即停止使用本站之服務。
+
+一、本站委託方（人）須遵守之義務
+本站之服務使用者為委託方（人），委託本站志工為重製代理人，部份委託方（人）受限於身體功能無法親自操作平台功能，故另行委託親人及好友為操作代理人。
+重製代理人進行文件重製成電子版本，是接受服務使用者或平台管理單位委託進行重製。平台管理單位或服務使用者註冊後，進行上傳文件之動作即表示委託重製代理人進行重製電子版的文件。
+根據著作權法第五十三條所定，本站所提供之著作重製物僅供著作權法53條規定之免責人使用，重製物雖可在所定障礙者、中央或地方政府機關、非營利機構或團體、依法立案之各級學校間散布或公開傳輸，但強烈建議每位服務使用者自行至本系統領取轉制成品，因每位服務使用者所獲之轉製成品皆有獨特之處理編碼。若轉製成品散布給非免責人，則以轉製成品特定編碼所指向之服務使用者為法律責任人。
+
+二、本站代理方（人）須遵守之義務
+根據著作權法第五十三條所定：「前項所定障礙者或其代理人為供該障礙者個人非營利使用，準用前項規定。」本站志工以及服務使用者所委託的親人好友即此處所指的代理人，代理人接受本站服務使用者之委託，得以協助重製成電子格式的檔案，或是協助服務使用者操作平台功能，但用途僅限專供該障礙者個人非營利使用。
+2-1 本站所提供志工校對之影像圖檔專為轉製電子文件校對所使用，志工不得將在本站校對所獲之影像檔以任何形式違反著作權法之規範。本站志工註冊並領取文件僅表示接受服務使用者的委託以重製電子版文件，並無其他著作權上的使用權利，包括：重製、改作、公開傳輸、公開展示、散布等等，其違反著作權法的行為須自行負責。
+2-2 由服務使用者委託親人好友操作網路平台或是代為下載電子文件，操作代理人不得將所獲之影像檔以任何形式違反著作權法之規範，包括：重製、改作、公開傳輸、公開展示、散布等等，其違反著作權法的行為須由操作代理人自行負責。
+
+三、著作權法相關用詞定義
+根據著作權法第三條所定，擷取部分用詞定義作為行為規範聲明，本站志工應避免將本站提供之校對影像圖檔有其他不受法律規範下之行為，如使用文件上觸犯以下行為，則其違法責任須自行負責。
+(一) 重製
+指以印刷、複印、錄音、錄影、攝影、筆錄或其他方法直接、間接、永久或暫時之重複製作。於劇本、音樂著作或其他類似著作演出或播送時予以錄音或錄影；或依建築設計圖或建築模型建造建築物者，亦屬之。
+(二)公開口述
+指以言詞或其他方法向公眾傳達著作內容。
+(三) 公開傳輸
+指以有線電、無線電之網路或其他通訊方法，藉聲音或影像向公眾提供或傳達著作內容，包括使公眾得於其各自選定之時間或地點，以上述方法接收著作內容。
+(四)改作
+指以翻譯、編曲、改寫、拍攝影片或其他方法就原著作另為創作。
+(五)散布
+指不問有償或無償，將著作之原件或重製物提供公眾交易或流通。
+(六)公開展示
+指向公眾展示著作內容。
+(七)公開發表
+指權利人以發行、播送、上映、口述、演出、展示或其他方法向公眾公開提示著作內容。
+
+*歡迎瀏覽 eDocumentService 隱私權政策
+
+當您開始使用eDocumentService網站，即表示您信賴我們對您個人資訊的處理方式。本《隱私權政策》旨在協助您瞭解本站如何蒐集、應用及保護您所提供的個人資訊，以下的隱私權政策，適用於您在本站活動時，所涉及的個人資料蒐集、運用與保護，當您註冊或是登入時，即視為您已閱讀本同意書，並同意遵守以下所有同意書之規範。
+一、個人資料之蒐集與應用
+1. 若欲使用本站所提供之各項功能，必須先申請本站帳戶才能使用，在申請過程中，本站會請您提供個人正確且完整之必要資料，如姓名、電子郵件、聯絡電話、生日、學歷等個人資訊，儲存在您的帳戶中。
+2. 進行網頁瀏覽時，伺服器會自行記錄相關行徑，包括日期和時間、您所擷取之網頁、您所在之網址、您的瀏覽器種類、您對本站網頁所做行動等，做為本站增進網站服務的參考依據，此記錄為內部應用，絕不對外公佈。
+3. 為了向所有使用者提供更優質的服務，當您造訪本站時，本站會使用各種技術收集並儲存資訊，這可能包括使用 Cookie 或類似技術來識別您的瀏覽器或裝置。若您不願接受Cookie的寫入，您可在您使用的瀏覽器功能項中設定隱私權等級為高，即可拒絕Cookie紀錄，但可能會導致網站某些功能無法正常執行。
+
+二、個人資訊更新及帳戶安全
+1. 無論您何時使用本站的服務，本站都致力讓您能夠維持並更新個人資訊。若該資訊有誤，我們會盡力提供管道讓您可以迅速更新或刪除資訊，但如果我們基於正當業務或法律目的考量必須保存該資訊時，則不在此列。凡為本站使用者，皆有義務維持並更新其所屬個人資料，並確保該資料為正確、最新以及完整。若您提供任何錯誤或不實的資料，本站有權拒絕您以該帳號使用網站之全部或部份功能。
+2. 維護用戶資訊與密碼的資訊安全是本站與您共同的責任，本站會致力於保護用戶相關資訊，防止未經授權而遭到存取、竄改或揭露。也請您於每次關閉瀏覽器視窗時登出本站，以保護個人資料不會遭到他人讀取與濫用。
+3. 凡為本站使用者之網路行為應遵循國內、外法律規範，並且對於個人所屬帳戶所發生之情事負全部責任。若您的密碼或帳號遭到盜用或有其他任何安全問題發生時，請立即以電子郵件通知本站，以便資訊人員盡快處理。
+
+三、與第三人共用個人資料之政策除非適用下列任一情況，否則我們不會與本站以外的其他公司、機構或個人分享使用者的個人資訊：
+1. 事先徵得您的同意：除非得到您的同意，本站絕不會提供、交換、出租或出售任何您的個人資料給其他個人、團體、私人企業或公務機關。
+2. 基於法律原因：若為達到下列目的，對個人資訊的存取、使用、保存或揭露屬合理必要行為時，我們便將與本站以外的其他公司、機構或個人分享個人資訊：
+a. 符合任何適用法律、法規、法律函狀或強制性政府調閱要求的規定。
+b. 配合檢調或司法單位合法的調查。
+c. 配合政府機關依法進行之調查或使用。
+d. 依法律規應或在合法範圍內，保護本站、使用者或公眾之權利、財產或安全不致遭受危害。
+e. 與公務機關或學術研究機構合作，基於公共利益為統計或學術研究之必要，僅分享不含身分識別內容的資訊，且蒐集者依其揭露方式無從識別特定之當事人。
+f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站與其他使用者權益或導致任何人遭受損害時，經網站管理單位研析揭露您的個人資料是為了辨識、聯絡或採取法律行動所必要者。
+
+四、資料安全：本站主機均設有防火牆、防毒系統等相關的各項資訊安全設備及必要的安全防護措施，加以嚴格保護網站及您的個人資料。本站僅允許代表本站處理個人資訊而需要知悉該等資訊的本站團隊成員存取資訊，且相關人員均須遵守嚴格的保密義務合約，一旦未遵守義務便將受到相關的法律處分
+
+五、隱私權保護政策之修正：本站隱私權保護政策將因應需求隨時進行修正，並且不會在未經您明確同意的情況下，即縮減本《隱私權政策》賦予您的權利。修正後的條款將刊登於網站上，若會員不同意修改的內容，請來信告知或暫停使用本站。若會員繼續使用，將視為會員已同意並接受本規範等增訂或修改內容之約束。
+
+六、《隱私權政策》適用範圍及效力：本站的《隱私權政策》不適用於由其他網站連結或個人提供的服務，諸如由本站所連結到的其他網站皆不在此《隱私權政策》適用範圍之內。我們的《隱私權政策》不涵括其他為本站服務宣傳之公司或機構所採用的資訊做法。
+
+本同意書所定之任何會員條款之全部或一部無效時，不影響其他條款之效力。關於本條款之解釋或適用，均以中華民國之法律為基準。使用者因使用本站而生之爭議，同意本誠信原則解決之，如有訴訟之必要時，同意以台灣台北地方法院為第一審管轄法院。
+</script>
+
 
 {% endblock %}

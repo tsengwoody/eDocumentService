@@ -18,7 +18,7 @@
         .done(function(data){
 
             let d=data[0];
-            //console.log(d)
+            console.log(d)
 
             //c
             let c='';
@@ -70,9 +70,18 @@
                 let key=inp.attr('key');
                 transferData[key]=checked;
             })
-            console.log(transferData)    
+ 
             //aj_user_updateid
-            aj_user_updateid(userid,'role',transferData);
+            aj_user_updateid(userid,'role',transferData)
+            .done(function(data){
+                alertmessage(data.status, data.message)
+                .done(function(){
+                    location.reload(); //重新載入網頁以更新資訊
+                });
+            })
+            .fail(function(data){
+                alertmessage(data.status, data.message)
+            })
 
             div.modal('hide');
         });

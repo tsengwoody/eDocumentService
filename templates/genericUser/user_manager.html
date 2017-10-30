@@ -9,15 +9,6 @@
 
 <script>
 
-	$(function(){
-
-		// aj_user_querylist('info');
-		// aj_user_queryid(1,'info');
-		// aj_user_querylist('role');
-		// aj_user_queryid(1,'role');
-
-	})
-
 
 	function usersearch(){
 		//任意關鍵字搜尋
@@ -28,9 +19,6 @@
 		//aj_user_querylist_combine
 		aj_user_querylist_combine()
 		.done(function(d){
-
-			//alertmessage
-			alertmessage('success', '查詢成功');
 
 			//ar
 			let ar=[];
@@ -67,9 +55,27 @@
 
 			})
 
-			//gentable
-			gentable('usermanager_div_查詢','usermanager_div_查詢_table',ar);
-		
+			//iddiv
+			let iddiv='usermanager_div_查詢';
+
+			if(ar.length>0){
+
+				//alertmessage
+				alertmessage('success', '查詢成功');
+
+				//gentable
+				gentable(iddiv,'usermanager_div_查詢_table',ar);
+			
+			}
+			else{
+
+				//alertmessage
+				alertmessage('error', '查無使用者資訊');
+
+				//html
+				$('#'+iddiv).html('查無使用者資訊');
+
+			}
 		})
 		.fail(function(msg){
 			console.log(msg)

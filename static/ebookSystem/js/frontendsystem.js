@@ -650,6 +650,65 @@ function arrarymerge(ar1,ar2,key){
 }
 
 
+function base642bin(c){
+    //base64字串轉binary
+
+    return base64js.toByteArray(c);
+}
+
+
+function bin2base64(b){
+    //binary轉base64字串
+
+    return base64js.fromByteArray(b);
+}
+
+
+function bs2barr(bs) {
+    //Binary String Array轉Binary Uint8 Array，應用於input file使用readAsBinaryString讀檔之資料
+
+    let n = bs.length;
+    let arr = new Uint8Array(n);
+    for (let i = 0; i < n; i++) {
+        arr[i] = bs.charCodeAt(i);
+    }
+    return arr;
+}
+
+
+function readfile(me) {
+    //讀取檔案
+
+    //df
+    let df = $.Deferred();
+
+    //file
+    let file = me.files[0];
+
+    //name
+    let name = file.name;
+
+    //reader
+    let reader = new FileReader();
+
+    //onload
+    reader.onload = function (event) {
+
+        //bindata
+        let bindata = event.target.result;
+
+        //resolve
+        df.resolve(bindata);
+
+    };
+
+    //readAsBinaryString
+    reader.readAsBinaryString(file);
+
+    return df;
+}
+
+
 function dict2grid(ar,tabid){
     //字典陣列轉出基本table
 
@@ -1660,6 +1719,7 @@ function aj_user_dict(){
         'phone':'手機',
         'username':'使用者名稱',
         'name':'姓名', //'first_name'+'last_name'
+        'is_book':'訂閱訊息',
         'auth_email':'驗證電子郵件',
         'auth_phone':'驗證手機',
         'is_active':'登錄權限',
@@ -1719,6 +1779,29 @@ function aj_user_key2head_array(ar){
 }
 
 
+function aj_user_head2key_array(ar){
+    //陣列物件中文轉key
+
+    //r
+    let r=[];
+    _.each(ar,function(v,k){
+            
+        //newkey
+        let o={};
+        _.each(v,function(value,key){
+            let newkey=aj_user_head2key(key);
+            o[newkey]=value;
+        })
+
+        //push
+        r.push(o);
+
+    })
+
+    return r;
+}
+
+
 function aj_user_querylist_combine(){
     //使用API user_list結合info,role取得使用者資訊
 
@@ -1758,7 +1841,7 @@ function aj_user_querylist(action){
     let transferData={
         'query_field':'all',
         'query_value':'',
-        'action':action, //'info','role'
+        'action':action,
     };
 
     //aj_get
@@ -1791,7 +1874,7 @@ function aj_user_queryid(id,action){
 
     //transferData
     let transferData={
-        'action':action, //'info','role'
+        'action':action,
     };
 
     //aj_get
@@ -1820,27 +1903,23 @@ function aj_user_updateid(id,action,transferData){
     //使用API user_update
 
     //df
-    //let df = $.Deferred();
+    let df = $.Deferred();
     
     //url
     let url='/genericUser/user_update/'+id+'/';
 
     //transferData
-    transferData['action']=action; //'info','role'
-console.log(transferData)    
+    transferData['action']=action;
+
     //aj_post
     aj_post(url, transferData)
     .done(function(data){
-        alertmessage(data.status, data.message)
-        .done(function(){
-            location.reload(); //重新載入網頁以更新資訊
-        });
-        //df.resolve(ar);
+        df.resolve(data);
     })
     .fail(function(data){
-        alertmessage(data.status, data.message)
-        //df.reject(data['message']);
+        df.reject(data);
     })
 
-    //return df;
+    return df;
 }
+
