@@ -705,6 +705,9 @@ class BookOrder(models.Model):
 	book = models.OneToOneField(Book, related_name='bookorder')
 	order = models.IntegerField()
 
+	def __unicode__(self):
+		return self.book.book_info.bookname
+
 class GetBookRecord(models.Model):
 	user = models.ForeignKey(User, related_name='getbookrecord_set')
 	book = models.ForeignKey(Book, related_name='getbookrecord_set')

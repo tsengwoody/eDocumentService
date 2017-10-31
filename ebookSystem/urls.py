@@ -32,4 +32,5 @@ urlpatterns = [
 	url(r'^library_view$', views.library_view, name='library_view'),
 	url(r'^library_action$', views.library_action, name='library_action'),
 	url(r'^book_saelf$', views.book_saelf, name='book_saelf'),
+	url(r'^service/$', views.service, name='service'),
 ]

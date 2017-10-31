@@ -96,6 +96,7 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 if socket.gethostname() == 'edoc':
+#if 1:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -217,3 +218,5 @@ AUTHENTICATION_BACKENDS = (
 )
 
 from .account_info import *
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = None
