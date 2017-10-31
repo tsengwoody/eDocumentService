@@ -18,6 +18,7 @@ from utils.uploadFile import handle_uploaded_file
 from .forms import *
 from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWORD
 from zipfile import ZipFile
+import base64
 import json
 import shutil
 import datetime
@@ -324,8 +325,7 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 				cache.set(request.user.phone, {'vcode': vcode}, 600)
 			else:
 				vcode = cache.get(request.user.phone)['vcode']
-			t = get_template('email/phone_validate.txt')
-			data = t.render(Context(locals()))
+			data = u'親愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
 			url = 'https://api2.kotsms.com.tw/kotsmsapi-1.php?username={0}&password={1}&dstaddr={2}&smbody={3}'.format(
 				OTP_ACCOUNT, OTP_PASSWORD, request.user.phone, urllib.quote(data.encode('big5'))
 			)
@@ -419,8 +419,13 @@ def user_update(request, ID, ):
 
 		elif request.POST['action'] == 'disability_card':
 			try:
-				handle_uploaded_file(user.disability_card_front, request.FILES['front'])
-				handle_uploaded_file(user.disability_card_back, request.FILES['back'])
+				print user.disability_card_front
+				with open(user.disability_card_back, 'wb') as f:
+					image_content = base64.b64decode(request.POST['back'])
+					f.write(image_content)
+				with open(user.disability_card_front, 'wb') as f:
+					image_content = base64.b64decode(request.POST['front'])
+					f.write(image_content)
 			except BaseException as e:
 				status = 'error'
 				message = u'身障手冊上傳失敗：{0}'.format(unicode(e))

@@ -9,6 +9,15 @@
 
 <script>
 
+	$(function(){
+
+		// aj_user_querylist('info');
+		// aj_user_queryid(1,'info');
+		// aj_user_querylist('role');
+		// aj_user_queryid(1,'role');
+
+	})
+
 
 	function usersearch(){
 		//任意關鍵字搜尋
@@ -19,6 +28,9 @@
 		//aj_user_querylist_combine
 		aj_user_querylist_combine()
 		.done(function(d){
+
+			//alertmessage
+			alertmessage('success', '查詢成功');
 
 			//ar
 			let ar=[];
@@ -40,8 +52,9 @@
 				let c='';
 				c+='<button class="btn btn-default" type="button" style="margin:0px 3px 3px 0px;" onclick="userpermission('+v['id']+')">權限設定</button>';
 				c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/ebookSystem/getbookrecord_user/'+v['id']+'/">下載紀錄</a>';
+				c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/genericUser/review_user/'+v['使用者名稱']+'/">審核</a>';
 				if(v['校對權限']==='True'){
-					c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/genericUser/serviceinfo_list/root/">服務紀錄</a>';
+					c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/genericUser/serviceinfo_list/'+v['使用者名稱']+'/">服務紀錄</a>';
 				}
 				if(v['來賓權限']==='True'){
 					c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="#">手冊查閱</a>';
@@ -55,27 +68,9 @@
 
 			})
 
-			//iddiv
-			let iddiv='usermanager_div_查詢';
-
-			if(ar.length>0){
-
-				//alertmessage
-				alertmessage('success', '查詢成功');
-
-				//gentable
-				gentable(iddiv,'usermanager_div_查詢_table',ar);
-			
-			}
-			else{
-
-				//alertmessage
-				alertmessage('error', '查無使用者資訊');
-
-				//html
-				$('#'+iddiv).html('查無使用者資訊');
-
-			}
+			//gentable
+			gentable('usermanager_div_查詢','usermanager_div_查詢_table',ar);
+		
 		})
 		.fail(function(msg){
 			console.log(msg)

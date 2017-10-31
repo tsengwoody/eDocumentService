@@ -1,6 +1,7 @@
 ﻿# coding: utf-8
 import codecs
 import datetime
+import base64
 from zipfile import ZipFile
 from django.core.cache import cache
 from django.core.mail import EmailMessage
@@ -25,6 +26,8 @@ import json
 import shutil
 import uuid
 from django.views.decorators.cache import cache_control
+
+GET_MAX_PART = 3
 
 #logging config
 import logging
@@ -970,7 +973,6 @@ def library_view(request, template_name='ebookSystem/library_view.html'):
 		token = uuid.uuid4().hex
 		cache.set('token.' +str(request.user.id), token, 10)
 		path = '/epub/' +book.ISBN +'/' +token
-		import base64
 		base64_path = base64.b64encode(path)
 		return locals()
 
@@ -1004,4 +1006,48 @@ def library_action(request, ):
 			lr.check_in()
 			status = 'success'
 			message = u'成功歸還書籍{0}'.format(lr.book)
+		return locals()
+
+@http_response
+def service(request, template_name='ebookSystem/service.html'):
+	editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
+	finishPartList = request.user.edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
+	if request.method == 'POST':
+		if request.POST.has_key('getPart'):
+			if len(editingPartList)>=100:
+				status = 'error'
+				message = u'您已有超過{0}段文件，請先校對完成再領取'.format(GET_MAX_PART)
+				return locals()
+			try:
+				partialBook = BookOrder.objects.filter(book__status=Book.STATUS['active']).order_by('-order')[0].book
+			except BaseException as e:
+				status = 'error'
+				message = u'無文件：{0}'.format(unicode(e))
+				return locals()
+			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
+			getPart.change_status(1, 'edit', user=request.user, deadline=timezone.now() +datetime.timedelta(days=5))
+			status = 'success'
+			message = u'成功取得文件{}'.format(getPart.__unicode__())
+		elif request.POST.has_key('rebackPart'):
+			ISBN_part = request.POST.get('rebackPart')
+			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
+			rebackPart.change_status(-1, 'active')
+			status = 'success'
+			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
+		elif request.POST.has_key('reEditPart'):
+			ISBN_part = request.POST.get('reEditPart')
+			reEditPart = EBook.objects.get(ISBN_part = ISBN_part)
+			reEditPart.change_status(-1, 'edit')
+			events = Event.objects.filter(content_type__model='ebook', object_id=reEditPart.ISBN_part, status=Event.STATUS['review'])
+			for event in events:
+				event.delete()
+			status = 'success'
+			message = u'再編輯文件{}'.format(reEditPart.__unicode__())
+		else:
+			status = 'error'
+			message = u'不明的操作'
+		editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
+		finishPartList = request.user.edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
+		return locals()
+	if request.method == 'GET':
 		return locals()
