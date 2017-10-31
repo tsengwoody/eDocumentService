@@ -966,8 +966,13 @@ Vue.component('vu-user', {
 				//when
 				$.when(df_info,df_role,df_disability_card)
 				.done(function(d_info,d_role,d_disability_card){
-					alertmessage(d_info['status'],d_role['message'],d_info['message'])
-					displaydata('show'); //重撈資料變更頁面，並切換為show
+
+					//僅顯示info的更新
+					alertmessage(d_info['status'],d_info['message']);
+
+					//重撈資料變更頁面，並切換為show
+					displaydata('show'); 
+
 				})
 				.fail(function(data){
 					alertmessage(data['status'],data['message'])
