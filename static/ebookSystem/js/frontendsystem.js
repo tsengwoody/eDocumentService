@@ -1883,7 +1883,8 @@ function aj_user_queryid(id,action){
         
         //d
         let d=[data['content']];
-console.log(d)
+        //console.log(d)
+
         //ar
         let ar=aj_user_key2head_array(d);
         

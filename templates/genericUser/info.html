@@ -15,14 +15,25 @@
 
 
 <script>
-
 	let voUser;
 	let u_original;
 
 	$(function(){
 
-		//user_id
-		$('div[user_id]').attr('user_id',3)
+		$('div[user_id]').attr('user_id',3);
+
+		//grid2bstable
+		grid2bstable('s_fackbook');
+		grid2bstable('s_google');
+
+		//displaydata
+		displaydata('show');
+
+	})
+
+
+	function displaydata(mode){
+		//load and fill data
 
 		//loaddata
 		loaddata()
@@ -32,15 +43,11 @@
 			filldata(o);
 
 			//show
-			voUser.$refs.user.ch_mode('show');
+			voUser.$refs.user.ch_mode(mode);
 
 		})
 
-		//grid2bstable
-		grid2bstable('s_fackbook');
-		grid2bstable('s_google');
-
-	})
+	}
 
 
 	function loaddata(){
@@ -111,11 +118,11 @@
 	}
 
 
-	function filldata(o){
-		//填入使用者資料
+	function condensdata(vuedata,srvdata){
+		//提取資料
 
 		//cloneDeep
-		o=_.cloneDeep(o);
+		let o=_.cloneDeep(srvdata);
 
 		//boolean
 		_.each(o,function(v,k){
@@ -134,10 +141,63 @@
 		u_original=_.cloneDeep(o);
 
 		//org_srv2ui
-		o['org']=org_srv2ui(o['org']);
+		o['org']=org_srv2ui(o['org']); //暴力改org
 		
-		//cloneDeep
-		let p=_.cloneDeep(o);
+		//addormod keyvalue
+		function g(k1,k2,v){
+
+			if(!haskey(vuedata,k1)){
+				vuedata[k1]={};
+			}
+			if(!haskey(vuedata[k1],k2)){
+				vuedata[k1][k2]=null;
+			}
+			vuedata[k1][k2]=v;
+		}
+
+		//vuedata
+		_.each(o,function(v,k){
+			if(k!=='is_editor' && k!=='is_guest'){
+				g(k,'value',v);
+			}
+		})
+
+		//email, phone
+		//vuedata['email']['auth']=o.auth_email;
+		//vuedata['phone']['auth']=o.auth_phone;
+		g('email','auth',o.auth_email);
+		g('phone','auth',o.auth_phone);
+
+		//role
+		// vuedata['role']['value']={
+		// 	is_editor:o.is_editor,
+		// 	is_guest:o.is_guest,
+		// };
+		g('role','value',{
+			is_editor:o.is_editor,
+			is_guest:o.is_guest,
+		}); 
+
+		//password, confirm_password, is_privacy
+		// vuedata['password']={'value':''};
+		// vuedata['confirm_password']={'value':''};
+		// vuedata['is_privacy']={'value':''};
+		g('password','value','');
+		g('confirm_password','value','');
+		g('is_privacy','value','');
+
+		return vuedata;
+	}
+
+
+	function filldata(o){
+		//填入使用者資料
+
+		//refresh
+		if(!iser(voUser)){
+			voUser.s=condensdata(voUser.s,o);
+			return;
+		}
 
 		//divid
 		let divid='v_user';
@@ -145,109 +205,22 @@
 		//wrap
 		$('#'+divid).wrap('<vu-user ref="user" id="v_user" v-bind:s="s"></vu-user>');
 
+		//condensdata
+		let s={};
+		s=condensdata(s,o);
+
+		//add prop
+		_.each(s,function(v,k){
+			s[k]['show']=true;
+			s[k]['mode']='forshow';
+			s[k]['remark']=true;
+		})
+		s['mode']='';
+
 		//voUser
 		voUser = new Vue({
 			el: '#'+divid,
-			data: {
-				s:{
-					mode:'',
-					username:{
-						show:true,
-						mode:'forshow',
-						value:p.username,
-						remark:true,
-					},
-					password:{
-						show:true,
-						mode:'forshow',
-						value:p.password,
-						remark:true,
-					},
-					confirm_password:{
-						show:true,
-						mode:'forshow',
-						value:p.confirm_password,
-						remark:true,
-					},
-					first_name:{
-						show:true,
-						mode:'forshow',
-						value:p.first_name,
-						remark:true,
-					},
-					last_name:{
-						show:true,
-						mode:'forshow',
-						value:p.last_name,
-						remark:true,
-					},
-					email:{
-						show:true,
-						mode:'forshow',
-						value:p.email,
-						auth:p.auth_email,
-						remark:true,
-					},
-					phone:{
-						show:true,
-						mode:'forshow',
-						value:p.phone,
-						auth:p.auth_phone,
-						remark:true,
-					},
-					birthday:{
-						show:true,
-						mode:'forshow',
-						value:p.birthday,
-						remark:true,
-					},
-					education:{
-						show:true,
-						mode:'forshow',
-						value:p.education,
-						remark:true,
-					},
-					is_book:{
-						show:true,
-						mode:'forshow',
-						value:p.is_book,
-						remark:true,
-					},
-					org:{
-						show:true,
-						mode:'forshow',
-						value:p.org,
-						remark:true,
-					},
-					role:{
-						show:true,
-						mode:'forshow',
-						value:{
-							is_editor:p.is_editor,
-							is_guest:p.is_guest,
-						},
-						remark:true,
-					},
-					front:{
-						show:true,
-						mode:'forshow',
-						value:p.front,
-						remark:true,
-					},
-					back:{
-						show:true,
-						mode:'forshow',
-						value:p.back,
-						remark:true,
-					},
-					is_privacy:{
-						show:true,
-						mode:'forshow',
-						value:false,
-						remark:true,
-					},
-				}
-			},
+			data: {s:s},
 		})
 		
 	}
@@ -481,7 +454,7 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.username.show===true">
 		<label v-bind:class="gridclass" for="v_id_use_username"><font style="color:red">*</font><span>使用者名稱</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<input id="v_id_use_username" class="form-control" type="text" maxlength="30" v-model="s.username.value" v-if="s.username.mode==='foredit'">
 			<div class="likebtn" v-html="s.username.value" v-if="s.username.mode==='forshow'"></div>
 		</div>
@@ -491,7 +464,7 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.password.show===true">
 		<label v-bind:class="gridclass" for="v_id_use_password"><font style="color:red">*</font><span>密碼</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<input id="v_id_use_password" class="form-control" type="password" maxlength="30" v-model="s.password.value" v-if="s.password.mode==='foredit'">
 			<div class="likebtn" v-html="s.password.value" v-if="s.password.mode==='forshow'"></div>
 		</div>
@@ -501,7 +474,7 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.confirm_password.show===true">
 		<label v-bind:class="gridclass" for="v_id_use_confirm_password"><font style="color:red">*</font><span>確認密碼</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<input id="v_id_use_confirm_password" class="form-control" type="confirm_password" maxlength="30" v-model="s.confirm_password.value" v-if="s.confirm_password.mode==='foredit'">
 			<div class="likebtn" v-html="s.confirm_password.value" v-if="s.confirm_password.mode==='forshow'"></div>
 		</div>
@@ -511,7 +484,7 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.first_name.show===true">
 		<label v-bind:class="gridclass" for="v_id_use_first_name"><font style="color:red">*</font><span>姓氏</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<input id="v_id_use_first_name" class="form-control" type="text" maxlength="30" v-model="s.first_name.value" v-if="s.first_name.mode==='foredit'">
 			<div class="likebtn" v-html="s.first_name.value" v-if="s.first_name.mode==='forshow'"></div>
 		</div>
@@ -521,7 +494,7 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.last_name.show===true">
 		<label v-bind:class="gridclass" for="v_id_use_last_name"><font style="color:red">*</font><span>名字</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<input id="v_id_use_last_name" class="form-control" type="text" maxlength="30" v-model="s.last_name.value" v-if="s.last_name.mode==='foredit'">
 			<div class="likebtn" v-html="s.last_name.value" v-if="s.last_name.mode==='forshow'"></div>
 		</div>
@@ -531,7 +504,7 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.email.show===true">
 		<label v-bind:class="gridclass" for="v_id_email"><font style="color:red">*</font><span>電子信箱</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 
 			<div class="input-group" v-if="s.email.mode==='forshowauth'">
 					
@@ -555,7 +528,7 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.phone.show===true">
 		<label v-bind:class="gridclass" for="v_id_phone"><font style="color:red">*</font><span>聯絡電話</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 
 			<div class="input-group" v-if="s.phone.mode==='forshowauth'">
 					
@@ -579,7 +552,7 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.birthday.show===true">
 		<label v-bind:class="gridclass" for="v_id_use_birthday"><font style="color:red">*</font><span>生日</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<input ref="birthday" id="v_id_use_birthday" class="form-control" type="text" v-model="s.birthday.value" v-if="s.birthday.mode==='foredit' && false">
 			<DatePicker size="large" format="yyyy-MM-dd" type="date" placeholder="選擇日期" style="width:100%;" v-model="s.birthday.value" v-if="s.birthday.mode==='foredit' && false"></DatePicker>
 			<el-date-picker format="yyyy-MM-dd" type="date" placeholder="選擇日期" style="width:100%;" v-model="s.birthday.value" v-if="s.birthday.mode==='foredit'"></el-date-picker>
@@ -591,7 +564,7 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.education.show===true">
 		<label v-bind:class="gridclass" for="v_id_use_education"><font style="color:red">*</font><span>教育程度</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<select id="v_id_use_education" class="form-control" v-model="s.education.value" v-if="s.education.mode==='foredit'">
 				<option value="" selected="selected">---------</option>
 				<option value="國小">國小</option>
@@ -608,7 +581,7 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.is_book.show===true">
 		<label v-bind:class="gridclass" for="v_id_use_is_book"><font style="color:red">*</font><span>訂閱訊息</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<input id="v_id_use_is_book" type="checkbox" style="height: 30px; line-height: 30px;" v-model="s.is_book.value" v-if="s.is_book.mode==='foredit'">
 			<div class="likebtn" v-html="cv_is_book" v-if="s.is_book.mode==='forshow'"></div>
 		</div>
@@ -618,7 +591,7 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.org.show===true">
 		<label v-bind:class="gridclass" for="v_id_use_org"><font style="color:red">*</font><span>所屬單位</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<select id="v_id_use_org" class="form-control" v-model="s.org.value" v-if="s.org.mode==='foredit'">
 				<option>其他</option>
 				<option>eDocumentService</option>
@@ -631,13 +604,13 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.role.show===true">
 		<label v-bind:class="gridclass"><font style="color:red">*</font><span>角色</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<div v-if="s.role.mode==='foredit'">
-				<label class="radio-inline" for="v_id_use_editor">
-					<input id="v_id_use_editor" type="radio" name="v_grp_role" value="志工" v-model="role">志工
+				<label class="checkbox-inline" for="v_id_use_editor">
+					<input id="v_id_use_editor" type="checkbox" name="v_grp_role" value="志工" v-model="s.role.value.is_editor">志工
 				</label>
-				<label class="radio-inline" for="v_id_use_guest">
-					<input id="v_id_use_guest" type="radio" name="v_grp_role" value="視障者" v-model="role">視障者
+				<label class="checkbox-inline" for="v_id_use_guest">
+					<input id="v_id_use_guest" type="checkbox" name="v_grp_role" value="視障者" v-model="s.role.value.is_guest">視障者
 				</label>
 			</div>
 			<div class="likebtn" v-html="cv_role" v-if="s.role.mode==='forshow'"></div>
@@ -648,7 +621,7 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.front.show===true">
 		<label v-bind:class="gridclass" for="v_id_use_front"><font style="color:red">*</font><span>身心障礙手冊正面</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<div><img class="img-thumbnail" v-bind:src="cv_front"></div>
 			<input ref="inp_front" id="v_id_use_front" type="file" accept="image/jpg,image/jpeg" v-on:change="ch_front" v-if="s.front.mode==='foredit'">
 		</div>
@@ -658,7 +631,7 @@ Vue.component('vu-user', {
 
 	<div class="form-group" v-if="s.back.show===true">
 		<label v-bind:class="gridclass" for="v_id_use_back"><font style="color:red">*</font><span>身心障礙手冊正面</span></label>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<div><img class="img-thumbnail" v-bind:src="cv_back"></div>
 			<input ref="inp_back" id="v_id_use_back" type="file" accept="image/jpg,image/jpeg" v-on:change="ch_back" v-if="s.back.mode==='foredit'">
 		</div>
@@ -675,7 +648,7 @@ Vue.component('vu-user', {
 				<span>我同意此條款</span>
 			</label>
 		</div>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<div class="likebtn" v-html="cv_is_privacy" v-if="s.is_privacy.mode==='forshow'"></div>
 		</div>
 	</div>
@@ -698,7 +671,6 @@ Vue.component('vu-user', {
 	props: ['s'],
 	data:function(){
 		return {
-			//role:'',
 		}
 	},
     mounted: function(){
@@ -723,29 +695,6 @@ Vue.component('vu-user', {
 			}
 			else{
 				return 'control-label col-sm-2';
-			}
-		},
-
-		role:{
-			get:function(){
-				let vo=this;
-				if(vo.s.role.value.is_guest){
-					return '視障者';
-				}
-				return '志工';
-			},
-			set:function(v){
-				let vo=this;
-				if(v==='志工'){
-					vo.s.role.value.is_editor=true;
-					vo.s.role.value.is_guest=false;
-				}
-				else{
-					vo.s.role.value.is_editor=false;
-					vo.s.role.value.is_guest=true;	
-				}
-				vo.s.front.show=vo.s.role.value.is_guest;
-				vo.s.back.show=vo.s.role.value.is_guest;
 			}
 		},
 
@@ -813,7 +762,9 @@ Vue.component('vu-user', {
 	watch: {
         s: {
             handler: function () {
-                // let vo = this;
+				let vo=this;
+				vo.s.front.show=vo.s.role.value.is_guest;
+				vo.s.back.show=vo.s.role.value.is_guest;
             },
             deep: true
         },
@@ -917,7 +868,7 @@ Vue.component('vu-user', {
 				let userid=$('div[user_id]').attr('user_id');
 
 				//org
-				o['org']=org_ui2srv(o['org']);
+				o['org']=org_ui2srv(o['org']); //暴力改org
 				
 				//待user_create api出來(註冊)
 
@@ -939,7 +890,7 @@ Vue.component('vu-user', {
 				let userid=$('div[user_id]').attr('user_id');
 
 				//org
-				o['org']=org_ui2srv(o['org']);
+				o['org']=org_ui2srv(o['org']); //暴力改org
 
 				//pinfo
 				function pinfo(o){
@@ -952,18 +903,27 @@ Vue.component('vu-user', {
 					let p=_.cloneDeep(o);
 					return _.pick(p, ['front','back']);
 				}
-				
-				//o_info, o_disability_card
+
+				//prole
+				function prole(o){
+					let p=_.cloneDeep(o);
+					return _.pick(p, ['auth_phone','auth_email','is_active','is_editor','is_guest']);
+				}
+
+				//o_info, o_role, o_disability_card
 				let o_info=pinfo(o);
+				let o_role=prole(o);
 				let o_disability_card=pdc(o);
-				
-				//r_info, r_disability_card
+
+				//p
 				let p=_.cloneDeep(u_original);
 				p['org']=replace(p['org'],'Organization/',''); //暴力改org
+
+				//r_info, r_role, r_disability_card
 				let r_info=pinfo(p);
+				let r_role=prole(p);
 				let r_disability_card=pdc(p);
-				
-				console.log(o_info,r_info)
+
 				//diff
 				let diff_info=_.isEqual(o_info,r_info);
 				let diff_disability_card=_.isEqual(o_disability_card,r_disability_card);
@@ -972,25 +932,42 @@ Vue.component('vu-user', {
 					return;
 				}
 
+				//diff_email, diff_phone
+				let diff_email=_.isEqual(o_info.email,r_info.email);
+				let diff_phone=_.isEqual(o_info.phone,r_info.phone);
+
 				//df_info
 				let df_info;
 				if(!diff_info){
+					//console.log('o_info: ',o_info)
 					df_info=aj_user_updateid(userid,'info',o_info);
+				}
+
+				//df_role
+				let df_role;
+				if(!diff_email || !diff_phone){
+					if(!diff_email){
+						o_role.auth_email=false;
+					}
+					if(!diff_phone){
+						o_role.auth_phone=false;
+					}
+					//console.log('o_role: ',o_role)
+					df_role=aj_user_updateid(userid,'role',o_role);
 				}
 
 				//df_disability_card
 				let df_disability_card;
 				if(!diff_disability_card){
+					//console.log('o_disability_card: ',o_disability_card)
 					df_disability_card=aj_user_updateid(userid,'disability_card',o_disability_card);
 				}
 				
 				//when
-				$.when(df_info,df_disability_card)
-				.done(function(d_info,d_disability_card){
-					alertmessage(d_info['status'],d_info['message'])
-					.done(function(){
-						window.location.reload(); //變更成功則重新整理網頁
-					})
+				$.when(df_info,df_role,df_disability_card)
+				.done(function(d_info,d_role,d_disability_card){
+					alertmessage(d_info['status'],d_role['message'],d_info['message'])
+					displaydata('show'); //重撈資料變更頁面，並切換為show
 				})
 				.fail(function(data){
 					alertmessage(data['status'],data['message'])
