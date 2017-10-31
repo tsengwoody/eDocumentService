@@ -1103,14 +1103,16 @@ function aj_send(type, url, transferData){
             let csrf=$('input[name=csrfmiddlewaretoken]').val();
             jqXHR.setRequestHeader('X-CSRFToken', csrf);
             jqXHR.setRequestHeader("X-Requested-With", "XMLHttpRequest")
-        }
+        },
     })
     .done(function(data){
 
         if(data['status']==='success'){
+            //console.log('resolve',data)
             df.resolve(data);
         }
         else if(data['status']==='error'){
+            //console.log('reject',data)
             df.reject(data);
         }
         else{
@@ -1122,6 +1124,7 @@ function aj_send(type, url, transferData){
                 'status':'error',
                 'message':'伺服器非預期回應: '+o2j(data),
             };
+            c//onsole.log('reject',res)
             df.reject(res);
         }
 
@@ -1136,9 +1139,15 @@ function aj_send(type, url, transferData){
             'status':'error',
             'message':'伺服器錯誤回應: '+xhr.responseText,
         };
+        //console.log('reject',res)
         df.reject(res);
 
     })
+    .always(function() {
+        //TO-DO after fail/done request.
+        console.log(url,transferData,"ended");
+    });
+
 
     return df;
 }

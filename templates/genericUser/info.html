@@ -33,7 +33,7 @@
 
 
 	function displaydata(mode){
-		//load and fill data
+		//載入數據與填入使用者資料
 
 		//loaddata
 		loaddata()
@@ -66,7 +66,11 @@
 				dff.resolve(d);
 			})
 			.fail(function(){
-				let d={};
+				//具有欄位的空資料
+				let d=[{
+					'front':'',
+					'back':'',
+				}];
 				dff.resolve(d);
 			})
 			return dff;
@@ -155,7 +159,7 @@
 			vuedata[k1][k2]=v;
 		}
 
-		//vuedata
+		//general attr
 		_.each(o,function(v,k){
 			if(k!=='is_editor' && k!=='is_guest'){
 				g(k,'value',v);
@@ -163,25 +167,16 @@
 		})
 
 		//email, phone
-		//vuedata['email']['auth']=o.auth_email;
-		//vuedata['phone']['auth']=o.auth_phone;
 		g('email','auth',o.auth_email);
 		g('phone','auth',o.auth_phone);
 
 		//role
-		// vuedata['role']['value']={
-		// 	is_editor:o.is_editor,
-		// 	is_guest:o.is_guest,
-		// };
 		g('role','value',{
 			is_editor:o.is_editor,
 			is_guest:o.is_guest,
 		}); 
 
 		//password, confirm_password, is_privacy
-		// vuedata['password']={'value':''};
-		// vuedata['confirm_password']={'value':''};
-		// vuedata['is_privacy']={'value':''};
 		g('password','value','');
 		g('confirm_password','value','');
 		g('is_privacy','value','');
