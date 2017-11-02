@@ -24,7 +24,7 @@ urlpatterns = [
 	url(r'^message_send$', views.message_send, name='message_send'),
 	url(r'^book_create/$', views.book_create, name='book_create'),
 	url(r'^book_upload/$', views.book_upload, name='book_upload'),
-	url(r'^book_delete/(?P<ISBN>[0-9]+)$', views.book_delete, name='book_delete'),
+	url(r'^book_delete/$', views.book_delete, name='book_delete'),
 	url(r'^book_list$', views.book_list, name='book_list'),
 	url(r'^book_repository$', views.book_repository, name='book_repository'),
 	url(r'^getbookrecord_user/(?P<ID>\d+)/$', views.getbookrecord_user, name='getbookrecord_user'),
@@ -33,4 +33,7 @@ urlpatterns = [
 	url(r'^library_action$', views.library_action, name='library_action'),
 	url(r'^book_saelf$', views.book_saelf, name='book_saelf'),
 	url(r'^service/$', views.service, name='service'),
+	url(r'^bookorder_list$', views.bookorder_list, name='bookorder_list'),
+	url(r'^book_repository_person$', views.book_repository_person, name='book_repository_person'),
+	url(r'^book_action/$', views.book_action, name='book_action'),
 ]

@@ -16,11 +16,7 @@ import json
 import os
 import shutil
 
-
 @http_response
-def userGuide(request, template_name='home.html'):
-#	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
-	return render(request, template_name, locals())
 
 @http_response
 def book_repository(request, template_name='guest/book_repository.html'):

@@ -1,0 +1,25 @@
+﻿{% extends "base_nav.html" %}
+{% load staticfiles %}
+{% block title %}
+校對順序
+{% endblock %}
+{% block header %}
+校對順序
+{% endblock %}
+{% block content %}
+<h3>校對順序</h3>
+<table>
+	<tr>
+		<th>序號</th>
+		<th>文件</th>
+		<th>狀態</th>
+	</tr>
+	{% for bookorder in bookorder_list %}
+	<tr>
+		<td>{{ bookorder.order }}</td>
+		<td>{{ bookorder.book }}</td>
+		<td>{{ bookorder.book.status }}</td>
+	</tr>
+	{% endfor %}
+</table>
+{% endblock %}

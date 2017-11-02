@@ -377,6 +377,7 @@ def edit_log(request, ISBN_part, template_name='ebookSystem/edit_log.html'):
 
 @http_response
 def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
+	ISBN = request.POST['ISBN']
 	if len(ISBN) == 10 and not ISBN10_check(ISBN):
 		status = u'error'
 		message = u'ISBN10碼錯誤'
@@ -391,7 +392,7 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 	if request.POST['source'] == 'NCL':
 		#=====NCL=====
 		try:
-			[ISBN, bookname, author, house, date, bookbinding, chinese_book_category, order] = get_ncl_bookinfo(request.POST['ISBN'])
+			[ISBN, bookname, author, house, date, bookbinding, chinese_book_category, order] = get_ncl_bookinfo(ISBN)
 			source = 'NCL'
 		except BaseException as e:
 			status = 'error'
@@ -401,7 +402,7 @@ def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 	elif request.POST['source'] == 'douban':
 		#=====douban=====
 		try:
-			[ISBN, bookname, author, house, date, bookbinding,] = get_douban_bookinfo(request.POST['ISBN'])
+			[ISBN, bookname, author, house, date, bookbinding,] = get_douban_bookinfo(ISBN)
 			chinese_book_category, order = ('', '')
 			source = 'douban'
 		except BaseException as e:
@@ -845,24 +846,47 @@ def book_upload(request, template_name='ebookSystem/book_upload.html'):
 from django.contrib.auth import authenticate
 @user_category_check(['manager'])
 @http_response
-def book_delete(request, ISBN, ):
+def book_delete(request):
 	if request.method == 'POST' and request.is_ajax():
-		getBook = Book.objects.get(ISBN=ISBN)
+		getBook = Book.objects.get(ISBN=request.POST['ISBN'])
 		try:
 			user = authenticate(username=request.user.username, password=request.POST['password'])
 			if user is None:
 				raise SystemError(u'使用者驗證失敗')
 			if not getBook.owner == user:
 				raise SystemError(u'非擁有者無法刪除')
-			if getBook.source == 'self':
+			if getBook.source == 'self' and getBook.status > getBook.STATUS['inactive']:
 				raise SystemError(u'校對書籍無法刪除')
 			getBook.delete()
 		except BaseException as e:
 			status = 'error'
-			message = u'book delete : {0}'.format(unicode(e))
+			message = u'文件刪除失敗: {0}'.format(unicode(e))
 			return locals()
 		status = 'success'
-		message = u'book delete : finish'
+		message = u'文件刪除成功: finish'
+		return locals()
+
+@http_response
+def book_action(request):
+	if request.method == 'POST' and request.is_ajax():
+		getBook = Book.objects.get(ISBN=request.POST['ISBN'])
+		try:
+			user = authenticate(username=request.user.username, password=request.POST['password'])
+			if user is None:
+				raise SystemError(u'使用者驗證失敗')
+
+			if request.POST['action'] == 'set_priority':
+				if not (int(request.POST['priority']) > 0 and int(request.POST['priority']) < 10):
+					raise SystemError(u'權重數值錯誤，請輸入0-9之數值')
+				getBook.priority = int(request.POST['priority'])
+				getBook.save()
+
+		except BaseException as e:
+			status = 'error'
+			message = u'book {0}: error'.format(request.POST['action'])
+			return locals()
+		status = 'success'
+		message = u'book {0}: success'.format(request.POST['action'])
 		return locals()
 
 @http_response
@@ -896,14 +920,10 @@ def book_list(request, ):
 			r = GetBookRecord.objects.filter(get_time__gt=begin_day, get_time__lt=end_day).values('book').annotate(count=Count('book'))
 			import heapq
 			hottest = heapq.nlargest(int(request.GET['query_value']), r, key=lambda s: s['count'])
-			status = 'success'
-			message = u'成功查詢指定文件'
-			content = {}
-			content['book'] = zip(
-				[Book.objects.get(ISBN=i['book']).serialized() for i in hottest],
-				[Book.objects.get(ISBN=i['book']).book_info.serialized() for i in hottest],
-			)
-			return locals()
+			book_list = [Book.objects.get(ISBN=i['book']) for i in hottest],
+		elif query_type == 'owner':
+			owner = User.objects.get(username=request.GET['query_value'])
+			book_list = Book.objects.filter(owner=owner)
 		status = 'success'
 		message = u'成功查詢指定文件'
 		content = {}
@@ -1019,7 +1039,7 @@ def service(request, template_name='ebookSystem/service.html'):
 				message = u'您已有超過{0}段文件，請先校對完成再領取'.format(GET_MAX_PART)
 				return locals()
 			try:
-				partialBook = BookOrder.objects.filter(book__status=Book.STATUS['active']).order_by('-order')[0].book
+				partialBook = BookOrder.objects.filter(book__status=Book.STATUS['active']).order_by('order')[0].book
 			except BaseException as e:
 				status = 'error'
 				message = u'無文件：{0}'.format(unicode(e))
@@ -1048,6 +1068,29 @@ def service(request, template_name='ebookSystem/service.html'):
 			message = u'不明的操作'
 		editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
 		finishPartList = request.user.edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
+@http_response
+def bookorder_list(request, template_name='ebookSystem/bookorder_list.html'):
+	bookorder_list = BookOrder.objects.all().order_by('order')
+	if request.method == 'GET':
+		return locals()
+
+@http_response
+def book_repository_person(request, template_name='ebookSystem/book_repository_person.html'):
+	edit_book_list = request.user.own_book_set.all().filter(status__lte=Book.STATUS['review'])
+	finish_book_list = request.user.own_book_set.all().filter(status__gte=Book.STATUS['finish'])
+	bookinfos = [ book.book_info for book in finish_book_list ]
+	if request.method == 'POST':
+		if request.POST.has_key('delete'):
+			deleteBook = Book.objects.get(ISBN=request.POST['delete'])
+			deleteBook.delete()
+			status = 'success'
+			message = u'成功刪除文件'
+		edit_book_list = request.user.own_book_set.all().filter(status__lte=Book.STATUS['review'])
+		finish_book_list = request.user.own_book_set.all().filter(status__gte=Book.STATUS['finish'])
 		return locals()
 	if request.method == 'GET':
 		return locals()

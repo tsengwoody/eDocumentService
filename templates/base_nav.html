@@ -42,8 +42,8 @@
 						<li><a href="{% url 'manager:org_manage' %}">組織管理</a></li>
 						{% endif %}
 						{% if request.user.is_superuser %}
-
 						<li><a href="{% url 'manager:event_list' 'ebook' %}">審核校對文件</a></li>
+						<li><a href="{% url 'ebookSystem:bookorder_list' %}">校對順序</a></li>
 						<li><a href="{% url 'manager:event_list' 'applydocumentaction' %}">代掃申請列表</a></li>
 						<li><a href="{% url 'ebookSystem:book_list_manager' %}">書籍管理</a></li>
 						{% endif %}
@@ -72,7 +72,7 @@
 					</ul>
 				</li>
 				{% if request.user.is_guest %}
-				<li><a href="{% url 'guest:book_repository' %}">校對進度</a></li>
+				<li><a href="{% url 'ebookSystem:book_repository_person' %}">校對進度</a></li>
 				<li><a href="{% url 'ebookSystem:book_saelf' %}">借閱書櫃</a></li>
 				{% endif %}
 				{% if request.user.is_superuser %}

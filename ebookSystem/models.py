@@ -708,6 +708,27 @@ class BookOrder(models.Model):
 	def __unicode__(self):
 		return self.book.book_info.bookname
 
+	@classmethod
+	def refresh(cls):
+		BookOrder.objects.all().delete()
+		book_list = [ book for book in Book.objects.filter(status=Book.STATUS['active']) ]
+
+		user_order = []
+		for book in book_list:
+			if book.owner not in user_order:
+				user_order.append(book.owner)
+
+		book_order = []
+		while book_list:
+			for user in user_order:
+				for book in book_list:
+					if book.owner == user:
+						book_list.remove(book)
+						book_order.append(book)
+						break
+		for index, book in enumerate(book_order):
+			BookOrder.objects.create(book=book, order=index)
+
 class GetBookRecord(models.Model):
 	user = models.ForeignKey(User, related_name='getbookrecord_set')
 	book = models.ForeignKey(Book, related_name='getbookrecord_set')

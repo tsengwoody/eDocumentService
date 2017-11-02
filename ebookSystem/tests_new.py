@@ -192,11 +192,9 @@ class book_deleteViewTests(TestCase):
 		response = client.post(
 			reverse(
 				'ebookSystem:book_delete',
-				kwargs = {
-					'ISBN': BookInfo3_data['ISBN'],
-				},
 			),
 			{
+				'ISBN': BookInfo3_data['ISBN'],
 				'password': 'root',
 			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
@@ -212,11 +210,9 @@ class book_deleteViewTests(TestCase):
 		response = client.post(
 			reverse(
 				'ebookSystem:book_delete',
-				kwargs = {
-					'ISBN': BookInfo2_data['ISBN'],
-				},
 			),
 			{
+				'ISBN': BookInfo2_data['ISBN'],
 				'password': 'root',
 			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
@@ -230,11 +226,9 @@ class book_deleteViewTests(TestCase):
 		response = client.post(
 			reverse(
 				'ebookSystem:book_delete',
-				kwargs = {
-					'ISBN': BookInfo2_data['ISBN'],
-				},
 			),
 			{
+				'ISBN': BookInfo2_data['ISBN'],
 				'password': 'root1',
 			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
@@ -303,8 +297,30 @@ class book_infoViewTests(TestCase):
 				},
 			),
 			{
+				'ISBN': '9787801871527',
 				'source': 'douban',
 			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
 		print response.json()['bookname']
+
+class book_set_priorityViewTests(TestCase):
+	fixtures = ['dump.json',]
+
+	def test_book_set_priority_correct_case(self):
+		client = Client()
+		client.login(username='root', password='root')
+		response = client.post(
+			reverse(
+				'ebookSystem:book_action',
+			),
+			{
+				'action': 'set_priority',
+				'ISBN': '9789863981459',
+				'password': 'root',
+				'priority': '3',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		book = Book.objects.get(ISBN='9789863981459')
+		self.assertEqual(book.priority, 3)
