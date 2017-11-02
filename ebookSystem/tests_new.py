@@ -9,7 +9,6 @@ from django.test import Client, RequestFactory
 
 from account.models import *
 from ebookSystem.models import *
-from guest.models import *
 from genericUser.models import *
 from .forms import *
 from .tests_data import *

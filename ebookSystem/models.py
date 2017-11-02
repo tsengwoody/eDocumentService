@@ -3,7 +3,6 @@ from django.db import models
 from django.utils import timezone
 from mysite.settings import BASE_DIR
 from genericUser.models import User, ServiceInfo, Event
-from guest.models import Guest
 import glob,os
 import datetime
 import codecs
@@ -528,7 +527,6 @@ class EBook(models.Model):
 		img2.paste(img, (px, py), img)
 		imagefile = imagefile.split('/')[-1]
 		imagefile = imagefile
-		print output_dir+" "+imagefile + " saved..."
 		img2.save(output_dir + imagefile)
 		del draw0, draw
 		del img0, img, img2
@@ -547,78 +545,6 @@ class EBook(models.Model):
 		from utils import tag
 		title = self.book.book_info.bookname +'-part{0}'.format(self.part)
 		tag.clean_tag(src, dst, title)
-
-	def create_SpecialContent(self, encoding='utf-8'):
-		source_path = self.book.path +u'/source'
-		try:
-			fileList=os.listdir(source_path)
-		except:
-			fileList = []
-		fileList = sorted(fileList)
-		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
-		scanPageList = scanPageList[self.begin_page:self.end_page+1]
-		source = self.get_path('-sc')
-		with codecs.open(source, 'r', encoding=encoding) as sourceFile:
-			source_content = sourceFile.read()
-		soup = BeautifulSoup(source_content, 'html5lib')
-		span_tags = soup.find_all('span')
-		for span_tag in span_tags:
-			if span_tag.attrs.has_key('class') and ('unknown' in span_tag.attrs['class'] or 'mathml' in span_tag.attrs['class']):
-				p_tag_count = 0
-				for parent in span_tag.parents:
-					if parent.name == 'p':
-						span_tag_pparent = parent
-						p_tag_count = p_tag_count +1
-				if not p_tag_count == 1:continue
-				try:
-					tag_id = span_tag_pparent['id']
-					page = scanPageList.index(span_tag['id'])
-				except:
-					continue
-				id = self.ISBN_part +'-' +tag_id
-				content = unicode(span_tag_pparent)
-				if 'unknown' in span_tag.attrs['class']:
-					type = SpecialContent.TYPE['unknown']
-				elif 'mathml' in span_tag.attrs['class']:
-					type = SpecialContent.TYPE['mathml']
-				else:
-					continue
-				try:
-					SpecialContent.objects.get(id=id)
-				except:
-					SpecialContent.objects.create(id=id, ebook=self, tag_id=tag_id, page=page, content=content, type=type)
-		#image markup
-		img_tags = soup.find_all('img')
-		for img_tag in img_tags:
-			if not img_tag.attrs.has_key('src'):
-				p_tag_count = 0
-				for parent in img_tag.parents:
-					if parent.name == 'p':
-						img_tag_pparent = parent
-						p_tag_count = p_tag_count +1
-				if p_tag_count != 1:continue
-				try:
-					tag_id = img_tag_pparent['id']
-					page = scanPageList.index(img_tag['id'])
-				except:
-					continue
-				id = self.ISBN_part +'-' +tag_id
-				content = unicode(img_tag_pparent)
-				type = SpecialContent.TYPE['image']
-				try:
-					SpecialContent.objects.get(id=id)
-				except:
-					SpecialContent.objects.create(id=id, ebook=self, tag_id=tag_id, page=page, content=content, type=type)
-
-	def delete_SpecialContent(self):
-		for sc in self.specialcontent_set.all():
-			sc.delete()
-
-	def specialcontent_finish_count(self):
-		return len(self.specialcontent_set.all().filter(is_edited=True))
-
-	def specialcontent_count(self):
-		return len(self.specialcontent_set.all())
 
 	def replace(self):
 		from utils.replace import replace

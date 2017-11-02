@@ -62,7 +62,6 @@ urlpatterns = [
 	url(r'^ebookSystem/', include('ebookSystem.urls', namespace="ebookSystem")),
 	url(r'^genericUser/', include('genericUser.urls', namespace="genericUser")),
 	url(r'^manager/', include('manager.urls', namespace="manager")),
-	url(r'^guest/', include('guest.urls', namespace="guest")),
 	url(r'^auth/password_change/$', views.password_change, name='password_change'),
 	url(r'^auth/register/$', views.register, name='register'),
 	url(r'^auth/login/$', views.login, name='login'),

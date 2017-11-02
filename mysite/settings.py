@@ -56,7 +56,6 @@ INSTALLED_APPS = (
     'account',
     'ebookSystem',
     'genericUser',
-    'guest',
     'snowpenguin.django.recaptcha2',
 )
 

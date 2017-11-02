@@ -10,7 +10,6 @@ from django.utils import timezone
 
 from ebookSystem.models import *
 from genericUser.models import *
-from guest.models import *
 from account.views import *
 from ebookSystem.views import *
 from genericUser.views import *
@@ -25,28 +24,6 @@ class Command(BaseCommand):
 		parser.add_argument('create_demo_data', nargs='*')
 
 	def handle(self, *args, **options):
-		p = ['active', 'editor', 'guest', 'manager', 'advanced_editor', 'root', 'license', ]
-		for item in p:
-			exec("permission_{0} = Permission.objects.create(name='{0}', codename='{0}')".format(item))
-		urls = [
-			('manager', 'event_list', (permission_manager, )),
-			('genericUser', 'article/create', (permission_root, )),
-			('ebookSystem', 'detail_manager', (permission_root, )),
-			('ebookSystem', 'review_document', (permission_manager, )),
-			('ebookSystem', 'review_part', (permission_manager, )),
-			('ebookSystem', 'book_create', (permission_guest, )),
-			('genericUser', 'review_user', (permission_manager, )),
-			('genericUser', 'apply_document', (permission_guest, )),
-			('manager', 'applydocumentaction', (permission_advanced_editor, )),
-			('account', 'service', (permission_editor, )),
-			('account', 'sc_service', (permission_advanced_editor, )),
-			('account', 'an_service', (permission_root, )),
-		]
-		for url in urls:
-			v = View.objects.create(namespace=url[0], url_name=url[1], )
-			v.permission.add(permission_root)
-			for p in url[2]:
-				v.permission.add(p)
 		root = User(
 			username='root',
 			email='edocumentservice@gmail.com',
@@ -73,10 +50,7 @@ class Command(BaseCommand):
 		org = Organization.objects.create(name=u'eDocumentService', address=u'台北市大同區1段149號7樓', email=u'edocumentservice@gmail.com', phone='0917823098', manager=root, is_service_center=True)
 		root.org=org
 		root.save()
-		p = ['active', 'editor', 'guest', 'manager', 'advanced_editor', 'root', 'license', ]
-		for item in p:
-			exec("root.permission.add(permission_{0})".format(item))
-		rootGuest = Guest.objects.create(user=root)
+
 		client = Client()
 		response = client.post(
 			reverse('register'),

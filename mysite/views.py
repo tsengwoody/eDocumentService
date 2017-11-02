@@ -60,14 +60,10 @@ def register(request, template_name='registration/register.html'):
 		newUser.is_active = True
 		newUser.is_license = True
 		newUser.save()
-		newUser.permission.add(
-			Permission.objects.get(codename='active'),
-			Permission.objects.get(codename='license'),
-		)
+
 		if request.POST['role'] == 'Editor':
 			try:
 				newUser.is_editor = True
-				newUser.permission.add(Permission.objects.get(codename='editor'))
 			except:
 				newUser.delete()
 				status = 'error'
@@ -78,7 +74,6 @@ def register(request, template_name='registration/register.html'):
 				DCDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(newUser.username)
 				handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_front.jpg'), request.FILES['disability_card_front'])
 				handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_back.jpg'), request.FILES['disability_card_back'])
-				newGuest = Guest.objects.create(user=newUser)
 			except:
 				newUser.delete()
 				status = 'error'
@@ -125,7 +120,7 @@ def login(request, template_name='registration/login.html', authentication_form=
 			return locals()
 
 		auth_login(request, form.get_user())
-		if Permission.objects.get(codename='license') not in request.user.permission.all():
+		if not request.user.is_license:
 			redirect_to='/genericUser/license/'
 		else:
 			redirect_to = '/'

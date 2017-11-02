@@ -10,7 +10,6 @@ from django.template.loader import get_template
 from django.template import Context
 from django.utils import timezone
 from ebookSystem.models import *
-from guest.models import Guest
 from genericUser.models import *
 from utils.decorator import *
 from utils.tag import *
@@ -174,8 +173,6 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 	if request.method == 'POST':
 		for item in ['active', 'editor', 'guest', 'manager', 'advanced_editor', ]:
 			exec("user.is_{0} = True if request.POST.has_key('{0}') else False".format(item))
-			p = Permission.objects.get(codename=item)
-			exec("user.permission.add(p) if request.POST.has_key('{0}') else user.permission.remove(p)".format(item))
 		if request.POST['review'] == 'success':
 			user.status = user.STATUS['active']
 			user.save()
