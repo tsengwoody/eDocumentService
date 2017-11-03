@@ -922,7 +922,7 @@ def book_list(request, ):
 			hottest = heapq.nlargest(int(request.GET['query_value']), r, key=lambda s: s['count'])
 			book_list = [Book.objects.get(ISBN=i['book']) for i in hottest],
 		elif query_type == 'owner':
-			owner = User.objects.get(username=request.GET['query_value'])
+			owner = User.objects.get(id=request.GET['query_value'])
 			book_list = Book.objects.filter(owner=owner)
 		status = 'success'
 		message = u'成功查詢指定文件'
@@ -1094,3 +1094,9 @@ def book_repository_person(request, template_name='ebookSystem/book_repository_p
 		return locals()
 	if request.method == 'GET':
 		return locals()
+
+#=====rest API=====
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
