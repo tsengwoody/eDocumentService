@@ -368,7 +368,8 @@
 
 		//front
 		if(mode==='create' || mode==='update'){
-			if($('#id_use_guest').prop('checked')===true){
+			let is_guest=o.is_guest;
+			if(is_guest===true){
 				let front=o.front;
 				if(iser(front)){
 					err.push('身心障礙手冊正面尚未選擇正確檔案');
@@ -379,7 +380,8 @@
 
 		//back
 		if(mode==='create' || mode==='update'){
-			if($('#id_use_guest').prop('checked')===true){
+			let is_guest=o.is_guest;
+			if(is_guest===true){
 				let back=o.back;
 				if(iser(back)){
 					err.push('身心障礙手冊反面尚未選擇正確檔案');
@@ -617,7 +619,7 @@ Vue.component('vu-user', {
 	<div class="form-group" v-if="s.front.show===true">
 		<label v-bind:class="gridclass" for="v_id_use_front"><font style="color:red">*</font><span>身心障礙手冊正面</span></label>
 		<div class="col-sm-4">
-			<div><img class="img-thumbnail" v-bind:src="cv_front"></div>
+			<div><img class="img-thumbnail" v-bind:src="cv_front" v-bind:alt="alt_front"></div>
 			<input ref="inp_front" id="v_id_use_front" type="file" accept="image/jpg,image/jpeg" v-on:change="ch_front" v-if="s.front.mode==='foredit'">
 		</div>
 		<label class="control-label col-sm-5" for="v_id_use_front" style="text-align:left;" v-if="s.front.remark===true"><font style="color:red">請上傳身心障礙手冊正面掃描檔</font></label>
@@ -627,7 +629,7 @@ Vue.component('vu-user', {
 	<div class="form-group" v-if="s.back.show===true">
 		<label v-bind:class="gridclass" for="v_id_use_back"><font style="color:red">*</font><span>身心障礙手冊正面</span></label>
 		<div class="col-sm-4">
-			<div><img class="img-thumbnail" v-bind:src="cv_back"></div>
+			<div><img class="img-thumbnail" v-bind:src="cv_back" v-bind:alt="alt_back"></div>
 			<input ref="inp_back" id="v_id_use_back" type="file" accept="image/jpg,image/jpeg" v-on:change="ch_back" v-if="s.back.mode==='foredit'">
 		</div>
 		<label class="control-label col-sm-5" for="v_id_use_back" style="text-align:left;" v-if="s.back.remark===true"><font style="color:red">請上傳身心障礙手冊正面掃描檔</font></label>
@@ -723,6 +725,22 @@ Vue.component('vu-user', {
 				role+='視障者';
 			}
 			return role;
+		},
+
+		alt_front:function(){
+			let vo=this;
+			if(iser(vo.s.front.value)){
+				return '目前無任何圖片';
+			}
+			return '身心障礙手冊正面';
+		},
+
+		alt_back:function(){
+			let vo=this;
+			if(iser(vo.s.back.value)){
+				return '目前無任何圖片';
+			}
+			return '身心障礙手冊反面';
 		},
 
 		cv_front:function(){
@@ -934,7 +952,7 @@ Vue.component('vu-user', {
 				//df_info
 				let df_info;
 				if(!diff_info){
-					//console.log('o_info: ',o_info)
+					console.log('o_info: ',o_info)
 					df_info=aj_user_updateid(userid,'info',o_info);
 				}
 
@@ -947,14 +965,14 @@ Vue.component('vu-user', {
 					if(!diff_phone){
 						o_role.auth_phone=false;
 					}
-					//console.log('o_role: ',o_role)
+					console.log('o_role: ',o_role)
 					df_role=aj_user_updateid(userid,'role',o_role);
 				}
 
 				//df_disability_card
 				let df_disability_card;
 				if(!diff_disability_card){
-					//console.log('o_disability_card: ',o_disability_card)
+					console.log('o_disability_card: ',o_disability_card)
 					df_disability_card=aj_user_updateid(userid,'disability_card',o_disability_card);
 				}
 				

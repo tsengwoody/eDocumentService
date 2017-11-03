@@ -10,48 +10,6 @@
 {% csrf_token %}
 
 
-<script id="tmp_booklist_tabframe" type="text/x-custom-template">
-	<table>
-		<thead>
-			<tr>
-				<th>ISBN</th>
-				<th>書名</th>
-				<th>裝訂冊數</th>
-				<th>版次</th>
-				<th>作者</th>
-				<th>出版社</th>
-				<th>出版日期</th>
-				{% if request.user.is_guest %}
-				<th>動作</th>
-				{% endif %}
-			</tr>
-		</thead>
-		<tbody>
-		</tbody>
-	</table>
-</script>
-
-
-<script id="tmp_booklist_row" type="text/x-jquery-tmpl">
-	<tr>
-		<td>${ISBN}</td>
-		<td>${bookname}</td>
-		<td>${bookbinding}</td>
-		<td>${order}</td>
-		<td>${author}</td>
-		<td>${house}</td>
-		<td>${date}</td>
-		{% if request.user.is_guest %}
-		<td>
-			<a class="btn btn-default" role="button" href="{%url 'ebookSystem:library_view' %}?ISBN=${ISBN}" target="_blank" title="閱讀(另開新視窗)">閱讀</a>
-			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="receivebook(this, false, 'download')">下載</button>
-			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="aj_borrowbook(this, 'check_out')">借閱</button>
-		</td>
-		{% endif %}
-	</tr>
-</script>
-
-
 <script>
 
 
@@ -85,15 +43,12 @@
 		//search_value
 		let search_value=$('#search_value').val();
 
-		//div
-		let div=$('#repository_books_div_查詢');
-
 		//aj_booklist
 		aj_booklist(search_type,search_value)
 		.done(function(data){
 
 			//datatable
-			bk_datatable(div,data,'tab_result');
+			bk_datatable('repository_books_div_查詢',data,'tab_result');
 
 			//alertmessage
 			alertmessage('success', '查詢成功，共取得 '+data.length+' 筆資料')
@@ -102,7 +57,7 @@
 		.fail(function(msg){
 
 			//msg
-			div.html(msg);
+			$('#repository_books_div_查詢').html(msg);
 
 			//alertmessage
 			alertmessage('error', msg)
@@ -147,19 +102,16 @@
 	function listnewst(){
 		//顯示新書上架
 
-		//div
-		let div=$('#bookrecommend_新書上架');
-
 		//aj_booklist
 		aj_booklist('newest',5) //先5本
 		.done(function(data){
 
 			//datatable
-			bk_datatable(div,data,'tab_bookrecommend_新書上架');
+			bk_datatable('bookrecommend_新書上架',data,'tab_bookrecommend_新書上架');
 
 		})
 		.fail(function(msg){
-			div.html(msg);
+			$('#bookrecommend_新書上架').html(msg);
 		})
 		
 
@@ -169,19 +121,16 @@
 	function listhottest(){
 		//顯示借閱排行
 
-		//div
-		let div=$('#bookrecommend_借閱排行');
-
 		//aj_booklists
 		aj_booklist('hottest',5) //先5本
 		.done(function(data){
 
 			//datatable
-			bk_datatable(div,data,'tab_bookrecommend_借閱排行');
+			bk_datatable('bookrecommend_借閱排行',data,'tab_bookrecommend_借閱排行');
 
 		})
 		.fail(function(msg){
-			div.html(msg);
+			$('#bookrecommend_借閱排行').html(msg);
 		})
 		
 
@@ -226,46 +175,22 @@
 		//each 0~9
 		_.each(_.range(0,10),function(i){
 
-			//div
-			let div=$('#bookcategory_'+i);
-
 			//aj_booklist
 			aj_booklist('chinese_book_category',i)
 			.done(function(data){
 
 				//datatable
-				bk_datatable(div,data,'tab_category_'+i);
+				bk_datatable('bookcategory_'+i,data,'tab_category_'+i);
 
 			})
 			.fail(function(msg){
-				div.html(msg);
+				$('#bookcategory_'+i).html(msg);
 			})
 			
 		})
 
 	}
 	
-
-	function bk_datatable(div,data,tabid){
-		//以表格顯示資訊
-
-		//tabframe
-		div.html($('#tmp_booklist_tabframe').html());
-
-		//tmpl
-		$('#tmp_booklist_row').tmpl(data).appendTo(div.find('tbody'));
-
-		//set tabid
-		div.find('table').attr('id',tabid);
-
-		//table style
-		grid2bstable(tabid);
-
-		//pagin
-		pagin(tabid);
-
-	}
-
 
 </script>	
 

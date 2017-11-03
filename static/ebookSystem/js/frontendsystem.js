@@ -746,9 +746,8 @@ function grid2bstable(tabid){
     let tab=$('#'+tabid);
 
     //table
-    tab.addClass('table table-hover table-rwd').css({ //table-striped
+    tab.addClass('table table-hover table-rwd').css({
         'margin':'10px 0px',
-        //'white-space':'nowrap',
     });
 
     //thead
@@ -958,6 +957,21 @@ function pagin_change(tabid,oper){
 }
 
 
+function dtarrsortkeys(dtarr,keys){
+    //重排取物件陣列keys
+
+    let r=[];
+    _.each(dtarr,function(v,k){
+        let o={};
+        _.each(keys,function(kk){
+            o[kk]=v[kk];
+        })
+        r.push(o);
+    })
+    return r;
+}
+
+
 function gentable(divid,tabid,ar){
     //於div內由資料ar快速產生有樣式與具分頁功能的table
 
@@ -1143,11 +1157,6 @@ function aj_send(type, url, transferData){
         df.reject(res);
 
     })
-    .always(function() {
-        //TO-DO after fail/done request.
-        console.log(url,transferData,"ended");
-    });
-
 
     return df;
 }
@@ -1235,6 +1244,68 @@ function aj_binary(url, transferData){
     })
 
     return df;
+}
+
+
+function aj_booklist_dict(key2head,k){
+    let o={
+        'ISBN':'ISBN',
+        'bookname':'書名',
+        'bookbinding':'裝訂冊數',
+        'order':'版次',
+        'author':'作者',
+        'house':'出版社',
+        'date':'出版日期',
+        'chinese_book_category':'中文圖書分類號',
+        'source':'來源',
+    };
+    let p={
+        'ISBN':'ISBN',
+        '書名':'bookname',
+        '裝訂冊數':'bookbinding',
+        '版次':'order',
+        '作者':'author',
+        '出版社':'house',
+        '出版日期':'date',
+        '中文圖書分類號':'chinese_book_category',
+        '來源':'source',
+    };
+
+    let q;
+    if(key2head){
+        q=o;
+    }
+    else{
+        q=p;
+    }
+
+    if(haskey(q,k)){
+        return q[k];
+    }
+    else{
+        return k
+    }
+
+}
+
+
+function aj_booklist_dict_array(ar,key2head){
+
+    function forobj(o){
+        let r={};
+        _.each(o,function(vv,kk){
+            let knew=aj_booklist_dict(key2head,kk);
+            r[knew]=vv;
+        })
+        return r;
+    }
+
+    let r=[];
+    _.each(ar,function(vv,kk){
+        r.push(forobj(vv));
+    })
+
+    return r;
 }
 
 
@@ -1920,6 +1991,64 @@ function aj_user_updateid(id,action,transferData){
 
     //transferData
     transferData['action']=action;
+
+    //aj_post
+    aj_post(url, transferData)
+    .done(function(data){
+        df.resolve(data);
+    })
+    .fail(function(data){
+        df.reject(data);
+    })
+
+    return df;
+}
+
+
+function aj_booksetpriority(password,ISBN,priority){
+    //使用API book_action
+
+    //df
+    let df = $.Deferred();
+    
+    //url
+    let url='/ebookSystem/book_action/';
+
+    //transferData
+    let transferData={
+        'action':'set_priority',
+        'ISBN':ISBN,
+        'password':password,
+        'priority':priority,
+    };
+
+    //aj_post
+    aj_post(url, transferData)
+    .done(function(data){
+        df.resolve(data);
+    })
+    .fail(function(data){
+        df.reject(data);
+    })
+
+    return df;
+}
+
+
+function aj_bookdeleterepository(password,ISBN){
+    //使用API book_delete
+
+    //df
+    let df = $.Deferred();
+    
+    //url
+    let url='/ebookSystem/book_delete/';
+
+    //transferData
+    let transferData={
+        'ISBN':ISBN,
+        'password':password,
+    };
 
     //aj_post
     aj_post(url, transferData)

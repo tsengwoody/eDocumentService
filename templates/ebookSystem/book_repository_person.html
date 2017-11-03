@@ -12,8 +12,51 @@
 {% block content %}
 {% include 'utils/get_book.html' %}
 {% include 'utils/dialog.html' %}
+
+
+<script>
+
+	$(function(){
+
+		//userid
+		let userid=$('div[user_id]').attr('user_id');
+
+		//aj_booklist
+		aj_booklist('owner', userid)
+		.done(function(data){
+			
+			//轉中文head
+			data=aj_booklist_dict_array(data,true);
+
+			//動作
+			_.each(data,function(v,k){
+
+				//動作
+				let c='';
+				c+='<a class="btn btn-default" role="button" href="/ebookSystem/library_view?ISBN='+v['ISBN']+'" target="_blank" title="閱讀(另開新視窗)">閱讀</a>';
+				c+='<button type="button" class="btn btn-default" isbn="'+v['ISBN']+'" onclick="receivebook(this, false, \'download\')">下載</button>';
+				data[k]['動作']=c;
+
+			})
+
+			//dtarrsortkeys
+			data=dtarrsortkeys(data,['ISBN','書名','裝訂冊數','版次','作者','出版社','出版日期','動作']);
+
+			//gentable
+			gentable('repository_books_div_havedoc','repository_books_div_havedoc_table',data);
+
+		})
+		.fail(function(data){
+
+		})
+
+	})
+
+</script>
+
 <form action="" method="post">
 {% csrf_token %}
+
 	<h4 class="page-header">校對文件進度</h4>
 	<table class="table table-striped table-hover">
 		<tr>
@@ -33,15 +76,17 @@
 			<td>{{ book.priority }}</td>
 			<td>
 				{% if book.status_int2str == 'inactive' %}
-				<button type="submit" class="btn btn-default send_button" id="delete_id" name="delete" value={{book.ISBN}}>刪除</button>
+				<button class="btn btn-default send_button" type="button" name="delete" onclick="bookdeleterepository('{{book.ISBN}}')">刪除</button>
 				{% else %}
-				<button type="submit" class="btn btn-default send_button" id="set_priority_id" name="set_priority">設定權重</button>
+				<button class="btn btn-default send_button" type="button" name="set_priority" onclick="booksetpriority('{{book.ISBN}}')">設定權重</button>
 				{% endif %}
 			</td>
 		</tr>
 		{% endfor %}
 	</table>
-<h4 class="page-header">您擁有的文件</h4>
+
+	<h4 class="page-header">您擁有的文件</h4>
+	<div id="repository_books_div_havedoc"></div>
 
 </form>
 {% endblock %}
