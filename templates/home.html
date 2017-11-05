@@ -82,7 +82,9 @@
 			<div class="panel-heading">最新消息</div>
 			<div class="panel-body">
 				{% for announcement in announcement_list|slice:":5" %}
-				<p><a class="btn btn-link" role="button" href="{% url 'genericUser:announcement' announcement.id %}">{{ announcement.datetime.year }}年{{ announcement.datetime.month }}月{{ announcement.datetime.day }}日 {{ announcement.title }}</a></p>
+				<p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+					<a class="btn btn-link" role="button" href="{% url 'genericUser:announcement' announcement.id %}">{{ announcement.datetime.year }}年{{ announcement.datetime.month }}月{{ announcement.datetime.day }}日 {{ announcement.title }}</a>
+				</p>
 				{% endfor %}
 				<!-- <a href='{% url 'genericUser:announcement_list' %}'>公告列表</a> -->
 				<div class="pull-right">

@@ -590,7 +590,7 @@ Vue.component('vu-user', {
 		<label v-bind:class="gridclass" for="v_id_use_org"><font style="color:red">*</font><span>所屬單位</span></label>
 		<div class="col-sm-4">
 			<select id="v_id_use_org" class="form-control" v-model="s.org.value" v-if="s.org.mode==='foredit'">
-				<option>其他</option>
+				<option v-bind:disabled="s.mode!=='create'">其他</option>
 				<option>eDocumentService</option>
 			</select>
 			<div class="likebtn" v-html="s.org.value" v-if="s.org.mode==='forshow'"></div>
