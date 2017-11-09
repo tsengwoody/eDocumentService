@@ -31,8 +31,8 @@
 		<td>${date}</td>
 		{% if request.user.is_guest %}
 		<td>
-			<a class="btn btn-default" role="button" href="{%url 'ebookSystem:library_view' %}?ISBN=${ISBN}" target="_blank" title="閱讀(另開新視窗)">閱讀</a>
-			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="receivebook(this, false, 'download')">下載</button>
+<!--			<a class="btn btn-default" role="button" href="{%url 'ebookSystem:library_view' %}?ISBN=${ISBN}" target="_blank" title="閱讀(另開新視窗)">閱讀</a>
+			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="receivebook(this, false, 'download')">下載</button>-->
 			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="aj_borrowbook(this, 'check_out')">借閱</button>
 		</td>
 		{% endif %}

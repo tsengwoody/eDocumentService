@@ -33,7 +33,7 @@
 
 				//動作
 				let c='';
-				c+='<a class="btn btn-default" role="button" href="/ebookSystem/library_view?ISBN='+v['ISBN']+'" target="_blank" title="閱讀(另開新視窗)">閱讀</a>';
+				c+='<a class="btn btn-default" role="button" href="{%url 'ebookSystem:library_origin_view' %}?ISBN='+v['ISBN']+'" target="_blank" title="閱讀(另開新視窗)">閱讀</a>';
 				c+='<button type="button" class="btn btn-default" isbn="'+v['ISBN']+'" onclick="receivebook(this, false, \'download\')">下載</button>';
 				data[k]['動作']=c;
 

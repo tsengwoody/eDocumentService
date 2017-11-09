@@ -30,6 +30,7 @@ urlpatterns = [
 	url(r'^getbookrecord_user/(?P<ID>\d+)/$', views.getbookrecord_user, name='getbookrecord_user'),
 #	url(r'^epub/(?P<ISBN>[0-9]+)/$', views.epub, name='epub'),
 	url(r'^library_view$', views.library_view, name='library_view'),
+	url(r'^library_origin_view$', views.library_origin_view, name='library_origin_view'),
 	url(r'^library_action$', views.library_action, name='library_action'),
 	url(r'^book_saelf$', views.book_saelf, name='book_saelf'),
 	url(r'^service/$', views.service, name='service'),

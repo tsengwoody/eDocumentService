@@ -276,7 +276,7 @@ def serviceinfo_list(request, username, template_name='genericUser/serviceinfo_l
 				exchange_serviceInfo.is_exchange = True
 				exchange_serviceInfo.org = Organization.objects.get(id=request.POST['org'])
 				exchange_serviceInfo.save()
-				subject = u'[驗證] {0} 信箱驗證碼'.format(request.user.username)
+				subject = u'[通知] {0} 申請服務時數'.format(request.user.username)
 				t = get_template('email/serviceinfo_list.txt')
 				body = t.render(Context(locals()))
 				email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[exchange_serviceInfo.org.email])
@@ -592,3 +592,25 @@ def qanda_main(request, template_name='genericUser/qanda_main.html'):
 @http_response
 def getbookrecord_view(request, username, template_name='genericUser/getbookrecord_view.html'):
 	return locals()
+
+
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+@api_view(['GET', 'POST'])
+def qanda_list_api(request):
+	"""
+	List all QAndA, or create a new QAndA.
+	"""
+	if request.method == 'GET':
+		qanda_list = QAndA.objects.all()
+		serializer = QAndASerializer(qanda_list, many=True)
+		return Response(serializer.data)
+
+	elif request.method == 'POST':
+		serializer = SnippetSerializer(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

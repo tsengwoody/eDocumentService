@@ -99,12 +99,20 @@ class User(AbstractUser):
 
 		elif action == 'disability_card':
 			import base64
-			with open(self.disability_card_front, 'rb') as f:
-				front = f.read()
-				front = base64.b64encode(front)
-			with open(self.disability_card_back, 'rb') as f:
-				back = f.read()
-				back = base64.b64encode(back)
+			try:
+				with open(self.disability_card_front, 'rb') as f:
+					front = f.read()
+					front = base64.b64encode(front)
+			except BaseException as e:
+				front = ''
+
+			try:
+				with open(self.disability_card_back, 'rb') as f:
+					back = f.read()
+					back = base64.b64encode(back)
+			except BaseException as e:
+				back = ''
+
 			serialize = {
 				'id': self.id,
 				'front': front,
@@ -112,13 +120,6 @@ class User(AbstractUser):
 			}
 
 		return serialize
-
-	def has_guest(self):
-		try:
-			self.guest
-			return True
-		except:
-			return False
 
 	def authentication(self):
 		return self.auth_email and self.auth_phone and self.is_license

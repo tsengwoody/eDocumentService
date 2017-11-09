@@ -188,27 +188,34 @@ class Book(models.Model):
 		self.check_status()
 		#準備epub文件
 		from ebooklib import epub
+		from utils.epub import txt2epub, add_bookinfo
+		info = {
+			'ISBN': self.book_info.ISBN,
+			'bookname': self.book_info.bookname,
+			'author': self.book_info.author,
+			'date': str(self.book_info.date),
+			'house': self.book_info.house,
+			'language': 'zh',
+		}
 		if self.status == self.STATUS['final']:
 			final_epub = self.path +'/OCR/{0}.epub'.format(self.ISBN)
 			try:
 				book = epub.read_epub(final_epub)
+				book = add_bookinfo(
+					book,
+					**info
+				)
 				book.set_identifier(user.username)
 				epub.write_epub(custom_epub, book, {})
 			except BaseException as e:
 				raise SystemError('epub create fail:' +unicode(e))
 		else:
 			final_epub = self.path +'/temp/{0}.temp'.format(self.ISBN)
+			final_dir = os.path.dirname(final_epub)
+			if not os.path.exists(final_dir):
+				os.mkdir(final_dir)
 			try:
 				part_list = [ file.get_clean_file() for file in self.ebook_set.all() ]
-				from utils.epub import html2epub
-				info = {
-					'ISBN': self.book_info.ISBN,
-					'bookname': self.book_info.bookname,
-					'author': self.book_info.author,
-					'date': str(self.book_info.date),
-					'house': self.book_info.house,
-					'language': 'zh',
-				}
 				html2epub(part_list, final_epub, **info)
 				book = epub.read_epub(final_epub)
 				book.set_identifier(user.username)
@@ -674,25 +681,31 @@ class LibraryRecord(models.Model):
 	def __unicode__(self):
 		return u'{0}-{1}'.format(self.book, self.user)
 
+	def __init__(self, *args, **kwargs):
+		super(LibraryRecord, self).__init__(*args, **kwargs)
+		self.epub = BASE_DIR +'/file/ebookSystem/library/{0}.epub'.format(self.id)
+
 	def check_out(self):
+		if not os.path.exists(os.path.dirname(self.epub)):
+			os.mkdir(os.path.dirname(self.epub))
+		path = self.book.custom_epub_create(self.epub, self.user)
+
 		self.check_out_time = timezone.now()
 		self.check_in_time = self.check_out_time +datetime.timedelta(days=30)
 		self.status = True
 		self.save()
 
-		custom_epub = BASE_DIR +'/file/ebookSystem/library/{0}.epub'.format(self.id)
-		if not os.path.exists(os.path.dirname(custom_epub)):
-			os.mkdir(os.path.dirname(custom_epub))
-		custom_epub = self.book.custom_epub_create(custom_epub, self.user)
-		return custom_epub
+		return path
 
 	def check_in(self):
 		self.check_in_time = timezone.now()
 		self.status = False
 		self.save()
-		custom_epub = BASE_DIR +'/file/ebookSystem/library/{0}.epub'.format(self.id)
-		os.remove(custom_epub)
-		return custom_epub
+		try:
+			os.remove(self.epub)
+		except BaseException as e:
+			pass
+		return self.epub
 
 class EditRecord(models.Model):
 	part = models.ForeignKey(EBook, blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')

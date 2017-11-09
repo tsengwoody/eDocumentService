@@ -30,7 +30,29 @@ from django.http import (
 )
 
 from django.core.cache import cache
-def epub(request, ISBN, token, document_root=None, show_indexes=False):
+
+def library_epub(request, ISBN, token, document_root=None, show_indexes=False):
+	from ebookSystem.models import Book, LibraryRecord
+	lr = LibraryRecord.objects.get(id=ISBN)
+	fullpath = lr.epub
+
+	if not os.path.exists(fullpath):
+		raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
+	# Respect the If-Modified-Since header.
+	statobj = os.stat(fullpath)
+	content_type, encoding = mimetypes.guess_type(fullpath)
+	content_type = content_type or 'application/octet-stream'
+	response = FileResponse(open(fullpath, 'rb'), content_type=content_type)
+#	response["Last-Modified"] = http_date(statobj.st_mtime)
+#	if stat.S_ISREG(statobj.st_mode):
+#		response["Content-Length"] = statobj.st_size
+	if encoding:
+		response["Content-Encoding"] = encoding
+#	if token == cache.get('token.' +str(request.user.id)):
+	return response
+#============
+
+def library_origin_epub(request, ISBN, token, document_root=None, show_indexes=False):
 	from ebookSystem.models import Book
 	book = Book.objects.get(ISBN=ISBN)
 	fullpath = book.path +'/OCR/{0}.epub'.format(book.ISBN)
@@ -48,14 +70,14 @@ def epub(request, ISBN, token, document_root=None, show_indexes=False):
 		response["Content-Encoding"] = encoding
 #	if token == cache.get('token.' +str(request.user.id)):
 	return response
-#============
 
 urlpatterns = [
 	url(r'^$', views.home, name='home'),
 	url(r'^about/(?P<name>[\w]+)$', views.about, name='about'),
 	url(r'^sitemap$', views.sitemap, name='sitemap'),
 	url(r'^error_social_auth$', views.error_social_auth, name='error_social_auth'),
-	url(r'^epub/(?P<ISBN>[0-9]{13,13})/(?P<token>[abcdef0-9]{32,32})/$', epub),
+	url(r'^library_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{32,32})/$', library_epub),
+	url(r'^library_origin_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{32,32})/$', library_origin_epub),
 	url(r'^admin/', include(admin.site.urls)),
 	url(r'social-auth/', include('social_django.urls', namespace='social')),
 	url(r'^account/', include('account.urls', namespace="account", app_name="account")),

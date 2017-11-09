@@ -836,7 +836,6 @@ def book_upload(request, template_name='ebookSystem/book_upload.html'):
 		ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN'] + '-1', begin_page=-1, end_page=-1)
 		ebook.change_status(9, 'final')
 
-		redirect_to = '/'
 		status = 'success'
 		message = u'成功建立並上傳文件'
 		return locals()
@@ -923,7 +922,7 @@ def book_list(request, ):
 			book_list = [Book.objects.get(ISBN=i['book']) for i in hottest],
 		elif query_type == 'owner':
 			owner = User.objects.get(id=request.GET['query_value'])
-			book_list = Book.objects.filter(owner=owner)
+			book_list = Book.objects.filter(owner=owner, status__gte=Book.STATUS['finish'])
 		status = 'success'
 		message = u'成功查詢指定文件'
 		content = {}
@@ -972,6 +971,21 @@ def library_view(request, template_name='ebookSystem/library_view.html'):
 			status = 'error'
 			message = ''
 			return locals()
+		lr = LibraryRecord.objects.get(id=request.GET['ISBN'])
+
+		token = uuid.uuid4().hex
+		cache.set('token.' +str(request.user.id), token, 100)
+		path = '/library_epub/' +str(lr.id) +'/' +token
+		base64_path = base64.b64encode(path)
+		return locals()
+
+@http_response
+def library_origin_view(request, template_name='ebookSystem/library_origin_view.html'):
+	if request.method == 'GET':
+		if not request.user.is_guest:
+			status = 'error'
+			message = ''
+			return locals()
 		book = Book.objects.get(ISBN=request.GET['ISBN'])
 		if not book.status == book.STATUS['final']:
 			final_epub = book.path +'/OCR/{0}.epub'.format(book.ISBN)
@@ -992,7 +1006,7 @@ def library_view(request, template_name='ebookSystem/library_view.html'):
 
 		token = uuid.uuid4().hex
 		cache.set('token.' +str(request.user.id), token, 10)
-		path = '/epub/' +book.ISBN +'/' +token
+		path = '/library_origin_epub/' +book.ISBN +'/' +token
 		base64_path = base64.b64encode(path)
 		return locals()
 
@@ -1018,9 +1032,11 @@ def library_action(request, ):
 				message = u'已在借閱書櫃無需再借閱'
 				return locals()
 			lr = LibraryRecord.objects.create(user=request.user, book=book)
+			lr = LibraryRecord.objects.get(id=lr.id)
 			lr.check_out()
 			status = 'success'
 			message = u'成功借閱書籍{0}'.format(book)
+			redirect_to = reverse('ebookSystem:book_saelf')
 		elif request.POST['action'] == 'check_in':
 			lr = LibraryRecord.objects.get(id=request.POST['id'])
 			lr.check_in()
@@ -1094,9 +1110,3 @@ def book_repository_person(request, template_name='ebookSystem/book_repository_p
 		return locals()
 	if request.method == 'GET':
 		return locals()
-
-#=====rest API=====
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-

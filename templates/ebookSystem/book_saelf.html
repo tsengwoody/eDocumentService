@@ -60,7 +60,7 @@
 		"{{ lr.book }}",
 		"{{ lr.check_out_time }}",
 		"{{ lr.check_in_time }}",
-		"{%url 'ebookSystem:library_view' %}?ISBN={{ lr.book.ISBN }}",
+		"{%url 'ebookSystem:library_view' %}?ISBN={{ lr.id }}",
 		"{{ lr.id }}"
 	],
 	{% endfor %}
@@ -96,7 +96,7 @@
 					<td>{{ lr.check_out_time }}</td>
 					<td>{{ lr.check_in_time }}</td>
 					<td>
-						<a class="btn btn-default" role="button" href="{%url 'ebookSystem:library_view' %}?ISBN={{ lr.book.ISBN }}" target="_blank" title="閱讀(另開新視窗)">閱讀</a>
+						<a class="btn btn-default" role="button" href="{%url 'ebookSystem:library_view' %}?ISBN={{ lr.id }}" target="_blank" title="閱讀(另開新視窗)">閱讀</a>
 						<button type="button" class="btn btn-default" ISBN={{ lr.book.ISBN }} onclick="receivebook(this, false, 'download')">下載</button>
 						<button type="button" class="btn btn-default" id="{{ lr.id }}" onclick="aj_borrowbook(this, 'check_in')">歸還</button>
 					</td>

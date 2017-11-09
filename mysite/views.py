@@ -4,6 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
+from django.utils import timezone
 from .forms import *
 from ebookSystem.models import *
 from genericUser.models import *
@@ -11,6 +12,7 @@ from utils.uploadFile import *
 from utils.decorator import *
 from utils.other import *
 from mysite.settings import BASE_DIR
+import datetime
 import json
 
 #logging config
@@ -35,7 +37,8 @@ def about(request, name):
 @http_response
 def home(request, template_name='home.html'):
 #	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
-	announcement_list = Announcement.objects.all().order_by('-datetime')
+	deadline = timezone.now() -datetime.timedelta(days=10)
+	announcement_list = Announcement.objects.filter(datetime__gt=deadline).order_by('-datetime')
 	return locals()
 
 @http_response
