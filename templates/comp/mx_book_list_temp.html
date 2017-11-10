@@ -1,0 +1,68 @@
+<script id="tmp_booklist_tabframe" type="text/x-custom-template">
+	<table>
+		<thead>
+			<tr>
+				<th>ISBN</th>
+				<th>書名</th>
+				<th>裝訂冊數</th>
+				<th>版次</th>
+				<th>作者</th>
+				<th>出版社</th>
+				<th>出版日期</th>
+				{% if request.user.is_guest %}
+				<th>動作</th>
+				{% endif %}
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</script>
+
+
+<script id="tmp_booklist_row" type="text/x-jquery-tmpl">
+	<tr>
+		<td>${ISBN}</td>
+		<td>${bookname}</td>
+		<td>${bookbinding}</td>
+		<td>${order}</td>
+		<td>${author}</td>
+		<td>${house}</td>
+		<td>${date}</td>
+		{% if request.user.is_guest %}
+		<td>
+			<a class="btn btn-default" role="button" href="{%url 'ebookSystem:library_view' %}?ISBN=${ISBN}" target="_blank" title="閱讀(另開新視窗)">閱讀</a>
+			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="receivebook(this, false, 'download')">下載</button>
+			<button type="button" class="btn btn-default" ISBN="${ISBN}" onclick="aj_borrowbook(this, 'check_out')">借閱</button>
+		</td>
+		{% endif %}
+	</tr>
+</script>
+
+
+<script>
+
+	function bk_datatable(divid,data,tabid){
+		//以表格顯示資訊
+
+        //div
+        let div=$('#'+divid);
+        
+		//tabframe
+		div.html($('#tmp_booklist_tabframe').html());
+
+		//tmpl
+		$('#tmp_booklist_row').tmpl(data).appendTo(div.find('tbody'));
+
+		//set tabid
+		div.find('table').attr('id',tabid);
+
+		//table style
+		grid2bstable(tabid);
+
+		//pagin
+		pagin(tabid);
+
+	}
+
+</script>

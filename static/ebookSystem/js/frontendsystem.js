@@ -1948,7 +1948,7 @@ function aj_user_queryid(id,action){
 
     //df
     let df = $.Deferred();
-    
+
     //url
     let url='/genericUser/user_view/'+id+'/';
 

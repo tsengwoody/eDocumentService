@@ -1,0 +1,114 @@
+<script>
+
+    function cv_img_set(kind,v){
+        let hd='data:image/jpeg;base64,';
+        $('#id_view_'+kind).attr('src',hd+v).attr('base64',v);
+    }
+
+    function cv_img_get(kind){
+        return $('#id_view_'+kind).attr('base64');
+    }
+
+    function ch_img(me,kind){
+        readfile(me)
+        .done(function(bs){
+            let v=bin2base64(bs2barr(bs));
+            cv_img_set(kind,v)
+        })
+    }
+
+    function UserDisabilityCard(userid){
+        //顯示與編輯使用者手冊
+
+        //div
+        let div=$('#divmadal_UserDisabilityCard');
+
+        //aj_user_queryid
+        aj_user_queryid(userid,'disability_card')
+        .done(function(data){
+
+            let d=data[0];
+
+            //front, back
+            cv_img_set('front',d['front']);
+            cv_img_set('back',d['back']);
+            
+        })
+        .fail(function(msg){
+            
+			//alertmessage
+			alertmessage('error', msg)
+
+        })
+
+        //ok
+        $('#divmadal_UserDisabilityCard_upload').off().on('click', function(){
+
+            //transferData
+            let transferData={
+                'front':cv_img_get('front'),
+                'back':cv_img_get('back'),
+            };
+            
+            //aj_user_updateid
+            aj_user_updateid(userid,'disability_card',transferData)
+            .done(function(data){
+                alertmessage(data.status, data.message); //不需重新載入網頁以更新資訊
+            })
+            .fail(function(data){
+                alertmessage(data.status, data.message)
+            })
+
+            div.modal('hide');
+        });
+
+        //cancel
+        $('#divmadal_UserDisabilityCard_cancel').off().on('click', function () {
+            div.modal('hide');
+        })
+
+        //show
+        div.modal('show');
+
+        //autofocus
+        _.delay(function(){
+            div.find('input').eq(0).focus();
+        },500)
+        
+    }
+
+</script>
+
+
+<div id="divmadal_UserDisabilityCard" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmadal_UserDisabilityCard_title" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content alert-info" style="background-color: #f5f5f5;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 id="divmadal_UserDisabilityCard_title" class="modal-title">手冊查閱與上傳</h4>
+            </div>
+            <div style="padding:20px 20px; background-color:#fafafa;">
+                
+                <div class="row">
+                    <div class="col-sm-6">
+                        <img id="id_view_front" class="img-thumbnail" alt="身心障礙手冊正面">
+                        <input id="id_use_front" type="file" accept="image/jpg,image/jpeg" onchange="ch_img(this,'front')">
+                    </div>
+    
+                    <div class="col-sm-6">
+                        <img id="id_view_back" class="img-thumbnail" alt="身心障礙手冊反面">
+                        <input id="id_use_back" type="file" accept="image/jpg,image/jpeg" onchange="ch_img(this,'back')">
+                    </div>
+                </div>
+   
+            </div>
+            <div class="modal-footer">
+                <button id="divmadal_UserDisabilityCard_cancel" type="button" class="btn btn-danger">取消</button>
+                <button id="divmadal_UserDisabilityCard_upload" type="button" class="btn btn-primary">上傳</button>
+            </div>
+        </div>
+    </div>
+</div>
+

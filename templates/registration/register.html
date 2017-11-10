@@ -85,6 +85,14 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 		//addClass
 		$('input[type="text"], input[type="password"], input[type="email"], select, textarea').addClass('form-control');
 
+		//id_birthday
+		$('#id_birthday').datepicker({
+			format: "yyyy-mm-dd",
+			autoclose: true,
+			todayHighlight: true,
+			language: 'zh-TW'
+		});
+
 		//id_is_book(checkbox)
 		$('#id_is_book').css({
 			'vertical-align':'center',

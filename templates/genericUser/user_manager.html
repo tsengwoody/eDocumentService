@@ -48,8 +48,7 @@
 					c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/genericUser/serviceinfo_list/'+v['使用者名稱']+'/">服務紀錄</a>';
 				}
 				if(v['來賓權限']==='True'){
-					c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="#">手冊查閱</a>';
-					c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="#">手冊上傳</a>';
+					c+='<button class="btn btn-default" type="button" style="margin:0px 3px 3px 0px;" onclick="UserDisabilityCard('+v['id']+')">手冊查閱與上傳</button>';
 				}
 				o['動作']=c;
 
