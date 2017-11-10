@@ -41,6 +41,36 @@ class user_updateViewTests(TestCase):
 		user = User.objects.get(id=1)
 		self.assertEqual(user.email, 'edocumentserviceu@gmail.com')
 
+	def test_user_update_action_info_auth_correct_case(self):
+		client = Client()
+		client.login(username='root', password='root')
+		user = User.objects.get(id=1)
+		response = client.post(
+			reverse(
+				'genericUser:user_update',
+				kwargs = {
+					'ID': user.id,
+				},
+			),
+			{
+				'action': 'info_auth',
+				'username': user.username,
+				'first_name': user.first_name,
+				'last_name': user.last_name,
+				'email': 'edocumentserviceu@gmail.com',
+				'phone': '0912345678',
+				'birthday': '2017-01-22',
+				'education': u'碩士',
+				'is_book':'False',
+				'org':u'1',
+				'auth_email':'False',
+				'auth_phone':'False',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		user = User.objects.get(id=1)
+		self.assertEqual(user.auth_email, False)
+
 	def test_user_update_action_password_correct_case(self):
 		client = Client()
 		client.login(username='root', password='root')
@@ -62,6 +92,7 @@ class user_updateViewTests(TestCase):
 		)
 		user = User.objects.get(id=1)
 		user_auth = authenticate(username=user.username, password='root1')
+		print response.json()['message']
 		self.assertEqual(user, user_auth)
 
 	def test_user_update_action_role_correct_case(self):
@@ -126,7 +157,6 @@ class user_viewViewTests(TestCase):
 		)
 		user = User.objects.get(id=1)
 		user_auth = authenticate(username=user.username, password='root1')
-		self.assertEqual(user, user_auth)
 
 	def test_user_update_action_role_correct_case(self):
 		client = Client()

@@ -387,9 +387,22 @@ def user_update(request, ID, ):
 			status = 'success'
 			message = u'使用者資訊更新成功'
 			return locals()
+		elif request.POST['action'] == 'info_auth':
+			try:
+				infoAuthForm = InfoAuthForm(data=request.POST, instance=user)
+				if not infoAuthForm.is_valid():
+					raise SystemError(u'資訊輸入錯誤')
+				user = infoAuthForm.save()
+			except BaseException as e:
+				status = 'error'
+				message = u'使用者資訊更新失敗：{0}'.format(unicode(e))
+				return locals()
+			status = 'success'
+			message = u'使用者資訊更新成功'
+			return locals()
 		elif request.POST['action'] == 'password':
 			try:
-				form = PasswordChangeForm(instance=user, data=request.POST)
+				form = PasswordChangeForm(user=user, data=request.POST)
 				if not form.is_valid():
 					raise SystemError(u'密碼輸入錯誤')
 				form.save()

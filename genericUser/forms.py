@@ -113,3 +113,8 @@ class RoleForm(forms.ModelForm):
 	class Meta:
 		model = User
 		fields = ['is_active', 'is_editor', 'is_guest', 'auth_email', 'auth_phone']
+
+class InfoAuthForm(forms.ModelForm):
+	class Meta:
+		model = User
+		fields = ['username', 'email', 'first_name', 'last_name', 'phone', 'birthday', 'education', 'is_book', 'org', 'auth_email', 'auth_phone',]
