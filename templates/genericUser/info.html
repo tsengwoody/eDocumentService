@@ -905,69 +905,86 @@ Vue.component('vu-user', {
 				//org
 				o['org']=org_ui2srv(o['org']); //暴力改org
 
-				//pinfo
-				function pinfo(o){
+				// //pinfo
+				// function pinfo(o){
+				// 	let p=_.cloneDeep(o);
+				// 	return _.pick(p, ['username', 'first_name', 'last_name', 'email', 'phone', 'birthday', 'education', 'is_book', 'org']);
+				// }
+
+				//pinfoauth
+				function pinfoauth(o){
 					let p=_.cloneDeep(o);
-					return _.pick(p, ['username', 'first_name', 'last_name', 'email', 'phone', 'birthday', 'education', 'is_book', 'org']);
+					return _.pick(p, ['username', 'first_name', 'last_name', 'email', 'phone', 'birthday', 'education', 'is_book', 'org','auth_phone','auth_email']);
 				}
 				
+				// //prole
+				// function prole(o){
+				// 	let p=_.cloneDeep(o);
+				// 	return _.pick(p, ['auth_phone','auth_email','is_active','is_editor','is_guest']);
+				// }
+
 				//pdc
 				function pdc(o){
 					let p=_.cloneDeep(o);
 					return _.pick(p, ['front','back']);
 				}
 
-				//prole
-				function prole(o){
-					let p=_.cloneDeep(o);
-					return _.pick(p, ['auth_phone','auth_email','is_active','is_editor','is_guest']);
-				}
-
-				//o_info, o_role, o_disability_card
-				let o_info=pinfo(o);
-				let o_role=prole(o);
+				//o_info, o_role, o_infoauth, o_disability_card
+				//let o_info=pinfo(o);
+				//let o_role=prole(o);
+				let o_infoauth=pinfoauth(o);
 				let o_disability_card=pdc(o);
 
 				//p
 				let p=_.cloneDeep(u_original);
 				p['org']=replace(p['org'],'Organization/',''); //暴力改org
 
-				//r_info, r_role, r_disability_card
-				let r_info=pinfo(p);
-				let r_role=prole(p);
+				//r_info, r_role, r_infoauth, r_disability_card
+				//let r_info=pinfo(p);
+				//let r_role=prole(p);
+				let r_infoauth=pinfoauth(p);
 				let r_disability_card=pdc(p);
 
 				//diff
-				let diff_info=_.isEqual(o_info,r_info);
+				let diff_infoauth=_.isEqual(o_infoauth,r_infoauth);
 				let diff_disability_card=_.isEqual(o_disability_card,r_disability_card);
-				if(diff_info===true && diff_disability_card===true){
+				if(diff_infoauth===true && diff_disability_card===true){
 					alertmessage('error','無資訊有異動，不需變更');
 					return;
 				}
 
-				//diff_email, diff_phone
-				let diff_email=_.isEqual(o_info.email,r_info.email);
-				let diff_phone=_.isEqual(o_info.phone,r_info.phone);
-
-				//df_info
-				let df_info;
-				if(!diff_info){
-					console.log('o_info: ',o_info)
-					df_info=aj_user_updateid(userid,'info',o_info);
+				//diff_email
+				let diff_email=_.isEqual(o_infoauth.email,r_infoauth.email);
+				if(!diff_email){
+					o_infoauth.auth_email=false;
 				}
 
-				//df_role
-				let df_role;
-				if(!diff_email || !diff_phone){
-					if(!diff_email){
-						o_role.auth_email=false;
-					}
-					if(!diff_phone){
-						o_role.auth_phone=false;
-					}
-					console.log('o_role: ',o_role)
-					df_role=aj_user_updateid(userid,'role',o_role);
+				//diff_phone
+				let diff_phone=_.isEqual(o_infoauth.phone,r_infoauth.phone);
+				if(!diff_phone){
+					o_infoauth.auth_phone=false;
 				}
+
+				//df_infoauth
+				let df_infoauth;
+				if(!diff_infoauth){
+					console.log('o_infoauth: ',o_infoauth)
+					//df_info=aj_user_updateid(userid,'info',o_info);
+					df_infoauth=aj_user_updateid(userid,'info_auth',o_infoauth);
+				}
+
+				// //df_role
+				// let df_role;
+				// if(!diff_email || !diff_phone){
+				// 	if(!diff_email){
+				// 		o_role.auth_email=false;
+				// 	}
+				// 	if(!diff_phone){
+				// 		o_role.auth_phone=false;
+				// 	}
+				// 	console.log('o_role: ',o_role)
+				// 	df_role=aj_user_updateid(userid,'role',o_role);
+				// }
 
 				//df_disability_card
 				let df_disability_card;
@@ -977,11 +994,12 @@ Vue.component('vu-user', {
 				}
 				
 				//when
-				$.when(df_info,df_role,df_disability_card)
-				.done(function(d_info,d_role,d_disability_card){
+				//$.when(df_info,df_role,df_disability_card)
+				$.when(df_infoauth,df_disability_card)
+				.done(function(d_infoauth,d_disability_card){
 
-					//僅顯示info的更新
-					alertmessage(d_info['status'],d_info['message']);
+					//僅顯示infoauth的更新
+					alertmessage(d_infoauth['status'],d_infoauth['message']);
 
 					//重撈資料變更頁面，並切換為show
 					displaydata('show'); 

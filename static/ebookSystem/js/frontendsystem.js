@@ -1019,6 +1019,12 @@ function selscr_find(idtar, cdir) {
         //dtop, top為螢幕位置，故需再把第一個元素top考慮進來
         //let dtop = selector.children().eq(0).offset().top;
 
+        //自動切換至標記內指定圖片
+        let pic=obj.attr('id');
+        let sel=$('#scanPageList');
+        sel.find('option[value="'+pic+'"]').prop('selected',true);
+        sel.change();
+
         //scrollTop
         selector.animate({
             //scrollTop: obj.offset().top - dtop,
