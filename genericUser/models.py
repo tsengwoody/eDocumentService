@@ -52,7 +52,6 @@ class User(AbstractUser):
 	is_guest = models.BooleanField(default=False)
 	is_manager = models.BooleanField(default=False)
 	is_advanced_editor = models.BooleanField(default=False)
-	permission = models.ManyToManyField('Permission')
 	auth_email = models.BooleanField(default=False)
 	auth_phone = models.BooleanField(default=False)
 

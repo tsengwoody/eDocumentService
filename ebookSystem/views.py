@@ -123,6 +123,7 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		if request.POST['review'] == 'success':
 			for part in book.ebook_set.all():
 				part.change_status(1, 'active')
+				BookOrder.refresh()
 			shutil.rmtree(org_path)
 			status = 'success'
 			message = u'審核通過文件'

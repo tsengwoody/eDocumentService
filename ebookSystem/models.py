@@ -1,5 +1,6 @@
 ﻿# coding: utf-8
 from django.db import models
+from django.db.models import F,Q
 from django.utils import timezone
 from mysite.settings import BASE_DIR
 from genericUser.models import User, ServiceInfo, Event
@@ -644,7 +645,7 @@ class BookOrder(models.Model):
 	@classmethod
 	def refresh(cls):
 		BookOrder.objects.all().delete()
-		book_list = [ book for book in Book.objects.filter(status=Book.STATUS['active']) ]
+		book_list = [ book for book in Book.objects.filter(Q(status=Book.STATUS['active'])|Q(status=Book.STATUS['edit'])) ]
 
 		user_order = []
 		for book in book_list:

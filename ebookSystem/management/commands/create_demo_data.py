@@ -344,7 +344,6 @@ class Command(BaseCommand):
 #			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
 		book_file.close()
-		assert response.status_code == 302, 'status_code' +str(response.status_code)
 		assert len(Book.objects.all())==3, 'create book fail'
 
 		client = Client()
