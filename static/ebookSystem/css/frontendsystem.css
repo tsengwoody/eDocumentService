@@ -1,3 +1,7 @@
+html, body {
+    font-family: "微軟正黑體","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
 .loader {
 	display: inline-block;
 	border: 5px solid #f3f3f3;
@@ -49,6 +53,7 @@
 
 .textfornvda {
 	display:inline-block;
+	overflow-y: scroll;
 	margin:0;
 	padding:0;
 	width:1px;
