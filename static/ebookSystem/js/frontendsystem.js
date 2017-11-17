@@ -1000,7 +1000,7 @@ function selscr_find(idtar, cdir) {
 
 
     //selector
-    let selector =$("#"+idtar).contents().find('body'); //iframe -> body
+    let selector =$("#"+idtar).contents().find('html'); //iframe -> html, 各瀏覽器預設使用捲軸為html
 
     if (gvselscr.tar !== idtar) { 
 
@@ -2058,6 +2058,81 @@ function aj_bookdeleterepository(password,ISBN){
 
     //aj_post
     aj_post(url, transferData)
+    .done(function(data){
+        df.resolve(data);
+    })
+    .fail(function(data){
+        df.reject(data);
+    })
+
+    return df;
+}
+
+
+function aj_qanda(mode,aid,transferData){
+    //Q&A API新增、更新、刪除
+
+    //df
+    let df = $.Deferred();
+
+    //url
+    let url;
+    if(mode==='list'){
+        url='/genericUser/qanda_list'; //不能於最後有反斜線
+    }
+    else if(mode==='create'){
+        url='/genericUser/qanda_create/'; //create不用給aid
+    }
+    else if(mode==='update'){
+        url='/genericUser/qanda_update/'+aid+'/';
+    }
+    else if(mode==='delete'){
+        url='/genericUser/qanda_delete/'+aid+'/';
+    }
+    else{
+
+        //reject
+        df.reject({'status':'error','message':' mode error'});
+        
+        return df;
+    }
+    
+    //check
+    if(mode==='create'){
+        let err=[];
+        if(iser(transferData.question)){
+            err.push('問題不能為空');
+        }
+        if(iser(transferData.answer)){
+            err.push('回答不能為空');
+        }
+        if(err.length>0){
+    
+            //msg
+            let msg=_.chain(err)
+            .map(function(v,k){
+                return '<div style="margin-top:5px;">'+cstr(k+1)+': '+v+'</div>';
+            })
+            .join('')
+            .value();
+            msg='<div>輸入錯誤訊息如下：</div>'+msg;
+            
+            //reject
+            df.reject({'status':'error','message':msg});
+    
+            return df;
+        }
+    }
+
+    //aj
+    let aj;
+    if(mode==='list'){
+        aj=aj_get;
+    }
+    else{
+        aj=aj_post;
+    }
+    aj(url, transferData)
     .done(function(data){
         df.resolve(data);
     })

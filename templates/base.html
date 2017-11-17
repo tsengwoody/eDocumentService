@@ -33,11 +33,6 @@
 	<script language="javascript" src="{% static 'ebookSystem/js/moment-2.19.1.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/moment-with-locales-2.19.1.js' %}"></script>
 
-	<!-- iview -->
-	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/iview/2.6.0/styles/iview.css" />
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/iview/2.6.0/iview.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/iview/2.6.0/locale/zh-TW.min.js"></script> -->
-
 	<!-- element-ui -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.0.1/theme-chalk/index.css" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.0.1/index.js"></script>
@@ -63,6 +58,16 @@
 	<!-- tinymce -->
 	<script language="javascript" src="{% static 'ebookSystem/framework/tinymce-4.6.7/js/tinymce/tinymce.min.js' %}"></script>
 
+	<!-- wiriseditor -->
+	<script language="javascript" src="{% static 'ebookSystem/js/wiriseditor/wiriseditor.js' %}"></script>
+
+	<!-- MathJax, 可選 TeX-AMS-MML_SVG TeX-MML-AM_CHTML -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
+		MathJax.Hub.Config({
+			skipStartupTypeset: true, //不初始化啟動
+		});
+	</script>
+	
 	<title>{% block title %}{% endblock %} | 雲端千眼平台</title>
 	{% block resource%} {% endblock%}
 	{% block style %}{% endblock %}
@@ -132,6 +137,7 @@
 	{% include 'comp/mx_book_set_priority.html' %}
 	{% include 'comp/mx_book_delete_repository.html' %}
 	{% include 'comp/mx_user_disability_card.html' %}
+	{% include 'comp/mx_editor.html' %}
 
 	{% block nav %} {% endblock %}
 

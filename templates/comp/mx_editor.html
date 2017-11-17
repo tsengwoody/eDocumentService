@@ -1,9 +1,29 @@
 <script>
 
 
-	MathJax.Hub.Config({
-		skipStartupTypeset: true, //不初始化啟動
-	});
+	function mxeditor_ele_setdata(me,data){
+		//元素給予資料
+		me=$(me);
+		me.attr('data-mxeditor',o2b(data));
+	}
+
+
+	function mxeditor_ele_getdata(me){
+		//元素讀取資料
+		me=$(me);
+		let h=me.attr('data-mxeditor');
+		return b2o(h);
+	}
+
+
+	function mxeditor_ele_show(me){
+		//元素顯示編修內含資料
+		let d_in=mxeditor_ele_getdata(me);
+		mxeditor_show(me,d_in)
+		.done(function(d_out){
+			mxeditor_ele_setdata(me,d_out);
+		})
+	}
 
 
 	function mathmltosvg(ele){
@@ -12,46 +32,48 @@
 	}
 
 
-	function editor_show(me, ardata_in, f){
+	function mxeditor_show(me, ardata_in){
 		//顯示文件編輯器
+
+        //df
+        let df = $.Deferred();
 
 		//me
 		me=$(me);
 
 		//initial
-		editor_initial(ardata_in);
+		mxeditor_load(ardata_in);
 
-		//click save
-		$('#btn_editor_document_save').off().on('click',function(){
+		//save
+		$('#btn_mxeditor_document_save').off().on('click',function(){
 
 			//save
-			let ardata_out=editor_save();
+			let ardata_out=mxeditor_save();
 
-			//f
-			f(ardata_out);
-
-			//hide
-			$('#divmadal_document').modal('hide');
-
-		})
-
-		//click cancel
-		$('#btn_editor_document_cancel, #btn_editor_document_close').off().on('click',function(){
-			
-			//need function
+            //resolve
+            df.resolve(ardata_out);
 
 			//hide
 			$('#divmadal_document').modal('hide');
 
 		})
 
-		//show, 先載入資料再顯示使用者體驗比較好
+        //cancel
+        $('#divmadal_document').on('hide.bs.modal', function (e) {
+
+            //reject
+            df.reject();
+
+        });
+
+		//show
 		$('#divmadal_document').modal('show');
 
+        return df;
 	}
 
 
-	function editor_save(){
+	function mxeditor_save(){
 		//文件編輯器儲存
 
 		let ar=[];
@@ -82,23 +104,23 @@
 	}
 
 
-	function editor_initial(ardata){
-		//初始化文件編輯器
+	function mxeditor_load(ardata){
+		//文件編輯器載入資料
 
 		//c
 		let c='';
 
 		//item
 		$(ardata).each(function(k,v){
-			c+=editor_initial_item('', v['kind'], v['data']);
+			c+=mxeditor_initial_item('', v['kind'], v['data']);
 		})
 
 		//html
-		let doc=$('#div_editor_document');
+		let doc=$('#div_mxeditor_document');
 		doc.html(c);
 
 		//show mathml
-		editor_initial_showmathml();
+		mxeditor_initial_showmathml();
 
 		//sortable
 		//doc.sortable("destroy");
@@ -108,7 +130,7 @@
 	}
 
 
-	function editor_initial_item(id, kind, data){
+	function mxeditor_initial_item(id, kind, data){
 		//初始單一項目
 
 		let rawdata;
@@ -128,16 +150,16 @@
 			textalign='text-align:center;';
 		}
 		let c='';
-		c+='<div id="'+id+'" name="editor_grp" style="position:relative; margin:3px; border:1px solid #ffffff;" focus="false" onclick="editor_item_focus(this)" onmouseenter="editor_item_mouseenter(this)" onmouseleave="editor_item_mouseleave(this)">';
-		c+='<button type="button" class="close" data-dismiss="modal" aria-label="Close" style="display:none; position: absolute; top: -4px; right: 1px;" onclick="editor_item_remove(this)"><span aria-hidden="true">&times;</span></button>';
+		c+='<div id="'+id+'" name="mxeditor_grp" style="position:relative; margin:3px; border:1px solid #ffffff;" focus="false" onclick="mxeditor_item_focus(this)" onmouseenter="mxeditor_item_mouseenter(this)" onmouseleave="mxeditor_item_mouseleave(this)">';
+		c+='<button type="button" class="close" data-dismiss="modal" aria-label="Close" style="display:none; position: absolute; top: -4px; right: 1px;" onclick="mxeditor_item_remove(this)"><span aria-hidden="true">&times;</span></button>';
 		c+='<div kind="'+kind+'" rawdata data="'+rawdataes+'" style="position:absolute; top:0px; left:0px; width:0px; height:0px; opacity:0.001;">'+rawdata+'</div>';
-		c+='<div kind="'+kind+'" showdata data="'+rawdataes+'" ondblclick="editor_item_showedit(this);" style="'+textalign+'">'+showdata+'</div>';
+		c+='<div kind="'+kind+'" showdata data="'+rawdataes+'" ondblclick="mxeditor_item_showedit(this);" style="'+textalign+'">'+showdata+'</div>';
 		c+='</div>';
 		return c;
 	}
 
 
-	function editor_initial_showmathml(){
+	function mxeditor_initial_showmathml(){
 		//將mathml以svg顯示
 
 		$('div[kind="mathml"][showdata]').each(function(){
@@ -156,7 +178,7 @@
 	}
 
 
-	function editor_item_add(me){
+	function mxeditor_item_add(me){
 		//新增項目
 
 		//me
@@ -166,11 +188,11 @@
 		let kind=me.attr('kind');
 
 		//focus
-		let o=$('div[name="editor_grp"][focus="true"]');
+		let o=$('div[name="mxeditor_grp"][focus="true"]');
 		if(o){
 			if(o.length===0){
 				//取最後一個
-				o=$('div[name="editor_grp"]').eq(-1);
+				o=$('div[name="mxeditor_grp"]').eq(-1);
 			}
 		}
 
@@ -185,12 +207,12 @@
 
 		//insert
 		let id=GenID();
-		let c=editor_initial_item(id, kind, data);
+		let c=mxeditor_initial_item(id, kind, data);
 		if(o){
 			$(c).insertAfter(o);
 		}
 		else{
-			$('#div_editor_document').html(c);
+			$('#div_mxeditor_document').html(c);
 		}
 
 		//dblclick obj
@@ -198,17 +220,17 @@
 
 		//show editor
 		if(kind==='normal'){
-			editor_normaltext_show(obj, true);
+			mxeditor_normaltext_show(obj, true);
 		}
 		else if(kind==='mathml'){
 			//不用呼叫轉mathmltosvg
-			editor_mathml_show(obj, true);
+			mxeditor_mathml_show(obj, true);
 		}
 
 	}
 
 
-	function editor_item_mouseenter(me){
+	function mxeditor_item_mouseenter(me){
 		//滑鼠移入顯示移除按鈕
 
 		me=$(me);
@@ -216,7 +238,7 @@
 	}
 
 
-	function editor_item_mouseleave(me){
+	function mxeditor_item_mouseleave(me){
 		//滑鼠移出隱藏移除按鈕
 
 		me=$(me);
@@ -224,27 +246,27 @@
 	}
 
 
-	function editor_item_showedit(me){
+	function mxeditor_item_showedit(me){
 		//基於項目kind顯示對應編輯視窗
 
 		me=$(me);
 		let kind=me.attr('kind');
 		if(kind==='normal'){
-			editor_normaltext_show(me, false);
+			mxeditor_normaltext_show(me, false);
 		}
 		else if(kind==='mathml'){
-			editor_mathml_show(me, false);
+			mxeditor_mathml_show(me, false);
 		}
 	}
 
 
-	function editor_item_focus(me){
+	function mxeditor_item_focus(me){
 		//項目滑鼠單擊取得駐點
 
 		me=$(me);
 
 		//clear
-		$('div[name="editor_grp"]')
+		$('div[name="mxeditor_grp"]')
 		.attr('focus', false)
 		.css({
 			'background-color':'',
@@ -262,14 +284,14 @@
 	}
 
 
-	function editor_item_remove(me){
+	function mxeditor_item_remove(me){
 		//刪除項目
 
 		$(me).parent().remove();
 	}
 
 
-	function editor_mathml_show(me, canceldelete){
+	function mxeditor_mathml_show(me, canceldelete){
 		//顯示mathml編輯視窗
 
 		//me
@@ -283,13 +305,13 @@
 		//onsole.log(data)
 
 		//setMathML
-		editor_mathml.setMathML(data);
+		mxeditor_mathml.setMathML(data);
 
 		//click save
-		$('#btn_editor_mathml_save').off().on('click',function(){
+		$('#btn_mxeditor_mathml_save').off().on('click',function(){
 
 			//datanew
-			let datanew=editor_mathml.getMathML();
+			let datanew=mxeditor_mathml.getMathML();
 			//console.log(datanew)
 			
 			//save
@@ -308,7 +330,7 @@
 		})
 
 		//click cancel
-		$('#btn_editor_mathml_cancel, #btn_editor_mathml_close').off().on('click',function(){
+		$('#btn_mxeditor_mathml_cancel, #btn_mxeditor_mathml_close').off().on('click',function(){
 
 			//parent remove
 			if(canceldelete){
@@ -326,7 +348,7 @@
 	}
 
 
-	function editor_normaltext_show(me, canceldelete){
+	function mxeditor_normaltext_show(me, canceldelete){
 		//顯示一般文字編輯視窗
 
 		//show, 因tinymce需先顯示才有activeEditor可操作
@@ -346,7 +368,7 @@
 		tinymce.activeEditor.setContent(data);
 
 		//click save
-		$('#btn_editor_normaltext_save').off().on('click',function(){
+		$('#btn_mxeditor_normaltext_save').off().on('click',function(){
 
 			//datanew
 			let datanew=tinymce.activeEditor.getContent();
@@ -361,7 +383,7 @@
 		})
 
 		//click cancel
-		$('#btn_editor_normaltext_cancel, #btn_editor_normaltext_close').off().on('click',function(){
+		$('#btn_mxeditor_normaltext_cancel, #btn_mxeditor_normaltext_close').off().on('click',function(){
 
 			//parent remove
 			if(canceldelete){
@@ -377,16 +399,16 @@
 
 
 	//初始化套件wiris, tinymce
-	let editor_mathml;
+	let mxeditor_mathml;
 	$(document).ready(function(){
 
 		//wiris
-		editor_mathml = com.wiris.jsEditor.JsEditor.newInstance({'language': 'zh'});
-		editor_mathml.insertInto(document.getElementById('div_editor_mathml'));
+		mxeditor_mathml = com.wiris.jsEditor.JsEditor.newInstance({'language': 'zh'});
+		mxeditor_mathml.insertInto(document.getElementById('div_mxeditor_mathml'));
 
 		//tinymce
 		tinymce.init({
-			selector: "#div_editor_normaltext",
+			selector: "#div_mxeditor_normaltext",
 			plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
 			toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample',
 			setup: function (editor) {
@@ -395,7 +417,7 @@
 					//tinymce.activeEditor.setContent(n);
 				});
 			}
-
+		});
 	});
 
 
@@ -403,69 +425,68 @@
 
 
 <div id="divmadal_document" class="modal fade">
-  <div class="modal-dialog" style="width:90%;" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-		<span style="font-size:14pt;">文件編輯器</span>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="btn_editor_document_close" >
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-		<div id="div_editor_document"></div>
-      </div>
-      <div class="modal-footer">
-
-		<button kind="normal" type="button" class="btn btn-info pull-left" style="margin-right:5px;" onclick="editor_item_add(this)">新增文字</button>
-		<button kind="mathml" type="button" class="btn btn-info pull-left" style="margin-right:5px;" onclick="editor_item_add(this)">新增公式</button>
-
-		<button id="btn_editor_document_save" type="button" class="btn btn-primary">儲存</button>
-		<button id="btn_editor_document_cancel" type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-		
-      </div>
-    </div>
-  </div>
+	<div class="modal-dialog" style="width:90%;" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span style="font-size:14pt;">文件編輯器</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" id="btn_mxeditor_document_close" >
+				<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div id="div_mxeditor_document"></div>
+			</div>
+			<div class="modal-footer">
+				<button kind="normal" type="button" class="btn btn-info pull-left" style="margin-right:5px;" onclick="mxeditor_item_add(this)">新增文字</button>
+				<button kind="mathml" type="button" class="btn btn-info pull-left" style="margin-right:5px;" onclick="mxeditor_item_add(this)">新增公式</button>
+				<button id="btn_mxeditor_document_cancel" type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+				<button id="btn_mxeditor_document_save" type="button" class="btn btn-primary">儲存</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 
 <div id="divmadal_normaltext" class="modal fade">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-		<span style="font-size:14pt;">文字編輯器</span>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="btn_editor_normaltext_close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-		<div id="div_editor_normaltext"></div>
-      </div>
-      <div class="modal-footer">
-		<button id="btn_editor_normaltext_save" type="button" class="btn btn-primary">儲存</button>
-        <button id="btn_editor_normaltext_cancel" type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-      </div>
-    </div>
-  </div>
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span style="font-size:14pt;">文字編輯器</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" id="btn_mxeditor_normaltext_close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div id="div_mxeditor_normaltext"></div>
+			</div>
+			<div class="modal-footer">
+				<button id="btn_mxeditor_normaltext_cancel" type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+				<button id="btn_mxeditor_normaltext_save" type="button" class="btn btn-primary">儲存</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 
 <div id="divmadal_mathml" class="modal fade">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-		<span style="font-size:14pt;">MathML編輯器</span>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="btn_editor_mathml_close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-		<div id="div_editor_mathml"></div>
-      </div>
-      <div class="modal-footer">
-		<button id="btn_editor_mathml_save" type="button" class="btn btn-primary">儲存</button>
-        <button id="btn_editor_mathml_cancel" type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-      </div>
-    </div>
-  </div>
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span style="font-size:14pt;">MathML編輯器</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" id="btn_mxeditor_mathml_close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div id="div_mxeditor_mathml"></div>
+			</div>
+			<div class="modal-footer">
+				<button id="btn_mxeditor_mathml_cancel" type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+				<button id="btn_mxeditor_mathml_save" type="button" class="btn btn-primary">儲存</button>
+			</div>
+		</div>
+	</div>
 </div>
+
+
 
