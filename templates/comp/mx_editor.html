@@ -409,14 +409,9 @@
 		//tinymce
 		tinymce.init({
 			selector: "#div_mxeditor_normaltext",
+			language:"zh_TW",
 			plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
 			toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample',
-			setup: function (editor) {
-				editor.on('init', function () {
-					//setContent
-					//tinymce.activeEditor.setContent(n);
-				});
-			}
 		});
 	});
 
@@ -425,7 +420,7 @@
 
 
 <div id="divmadal_document" class="modal fade">
-	<div class="modal-dialog" style="width:90%;" role="document">
+	<div class="modal-dialog" style="width:95%;" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
 				<span style="font-size:14pt;">文件編輯器</span>
@@ -448,7 +443,7 @@
 
 
 <div id="divmadal_normaltext" class="modal fade">
-	<div class="modal-dialog" role="document">
+	<div class="modal-dialog" role="document" style="width:80%;">
 		<div class="modal-content">
 			<div class="modal-header">
 				<span style="font-size:14pt;">文字編輯器</span>
@@ -469,7 +464,7 @@
 
 
 <div id="divmadal_mathml" class="modal fade">
-	<div class="modal-dialog" role="document">
+	<div class="modal-dialog" role="document" style="width:80%;">
 		<div class="modal-content">
 			<div class="modal-header">
 				<span style="font-size:14pt;">MathML編輯器</span>

@@ -2070,7 +2070,7 @@ function aj_bookdeleterepository(password,ISBN){
 
 
 function aj_qanda(mode,aid,transferData){
-    //Q&A API新增、更新、刪除
+    //Q&A API顯示、新增、更新、刪除
 
     //df
     let df = $.Deferred();

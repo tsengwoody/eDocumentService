@@ -6,279 +6,176 @@
 {% block content %}
 {% csrf_token %} 
 
-<script>
-
-//vu-qanda
-Vue.component('vu-qanda', {
-    template: `
-<div>
-
-    <div class="bs-callout bs-callout-info" style="position: relative;" v-for="(qa,iqa) in s.qa"> 
-
-        <div style="position: absolute; top:7px; right:7px;">
-            <button type="button" class="close" style="margin-left:6px;" title="刪除" aria-label="刪除">
-                <span class="glyphicon glyphicon-remove-sign"></span>
-            </button>
-            <button type="button" class="close" style="margin-left:6px;" title="編輯" aria-label="編輯">
-                <span class="glyphicon glyphicon-edit"></span>
-            </button>
-        </div>
-        
-        <div style="font-size:12pt;">
-            <div v-html="qa.question"></div>
-        </div> 
-
-        <div style="font-size:12pt; margin-top:10px;">
-            <div v-html="qa.answer"></div>
-        </div> 
-
-    </div>
-        
-    <button type="button" class="btn btn-primary">建立新Q&A</button>
-
-</div>
-`,
-    props: ['s'],
-
-    methods: {
-
-        click: function () {
-            //console.log('methods click')
-
-            let vo = this;
-
-        },
-
-    },
-})
-
-</script>
 
 <script>
-	let qanda_transferData_temp;
+	let vo_qana;
 
 	$(function(){
 
-
-        aj_qanda('list')
-        .done(function(d){
-            console.log('list',d)
-
-            //vo
-            let vo = new Vue({
-                el: '#' + 'id_qanda_list',
-                data: {
-                    s:{
-                        qa:d.content,
-                    }
-                },
-            })
-            
-        })
-
-		// //view
-		// qanda_change('view');
-
-		// //btn
-		// $('#id_tolist, #id_toedit').show();
-		// $('#id_update, #id_cancel, #id_delete').hide();
+		//refresh
+		qana_refresh();
 
 	})
 
-	function qanda_change(mode){
-		//QA模式切換
+</script>
 
-		if(mode==='view'){
-			//顯示
-			$('[mode="ori"]').show();
-			$('[mode="mod"]').hide();
-		}
-		else if(mode==='edit'){
 
-			//編修
-			$('[mode="ori"]').hide();
-			$('[mode="mod"]').show();
+<script>
 
-			//btn
-			$('#id_tolist, #id_toedit').hide();
-			$('#id_update, #id_cancel, #id_delete').show();
+	//vu-qanda
+	Vue.component('vu-qanda', {
+		template: `
+	<div>
 
-			//question
-			let t=$('[mode="ori"][kind="question"]').html();
-			$('[mode="mod"][kind="question"]').val(t);
+		<div class="bs-callout bs-callout-info" style="position: relative;" v-for="(qa,iqa) in s.qa" v-if="s.mode==='forshow' || s.mode==='foredit'"> 
 
-			//answer
-			let n=$('[mode="ori"][kind="answer"]').html();
+			<div style="position: absolute; top:5px; right:5px;" v-if="s.mode==='foredit'">
+				<button type="button" class="close" style="margin-left:5px;" title="刪除" aria-label="刪除" v-on:click="ckdelete(qa)">
+					<span class="glyphicon glyphicon-remove-sign"></span>
+				</button>
+				<button type="button" class="close" style="margin-left:5px;" title="編輯" aria-label="編輯" v-on:click="ckupdate(qa)">
+					<span class="glyphicon glyphicon-edit"></span>
+				</button>
+			</div>
 			
-			//tinymce
-			tinymce.init({
-				selector: "#id_answer",
-				language:"zh_TW",
-				plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
-				toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample',
-				setup: function (editor) {
-					editor.on('init', function () {
+			<div v-if="s.mode==='forshow' || s.mode==='foredit'">
+				<div style="font-size:12pt;">
+					<div v-html="qa.question"></div>
+				</div> 
+				<div style="font-size:12pt; margin-top:10px;">
+					<div v-html="qa.answer"></div>
+				</div> 
+			</div>
 
-						//setContent
-						tinymce.activeEditor.setContent(n);
+		</div>
+			
+		<button type="button" class="btn btn-primary" v-on:click="ckcreate" v-if="s.mode==='foredit'">建立新Q&A</button>
 
-						//save
-						qanda_transferData_temp=qanda_save();
-					
+	</div>
+	`,
+		props: ['s'],
+
+		methods: {
+
+			operate:function(mode,aid,transferData){
+				//console.log('methods operate')
+
+				//aj_qanda
+				aj_qanda(mode,aid,transferData)
+				.done(function(data){
+					alertmessage(data.status, data.message)
+					.done(function(){
+						qana_refresh(); //refresh
 					});
-				}
-			});
+				})
+				.fail(function(data){
+					alertmessage(data.status, data.message)
+				})
 
-		}
-		else{
-			console.log('mode error');
-			return;
-		}
+			},
 
-	}
+			ckdelete: function (qa) {
+				//console.log('methods ckdelete')
 
-	function qanda_save(){
-		//儲存資料
-		
-		//question
-		let question=cstrtrim($('[mode="mod"][kind="question"]').val());
+				let vo = this;
 
-		//answer
-		let answer=cstrtrim(tinymce.activeEditor.getContent());
+				alertconfirm('是否確定刪除?')
+				.done(function(){
 
-		//transferData
-		let transferData={
-			'question':question,
-			'answer':answer,
-		};
+					//operate
+					vo.operate('delete',qa.id,null);
 
-		return transferData;
-	}
+				})
+				
+			},
 
-	function qanda_cancel(){
-		//取消離開檢核
+			ckupdate: function (qa) {
+				//console.log('methods ckupdate')
 
-		//transferData
-		let transferData=qanda_save();
-		
-		//check
-		if(!qanda_checkdata_equal()){
-			alertconfirm('資料已變更，是否確定取消?')
-			.done(function(){
-				//重新整理
-				window.location.reload();
-			})
-		}
-		else{
-			//重新整理
-			window.location.reload();
-		}
+				let vo = this;
 
-	}
+				//aboutqanda
+				aboutqanda(qa.question,qa.answer)
+				.done(function(nq,na){
+					
+					//transferData
+					let transferData={
+						question:nq,
+						answer:na,
+					};
 
-	function qanda_checkdata_equal(){
-		//檢核資料是否相同
+					//operate
+					vo.operate('update',qa.id,transferData);
 
-		//transferData
-		let transferData=qanda_save();
+				})
 
-		//return
-		return _.isEqual(qanda_transferData_temp, transferData);
-	}
+			},
 
-	function qanda_update(me){
-		//update
+			ckcreate: function () {
+				//console.log('methods ckcreate')
 
-		qanda_operate(me,'update');
-	}
+				let vo = this;
 
-	function qanda_delete(me){
-		//delete
+				//aboutqanda
+				aboutqanda('','')
+				.done(function(nq,na){
+					
+					//transferData
+					let transferData={
+						question:nq,
+						answer:na,
+					};
 
-		alertconfirm('是否確定刪除?')
-		.done(function(){
-			qanda_operate(me,'delete');
-		})
-	}
+					//operate
+					vo.operate('create',null,transferData);
 
-	function qanda_operate(me,mode){
-		//QA編修或刪除
+				})
 
-		//me
-		me=$(me);
+			},
 
-		//aid
-		let aid=me.attr('aid');
+		},
+	})
 
-		//check same
-		if(mode==='update'){
-			if(qanda_checkdata_equal()){
-				alertmessage('error', '資料未有更動');
-				return;
-			}
-		}
-
-		//transferData
-		let transferData=qanda_save();
+	//qana_refresh
+	function qana_refresh(){
 
 		//aj_qanda
-		aj_qanda(mode,aid,transferData)
-		.done(function(data){
-			alertmessage(data['status'], data['message'])
-			.done(function(){
-				//自動轉址回QA列表
-				window.location='/genericUser/qanda_list';
-			})
+        aj_qanda('list')
+        .done(function(d){
+
+			//opt
+			let opt={
+                el: '#' + 'id_qanda_list',
+                data: {
+                    s:{
+						qa:d.content,
+						mode:'foredit', //forshow foredit
+                    }
+                },
+			};
+			
+			//vo
+			if(iser(vo_qana)){
+				vo_qana = new Vue(opt);
+			}
+			else{
+				vo_qana.s.qa=d.content;
+			}
+
 		})
-		.fail(function(data){
-		    alertmessage(data['status'], data['message']);
-		})
-		
+
 	}
+
 
 </script>
 
+
 <h3>平台Q&A</h3>
 
-<div style="padding-bottom:50px;">
+
+<div style="padding-bottom:30px;">
     <vu-qanda id="id_qanda_list" v-bind:s="s"></vu-qanda>
 </div>
 
-
-<!-- 
-<div class="form-horizontal">
-
-	<div class="form-group">
-		<label for="id_question" class="control-label col-sm-1"><font style="color:red">*</font>標題</label>
-		<div class="col-sm-11">
-			<div kind="question" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">{{ qanda.question }}</div>
-			<input id="id_question" kind="question" mode="mod" class="form-control" type="text"/>
-		</div>
-	</div>
-
-	<div class="form-group">
-		<label for="id_answer" class="control-label col-sm-1"><font style="color:red">*</font>內容</label>
-		<div class="col-sm-11">
-			<div kind="answer" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">
-				{{ qanda.answer }}
-			</div>
-			<div id="id_answer" kind="answer" mode="mod" class="form-control" >{{ qanda.answer }}</div>
-		</div>
-	</div>
-
-	<div class="form-group">        
-		<div class="col-sm-offset-1 col-sm-11">
-
-			<button id="id_tolist" type="button" class="btn btn-default" onclick="window.location='/about/qanda'">返回Q&A列表</button>
-
-			<button id="id_toedit" type="button" class="btn btn-primary" onclick="qanda_change('edit');">進行修改</button>
-			<button id="id_update" type="button" class="btn btn-primary" aid="{{ qanda.id }}" onclick="qanda_update(this);">儲存</button>
-			<button id="id_cancel" type="button" class="btn btn-default" onclick="qanda_cancel();">取消</button>
-			<button id="id_delete" type="button" class="btn btn-danger" aid="{{ qanda.id }}" onclick="qanda_delete(this);">刪除</button>
-
-		</div>
-	</div>
-	
-</div> -->
 
 {% endblock %}
