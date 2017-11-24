@@ -8,29 +8,29 @@
         let df = $.Deferred();
 
         //div
-        let div=$('#divmadal_alertconfirm');
+        let div=$('#divmodal_alertconfirm');
 
         //kind
         let icon='<span class="glyphicon glyphicon-question-sign" style="color:#ee9922;"></span>';
 
         //html
-         $('#divmadal_alertconfirm_icon').html(icon);
+         $('#divmodal_alertconfirm_icon').html(icon);
 
         //message
         if(message===''){
             console.log('alertconfirm: message empty')
             return;
         }
-        $('#divmadal_alertconfirm_msg').html(message);
+        $('#divmodal_alertconfirm_msg').html(message);
 
         //ok
-        $('#divmadal_alertconfirm_ok').off().on('click', function(){
+        $('#divmodal_alertconfirm_ok').off().on('click', function(){
             df.resolve();
             div.modal('hide');
         });
 
         //cancel
-        $('#divmadal_alertconfirm_cancel').off().on('click', function () {
+        $('#divmodal_alertconfirm_cancel').off().on('click', function () {
             df.reject();
             div.modal('hide');
         })
@@ -40,7 +40,7 @@
 
         //autofocus
         _.delay(function(){
-            $('#divmadal_alertconfirm_msg').focus();
+            $('#divmodal_alertconfirm_msg').focus();
         },500)
         
         return df;
@@ -49,26 +49,26 @@
 </script>
 
 
-<div id="divmadal_alertconfirm" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmadal_alertconfirm_title" aria-hidden="true">
+<div id="divmodal_alertconfirm" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_alertconfirm_title" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content alert-info" style="background-color: #f5f5f5;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 id="divmadal_alertconfirm_title" class="modal-title">系統訊息</h4>
+                <h4 id="divmodal_alertconfirm_title" class="modal-title">系統訊息</h4>
             </div>
             <div style="padding:40px 20px; background-color:#fafafa;">
                 <table>
                     <tr>
-                        <td id="divmadal_alertconfirm_icon" style="font-size:30pt; padding-right:15px;"></td>
-                        <td id="divmadal_alertconfirm_msg" style="font-size:12pt;" tabindex="0"></td>
+                        <td id="divmodal_alertconfirm_icon" style="font-size:30pt; padding-right:15px;"></td>
+                        <td id="divmodal_alertconfirm_msg" style="font-size:12pt;" tabindex="0"></td>
                     </tr>
                 </table>
             </div>
             <div class="modal-footer">
-                <button id="divmadal_alertconfirm_cancel" type="button" class="btn btn-danger">取消</button>
-                <button id="divmadal_alertconfirm_ok" type="button" class="btn btn-primary">確定</button>
+                <button id="divmodal_alertconfirm_cancel" type="button" class="btn btn-danger">取消</button>
+                <button id="divmodal_alertconfirm_ok" type="button" class="btn btn-primary">確定</button>
             </div>
         </div>
     </div>

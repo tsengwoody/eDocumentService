@@ -1,7 +1,7 @@
 <script>
 
     function receivebook_default(){
-        $('#divmadal_downloadbook_password').val('');
+        $('#divmodal_downloadbook_password').val('');
     }
 
     function receivebook(me, ebook, action){
@@ -14,13 +14,13 @@
         receivebook_default();
 
         //submit
-        $('#divmadal_downloadbook_submit').off().on('click', function(){
+        $('#divmodal_downloadbook_submit').off().on('click', function(){
 
             //ISBN
             let ISBN=me.attr('ISBN');
 
             //password
-            let password=$('#divmadal_downloadbook_password').val();
+            let password=$('#divmodal_downloadbook_password').val();
 
             //transferData
             let transferData={
@@ -65,24 +65,24 @@
             })
 
             //hide
-            $('#divmadal_downloadbook').modal('hide');
+            $('#divmodal_downloadbook').modal('hide');
 
         });
 
         //enter
-        $("#divmadal_downloadbook_password").off().on('keypress',function(event){
+        $("#divmodal_downloadbook_password").off().on('keypress',function(event){
             if (event.which===13) {
                 event.preventDefault();
-                $('#divmadal_downloadbook_submit').click();
+                $('#divmodal_downloadbook_submit').click();
             }
         });
 
         //show
-        $('#divmadal_downloadbook').modal('show');
+        $('#divmodal_downloadbook').modal('show');
 
         //autofocus
         _.delay(function(){
-            $('#divmadal_downloadbook_password').focus();
+            $('#divmodal_downloadbook_password').focus();
         },500)
         
     }
@@ -90,25 +90,25 @@
 </script>
 
 
-<div id="divmadal_downloadbook" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmadal_downloadbook_title" aria-hidden="true">
+<div id="divmodal_downloadbook" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_downloadbook_title" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content alert-info" style="background-color: #f5f5f5;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 id="divmadal_downloadbook_title" class="modal-title">取得書籍</h4>
+                <h4 id="divmodal_downloadbook_title" class="modal-title">取得書籍</h4>
             </div>
             <div style="padding:40px 10px 20px 10px; background-color:#fafafa;">
                 <div class="form-group form-inline text-center">
                     <label>
                         <span>請輸入密碼</span>
-                        <input id="divmadal_downloadbook_password" type="password" class="form-control">
+                        <input id="divmodal_downloadbook_password" type="password" class="form-control">
                     </label>
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="divmadal_downloadbook_submit" type="button" class="btn btn-primary">取得</button>
+                <button id="divmodal_downloadbook_submit" type="button" class="btn btn-primary">取得</button>
             </div>
         </div>
     </div>

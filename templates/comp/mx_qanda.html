@@ -5,7 +5,7 @@
 
 		//tinymce
 		tinymce.init({
-			selector: "#divmadal_qanda_question, #divmadal_qanda_answer",
+			selector: "#divmodal_qanda_question, #divmodal_qanda_answer",
             language:"zh_TW",
             plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
             toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample',
@@ -20,18 +20,18 @@
         let df = $.Deferred();
 
         //div
-        let div=$('#divmadal_qanda');
+        let div=$('#divmodal_qanda');
 
         //setContent
-        tinymce.get('divmadal_qanda_question').setContent(q);
-        tinymce.get('divmadal_qanda_answer').setContent(a);
+        tinymce.get('divmodal_qanda_question').setContent(q);
+        tinymce.get('divmodal_qanda_answer').setContent(a);
 
         //ok
-        $('#divmadal_qanda_save').off().on('click', function(){
+        $('#divmodal_qanda_save').off().on('click', function(){
 
             //getContent
-            let nq=tinymce.get('divmadal_qanda_question').getContent();
-            let na=tinymce.get('divmadal_qanda_answer').getContent();
+            let nq=tinymce.get('divmodal_qanda_question').getContent();
+            let na=tinymce.get('divmodal_qanda_answer').getContent();
 
             //resolve
             if(!_.isEqual(q,nq) || !_.isEqual(a,na)){
@@ -42,7 +42,7 @@
         });
 
         //cancel
-        $('#divmadal_qanda_cancel').off().on('click', function () {
+        $('#divmodal_qanda_cancel').off().on('click', function () {
             div.modal('hide');
         })
 
@@ -51,7 +51,7 @@
 
         //autofocus
         _.delay(function(){
-            tinymce.get('divmadal_qanda_question').focus();
+            tinymce.get('divmodal_qanda_question').focus();
         },500)
         
         return df;
@@ -60,32 +60,32 @@
 </script>
 
 
-<div id="divmadal_qanda" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmadal_qanda_title" aria-hidden="true">
+<div id="divmodal_qanda" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_qanda_title" aria-hidden="true">
     <div class="modal-dialog" role="document" style="width:95%;">
         <div class="modal-content alert-info" style="background-color: #f5f5f5;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 id="divmadal_qanda_title" class="modal-title">Q&A視窗</h4>
+                <h4 id="divmodal_qanda_title" class="modal-title">Q&A視窗</h4>
             </div>
             <div style="padding:20px 20px; background-color:#fafafa;">
                 
                 <div class="row">
                     <div class="col-sm-6">
-                        <label for="divmadal_qanda_question">問題Question</label>
-                        <div id="divmadal_qanda_question"></div>
+                        <label for="divmodal_qanda_question">問題Question</label>
+                        <div id="divmodal_qanda_question"></div>
                     </div>
                     <div class="col-sm-6">
-                        <label for="divmadal_qanda_answer">回答Answer</label>
-                        <div id="divmadal_qanda_answer"></div>
+                        <label for="divmodal_qanda_answer">回答Answer</label>
+                        <div id="divmodal_qanda_answer"></div>
                     </div>
                 </div>
    
             </div>
             <div class="modal-footer">
-                <button id="divmadal_qanda_cancel" type="button" class="btn btn-danger">取消</button>
-                <button id="divmadal_qanda_save" type="button" class="btn btn-primary">儲存</button>
+                <button id="divmodal_qanda_cancel" type="button" class="btn btn-danger">取消</button>
+                <button id="divmodal_qanda_save" type="button" class="btn btn-primary">儲存</button>
             </div>
         </div>
     </div>

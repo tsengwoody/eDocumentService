@@ -11,7 +11,7 @@
         //顯示與編輯使用者權限
 
         //div
-        let div=$('#divmadal_userpermission');
+        let div=$('#divmodal_userpermission');
 
         //aj_user_queryid
         aj_user_queryid(userid,'role')
@@ -49,7 +49,7 @@
             })
             
             //html
-            $('#divmadal_userpermission_list').html(c);
+            $('#divmodal_userpermission_list').html(c);
 
         })
         .fail(function(msg){
@@ -60,7 +60,7 @@
         })
 
         //ok
-        $('#divmadal_userpermission_ok').off().on('click', function(){
+        $('#divmodal_userpermission_ok').off().on('click', function(){
 
             //transferData
             let transferData={};
@@ -87,7 +87,7 @@
         });
 
         //cancel
-        $('#divmadal_userpermission_cancel').off().on('click', function () {
+        $('#divmodal_userpermission_cancel').off().on('click', function () {
             div.modal('hide');
         })
 
@@ -104,23 +104,23 @@
 </script>
 
 
-<div id="divmadal_userpermission" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmadal_userpermission_title" aria-hidden="true">
+<div id="divmodal_userpermission" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_userpermission_title" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content alert-info" style="background-color: #f5f5f5;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 id="divmadal_userpermission_title" class="modal-title">編輯使用者權限</h4>
+                <h4 id="divmodal_userpermission_title" class="modal-title">編輯使用者權限</h4>
             </div>
             <div style="padding:20px 20px; background-color:#fafafa;">
 
-                <div id="divmadal_userpermission_list"></div>
+                <div id="divmodal_userpermission_list"></div>
 
             </div>
             <div class="modal-footer">
-                <button id="divmadal_userpermission_cancel" type="button" class="btn btn-danger">取消</button>
-                <button id="divmadal_userpermission_ok" type="button" class="btn btn-primary">確定</button>
+                <button id="divmodal_userpermission_cancel" type="button" class="btn btn-danger">取消</button>
+                <button id="divmodal_userpermission_ok" type="button" class="btn btn-primary">確定</button>
             </div>
         </div>
     </div>

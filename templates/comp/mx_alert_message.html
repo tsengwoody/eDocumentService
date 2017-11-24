@@ -8,7 +8,7 @@
         let df = $.Deferred();
 
         //div
-        let div=$('#divmadal_alertmessage');
+        let div=$('#divmodal_alertmessage');
 
         //kind
         let icon='';
@@ -25,17 +25,17 @@
             console.log('alertmessage: kind error: '+kind)
             return;
         }
-         $('#divmadal_alertmessage_icon').html(icon);
+         $('#divmodal_alertmessage_icon').html(icon);
 
         //message
         if(message===''){
             console.log('alertmessage: message empty')
             return;
         }
-        $('#divmadal_alertmessage_msg').html(message);
+        $('#divmodal_alertmessage_msg').html(message);
 
         //ok
-        $('#divmadal_alertmessage_ok').off().on('click', function(){
+        $('#divmodal_alertmessage_ok').off().on('click', function(){
 
             //show
             div.modal('hide');
@@ -55,7 +55,7 @@
 
         //autofocus
         _.delay(function(){
-            $('#divmadal_alertmessage_msg').focus();
+            $('#divmodal_alertmessage_msg').focus();
         },500)
         
         return df;
@@ -64,25 +64,25 @@
 </script>
 
 
-<div id="divmadal_alertmessage" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmadal_alertmessage_title" aria-hidden="true">
+<div id="divmodal_alertmessage" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_alertmessage_title" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content alert-info" style="background-color: #f5f5f5;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 id="divmadal_alertmessage_title" class="modal-title">系統訊息</h4>
+                <h4 id="divmodal_alertmessage_title" class="modal-title">系統訊息</h4>
             </div>
             <div style="padding:40px 20px; background-color:#fafafa;">
                 <table>
                     <tr>
-                        <td id="divmadal_alertmessage_icon" style="font-size:30pt; padding-right:15px;"></td>
-                        <td id="divmadal_alertmessage_msg" style="font-size:12pt;" tabindex="0"></td>
+                        <td id="divmodal_alertmessage_icon" style="font-size:30pt; padding-right:15px;"></td>
+                        <td id="divmodal_alertmessage_msg" style="font-size:12pt;" tabindex="0"></td>
                     </tr>
                 </table>
             </div>
             <div class="modal-footer">
-                <button id="divmadal_alertmessage_ok" type="button" class="btn btn-primary">確定</button>
+                <button id="divmodal_alertmessage_ok" type="button" class="btn btn-primary">確定</button>
             </div>
         </div>
     </div>

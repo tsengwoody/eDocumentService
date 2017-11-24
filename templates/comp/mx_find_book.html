@@ -3,21 +3,21 @@
     function findbook_default(){
 
         //預設下拉式選單與清空輸入框
-        let p=$('#divmadal_findbook');
+        let p=$('#divmodal_findbook');
         p.find('select option:eq(0)').prop('selected',true);
         p.find('input[type="text"]').val('');
         p.find('div.modal-dialog').css('width','');
 
         //顯示查尋頁與隱藏挑選頁
-        $('#divmadal_findbook_page_find').show();
-        $('#divmadal_findbook_page_pick').hide();
+        $('#divmodal_findbook_page_find').show();
+        $('#divmodal_findbook_page_pick').hide();
 
         //顯示查詢按鈕與隱藏挑選按鈕
-        $('#divmadal_findbook_find').show();
-        $('#divmadal_findbook_pick').hide();
+        $('#divmodal_findbook_find').show();
+        $('#divmodal_findbook_pick').hide();
 
         //預設簡易查詢
-        $('li[name="divmadal_findbook_tab_grp"]').eq(0).children().click();
+        $('li[name="divmodal_findbook_tab_grp"]').eq(0).children().click();
         
         //$('#mixvalue').val('9789573329466') //蔡康永愛情短信
 
@@ -37,15 +37,15 @@
     function findbook_loading(){
         //loading
 
-        $('#divmadal_findbook_loader').show();
-        $('#divmadal_findbook_find').prop('disabled',true);
+        $('#divmodal_findbook_loader').show();
+        $('#divmodal_findbook_find').prop('disabled',true);
     }
 
     function findbook_unloading(){
         //unloading
 
-        $('#divmadal_findbook_loader').hide();
-        $('#divmadal_findbook_find').prop('disabled',false);
+        $('#divmodal_findbook_loader').hide();
+        $('#divmodal_findbook_find').prop('disabled',false);
     }
 
     function findbook_easy(){
@@ -102,10 +102,10 @@
         let bs=[];
 
         //find
-        $('#divmadal_findbook_find').off().on('click', function(){
+        $('#divmodal_findbook_find').off().on('click', function(){
 
             //mode
-            let mode=$('li[name="divmadal_findbook_tab_grp"].active').attr('mode');
+            let mode=$('li[name="divmodal_findbook_tab_grp"].active').attr('mode');
 
             //transferData
             let transferData=null;
@@ -143,7 +143,7 @@
                 //bs, add radio
                 _.each(data,function(v,k){
                     let b={};
-                    b['勾選']='<input type="radio" name="divmadal_findbook_page_pick_inpgrp" index="'+k+'" onclick="findbook_highlightpick(this)">';
+                    b['勾選']='<input type="radio" name="divmodal_findbook_page_pick_inpgrp" index="'+k+'" onclick="findbook_highlightpick(this)">';
                     _.each(v,function(vv,kk){
                         b[kk]=vv;
                     })
@@ -151,17 +151,17 @@
                 })
 
                 //切換顯示
-                $('#divmadal_findbook_page_find').hide();
-                $('#divmadal_findbook_page_pick').fadeIn();
-                $('#divmadal_findbook_find').hide();
-                $('#divmadal_findbook_pick').fadeIn();
-                $('#divmadal_findbook').find('div.modal-dialog').css('width','90%');
+                $('#divmodal_findbook_page_find').hide();
+                $('#divmodal_findbook_page_pick').fadeIn();
+                $('#divmodal_findbook_find').hide();
+                $('#divmodal_findbook_pick').fadeIn();
+                $('#divmodal_findbook').find('div.modal-dialog').css('width','90%');
 
                 //gentable
-                gentable('divmadal_findbook_page_pick_list','divmadal_findbook_page_pick_list_table',bs);
+                gentable('divmodal_findbook_page_pick_list','divmodal_findbook_page_pick_list_table',bs);
             
                 //checked first
-                $('input[type="radio"][name="divmadal_findbook_page_pick_inpgrp"]').eq(0).click();
+                $('input[type="radio"][name="divmodal_findbook_page_pick_inpgrp"]').eq(0).click();
 
             })
             .fail(function(data){
@@ -197,21 +197,21 @@
         });
 
         //pick
-        $('#divmadal_findbook_pick').off().on('click', function(){
+        $('#divmodal_findbook_pick').off().on('click', function(){
 
             //index
-            let index=$('input[type="radio"][name="divmadal_findbook_page_pick_inpgrp"]:checked').attr('index');
+            let index=$('input[type="radio"][name="divmodal_findbook_page_pick_inpgrp"]:checked').attr('index');
 
             //resolve
             df.resolve(bs[index]);
 
             //hide
-            $('#divmadal_findbook').modal('hide');
+            $('#divmodal_findbook').modal('hide');
 
         });
 
         //cancel
-        $('#divmadal_findbook').on('hide.bs.modal', function (e) {
+        $('#divmodal_findbook').on('hide.bs.modal', function (e) {
 
             //reject
             df.reject();
@@ -222,12 +222,12 @@
         $('input[type="text"]').off().on('keypress',function(event){
             if (event.which===13) {
                 event.preventDefault();
-                $('#divmadal_findbook_find').click();
+                $('#divmodal_findbook_find').click();
             }
         });
 
         //show
-        $('#divmadal_findbook').modal('show');
+        $('#divmodal_findbook').modal('show');
 
         //autofocus
         _.delay(function(){
@@ -239,34 +239,34 @@
 
 </script>
 
-<div id="divmadal_findbook" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmadal_findbook_title" aria-hidden="true">
+<div id="divmodal_findbook" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_findbook_title" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content alert-info" style="background-color: #f5f5f5;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 id="divmadal_findbook_title" class="modal-title">更多查詢書籍資訊</h4>
+                <h4 id="divmodal_findbook_title" class="modal-title">更多查詢書籍資訊</h4>
             </div>
             <div style="padding:20px; background-color: #fff;">
 
-                <div id="divmadal_findbook_page_find">
+                <div id="divmodal_findbook_page_find">
 
                     <ul class="nav nav-tabs">
-                        <li class="active" name="divmadal_findbook_tab_grp" mode="easy"><a href="#divmadal_findbook_tab_easy" data-toggle="tab" aria-expanded="true">綜合查詢</a></li>
-                        <li name="divmadal_findbook_tab_grp" mode="adv"><a href="#divmadal_findbook_tab_adv" data-toggle="tab" aria-expanded="false">國圖查詢</a></li>
+                        <li class="active" name="divmodal_findbook_tab_grp" mode="easy"><a href="#divmodal_findbook_tab_easy" data-toggle="tab" aria-expanded="true">綜合查詢</a></li>
+                        <li name="divmodal_findbook_tab_grp" mode="adv"><a href="#divmodal_findbook_tab_adv" data-toggle="tab" aria-expanded="false">國圖查詢</a></li>
                     </ul>
 
                     <div class="tab-content" style="background-color:#fff;">
 
-                        <div id="divmadal_findbook_tab_easy" class="tab-pane active">
+                        <div id="divmodal_findbook_tab_easy" class="tab-pane active">
                             <div style="margin:20px 0px 10px 0px;">輸入書籍ISBN或書名進行查詢：</div>
                             
                             <input id="mixvalue" type="text" class="form-control">
 
                         </div>
 
-                        <div id="divmadal_findbook_tab_adv" class="tab-pane">
+                        <div id="divmodal_findbook_tab_adv" class="tab-pane">
                             <div style="margin:20px 0px;">輸入書籍相關資訊與條件進行查詢：</div>
 
                             <div class="form-group form-inline">
@@ -337,17 +337,17 @@
 
                 </div>
 
-                <div id="divmadal_findbook_page_pick">
+                <div id="divmodal_findbook_page_pick">
                     <h4>請由下列書籍清單中勾選欲上傳之書籍：</h4>
-                    <div id="divmadal_findbook_page_pick_list" style="overflow-x:auto;"></div>
+                    <div id="divmodal_findbook_page_pick_list" style="overflow-x:auto;"></div>
                 </div>
     
             </div>
             <div class="modal-footer">
-                <button id="divmadal_findbook_cancel" type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
-                <button id="divmadal_findbook_find" type="button" class="btn btn-primary">取得</button>
-                <img id="divmadal_findbook_loader" src="/static/ebookSystem/img/load.gif" style="display: none;" width="30px" height="30px"/>
-                <button id="divmadal_findbook_pick" type="button" class="btn btn-primary">確定</button>
+                <button id="divmodal_findbook_cancel" type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
+                <button id="divmodal_findbook_find" type="button" class="btn btn-primary">取得</button>
+                <img id="divmodal_findbook_loader" src="/static/ebookSystem/img/load.gif" style="display: none;" width="30px" height="30px"/>
+                <button id="divmodal_findbook_pick" type="button" class="btn btn-primary">確定</button>
             </div>
         </div>
     </div>

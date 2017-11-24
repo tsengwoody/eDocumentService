@@ -5,16 +5,16 @@
         //變更書籍權重
 
         //div
-        let div=$('#divmadal_bookdeleterepository');
+        let div=$('#divmodal_bookdeleterepository');
 
         //clear password
-        $('#divmadal_bookdeleterepository_password').val('');
+        $('#divmodal_bookdeleterepository_password').val('');
 
         //ok
-        $('#divmadal_bookdeleterepository_ok').off().on('click', function(){
+        $('#divmodal_bookdeleterepository_ok').off().on('click', function(){
 
             //password, priority
-            let password=$('#divmadal_bookdeleterepository_password').val();
+            let password=$('#divmodal_bookdeleterepository_password').val();
 
             //aj_bookdeleterepository
             aj_bookdeleterepository(password,ISBN)
@@ -32,15 +32,15 @@
         });
 
         //cancel
-        $('#divmadal_bookdeleterepository_cancel').off().on('click', function () {
+        $('#divmodal_bookdeleterepository_cancel').off().on('click', function () {
             div.modal('hide');
         })
 
         //enter
-        $("#divmadal_bookdeleterepository_password").off().on('keypress',function(event){
+        $("#divmodal_bookdeleterepository_password").off().on('keypress',function(event){
             if (event.which===13) {
                 event.preventDefault();
-                $('#divmadal_bookdeleterepository_ok').click();
+                $('#divmodal_bookdeleterepository_ok').click();
             }
         });
 
@@ -49,7 +49,7 @@
 
         //autofocus
         _.delay(function(){
-            $('#divmadal_bookdeleterepository_priority').focus();
+            $('#divmodal_bookdeleterepository_priority').focus();
         },500)
         
     }
@@ -57,28 +57,28 @@
 </script>
 
 
-<div id="divmadal_bookdeleterepository" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmadal_bookdeleterepository_title" aria-hidden="true">
+<div id="divmodal_bookdeleterepository" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_bookdeleterepository_title" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content alert-info" style="background-color: #f5f5f5;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 id="divmadal_bookdeleterepository_title" class="modal-title">設定書籍權重</h4>
+                <h4 id="divmodal_bookdeleterepository_title" class="modal-title">設定書籍權重</h4>
             </div>
             <div class="form-horizontal" style="padding:20px 20px; background-color:#fafafa;">
 
                 <div class="form-group">
-                    <label for="divmadal_bookdeleterepository_password" class="control-label col-sm-4">請輸入密碼</label>
+                    <label for="divmodal_bookdeleterepository_password" class="control-label col-sm-4">請輸入密碼</label>
                     <div class="col-sm-5">
-                        <input id="divmadal_bookdeleterepository_password" type="password" class="form-control">
+                        <input id="divmodal_bookdeleterepository_password" type="password" class="form-control">
                     </div>
                 </div>
                 
             </div>
             <div class="modal-footer">
-                <button id="divmadal_bookdeleterepository_cancel" type="button" class="btn btn-danger">取消</button>
-                <button id="divmadal_bookdeleterepository_ok" type="button" class="btn btn-primary">確定</button>
+                <button id="divmodal_bookdeleterepository_cancel" type="button" class="btn btn-danger">取消</button>
+                <button id="divmodal_bookdeleterepository_ok" type="button" class="btn btn-primary">確定</button>
             </div>
         </div>
     </div>

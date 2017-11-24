@@ -5,23 +5,23 @@
         //變更書籍權重
 
         //div
-        let div=$('#divmadal_booksetpriority');
+        let div=$('#divmodal_booksetpriority');
 
         //sel
         let sel=_.chain(_.range(10))
         .map(function(i){return '<option value="'+i+'">'+i+'</option>'})
         .value()
-        $('#divmadal_booksetpriority_priority').html(sel);
+        $('#divmodal_booksetpriority_priority').html(sel);
 
         //clear password
-        $('#divmadal_booksetpriority_password').val('');
+        $('#divmodal_booksetpriority_password').val('');
 
         //ok
-        $('#divmadal_booksetpriority_ok').off().on('click', function(){
+        $('#divmodal_booksetpriority_ok').off().on('click', function(){
 
             //password, priority
-            let password=$('#divmadal_booksetpriority_password').val();
-            let priority=$('#divmadal_booksetpriority_priority').find('option:selected').val();
+            let password=$('#divmodal_booksetpriority_password').val();
+            let priority=$('#divmodal_booksetpriority_priority').find('option:selected').val();
 
             //aj_booksetpriority
             aj_booksetpriority(password,ISBN,priority)
@@ -39,15 +39,15 @@
         });
 
         //cancel
-        $('#divmadal_booksetpriority_cancel').off().on('click', function () {
+        $('#divmodal_booksetpriority_cancel').off().on('click', function () {
             div.modal('hide');
         })
 
         //enter
-        $("#divmadal_booksetpriority_password").off().on('keypress',function(event){
+        $("#divmodal_booksetpriority_password").off().on('keypress',function(event){
             if (event.which===13) {
                 event.preventDefault();
-                $('#divmadal_booksetpriority_ok').click();
+                $('#divmodal_booksetpriority_ok').click();
             }
         });
 
@@ -56,7 +56,7 @@
 
         //autofocus
         _.delay(function(){
-            $('#divmadal_booksetpriority_priority').focus();
+            $('#divmodal_booksetpriority_priority').focus();
         },500)
         
     }
@@ -64,35 +64,35 @@
 </script>
 
 
-<div id="divmadal_booksetpriority" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmadal_booksetpriority_title" aria-hidden="true">
+<div id="divmodal_booksetpriority" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_booksetpriority_title" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content alert-info" style="background-color: #f5f5f5;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 id="divmadal_booksetpriority_title" class="modal-title">設定書籍權重</h4>
+                <h4 id="divmodal_booksetpriority_title" class="modal-title">設定書籍權重</h4>
             </div>
             <div class="form-horizontal" style="padding:20px 20px; background-color:#fafafa;">
 
                 <div class="form-group">
-                    <label for="divmadal_booksetpriority_priority" class="control-label col-sm-4">請選擇權重</label>
+                    <label for="divmodal_booksetpriority_priority" class="control-label col-sm-4">請選擇權重</label>
                     <div class="col-sm-5">
-                        <select id="divmadal_booksetpriority_priority" class="form-control"></select>
+                        <select id="divmodal_booksetpriority_priority" class="form-control"></select>
                     </div>
                 </div>
            
                 <div class="form-group">
-                    <label for="divmadal_booksetpriority_password" class="control-label col-sm-4">請輸入密碼</label>
+                    <label for="divmodal_booksetpriority_password" class="control-label col-sm-4">請輸入密碼</label>
                     <div class="col-sm-5">
-                        <input id="divmadal_booksetpriority_password" type="password" class="form-control">
+                        <input id="divmodal_booksetpriority_password" type="password" class="form-control">
                     </div>
                 </div>
                 
             </div>
             <div class="modal-footer">
-                <button id="divmadal_booksetpriority_cancel" type="button" class="btn btn-danger">取消</button>
-                <button id="divmadal_booksetpriority_ok" type="button" class="btn btn-primary">確定</button>
+                <button id="divmodal_booksetpriority_cancel" type="button" class="btn btn-danger">取消</button>
+                <button id="divmodal_booksetpriority_ok" type="button" class="btn btn-primary">確定</button>
             </div>
         </div>
     </div>
