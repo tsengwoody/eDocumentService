@@ -132,10 +132,10 @@ function urlparam() {
     //ar
     let ar = {};
     if (url.indexOf("?") != -1) {
-        var param = url.split("?");
-        var data = param[1].split("&");
+        let param = url.split("?");
+        let data = param[1].split("&");
         for (let i = 0; i < data.length; i++) {
-            var s = data[i].split("=");
+            let s = data[i].split("=");
             ar[s[0]] = s[1];
         }
     }
@@ -597,6 +597,46 @@ function keyspace2enter(event,me){
     if(event.keyCode===32){
         $(me).click();
     }
+}
+
+
+function trapfocus(id, namespace) {
+    //trap focus
+
+    let element = $('#'+id);
+    let focusableEls = element.find('a, object, :input, iframe, [tabindex]');
+    let firstFocusableEl = focusableEls.first()[0];
+    let lastFocusableEl = focusableEls.last()[0];
+    let KEYCODE_TAB = 9;
+
+    element.on('keydown.'+ namespace, function(e) {
+        let isTabPressed = (e.key === 'Tab' || e.keyCode === KEYCODE_TAB);
+
+        if (!isTabPressed) { 
+            return; 
+        }
+
+        if ( e.shiftKey ){
+            //shift + tab
+            if (document.activeElement === firstFocusableEl) {
+                lastFocusableEl.focus();
+                e.preventDefault();
+            }
+        } 
+        else {
+            //tab
+            if (document.activeElement === lastFocusableEl) {
+                firstFocusableEl.focus();
+                e.preventDefault();
+            }
+        }
+
+    });
+}
+function untrapfocus(id, namespace) {
+    //un-trap focus
+    let element = $('#'+id);
+    element.off('keydown.' + namespace);
 }
 
 
