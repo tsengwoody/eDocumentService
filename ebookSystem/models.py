@@ -299,12 +299,16 @@ class EBook(models.Model):
 
 	def get_source_list(self):
 		source_path = self.book.path +u'/source'
-		file_list = os.listdir(source_path)
-		file_list = sorted(file_list)
-		scan_file_list = [scan_file for scan_file in file_list if scan_file.split('.')[-1].lower() == 'jpg']
-		scan_file_list = scan_file_list[self.begin_page:self.end_page+1]
-		scan_file_dict = dict(enumerate(scan_file_list))
-		return scan_file_dict
+		try:
+			file_list = os.listdir(source_path)
+			file_list = sorted(file_list)
+			scan_file_list = [scan_file for scan_file in file_list if scan_file.split('.')[-1].lower() == 'jpg']
+			scan_file_list = scan_file_list[self.begin_page:self.end_page+1]
+			scan_file_dict = dict(enumerate(scan_file_list))
+			return scan_file_dict
+		except:
+			return {}
+
 
 	def status_int2str(self):
 		for k, v in self.STATUS.iteritems():

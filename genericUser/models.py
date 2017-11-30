@@ -59,6 +59,7 @@ class User(AbstractUser):
 		super(User, self).__init__(*args, **kwargs)
 		self.disability_card_front = BASE_DIR +'/static/ebookSystem/disability_card/{0}/{0}_front.jpg'.format(self.username)
 		self.disability_card_back = BASE_DIR +'/static/ebookSystem/disability_card/{0}/{0}_back.jpg'.format(self.username)
+		self.has_disability_card = os.path.exists(BASE_DIR +'/static/ebookSystem/disability_card/{0}/'.format(self.username))
 
 	def __unicode__(self):
 		return self.first_name +self.last_name
