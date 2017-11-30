@@ -51,7 +51,7 @@ class Book(models.Model):
 	part_count = models.IntegerField(default = 1)
 	page_per_part = models.IntegerField(default=-1)
 	finish_date = models.DateField(blank=True, null=True)
-	priority = models.IntegerField(default=0)
+	priority = models.IntegerField(default=9)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
 	owner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='own_book_set')
 	upload_date = models.DateField(default = timezone.now)
@@ -189,7 +189,7 @@ class Book(models.Model):
 		self.check_status()
 		#準備epub文件
 		from ebooklib import epub
-		from utils.epub import txt2epub, add_bookinfo
+		from utils.epub import txt2epub, html2epub, add_bookinfo
 		info = {
 			'ISBN': self.book_info.ISBN,
 			'bookname': self.book_info.bookname,
@@ -251,12 +251,6 @@ class Book(models.Model):
 				raise SystemError('zip create fail remove dirname' +unicode(e))
 			raise SystemError('zip create fail:' +unicode(e))
 
-	def collect_is_finish(self):
-		is_finish = True
-		for part in self.ebook_set.all():
-			is_finish = is_finish and part.status == part.STATUS['finish']
-		return is_finish
-
 	def collect_finish_page_count(self):
 		finish_page_count = 0
 		for part in self.ebook_set.all():
@@ -302,7 +296,15 @@ class EBook(models.Model):
 	an_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='an_edit_ebook_set')
 	an_deadline = models.DateField(blank=True, null=True)
 	an_get_date = models.DateField(blank=True, null=True)
-	is_sc_rebuild = models.BooleanField(default=True)
+
+	def get_source_list(self):
+		source_path = self.book.path +u'/source'
+		file_list = os.listdir(source_path)
+		file_list = sorted(file_list)
+		scan_file_list = [scan_file for scan_file in file_list if scan_file.split('.')[-1].lower() == 'jpg']
+		scan_file_list = scan_file_list[self.begin_page:self.end_page+1]
+		scan_file_dict = dict(enumerate(scan_file_list))
+		return scan_file_dict
 
 	def status_int2str(self):
 		for k, v in self.STATUS.iteritems():
@@ -645,7 +647,7 @@ class BookOrder(models.Model):
 	@classmethod
 	def refresh(cls):
 		BookOrder.objects.all().delete()
-		book_list = [ book for book in Book.objects.filter(Q(status=Book.STATUS['active'])|Q(status=Book.STATUS['edit'])) ]
+		book_list = [ book for book in Book.objects.filter(Q(status=Book.STATUS['active'])|Q(status=Book.STATUS['edit'])).order_by('priority', 'upload_date') ]
 
 		user_order = []
 		for book in book_list:

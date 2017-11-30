@@ -1,13 +1,37 @@
-from django.conf.urls import url
+from django.conf.urls import include, url
 
 from . import views
+from . import apis
+
+user_list = apis.UserViewSet.as_view({
+	'post': 'create',
+})
+user_detail = apis.UserViewSet.as_view({
+	'get': 'retrieve',
+	'put': 'update',
+	'patch': 'partial_update',
+})
+
+from rest_framework.routers import DefaultRouter
+router = DefaultRouter()
+router.register(r'users_manager', apis.UserManagerViewSet)
+router.register(r'announcements', apis.AnnouncementViewSet)
+router.register(r'qandas', apis.QAndAViewSet)
+
+import copy
+api_urlpatterns = copy.copy(router.urls)
+api_urlpatterns = api_urlpatterns +[
+	url(r'^users/$', user_list, name='user-list'),
+	url(r'^users/(?P<pk>[\d]+)/$', user_detail, name='user-detail'),
+]
+
+import rest_framework
 
 urlpatterns = [
 	url(r'^user_guide', views.user_guide, name='user_guide'),
 	url(r'^recruit', views.recruit, name='recruit'),
 	url(r'^apply_document/$', views.apply_document, name='apply_document'),
 	url(r'^func_desc/$', views.func_desc, name='func_desc'),
-#	url(r'^privacy/$', views.privacy, name='privacy'),
 	url(r'^org_info$', views.org_info, name='org_info'),
 	url(r'^license/$', views.license, name='license'),
 	url(r'^upload_progress/$', views.upload_progress, name='upload_progress'),
@@ -31,4 +55,6 @@ urlpatterns = [
 	url(r'^qanda_update/(?P<id>[0-9]+)/$', views.qanda_update, name='qanda_update'),
 	url(r'^qanda_delete/(?P<id>[0-9]+)/$', views.qanda_delete, name='qanda_delete'),
 	url(r'^qanda_list$', views.qanda_list, name='qanda_list'),
+	url(r'^api/', include(api_urlpatterns, namespace='genericUser-api')),
+	url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

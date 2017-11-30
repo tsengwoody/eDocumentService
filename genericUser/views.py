@@ -605,25 +605,3 @@ def qanda_main(request, template_name='genericUser/qanda_main.html'):
 @http_response
 def getbookrecord_view(request, username, template_name='genericUser/getbookrecord_view.html'):
 	return locals()
-
-
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-
-@api_view(['GET', 'POST'])
-def qanda_list_api(request):
-	"""
-	List all QAndA, or create a new QAndA.
-	"""
-	if request.method == 'GET':
-		qanda_list = QAndA.objects.all()
-		serializer = QAndASerializer(qanda_list, many=True)
-		return Response(serializer.data)
-
-	elif request.method == 'POST':
-		serializer = SnippetSerializer(data=request.data)
-		if serializer.is_valid():
-			serializer.save()
-			return Response(serializer.data, status=status.HTTP_201_CREATED)
-		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

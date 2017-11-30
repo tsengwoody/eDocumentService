@@ -56,6 +56,7 @@ INSTALLED_APPS = (
     'account',
     'ebookSystem',
     'genericUser',
+#    'guest',
     'rest_framework',
     'snowpenguin.django.recaptcha2',
 )
@@ -219,4 +220,9 @@ AUTHENTICATION_BACKENDS = (
 
 from .account_info import *
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = None
+#DATA_UPLOAD_MAX_MEMORY_SIZE = None
+'''REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    )
+}'''

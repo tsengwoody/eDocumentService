@@ -502,9 +502,9 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 		status = u'error'
 		message = u'您非本文件之校對者！'
 #		permission_denied = True
-		redirect_to = reverse('account:service')
+		redirect_to = reverse('ebookSystem:service')
 		return locals()
-	[scanPageList, defaultPageURL] = part.get_image(request.user)
+	[scanPageList, defaultPageURL] = part.get_org_image(request.user)
 	editContent = part.get_content('-edit')
 	if request.method == 'POST':
 		Token = request.session.get('postToken',default=None)
@@ -531,19 +531,19 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 		elif request.POST.has_key('close'):
 			status = 'success'
 			message = u'關閉無儲存資料'
-			redirect_to = reverse('account:service')
+			redirect_to = reverse('ebookSystem:service')
 		elif request.POST.has_key('finish'):
 			part.set_content(finish_content=content, edit_content='')
 			part.change_status(1, 'review')
 			status = 'success'
 			message = u'完成文件校對，將進入審核'
-			redirect_to = reverse('account:service')
+			redirect_to = reverse('ebookSystem:service')
 			event = Event.objects.create(creater=request.user, action=part)
 		elif request.POST.has_key('load'):
 			part.load_full_content()
 			status = 'success'
 			message = u'成功載入全部文件內容'
-		[scanPageList, defaultPageURL] = part.get_image(request.user)
+		[scanPageList, defaultPageURL] = part.get_org_image(request.user)
 		editContent = part.get_content('-edit')
 		del request.session['postToken']
 		postToken = uuid.uuid1().hex
@@ -561,7 +561,7 @@ def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
 		part = EBook.objects.get(ISBN_part=ISBN_part)
 	except:
 		raise Http404("book does not exist")
-	[scanPageList, defaultPageURL] = part.get_image(request.user)
+	[scanPageList, defaultPageURL] = part.get_org_image(request.user)
 	editContent = part.get_content('-sc')
 	if request.method == 'POST':
 		with codecs.open(part.get_path('-sc'), 'w', encoding='utf-8') as scFile:
@@ -617,10 +617,10 @@ def book_download(request, ISBN, ):
 		from utils.other import get_client_ip
 		get_ip = get_client_ip(request)
 		GetBookRecord.objects.create(book=getBook, user=request.user, get_ip=get_ip)
-		if len(gbr) <= 0:
+		'''if len(gbr) <= 0:
 			cache.set(request.user.username, {'get_book': timezone.now() +datetime.timedelta(seconds=MIN_DURATION_TIME)}, MIN_DURATION_TIME)
 		else:
-			pass
+			pass'''
 
 		return locals()
 
@@ -920,7 +920,7 @@ def book_list(request, ):
 			r = GetBookRecord.objects.filter(get_time__gt=begin_day, get_time__lt=end_day).values('book').annotate(count=Count('book'))
 			import heapq
 			hottest = heapq.nlargest(int(request.GET['query_value']), r, key=lambda s: s['count'])
-			book_list = [Book.objects.get(ISBN=i['book']) for i in hottest],
+			book_list = [Book.objects.get(ISBN=i['book']) for i in hottest]
 		elif query_type == 'owner':
 			owner = User.objects.get(id=request.GET['query_value'])
 			book_list = Book.objects.filter(owner=owner, status__gte=Book.STATUS['finish'])
@@ -1111,3 +1111,28 @@ def book_repository_person(request, template_name='ebookSystem/book_repository_p
 		return locals()
 	if request.method == 'GET':
 		return locals()
+
+#=====file=====
+from rest_framework.decorators import api_view, permission_classes
+
+@api_view(['GET'])
+#@permission_classes((IsAuthenticated, ))
+def ebook_resource(request, pk, dir, resource):
+	try:
+		ebook = EBook.objects.get(ISBN_part=pk)
+	except:
+		raise Http404("ebook does not exist")
+	if dir == 'OCR':
+		if resource == 'origin':
+			fullpath = ebook.get_path()
+		else:
+			fullpath = ebook.get_path('-' +resource)
+
+	elif dir == 'source':
+		fullpath = os.path.join(ebook.book.path +u'/source', ebook.get_source_list()[int(resource)])
+
+	else:
+		pass
+
+	if request.method == 'GET':
+		return get_file(fullpath)

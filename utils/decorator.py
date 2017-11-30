@@ -3,6 +3,8 @@ from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponse,HttpResponseRedirect, FileResponse
 from django.shortcuts import render
 import json
+import mimetypes
+import os
 
 from genericUser.models import View
 
@@ -51,41 +53,21 @@ def user_category_check(category):
 		return user_category_in
 	return user_category_out
 
-def view_permission(view):
-	def decorator(request, *args, **kwargs):
-		r = resolve(request.path)
-		try:
-			v = View.objects.get(namespace=r.namespace, url_name=r.url_name)
-		except View.DoesNotExist:
-			v = None
-		response = {}
-		if not request.user.is_authenticated():
-			template_name = 'user_category_check.html'
-			redirect_to = reverse('login')
-			status = 'error'
-			message = u'您尚未登錄'
-			response['redirect_to'] = redirect_to
-			response['status'] = status
-			response['message'] = message
-			if request.is_ajax():
-				return HttpResponse(json.dumps(response), content_type="application/json")
-			else:
-				return render(request, template_name, locals())
-		if (v and v.check_permission(request.user)) or not v:
-			return view(request, *args, **kwargs)
-		else:
-			template_name = 'user_category_check.html'
-			redirect_to = reverse('login')
-			status = 'error'
-			message = u'帳號無權限'
-			response['redirect_to'] = redirect_to
-			response['status'] = status
-			response['message'] = message
-			if request.is_ajax():
-				return HttpResponse(json.dumps(response), content_type="application/json")
-			else:
-				return render(request, template_name, locals())
-	return decorator
+def get_file(fullpath):
+	if not os.path.exists(fullpath):
+		raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
+	# Respect the If-Modified-Since header.
+	statobj = os.stat(fullpath)
+	content_type, encoding = mimetypes.guess_type(fullpath)
+	content_type = content_type or 'application/octet-stream'
+	response = FileResponse(open(fullpath, 'rb'), content_type='application/octet-stream')
+	response['Content-Disposition'] = u'attachment; filename="{0}"'.format(os.path.basename(fullpath)).encode('utf-8')
+#	response["Last-Modified"] = http_date(statobj.st_mtime)
+#	if stat.S_ISREG(statobj.st_mode):
+#		response["Content-Length"] = statobj.st_size
+	if encoding:
+		response["Content-Encoding"] = encoding
+	return response
 
 def http_response(view):
 	def decorator(request, *args, **kwargs):
