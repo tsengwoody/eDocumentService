@@ -3,6 +3,7 @@
 <script>
 	let vo_editor;
 	let editor_mathml;
+	let editor_svg={};
 
 
 	$(function(){
@@ -31,7 +32,9 @@
 	//vu-editoritem
 	Vue.component('vu-editoritem', {
 		template: `
-	<div ref="item" v-html="render(s)">
+	<div ref="panel">
+		<div ref="item" v-html="render(s)">
+		</div>
 	</div>
 	`,
 		props: ['s'],
@@ -43,25 +46,45 @@
 
 				//ele
 				let ele=vo.$refs.item;
+				let op=$(vo.$refs.panel);
 
 				//mathml to svg
 				if(ss.kind==='mathml'){
 
-					//hide
-					$(ele).css('opacity',0);
+					//key
+					let key = md5(ss.data);
 
-					//delay convert
-					_.delay(function(){
+					if(haskey(editor_svg,key)){
+						
+						//return svg
+						return editor_svg[key]
 
-						//convert
-						MathJax.Hub.Queue(["Typeset",MathJax.Hub,ele],function(){
+					}
+					else{
 
-							//show
-							$(ele).animate({'opacity':1},300);
+						//hide
+						op.css('opacity',0);
 
-						});
+						//delay convert
+						_.delay(function(){
 
-					},1)
+							//convert
+							MathJax.Hub.Queue(["Typeset",MathJax.Hub,ele],function(){
+
+								//svg
+								let svg=$(vo.$refs.panel).children().html(); //mathjax會對原ele進行替換，此處無法取得item只有panel
+
+								//save svg
+								editor_svg[key]=svg;
+
+								//show
+								op.animate({'opacity':1},300);
+							
+							});
+
+						},1)
+
+					}
 
 				}
 
@@ -78,23 +101,23 @@
 
 		<div style="padding:20px 20px; background-color:#fff; color:#666;">
 				
-			<div v-bind:class="panelclass(ss,iss)" style="position:relative; padding:5px; margin-bottom:2px; min-height:35px;" v-on:click="s.focus=iss" v-on:dblclick="ckupdate(ss,iss)" v-for="(ss,iss) in s.data" v-if="s.mode==='forshow' || s.mode==='foredit'"> 
+			<div v-bind:iss="iss" v-bind:class="panelclass(ss,iss)" style="position:relative; padding:5px; margin-bottom:2px; min-height:35px;" v-on:click="s.focus=iss" v-on:dblclick="ckupdate(ss,iss)" v-for="(ss,iss) in s.data" v-if="s.mode==='forshow' || s.mode==='foredit'"> 
 
-				<div style="position: absolute; top:5px; right:5px;" v-if="s.mode==='foredit'">
-					<button type="button" class="close" style="margin-left:5px;" title="刪除" aria-label="刪除" v-on:click="ckdelete(ss,iss)">
-						<span class="glyphicon glyphicon-remove-sign"></span>
+				<div style="position: absolute; top:5px; right:5px; text-align:right;" v-if="s.mode==='foredit'">
+					<button class="iconbtn iconbtn-hover" type="button" title="複製" aria-label="複製" v-on:click.stop="ckcopy(ss,iss)">
+						<span class="glyphicon glyphicon-floppy-save"></span>
 					</button>
-					<button type="button" class="close" style="margin-left:5px;" title="往下" aria-label="往下" v-on:click="ckmove(ss,iss,'down')" v-bind:disabled="iss===s.data.length-1">
-						<span class="glyphicon glyphicon-chevron-down"></span>
-					</button>
-					<button type="button" class="close" style="margin-left:5px;" title="往上" aria-label="往上" v-on:click="ckmove(ss,iss,'up')" v-bind:disabled="iss===0">
-						<span class="glyphicon glyphicon-chevron-up"></span>
-					</button>
-					<button type="button" class="close" style="margin-left:5px;" title="編輯" aria-label="編輯" v-on:click="ckupdate(ss,iss)">
+					<button class="iconbtn iconbtn-hover" type="button" title="編輯" aria-label="編輯" v-on:click.stop="ckupdate(ss,iss)">
 						<span class="glyphicon glyphicon-edit"></span>
 					</button>
-					<button type="button" class="close" style="margin-left:5px;" title="複製" aria-label="複製" v-on:click="ckcopy(ss,iss)">
-						<span class="glyphicon glyphicon-floppy-save"></span>
+					<button v-bind:class="{ 'iconbtn':true, 'iconbtn-hover':iss!==0, 'iconbtn-disabled':iss===0 }" type="button" title="往上" aria-label="往上" v-on:click.stop="ckmove(ss,iss,'up')" v-bind:disabled="iss===0">
+						<span class="glyphicon glyphicon-chevron-up"></span>
+					</button>
+					<button v-bind:class="{ 'iconbtn':true, 'iconbtn-hover':iss!==s.data.length-1, 'iconbtn-disabled':iss===s.data.length-1 }" type="button" title="往下" aria-label="往下" v-on:click.stop="ckmove(ss,iss,'down')" v-bind:disabled="iss===s.data.length-1">
+						<span class="glyphicon glyphicon-chevron-down"></span>
+					</button>
+					<button class="iconbtn iconbtn-hover" type="button" title="刪除" aria-label="刪除" v-on:click.stop="ckdelete(ss,iss)">
+						<span class="glyphicon glyphicon-remove-sign"></span>
 					</button>
 				</div>
 
@@ -127,7 +150,12 @@
 				let vo = this;
 
 				//focus
-				$(vo.$refs.save).focus();
+				if(!iser(vo.s.focus)){
+					$('div[iss="'+vo.s.focus+'"]') .find('button[title="編輯"]').focus();
+				}
+				else{
+					$(vo.$refs.save).focus();
+				}
 
 			},
 
@@ -138,7 +166,7 @@
 
 				let c='canhov canhov-lightgray';
 				if(vo.s.focus===iss){
-					c='canactive';
+					c='nowactive';
 				}
 				
 				return c;
@@ -148,7 +176,7 @@
 				//console.log('methods itemstyle')
 
 				let o={};
-				o['padding-right']='140px';
+				o['padding-right']='110px';
 				if(ss.kind==='mathml'){
 					o['text-align']='center';
 					o['padding-top']='5px';
@@ -164,6 +192,10 @@
 
 				//n
 				let n=vo.s.data.length;
+
+				//ltfcs
+				let ltfcs=_.fill(n, 0);;
+				ltfcs[vo.s.focus]=1;
 
 				//new index
 				let r=[];
@@ -192,9 +224,13 @@
 					r.push(newinx);
 				});
 
-				//at
+				//at focus
+				ltfcs=_.at(ltfcs, r);
+				vo.s.focus=_.indexOf(ltfcs,1)
+
+				//at data
 				vo.s.data=_.at(vo.s.data, r);
-				
+
 			},
 
 			ckcopy: function (ss,iss) {
@@ -346,16 +382,11 @@
 	function editor_recover(){
 		//復原文件編輯視窗捲軸與限制駐點功能
 
-		//overflow-y
-		$('#divmodal_doceditor').css('overflow-y','auto');
+		//afterhide
+		lm_afterhide('divmodal_doceditor');
 
-		//trapfocus
-		trapfocus('divmodal_doceditor', 'doceditor');
-		
 		//defaultfocus
-		_.delay(function(){
-			vo_editor.$refs.comp.defaultfocus();
-		},500)
+		vo_editor.$refs.comp.defaultfocus();
 
 	}
 
@@ -382,7 +413,7 @@
 
 			//datanew
 			let datanew=tinymce.get('div_editor_normaltext').getContent();
-			
+
 			//resolve
 			df.resolve(datanew);
 
@@ -392,7 +423,7 @@
 		})
 
 		//cancel
-		div.on('hide.bs.modal', function (e) {
+		div.off().on('hidden.bs.modal', function (e) {
 
 			//recover
 			editor_recover();
@@ -402,12 +433,15 @@
 
 		});
 
+		//beforeshow
+		lm_beforeshow('divmodal_doceditor');
+
 		//show, 先載入資料再顯示使用者體驗比較好
 		div.modal('show');
 
         //autofocus
         _.delay(function(){
-            tinymce.get('divmodal_qanda_question').focus();
+            tinymce.get('div_editor_normaltext').focus();
         },500)
         
 		return df;
@@ -446,7 +480,7 @@
 		})
 
 		//cancel
-		div.on('hide.bs.modal', function (e) {
+		div.off().on('hidden.bs.modal', function (e) {
 
 			//recover
 			editor_recover();
@@ -456,12 +490,15 @@
 
 		});
 
+		//beforeshow
+		lm_beforeshow('divmodal_doceditor');
+
 		//show, 先載入資料再顯示使用者體驗比較好
 		div.modal('show');
 
         //autofocus
         _.delay(function(){
-            //
+            editor_mathml.focus();
         },500)
         
 		return df;
@@ -480,7 +517,7 @@
 		//refresh
 		editor_refresh(data);
 
-		//save
+		//ok
 		$('#btn_editor_document_save').off().on('click',function(){
 
 			//resolve
@@ -492,11 +529,11 @@
 		})
 
 		//cancel
-		div.on('hide.bs.modal', function (e) {
+		div.off().on('hidden.bs.modal', function (e) {
 
 			//untrapfocus
-			untrapfocus('divmodal_doceditor', 'doceditor');
-
+			div.untrapfocus();
+			
 			//reject
 			df.reject();
 
@@ -504,6 +541,9 @@
 
 		//show
 		div.modal('show');
+
+		//trapfocus
+		div.trapfocus();
 
 		//autofocus
 		_.delay(function(){
@@ -517,7 +557,7 @@
 </script>
 	
 
-<div id="divmodal_doceditor" class="modal fade" Atabindex="-1" role="dialog" style="z-index:10000;" aria-labelledby="divmodal_doceditor_title" aria-hidden="true">
+<div id="divmodal_doceditor" class="modal fade" tabindex="-1" role="dialog" style="z-index:10000;" aria-labelledby="divmodal_doceditor_title" aria-hidden="true">
     <div class="modal-dialog" role="document" style="width:95%;">
         <div class="modal-content alert-info" style="background-color: #fff;">
             <div class="modal-header">

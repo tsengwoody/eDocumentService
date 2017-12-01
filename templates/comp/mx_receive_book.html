@@ -8,12 +8,15 @@
         //下載書籍或email寄送
 
         //me
-        me=$(me)
+        me=$(me);
+
+        //div
+        let div=$('#divmodal_downloadbook');
 
         //default
         receivebook_default();
 
-        //submit
+        //ok
         $('#divmodal_downloadbook_submit').off().on('click', function(){
 
             //ISBN
@@ -65,9 +68,14 @@
             })
 
             //hide
-            $('#divmodal_downloadbook').modal('hide');
+            div.modal('hide');
 
         });
+
+        //cancel
+		div.off().on('hidden.bs.modal', function (e) {
+            //none
+        })
 
         //enter
         $("#divmodal_downloadbook_password").off().on('keypress',function(event){
@@ -78,7 +86,7 @@
         });
 
         //show
-        $('#divmodal_downloadbook').modal('show');
+        div.modal('show');
 
         //autofocus
         _.delay(function(){

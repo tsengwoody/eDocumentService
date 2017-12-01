@@ -600,15 +600,15 @@ function keyspace2enter(event,me){
 }
 
 
-function trapfocus(id, namespace) {
+function trapfocus() {
     //trap focus
 
-    let element = $('#'+id);
+    let element = this;
+    let namespace = element.attr('id');
     let focusableEls = element.find('a, object, :input, iframe, [tabindex]');
     let firstFocusableEl = focusableEls.first()[0];
     let lastFocusableEl = focusableEls.last()[0];
     let KEYCODE_TAB = 9;
-
     element.on('keydown.'+ namespace, function(e) {
         let isTabPressed = (e.key === 'Tab' || e.keyCode === KEYCODE_TAB);
 
@@ -633,10 +633,68 @@ function trapfocus(id, namespace) {
 
     });
 }
-function untrapfocus(id, namespace) {
+function untrapfocus() {
     //un-trap focus
-    let element = $('#'+id);
+    
+    let element = this;
+    let namespace = element.attr('id');
     element.off('keydown.' + namespace);
+}
+(function($) {
+    //註冊trapfocus,untrapfocus
+    $.fn.extend({
+        trapfocus: trapfocus,
+        untrapfocus: untrapfocus
+     });
+})(jQuery);
+
+
+let modalinfor={};
+function lm_beforeshow(id){
+    //modal顯示之前紀錄會被遮蔽之視窗
+
+    //o
+    let o=$('#'+id);
+
+    //r
+    let r={
+        'id':id,
+        'overflow-y':o.css('overflow-y'),
+        'scroll-top':o.scrollTop(),
+    };
+
+    //save r
+    modalinfor[id]=r;
+
+    //untrapfocus
+    o.untrapfocus();
+
+}
+
+
+function lm_afterhide(id){
+    //modal隱藏之後還原被遮蔽之視窗
+
+    //get r
+    let r=modalinfor[id];
+
+    //o
+    let o=$('#'+r['id']);
+
+    //overflow-y
+    o.css('overflow-y',r['overflow-y']);
+
+    //scroll-top
+    _.delay(function(){
+
+        //等視窗捲軸出現才恢復
+        o.scrollTop(r['scroll-top'])
+        
+    },750)
+
+    //trapfocus
+    o.trapfocus();
+    
 }
 
 

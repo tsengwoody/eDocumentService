@@ -95,6 +95,9 @@
         //df
         let df = $.Deferred();
 
+        //div
+        let div=$('#divmodal_findbook');
+
         //default
         findbook_default();
 
@@ -155,7 +158,7 @@
                 $('#divmodal_findbook_page_pick').fadeIn();
                 $('#divmodal_findbook_find').hide();
                 $('#divmodal_findbook_pick').fadeIn();
-                $('#divmodal_findbook').find('div.modal-dialog').css('width','90%');
+                div.find('div.modal-dialog').css('width','90%');
 
                 //gentable
                 gentable('divmodal_findbook_page_pick_list','divmodal_findbook_page_pick_list_table',bs);
@@ -206,12 +209,12 @@
             df.resolve(bs[index]);
 
             //hide
-            $('#divmodal_findbook').modal('hide');
+            div.modal('hide');
 
         });
 
         //cancel
-        $('#divmodal_findbook').on('hide.bs.modal', function (e) {
+		div.off().on('hidden.bs.modal', function (e) {
 
             //reject
             df.reject();
@@ -227,7 +230,7 @@
         });
 
         //show
-        $('#divmodal_findbook').modal('show');
+        div.modal('show');
 
         //autofocus
         _.delay(function(){

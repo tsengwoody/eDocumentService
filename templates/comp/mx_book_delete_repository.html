@@ -32,8 +32,8 @@
         });
 
         //cancel
-        $('#divmodal_bookdeleterepository_cancel').off().on('click', function () {
-            div.modal('hide');
+		div.off().on('hidden.bs.modal', function (e) {
+            //none
         })
 
         //enter
@@ -77,7 +77,7 @@
                 
             </div>
             <div class="modal-footer">
-                <button id="divmodal_bookdeleterepository_cancel" type="button" class="btn btn-danger">取消</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
                 <button id="divmodal_bookdeleterepository_ok" type="button" class="btn btn-primary">確定</button>
             </div>
         </div>

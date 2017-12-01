@@ -80,9 +80,29 @@ html, body {
     border-color: rgb(200,200,200);
     background-color: rgb(252,252,252);
 }
-.canactive {
+.nowactive {
 	border:1px solid #ffccbe;
 	background-color: #fffcfe;
+}
+.nowactive {
+	border:1px solid #ffccbe;
+	background-color: #fffcfe;
+}
+
+
+.iconbtn {
+	margin:0px 3px 3px 0px;
+	padding:0;
+	border:0;
+	background-color:rgba(0,0,0,0);
+	opacity:0.3;
+	transition: all 0.25s linear;
+}
+.iconbtn-hover:hover {
+	opacity:1;
+}
+.iconbtn-disabled {
+	opacity:0;
 }
 
 

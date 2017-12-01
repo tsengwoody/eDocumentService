@@ -63,8 +63,8 @@
         });
 
         //cancel
-        $('#divmodal_UserDisabilityCard_cancel').off().on('click', function () {
-            div.modal('hide');
+		div.off().on('hidden.bs.modal', function (e) {
+            //none
         })
 
         //show
@@ -107,7 +107,7 @@
    
             </div>
             <div class="modal-footer">
-                <button id="divmodal_UserDisabilityCard_cancel" type="button" class="btn btn-danger">取消</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
                 <button id="divmodal_UserDisabilityCard_upload" type="button" class="btn btn-primary">上傳</button>
             </div>
         </div>

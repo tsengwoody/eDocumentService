@@ -33,19 +33,19 @@ MathML 編輯 demo
 				'data': '<math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><msqrt><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><msup><mi>b</mi><mrow><mn>0</mn><mo>.</mo><mn>5</mn></mrow></msup><mo>-</mo><mn>4</mn><mi>a</mi><mi>c</mi></msqrt><mrow><mn>2</mn><mi>n</mi></mrow></mfrac></math>',
 			},
 		];
-		editor_ele_setdata($('#test'),d);
+		editor_forele_setdata($('#test'),d);
 
 	});
 
 
-	function editor_ele_setdata(me,data){
+	function editor_forele_setdata(me,data){
 		//元素給予資料
 		me=$(me);
 		me.attr('data-editor',o2b(data));
 	}
 
 
-	function editor_ele_getdata(me){
+	function editor_forele_getdata(me){
 		//元素讀取資料
 		me=$(me);
 		let h=me.attr('data-editor');
@@ -53,12 +53,12 @@ MathML 編輯 demo
 	}
 
 
-	function editor_ele_show(me){
+	function editor_forele_show(me){
 		//元素顯示編修內含資料
-		let d_in=editor_ele_getdata(me);
+		let d_in=editor_forele_getdata(me);
 		editor_show(d_in)
 		.done(function(d_out){
-			editor_ele_setdata(me,d_out);
+			editor_forele_setdata(me,d_out);
 		})
 	}
 
@@ -66,7 +66,7 @@ MathML 編輯 demo
 </script>
 
 
-<button id="test" onclick="editor_ele_show(this)">測試按鈕</button>
+<button id="test" onclick="editor_forele_show(this)">測試按鈕</button>
 
 
 {% endblock %}

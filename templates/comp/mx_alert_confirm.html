@@ -25,14 +25,21 @@
 
         //ok
         $('#divmodal_alertconfirm_ok').off().on('click', function(){
+
+            //resolve
             df.resolve();
+
+			//hide
             div.modal('hide');
+            
         });
 
-        //cancel
-        $('#divmodal_alertconfirm_cancel').off().on('click', function () {
+		//cancel
+		div.off().on('hidden.bs.modal', function (e) {
+
+            //reject
             df.reject();
-            div.modal('hide');
+
         })
 
         //show
@@ -67,7 +74,7 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button id="divmodal_alertconfirm_cancel" type="button" class="btn btn-danger">取消</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
                 <button id="divmodal_alertconfirm_ok" type="button" class="btn btn-primary">確定</button>
             </div>
         </div>

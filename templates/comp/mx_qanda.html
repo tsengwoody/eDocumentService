@@ -42,7 +42,7 @@
         });
 
         //cancel
-        div.on('hide.bs.modal', function (e) {
+		div.off().on('hidden.bs.modal', function (e) {
 
             //reject
             df.reject();
