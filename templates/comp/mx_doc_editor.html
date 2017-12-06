@@ -1,21 +1,19 @@
-
-
 <script>
 	let vo_editor;
 	let editor_mathml;
-	let editor_svg={};
+	let editor_svg = {};
 
 
-	$(function(){
+	$(function () {
 
 		//wiris
-		editor_mathml = com.wiris.jsEditor.JsEditor.newInstance({'language': 'zh'});
+		editor_mathml = com.wiris.jsEditor.JsEditor.newInstance({ 'language': 'zh' });
 		editor_mathml.insertInto(document.getElementById('div_editor_mathml'));
 
 		//tinymce
 		tinymce.init({
 			selector: "#div_editor_normaltext",
-			language:"zh_TW",
+			language: "zh_TW",
 			plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
 			toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample',
 		});
@@ -24,6 +22,7 @@
 
 
 </script>
+
 
 
 <script>
@@ -39,50 +38,50 @@
 	`,
 		props: ['s'],
 		methods: {
-			render:function(ss){
+			render: function (ss) {
 				//console.log('methods render')
 
 				let vo = this;
 
 				//ele
-				let ele=vo.$refs.item;
-				let op=$(vo.$refs.panel);
+				let ele = vo.$refs.item;
+				let op = $(vo.$refs.panel);
 
 				//mathml to svg
-				if(ss.kind==='mathml'){
+				if (ss.kind === 'mathml') {
 
 					//key
 					let key = md5(ss.data);
 
-					if(haskey(editor_svg,key)){
-						
+					if (haskey(editor_svg, key)) {
+
 						//return svg
 						return editor_svg[key]
 
 					}
-					else{
+					else {
 
 						//hide
-						op.css('opacity',0);
+						op.css('opacity', 0);
 
 						//delay convert
-						_.delay(function(){
+						_.delay(function () {
 
 							//convert
-							MathJax.Hub.Queue(["Typeset",MathJax.Hub,ele],function(){
+							MathJax.Hub.Queue(["Typeset", MathJax.Hub, ele], function () {
 
 								//svg
-								let svg=$(vo.$refs.panel).children().html(); //mathjax會對原ele進行替換，此處無法取得item只有panel
+								let svg = $(vo.$refs.panel).children().html(); //mathjax會對原ele進行替換，此處無法取得item只有panel
 
 								//save svg
-								editor_svg[key]=svg;
+								editor_svg[key] = svg;
 
 								//show
-								op.animate({'opacity':1},300);
-							
+								op.animate({ 'opacity': 1 }, 300);
+
 							});
 
-						},1)
+						}, 1)
 
 					}
 
@@ -144,80 +143,80 @@
 		props: ['s'],
 		methods: {
 
-			defaultfocus:function(){
+			defaultfocus: function () {
 				//console.log('methods defaultfocus')
 
 				let vo = this;
 
 				//focus
-				if(!iser(vo.s.focus)){
-					$('div[iss="'+vo.s.focus+'"]') .find('button[title="編輯"]').focus();
+				if (!iser(vo.s.focus)) {
+					$('div[iss="' + vo.s.focus + '"]').find('button[title="編輯"]').focus();
 				}
-				else{
+				else {
 					$(vo.$refs.save).focus();
 				}
 
 			},
 
-			panelclass:function(ss,iss){
+			panelclass: function (ss, iss) {
 				//console.log('methods panelclass')
 
 				let vo = this;
 
-				let c='canhov canhov-lightgray';
-				if(vo.s.focus===iss){
-					c='nowactive';
+				let c = 'canhov canhov-lightgray';
+				if (vo.s.focus === iss) {
+					c = 'nowactive';
 				}
-				
+
 				return c;
 			},
 
-			itemstyle:function(ss){
+			itemstyle: function (ss) {
 				//console.log('methods itemstyle')
 
-				let o={};
-				o['padding-right']='110px';
-				if(ss.kind==='mathml'){
-					o['text-align']='center';
-					o['padding-top']='5px';
+				let o = {};
+				o['padding-right'] = '110px';
+				if (ss.kind === 'mathml') {
+					o['text-align'] = 'center';
+					o['padding-top'] = '5px';
 				}
-				
+
 				return o;
 			},
 
-			ckmove: function (ss,iss,mode) {
+			ckmove: function (ss, iss, mode) {
 				//console.log('methods ckmove')
 
 				let vo = this;
 
 				//n
-				let n=vo.s.data.length;
+				let n = vo.s.data.length;
 
 				//ltfcs
-				let ltfcs=_.fill(n, 0);;
-				ltfcs[vo.s.focus]=1;
+				let ltfcs = _.fill(n, 0);;
+				ltfcs[vo.s.focus] = 1;
 
 				//new index
-				let r=[];
-				_.each(_.times(n),function(ind){
-					let newinx=ind;
-					if(mode==='up'){
-						if(iss>0){
-							if(ind===iss-1){
-								newinx=iss;
+				let r = [];
+				_.each(_.times(n), function (ind) {
+					let newinx = ind;
+					if (mode === 'up') {
+						if (iss > 0) {
+							if (ind === iss - 1) {
+								newinx = iss;
 							}
-							else if(ind===iss){
-								newinx=iss-1;
+							else if (ind === iss) {
+								newinx = iss - 1;
 							}
 						}
 					}
-					else if(mode==='down'){
-						if(iss<n-1){
-							if(ind===iss+1){
-								newinx=iss;
+					else if (mode === 'down') {
+						if (iss < n - 1) {
+							if (ind === iss + 1) {
+								newinx = iss;
 							}
-							else if(ind===iss){
-								newinx=iss+1;
+							else if (ind === iss) {
+								newinx = iss + 1;
 							}
 						}
 					}
@@ -225,65 +224,65 @@
 				});
 
 				//at focus
-				ltfcs=_.at(ltfcs, r);
-				vo.s.focus=_.indexOf(ltfcs,1)
+				ltfcs = _.at(ltfcs,  r);
+				vo.s.focus = _.indexOf(ltfcs, 1)
 
 				//at data
-				vo.s.data=_.at(vo.s.data, r);
+				vo.s.data = _.at(vo.s.data,  r);
 
 			},
 
-			ckcopy: function (ss,iss) {
+			ckcopy: function (ss, iss) {
 				//console.log('methods ckcopy')
 
 				let vo = this;
 
 				//new data
-				let r=[];
-				_.each(vo.s.data,function(v,k){
-					if(k===iss){
+				let r = [];
+				_.each(vo.s.data, function (v, k) {
+					if (k === iss) {
 						r.push(_.cloneDeep(v));
 					}
 					r.push(v);
 				})
 
 				//biind
-				vo.s.data=r;
+				vo.s.data = r;
 
 			},
 
-			ckupdate: function (ss,iss) {
+			ckupdate: function (ss, iss) {
 				//console.log('methods ckupdate')
 
 				let vo = this;
 
-				if(ss.kind==='normal'){
+				if (ss.kind === 'normal') {
 					editor_normal_show(ss.data)
-					.done(function(data){
-						ss.data=data;
-					})
+						.done(function (data) {
+							ss.data = data;
+						})
 				}
-				else if(ss.kind==='mathml'){
+				else if (ss.kind === 'mathml') {
 					editor_mathml_show(ss.data)
-					.done(function(data){
-						ss.data=data;
-					})
+						.done(function (data) {
+							ss.data = data;
+						})
 				}
 
 			},
 
-			ckdelete: function (ss,iss) {
+			ckdelete: function (ss, iss) {
 				//console.log('methods ckdelete')
 
 				let vo = this;
 
 				//reject
-				let r=_.reject(vo.s.data, function(v,k){
-					return k===iss;
+				let r = _.reject(vo.s.data,  function (v, k) {
+					return k === iss;
 				});
 
 				//biind
-				vo.s.data=r;
+				vo.s.data = r;
 
 			},
 
@@ -294,47 +293,47 @@
 
 				//df
 				let df;
-				if(kind==='normal'){
-					df=editor_normal_show('')
+				if (kind === 'normal') {
+					df = editor_normal_show('')
 				}
-				else if(kind==='mathml'){
-					df=editor_mathml_show('')
+				else if (kind === 'mathml') {
+					df = editor_mathml_show('')
 				}
 
 				//done
-				df.done(function(data){
-					
+				df.done(function (data) {
+
 					//ss
-					let ss={
-						kind:kind,
-						data:data,
+					let ss = {
+						kind: kind,
+						data: data,
 					};
 
-					if(iser(vo.s.focus)){
+					if (iser(vo.s.focus)) {
 
 						//push
 						vo.s.data.push(ss);
 
 					}
-					else if(vo.s.focus===vo.s.data.length-1){
+					else if (vo.s.focus === vo.s.data.length - 1) {
 
 						//push
 						vo.s.data.push(ss);
 
 					}
-					else{
+					else {
 
 						//new data
-						let r=[];
-						_.each(vo.s.data,function(v,k){
+						let r = [];
+						_.each(vo.s.data, function (v, k) {
 							r.push(v);
-							if(vo.s.focus===k){
+							if (vo.s.focus === k) {
 								r.push(ss);
 							}
 						})
 
 						//bind
-						vo.s.data=r;
+						vo.s.data = r;
 
 					}
 
@@ -347,27 +346,27 @@
 
 
 	//editor_refresh
-	function editor_refresh(arr){
+	function editor_refresh(arr) {
 
 		//opt
-		let opt={
+		let opt = {
 			el: '#' + 'divmodal_editor_list',
 			data: {
-				s:{
-					data:arr,
-					focus:null,
-					mode:'foredit', //forshow foredit
+				s: {
+					data: arr,
+					focus: null,
+					mode: 'foredit', //forshow foredit
 				}
 			},
 		};
-		
+
 		//vo
-		if(iser(vo_editor)){
+		if (iser(vo_editor)) {
 			vo_editor = new Vue(opt);
 		}
-		else{
-			vo_editor.s.data=arr;
-			vo_editor.s.focus=null;
+		else {
+			vo_editor.s.data = arr;
+			vo_editor.s.focus = null;
 		}
 
 	}
@@ -379,7 +378,7 @@
 <script>
 
 
-	function editor_recover(){
+	function editor_recover() {
 		//復原文件編輯視窗捲軸與限制駐點功能
 
 		//afterhide
@@ -391,28 +390,28 @@
 	}
 
 
-	function editor_normal_show(data){
+	function editor_normal_show(data) {
 		//顯示一般文字編輯視窗
 
 		//df
 		let df = $.Deferred();
 
 		//div
-		let div=$('#divmodal_normaltext');
+		let div = $('#divmodal_normaltext');
 
 		//data
-		if (iser(data)){
-			data='';
+		if (iser(data)) {
+			data = '';
 		}
 
 		//setContent
 		tinymce.get('div_editor_normaltext').setContent(data);
 
 		//click save
-		$('#btn_editor_normaltext_save').off().on('click',function(){
+		$('#btn_editor_normaltext_save').off().on('click', function () {
 
 			//datanew
-			let datanew=tinymce.get('div_editor_normaltext').getContent();
+			let datanew = tinymce.get('div_editor_normaltext').getContent();
 
 			//resolve
 			df.resolve(datanew);
@@ -439,38 +438,38 @@
 		//show, 先載入資料再顯示使用者體驗比較好
 		div.modal('show');
 
-        //autofocus
-        _.delay(function(){
-            tinymce.get('div_editor_normaltext').focus();
-        },500)
-        
+		//autofocus
+		_.delay(function () {
+			tinymce.get('div_editor_normaltext').focus();
+		}, 500)
+
 		return df;
 	}
 
 
-	function editor_mathml_show(data){
+	function editor_mathml_show(data) {
 		//顯示mathml編輯視窗
 
 		//df
 		let df = $.Deferred();
 
 		//div
-		let div=$('#divmodal_mathml');
+		let div = $('#divmodal_mathml');
 
 		//data
-		if (iser(data)){
-			data='<math></math>';
+		if (iser(data)) {
+			data = '<math></math>';
 		}
 
 		//setMathML
 		editor_mathml.setMathML(data);
 
 		//click save
-		$('#btn_editor_mathml_save').off().on('click',function(){
+		$('#btn_editor_mathml_save').off().on('click', function () {
 
 			//datanew
-			let datanew=editor_mathml.getMathML();
-			
+			let datanew = editor_mathml.getMathML();
+
 			//resolve
 			df.resolve(datanew);
 
@@ -496,29 +495,29 @@
 		//show, 先載入資料再顯示使用者體驗比較好
 		div.modal('show');
 
-        //autofocus
-        _.delay(function(){
-            editor_mathml.focus();
-        },500)
-        
+		//autofocus
+		_.delay(function () {
+			editor_mathml.focus();
+		}, 500)
+
 		return df;
 	}
 
 
-	function editor_show(data){
+	function editor_show(data) {
 		//顯示文件編輯器
 
 		//df
 		let df = $.Deferred();
 
 		//div
-		let div=$('#divmodal_doceditor');
+		let div = $('#divmodal_doceditor');
 
 		//refresh
 		editor_refresh(data);
 
 		//ok
-		$('#btn_editor_document_save').off().on('click',function(){
+		$('#btn_editor_document_save').off().on('click', function () {
 
 			//resolve
 			df.resolve(vo_editor.s.data);
@@ -533,7 +532,7 @@
 
 			//untrapfocus
 			div.untrapfocus();
-			
+
 			//reject
 			df.reject();
 
@@ -546,72 +545,72 @@
 		div.trapfocus();
 
 		//autofocus
-		_.delay(function(){
+		_.delay(function () {
 			vo_editor.$refs.comp.defaultfocus();
-		},500)
-		
+		}, 500)
+
 		return df;
 	}
 
 
 </script>
-	
 
-<div id="divmodal_doceditor" class="modal fade" tabindex="-1" role="dialog" style="z-index:10000;" aria-labelledby="divmodal_doceditor_title" aria-hidden="true">
-    <div class="modal-dialog" role="document" style="width:95%;">
-        <div class="modal-content alert-info" style="background-color: #fff;">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 id="divmodal_doceditor_title" class="modal-title" style="color:#222;">文件編輯器</h4>
+
+<div id="divmodal_doceditor" class="modal fade" tabindex="-1" role="dialog" style="z-index:10000;" aria-labelledby="divmodal_doceditor_title"
+ aria-hidden="true">
+	<div class="modal-dialog" role="document" style="width:95%;">
+		<div class="modal-content alert-info" style="background-color: #fff;">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 id="divmodal_doceditor_title" class="modal-title" style="color:#222;">文件編輯器</h4>
 			</div>
 			<vu-editor id="divmodal_editor_list" ref="comp" v-bind:s="s"></vu-editor>
-        </div>
-    </div>
+		</div>
+	</div>
 </div>
 
 
-<div id="divmodal_normaltext" class="modal fade" tabindex="-1" role="dialog" style="z-index:10001;" aria-labelledby="divmodal_normaltext_title" aria-hidden="true">
-    <div class="modal-dialog" role="document" style="width:80%;">
-        <div class="modal-content alert-info" style="background-color: #fff;">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 id="divmodal_normaltext_title" class="modal-title" style="color:#222;">文字編輯器</h4>
-            </div>
-            <div style="padding:20px 20px; background-color:#fff; color:#666;">
+<div id="divmodal_normaltext" class="modal fade" tabindex="-1" role="dialog" style="z-index:10001;" aria-labelledby="divmodal_normaltext_title"
+ aria-hidden="true">
+	<div class="modal-dialog" role="document" style="width:80%;">
+		<div class="modal-content alert-info" style="background-color: #fff;">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 id="divmodal_normaltext_title" class="modal-title" style="color:#222;">文字編輯器</h4>
+			</div>
+			<div style="padding:20px 20px; background-color:#fff; color:#666;">
 				<div id="div_editor_normaltext"></div>
-            </div>
-            <div class="modal-footer">
+			</div>
+			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
 				<button id="btn_editor_normaltext_save" type="button" class="btn btn-primary">儲存</button>
-            </div>
-        </div>
-    </div>
+			</div>
+		</div>
+	</div>
 </div>
 
 
-<div id="divmodal_mathml" class="modal fade" tabindex="-1" role="dialog" style="z-index:10001;" aria-labelledby="divmodal_mathml_title" aria-hidden="true">
-    <div class="modal-dialog" role="document" style="width:80%;">
-        <div class="modal-content alert-info" style="background-color: #fff;">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 id="divmodal_mathml_title" class="modal-title" style="color:#222;">MathML編輯器</h4>
-            </div>
-            <div style="padding:20px 20px; background-color:#fff; color:#666;">
+<div id="divmodal_mathml" class="modal fade" tabindex="-1" role="dialog" style="z-index:10001;" aria-labelledby="divmodal_mathml_title"
+ aria-hidden="true">
+	<div class="modal-dialog" role="document" style="width:80%;">
+		<div class="modal-content alert-info" style="background-color: #fff;">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 id="divmodal_mathml_title" class="modal-title" style="color:#222;">MathML編輯器</h4>
+			</div>
+			<div style="padding:20px 20px; background-color:#fff; color:#666;">
 				<div id="div_editor_mathml"></div>
-            </div>
-            <div class="modal-footer">
+			</div>
+			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
 				<button id="btn_editor_mathml_save" type="button" class="btn btn-primary">儲存</button>
-            </div>
-        </div>
-    </div>
+			</div>
+		</div>
+	</div>
 </div>
-
-
-

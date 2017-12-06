@@ -1,124 +1,124 @@
 <script>
 
-    function receivebook_default(){
-        $('#divmodal_downloadbook_password').val('');
-    }
+	function receivebook_default() {
+		$('#divmodal_downloadbook_password').val('');
+	}
 
-    function receivebook(me, ebook, action){
-        //下載書籍或email寄送
+	function receivebook(me, ebook, action) {
+		//下載書籍或email寄送
 
-        //me
-        me=$(me);
+		//me
+		me = $(me);
 
-        //div
-        let div=$('#divmodal_downloadbook');
+		//div
+		let div = $('#divmodal_downloadbook');
 
-        //default
-        receivebook_default();
+		//default
+		receivebook_default();
 
-        //ok
-        $('#divmodal_downloadbook_submit').off().on('click', function(){
+		//ok
+		$('#divmodal_downloadbook_submit').off().on('click', function () {
 
-            //ISBN
-            let ISBN=me.attr('ISBN');
+			//ISBN
+			let ISBN = me.attr('ISBN');
 
-            //password
-            let password=$('#divmodal_downloadbook_password').val();
+			//password
+			let password = $('#divmodal_downloadbook_password').val();
 
-            //transferData
-            let transferData={
-                'action':action,
-                'password':password,
-            };
-            //console.log(transferData)
+			//transferData
+			let transferData = {
+				'action': action,
+				'password': password,
+			};
+			//console.log(transferData)
 
-            //aj
-            let url;
-            let df;
-            if(ebook===false){
-                url='/ebookSystem/book_download/'+ISBN;
-                if(action==='download'){
-                    //console.log('aj_binary',ebook,url,transferData)
-                    df=aj_binary(url, transferData);
-                }
-                else{
-                    //console.log('aj_post',ebook,url,transferData)
-                    df=aj_post(url, transferData);
-                }
-            }
-            else{
-                url='/ebookSystem/ebook_download/'+ISBN;
-                if(action==='download'){
-                    //console.log('aj_binary',ebook,url,transferData)
-                    df=aj_binary(url, transferData);
-                }
-                else{
-                    //console.log('aj_post',ebook,url,transferData)
-                    df=aj_post(url, transferData);
-                }
-            }
+			//aj
+			let url;
+			let df;
+			if (ebook === false) {
+				url = '/ebookSystem/book_download/' + ISBN;
+				if (action === 'download') {
+					//console.log('aj_binary',ebook,url,transferData)
+					df = aj_binary(url, transferData);
+				}
+				else {
+					//console.log('aj_post',ebook,url,transferData)
+					df = aj_post(url, transferData);
+				}
+			}
+			else {
+				url = '/ebookSystem/ebook_download/' + ISBN;
+				if (action === 'download') {
+					//console.log('aj_binary',ebook,url,transferData)
+					df = aj_binary(url, transferData);
+				}
+				else {
+					//console.log('aj_post',ebook,url,transferData)
+					df = aj_post(url, transferData);
+				}
+			}
 
-            //df
-            df
-            .done(function(data){
-                alertmessage(data['status'], data['message']);
-            })
-            .fail(function(data){
-                alertmessage(data['status'], data['message']);
-            })
+			//df
+			df
+				.done(function (data) {
+					alertmessage(data['status'], data['message']);
+				})
+				.fail(function (data) {
+					alertmessage(data['status'], data['message']);
+				})
 
-            //hide
-            div.modal('hide');
+			//hide
+			div.modal('hide');
 
-        });
+		});
 
-        //cancel
+		//cancel
 		div.off().on('hidden.bs.modal', function (e) {
-            //none
-        })
+			//none
+		})
 
-        //enter
-        $("#divmodal_downloadbook_password").off().on('keypress',function(event){
-            if (event.which===13) {
-                event.preventDefault();
-                $('#divmodal_downloadbook_submit').click();
-            }
-        });
+		//enter
+		$("#divmodal_downloadbook_password").off().on('keypress', function (event) {
+			if (event.which === 13) {
+				event.preventDefault();
+				$('#divmodal_downloadbook_submit').click();
+			}
+		});
 
-        //show
-        div.modal('show');
+		//show
+		div.modal('show');
 
-        //autofocus
-        _.delay(function(){
-            $('#divmodal_downloadbook_password').focus();
-        },500)
-        
-    }
+		//autofocus
+		_.delay(function () {
+			$('#divmodal_downloadbook_password').focus();
+		}, 500)
+
+	}
 
 </script>
 
 
-<div id="divmodal_downloadbook" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_downloadbook_title" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content alert-info" style="background-color: #f5f5f5;">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 id="divmodal_downloadbook_title" class="modal-title">取得書籍</h4>
-            </div>
-            <div style="padding:40px 10px 20px 10px; background-color:#fafafa;">
-                <div class="form-group form-inline text-center">
-                    <label>
-                        <span>請輸入密碼</span>
-                        <input id="divmodal_downloadbook_password" type="password" class="form-control">
-                    </label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button id="divmodal_downloadbook_submit" type="button" class="btn btn-primary">取得</button>
-            </div>
-        </div>
-    </div>
+<div id="divmodal_downloadbook" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_downloadbook_title"
+ aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content alert-info" style="background-color: #f5f5f5;">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 id="divmodal_downloadbook_title" class="modal-title">取得書籍</h4>
+			</div>
+			<div style="padding:40px 10px 20px 10px; background-color:#fafafa;">
+				<div class="form-group form-inline text-center">
+					<label>
+						<span>請輸入密碼</span>
+						<input id="divmodal_downloadbook_password" type="password" class="form-control">
+					</label>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button id="divmodal_downloadbook_submit" type="button" class="btn btn-primary">取得</button>
+			</div>
+		</div>
+	</div>
 </div>
-

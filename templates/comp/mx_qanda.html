@@ -1,96 +1,95 @@
 <script>
 
 	//初始化套件tinymce
-	$(document).ready(function(){
+	$(document).ready(function () {
 
 		//tinymce
 		tinymce.init({
 			selector: "#divmodal_qanda_question, #divmodal_qanda_answer",
-            language:"zh_TW",
-            plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
-            toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample',
+			language: "zh_TW",
+			plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
+			toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample',
 		});
 
 	});
 
-    function aboutqanda(q,a){
-        //顯示與編輯Q&A
+	function aboutqanda(q, a) {
+		//顯示與編輯Q&A
 
-        //df
-        let df = $.Deferred();
+		//df
+		let df = $.Deferred();
 
-        //div
-        let div=$('#divmodal_qanda');
+		//div
+		let div = $('#divmodal_qanda');
 
-        //setContent
-        tinymce.get('divmodal_qanda_question').setContent(q);
-        tinymce.get('divmodal_qanda_answer').setContent(a);
+		//setContent
+		tinymce.get('divmodal_qanda_question').setContent(q);
+		tinymce.get('divmodal_qanda_answer').setContent(a);
 
-        //ok
-        $('#divmodal_qanda_save').off().on('click', function(){
+		//ok
+		$('#divmodal_qanda_save').off().on('click', function () {
 
-            //getContent
-            let nq=tinymce.get('divmodal_qanda_question').getContent();
-            let na=tinymce.get('divmodal_qanda_answer').getContent();
+			//getContent
+			let nq = tinymce.get('divmodal_qanda_question').getContent();
+			let na = tinymce.get('divmodal_qanda_answer').getContent();
 
-            //resolve
-            if(!_.isEqual(q,nq) || !_.isEqual(a,na)){
-                df.resolve(nq,na);
-            }
+			//resolve
+			if (!_.isEqual(q, nq) || !_.isEqual(a, na)) {
+				df.resolve(nq, na);
+			}
 
-            div.modal('hide');
-        });
+			div.modal('hide');
+		});
 
-        //cancel
+		//cancel
 		div.off().on('hidden.bs.modal', function (e) {
 
-            //reject
-            df.reject();
+			//reject
+			df.reject();
 
-        });
+		});
 
-        //show
-        div.modal('show');
+		//show
+		div.modal('show');
 
-        //autofocus
-        _.delay(function(){
-            tinymce.get('divmodal_qanda_question').focus();
-        },500)
-        
-        return df;
-    }
+		//autofocus
+		_.delay(function () {
+			tinymce.get('divmodal_qanda_question').focus();
+		}, 500)
+
+		return df;
+	}
 
 </script>
 
 
 <div id="divmodal_qanda" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_qanda_title" aria-hidden="true">
-    <div class="modal-dialog" role="document" style="width:95%;">
-        <div class="modal-content alert-info" style="background-color: #f5f5f5;">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 id="divmodal_qanda_title" class="modal-title">Q&A視窗</h4>
-            </div>
-            <div style="padding:20px 20px; background-color:#fafafa;">
-                
-                <div class="row">
-                    <div class="col-sm-6">
-                        <label for="divmodal_qanda_question">問題Question</label>
-                        <div id="divmodal_qanda_question"></div>
-                    </div>
-                    <div class="col-sm-6">
-                        <label for="divmodal_qanda_answer">回答Answer</label>
-                        <div id="divmodal_qanda_answer"></div>
-                    </div>
-                </div>
-   
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
-                <button id="divmodal_qanda_save" type="button" class="btn btn-primary">儲存</button>
-            </div>
-        </div>
-    </div>
-</div>
+	<div class="modal-dialog" role="document" style="width:95%;">
+		<div class="modal-content alert-info" style="background-color: #f5f5f5;">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 id="divmodal_qanda_title" class="modal-title">Q&A視窗</h4>
+			</div>
+			<div style="padding:20px 20px; background-color:#fafafa;">
 
+				<div class="row">
+					<div class="col-sm-6">
+						<label for="divmodal_qanda_question">問題Question</label>
+						<div id="divmodal_qanda_question"></div>
+					</div>
+					<div class="col-sm-6">
+						<label for="divmodal_qanda_answer">回答Answer</label>
+						<div id="divmodal_qanda_answer"></div>
+					</div>
+				</div>
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
+				<button id="divmodal_qanda_save" type="button" class="btn btn-primary">儲存</button>
+			</div>
+		</div>
+	</div>
+</div>

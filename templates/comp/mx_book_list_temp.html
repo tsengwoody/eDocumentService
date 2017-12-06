@@ -42,12 +42,12 @@
 
 <script>
 
-	function bk_datatable(divid,data,tabid){
+	function bk_datatable(divid, data, tabid) {
 		//以表格顯示資訊
 
-        //div
-        let div=$('#'+divid);
-        
+		//div
+		let div = $('#' + divid);
+
 		//tabframe
 		div.html($('#tmp_booklist_tabframe').html());
 
@@ -55,7 +55,7 @@
 		$('#tmp_booklist_row').tmpl(data).appendTo(div.find('tbody'));
 
 		//set tabid
-		div.find('table').attr('id',tabid);
+		div.find('table').attr('id', tabid);
 
 		//table style
 		grid2bstable(tabid);

@@ -1,127 +1,128 @@
 <script>
 
 
-    function userpermission_inputchange(tarid){
-        let o=$('#'+tarid);
-        o.prop('checked',!o.prop('checked'));
-    }
+	function userpermission_inputchange(tarid) {
+		let o = $('#' + tarid);
+		o.prop('checked', !o.prop('checked'));
+	}
 
 
-    function userpermission(userid){
-        //顯示與編輯使用者權限
+	function userpermission(userid) {
+		//顯示與編輯使用者權限
 
-        //div
-        let div=$('#divmodal_userpermission');
+		//div
+		let div = $('#divmodal_userpermission');
 
-        //aj_user_queryid
-        aj_user_queryid(userid,'role')
-        .done(function(data){
+		//aj_user_queryid
+		aj_user_queryid(userid, 'role')
+			.done(function (data) {
 
-            let d=data[0];
-            console.log(d)
+				let d = data[0];
+				console.log(d)
 
-            //c
-            let c='';
-            _.each(d,function(value,head){
-                if(head!=='id'){
+				//c
+				let c = '';
+				_.each(d, function (value, head) {
+					if (head !== 'id') {
 
-                    //key
-                    let key=aj_user_head2key(head);
+						//key
+						let key = aj_user_head2key(head);
 
-                    //checked
-                    let checked='';
-                    if(value==='True'){
-                        checked='checked';
-                    }
+						//checked
+						let checked = '';
+						if (value === 'True') {
+							checked = 'checked';
+						}
 
-                    //inpid
-                    let inpid='id_'+key;
-    
-                    //ui
-                    c+='<div style="margin:15px 0px;">';
-                    c+='<div style="display: flex; align-items: center; justify-content: flex-start;">';
-                    c+='<input id="'+inpid+'" type="checkbox" style="margin:0px 3px 0px 0px; padding:0px; cursor:pointer;" name="userpermission_grp" key="'+key+'" '+checked+'>';
-                    c+='<label for="'+inpid+'" style="margin:0px; padding:0px; cursor:pointer;">'+head+'</label>';
-                    c+='</div>';
-                    c+='</div>';
+						//inpid
+						let inpid = 'id_' + key;
 
-                }
-            })
-            
-            //html
-            $('#divmodal_userpermission_list').html(c);
+						//ui
+						c += '<div style="margin:15px 0px;">';
+						c += '<div style="display: flex; align-items: center; justify-content: flex-start;">';
+						c += '<input id="' + inpid + '" type="checkbox" style="margin:0px 3px 0px 0px; padding:0px; cursor:pointer;" name="userpermission_grp" key="' + key + '" ' + checked + '>';
+						c += '<label for="' + inpid + '" style="margin:0px; padding:0px; cursor:pointer;">' + head + '</label>';
+						c += '</div>';
+						c += '</div>';
 
-        })
-        .fail(function(msg){
-            
-			//alertmessage
-			alertmessage('error', msg)
+					}
+				})
 
-        })
+				//html
+				$('#divmodal_userpermission_list').html(c);
 
-        //ok
-        $('#divmodal_userpermission_ok').off().on('click', function(){
+			})
+			.fail(function (msg) {
 
-            //transferData
-            let transferData={};
-            $('input[name="userpermission_grp"]').each(function(){
-                let inp=$(this);
-                let checked=inp.prop('checked');
-                let key=inp.attr('key');
-                transferData[key]=checked;
-            })
- 
-            //aj_user_updateid
-            aj_user_updateid(userid,'role',transferData)
-            .done(function(data){
-                alertmessage(data.status, data.message)
-                .done(function(){
-                    location.reload(); //重新載入網頁以更新資訊
-                });
-            })
-            .fail(function(data){
-                alertmessage(data.status, data.message)
-            })
+				//alertmessage
+				alertmessage('error', msg)
 
-            div.modal('hide');
-        });
+			})
 
-        //cancel
+		//ok
+		$('#divmodal_userpermission_ok').off().on('click', function () {
+
+			//transferData
+			let transferData = {};
+			$('input[name="userpermission_grp"]').each(function () {
+				let inp = $(this);
+				let checked = inp.prop('checked');
+				let key = inp.attr('key');
+				transferData[key] = checked;
+			})
+
+			//aj_user_updateid
+			aj_user_updateid(userid, 'role', transferData)
+				.done(function (data) {
+					alertmessage(data.status, data.message)
+						.done(function () {
+							location.reload(); //重新載入網頁以更新資訊
+						});
+				})
+				.fail(function (data) {
+					alertmessage(data.status, data.message)
+				})
+
+			div.modal('hide');
+		});
+
+		//cancel
 		div.off().on('hidden.bs.modal', function (e) {
-            //none
-        })
+			//none
+		})
 
-        //show
-        div.modal('show');
+		//show
+		div.modal('show');
 
-        //autofocus
-        _.delay(function(){
-            div.find('input').eq(0).focus();
-        },500)
-        
-    }
+		//autofocus
+		_.delay(function () {
+			div.find('input').eq(0).focus();
+		}, 500)
+
+	}
 
 </script>
 
 
-<div id="divmodal_userpermission" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_userpermission_title" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content alert-info" style="background-color: #f5f5f5;">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 id="divmodal_userpermission_title" class="modal-title">編輯使用者權限</h4>
-            </div>
-            <div style="padding:20px 20px; background-color:#fafafa;">
+<div id="divmodal_userpermission" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_userpermission_title"
+ aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content alert-info" style="background-color: #f5f5f5;">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 id="divmodal_userpermission_title" class="modal-title">編輯使用者權限</h4>
+			</div>
+			<div style="padding:20px 20px; background-color:#fafafa;">
 
-                <div id="divmodal_userpermission_list"></div>
+				<div id="divmodal_userpermission_list"></div>
 
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
-                <button id="divmodal_userpermission_ok" type="button" class="btn btn-primary">確定</button>
-            </div>
-        </div>
-    </div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
+				<button id="divmodal_userpermission_ok" type="button" class="btn btn-primary">確定</button>
+			</div>
+		</div>
+	</div>
 </div>

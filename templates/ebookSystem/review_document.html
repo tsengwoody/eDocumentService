@@ -1,129 +1,202 @@
-﻿{% extends "ebookSystem/review.html" %}
-
-{% load staticfiles %}
-
-{% block title %}
-
-{{ book.book_info.bookname }}審核
-
-{% endblock %}
-
-{% block header %}
-
-{{ book.book_info.bookname }}審核
-
-{% endblock %}
-
-{% block review_title %}{{ book.book_info.bookname }}審核{% endblock %}
+{% extends "ebookSystem/review.html" %} {% load staticfiles %} {% block content %} {% csrf_token %}
 
 
+<script>
 
-{% block review_step1_title %}Step1:基本資料{% endblock %}
+	$(function () {
 
-{% block review_step2_title %}Step2:掃描內容{% endblock %}
+		//isbn
+		let isbn = '{{ book.ISBN }}';
 
-{% block review_step3_title %}Step3:審查結果{% endblock %}
+		//books
+		let client = new $.RestClient('/ebookSystem/api/');
+		client.add('books');
+
+		//read
+		client.books.read(isbn)
+			.done(function (data) {
+
+				//book_info
+				let book_info_key = data.book_info;
+				let book_info_head = aj_booklist_dict_array([book_info_key], true)[0];
+
+				//heads
+				let heads = ['書名', '作者', '出版社', '出版日期', 'ISBN'];
+
+				//html
+				let c = _.map(heads, function (h) {
+					return '<div style="margin-bottom:5px;"><div style="display:inline-block; width:60px; font-weight:bold;">' + h + '</div>：' + book_info_head[h] + '</div>';
+				})
+				$('#step1_items').html(c);
+
+			});
+
+		//step2 part1 show
+		$('a[href="#step2_part1_div"]').click();
+
+	})
+
+	function gopage(id) {
+		$('a[href="#' + id + '"]').click();
+	}
+
+</script>
 
 
-
-{% block review_step1 %}
-
-<ul>
-
-	<li>書名：{{ book.book_info.bookname }}</li>
-
-	<li>作者：{{ book.book_info.author }}</li>
-
-	<li>出版社：{{ book.book_info.house }}</li>
-
-	<li>出版日：{{ book.book_info.date }}</li>
-
-	<li>ISBN：{{ book.ISBN }}</li>
-
-</ul>
-
-{% endblock %}
+<h3 style="margin:40px 0px 30px 0px;">待審核文件：{{ book.book_info.bookname }}</h3>
 
 
-{% block review_step2 %}
+<div class="row" style="margin-bottom:40px;">
 
-<ul class="nav nav-tabs">
 
-{% for i in sdc %}
+	<div class="col-md-2">
+		<ul class="nav nav-pills nav-stacked">
+			<li class="active">
+				<a data-toggle="pill" href="#step1" onclick="pagetab_subtabfix(this);">Step1:基本資料</a>
+			</li>
+			<li>
+				<a data-toggle="pill" href="#step2" onclick="pagetab_subtabfix(this);">Step2:掃描內容</a>
+			</li>
+			<li>
+				<a data-toggle="pill" href="#step3" onclick="pagetab_subtabfix(this);">Step3:審查結果</a>
+			</li>
+		</ul>
+	</div>
 
-	<li><a href="#step2_part{{ forloop.counter }}_div" data-toggle="tab">part{{ forloop.counter }}</a></li>
 
-{% endfor %}
+	<div class="col-md-10" style="border-left:1px solid #eee; padding-left:20px;">
+		<div class="tab-content">
 
-</ul>
+			<div id="step1" class="tab-pane fade in active">
 
-<div class="tab-content">
+				<div id="step1_items"></div>
 
-	{% for scanPageList, defaultPageURL, content in sdc %}
+				<div class="form-group row after-box">
+					<div class="pull-right ">
+						<button class="btn btn-primary" type="button" onclick="gopage('step2')">下一步</button>
+					</div>
+				</div>
 
-	<div class="tab-pane" id="step2_part{{ forloop.counter }}_div">
+			</div>
 
-		<div style="margin:20px 0px 10px 0px;">
-			<button type="button" class="btn btn-info" onclick="review_doc_scrto('{{ forloop.counter }}', true)">顯示捲動至最初頁</button>
-			<button type="button" class="btn btn-info" onclick="review_doc_scrto('{{ forloop.counter }}', false)">顯示捲動至最後頁</button>
-		</div>
+			<div id="step2" class="tab-pane fade">
 
-		<ul class="pager" style="justify-content:space-between">
-			<li class="previous"><a href="#" onclick="review_doc_changeimg('{{ forloop.counter }}',-1); return false;"><span aria-hidden="true">&larr;</span> Older</a></li>
+				{% block review_step2 %}
+				<ul class="nav nav-tabs">
 
-			<li class="col-xs-5" style="display: inline-block;float: none;">
-				<select id="step2_part{{ forloop.counter }}_select" class="form-control" onchange="review_doc_viewimg('{{ forloop.counter }}')">
+					{% for i in sdc %}
+					<li>
+						<a href="#step2_part{{ forloop.counter }}_div" data-toggle="tab">part{{ forloop.counter }}</a>
+					</li>
+					{% endfor %}
 
-					{% for scanPage in scanPageList %}
+				</ul>
 
-					<option value="{{ scanPage }}">{{ scanPage }}</option>
+				<div class="tab-content">
+
+					{% for scanPageList, defaultPageURL, content in sdc %}
+
+					<div class="tab-pane" id="step2_part{{ forloop.counter }}_div">
+
+						<div style="margin:20px 0px 10px 0px;">
+							<button type="button" class="btn btn-info" onclick="review_doc_scrto('{{ forloop.counter }}', true)">顯示捲動至最初頁</button>
+							<button type="button" class="btn btn-info" onclick="review_doc_scrto('{{ forloop.counter }}', false)">顯示捲動至最後頁</button>
+						</div>
+
+						<ul class="pager" style="justify-content:space-between">
+							<li class="previous">
+								<a href="#" onclick="review_doc_changeimg('{{ forloop.counter }}',-1); return false;">
+									<span aria-hidden="true">&larr;</span> 上一頁
+								</a>
+							</li>
+
+							<li class="col-xs-5" style="display: inline-block;float: none;">
+								<select id="step2_part{{ forloop.counter }}_select" class="form-control" onchange="review_doc_viewimg('{{ forloop.counter }}')">
+
+									{% for scanPage in scanPageList %}
+
+									<option value="{{ scanPage }}">{{ scanPage }}</option>
+
+									{% endfor %}
+
+								</select>
+
+							</li>
+
+							<li class="next">
+								<a href="#" onclick="review_doc_changeimg('{{ forloop.counter }}',1); return false;">
+									下一頁 <span aria-hidden="true">&rarr;</span>
+								</a>
+							</li>
+						</ul>
+
+						<div class="col-xs-6">
+
+							<div id="step2_part{{ forloop.counter }}_divimg" style="height:400px; overflow: scroll;">
+
+								<img id="step2_part{{ forloop.counter }}_img" src="{% static defaultPageURL %}" alt="文件掃描原檔-part{{ forloop.counter }}" style="width:100%"
+								/>
+
+							</div>
+
+							<div class="input-group col-md-3 pull-right">
+
+								<span class="input-group-btn">
+									<button class="btn btn-default btn-sm" type="button" onclick="review_doc_zoom('{{ forloop.counter }}',-10)">-</button>
+								</span>
+
+								<input id="step2_part{{ forloop.counter }}_inpzoom" class="form-control input-sm" type="text" size="2" value="100%" readonly="true">
+
+								<span class="input-group-btn">
+									<button class="btn btn-default btn-sm" type="button" onclick="review_doc_zoom('{{ forloop.counter }}',10)">+</button>
+								</span>
+
+							</div>
+
+						</div>
+
+						{% autoescape off %}
+						<div id="step2_part{{ forloop.counter }}_divtext" class="col-xs-6" style="height:400px; overflow-y: scroll;">
+
+							{{ content }}
+
+						</div>
+						{% endautoescape %}
+
+					</div>
 
 					{% endfor %}
 
-				</select>
+				</div>
 
-			</li>
-		  
-			<li class="next"><a href="#" onclick="review_doc_changeimg('{{ forloop.counter }}',1); return false;">Newer<span aria-hidden="true">&rarr;</span></a></li>
-		</ul>
-
-		<div class="col-xs-6">
-
-			<div id="step2_part{{ forloop.counter }}_divimg"  style="height:400px; overflow: scroll;">
-
-				<img id="step2_part{{ forloop.counter }}_img" src="{% static defaultPageURL %}" alt="文件掃描原檔-part{{ forloop.counter }}" style="width:100%"/>
+				{% endblock %}
 
 			</div>
 
-			<div class="input-group col-md-3 pull-right">
+			<div id="step3" class="tab-pane fade">
 
-				<span class="input-group-btn">
-					<button class="btn btn-default btn-sm" type="button" onclick="review_doc_zoom('{{ forloop.counter }}',-10)">-</button>
-				</span>
-											
-				<input id="step2_part{{ forloop.counter }}_inpzoom" class="form-control input-sm" type="text" size="2" value="100%" readonly="true">
+				<div class="form-inline">
+					<label for="id_review_success" style="margin-right:15px;">
+						<input id="id_review_success" type="radio" name="review" value="success" checked> 通過
+					</label>
+				</div>
 
-				<span class="input-group-btn">
-					<button class="btn btn-default btn-sm" type="button" onclick="review_doc_zoom('{{ forloop.counter }}',10)">+</button>
-				</span>
+				<div class="form-inline">
+					<label for="id_review_error" style="margin-right:15px;">
+						<input id="id_review_error" type="radio" name="review" value="error"> 退件
+						<input id="id_reason" class="form-control" type="text" placeholder="輸入退件原因" maxlength="30" name="reason">
+					</label>
+				</div>
+
+				<button id="send_id" class="btn btn-primary send_form" style="margin-top:10px;" type="submit" name="send">送出</button>
 
 			</div>
 
 		</div>
-
-		{% autoescape off %}
-		<div id="step2_part{{ forloop.counter }}_divtext" class="col-xs-6" style="height:400px; overflow-y: scroll;">
-
-			{{ content }}
-
-		</div>
-		{% endautoescape %}
-
 	</div>
 
-	{% endfor %}
 
 </div>
 
-{% endblock %}
 
+{% endblock %}
