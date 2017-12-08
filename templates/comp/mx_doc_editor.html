@@ -24,7 +24,6 @@
 </script>
 
 
-
 <script>
 
 
@@ -109,10 +108,10 @@
 					<button class="iconbtn iconbtn-hover" type="button" title="編輯" aria-label="編輯" v-on:click.stop="ckupdate(ss,iss)">
 						<span class="glyphicon glyphicon-edit"></span>
 					</button>
-					<button v-bind:class="{ 'iconbtn':true, 'iconbtn-hover':iss!==0, 'iconbtn-disabled':iss===0 }" type="button" title="往上" aria-label="往上" v-on:click.stop="ckmove(ss,iss,'up')" v-bind:disabled="iss===0">
+					<button v-bind:class="{ 'iconbtn':true, 'iconbtn-hover':iss!==0, 'iconbtn-disabled':iss===0 }" type="button" title="往上" aria-label="往上" v-on:click.stop="ckmove(ss,iss,'up')">
 						<span class="glyphicon glyphicon-chevron-up"></span>
 					</button>
-					<button v-bind:class="{ 'iconbtn':true, 'iconbtn-hover':iss!==s.data.length-1, 'iconbtn-disabled':iss===s.data.length-1 }" type="button" title="往下" aria-label="往下" v-on:click.stop="ckmove(ss,iss,'down')" v-bind:disabled="iss===s.data.length-1">
+					<button v-bind:class="{ 'iconbtn':true, 'iconbtn-hover':iss!==s.data.length-1, 'iconbtn-disabled':iss===s.data.length-1 }" type="button" title="往下" aria-label="往下" v-on:click.stop="ckmove(ss,iss,'down')">
 						<span class="glyphicon glyphicon-chevron-down"></span>
 					</button>
 					<button class="iconbtn iconbtn-hover" type="button" title="刪除" aria-label="刪除" v-on:click.stop="ckdelete(ss,iss)">
@@ -192,6 +191,11 @@
 				//n
 				let n = vo.s.data.length;
 
+				//check
+				if((mode === 'up' && iss===0) || (mode === 'down' && iss===n-1)){
+					return;
+				}
+
 				//ltfcs
 				let ltfcs = _.fill(n, 0);;
 				ltfcs[vo.s.focus] = 1;
@@ -224,11 +228,19 @@
 				});
 
 				//at focus
-				ltfcs = _.at(ltfcs,  r);
+				ltfcs = _.at(ltfcs, r);
 				vo.s.focus = _.indexOf(ltfcs, 1)
 
 				//at data
-				vo.s.data = _.at(vo.s.data,  r);
+				vo.s.data = _.at(vo.s.data, r);
+
+				//focus
+				if (mode === 'up' && iss>0) {
+					$('div[iss="' + (iss-1) + '"]').find('button[title="往上"]').focus();
+				}
+				else if (mode === 'down' && iss<n-1) {
+					$('div[iss="' + (iss+1) + '"]').find('button[title="往下"]').focus();
+				}
 
 			},
 
@@ -237,6 +249,11 @@
 
 				let vo = this;
 
+				//focus
+				if(vo.s.focus > iss){
+					vo.s.focus++;
+				}
+				
 				//new data
 				let r = [];
 				_.each(vo.s.data, function (v, k) {
@@ -276,8 +293,13 @@
 
 				let vo = this;
 
+				//focus
+				if(vo.s.focus > iss){
+					vo.s.focus--
+				}
+				
 				//reject
-				let r = _.reject(vo.s.data,  function (v, k) {
+				let r = _.reject(vo.s.data, function (v, k) {
 					return k === iss;
 				});
 

@@ -144,6 +144,24 @@ function urlparam() {
 }
 
 
+function sep(c,t){
+	//將字串c使用t分割，並回傳非空字串結果s
+
+	//check, 預設使用空白分割
+	if(iser(t)){ 
+		t=' ';
+	}
+
+	//split
+	let s=c.split(t);
+
+	//pull
+	_.pull(s, '');
+
+	return s;
+}
+
+
 function cint(v) {
 	//轉整數
 
@@ -1066,6 +1084,9 @@ function pagin_change(tabid, oper) {
 		}
 	})
 
+	//scrollParent scroll to Top
+	tab.scrollParent().scrollTop(0);
+
 }
 
 
@@ -1211,15 +1232,36 @@ function aj_send(type, url, transferData) {
 	//df
 	let df = $.Deferred();
 
+	//csrfSafeMethod
+	function csrfSafeMethod(method) {
+		return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method)); // these HTTP methods do not require CSRF protection
+	}
+
+	//sameOrigin
+	function sameOrigin(url) {
+		// test that a given url is a same-origin URL, url could be relative or scheme relative or absolute
+		let host = document.location.host; // host + port
+		let protocol = document.location.protocol;
+		let sr_origin = '//' + host;
+		let origin = protocol + sr_origin;
+		// Allow absolute or scheme relative URLs to same origin
+		return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+			(url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+			// or any other URL that isn't scheme relative or absolute i.e relative.
+			!(/^(\/\/|http:|https:).*/.test(url));
+	}
+
 	//ajax
 	$.ajax({
 		url: url,
 		type: type,
 		data: transferData,
 		beforeSend: function (jqXHR, settings) {
-			let csrf = $('input[name=csrfmiddlewaretoken]').val();
-			jqXHR.setRequestHeader('X-CSRFToken', csrf);
-			jqXHR.setRequestHeader("X-Requested-With", "XMLHttpRequest")
+			if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+				let csrf = $('input[name=csrfmiddlewaretoken]').val();
+				jqXHR.setRequestHeader('X-CSRFToken', csrf);
+				jqXHR.setRequestHeader("X-Requested-With", "XMLHttpRequest")
+			}
 		},
 	})
 		.done(function (data) {
@@ -1241,7 +1283,7 @@ function aj_send(type, url, transferData) {
 					'status': 'error',
 					'message': '伺服器非預期回應: ' + o2j(data),
 				};
-				c//onsole.log('reject',res)
+				//console.log('reject',res)
 				df.reject(res);
 			}
 
