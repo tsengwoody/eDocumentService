@@ -201,35 +201,63 @@ function getCursorPosition(editor) {
 
     return index;
 }
+// function rotateFormat() {
+//     if ($('#imagePage').hasClass('col-md-6')) { //改上下
+//         $('#imagePage').removeClass("col-md-6");
+//         $('#imagePage').addClass("col-md-12");
+
+
+//         $('#textPage').removeClass("col-md-6");
+//         $('#textPage').addClass("col-md-12");
+
+//         $('#textPage').removeClass("towColumn");
+//         $('#textPage').addClass("oneColumn-text");
+
+//         $('#imagePage').removeClass("towColumn");
+//         $('#imagePage').addClass("oneColumn-image");
+//     } else { //左右
+//         $('#imagePage').removeClass("col-md-12");
+//         $('#imagePage').addClass("col-md-6");
+
+//         $('#textPage').removeClass("col-md-12");
+//         $('#textPage').addClass("col-md-6");
+
+//         $('#textPage').removeClass("oneColumn-text");
+//         $('#textPage').addClass("towColumn");
+
+//         $('#imagePage').removeClass("oneColumn-image");
+//         $('#imagePage').addClass("towColumn");
+//     }
+
+// }
+
 function rotateFormat() {
-    if ($('#imagePage').hasClass('col-md-6')) { //改上下
-        $('#imagePage').removeClass("col-md-6");
-        $('#imagePage').addClass("col-md-12");
 
+    let imagePage = $('#imagePage');
+    let textPage = $('#textPage');
 
-        $('#textPage').removeClass("col-md-6");
-        $('#textPage').addClass("col-md-12");
+    if (imagePage.hasClass('col-md-6')) {
+        //改上下
 
-        $('#textPage').removeClass("towColumn");
-        $('#textPage').addClass("oneColumn-text");
+        imagePage.css('margin-bottom', '30px')
+            .removeClass("col-md-6")
+            .addClass("col-md-12")
+        textPage.removeClass("col-md-6")
+            .addClass("col-md-12")
 
-        $('#imagePage').removeClass("towColumn");
-        $('#imagePage').addClass("oneColumn-image");
-    } else { //左右
-        $('#imagePage').removeClass("col-md-12");
-        $('#imagePage').addClass("col-md-6");
+    } else {
+        //左右
 
-        $('#textPage').removeClass("col-md-12");
-        $('#textPage').addClass("col-md-6");
+        imagePage.css('margin-bottom', '0px')
+            .removeClass("col-md-12")
+            .addClass("col-md-6")
+        textPage.removeClass("col-md-12")
+            .addClass("col-md-6")
 
-        $('#textPage').removeClass("oneColumn-text");
-        $('#textPage').addClass("towColumn");
-
-        $('#imagePage').removeClass("oneColumn-image");
-        $('#imagePage').addClass("towColumn");
     }
 
 }
+    
 var editor;
 // function createMathMlEditor() {
 //     editor = com.wiris.jsEditor.JsEditor.newInstance({ 'language': 'zh' });
@@ -302,17 +330,6 @@ function createHtmlEditor() {
                         addMark(message, editor);
                     }
                 },
-                    //   {
-                    //     text: '移至上一標記',
-                    //     onclick: function() {
-                    //         selscr_find('id_content_ifr', 'previous');
-                    //     }
-                    //   }, {
-                    //     text: '移至下一標記',
-                    //     onclick: function() {
-                    //         selscr_find('id_content_ifr', 'next');
-                    //     }
-                    //   }
                 ]
             });
 
@@ -394,11 +411,11 @@ function createHtmlEditor() {
 
                     //isbnpart
                     let href = location.href;
-                    let s = sep(href,'/');
-                    let isbnpart=s.pop();
+                    let s = sep(href, '/');
+                    let isbnpart = s.pop();
 
                     //url
-                    let url='/ebookSystem/resource/ebooks/'+isbnpart+'/OCR/origin';
+                    let url = '/ebookSystem/resource/ebooks/' + isbnpart + '/OCR/origin';
 
                     //download
                     location.replace(url);
@@ -418,11 +435,12 @@ $(document).ready(function () {
     function_click = false;
     idel_min = 0;
     change_count = 0;
-    var dialog = '#Dialog';
-    $(dialog).on('shown.bs.modal', function () {
-        $(dialog + " .close").focus();
-    });
-    $(dialog).modal();
+
+    // var dialog = '#Dialog';
+    // $(dialog).on('shown.bs.modal', function () {
+    //     $(dialog + " .close").focus();
+    // });
+    // $(dialog).modal();
 
     var csrftoken = getCookie('csrftoken');
     $.ajaxSetup({
