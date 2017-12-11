@@ -75,9 +75,9 @@
 			<td>{{ book.priority }}</td>
 			<td>
 				{% if book.status_int2str == 'inactive' %}
-				<button class="btn btn-default send_button" type="button" name="delete" onclick="bookdeleterepository('{{book.ISBN}}')">刪除</button>
+				<button class="btn btn-default send_button" type="button" name="delete" onclick="BookDeleterePository('{{book.ISBN}}')">刪除</button>
 				{% else %}
-				<button class="btn btn-default send_button" type="button" name="set_priority" onclick="booksetpriority('{{book.ISBN}}')">設定權重</button>
+				<button class="btn btn-default send_button" type="button" name="set_priority" onclick="BookSetPriority('{{book.ISBN}}')">設定權重</button>
 				{% endif %}
 			</td>
 		</tr>

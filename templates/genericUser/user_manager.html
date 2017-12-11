@@ -10,7 +10,7 @@
 <script>
 
 
-	function usersearch(){
+	function UserSearch(){
 		//任意關鍵字搜尋
 
 		//query
@@ -41,7 +41,7 @@
 
 				//動作
 				let c='';
-				c+='<button class="btn btn-default" type="button" style="margin:0px 3px 3px 0px;" onclick="userpermission('+v['id']+')">權限設定</button>';
+				c+='<button class="btn btn-default" type="button" style="margin:0px 3px 3px 0px;" onclick="UserPermission('+v['id']+')">權限設定</button>';
 				c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/ebookSystem/getbookrecord_user/'+v['id']+'/">下載紀錄</a>';
 				c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/genericUser/review_user/'+v['使用者名稱']+'/">審核</a>';
 				if(v['校對權限']==='True'){
@@ -88,7 +88,7 @@
 		<div class="form-inline" style="margin-bottom:20px;">
 			<span>關鍵字查詢：</span>
 			<input id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊">
-			<button class="btn btn-primary" type="button" onclick="usersearch();">搜尋</button>
+			<button class="btn btn-primary" type="button" onclick="UserSearch();">搜尋</button>
 		</div>
 		
 		<div id="usermanager_div_查詢"></div>

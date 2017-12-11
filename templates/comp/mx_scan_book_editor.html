@@ -1,0 +1,267 @@
+<script>
+	let ScanBookEditor_dataimgs;
+
+
+	function ScanBookEditor_SelectMode(mode) {
+		//切換顯示圖片
+
+		//s
+		let s = $('#divmodal_ScanBookEditor_selectimg');
+
+		//t
+		let t = $('#divmodal_ScanBookEditor_text');
+
+		//n
+		let n = s.find('option').length - 1;
+
+		//ind
+		let ind = cint(s.find('option:selected').val());
+
+		if (mode === '+1') {
+			if (ind === n) {
+				alertmessage('error', '已經位於最後一頁');
+				return;
+			}
+			else {
+				ind++;
+			}
+		}
+		else if (mode === '-1') {
+			if (ind === 0) {
+				alertmessage('error', '已經位於第一頁');
+				return;
+			}
+			else {
+				ind--;
+			}
+		}
+		else if (mode === 'end') {
+			t.scrollTop(t[0].scrollHeight);
+			if (ind === n) {
+				alertmessage('error', '已經位於最後一頁');
+				return;
+			}
+			ind = n;
+		}
+		else if (mode === 'first') {
+			t.scrollTop(0);
+			if (ind === 0) {
+				alertmessage('error', '已經位於第一頁');
+				return;
+			}
+			ind = 0;
+		}
+
+		//selected
+		s.find('option[value="' + ind + '"]').prop('selected', true);
+
+		//change(
+		ScanBookEditor_SelectChange();
+
+	}
+
+
+	function ScanBookEditor_SelectChange() {
+		//圖片下拉式選單變更，亦具備初始化功能
+
+		//o
+		let o = $('#divmodal_ScanBookEditor_imgs');
+
+		//ind
+		let s = $('#divmodal_ScanBookEditor_selectimg');
+		let opt = s.find('option:selected');
+		let ind = opt.val();
+		let name = opt.html();
+
+		//isbnpart
+		let isbnpart = ScanBookEditor_dataimgs.ISBN_part;
+		let u = '/ebookSystem/resource/ebooks/' + isbnpart + '/source/' + ind;
+
+		//img src, alt
+		o.attr({
+			'src': u,
+			'alt': '文件掃描原檔:' + name,
+		});
+
+		if (o.attr('ini') === 'done') {
+			o.viewer('update');
+		}
+		else {
+			o.attr('ini', 'done');
+
+			//等頁面出現才初始化
+			_.delay(function () {
+
+				//opt
+				let opt = {
+					inline: true,
+					button: false,
+					navbar: false,
+					title: false,
+					toolbar: true,
+					tooltip: false,
+					movable: true,
+					zoomable: true,
+					rotatable: true,
+					scalable: false,
+					transition: true,
+					fullscreen: false,
+					keyboard: false,
+				};
+
+				//viewer
+				o.viewer(opt);
+
+				//hide
+				$('li.viewer-prev, li.viewer-play, li.viewer-next, li.viewer-flip-horizontal, li.viewer-flip-vertical').hide();
+
+				//center
+				$('ul.viewer-toolbar').css({ 'display': 'flex', 'justify-content': 'center' });
+
+			}, 500)
+
+		}
+
+	}
+
+
+	function ScanBookEditor(title, isbnpart) {
+		//顯示與編輯使用者權限
+
+		//df
+		let df = GenDF();
+
+		//div
+		let div = $('#divmodal_ScanBookEditor');
+
+		//title
+		$('#divmodal_ScanBookEditor_title').html(title);
+
+		//ebooks
+		let client = new $.RestClient('/ebookSystem/api/');
+		client.add('ebooks');
+
+		//read
+		client.ebooks.read(isbnpart)
+			.done(function (data) {
+
+				//save
+				ScanBookEditor_dataimgs = data;
+
+				//selectimg
+				let c = _.map(data.scan_image, function (v, k) {
+					let s = '';
+					if (k === '0') {
+						s = 'selected';
+					}
+					return '<option value="' + k + '" ' + s + '>' + v + '</option>';
+				})
+				$('#divmodal_ScanBookEditor_selectimg').html(c);
+
+				//imgs
+				ScanBookEditor_SelectChange();
+
+				//text 
+				let tu = 'http://0.0.0.0/ebookSystem/resource/ebooks/' + isbnpart + '/OCR/origin';
+				$.get(tu).done(function (t) {
+					$('#divmodal_ScanBookEditor_text').html(t);
+				})
+
+			});
+
+
+		//ok
+		$('#divmodal_ScanBookEditor_ok').off().on('click', function () {
+			df.resolve();
+			div.modal('hide');
+		});
+
+		//hidden
+		div.off().on('hidden.bs.modal', function (e) {
+			lm_minu();
+			df.reject();
+		})
+
+		//show
+		lm_add(div);
+		div.modal('show');
+
+		//autofocus
+		_.delay(function () {
+			$('#divmodal_ScanBookEditor_selectimg').focus();
+		}, 500)
+
+		return df;
+	}
+
+
+</script>
+
+
+<div id="divmodal_ScanBookEditor" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_ScanBookEditor_title"
+ aria-hidden="true">
+	<div class="modal-dialog" role="document" style="width:95%;">
+		<div class="modal-content alert-info" style="background-color: #f5f5f5;">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 id="divmodal_ScanBookEditor_title" class="modal-title"></h4>
+			</div>
+			<div style="padding:20px 20px; background-color:#fafafa;">
+
+				<div style="margin-bottom:10px;">
+
+					<div style="display:inline-block; margin-right:10px;">
+
+						<ul class="pager" style="margin:0px;">
+
+							<li>
+								<a href="#" aria-label="至最初頁" onclick="ScanBookEditor_SelectMode('first')">＜＜至最初頁</a>
+							</li>
+
+							<li>
+								<a href="#" aria-label="至最初頁" onclick="ScanBookEditor_SelectMode('-1')">＜上一頁</a>
+							</li>
+
+							<li style="display:inline-block; float:none; margin:0px 10px;">
+								<select id="divmodal_ScanBookEditor_selectimg" class="form-control" onchange="ScanBookEditor_SelectChange()"></select>
+							</li>
+
+							<li>
+								<a href="#" aria-label="至最初頁" onclick="ScanBookEditor_SelectMode('+1')">下一頁＞</a>
+							</li>
+
+							<li>
+								<a href="#" aria-label="至最初頁" onclick="ScanBookEditor_SelectMode('end')">至最後頁＞＞</a>
+							</li>
+
+						</ul>
+
+					</div>
+
+				</div>
+
+				<div class="row">
+
+					<div class="col-sm-6">
+						<div aria-label="文件掃描原圖">
+							<img id="divmodal_ScanBookEditor_imgs" style="height:400px; opacity:0;" src="" alt="">
+						</div>
+					</div>
+
+					<div class="col-sm-6">
+						<div id="divmodal_ScanBookEditor_text" style="height:400px; line-height:28px; background-color:#fff; overflow-y:scroll;"
+						 aria-label="辨識文字內容"></div>
+					</div>
+
+				</div>
+
+			</div>
+			<div class="modal-footer">
+				<!-- <button type="button" class="btn btn-danger" data-dismiss="modal">取消</button> -->
+				<button id="divmodal_ScanBookEditor_ok" type="button" class="btn btn-primary">確定</button>
+			</div>
+		</div>
+	</div>
+</div>

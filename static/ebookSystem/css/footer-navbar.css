@@ -6,7 +6,7 @@
 body {
   height:100%;
   padding-top: 50px;    /*nav height*/
-  padding-bottom:70px;  /*footer height and nav margin-bottom*/
+  /* padding-bottom:70px;  footer height and nav margin-bottom */
 }
 body > .container {
  min-height: 100%;

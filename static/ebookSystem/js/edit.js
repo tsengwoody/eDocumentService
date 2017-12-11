@@ -1,4 +1,3 @@
-﻿
 // This function gets cookie with a given name
 function getCookie(name) {
     var cookieValue = null;
@@ -257,7 +256,7 @@ function rotateFormat() {
     }
 
 }
-    
+
 var editor;
 // function createMathMlEditor() {
 //     editor = com.wiris.jsEditor.JsEditor.newInstance({ 'language': 'zh' });
@@ -487,11 +486,14 @@ $(document).ready(function () {
         $('#setValue').hide();
     });
 
-    // $(window).on('beforeunload', function(e){ //此寫法已無法使用
-    //   if(function_click)
-    //     return;
-    //   function_click=false;
-    //   return 'Are you sure you want to leave?';
-    // });
+    $(window).on('beforeunload', function (e) {
+        console.log('a')
+        if (function_click) {
+            console.log('b')
+            return;
+        }
+        function_click = false;
+        return 'Are you sure you want to leave?';
+    });
 
 });

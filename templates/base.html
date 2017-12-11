@@ -33,12 +33,10 @@
 	<script language="javascript" src="{% static 'ebookSystem/js/vue-2.5.9.min.js' %}"></script>
 
 	<!--imageviewer-->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/imageviewer/0.6.0/viewer.min.css" />
-	<script language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/imageviewer/0.6.0/viewer.min.js"></script>
+	<link rel="stylesheet" href="{% static 'ebookSystem/framework/viewer-0.6.0/viewer.min.css' %}">
+	<script language="javascript" src="{% static 'ebookSystem/framework/viewer-0.6.0/viewer.min.js' %}"></script>
 
 	<!-- moment -->
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/zh-tw.js"></script> -->
 	<script language="javascript" src="{% static 'ebookSystem/js/moment-2.19.1.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/moment-with-locales-2.19.1.js' %}"></script>
 
@@ -63,6 +61,10 @@
 	<link rel="stylesheet" href="{% static 'ebookSystem/framework/bootstrap-additional/ie10-viewport.css' %}">
 	<link rel="stylesheet" href="{% static 'ebookSystem/framework/bootstrap-additional/ie10-viewport-upd3.css' %}">
 	<script type="text/javascript" src="{% static 'ebookSystem/framework/bootstrap-additional/ie10-viewport.js' %}"></script>
+
+	<!--imageviewer-->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/imageviewer/0.6.0/viewer.min.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/imageviewer/0.6.0/viewer.min.js"></script>
 
 	<!-- tinymce -->
 	<script type="text/javascript" src="{% static 'ebookSystem/framework/tinymce-4.7.4/js/tinymce/tinymce.min.js' %}"></script>
@@ -151,7 +153,8 @@
 	{% include 'comp/mx_user_disability_card.html' %}
 	{% include 'comp/mx_qanda.html' %}
 	{% include 'comp/mx_doc_editor.html' %}
-	
+	{% include 'comp/mx_scan_book_editor.html' %}
+
 	{% block nav %}
 	{% endblock %}
 

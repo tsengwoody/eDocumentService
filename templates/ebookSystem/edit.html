@@ -1,8 +1,17 @@
-{% extends "base_nav.html" %} {% load staticfiles %} {% block title %} 編輯{{ part }} {% endblock %} {% block style %}
-<!-- <script language="javascript" src="{% static 'ebookSystem/js/edit.js' %}"></script> -->
-<script language="javascript" src="/static/ebookSystem/js/edit.js?0.03"></script>
-<!-- <link href="{% static 'ebookSystem/css/edit.css' %}" rel="stylesheet"> -->
-<!-- <link rel="stylesheet" href="/static/ebookSystem/css/edit.css?0.02"> -->
+{% extends "base_nav.html" %} 
+{% load staticfiles %} 
+{% block title %} 
+編輯{{ part }} 
+{% endblock %} 
+{% block style %}
+<script language="javascript" src="{% static 'ebookSystem/js/edit.js' %}"></script> 
+{% endblock %} 
+{% block header %} 
+編輯{{ part }} 
+{% endblock %} 
+{% block content %}
+
+
 <script type="text/javascript"> 
 
 	window.history.forward("/account/profile/");
@@ -13,7 +22,9 @@
 		//$('div.container').css('margin-top', '-20px');
 	})
 
-</script> {% endblock %} {% block header %} 編輯{{ part }} {% endblock %} {% block content %}
+</script>
+
+
 <form action="" method="post" id="currentForm" role="form">
 	{% csrf_token %}
 
@@ -32,11 +43,13 @@
 					<li>
 						<div class="col-xs-5 centered">
 							<select class="form-control" name="scanPageList" id="scanPageList" onchange="changePageSelect()">
-								{% for scanPage in scanPageList %} {% if forloop.counter0 == part.edited_page %}
+								{% for scanPage in scanPageList %} 
+								{% if forloop.counter0 == part.edited_page %}
 								<option value="{{ scanPage }}" selected>{{ scanPage }}-上次校對頁數</option>
 								{% else %}
 								<option value="{{ scanPage }}">{{ scanPage }}</option>
-								{% endif %} {% endfor %}
+								{% endif %} 
+								{% endfor %}
 							</select>
 						</div>
 					</li>
@@ -82,4 +95,8 @@
 	<input type="hidden" name="postToken" id="postToken" value="{{postToken}}" />
 
 </form>
-{% endblock %} {% block footer %} {% endblock %}
+
+
+{% endblock %} 
+{% block footer %} 
+{% endblock %}

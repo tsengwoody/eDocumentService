@@ -62,12 +62,13 @@
 			div.modal('hide');
 		});
 
-		//cancel
+		//hidden
 		div.off().on('hidden.bs.modal', function (e) {
-			//none
+			lm_minu();
 		})
 
 		//show
+		lm_add(div);
 		div.modal('show');
 
 		//autofocus

@@ -42,15 +42,14 @@
 
 		});
 
-		//cancel
+		//hidden
 		div.off().on('hidden.bs.modal', function () {
-
-			//resolve
+			lm_minu();
 			df.resolve();
-
 		})
 
 		//show
+		lm_add(div);
 		div.modal('show');
 
 		//autofocus
@@ -64,8 +63,7 @@
 </script>
 
 
-<div id="divmodal_alertmessage" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_alertmessage_title"
- aria-hidden="true">
+<div id="divmodal_alertmessage" class="modal fade" style="z-index:10000;" tabindex="-1" role="dialog" aria-labelledby="divmodal_alertmessage_title" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content alert-info" style="background-color: #f5f5f5;">
 			<div class="modal-header">

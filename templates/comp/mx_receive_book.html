@@ -72,9 +72,9 @@
 
 		});
 
-		//cancel
+		//hidden
 		div.off().on('hidden.bs.modal', function (e) {
-			//none
+			lm_minu();
 		})
 
 		//enter
@@ -86,6 +86,7 @@
 		});
 
 		//show
+		lm_add(div);
 		div.modal('show');
 
 		//autofocus

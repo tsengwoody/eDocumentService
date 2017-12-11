@@ -400,18 +400,6 @@
 <script>
 
 
-	function editor_recover() {
-		//復原文件編輯視窗捲軸與限制駐點功能
-
-		//afterhide
-		lm_afterhide('divmodal_doceditor');
-
-		//defaultfocus
-		vo_editor.$refs.comp.defaultfocus();
-
-	}
-
-
 	function editor_normal_show(data) {
 		//顯示一般文字編輯視窗
 
@@ -445,19 +433,16 @@
 
 		//cancel
 		div.off().on('hidden.bs.modal', function (e) {
+			
+			//defaultfocus
+			vo_editor.$refs.comp.defaultfocus();
 
-			//recover
-			editor_recover();
-
-			//reject
+			lm_minu();
 			df.reject();
-
 		});
 
-		//beforeshow
-		lm_beforeshow('divmodal_doceditor');
-
-		//show, 先載入資料再顯示使用者體驗比較好
+		//show
+		lm_add(div);
 		div.modal('show');
 
 		//autofocus
@@ -503,18 +488,15 @@
 		//cancel
 		div.off().on('hidden.bs.modal', function (e) {
 
-			//recover
-			editor_recover();
+			//defaultfocus
+			vo_editor.$refs.comp.defaultfocus();
 
-			//reject
+			lm_minu();
 			df.reject();
-
 		});
 
-		//beforeshow
-		lm_beforeshow('divmodal_doceditor');
-
-		//show, 先載入資料再顯示使用者體驗比較好
+		//show
+		lm_add(div);
 		div.modal('show');
 
 		//autofocus
@@ -551,20 +533,13 @@
 
 		//cancel
 		div.off().on('hidden.bs.modal', function (e) {
-
-			//untrapfocus
-			div.untrapfocus();
-
-			//reject
+			lm_minu();
 			df.reject();
-
 		});
 
 		//show
+		lm_add(div);
 		div.modal('show');
-
-		//trapfocus
-		div.trapfocus();
 
 		//autofocus
 		_.delay(function () {

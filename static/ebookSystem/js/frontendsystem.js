@@ -6,7 +6,7 @@
 
 // function inicomp(name){
 //     //初始化組件
-//     let df = $.Deferred();
+//     let df = GenDF();
 
 //     //infor
 //     let o=inicomp_getinfor(name);
@@ -38,7 +38,7 @@
 
 // function inicomp_load(name){
 //     //載入組件
-//     let df = $.Deferred();
+//     let df = GenDF();
 
 //     if(haskey(comploader,name)){
 //         df.resolve();
@@ -144,16 +144,16 @@ function urlparam() {
 }
 
 
-function sep(c,t){
+function sep(c, t) {
 	//將字串c使用t分割，並回傳非空字串結果s
 
 	//check, 預設使用空白分割
-	if(iser(t)){ 
-		t=' ';
+	if (iser(t)) {
+		t = ' ';
 	}
 
 	//split
-	let s=c.split(t);
+	let s = c.split(t);
 
 	//pull
 	_.pull(s, '');
@@ -499,7 +499,7 @@ function blob2str(bdata) {
 	//blob轉字串
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//reader
 	let reader = new FileReader();
@@ -564,6 +564,11 @@ function strdelright(c, n) {
 
 function GenID() {
 	return Math.uuid(32);
+}
+
+
+function GenDF() {
+	return $.Deferred();;
 }
 
 
@@ -712,7 +717,7 @@ function readfile(me) {
 	//讀取檔案
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//file
 	let file = me.files[0];
@@ -790,51 +795,83 @@ function untrapfocus() {
 })(jQuery);
 
 
-let modalinfor = {};
-function lm_beforeshow(id) {
-	//modal顯示之前紀錄會被遮蔽之視窗
+let modalinfors = [];
+function lm_add(o) {
 
-	//o
-	let o = $('#' + id);
+	//lastone
+	let loso = null;
+	let oy = null;
+	let st = null;
+	if (modalinfors.length > 0) {
+		loso = _.last(modalinfors).selfobj;
+		oy = loso.css('overflow-y');
+		st = loso.scrollTop();
+	}
 
 	//r
 	let r = {
-		'id': id,
-		'overflow-y': o.css('overflow-y'),
-		'scroll-top': o.scrollTop(),
+		'selfobj': o,
+		'lastone-selfobj': loso,
+		'lastone-overflow-y': oy,
+		'lastone-scroll-top': st,
 	};
 
-	//save r
-	modalinfor[id] = r;
+	//push
+	modalinfors.push(r);
 
-	//untrapfocus
-	o.untrapfocus();
+	//trapfocus
+	_.delay(function () {
+		o.trapfocus();
+	}, 750)
 
 }
 
 
-function lm_afterhide(id) {
-	//modal隱藏之後還原被遮蔽之視窗
+function lm_minu() {
 
-	//get r
-	let r = modalinfor[id];
 
-	//o
-	let o = $('#' + r['id']);
+	//pop
+	let ss = modalinfors.pop();
 
-	//overflow-y
-	o.css('overflow-y', r['overflow-y']);
+	//loso
+	let loso = ss['lastone-selfobj'];
+	if (loso !== null) {
 
-	//scroll-top
-	_.delay(function () {
+		//hidden body overflow-y
+		$('body').css('overflow-y', 'hidden');
 
-		//等視窗捲軸出現才恢復
-		o.scrollTop(r['scroll-top'])
+		//overflow-y
+		loso.css('overflow-y', ss['lastone-overflow-y']);
 
-	}, 750)
+		//scroll-top
+		_.delay(function () {
 
-	//trapfocus
-	o.trapfocus();
+			//等視窗捲軸出現才恢復
+			loso.scrollTop(ss['lastone-scroll-top'])
+
+		}, 750)
+
+	}
+	else {
+
+		//reset body overflow-y
+		$('body').css('overflow-y', '');
+
+	}
+
+	//last
+	if (modalinfors.length > 0) {
+
+		//r
+		let r = _.last(modalinfors);
+
+		//trapfocus
+		_.delay(function () {
+			let selfobj = r['selfobj'];
+			selfobj.trapfocus();
+		}, 750)
+
+	}
 
 }
 
@@ -1230,7 +1267,7 @@ function aj_send(type, url, transferData) {
 	//ajax傳送訊息
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//csrfSafeMethod
 	function csrfSafeMethod(method) {
@@ -1311,7 +1348,7 @@ function aj_binary(url, transferData) {
 	//ajax下載binary檔案
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//getdisposition
 	function getdisposition(xhr) {
@@ -1461,7 +1498,7 @@ function aj_booklist(query_type, query_value) {
 	//API使用book_list查找書籍資訊
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//url
 	let url = '/ebookSystem/book_list'; //post會加「/」而get不會
@@ -1514,7 +1551,7 @@ function aj_isbnnet_ISBN(ISBN) {
 	//使用book_info API
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//transferData
 	let transferData = {
@@ -1586,11 +1623,11 @@ function aj_isbnnetanddouban_ISBN(ISBN) {
 	//用ISBN查找[全國新書資訊網]與[豆瓣]書籍資訊
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//df, d
-	let df_isbnnet = $.Deferred();
-	let df_douban = $.Deferred();
+	let df_isbnnet = GenDF();
+	let df_douban = GenDF();
 	let d_isbnnet = [];
 	let d_douban = [];
 
@@ -1660,15 +1697,15 @@ function aj_isbnnetanddouban(value) {
 	//用value查找[全國新書資訊網]與[豆瓣]書籍資訊
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	// let r=[{"ISBN":"9789869534239","書名":"新手媽媽的育兒療癒科學: 面對產後憂鬱、不安與孤獨、嬰兒夜哭、反抗期、夫妻失和等問題,用科學事實來建立妳的輕鬆教養術!","作者":"NHK特別採訪小組著; 張佩瑩譯","出版社":"大家","出版日期":"2017-11-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789574350605","書名":"新手媽媽坐月子到宅服務創新方案規劃與執行","作者":"杜佩紋著","出版社":"杜佩紋","出版日期":"2017-10-01","裝訂方式":"平裝","圖書類號":"429","版次":"","來源":"NCL"},{"ISBN":"9789869359382","書名":"新手媽媽哺乳親餵的24堂課","作者":"Jack Newman, Teresa Pitman作; 葉織茵、劉宜佳、鄭勝得翻譯","出版社":"臺灣愛思唯爾","出版日期":"2017-06-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789865786731","書名":"第一胎照書養!新手媽媽的第一本懷孕手冊","作者":"陳艾竹編","出版社":"維他命文化","出版日期":"2016-11-01","裝訂方式":"平裝","圖書類號":"429","版次":"初版","來源":"NCL"},{"ISBN":"9789869237673","書名":"新手媽媽必備的第1本DVD寶寶按摩指南","作者":"小谷博子監修; 沙子芳譯","出版社":"睿其書房","出版日期":"2016-02-01","裝訂方式":"平裝附數位影音光碟","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789866062582","書名":"嬰兒副食品聖經: 新手媽媽必學205道副食品食譜","作者":"趙小英著; 李靜宜譯","出版社":"橘子文化","出版日期":"2013-10-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789868932197","書名":"好孕一點都不難:  解決新手媽媽困擾的實踐全書","作者":"池下育子等監修","出版社":"方舟文化","出版日期":"2013-09-01","裝訂方式":"平裝","圖書類號":"429","版次":"初版","來源":"NCL"},{"ISBN":"9789868889682","書名":"新手媽媽一試就成功: 寶寶食譜全圖解","作者":"鍾毓珊著","出版社":"幸福文化","出版日期":"2013-05-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789868905573","書名":"幹嘛要有小孩?: 一位新手媽媽的真實告白","作者":"潔西卡.瓦蘭提作; 陳品秀譯","出版社":"行人文化實驗室","出版日期":"2013-05-01","裝訂方式":"平裝","圖書類號":"544","版次":"初版","來源":"NCL"},{"ISBN":"9789575659684","書名":"餵母乳 不煩惱!新手媽媽看這裡就對了!","作者":"赤すぐ編輯部文字; 統一翻譯社翻譯","出版社":"臺視文化","出版日期":"2013-03-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789868892613","書名":"寶寶出生關鍵100天照顧秘笈: 小兒名醫與10位新手媽媽的對談","作者":"陳素華總編輯","出版社":"聲活工坊文化","出版日期":"2013-01-01","裝訂方式":"平裝附光碟片","圖書類號":"","版次":"","來源":"NCL"},{"ISBN":"9789863012276","書名":"新手媽媽一定要學的哺乳經(簡體字版)","作者":"磊立同行著","出版社":"大眾國際書局","出版日期":"2012-12-01","裝訂方式":"平裝","圖書類號":"","版次":"","來源":"NCL"},{"ISBN":"9789866247521","書名":"新手媽媽一定要學的哺乳經","作者":"磊立同行著","出版社":"養沛文化館","出版日期":"2012-08-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789866701344","書名":"為什麼媽媽需要粉紅色手提包?: 新手媽媽的優雅生活","作者":"史黛芬妮.施奈德(Stephanie Schneider)著; 謝靜怡譯","出版社":"飛寶國際文化","出版日期":"2009-11-01","裝訂方式":"精裝","圖書類號":"192","版次":"初版","來源":"NCL"},{"ISBN":"9789868171985","書名":"新手媽媽的第一本書: 胎教","作者":"沈靜作","出版社":"喜樂亞","出版日期":"2006-08-01","裝訂方式":"平裝附光碟片","圖書類號":"429","版次":"一版","來源":"NCL"},{"ISBN":"9789861610504","書名":"第一次當媽媽就上手: 新手媽媽完全生活指南","作者":"Debra Glibert Rosenberg, Mary Susan Miller合著; 李明芝譯","出版社":"信誼基金","出版日期":"2005-06-01","裝訂方式":"平裝","圖書類號":"544","版次":"初版","來源":"NCL"},{"ISBN":"9789572965818","書名":"新手媽媽的280天","作者":"石芳瑜著","出版社":"華谷文化","出版日期":"2004-06-01","裝訂方式":"平裝","圖書類號":"429","版次":"初版","來源":"NCL"},{"ISBN":"9789572897713","書名":"新手媽媽育兒寶典","作者":"周晴芸編著","出版社":"咖啡田文化館","出版日期":"2003-10-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789576488641","書名":"新手媽媽必讀手冊","作者":"塚田一郎著; 盛勤譯","出版社":"書泉","出版日期":"2001-08-01","裝訂方式":"平裝","圖書類號":"429","版次":"初版","來源":"NCL"},{"ISBN":"9789578253711","書名":"新手媽媽百科","作者":"嬰兒與母親編輯部編著","出版社":"婦幼家庭","出版日期":"2001-05-01","裝訂方式":"平裝","圖書類號":"","版次":"1版","來源":"NCL"},{"ISBN":"9789578253568","書名":"新手媽媽","作者":"嬰兒與母親編輯部編著","出版社":"婦幼家庭","出版日期":"2000-12-01","裝訂方式":"平裝","圖書類號":"429","版次":"1版","來源":"NCL"},{"ISBN":"9789578253063","書名":"新手媽媽育嬰指南","作者":"嬰兒與母親雜誌社編輯部撰文","出版社":"婦幼家庭","出版日期":"1999-01-01","裝訂方式":"平裝","圖書類號":"428","版次":"1版","來源":"NCL"},{"ISBN":"9789578456778","書名":"新手媽媽育兒經","作者":"張震山作","出版社":"藝賞圖書","出版日期":"1998-11-01","裝訂方式":"平裝","圖書類號":"","版次":"初版","來源":"NCL"}];
 	// df.resolve(r);
 	// return df;
 
 	//df, d
-	let df_isbnnet = $.Deferred();
-	let df_douban = $.Deferred();
+	let df_isbnnet = GenDF();
+	let df_douban = GenDF();
 	let d_isbnnet = [];
 	let d_douban = [];
 
@@ -1746,7 +1783,7 @@ function aj_querybooklist(source, transferData) {
 	//使用get_book_info_list API
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//url
 	let url = '/ebookSystem/get_book_info_list/'; //post會加「/」而get不會
@@ -1827,7 +1864,7 @@ function aj_announcement(mode, aid, transferData) {
 	//公告API新增、更新、刪除
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//url
 	let url;
@@ -1894,7 +1931,7 @@ function aj_borrowbook(me, action) {
 	//使用library_action API進行借還閱
 
 	//df
-	//let df = $.Deferred();
+	//let df = GenDF();
 
 	//me
 	me = $(me);
@@ -2034,7 +2071,7 @@ function aj_user_querylist_combine() {
 	//使用API user_list結合info,role取得使用者資訊
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//when
 	$.when(aj_user_querylist('info'), aj_user_querylist('role'))
@@ -2060,7 +2097,7 @@ function aj_user_querylist(action) {
 	//使用API user_list
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//url
 	let url = '/genericUser/user_list/';
@@ -2095,7 +2132,7 @@ function aj_user_queryid(id, action) {
 	//使用API user_view
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//url
 	let url = '/genericUser/user_view/' + id + '/';
@@ -2132,7 +2169,7 @@ function aj_user_updateid(id, action, transferData) {
 	//使用API user_update
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//url
 	let url = '/genericUser/user_update/' + id + '/';
@@ -2157,7 +2194,7 @@ function aj_booksetpriority(password, ISBN, priority) {
 	//使用API book_action
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//url
 	let url = '/ebookSystem/book_action/';
@@ -2187,7 +2224,7 @@ function aj_bookdeleterepository(password, ISBN) {
 	//使用API book_delete
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//url
 	let url = '/ebookSystem/book_delete/';
@@ -2215,7 +2252,7 @@ function aj_qanda(mode, aid, transferData) {
 	//Q&A API顯示、新增、更新、刪除
 
 	//df
-	let df = $.Deferred();
+	let df = GenDF();
 
 	//url
 	let url;

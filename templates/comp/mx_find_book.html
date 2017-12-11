@@ -1,32 +1,32 @@
 <script>
 
-	function findbook_default() {
+	function FindBook_default() {
 
 		//預設下拉式選單與清空輸入框
-		let p = $('#divmodal_findbook');
+		let p = $('#divmodal_FindBook');
 		p.find('select option:eq(0)').prop('selected', true);
 		p.find('input[type="text"]').val('');
 		p.find('div.modal-dialog').css('width', '');
 
 		//顯示查尋頁與隱藏挑選頁
-		$('#divmodal_findbook_page_find').show();
-		$('#divmodal_findbook_page_pick').hide();
+		$('#divmodal_FindBook_page_find').show();
+		$('#divmodal_FindBook_page_pick').hide();
 
 		//顯示查詢按鈕與隱藏挑選按鈕
-		$('#divmodal_findbook_find').show();
-		$('#divmodal_findbook_pick').hide();
+		$('#divmodal_FindBook_find').show();
+		$('#divmodal_FindBook_pick').hide();
 
 		//預設簡易查詢
-		$('li[name="divmodal_findbook_tab_grp"]').eq(0).children().click();
+		$('li[name="divmodal_FindBook_tab_grp"]').eq(0).children().click();
 
 		//$('#mixvalue').val('9789573329466') //蔡康永愛情短信
 
 		//unloading
-		findbook_unloading();
+		FindBook_unloading();
 
 	}
 
-	function findbook_highlightpick(me) {
+	function FindBook_highlightpick(me) {
 		//高亮選擇之書籍列
 
 		me = $(me);
@@ -34,21 +34,21 @@
 		me.parents('tr').eq(0).css('background-color', '#bbccee');
 	}
 
-	function findbook_loading() {
+	function FindBook_loading() {
 		//loading
 
-		$('#divmodal_findbook_loader').show();
-		$('#divmodal_findbook_find').prop('disabled', true);
+		$('#divmodal_FindBook_loader').show();
+		$('#divmodal_FindBook_find').prop('disabled', true);
 	}
 
-	function findbook_unloading() {
+	function FindBook_unloading() {
 		//unloading
 
-		$('#divmodal_findbook_loader').hide();
-		$('#divmodal_findbook_find').prop('disabled', false);
+		$('#divmodal_FindBook_loader').hide();
+		$('#divmodal_FindBook_find').prop('disabled', false);
 	}
 
-	function findbook_easy() {
+	function FindBook_easy() {
 		//easy查找書籍資訊
 
 		//transferData
@@ -63,7 +63,7 @@
 		return transferData;
 	}
 
-	function findbook_adv() {
+	function FindBook_adv() {
 		//adv查找書籍資訊
 
 		//transferData
@@ -89,41 +89,41 @@
 		return transferData;
 	}
 
-	function findbook() {
+	function FindBook() {
 		//查找更多書籍資訊
 
 		//df
 		let df = $.Deferred();
 
 		//div
-		let div = $('#divmodal_findbook');
+		let div = $('#divmodal_FindBook');
 
 		//default
-		findbook_default();
+		FindBook_default();
 
 		//bs
 		let bs = [];
 
 		//find
-		$('#divmodal_findbook_find').off().on('click', function () {
+		$('#divmodal_FindBook_find').off().on('click', function () {
 
 			//mode
-			let mode = $('li[name="divmodal_findbook_tab_grp"].active').attr('mode');
+			let mode = $('li[name="divmodal_FindBook_tab_grp"].active').attr('mode');
 
 			//transferData
 			let transferData = null;
 			if (mode === 'easy') {
-				transferData = findbook_easy();
+				transferData = FindBook_easy();
 			}
 			else if (mode === 'adv') {
-				transferData = findbook_adv();
+				transferData = FindBook_adv();
 			}
 			if (transferData === null) {
 				return;
 			}
 
 			//loading
-			findbook_loading();
+			FindBook_loading();
 
 			//df
 			let df;
@@ -146,7 +146,7 @@
 				//bs, add radio
 				_.each(data, function (v, k) {
 					let b = {};
-					b['勾選'] = '<input type="radio" name="divmodal_findbook_page_pick_inpgrp" index="' + k + '" onclick="findbook_highlightpick(this)">';
+					b['勾選'] = '<input type="radio" name="divmodal_FindBook_page_pick_inpgrp" index="' + k + '" onclick="FindBook_highlightpick(this)">';
 					_.each(v, function (vv, kk) {
 						b[kk] = vv;
 					})
@@ -154,17 +154,17 @@
 				})
 
 				//切換顯示
-				$('#divmodal_findbook_page_find').hide();
-				$('#divmodal_findbook_page_pick').fadeIn();
-				$('#divmodal_findbook_find').hide();
-				$('#divmodal_findbook_pick').fadeIn();
+				$('#divmodal_FindBook_page_find').hide();
+				$('#divmodal_FindBook_page_pick').fadeIn();
+				$('#divmodal_FindBook_find').hide();
+				$('#divmodal_FindBook_pick').fadeIn();
 				div.find('div.modal-dialog').css('width', '90%');
 
 				//gentable
-				gentable('divmodal_findbook_page_pick_list', 'divmodal_findbook_page_pick_list_table', bs);
+				gentable('divmodal_FindBook_page_pick_list', 'divmodal_FindBook_page_pick_list_table', bs);
 
 				//checked first
-				$('input[type="radio"][name="divmodal_findbook_page_pick_inpgrp"]').eq(0).click();
+				$('input[type="radio"][name="divmodal_FindBook_page_pick_inpgrp"]').eq(0).click();
 
 			})
 				.fail(function (data) {
@@ -177,7 +177,7 @@
 					bdone = true;
 
 					//unloading
-					findbook_unloading();
+					FindBook_unloading();
 
 				})
 
@@ -192,7 +192,7 @@
 					alert('等待時間過長，可能是網路問題或符合結果過多，請重新輸入更多書籍資訊。');
 
 					//unloading
-					findbook_unloading();
+					FindBook_unloading();
 
 				}
 			}, 1000 * 60);
@@ -200,10 +200,10 @@
 		});
 
 		//pick
-		$('#divmodal_findbook_pick').off().on('click', function () {
+		$('#divmodal_FindBook_pick').off().on('click', function () {
 
 			//index
-			let index = $('input[type="radio"][name="divmodal_findbook_page_pick_inpgrp"]:checked').attr('index');
+			let index = $('input[type="radio"][name="divmodal_FindBook_page_pick_inpgrp"]:checked').attr('index');
 
 			//resolve
 			df.resolve(bs[index]);
@@ -213,23 +213,22 @@
 
 		});
 
-		//cancel
+		//hidden
 		div.off().on('hidden.bs.modal', function (e) {
-
-			//reject
+			lm_minu();
 			df.reject();
-
 		});
 
 		//enter
 		$('input[type="text"]').off().on('keypress', function (event) {
 			if (event.which === 13) {
 				event.preventDefault();
-				$('#divmodal_findbook_find').click();
+				$('#divmodal_FindBook_find').click();
 			}
 		});
 
 		//show
+		lm_add(div);
 		div.modal('show');
 
 		//autofocus
@@ -242,38 +241,38 @@
 
 </script>
 
-<div id="divmodal_findbook" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_findbook_title" aria-hidden="true">
+<div id="divmodal_FindBook" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_FindBook_title" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content alert-info" style="background-color: #f5f5f5;">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 id="divmodal_findbook_title" class="modal-title">更多查詢書籍資訊</h4>
+				<h4 id="divmodal_FindBook_title" class="modal-title">更多查詢書籍資訊</h4>
 			</div>
 			<div style="padding:20px; background-color: #fff;">
 
-				<div id="divmodal_findbook_page_find">
+				<div id="divmodal_FindBook_page_find">
 
 					<ul class="nav nav-tabs">
-						<li class="active" name="divmodal_findbook_tab_grp" mode="easy">
-							<a href="#divmodal_findbook_tab_easy" data-toggle="tab" aria-expanded="true">綜合查詢</a>
+						<li class="active" name="divmodal_FindBook_tab_grp" mode="easy">
+							<a href="#divmodal_FindBook_tab_easy" data-toggle="tab" aria-expanded="true">綜合查詢</a>
 						</li>
-						<li name="divmodal_findbook_tab_grp" mode="adv">
-							<a href="#divmodal_findbook_tab_adv" data-toggle="tab" aria-expanded="false">國圖查詢</a>
+						<li name="divmodal_FindBook_tab_grp" mode="adv">
+							<a href="#divmodal_FindBook_tab_adv" data-toggle="tab" aria-expanded="false">國圖查詢</a>
 						</li>
 					</ul>
 
 					<div class="tab-content" style="background-color:#fff;">
 
-						<div id="divmodal_findbook_tab_easy" class="tab-pane active">
+						<div id="divmodal_FindBook_tab_easy" class="tab-pane active">
 							<div style="margin:20px 0px 10px 0px;">輸入書籍ISBN或書名進行查詢：</div>
 
 							<input id="mixvalue" type="text" class="form-control">
 
 						</div>
 
-						<div id="divmodal_findbook_tab_adv" class="tab-pane">
+						<div id="divmodal_FindBook_tab_adv" class="tab-pane">
 							<div style="margin:20px 0px;">輸入書籍相關資訊與條件進行查詢：</div>
 
 							<div class="form-group form-inline">
@@ -344,18 +343,18 @@
 
 				</div>
 
-				<div id="divmodal_findbook_page_pick">
+				<div id="divmodal_FindBook_page_pick">
 					<h4>請由下列書籍清單中勾選欲上傳之書籍：</h4>
-					<div id="divmodal_findbook_page_pick_list" style="overflow-x:auto;"></div>
+					<div id="divmodal_FindBook_page_pick_list" style="overflow-x:auto;"></div>
 				</div>
 
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
-				<button id="divmodal_findbook_find" type="button" class="btn btn-primary">取得</button>
-				<img id="divmodal_findbook_loader" src="/static/ebookSystem/img/load.gif" style="display: none;" width="30px" height="30px"
+				<button id="divmodal_FindBook_find" type="button" class="btn btn-primary">取得</button>
+				<img id="divmodal_FindBook_loader" src="/static/ebookSystem/img/load.gif" style="display: none;" width="30px" height="30px"
 				/>
-				<button id="divmodal_findbook_pick" type="button" class="btn btn-primary">確定</button>
+				<button id="divmodal_FindBook_pick" type="button" class="btn btn-primary">確定</button>
 			</div>
 		</div>
 	</div>
