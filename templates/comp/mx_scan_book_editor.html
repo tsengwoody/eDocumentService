@@ -162,7 +162,7 @@
 				ScanBookEditor_SelectChange();
 
 				//text 
-				let tu = 'http://0.0.0.0/ebookSystem/resource/ebooks/' + isbnpart + '/OCR/origin';
+				let tu = '/ebookSystem/resource/ebooks/' + isbnpart + '/OCR/origin';
 				$.get(tu).done(function (t) {
 					$('#divmodal_ScanBookEditor_text').html(t);
 				})
