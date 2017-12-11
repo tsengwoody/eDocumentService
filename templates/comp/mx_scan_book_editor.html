@@ -221,7 +221,7 @@
 							</li>
 
 							<li>
-								<a href="#" aria-label="至最初頁" onclick="ScanBookEditor_SelectMode('-1')">＜上一頁</a>
+								<a href="#" aria-label="上一頁" onclick="ScanBookEditor_SelectMode('-1')">＜上一頁</a>
 							</li>
 
 							<li style="display:inline-block; float:none; margin:0px 10px;">
@@ -229,11 +229,11 @@
 							</li>
 
 							<li>
-								<a href="#" aria-label="至最初頁" onclick="ScanBookEditor_SelectMode('+1')">下一頁＞</a>
+								<a href="#" aria-label="下一頁" onclick="ScanBookEditor_SelectMode('+1')">下一頁＞</a>
 							</li>
 
 							<li>
-								<a href="#" aria-label="至最初頁" onclick="ScanBookEditor_SelectMode('end')">至最後頁＞＞</a>
+								<a href="#" aria-label="至最後頁" onclick="ScanBookEditor_SelectMode('end')">至最後頁＞＞</a>
 							</li>
 
 						</ul>
@@ -251,8 +251,9 @@
 					</div>
 
 					<div class="col-sm-6">
-						<div id="divmodal_ScanBookEditor_text" style="height:400px; line-height:28px; background-color:#fff; overflow-y:scroll;"
-						 aria-label="辨識文字內容"></div>
+						<div style="height:400px; overflow-y:scroll;" aria-label="辨識文字內容">
+							<div id="divmodal_ScanBookEditor_text" style="line-height:28px; background-color:#fff;"></div>
+						</div>
 					</div>
 
 				</div>
