@@ -48,7 +48,6 @@ resource_urlpatterns = [
 
 urlpatterns = [
 	url(r'^mathml', views.mathml, name='mathml'),
-	url(r'^tinymce_demo', views.tinymce_demo, name='tinymce_demo'),
 	url(r'^analyze_part/(?P<ISBN_part>[\d-]+)/$', views.analyze_part, name='analyze_part'),
 	url(r'^book_info/(?P<ISBN>[0-9Xx]+)/$', views.book_info, name='book_info'),
 	url(r'^get_book_info_list/$', views.get_book_info_list, name='get_book_info_list'),
@@ -76,6 +75,7 @@ urlpatterns = [
 	url(r'^library_action$', views.library_action, name='library_action'),
 	url(r'^book_saelf$', views.book_saelf, name='book_saelf'),
 	url(r'^service/$', views.service, name='service'),
+	url(r'^sc_service/$', views.sc_service, name='sc_service'),
 	url(r'^bookorder_list$', views.bookorder_list, name='bookorder_list'),
 	url(r'^book_repository_person$', views.book_repository_person, name='book_repository_person'),
 	url(r'^book_action/$', views.book_action, name='book_action'),

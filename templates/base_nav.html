@@ -67,7 +67,7 @@
 					<li><a href="{% url 'ebookSystem:service' %}">一般校對</a></li>
 					{% endif %}
 					{% if request.user.is_advanced_editor %}
-					<li><a href="{% url 'account:sc_service' %}">進階校對</a></li>
+					<li><a href="{% url 'ebookSystem:sc_service' %}">進階校對</a></li>
 					{% endif %}
 					</ul>
 				</li>

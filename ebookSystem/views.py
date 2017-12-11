@@ -65,30 +65,6 @@ def mathml(request, template_name='ebookSystem/editor.html'):
 		message = u'成功獲取內容'
 		return locals()
 
-@http_response
-def tinymce_demo(request, template_name='ebookSystem/tinymce_demo.html'):
-	if request.method == 'POST':
-		if request.POST.has_key('set'):
-			cache.set(request.user.username, {'html':request.POST['content']}, 600)
-			status = u'success'
-			message = u'成功暫存內容'
-			return locals()
-		if request.POST.has_key('get'):
-			try:
-				content = cache.get(request.user.username)['html']
-				extra_list = ['content']
-				status = u'success'
-				message = u'成功獲取內容'
-				return locals()
-			except:
-				status = u'error'
-				message = u'server無資料'
-				return locals()
-	if request.method == 'GET':
-		status = u'success'
-		message = u'get'
-		return locals()
-
 @user_category_check(['superuser'])
 @http_response
 def book_list_manager(request, template_name='ebookSystem/book_list_manager.html'):
@@ -107,30 +83,20 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 	except:
 		raise Http404("book does not exist")
 	events = Event.objects.filter(content_type__model='book', object_id=book.ISBN, status=Event.STATUS['review'])
-	org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(book.book_info.ISBN,"org")
-	source_path = book.path +u'/source'
-	scan_page_list, default_page_url = book.get_org_image(request.user)
-	t = []
-	for part in book.ebook_set.all():
-		import io
-		with io.open(part.get_path(), 'r', encoding='utf-8') as f:
-			t.append(f.read())
-	sdc = zip(scan_page_list, default_page_url, t)
 
 	if request.method == 'GET':
 		return locals()
+
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
 			for part in book.ebook_set.all():
 				part.change_status(1, 'active')
 				BookOrder.refresh()
-			shutil.rmtree(org_path)
 			status = 'success'
 			message = u'審核通過文件'
 			for event in events:
 				event.response(status=status, message=message, user=request.user)
 		if request.POST['review'] == 'error':
-			shutil.rmtree(org_path)
 			book.delete()
 			status = 'success'
 			message = u'審核退回文件'
@@ -1045,6 +1011,7 @@ def library_action(request, ):
 			message = u'成功歸還書籍{0}'.format(lr.book)
 		return locals()
 
+@user_category_check(['editor'])
 @http_response
 def service(request, template_name='ebookSystem/service.html'):
 	editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
@@ -1089,6 +1056,36 @@ def service(request, template_name='ebookSystem/service.html'):
 	if request.method == 'GET':
 		return locals()
 
+@user_category_check(['manager'])
+@http_response
+def sc_service(request, template_name='ebookSystem/sc_service.html'):
+	sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(status=EBook.STATUS['sc_edit'])
+	if request.method == 'POST':
+		if request.POST.has_key('getPart'):
+			if len(sc_editingPartList)>=3:
+				status = 'error'
+				message = u'您已有超過3段文件，請先校對完成再領取'
+				return locals()
+			try:
+				getPart = EBook.objects.filter(status=EBook.STATUS['finish']).order_by('get_date')[0]
+			except BaseException as e:
+				status = 'error'
+				message = u'無文件'
+				return locals()
+			getPart.change_status(1, 'sc_edit', user=request.user)
+			status = 'success'
+			message = u'成功取得文件{}'.format(getPart.__unicode__())
+		elif request.POST.has_key('rebackPart'):
+			ISBN_part = request.POST.get('rebackPart')
+			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
+			rebackPart.change_status(-1, 'finish')
+			status = 'success'
+			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
+		sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(status=EBook.STATUS['sc_edit'])
+		return locals()
+	if request.method == 'GET':
+		return locals()
+
 @http_response
 def bookorder_list(request, template_name='ebookSystem/bookorder_list.html'):
 	bookorder_list = BookOrder.objects.all().order_by('order')
@@ -1114,9 +1111,10 @@ def book_repository_person(request, template_name='ebookSystem/book_repository_p
 
 #=====file=====
 from rest_framework.decorators import api_view, permission_classes
+from genericUser.premissions import IsManager
 
 @api_view(['GET'])
-#@permission_classes((IsAuthenticated, ))
+@permission_classes((IsManager, ))
 def ebook_resource(request, pk, dir, resource):
 	try:
 		ebook = EBook.objects.get(ISBN_part=pk)

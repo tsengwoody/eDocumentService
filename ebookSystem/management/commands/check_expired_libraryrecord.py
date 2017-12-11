@@ -10,6 +10,6 @@ class Command(BaseCommand):
 #		parser.add_argument('reviewpart', nargs='*')
 
 	def handle(self, *args, **options):
-		for lr in LibraryRecord.objects.all():
+		for lr in LibraryRecord.objects.filter(status=True):
 			if lr.check_in_time and lr.check_in_time.date() < datetime.date.today():
 				lr.check_in()
