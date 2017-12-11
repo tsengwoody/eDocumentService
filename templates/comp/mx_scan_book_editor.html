@@ -8,8 +8,8 @@
 		//s
 		let s = $('#divmodal_ScanBookEditor_selectimg');
 
-		//t
-		let t = $('#divmodal_ScanBookEditor_text');
+		//p
+		let p = $('#divmodal_ScanBookEditor_text');
 
 		//n
 		let n = s.find('option').length - 1;
@@ -36,7 +36,7 @@
 			}
 		}
 		else if (mode === 'end') {
-			t.scrollTop(t[0].scrollHeight);
+			p.scrollTop(p[0].scrollHeight);
 			if (ind === n) {
 				alertmessage('error', '已經位於最後一頁');
 				return;
@@ -44,7 +44,7 @@
 			ind = n;
 		}
 		else if (mode === 'first') {
-			t.scrollTop(0);
+			p.scrollTop(0);
 			if (ind === 0) {
 				alertmessage('error', '已經位於第一頁');
 				return;
@@ -251,9 +251,7 @@
 					</div>
 
 					<div class="col-sm-6">
-						<div style="height:400px; overflow-y:scroll;" aria-label="辨識文字內容">
-							<div id="divmodal_ScanBookEditor_text" style="line-height:28px; background-color:#fff;"></div>
-						</div>
+						<div id="divmodal_ScanBookEditor_text" style="height:400px; overflow-y:scroll; line-height:28px; background-color:#fff;"></div>
 					</div>
 
 				</div>
