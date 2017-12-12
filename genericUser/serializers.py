@@ -17,6 +17,12 @@ class UserSerializer(serializers.ModelSerializer):
 			'org',
 		]
 
+class ServiceInfoSerializer(serializers.ModelSerializer):
+	editrecord_set = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+	class Meta:
+		model = ServiceInfo
+		fields = '__all__'
+
 class AnnouncementSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Announcement

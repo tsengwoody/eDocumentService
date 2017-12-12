@@ -46,3 +46,8 @@ class EBookSerializer(serializers.ModelSerializer):
 			'number_of_times',
 			'status',
 		]
+
+class EditRecordSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = EditRecord
+		fields = '__all__'
