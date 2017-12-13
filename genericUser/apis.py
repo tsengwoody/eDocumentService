@@ -3,6 +3,7 @@
 from rest_framework import filters
 from rest_framework import permissions
 from rest_framework import viewsets
+from .filters import *
 from .premissions import *
 from .serializers import *
 
@@ -18,6 +19,11 @@ class UserViewSet(viewsets.ModelViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
 	permission_classes = (UserIsSelf, )
+
+class ServiceInfoViewSet(viewsets.ModelViewSet):
+	queryset = ServiceInfo.objects.all()
+	serializer_class = ServiceInfoSerializer
+	filter_backends = (ServiceInfoUserFilter,)
 
 class AnnouncementViewSet(viewsets.ModelViewSet):
 	queryset = Announcement.objects.all()

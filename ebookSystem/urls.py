@@ -28,6 +28,10 @@ bookinfo_detail = apis.BookInfoViewSet.as_view({
 	'get': 'retrieve',
 })
 
+editrecord_detail = apis.EditRecordViewSet.as_view({
+	'get': 'retrieve',
+})
+
 from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 
@@ -40,6 +44,7 @@ api_urlpatterns = api_urlpatterns +[
 	url(r'^ebooks/(?P<pk>[\d-]+)/$', ebook_detail, name='ebook-detail'),
 	url(r'^bookinfos/$', bookinfo_list, name='bookinfo-list'),
 	url(r'^bookinfos/(?P<pk>[\d]+)/$', bookinfo_detail, name='bookinfo-detail'),
+	url(r'^editrecords/(?P<pk>[\d]+)/$', editrecord_detail, name='editrecord-detail'),
 ]
 
 resource_urlpatterns = [

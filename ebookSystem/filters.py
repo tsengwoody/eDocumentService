@@ -37,3 +37,20 @@ class HottestFilter(filters.BaseFilterBackend):
 			return queryset.filter(book__in=book_list)
 		else:
 			return queryset
+
+class EBookStatusFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		status = request.query_params.get('status')
+		if status:
+			return queryset.filter(status=status)
+		else:
+			return queryset
+
+class EBookEditorFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		editor_id = request.query_params.get('editor_id')
+		if editor_id:
+			editor = User.objects.get(id=editor_id)
+			return queryset.filter(editor=editor)
+		else:
+			return queryset

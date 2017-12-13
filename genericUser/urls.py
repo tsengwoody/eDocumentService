@@ -12,6 +12,13 @@ user_detail = apis.UserViewSet.as_view({
 	'patch': 'partial_update',
 })
 
+serviceinfo_list = apis.ServiceInfoViewSet.as_view({
+	'get': 'list',
+})
+serviceinfo_detail = apis.ServiceInfoViewSet.as_view({
+	'get': 'retrieve',
+})
+
 from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'users_manager', apis.UserManagerViewSet)
@@ -23,6 +30,8 @@ api_urlpatterns = copy.copy(router.urls)
 api_urlpatterns = api_urlpatterns +[
 	url(r'^users/$', user_list, name='user-list'),
 	url(r'^users/(?P<pk>[\d]+)/$', user_detail, name='user-detail'),
+	url(r'^serviceinfos/$', serviceinfo_list, name='serviceinfo-list'),
+	url(r'^serviceinfos/(?P<pk>[\d]+)/$', serviceinfo_detail, name='serviceinfo-detail'),
 ]
 
 import rest_framework
