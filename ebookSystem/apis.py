@@ -29,3 +29,5 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 class EditRecordViewSet(viewsets.ModelViewSet):
 	queryset = EditRecord.objects.all()
 	serializer_class = EditRecordSerializer
+	filter_backends = (filters.OrderingFilter, EditRecordEditorFilter,)
+	ordering_fields = ('username',)

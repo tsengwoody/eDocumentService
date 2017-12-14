@@ -37,7 +37,7 @@ def about(request, name):
 @http_response
 def home(request, template_name='home.html'):
 #	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
-	deadline = timezone.now() -datetime.timedelta(days=30)
+	deadline = timezone.now() -datetime.timedelta(days=60)
 	announcement_list = Announcement.objects.filter(datetime__gt=deadline).order_by('-datetime')
 	return locals()
 

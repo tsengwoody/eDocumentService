@@ -28,6 +28,10 @@ bookinfo_detail = apis.BookInfoViewSet.as_view({
 	'get': 'retrieve',
 })
 
+editrecord_list = apis.EditRecordViewSet.as_view({
+	'get': 'list',
+})
+
 editrecord_detail = apis.EditRecordViewSet.as_view({
 	'get': 'retrieve',
 })
@@ -44,6 +48,7 @@ api_urlpatterns = api_urlpatterns +[
 	url(r'^ebooks/(?P<pk>[\d-]+)/$', ebook_detail, name='ebook-detail'),
 	url(r'^bookinfos/$', bookinfo_list, name='bookinfo-list'),
 	url(r'^bookinfos/(?P<pk>[\d]+)/$', bookinfo_detail, name='bookinfo-detail'),
+	url(r'^editrecords/$', editrecord_list, name='editrecord-list'),
 	url(r'^editrecords/(?P<pk>[\d]+)/$', editrecord_detail, name='editrecord-detail'),
 ]
 

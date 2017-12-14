@@ -26,6 +26,7 @@ SECRET_KEY = 'e_#e-byj7#a+$v7#wmocwd8wp)+&wajk0axt70dl@)nsx!*glq'
 # SECURITY WARNING: don't run with debug turned on in production!
 import socket
 if socket.gethostname() == 'edoc':
+#if not 1:
     DEBUG = False
 else:
     DEBUG = True

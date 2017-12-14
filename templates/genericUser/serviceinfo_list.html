@@ -22,7 +22,6 @@
 			{% endif %}
 			<th>服務時數</th>
 			<th>頁數</th>
-			<th>字數</th>
 			<th>狀態</th>
 			<th>兌換中心</th>
 			<th>動作</th>
@@ -35,7 +34,6 @@
 			{% endif %}
 			<td>{{ current_ServiceInfo.get_service_hours }}</td>
 			<td>{{ current_ServiceInfo.get_page_count }}</td>
-			<td>{{ current_ServiceInfo.get_character_count }}</td>
 			<td>未兌換</td>
 			<td>{{ current_ServiceInfo.org }}</td>
 			<td>當月無法兌換</td>
@@ -49,7 +47,6 @@
 			{% endif %}
 			<td>{{ ServiceInfo.get_service_hours }}</td>
 			<td>{{ ServiceInfo.get_page_count }}</td>
-			<td>{{ ServiceInfo.get_character_count }}</td>
 			{% if ServiceInfo.is_exchange %}
 			<td>已兌換</td>
 			<td>{{ ServiceInfo.org }}</td>
