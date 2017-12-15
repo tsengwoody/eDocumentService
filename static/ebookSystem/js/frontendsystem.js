@@ -1281,6 +1281,18 @@ function aj_delete(url, transferData) {
 }
 
 
+function aj_getcsrf(){
+	//csrf
+
+	let csrf = $('input[name=csrfmiddlewaretoken]').val();
+	return {
+		'csrf':csrf,
+		'X-CSRFToken':csrf,
+		'X-Requested-With':'XMLHttpRequest'
+	};
+}
+
+
 function aj_send(type, url, transferData) {
 	//ajax傳送訊息
 
@@ -1313,9 +1325,9 @@ function aj_send(type, url, transferData) {
 		data: transferData,
 		beforeSend: function (jqXHR, settings) {
 			if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-				let csrf = $('input[name=csrfmiddlewaretoken]').val();
-				jqXHR.setRequestHeader('X-CSRFToken', csrf);
-				jqXHR.setRequestHeader("X-Requested-With", "XMLHttpRequest")
+				let g = aj_getcsrf();
+				jqXHR.setRequestHeader('X-CSRFToken', g.csrf);
+				jqXHR.setRequestHeader('X-Requested-With', g.XMLHttpRequest)
 			}
 		},
 	})

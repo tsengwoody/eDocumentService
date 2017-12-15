@@ -16,16 +16,23 @@
 
 
 	$(function () {
+		serviceinfo_ini_list();
+		serviceinfo_ini_org();
+	})
+
+
+	function serviceinfo_ini_list(){
+		//服務紀錄
 
 		//userid
 		let userid = $('div[user_id]').attr('user_id');
 
-		//books
+		//client
 		let client = new $.RestClient('/ebookSystem/api/');
 		client.add('editrecords');
 
 		//read
-		client.editrecords.read({ editor_id: userid })
+		client.editrecords.read({ editor_id: userid, exchange:false })
 			.done(function (data) {
 				//console.log(data)
 
@@ -93,8 +100,31 @@
 
 			});
 
-	})
+	}
 
+
+	function serviceinfo_ini_org(){
+		//兌換中心
+
+		//client
+		let client = new $.RestClient('/genericUser/api/');
+		client.add('organizations');
+
+		//read
+		client.organizations.read()
+			.done(function (data) {
+				//console.log(data)
+
+				//html
+				let c='<option value="" selected="selected">---------</option>'
+				_.each(data,function(v){
+					c+='<option value="'+v.id+'">'+v.name+'</option>';
+				})
+				$('#sel_exchangecenter').html(c);
+
+			})
+		
+	}
 
 	function serviceinfo_select_all(){
 		//全選
@@ -117,6 +147,58 @@
 			let inp=$(this);
 			inp.prop('checked',!inp.prop('checked'));
 		})
+	}
+
+	function serviceinfo_exchange(){
+		//兌換
+
+		//editrecord_set
+		let editrecord_set=[];
+		$('input[name="inp_grp_exchange"]:checked').each(function(){
+			let inp=$(this);
+			editrecord_set.push(inp.val());
+		})
+
+		//check
+		if(editrecord_set.length===0){
+			alertmessage('error', '至少需一筆紀錄');
+			return;
+		}
+
+		//org
+		let org=$('#sel_exchangecenter').find('option:selected').val();
+
+		//check
+		if(iser(org)){
+			alertmessage('error', '尚未選擇兌換中心');
+			return;
+		}
+
+		//data
+		let data={
+			org:org,
+			editrecord_set:editrecord_set,
+			date:moment().format('YYYY-MM-DD'),
+			user:$('div[user_id]').attr('user_id'),
+		};
+
+		//client
+		let client = new $.RestClient('/genericUser/api/');
+		client.add('serviceinfos', {csrf:aj_getcsrf().csrf});
+
+		//create
+		client.serviceinfos.create(data)
+			.done(function (data) {
+				//console.log(data)
+
+				//alertmessage
+				alertmessage('success', '兌換成功')
+				.done(function(){
+					location.reload();
+				})
+
+			})
+		
 	}
 
 
@@ -158,7 +240,7 @@
 	
 	</div>
 
-	<button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="">兌換</button>
+	<button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="serviceinfo_exchange()">兌換</button>
 		
 </div>
 
