@@ -98,7 +98,6 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 if socket.gethostname() == 'edoc':
-#if 1:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -109,6 +108,17 @@ if socket.gethostname() == 'edoc':
             'PORT': '3306',
         }
     }
+    '''else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'eDocumentService',
+            'USER': 'root',
+            'PASSWORD': 'eds@2017',
+            'HOST': '127.0.0.1',
+            'PORT': '3306',
+        }
+    }'''
 else:
     DATABASES = {
         'default': {
