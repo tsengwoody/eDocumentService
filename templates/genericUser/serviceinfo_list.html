@@ -89,6 +89,13 @@
 					})
 				})
 
+				//check
+				if(iser(sr)){
+					$('#div_serviceinfo_list_panel').html('目前無服務紀錄');
+					$('#btn_serviceinfo_exchange').attr('onclick','').prop('disabled',true);
+					return;
+				}
+
 				//gentable
 				gentable('div_serviceinfo_list', 'div_serviceinfo_list_table', sr);
 
@@ -198,6 +205,12 @@
 				})
 
 			})
+			.fail(function(msg){
+
+				//alertmessage
+				alertmessage('error', '兌換失敗: '+msg);
+
+			})
 		
 	}
 
@@ -212,7 +225,7 @@
 <hr style="margin-top:5px;">
 
 
-<div style="margin-bottom:40px;">
+<div id="div_serviceinfo_list_panel" style="margin-bottom:40px;">
 	<button class="btn btn-default" type="Button" onclick="serviceinfo_select_all()">全選</button>
 	<button class="btn btn-default" type="Button" onclick="serviceinfo_select_no()">全不選</button>
 	<button class="btn btn-default" type="Button" onclick="serviceinfo_select_inv()">反向選</button>
@@ -240,7 +253,7 @@
 	
 	</div>
 
-	<button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="serviceinfo_exchange()">兌換</button>
+	<button id="btn_serviceinfo_exchange" type="button" class="btn btn-primary" style="margin-top:10px;" onclick="serviceinfo_exchange()">兌換</button>
 		
 </div>
 
