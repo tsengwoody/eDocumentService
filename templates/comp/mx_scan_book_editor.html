@@ -125,6 +125,34 @@
 	}
 
 
+	function ScanBookEditor_FontSize(mode) {
+		//調整字型大小
+
+		//o
+		let o = $('#divmodal_ScanBookEditor_text');
+
+		//fs
+		let fs = cint(replace(o.css('font-size'), 'px', ''));
+		if (mode === 'small') {
+			if (fs <= 8) {
+				alertmessage('error', '字型大小已經為最小');
+				return;
+			}
+			fs -= 2;
+			o.css('font-size', fs + 'px');
+		}
+		if (mode === 'large') {
+			if (fs >= 30) {
+				alertmessage('error', '字型大小已經為最大');
+				return;
+			}
+			fs += 2;
+			
+			o.css('font-size', fs + 'px');
+		}
+	}
+
+
 	function ScanBookEditor(title, isbnpart) {
 		//顯示與編輯使用者權限
 
@@ -195,6 +223,8 @@
 	}
 
 
+
+
 </script>
 
 
@@ -236,6 +266,16 @@
 								<a href="#" aria-label="至最後頁" onclick="ScanBookEditor_SelectMode('end')">至最後頁＞＞</a>
 							</li>
 
+							<li style="margin:0px 10px; border:1px solid #ddd;"></li>
+
+							<li>
+								<a href="#" aria-label="文字放大" onclick="ScanBookEditor_FontSize('large')">文字放大</a>
+							</li>
+
+							<li>
+								<a href="#" aria-label="文字縮小" onclick="ScanBookEditor_FontSize('small')">文字縮小</a>
+							</li>
+
 						</ul>
 
 					</div>
@@ -251,7 +291,7 @@
 					</div>
 
 					<div class="col-sm-6">
-						<div id="divmodal_ScanBookEditor_text" style="height:400px; overflow-y:scroll; line-height:28px; background-color:#fff;"></div>
+						<div id="divmodal_ScanBookEditor_text" style="height:400px; overflow-y:scroll; color:#000; font-size:16px; line-height:1.8em; background-color:#fff;"></div>
 					</div>
 
 				</div>
