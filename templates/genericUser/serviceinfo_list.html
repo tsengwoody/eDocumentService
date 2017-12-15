@@ -29,28 +29,28 @@
 			.done(function (data) {
 				//console.log(data)
 
-				let d = []
-				_.each(data, function (v) {
-					_.times(3, function () {
-						let vv = _.cloneDeep(v)
-						d.push(vv)
-					})
-				})
-				_.each(data, function (v) {
-					_.times(3, function () {
-						let vv = _.cloneDeep(v)
-						vv.get_date = '2017-11-01'
-						d.push(vv)
-					})
-				})
-				_.each(data, function (v) {
-					_.times(3, function () {
-						let vv = _.cloneDeep(v)
-						vv.get_date = '2017-10-01'
-						d.push(vv)
-					})
-				})
-				data = d
+				// let d = []
+				// _.each(data, function (v) {
+				// 	_.times(3, function () {
+				// 		let vv = _.cloneDeep(v)
+				// 		d.push(vv)
+				// 	})
+				// })
+				// _.each(data, function (v) {
+				// 	_.times(3, function () {
+				// 		let vv = _.cloneDeep(v)
+				// 		vv.get_date = '2017-11-01'
+				// 		d.push(vv)
+				// 	})
+				// })
+				// _.each(data, function (v) {
+				// 	_.times(3, function () {
+				// 		let vv = _.cloneDeep(v)
+				// 		vv.get_date = '2017-10-01'
+				// 		d.push(vv)
+				// 	})
+				// })
+				// data = d
 
 				//group
 				let r = _.groupBy(data, function (v) {
