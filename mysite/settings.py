@@ -97,8 +97,8 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-if socket.gethostname() == 'edoc':
-#if 1:
+#if socket.gethostname() == 'edoc':
+if 1:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
