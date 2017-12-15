@@ -713,6 +713,24 @@ function downloadfile(cfn, bindata) {
 }
 
 
+function downloadtext(cfn, ccont) {
+	//下載text資料成為utf-8檔案
+
+	//tag a
+	let a = document.createElement('a');
+	let blob = new Blob(['\ufeff', ccont]);
+	let url = URL.createObjectURL(blob);
+	a.href = url;
+	a.download = cfn;
+
+	//download
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+
+}
+
+
 function readfile(me) {
 	//讀取檔案
 
@@ -1344,25 +1362,77 @@ function aj_send(type, url, transferData) {
 }
 
 
+function aj_disposition(xhr) {
+	//由 Content-Disposition 取得 filename
+
+	let filename = '';
+	let disposition = xhr.getResponseHeader('Content-Disposition');
+	if (disposition && disposition.indexOf('attachment') !== -1) {
+		let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+		let matches = filenameRegex.exec(disposition);
+		if (matches != null && matches[1]) {
+			filename = matches[1].replace(/['"]/g, '');
+		}
+	}
+	return filename;
+}
+
+
+function aj_text(url, transferData) {
+	//ajax下載text檔案
+
+	//df
+	let df = GenDF();
+
+	//ajax
+	$.ajax({
+		url: url,
+		type: "GET",
+		data: transferData,
+		beforeSend: function (jqXHR, settings) {
+			let csrf = $('input[name=csrfmiddlewaretoken]').val();
+			jqXHR.setRequestHeader('X-CSRFToken', csrf);
+			jqXHR.setRequestHeader("X-Requested-With", "XMLHttpRequest")
+		}
+	})
+		.done(function (cdata, status, xhr) {
+			// console.log('cdata', cdata);
+			// console.log('status', status);
+			// console.log('xhr', xhr);
+
+			//downloadtext
+			let filename = aj_disposition(xhr);
+			downloadtext(filename, cdata);
+
+			//resolve
+			let res = {
+				'status': 'success',
+				'message': '下載檔案成功',
+			};
+			df.resolve(res);
+
+		})
+		.fail(function (xhr) {
+			//console.log(xhr);
+
+			//reject
+			let res = {
+				'status': 'error',
+				'message': '伺服器錯誤回應: ' + o2j(xhr),
+			};
+			df.reject(res);
+
+		})
+
+	return df;
+}
+
+
 function aj_binary(url, transferData) {
 	//ajax下載binary檔案
 
 	//df
 	let df = GenDF();
-
-	//getdisposition
-	function getdisposition(xhr) {
-		let filename = '';
-		let disposition = xhr.getResponseHeader('Content-Disposition');
-		if (disposition && disposition.indexOf('attachment') !== -1) {
-			let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-			let matches = filenameRegex.exec(disposition);
-			if (matches != null && matches[1]) {
-				filename = matches[1].replace(/['"]/g, '');
-			}
-		}
-		return filename;
-	}
 
 	//ajax
 	$.ajax({
@@ -1381,7 +1451,7 @@ function aj_binary(url, transferData) {
 			if (bdata.type === 'application/octet-stream') {
 
 				//downloadfile
-				let filename = getdisposition(xhr);
+				let filename = aj_disposition(xhr);
 				downloadfile(filename, bdata);
 
 				//resolve

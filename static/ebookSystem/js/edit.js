@@ -414,14 +414,17 @@ function createHtmlEditor() {
                     let isbnpart = s.pop();
 
                     //url
-                    let url = '/ebookSystem/resource/ebooks/' + isbnpart + '/OCR/origin';
+                    let url = 'http://0.0.0.0/ebookSystem/resource/ebooks/' + isbnpart + '/OCR/origin';
 
-                    //download
-                    location.replace(url);
+                    //aj_text
+                    aj_text(url,{})
+                    .done(function(){
 
-                    //alert
-                    alertmessage('success', '成功提交下載原始文字檔申請');
-
+                        //alert
+                        alertmessage('success', '成功提交下載原始文字檔');
+                    
+                    })
+                   
                 }
             });
 

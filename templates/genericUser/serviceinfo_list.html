@@ -1,74 +1,166 @@
-﻿{% extends "base_nav.html" %}
-{% block title %}
-服務紀錄
-{% endblock %}
-{% block header %}
-服務紀錄
-{% endblock %}
-{% block style %}
-{% load staticfiles %}
+{% extends "base_nav.html" %} 
+{% block title %} 
+服務紀錄 
+{% endblock %} 
+{% block header %} 
+服務紀錄 
+{% endblock %} 
+{% block style%} 
+{% load staticfiles %} 
+{% endblock %} 
+{% block content %} 
+{% csrf_token %}
 
-<script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
-{% endblock %}
-{% block content %}
-<form action="" method="post">
-	<h3>服務紀錄列表</h3>
-	{% csrf_token %} 
-	<table class="table table-striped table-hover">
-		<tr>
-			<th>月份</th>
-			{% if request.user.is_manager %}
-			<th>線上時數</th>
-			{% endif %}
-			<th>服務時數</th>
-			<th>頁數</th>
-			<th>狀態</th>
-			<th>兌換中心</th>
-			<th>動作</th>
-		</tr>
-		{% if current_ServiceInfo %}
-		<tr>
-			<td>{{ current_ServiceInfo.date.year }}年{{ current_ServiceInfo.date.month }}月</td>
-			{% if request.user.is_manager %}
-			<td></td>
-			{% endif %}
-			<td>{{ current_ServiceInfo.get_service_hours }}</td>
-			<td>{{ current_ServiceInfo.get_page_count }}</td>
-			<td>未兌換</td>
-			<td>{{ current_ServiceInfo.org }}</td>
-			<td>當月無法兌換</td>
-		</tr>
-		{% endif %}
-		{% for ServiceInfo in ServiceInfo_list %}
-		<tr>
-			<td>{{ ServiceInfo.date.year }}年{{ ServiceInfo.date.month }}月</td>
-			{% if request.user.is_manager %}
-			<td></td>
-			{% endif %}
-			<td>{{ ServiceInfo.get_service_hours }}</td>
-			<td>{{ ServiceInfo.get_page_count }}</td>
-			{% if ServiceInfo.is_exchange %}
-			<td>已兌換</td>
-			<td>{{ ServiceInfo.org }}</td>
-			<td></td>
-			{% else %}
-			<td>未兌換</td>
-			<td>
-				<select id="id_org" name="org" required>
+
+<script>
+
+
+	$(function () {
+
+		//userid
+		let userid = $('div[user_id]').attr('user_id');
+
+		//books
+		let client = new $.RestClient('/ebookSystem/api/');
+		client.add('editrecords');
+
+		//read
+		client.editrecords.read({ editor_id: userid })
+			.done(function (data) {
+				//console.log(data)
+
+				let d = []
+				_.each(data, function (v) {
+					_.times(3, function () {
+						let vv = _.cloneDeep(v)
+						d.push(vv)
+					})
+				})
+				_.each(data, function (v) {
+					_.times(3, function () {
+						let vv = _.cloneDeep(v)
+						vv.get_date = '2017-11-01'
+						d.push(vv)
+					})
+				})
+				_.each(data, function (v) {
+					_.times(3, function () {
+						let vv = _.cloneDeep(v)
+						vv.get_date = '2017-10-01'
+						d.push(vv)
+					})
+				})
+				data = d
+
+				//group
+				let r = _.groupBy(data, function (v) {
+					return strleft(v.get_date, 7)
+				});
+				let keys = _.keys(r);
+				//onsole.log(r, keys)
+
+				//sr
+				let sr = [];
+				_.each(r, function (gv, gk) {
+					_.each(gv, function (v, k) {
+						if (k === 0) {
+							let o = {
+								'核取': gk,
+								'服務時間': '',
+								'服務時數': '',
+								'線上時數': '',
+							};
+							sr.push(o);
+						}
+						let o = {
+							'核取': '<label class="checkbox-inline" style="margin-left:40px;"><input type="checkbox" name="inp_grp_exchange" value="'+v.id+'">兌換</label>',
+							'服務時間': v.get_date,
+							'服務時數': v.service_hours,
+							'線上時數': v.stay_hours,
+						};
+						sr.push(o);
+					})
+				})
+
+				//gentable
+				gentable('div_serviceinfo_list', 'div_serviceinfo_list_table', sr);
+
+				//table
+				$('#div_serviceinfo_list_table').find('tr').each(function(){
+					let tr=$(this);
+					tr.find('td:gt(0)').css('text-align', 'center');
+				})
+
+			});
+
+	})
+
+
+	function serviceinfo_select_all(){
+		//全選
+
+		$('input[name="inp_grp_exchange"]').prop('checked',true);
+	}
+
+
+	function serviceinfo_select_no(){
+		//全不選
+
+		$('input[name="inp_grp_exchange"]').prop('checked',false);
+	}
+
+
+	function serviceinfo_select_inv(){
+		//反向選
+
+		$('input[name="inp_grp_exchange"]').each(function(){
+			let inp=$(this);
+			inp.prop('checked',!inp.prop('checked'));
+		})
+	}
+
+
+</script>
+
+
+<h3 style="margin:40px 0px 30px 0px;">服務紀錄列表與兌換</h3>
+
+
+<h4><span class="glyphicon glyphicon-check" aria-hidden="true"></span> Step1: 勾選欲兌換之服務紀錄</h4>
+<hr style="margin-top:5px;">
+
+
+<div style="margin-bottom:40px;">
+	<button class="btn btn-default" type="Button" onclick="serviceinfo_select_all()">全選</button>
+	<button class="btn btn-default" type="Button" onclick="serviceinfo_select_no()">全不選</button>
+	<button class="btn btn-default" type="Button" onclick="serviceinfo_select_inv()">反向選</button>
+	<div id="div_serviceinfo_list"></div>
+</div>
+
+
+<h4><span class="glyphicon glyphicon-check" aria-hidden="true"></span> Step2: 確認後進行兌換</h4>
+<hr style="margin-top:5px;">
+
+
+<div style="margin-bottom:40px;">
+
+	<div class="form-inline">
+			
+		<div class="form-group" style="margin-right:15px;">
+			<label for="sel_exchangecenter" style="margin:0px;">
+				選擇兌換中心
+				<select id="sel_exchangecenter" class="form-control">
 					<option value="" selected="selected">---------</option>
-					{% for org in org_list %}
-					<option value="{{ org.id }}">{{ org.name }}</option>
-					{% endfor %}
+					<option value="1">社團法人台北市視障者家長協會</option>
 				</select>
-			</td>
-			<td>
-				<button class="btn btn-sm btn-primary send_form_button" type="submit" id="id_exchange" name="exchange" value={{ ServiceInfo.id }}>兌換</button>
-			</td>
+			</label>
+		</div>
+	
+	</div>
 
-			{% endif %}
-		</tr>
-	{% endfor %}
-	</table>
-</form>
+	<button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="">兌換</button>
+		
+</div>
+
 
 {% endblock %}

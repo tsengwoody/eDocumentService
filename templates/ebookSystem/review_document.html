@@ -14,7 +14,7 @@
 		//books
 		let client = new $.RestClient('/ebookSystem/api/');
 		client.add('books');
-
+		
 		//read
 		client.books.read(isbn)
 			.done(function (data) {
@@ -44,8 +44,6 @@
 					return '<button class="btn btn-default" type="button" style="margin:0px 5px 5px 0px;" onclick="ScanBookEditor(\'掃描內容瀏覽\',\''+h+'\')">'+pn+'</button>';
 				})
 				$('#step2_items').html(c2);
-
-				
 
 			});
 
