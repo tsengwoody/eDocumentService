@@ -353,7 +353,6 @@ class EBook(models.Model):
 				try:
 					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
 					editRecord.record_info()
-					editRecord.group_ServiceInfo()
 				except:
 					return False
 				try:
@@ -371,7 +370,6 @@ class EBook(models.Model):
 				try:
 					editRecord = EditRecord.objects.get(part=self, category='advanced', number_of_times=self.number_of_times)
 					editRecord.record_info()
-					editRecord.group_ServiceInfo()
 				except:
 					return False
 				self.status = self.status +direction
