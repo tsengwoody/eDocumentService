@@ -1113,8 +1113,8 @@ def book_repository_person(request, template_name='ebookSystem/book_repository_p
 from rest_framework.decorators import api_view, permission_classes
 from genericUser.premissions import IsManager
 
-@api_view(['GET'])
-@permission_classes((IsManager, ))
+@api_view(['GET' 'POST',])
+#@permission_classes((IsManager, ))
 def ebook_resource(request, pk, dir, resource):
 	try:
 		ebook = EBook.objects.get(ISBN_part=pk)

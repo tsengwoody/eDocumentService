@@ -44,6 +44,8 @@ class EBookSerializer(serializers.ModelSerializer):
 			'part',
 			'edited_page',
 			'number_of_times',
+			'deadline',
+			'get_date',
 			'status',
 		]
 

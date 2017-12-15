@@ -37,3 +37,7 @@ class QAndAViewSet(viewsets.ModelViewSet):
 	queryset = QAndA.objects.all()
 	serializer_class = QAndASerializer
 	permission_classes = (IsManagerOrReadOnly, )
+
+class OrganizationViewSet(viewsets.ModelViewSet):
+	queryset = Organization.objects.all()
+	serializer_class = OrganizationSerializer

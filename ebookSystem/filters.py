@@ -64,3 +64,13 @@ class EditRecordEditorFilter(filters.BaseFilterBackend):
 			return queryset.filter(editor=editor)
 		else:
 			return queryset
+
+class EditRecordServiceInfoFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		exchange = request.query_params.get('exchange')
+		if exchange and exchange in ['true', 'True']:
+			return queryset.exclude(serviceInfo=None)
+		elif exchange and exchange in ['false', 'False']:
+			return queryset.filter(serviceInfo=None)
+		else:
+			return queryset

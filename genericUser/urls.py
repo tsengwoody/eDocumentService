@@ -14,9 +14,14 @@ user_detail = apis.UserViewSet.as_view({
 
 serviceinfo_list = apis.ServiceInfoViewSet.as_view({
 	'get': 'list',
+	'post': 'create',
 })
 serviceinfo_detail = apis.ServiceInfoViewSet.as_view({
 	'get': 'retrieve',
+})
+
+organization_list = apis.OrganizationViewSet.as_view({
+	'get': 'list',
 })
 
 from rest_framework.routers import DefaultRouter
@@ -32,6 +37,7 @@ api_urlpatterns = api_urlpatterns +[
 	url(r'^users/(?P<pk>[\d]+)/$', user_detail, name='user-detail'),
 	url(r'^serviceinfos/$', serviceinfo_list, name='serviceinfo-list'),
 	url(r'^serviceinfos/(?P<pk>[\d]+)/$', serviceinfo_detail, name='serviceinfo-detail'),
+	url(r'^organizations/$', organization_list, name='organization-list'),
 ]
 
 import rest_framework

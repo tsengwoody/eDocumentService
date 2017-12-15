@@ -17,11 +17,16 @@ class UserSerializer(serializers.ModelSerializer):
 			'org',
 		]
 
+from ebookSystem.models import EditRecord
 class ServiceInfoSerializer(serializers.ModelSerializer):
-	editrecord_set = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+	editrecord_set = serializers.PrimaryKeyRelatedField(many=True, queryset=EditRecord.objects.filter(serviceInfo=None))
 	class Meta:
 		model = ServiceInfo
 		fields = '__all__'
+
+#	def create(self, validated_data):
+#		instance = super(ServiceInfoSerializer, self).create(validated_data)
+#		print type(validated_data)
 
 class AnnouncementSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -31,4 +36,9 @@ class AnnouncementSerializer(serializers.ModelSerializer):
 class QAndASerializer(serializers.ModelSerializer):
 	class Meta:
 		model = QAndA
+		fields = ('__all__')
+
+class OrganizationSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Organization
 		fields = ('__all__')
