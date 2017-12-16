@@ -71,7 +71,7 @@
 		autoClearCache: true,
 		cachableMethods: ['GET'],
 		methodOverride: false,
-		stringifyData: false,
+		stringifyData: true, //change to contentType: 'application/json'
 		stripTrailingSlash: false,
 		password: null,
 		username: null,
@@ -352,8 +352,13 @@
 				headers['X-HTTP-Method-Override'] = method;
 				method = 'POST';
 			}
-			if (this.opts.csrf) {
-				headers['X-CSRFToken'] = this.opts.csrf;
+			// if (this.opts.csrf) {
+			// 	headers['X-CSRFToken'] = this.opts.csrf;
+			// 	headers['X-Requested-With'] = 'XMLHttpRequest';
+			// }
+			if (true) { //change to inherent csrf
+				headers['X-CSRFToken'] = aj_getcsrf().csrf;
+				headers['X-Requested-With'] = 'XMLHttpRequest';
 			}
 			if (this.opts.stripTrailingSlash) {
 				url = url.replace(/\/$/, "");

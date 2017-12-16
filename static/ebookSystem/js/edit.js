@@ -292,6 +292,11 @@ function createHtmlEditor() {
         fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt',
         menubar: false,
         setup: function (editor) {
+
+            editor.on('init', function (e) {
+                editor.getBody().style.fontSize = '14pt';
+            });
+
             editor.on('change', function (e) {
                 //console.log(idel_min);
                 idel_min = 0;

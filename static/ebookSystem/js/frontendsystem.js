@@ -423,8 +423,8 @@ function o2j(v) {
 
 	let c = '';
 	try {
-		c = JSON.stringify(v);
-		//c = JSON.stringify(v, null, '\t');
+		//c = JSON.stringify(v);
+		c = JSON.stringify(v, null, '\t');
 	}
 	catch (err) {
 	}
@@ -1288,7 +1288,7 @@ function aj_getcsrf(){
 	return {
 		'csrf':csrf,
 		'X-CSRFToken':csrf,
-		'X-Requested-With':'XMLHttpRequest'
+		'X-Requested-With':'XMLHttpRequest',
 	};
 }
 
@@ -1322,7 +1322,9 @@ function aj_send(type, url, transferData) {
 	$.ajax({
 		url: url,
 		type: type,
-		data: transferData,
+		//data: transferData,
+		data: JSON.stringify(transferData),
+		contentType: 'application/json', //default: 'application/x-www-form-urlencoded; charset=UTF-8'
 		beforeSend: function (jqXHR, settings) {
 			if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
 				let g = aj_getcsrf();

@@ -16,6 +16,11 @@
 			language: "zh_TW",
 			plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
 			toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample',
+			setup: function (ed) {
+				ed.on('init', function (e) {
+					ed.getBody().style.fontSize = '14pt';
+				});
+			},
 		});
 
 	})
@@ -192,7 +197,7 @@
 				let n = vo.s.data.length;
 
 				//check
-				if((mode === 'up' && iss===0) || (mode === 'down' && iss===n-1)){
+				if ((mode === 'up' && iss === 0) || (mode === 'down' && iss === n - 1)) {
 					return;
 				}
 
@@ -235,11 +240,11 @@
 				vo.s.data = _.at(vo.s.data, r);
 
 				//focus
-				if (mode === 'up' && iss>0) {
-					$('div[iss="' + (iss-1) + '"]').find('button[title="往上"]').focus();
+				if (mode === 'up' && iss > 0) {
+					$('div[iss="' + (iss - 1) + '"]').find('button[title="往上"]').focus();
 				}
-				else if (mode === 'down' && iss<n-1) {
-					$('div[iss="' + (iss+1) + '"]').find('button[title="往下"]').focus();
+				else if (mode === 'down' && iss < n - 1) {
+					$('div[iss="' + (iss + 1) + '"]').find('button[title="往下"]').focus();
 				}
 
 			},
@@ -250,10 +255,10 @@
 				let vo = this;
 
 				//focus
-				if(vo.s.focus > iss){
+				if (vo.s.focus > iss) {
 					vo.s.focus++;
 				}
-				
+
 				//new data
 				let r = [];
 				_.each(vo.s.data, function (v, k) {
@@ -294,10 +299,10 @@
 				let vo = this;
 
 				//focus
-				if(vo.s.focus > iss){
+				if (vo.s.focus > iss) {
 					vo.s.focus--
 				}
-				
+
 				//reject
 				let r = _.reject(vo.s.data, function (v, k) {
 					return k === iss;
@@ -433,7 +438,7 @@
 
 		//cancel
 		div.off().on('hidden.bs.modal', function (e) {
-			
+
 			//defaultfocus
 			vo_editor.$refs.comp.defaultfocus();
 
