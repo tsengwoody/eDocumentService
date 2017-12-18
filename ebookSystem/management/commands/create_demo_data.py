@@ -280,7 +280,7 @@ class Command(BaseCommand):
 		assert ebook.change_status(1, 'review'), 'change status error'
 		src = BASE_DIR +u'/temp/part1-finish-sp.txt'
 		shutil.copy2(src, ebook.get_path('-finish'))
-		client = Client()
+		'''client = Client()
 		client.login(username='root', password='root')
 		response = client.post(
 			reverse(
@@ -294,7 +294,7 @@ class Command(BaseCommand):
 				'reason': '',
 			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
-		)
+		)'''
 
 		src = BASE_DIR +u'/temp/山羊島的藍色奇蹟.zip'
 		with open(src) as book_file:

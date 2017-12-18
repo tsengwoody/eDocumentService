@@ -1018,7 +1018,7 @@ def service(request, template_name='ebookSystem/service.html'):
 	finishPartList = request.user.edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
 	if request.method == 'POST':
 		if request.POST.has_key('getPart'):
-			if len(editingPartList)>=100:
+			if len(editingPartList)>=6:
 				status = 'error'
 				message = u'您已有超過{0}段文件，請先校對完成再領取'.format(GET_MAX_PART)
 				return locals()
@@ -1111,6 +1111,8 @@ def book_repository_person(request, template_name='ebookSystem/book_repository_p
 
 #=====file=====
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework import status
+from rest_framework.response import Response
 from genericUser.premissions import IsManager
 
 @api_view(['GET', 'POST',])
@@ -1118,8 +1120,8 @@ from genericUser.premissions import IsManager
 def ebook_resource(request, pk, dir, resource):
 	try:
 		ebook = EBook.objects.get(ISBN_part=pk)
-	except:
-		raise Http404("ebook does not exist")
+	except EBook.DoesNotExist:
+		return Response(status=status.HTTP_404_NOT_FOUND)
 	if dir == 'OCR':
 		if resource == 'origin':
 			fullpath = ebook.get_path()
@@ -1134,3 +1136,29 @@ def ebook_resource(request, pk, dir, resource):
 
 	if request.method == 'GET':
 		return get_file(fullpath)
+
+@api_view(['POST',])
+def ebook_change_status(request, pk):
+	try:
+		ebook = EBook.objects.get(ISBN_part=pk)
+	except EBook.DoesNotExist:
+		return Response(status=status.HTTP_404_NOT_FOUND)
+	if request.method == 'POST':
+		try:
+			user = User.objects.get(id=request.POST['user_id'])
+		except:
+			user = None
+		try:
+			deadline = request.POST['deadline'].split('-')
+			deadline = [ int(v) for v in deadline ]
+			deadline = timezone.datetime(deadline[0], deadline[1], deadline[2])
+		except:
+			deadline = None
+
+		direction = int(request.POST['direction'])
+		try:
+			ebook.change_status(direction=direction, status=request.POST['status'], user=user, deadline=deadline)
+		except BaseException as e:
+			raise e
+			return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+		return Response(status=status.HTTP_202_ACCEPTED)
