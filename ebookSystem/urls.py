@@ -89,6 +89,7 @@ urlpatterns = [
 	url(r'^bookorder_list$', views.bookorder_list, name='bookorder_list'),
 	url(r'^book_repository_person$', views.book_repository_person, name='book_repository_person'),
 	url(r'^book_action/$', views.book_action, name='book_action'),
+	url(r'^ebook_change_status/(?P<pk>[\d-]+)/$', views.ebook_change_status, name='ebook_change_status'),
 	url(r'^api/', include(api_urlpatterns, namespace='api')),
 	url(r'^resource/', include(resource_urlpatterns, namespace='api')),
 ]

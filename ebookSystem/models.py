@@ -325,7 +325,7 @@ class EBook(models.Model):
 
 	def change_status(self, direction, status, **kwargs):
 		if not self.status +direction == self.STATUS[status]:
-			return False
+			raise SystemError('direction and status not match')
 
 		#正向status變化
 		if direction == 1:

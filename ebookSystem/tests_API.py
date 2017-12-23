@@ -18,7 +18,7 @@ class EBookAPITests(TestCase):
 		client.login(username='root', password='root')
 		response = client.get(
 			reverse(
-				'ebookSystem:ebook-list',
+				'ebookSystem:api:ebook-list',
 			),
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
@@ -33,7 +33,7 @@ class BookAPITests(TestCase):
 		client.login(username='root', password='root')
 		response = client.get(
 			reverse(
-				'ebookSystem:book-detail',
+				'ebookSystem:api:book-detail',
 				kwargs = {
 					'pk': u'9789573321569',
 				}
@@ -41,5 +41,32 @@ class BookAPITests(TestCase):
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
 		print response.status_code
-		print response.json()['owners']
-		print response.json()['owner']
+
+
+class EBookChangeStatusTests(TestCase):
+	fixtures = ['dump.json',]
+
+	def test_case(self):
+		ebook = EBook.objects.get(ISBN_part='9789573321569-2')
+		print 'before'
+		print ebook.status
+		client = Client()
+		client.login(username='root', password='root')
+		response = client.post(
+			reverse(
+				'ebookSystem:ebook_change_status',
+				kwargs = {
+					'pk': ebook.ISBN_part,
+				},
+			),
+			{
+				'direction': '-1',
+				'status': 'edit',
+				'user_id': '',
+				'deadline': '',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		ebook = EBook.objects.get(ISBN_part='9789573321569-2')
+		print 'after'
+		print ebook.status
