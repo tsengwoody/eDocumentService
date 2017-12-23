@@ -195,17 +195,27 @@
 		client.serviceinfos.create(transferData)
 			.done(function (data) {
 
-				//alertmessage
-				alertmessage('success', '兌換成功')
-					.done(function () {
-						location.reload();
-					})
+				if (iser(data.editrecord_set)) {
+
+					//alertmessage
+					alertmessage('error', '兌換失敗: ' + '無紀錄被兌換');
+
+				}
+				else {
+
+					//alertmessage
+					alertmessage('success', '兌換成功')
+						.done(function () {
+							location.reload();
+						})
+
+				}
 
 			})
 			.fail(function (msg) {
 
 				//alertmessage
-				alertmessage('error', '兌換失敗: ' + msg.detail);
+				alertmessage('error', '非預期兌換失敗: ' + o2j(msg.responseJSON));
 
 			})
 

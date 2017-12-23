@@ -173,6 +173,17 @@ function cint(v) {
 }
 
 
+function cdbl(v) {
+    //轉浮點數
+
+    if ($.isNumeric(v)) {
+        return _.toFinite(v);
+    }
+
+    return 0;
+}
+
+
 function cstr(v) {
 	//轉字串
 

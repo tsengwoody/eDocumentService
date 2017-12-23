@@ -1,7 +1,4 @@
-{% extends "base_nav.html" %}
-{% load staticfiles %} 
-{% block content %} 
-{% csrf_token %}
+{% extends "base_nav.html" %} {% load staticfiles %} {% block content %} {% csrf_token %}
 
 
 <script>
@@ -14,7 +11,7 @@
 		//books
 		let client = new $.RestClient('/ebookSystem/api/');
 		client.add('books');
-		
+
 		//read
 		client.books.read(isbn)
 			.done(function (data) {
@@ -36,12 +33,12 @@
 				$('#step1_items').html(c1);
 
 				//ebook_set
-				let ebook_set=data.ebook_set;
+				let ebook_set = data.ebook_set;
 
 				//step2
-				let c2=_.map(ebook_set, function (h,k) {
-					let pn='Part'+(k+1);
-					return '<button class="btn btn-default" type="button" style="margin:0px 5px 5px 0px;" onclick="ScanBookEditor(\'掃描內容瀏覽\',\''+h+'\')">'+pn+'</button>';
+				let c2 = _.map(ebook_set, function (h, k) {
+					let pn = 'Part' + (k + 1);
+					return '<button class="btn btn-default" type="button" style="margin:0px 5px 5px 0px;" onclick="ScanBookEditor(\'掃描內容瀏覽\',\'' + h + '\')">' + pn + '</button>';
 				})
 				$('#step2_items').html(c2);
 
@@ -49,18 +46,18 @@
 
 	})
 
-	function SendReviewResult(){
+	function SendReviewResult() {
 		//發送審查結果
 
 		//url
-		let url='.';
+		let url = '.';
 
 		//transferData
-		let review=$('input[name="review_grp"]:checked').attr('tag');
-		let reason=$('#id_review_error_reason').val();
-		let transferData={
-			review:review,
-			reason:reason,
+		let review = $('input[name="review_grp"]:checked').attr('tag');
+		let reason = $('#id_review_error_reason').val();
+		let transferData = {
+			review: review,
+			reason: reason,
 		};
 
 		//aj_post
@@ -68,7 +65,13 @@
 			.done(function (data) {
 				alertmessage(data.status, data.message)
 					.done(function () {
-						history.back(); //回上一頁
+
+						//回上一頁
+						//history.back(); //會因為使用者點擊a相關連結，上一頁非審核上傳文件頁
+
+						//轉址審核上傳文件頁
+						document.location.href = '/manager/event_list/book/';
+
 					});
 			})
 			.fail(function (data) {
@@ -80,20 +83,25 @@
 </script>
 
 
-<h3 style="margin:40px 0px 30px 0px;">待審核文件：<span id="div_rwdoc_name"></span></h3>
+<h3 style="margin:40px 0px 30px 0px;">待審核文件：
+	<span id="div_rwdoc_name"></span>
+</h3>
 
 
-<h4><span class="glyphicon glyphicon-check" aria-hidden="true"></span> Step1: 基本資料</h4>
+<h4>
+	<span class="glyphicon glyphicon-check" aria-hidden="true"></span> Step1: 基本資料</h4>
 <hr style="margin-top:5px;">
 <div id="step1_items" style="margin-bottom:40px;"></div>
 
 
-<h4><span class="glyphicon glyphicon-check" aria-hidden="true"></span> Step2: 掃描內容</h4>
+<h4>
+	<span class="glyphicon glyphicon-check" aria-hidden="true"></span> Step2: 掃描內容</h4>
 <hr style="margin-top:5px;">
 <div id="step2_items" style="margin-bottom:40px;"></div>
 
 
-<h4><span class="glyphicon glyphicon-check" aria-hidden="true"></span> Step3: 審查結果</h4>
+<h4>
+	<span class="glyphicon glyphicon-check" aria-hidden="true"></span> Step3: 審查結果</h4>
 <hr style="margin-top:5px;">
 <div id="step3_items" style="margin-bottom:40px;">
 

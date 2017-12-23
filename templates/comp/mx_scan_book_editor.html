@@ -64,6 +64,24 @@
 	function ScanBookEditor_SelectChange() {
 		//圖片下拉式選單變更，亦具備初始化功能
 
+		//getinfo
+		function getinfo() {
+			let img = $('#divmodal_ScanBookEditor_imgs');
+			let wo = img[0].naturalWidth;
+			let ho = img[0].naturalHeight;
+			let wi = img.parent().width();
+			let hi = img.parent().height();
+			let r = wi / wo;
+			return {
+				img: img,
+				wo: wo,
+				ho: ho,
+				wi: wi,
+				hi: hi,
+				r: r,
+			}
+		}
+
 		//o
 		let o = $('#divmodal_ScanBookEditor_imgs');
 
@@ -88,6 +106,7 @@
 		}
 		else {
 			o.attr('ini', 'done');
+			//Cookies.remove('ScanBookEditor_imgview_ratio');
 
 			//等頁面出現才初始化
 			_.delay(function () {
@@ -107,6 +126,37 @@
 					transition: true,
 					fullscreen: false,
 					keyboard: false,
+					viewed: function () {
+						_.delay(function () {
+
+							//getinfo
+							let v = getinfo();
+
+							//ro
+							let ro = Cookies.get('ScanBookEditor_imgview_ratio');
+
+							//ruse
+							let ruse;
+							if (iser(ro)) {
+								//console.log('no Cookies')
+								ruse = v.r;
+							}
+							else {
+								//console.log('use Cookies')
+								ruse = cdbl(ro);
+							}
+							//console.log('ruse', ruse)
+							Cookies.set('ScanBookEditor_imgview_ratio', ruse);
+
+							//hdy
+							let hdy = v.ho * ruse / 2 - v.hi / 2;
+							
+							//zoomTo ,move
+							o.viewer('zoomTo', ruse).viewer('move', 0, hdy);
+
+						}, 300)
+
+					}
 				};
 
 				//viewer
@@ -117,6 +167,24 @@
 
 				//center
 				$('ul.viewer-toolbar').css({ 'display': 'flex', 'justify-content': 'center' });
+
+				//mousewheel
+				o.next().on('mousewheel', _.debounce(function () { //捲動前事件需脫勾，使用debounce減少觸發次數
+
+					//getinfo
+					let v = getinfo();
+
+					//r
+					let imgshow = v.img.next().find('img');
+					let wi = imgshow.width();
+					let r = wi / v.wo;
+
+					//save r
+					Cookies.set('ScanBookEditor_imgview_ratio', r);
+
+				}, 500)
+				);
+
 
 			}, 600)
 
@@ -147,7 +215,7 @@
 				return;
 			}
 			fs += 2;
-			
+
 			o.css('font-size', fs + 'px');
 		}
 	}
@@ -192,7 +260,13 @@
 				//text 
 				let tu = '/ebookSystem/resource/ebooks/' + isbnpart + '/OCR/origin';
 				$.get(tu).done(function (t) {
+
+					//escape
+					t = _.escape(t);
+
+					//html
 					$('#divmodal_ScanBookEditor_text').html(t);
+
 				})
 
 			});
