@@ -8,7 +8,7 @@ class BookInfoSerializer(serializers.ModelSerializer):
 
 class BookSerializer(serializers.ModelSerializer):
 	ebook_set = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-	book_info = BookInfoSerializer(read_only=True)
+#	book_info = BookInfoSerializer(read_only=True)
 	finish_page_count = serializers.ReadOnlyField(source='collect_finish_page_count')
 	finish_part_count = serializers.ReadOnlyField(source='collect_finish_part_count')
 	service_hours = serializers.ReadOnlyField(source='collect_service_hours')

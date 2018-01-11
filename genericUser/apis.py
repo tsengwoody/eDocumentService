@@ -23,7 +23,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class ServiceInfoViewSet(viewsets.ModelViewSet):
 	queryset = ServiceInfo.objects.all()
 	serializer_class = ServiceInfoSerializer
-	filter_backends = (ServiceInfoUserFilter,)
+	filter_backends = (ServiceInfoUserFilter, ServiceInfoExchangeFilter,)
 
 class AnnouncementViewSet(viewsets.ModelViewSet):
 	queryset = Announcement.objects.all()

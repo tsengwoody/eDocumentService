@@ -18,6 +18,7 @@ serviceinfo_list = apis.ServiceInfoViewSet.as_view({
 })
 serviceinfo_detail = apis.ServiceInfoViewSet.as_view({
 	'get': 'retrieve',
+	'patch': 'partial_update',
 })
 
 organization_list = apis.OrganizationViewSet.as_view({

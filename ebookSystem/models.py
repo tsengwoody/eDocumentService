@@ -93,6 +93,8 @@ class Book(models.Model):
 		return 'unknown'
 
 	def check_status(self):
+		if self.status < 0:
+			return -1
 		status = min([ part.status for part in self.ebook_set.all() ])
 		self.status = status
 		if self.status_int2str() == 'finish':
@@ -637,6 +639,8 @@ class EBook(models.Model):
 		content = content.split('<p>|----------|</p>\r\n')
 		finish_content = content[0]
 		edit_content = content[1]
+		if not len(content) == 2:
+			raise SystemError('save mark error')
 		return [finish_content, edit_content]
 
 class BookOrder(models.Model):

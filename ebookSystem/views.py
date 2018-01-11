@@ -481,10 +481,13 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 			raise Http404("請勿重覆傳送")
 		content = request.POST['content']
 		if request.POST.has_key('save'):
-			[finishContent, editContent] = part.split_content(content)
-			if finishContent == '' or editContent == '':
+			try:
+				[finishContent, editContent] = part.split_content(content)
+				if finishContent == '' or editContent == '':
+					raise SystemError('save mark error')
+			except BaseException as e:
 				status = 'error'
-				message = u'標記位置不可在首行或末行'
+				message = u'標記位置錯誤或有多個標記'
 				del request.session['postToken']
 				postToken = uuid.uuid1().hex
 				request.session['postToken'] = postToken
