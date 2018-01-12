@@ -15,6 +15,12 @@ class UserSerializer(serializers.ModelSerializer):
 			'education',
 			'is_book',
 			'org',
+			'is_editor',
+			'is_guest',
+			'is_manager',
+			'is_advanced_editor',
+			'auth_email',
+			'auth_phone',
 		]
 
 from ebookSystem.models import EditRecord

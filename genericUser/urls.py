@@ -8,7 +8,6 @@ user_list = apis.UserViewSet.as_view({
 })
 user_detail = apis.UserViewSet.as_view({
 	'get': 'retrieve',
-	'put': 'update',
 	'patch': 'partial_update',
 })
 

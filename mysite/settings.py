@@ -26,7 +26,6 @@ SECRET_KEY = 'e_#e-byj7#a+$v7#wmocwd8wp)+&wajk0axt70dl@)nsx!*glq'
 # SECURITY WARNING: don't run with debug turned on in production!
 import socket
 if socket.gethostname() == 'edoc':
-#if not 1:
     DEBUG = False
 else:
     DEBUG = True
@@ -37,8 +36,6 @@ if socket.gethostname() == 'edoc':
     SECURE_SSL_REDIRECT = True
 
 ADMINS = [
-#    ('woody', 'tsengwoody.tw@gmail.com'),
-#    ('amy', 't101598002@ntut.edu.tw'),
     ('eDocumentService', 'edocumentservice@gmail.com'),
 ]
 
@@ -57,7 +54,6 @@ INSTALLED_APPS = (
     'account',
     'ebookSystem',
     'genericUser',
-#    'guest',
     'rest_framework',
     'snowpenguin.django.recaptcha2',
 )
@@ -97,6 +93,7 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+database = os.environ.get('DATABASE')
 if socket.gethostname() == 'edoc':
     DATABASES = {
         'default': {
@@ -108,22 +105,22 @@ if socket.gethostname() == 'edoc':
             'PORT': '3306',
         }
     }
-    '''else:
+elif database == 'sqlite3':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
+else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'eDocumentService',
             'USER': 'root',
-            'PASSWORD': 'eds@2017',
+            'PASSWORD': 'eds@2018',
             'HOST': '127.0.0.1',
             'PORT': '3306',
-        }
-    }'''
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
 
@@ -231,7 +228,6 @@ AUTHENTICATION_BACKENDS = (
 
 from .account_info import *
 
-#DATA_UPLOAD_MAX_MEMORY_SIZE = None
 '''REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
