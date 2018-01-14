@@ -107,15 +107,9 @@ def login(request, template_name='registration/login.html', authentication_form=
 	"""
 	if request.method == 'GET':
 		form = authentication_form(request)
-		captcha=FormWithCaptcha();
 		return locals()
 	if request.method == 'POST':
 		form = authentication_form(request, data=request.POST)
-		reCaptcha = FormWithCaptcha(request.POST);
-#		if not reCaptcha.is_valid():
-#			status = 'error'
-#			message = u'captcha驗證失敗，'+ str(reCaptcha.errors)
-#			return locals()
 		if not form.is_valid():
 			status = 'error'
 			message = u'帳號或密碼錯誤，請重新輸入'

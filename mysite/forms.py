@@ -1,8 +1,6 @@
 ﻿# coding: utf-8
 from django import forms
 from genericUser.models import User
-from snowpenguin.django.recaptcha2.fields import ReCaptchaField
-from snowpenguin.django.recaptcha2.widgets import ReCaptchaWidget
 from django.conf import settings
 import requests
 
@@ -114,6 +112,3 @@ class RegisterUserForm(forms.ModelForm):
 		field_order = ['username', 'password', 'confirm_password', 'first_name', 'last_name', 'email', 'phone', 'birthday', 'education', 'is_book', 'org',]
 		self.fields = type(self.fields)((k, self.fields[k]) for k in field_order)
 		self.fields['org'].empty_label = u'其他'
-
-class FormWithCaptcha(forms.Form):
-    captcha = ReCaptchaField(required=True,widget=ReCaptchaWidget())

@@ -8,7 +8,7 @@ import glob,os
 import datetime
 import codecs
 import shutil
-from PIL import Image, ImageFont, ImageDraw
+#from PIL import Image, ImageFont, ImageDraw
 from bs4 import BeautifulSoup, NavigableString
 
 def generic_serialized(self):

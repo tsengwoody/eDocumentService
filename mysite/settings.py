@@ -55,7 +55,6 @@ INSTALLED_APPS = (
     'ebookSystem',
     'genericUser',
     'rest_framework',
-    'snowpenguin.django.recaptcha2',
 )
 
 MIDDLEWARE_CLASSES = (
