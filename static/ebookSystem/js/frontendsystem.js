@@ -1333,9 +1333,9 @@ function aj_send(type, url, transferData) {
 	$.ajax({
 		url: url,
 		type: type,
-		//data: transferData,
-		data: JSON.stringify(transferData),
-		contentType: 'application/json', //default: 'application/x-www-form-urlencoded; charset=UTF-8'
+		data: transferData,
+		//ata: JSON.stringify(transferData),
+		//contentType: 'application/json', //default: 'application/x-www-form-urlencoded; charset=UTF-8'
 		beforeSend: function (jqXHR, settings) {
 			if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
 				let g = aj_getcsrf();
