@@ -10,12 +10,14 @@ from django.template.loader import get_template
 from django.template import Context
 from django.utils import timezone
 from ebookSystem.models import *
+from ebookSystem.apis import *
 from genericUser.models import *
 from utils.decorator import *
 from utils.tag import *
 from utils.uploadFile import handle_uploaded_file
 from .forms import *
 from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWORD
+from utils.resource import *
 from zipfile import ZipFile
 import base64
 import json
@@ -473,6 +475,7 @@ def user_manager(request, template_name='genericUser/user_manager.html'):
 
 @http_response
 def announcement_list(request, template_name='genericUser/announcement_list.html'):
+	API_list = [reverse('genericUser:api:announcement-list')]
 	announcement_lists = [
 		(i[0], Announcement.objects.filter(category=i[0]))
 		for i in Announcement.CATEGORY
@@ -484,6 +487,7 @@ def announcement_list(request, template_name='genericUser/announcement_list.html
 
 @http_response
 def announcement(request, ID, template_name='genericUser/announcement.html'):
+	API_list = [reverse('genericUser:api:announcement-detail', kwargs={'pk': ID})]
 	try:
 		announcement = Announcement.objects.get(id=ID)
 	except:
@@ -506,6 +510,7 @@ def announcement(request, ID, template_name='genericUser/announcement.html'):
 
 @http_response
 def announcement_create(request, template_name='genericUser/announcement_create.html'):
+	API_list = [reverse('genericUser:api:announcement-list')]
 	announcement_category = Announcement.CATEGORY
 	AnnouncementForm = modelform_factory(Announcement, fields=['category', 'title', 'content', ])
 	if request.method == 'POST':
@@ -524,10 +529,10 @@ def announcement_create(request, template_name='genericUser/announcement_create.
 		return locals()
 
 @http_response
-def announcement_update(request, id, ):
+def announcement_update(request, pk, ):
 	AnnouncementForm = modelform_factory(Announcement, fields=['category', 'title', 'content', ])
 	if request.method == 'POST':
-		announcement = Announcement.objects.get(id=id)
+		announcement = Announcement.objects.get(id=pk)
 		form = AnnouncementForm(request.POST, instance=announcement)
 		if not form.is_valid():
 			status = 'error'
@@ -605,3 +610,33 @@ def qanda_main(request, template_name='genericUser/qanda_main.html'):
 @http_response
 def getbookrecord_view(request, username, template_name='genericUser/getbookrecord_view.html'):
 	return locals()
+
+from django.http import Http404
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
+from genericUser.premissions import IsManager
+#@permission_classes((IsManager, ))
+
+class UserResource(Resource):
+	resourceClass = User
+
+	def get_fullpath(self, obj, dir, resource):
+		fullpath = None
+		if dir == 'disability_card':
+			if resource == 'front':
+				fullpath = obj.disability_card_front
+			if resource == 'back':
+				fullpath = obj.disability_card_back
+		return fullpath
+
+	def get(self, request, pk, dir, resource):
+		obj = self.get_object(pk)
+		fullpath = self.get_fullpath(obj, dir, resource)
+		return self.get_resource(fullpath)
+
+	def post(self, request, pk, dir, resource):
+		obj = self.get_object(pk)
+		fullpath = self.get_fullpath(obj, dir, resource)
+		return self.post_resource(fullpath, request.FILES['object'])

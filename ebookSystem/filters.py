@@ -2,6 +2,23 @@
 
 from rest_framework import filters
 
+class BookStatusFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		status = request.query_params.get('status')
+		if status:
+			return queryset.filter(status=int(status))
+		else:
+			return queryset
+
+class BookOwnerFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		owner_id = request.query_params.get('owner_id')
+		if owner_id:
+			owner = User.objects.get(id=owner_id)
+			return queryset.filter(owner=owner)
+		else:
+			return queryset
+
 class CBCFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
 		chinese_book_category = request.query_params.get('chinese_book_category')
@@ -42,7 +59,7 @@ class EBookStatusFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
 		status = request.query_params.get('status')
 		if status:
-			return queryset.filter(status=status)
+			return queryset.filter(status=int(status))
 		else:
 			return queryset
 

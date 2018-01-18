@@ -21,6 +21,7 @@ from utils.analysis import *
 from utils.crawler import *
 from utils.decorator import *
 from utils.uploadFile import handle_uploaded_file
+from utils.resource import *
 import os
 import json
 import shutil
@@ -904,6 +905,9 @@ def book_list(request, ):
 
 @http_response
 def book_repository(request, template_name='ebookSystem/book_repository.html'):
+	API_list = [
+		reverse('ebookSystem:api:bookinfo-list')
+	]
 	if request.method == 'GET':
 		return locals()
 
@@ -1097,6 +1101,10 @@ def bookorder_list(request, template_name='ebookSystem/bookorder_list.html'):
 
 @http_response
 def book_repository_person(request, template_name='ebookSystem/book_repository_person.html'):
+	API_list = [
+		reverse('ebookSystem:api:book-list'),
+		reverse('ebookSystem:api:bookinfo-list'),
+	]
 	edit_book_list = request.user.own_book_set.all().filter(status__lte=Book.STATUS['review'])
 	finish_book_list = request.user.own_book_set.all().filter(status__gte=Book.STATUS['finish'])
 	bookinfos = [ book.book_info for book in finish_book_list ]
@@ -1113,32 +1121,39 @@ def book_repository_person(request, template_name='ebookSystem/book_repository_p
 		return locals()
 
 #=====file=====
+from django.http import Http404
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from genericUser.premissions import IsManager
-
-@api_view(['GET', 'POST',])
 #@permission_classes((IsManager, ))
-def ebook_resource(request, pk, dir, resource):
-	try:
-		ebook = EBook.objects.get(ISBN_part=pk)
-	except EBook.DoesNotExist:
-		return Response(status=status.HTTP_404_NOT_FOUND)
-	if dir == 'OCR':
-		if resource == 'origin':
-			fullpath = ebook.get_path()
+
+class EBookResource(Resource):
+	resourceClass = EBook
+
+	def get_fullpath(self, ebook, dir, resource):
+		fullpath = None
+		if dir == 'OCR':
+			if resource == 'origin':
+				fullpath = ebook.get_path()
+			else:
+				fullpath = ebook.get_path('-' +resource)
+		elif dir == 'source':
+			fullpath = os.path.join(ebook.book.path +u'/source', ebook.get_source_list()[int(resource)])
 		else:
-			fullpath = ebook.get_path('-' +resource)
+			pass
+		return fullpath
 
-	elif dir == 'source':
-		fullpath = os.path.join(ebook.book.path +u'/source', ebook.get_source_list()[int(resource)])
+	def get(self, request, pk, dir, resource):
+		ebook = self.get_object(pk)
+		fullpath = self.get_fullpath(ebook, dir, resource)
+		return self.get_resource(fullpath)
 
-	else:
-		pass
-
-	if request.method == 'GET':
-		return get_file(fullpath)
+	def post(self, request, pk, dir, resource):
+		ebook = self.get_object(pk)
+		fullpath = self.get_fullpath(ebook, dir, resource)
+		return self.post_resource(fullpath, request.FILES['object'])
 
 @api_view(['POST',])
 def ebook_change_status(request, pk):

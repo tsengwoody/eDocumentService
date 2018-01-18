@@ -42,6 +42,10 @@ api_urlpatterns = api_urlpatterns +[
 
 import rest_framework
 
+resource_urlpatterns = [
+	url(r'^users/(?P<pk>[\d-]+)/(?P<dir>[\w]+)/(?P<resource>[\d\w]+)/$', views.UserResource.as_view(), name='user-resource'),
+]
+
 urlpatterns = [
 	url(r'^user_guide', views.user_guide, name='user_guide'),
 	url(r'^recruit', views.recruit, name='recruit'),
@@ -70,6 +74,7 @@ urlpatterns = [
 	url(r'^qanda_update/(?P<id>[0-9]+)/$', views.qanda_update, name='qanda_update'),
 	url(r'^qanda_delete/(?P<id>[0-9]+)/$', views.qanda_delete, name='qanda_delete'),
 	url(r'^qanda_list$', views.qanda_list, name='qanda_list'),
-	url(r'^api/', include(api_urlpatterns, namespace='genericUser-api')),
+	url(r'^api/', include(api_urlpatterns, namespace='api')),
+	url(r'^resource/', include(resource_urlpatterns, namespace='resource')),
 	url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

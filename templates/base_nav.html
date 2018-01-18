@@ -39,6 +39,7 @@
 						<li><a href="{% url 'genericUser:user_manager' %}">使用者管理</a></li>
 						{% endif %}
 						{% if request.user.manage_org_set.all|length > 0 %}
+						<li><a href="{% url 'genericUser:serviceinfo_list_check' %}">服務時數確認</a></li>
 						<li><a href="{% url 'manager:org_manage' %}">組織管理</a></li>
 						{% endif %}
 						{% if request.user.is_superuser %}

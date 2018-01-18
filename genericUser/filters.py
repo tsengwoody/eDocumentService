@@ -21,3 +21,20 @@ class ServiceInfoUserFilter(filters.BaseFilterBackend):
 			return queryset.filter(user=user)
 		else:
 			return queryset
+
+class AnnouncementCategoryFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		category = request.query_params.get('category')
+		if category:
+			return queryset.filter(category=category)
+		else:
+			return queryset
+
+class AnnouncementNewestFilter(filters.BaseFilterBackend):
+
+	def filter_queryset(self, request, queryset, view):
+		newest = request.query_params.get('newest')
+		if newest:
+			return queryset.order_by('-datetime')[0:int(newest)]
+		else:
+			return queryset

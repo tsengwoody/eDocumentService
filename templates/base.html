@@ -124,6 +124,9 @@
 
 <body>
 	<div user_id="{{ request.user.id }}"></div>
+	{% for i in API_list %}
+	<div API{{ forloop.counter }}="{{ i }}"></div>
+	{% endfor %}
 	{% block tawk %}
 	<!--Start of Tawk.to Script-->
 	<script type="text/javascript">

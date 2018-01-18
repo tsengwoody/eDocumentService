@@ -30,6 +30,11 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 @http_response
+def dev(request, name):
+	template_name='dev/{0}.html'.format(name)
+	return locals()
+
+@http_response
 def about(request, name):
 	template_name='about/{0}.html'.format(name)
 	return locals()

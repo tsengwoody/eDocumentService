@@ -28,7 +28,7 @@ class ServiceInfoViewSet(viewsets.ModelViewSet):
 class AnnouncementViewSet(viewsets.ModelViewSet):
 	queryset = Announcement.objects.all()
 	serializer_class = AnnouncementSerializer
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter,)
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, AnnouncementCategoryFilter, AnnouncementNewestFilter, )
 	ordering_fields = ('datetime',)
 	search_fields = ('category',)
 	permission_classes = (IsManagerOrReadOnly, )

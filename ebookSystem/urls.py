@@ -53,7 +53,7 @@ api_urlpatterns = api_urlpatterns +[
 ]
 
 resource_urlpatterns = [
-	url(r'^ebooks/(?P<pk>[\d-]+)/(?P<dir>[\w]+)/(?P<resource>[\d\w]+)/$', views.ebook_resource, name='ebook_resource'),
+	url(r'^ebooks/(?P<pk>[\d-]+)/(?P<dir>[\w]+)/(?P<resource>[\d\w]+)/$', views.EBookResource.as_view(), name='ebook-resource'),
 ]
 
 urlpatterns = [
@@ -91,5 +91,5 @@ urlpatterns = [
 	url(r'^book_action/$', views.book_action, name='book_action'),
 	url(r'^ebook_change_status/(?P<pk>[\d-]+)/$', views.ebook_change_status, name='ebook_change_status'),
 	url(r'^api/', include(api_urlpatterns, namespace='api')),
-	url(r'^resource/', include(resource_urlpatterns, namespace='api')),
+	url(r'^resource/', include(resource_urlpatterns, namespace='resource')),
 ]

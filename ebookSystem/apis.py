@@ -13,6 +13,7 @@ from .serializers import *
 class BookViewSet(viewsets.ModelViewSet):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
+	filter_backends = (BookStatusFilter, BookOwnerFilter,)
 
 class EBookViewSet(viewsets.ModelViewSet):
 	queryset = EBook.objects.all()
