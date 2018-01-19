@@ -130,12 +130,9 @@ def apply_document(request, template_name='genericUser/apply_document.html'):
 	if request.method == 'GET':
 		return locals()
 
-@user_category_check(['manager'])
-def event_list(request):
+def event_list(request, template_name = 'genericUser/event_list.html'):
 	events = Event.objects.filter(creater=request.user)
-	template_name = 'genericUser/event_list.html'
 	return render(request, template_name, locals())
-
 
 @http_response
 def org_info(request, template_name='genericUser/org_info.html'):
@@ -259,7 +256,7 @@ def change_contact_info(request, template_name):
 		return locals()
 
 @http_response
-def serviceinfo_list(request, username, template_name='genericUser/serviceinfo_list.html'):
+def serviceinfo_list(request, template_name='genericUser/serviceinfo_list.html'):
 	try:
 		user = User.objects.get(username=username)
 	except:
@@ -294,6 +291,10 @@ def serviceinfo_list(request, username, template_name='genericUser/serviceinfo_l
 		return locals()
 	if request.method == 'GET':
 		return locals()
+
+@http_response
+def serviceinfo_list_check(request, template_name='genericUser/serviceinfo_list_check.html'):
+	return locals()
 
 @http_response
 def verify_contact_info(request, template='genericUser/verify_contact_info.html'):
