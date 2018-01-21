@@ -1129,6 +1129,31 @@ from rest_framework.response import Response
 from genericUser.premissions import IsManager
 #@permission_classes((IsManager, ))
 
+class BookResource(Resource):
+	resourceClass = Book
+
+	def get_fullpath(self, obj, dir, resource):
+		fullpath = None
+		if dir == 'OCR':
+			if resource in ['epub', ]:
+				fullpath = obj.path +'/OCR/{0}.{1}'.format(obj.ISBN, resource)
+		elif dir == 'source':
+			if resource in ['epub', 'txt', 'zip', ]:
+				fullpath = obj.path +'/{0}.{1}'.format(obj.ISBN, resource)
+		else:
+			pass
+		return fullpath
+
+	def get(self, request, pk, dir, resource):
+		obj = self.get_object(pk)
+		fullpath = self.get_fullpath(obj, dir, resource)
+		return self.get_resource(fullpath)
+
+	def post(self, request, pk, dir, resource):
+		obj = self.get_object(pk)
+		fullpath = self.get_fullpath(obj, dir, resource)
+		return self.post_resource(fullpath, request.FILES['object'])
+
 class EBookResource(Resource):
 	resourceClass = EBook
 
@@ -1146,13 +1171,13 @@ class EBookResource(Resource):
 		return fullpath
 
 	def get(self, request, pk, dir, resource):
-		ebook = self.get_object(pk)
-		fullpath = self.get_fullpath(ebook, dir, resource)
+		obj = self.get_object(pk)
+		fullpath = self.get_fullpath(obj, dir, resource)
 		return self.get_resource(fullpath)
 
 	def post(self, request, pk, dir, resource):
-		ebook = self.get_object(pk)
-		fullpath = self.get_fullpath(ebook, dir, resource)
+		obj = self.get_object(pk)
+		fullpath = self.get_fullpath(obj, dir, resource)
 		return self.post_resource(fullpath, request.FILES['object'])
 
 @api_view(['POST',])

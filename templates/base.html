@@ -124,6 +124,8 @@
 
 <body>
 	<div user_id="{{ request.user.id }}"></div>
+	<div API="{{ api }}"></div>
+	<div pk="{{ pk }}"></div>
 	{% for i in API_list %}
 	<div API{{ forloop.counter }}="{{ i }}"></div>
 	{% endfor %}

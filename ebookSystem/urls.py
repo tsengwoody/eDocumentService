@@ -53,6 +53,7 @@ api_urlpatterns = api_urlpatterns +[
 ]
 
 resource_urlpatterns = [
+	url(r'^books/(?P<pk>[\d-]+)/(?P<dir>[\w]+)/(?P<resource>[\d\w]+)/$', views.BookResource.as_view(), name='book-resource'),
 	url(r'^ebooks/(?P<pk>[\d-]+)/(?P<dir>[\w]+)/(?P<resource>[\d\w]+)/$', views.EBookResource.as_view(), name='ebook-resource'),
 ]
 

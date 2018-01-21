@@ -27,6 +27,20 @@ import requests
 import urllib, urllib2
 
 @http_response
+def refactor(request, name):
+	template_name = 'genericUser/refactor/{0}.html'.format(name)
+	model = name.split('-')[0]
+	api = '/genericUser/api/{0}'.format(model)
+	return locals()
+
+@http_response
+def refactor_detail(request, name, pk):
+	template_name = 'genericUser/refactor/{0}.html'.format(name)
+	model = name.split('-')[0]
+	api = '/genericUser/api/{0}'.format(model)
+	return locals()
+
+@http_response
 def retrieve_password(request, template_name='genericUser/retrieve_password.html'):
 	if request.method == 'POST':
 		print request.POST['rpw_email']

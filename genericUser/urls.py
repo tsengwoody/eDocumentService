@@ -47,6 +47,8 @@ resource_urlpatterns = [
 ]
 
 urlpatterns = [
+	url(r'^refactor/(?P<name>[\w-]+)/$', views.refactor, name='refactor'),
+	url(r'^refactor/(?P<name>[\w-]+)/(?P<pk>[\d-]+)/$', views.refactor_detail, name='refactor-detail'),
 	url(r'^user_guide', views.user_guide, name='user_guide'),
 	url(r'^recruit', views.recruit, name='recruit'),
 	url(r'^apply_document/$', views.apply_document, name='apply_document'),
