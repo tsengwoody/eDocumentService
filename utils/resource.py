@@ -5,6 +5,7 @@ import os
 from django.http import FileResponse
 from django.http import Http404
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import detail_route, list_route
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -42,3 +43,17 @@ class Resource(APIView):
 			for chunk in file.chunks():
 				destination.write(chunk)
 		return Response(status=status.HTTP_202_ACCEPTED)
+
+class ResourceViewSet(Resource):
+	@detail_route(
+		methods=['get', 'post'],
+		url_name='resource',
+		url_path='resource/(?P<dir>[\w]+)/(?P<resource>[\d\w]+)',
+	)
+	def resource(self, request, pk=None, dir=None, resource=None):
+		obj = self.get_object()
+		fullpath = self.get_fullpath(obj, dir, resource)
+		if request.method == 'GET':
+			return self.get_resource(fullpath)
+		if request.method == 'POST':
+			return self.post_resource(fullpath, request.FILES['object'])

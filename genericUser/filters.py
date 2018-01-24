@@ -38,3 +38,10 @@ class AnnouncementNewestFilter(filters.BaseFilterBackend):
 			return queryset.order_by('-datetime')[0:int(newest)]
 		else:
 			return queryset
+
+class UserSelfOrManagerFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		if hasattr(request.user, 'is_manager') and request.user.is_manager:
+			return queryset
+		else:
+			return queryset.filter(id=request.user.id)

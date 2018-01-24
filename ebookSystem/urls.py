@@ -3,59 +3,15 @@ from django.conf.urls import include, url
 from . import views
 from . import apis
 
-book_list = apis.BookViewSet.as_view({
-	'get': 'list',
-})
-book_detail = apis.BookViewSet.as_view({
-	'get': 'retrieve',
-})
-
-ebook_list = apis.EBookViewSet.as_view({
-	'get': 'list',
-#	'post': 'create',
-})
-ebook_detail = apis.EBookViewSet.as_view({
-	'get': 'retrieve',
-#	'put': 'update',
-#	'patch': 'partial_update',
-#	'delete': 'destroy',
-})
-
-bookinfo_list = apis.BookInfoViewSet.as_view({
-	'get': 'list',
-})
-bookinfo_detail = apis.BookInfoViewSet.as_view({
-	'get': 'retrieve',
-})
-
-editrecord_list = apis.EditRecordViewSet.as_view({
-	'get': 'list',
-})
-
-editrecord_detail = apis.EditRecordViewSet.as_view({
-	'get': 'retrieve',
-})
-
 from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
+router.register(r'books', apis.BookViewSet)
+router.register(r'ebooks', apis.EBookViewSet)
+router.register(r'bookinfos', apis.BookInfoViewSet)
+router.register(r'editrecords', apis.EditRecordViewSet)
 
 import copy
 api_urlpatterns = copy.copy(router.urls)
-api_urlpatterns = api_urlpatterns +[
-	url(r'^books/$', book_list, name='book-list'),
-	url(r'^books/(?P<pk>[\d-]+)/$', book_detail, name='book-detail'),
-	url(r'^ebooks/$', ebook_list, name='ebook-list'),
-	url(r'^ebooks/(?P<pk>[\d-]+)/$', ebook_detail, name='ebook-detail'),
-	url(r'^bookinfos/$', bookinfo_list, name='bookinfo-list'),
-	url(r'^bookinfos/(?P<pk>[\d]+)/$', bookinfo_detail, name='bookinfo-detail'),
-	url(r'^editrecords/$', editrecord_list, name='editrecord-list'),
-	url(r'^editrecords/(?P<pk>[\d]+)/$', editrecord_detail, name='editrecord-detail'),
-]
-
-resource_urlpatterns = [
-	url(r'^books/(?P<pk>[\d-]+)/(?P<dir>[\w]+)/(?P<resource>[\d\w]+)/$', views.BookResource.as_view(), name='book-resource'),
-	url(r'^ebooks/(?P<pk>[\d-]+)/(?P<dir>[\w]+)/(?P<resource>[\d\w]+)/$', views.EBookResource.as_view(), name='ebook-resource'),
-]
 
 urlpatterns = [
 	url(r'^mathml', views.mathml, name='mathml'),
@@ -92,5 +48,4 @@ urlpatterns = [
 	url(r'^book_action/$', views.book_action, name='book_action'),
 	url(r'^ebook_change_status/(?P<pk>[\d-]+)/$', views.ebook_change_status, name='ebook_change_status'),
 	url(r'^api/', include(api_urlpatterns, namespace='api')),
-	url(r'^resource/', include(resource_urlpatterns, namespace='resource')),
 ]

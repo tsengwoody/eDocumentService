@@ -3,42 +3,20 @@ from django.conf.urls import include, url
 from . import views
 from . import apis
 
-user_list = apis.UserViewSet.as_view({
-	'post': 'create',
-})
-user_detail = apis.UserViewSet.as_view({
-	'get': 'retrieve',
-	'patch': 'partial_update',
-})
-
-serviceinfo_list = apis.ServiceInfoViewSet.as_view({
-	'get': 'list',
-	'post': 'create',
-})
-serviceinfo_detail = apis.ServiceInfoViewSet.as_view({
-	'get': 'retrieve',
-	'patch': 'partial_update',
-})
-
 organization_list = apis.OrganizationViewSet.as_view({
 	'get': 'list',
 })
 
 from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
-router.register(r'users_manager', apis.UserManagerViewSet)
 router.register(r'announcements', apis.AnnouncementViewSet)
+router.register(r'organizations', apis.OrganizationViewSet)
 router.register(r'qandas', apis.QAndAViewSet)
+router.register(r'serviceinfos', apis.ServiceInfoViewSet)
+router.register(r'users', apis.UserViewSet)
 
 import copy
 api_urlpatterns = copy.copy(router.urls)
-api_urlpatterns = api_urlpatterns +[
-	url(r'^users/$', user_list, name='user-list'),
-	url(r'^users/(?P<pk>[\d]+)/$', user_detail, name='user-detail'),
-	url(r'^serviceinfos/$', serviceinfo_list, name='serviceinfo-list'),
-	url(r'^serviceinfos/(?P<pk>[\d]+)/$', serviceinfo_detail, name='serviceinfo-detail'),
-	url(r'^organizations/$', organization_list, name='organization-list'),
-]
 
 import rest_framework
 
