@@ -72,12 +72,12 @@
 		let c='';
 		_.each(s,function(v,k){
 			c+='<li style="margin-top:10px;">';
-			c+='<a sid="'+v['sid']+'" style="cursor:pointer;" onclick="connclick(this);">'+(k+1)+'. '+v['text']+'</a>';
+			c+='<a href="#" sid="'+v['sid']+'" style="cursor:pointer;" onclick="connclick(this);">'+(k+1)+'. '+v['text']+'</a>';
 			
 			if(v['data'].length>0){
 				c+='<ul>';
 				_.each(v['data'],function(vv,kk){
-					c+='<li><a sid="'+vv['sid']+'" style="cursor:pointer;" onclick="connclick(this);">'+(k+1)+'.'+(kk+1)+'. '+vv['text']+'</a></li>';
+					c+='<li><a href="#" sid="'+vv['sid']+'" style="cursor:pointer;" onclick="connclick(this);">'+(k+1)+'.'+(kk+1)+'. '+vv['text']+'</a></li>';
 				})
 				c+='</ul>';
 			}
@@ -88,8 +88,14 @@
 		return c;
 	}
 
-	$(document).ready(function(){
+	$(function(){
 
+		//span_more
+		console.log($('div[user_id]').attr('user_id'),$('div[user_id]').attr('user_id')==='None')
+		if($('div[user_id]').attr('user_id')==='None'){
+			$('#span_more').show();
+		}
+		
 		//s
 		let s=[];
 
@@ -116,7 +122,7 @@
 
 </script>
 
-<h3>網站導覽</h3>
+<h3>網站導覽 <span id="span_more" class="label label-warning" style="display:none; font-size:12pt;">登入後有更多使用者功能!</span></h3>
 
 <ul id="ul_sitemap"></ul>
 

@@ -100,6 +100,12 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 			'line-height':'30px',
 		});
 
+		//id_phone
+		$('#id_phone').attr('aria-label','聯絡電話').attr('title','聯絡電話');
+
+		//id_email
+		$('#id_email').attr('aria-label','電子信箱email').attr('title','電子信箱email');
+
 		//userterms
 		$('#id_userterms').html($('#tmp_userterms').html());
 
@@ -277,7 +283,7 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 	<div class="form-group guest_mode">
 		<label class="control-label col-sm-2 col-sm-offset-2" for="id_disability_card_front"><font style="color:red">*</font><span>身心障礙手冊正面</span></label>
 		<div class="col-sm-3">
-			<input id="id_disability_card_front" maxlength="30" name="disability_card_front" type="file" accept="image/*">
+			<input id="id_disability_card_front" maxlength="30" name="disability_card_front" type="file" accept="image/*" aria-label="請上傳身心障礙手冊正面掃描檔" title="請上傳身心障礙手冊正面掃描檔">
 		</div>
 		<label class="control-label col-sm-4" for="id_disability_card_front" style="text-align:left;"><font style="color:red">請上傳身心障礙手冊正面掃描檔</font></label>
 	</div>
@@ -285,7 +291,7 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 	<div class="form-group guest_mode">
 		<label class="control-label col-sm-2 col-sm-offset-2" for="id_disability_card_back"><font style="color:red">*</font><span>身心障礙手冊反面</span></label>
 		<div class="col-sm-3">
-			<input id="id_disability_card_back" maxlength="30" name="disability_card_back" type="file" accept="image/*">
+			<input id="id_disability_card_back" maxlength="30" name="disability_card_back" type="file" accept="image/*" aria-label="請上傳身心障礙手冊反面掃描檔" title="請上傳身心障礙手冊反面掃描檔">
 		</div>
 		<label class="control-label col-sm-4" for="id_disability_card_back" style="text-align:left;"><font style="color:red">請上傳身心障礙手冊反面掃描檔</font></label>
 	</div>

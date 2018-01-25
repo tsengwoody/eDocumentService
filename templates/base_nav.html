@@ -17,18 +17,12 @@
 		</div>
 		<div id="navbar" class="collapse navbar-collapse navbar-dark bg-inverse">
 			<ul class="nav navbar-nav">
-				{% if request.user.authentication %}
-				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#">客製<span class="caret"></span></a>
-					<ul class="dropdown-menu">
-						
-					</ul>
-				</li>
 				<li class="dropdown">
 					<a href="/sitemap">網站導覽</a>
 				</li>
+				{% if request.user.authentication %}
 				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#">管理<span class="caret"></span></a>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">管理<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						{% if request.user.is_manager %}
 						<li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
@@ -40,7 +34,6 @@
 						<li><a href="{% url 'genericUser:user_manager' %}">使用者管理</a></li>
 						{% endif %}
 						{% if request.user.manage_org_set.all|length > 0 %}
-
 						<li><a href="{% url 'manager:org_manage' %}">組織管理</a></li>
 						{% endif %}
 						{% if request.user.is_superuser %}
@@ -52,7 +45,7 @@
 					</ul>
 				</li>
 				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#">文件上傳<span class="caret"></span></a>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">文件上傳<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						{% if request.user.is_guest %}
 						<li><a href="{% url 'ebookSystem:book_create' %}">掃描檔上傳</a></li>
@@ -63,7 +56,7 @@
 					</ul>
 				</li>
 				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#">校對服務<span class="caret"></span></a>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">校對服務<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 					{% if request.user.is_editor %}
 					<li><a href="{% url 'ebookSystem:service' %}">一般校對</a></li>
@@ -80,8 +73,8 @@
 				{% if request.user.is_superuser %}
 				<li><a href="{% url 'account:an_service' %}">分析</a></li>
 				{% endif %}
-				<li><a href="{% url 'ebookSystem:book_repository' %}">平台書庫</a></li>
 				{% endif %}
+				<li><a href="{% url 'ebookSystem:book_repository' %}">平台書庫</a></li>
 				{% if not request.user.is_license and request.user.is_authenticated %}
 				<li><a href="{% url 'genericUser:license' %}">簽署隱私權條款</a></li>
 				{% endif %}
@@ -89,7 +82,7 @@
 			<ul class="nav navbar-nav navbar-right">
 				{% if request.user.is_authenticated %}
 				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>帳號<span class="caret"></span></a>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false"><span class="glyphicon glyphicon-user"></span>帳號<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li><a href="{% url 'genericUser:event_list' %}">平台消息</a></li>
 						{% if request.user.is_editor %}
@@ -104,7 +97,7 @@
 				<li><a href="{% url 'register' %}"><span class="glyphicon glyphicon-user">註冊</a></li>
 				{% endif %}
 				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#">關於</a>
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">關於</a>
 					<ul class="dropdown-menu">
 						<li><a href="{% url 'about' 'user_guide' %}">平台使用指南</a></li>
 						<li><a href="{% url 'about' 'qanda' %}">平台Q&A</a></li>
