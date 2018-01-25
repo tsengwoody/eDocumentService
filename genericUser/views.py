@@ -271,7 +271,7 @@ def change_contact_info(request, template_name):
 
 @http_response
 def serviceinfo_list(request, template_name='genericUser/serviceinfo_list.html'):
-	try:
+	'''try:
 		user = User.objects.get(username=username)
 	except:
 		raise Http404("book does not exist")
@@ -281,7 +281,7 @@ def serviceinfo_list(request, template_name='genericUser/serviceinfo_list.html')
 		current_ServiceInfo = ServiceInfo.objects.get(date=month_day, user=user)
 	except:
 		pass
-	ServiceInfo_list = ServiceInfo.objects.filter(user=user).exclude(date=month_day).order_by('date')
+	ServiceInfo_list = ServiceInfo.objects.filter(user=user).exclude(date=month_day).order_by('date')'''
 	if request.method == 'POST':
 		if request.POST.has_key('exchange'):
 			try:
