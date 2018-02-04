@@ -28,7 +28,7 @@
 		//read
 		client.editrecords.read({ editor_id: userid, is_exchange: false })
 			.done(function (data) {
-				console.log('serviceinfo_ini_list',data)
+				//console.log('serviceinfo_ini_list',data)
 
 				//orderBy
 				data=_.orderBy(data, 'get_date','desc');
@@ -37,7 +37,7 @@
 				let sr = [];
 				_.each(data, function (v, k) {
 					let o = {
-						'核取': '<label class="checkbox-inline" style="margin-left:10px;"><input type="checkbox" name="inp_grp_exchange" value="' + v.id + '" service_hours="' + v.service_hours + '">兌換</label>',
+						'核取': '<label class="checkbox-inline"><input type="checkbox" name="inp_grp_exchange" value="' + v.id + '" service_hours="' + v.service_hours + '">兌換</label>',
 						'服務時間': v.get_date,
 						'服務時數': v.service_hours,
 						'線上時數': v.stay_hours,
@@ -60,7 +60,7 @@
 				//table
 				$('#div_serviceinfo_list_table').find('tr').each(function () {
 					let tr = $(this);
-					tr.find('td:gt(0)').css('text-align', 'center');
+					tr.css('text-align', 'center');
 				})
 
 			});
@@ -100,7 +100,7 @@
 				
 				//concat
 				data=_.concat(d1,d2);
-				console.log('serviceinfo_ini_sta',data)
+				//console.log('serviceinfo_ini_sta',data)
 
 				//orderBy
 				data=_.orderBy(data, 'get_date','desc');
@@ -125,6 +125,8 @@
 				_.each(r, function (gv, gk) {
 					let cb=_.countBy(gv, 'is_exchange');
 					_.each(gv, function (v, k) {
+
+						//k first, 當前月
 						if (k === 0) {
 							let o = {
 								'兌換': '<span style="font-weight:bold;">'+ gk +'</span>',
@@ -135,17 +137,21 @@
 							};
 							sr.push(o);
 						}
+
+						//k general, 一般兌換資料
 						let o = {
-							'兌換': '<span style="margin-left:40px;">'+ cexg(v.is_exchange) +'</span>',
+							'兌換': '<span style="margin-left:60px;">'+ cexg(v.is_exchange) +'</span>',
 							'服務時間': v.get_date,
 							'服務時數': v.service_hours,
 							'線上時數': v.stay_hours,
 							'類型': v.category,
 						};
 						sr.push(o);
+
+						//k end, 添加月底統計
 						if (k===_.size(gv)-1){
 							let o = {
-								'兌換': '<span style="margin-left:40px; font-weight:bold; color:#f26;" aria-label="小計">'+ '小計：兌換'+cb.true+'筆，未兌換'+cb.false+'筆' +'</span>',
+								'兌換': '<span style="margin-left:60px; font-weight:bold; color:#f26;" aria-label="小計">'+ '小計：兌換'+cb.true+'筆，未兌換'+cb.false+'筆' +'</span>',
 								'服務時間': '',
 								'服務時數': '',
 								'線上時數': '',
@@ -153,6 +159,7 @@
 							};
 							sr.push(o);
 						}
+
 					})
 				})
 
@@ -191,7 +198,7 @@
 		//read
 		client.serviceinfos.read({ editor_id: userid, exchange: false })
 			.done(function (data) {
-				console.log('serviceinfo_ini_dealing',data)
+				//console.log('serviceinfo_ini_dealing',data)
 				
 				//orderBy
 				data=_.orderBy(data, 'date','desc');
@@ -203,7 +210,7 @@
 						'兌換日期': v.date,
 						'服務時數': v.service_hours,
 						'兌換單位': cstr(serviceinfo_get_org(v.org).name),
-						'單筆紀錄': '',
+						'服務紀錄': '<button type="button" class="btn btn-default" onclick="ServiceinfoEditrecord(['+v.editrecord_set+'])">詳細服務紀錄</button>',
 					};
 					sr.push(o);
 				})
@@ -220,7 +227,7 @@
 				//table
 				$('#div_serviceinfo_dealing_table').find('tr').each(function () {
 					let tr = $(this);
-					tr.find('td:gt(0)').css('text-align', 'center');
+					tr.css('text-align', 'center');
 				})
 
 			});
@@ -241,7 +248,7 @@
 		//read
 		client.serviceinfos.read({ editor_id: userid, exchange: true })
 			.done(function (data) {
-				console.log('serviceinfo_ini_done',data)
+				//console.log('serviceinfo_ini_done',data)
 				
 				//orderBy
 				data=_.orderBy(data, 'date','desc');
@@ -253,7 +260,7 @@
 						'兌換日期': v.date,
 						'服務時數': v.service_hours,
 						'兌換單位': cstr(serviceinfo_get_org(v.org).name),
-						'單筆紀錄': '',
+						'服務紀錄': '<button type="button" class="btn btn-default" onclick="ServiceinfoEditrecord(['+v.editrecord_set+'])">詳細服務紀錄</button>',
 					};
 					sr.push(o);
 				})
@@ -270,7 +277,7 @@
 				//table
 				$('#div_serviceinfo_done_table').find('tr').each(function () {
 					let tr = $(this);
-					tr.find('td:gt(0)').css('text-align', 'center');
+					tr.css('text-align', 'center');
 				})
 
 			});
