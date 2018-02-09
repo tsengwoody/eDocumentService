@@ -93,7 +93,7 @@
 
 		//isbnpart
 		let isbnpart = ScanBookEditor_dataimgs.ISBN_part;
-		let u = '/ebookSystem/resource/ebooks/' + isbnpart + '/source/' + ind;
+		let u = '/ebookSystem/api/ebooks/' + isbnpart + '/resource/source/' + ind;
 
 		//img src, alt
 		o.attr({
@@ -132,25 +132,24 @@
 							//getinfo
 							let v = getinfo();
 
-							//ro
+							//get Cookies
 							let ro = Cookies.get('ScanBookEditor_imgview_ratio');
 
 							//ruse
 							let ruse;
 							if (iser(ro)) {
-								//console.log('no Cookies')
-								ruse = v.r;
+								ruse = v.r; //no Cookies
 							}
 							else {
-								//console.log('use Cookies')
-								ruse = cdbl(ro);
+								ruse = cdbl(ro); //use Cookies
 							}
-							//console.log('ruse', ruse)
+
+							//set Cookies
 							Cookies.set('ScanBookEditor_imgview_ratio', ruse);
 
 							//hdy
 							let hdy = v.ho * ruse / 2 - v.hi / 2;
-							
+
 							//zoomTo ,move
 							o.viewer('zoomTo', ruse).viewer('move', 0, hdy);
 
@@ -190,6 +189,17 @@
 
 		}
 
+		//等頁面出現才初始化
+		_.delay(function () {
+
+			//FontSize
+			ScanBookEditor_FontSize('cookise');
+
+			//scrollTop
+			$('#divmodal_ScanBookEditor_text').scrollTop(0);
+
+		},600)
+		
 	}
 
 
@@ -207,23 +217,42 @@
 				return;
 			}
 			fs -= 2;
-			o.css('font-size', fs + 'px');
 		}
-		if (mode === 'large') {
+		else if (mode === 'large') {
 			if (fs >= 30) {
 				alertmessage('error', '字型大小已經為最大');
 				return;
 			}
 			fs += 2;
-
-			o.css('font-size', fs + 'px');
 		}
+		else if (mode === 'cookise') {
+
+			//get Cookies
+			let ckfs = Cookies.get('ScanBookEditor_divtext_fontsize');
+
+			//fs
+			if (iser(ckfs)) {
+				fs = fs; //no Cookies
+			}
+			else {
+				fs = cdbl(ckfs); //use Cookies
+			}
+
+		}
+
+		//font-size'
+		o.css('font-size', fs + 'px');
+
+		//set Cookies
+		Cookies.set('ScanBookEditor_divtext_fontsize', fs);
+
+
 	}
 
 
 	function ScanBookEditor(title, isbnpart) {
 		//顯示與編輯使用者權限
-
+console.log(title, isbnpart)
 		//df
 		let df = GenDF();
 
@@ -237,15 +266,20 @@
 		let client = new $.RestClient('/ebookSystem/api/');
 		client.add('ebooks');
 
-		//read
-		client.ebooks.read(isbnpart)
-			.done(function (data) {
+		//read text data
+		let tu = '/ebookSystem/api/ebooks/' + isbnpart + '/resource/OCR/origin';
 
+		//when
+		$.when(client.ebooks.read(isbnpart),$.get(tu))
+			.done(function(data_pic,data_text){
+				data_pic=data_pic[0];
+				data_text=data_text[0];
+	
 				//save
-				ScanBookEditor_dataimgs = data;
+				ScanBookEditor_dataimgs = data_pic;
 
 				//selectimg
-				let c = _.map(data.scan_image, function (v, k) {
+				let c = _.map(data_pic.scan_image, function (v, k) {
 					let s = '';
 					if (k === '0') {
 						s = 'selected';
@@ -254,23 +288,16 @@
 				})
 				$('#divmodal_ScanBookEditor_selectimg').html(c);
 
-				//imgs
+				//escape
+				data_text = _.escape(data_text);
+
+				//html
+				$('#divmodal_ScanBookEditor_text').html(data_text);
+
+				//SelectChange
 				ScanBookEditor_SelectChange();
 
-				//text 
-				let tu = '/ebookSystem/resource/ebooks/' + isbnpart + '/OCR/origin';
-				$.get(tu).done(function (t) {
-
-					//escape
-					t = _.escape(t);
-
-					//html
-					$('#divmodal_ScanBookEditor_text').html(t);
-
-				})
-
-			});
-
+			})
 
 		//ok
 		$('#divmodal_ScanBookEditor_ok').off().on('click', function () {
