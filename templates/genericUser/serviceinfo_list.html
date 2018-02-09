@@ -378,89 +378,85 @@
 		//userid
 		let userid = $('div[user_id]').attr('user_id');
 
-		// //transferData
-		// let transferData = {
-		// 	"editrecord_set": editrecord_set,
-		// 	"date": moment().format('YYYY-MM-DD'),
-		// 	"service_hours": service_hours,
-		// 	"is_exchange": false,
-		// 	"user": cint(userid),
-		// 	"org": cint(org),
-		// };
+		// //client
+		// let client = new $.RestClient('/genericUser/api/');
+		// client.add('serviceinfos');
+
+		// //dfs
+		// let dfs = [];
+		// _.each(editrecord_set, function (id) {
+
+		// 	//df
+		// 	let df = GenDF();
+
+		// 	//id
+		// 	id = cstr(id) + '/';
+
+		// 	//PATCH
+		// 	client.serviceinfos.addVerb(id, 'PATCH');
+		// 	client.serviceinfos[id]({ "is_exchange": true })
+		// 		.done(function (data) {
+		// 			if (iser(data.editrecord_set)) {
+		// 				df.reject('兌換失敗: ' + '無紀錄被兌換');
+		// 			}
+		// 			else {
+		// 				df.resolve('兌換成功');
+		// 			}
+		// 		})
+		// 		.fail(function (msg) {
+		// 			df.reject('非預期兌換失敗: ' + o2j(msg.responseJSON));
+		// 		})
+
+		// 	//push
+		// 	dfs.push(df);
+
+		// })
+
+		// //Promise.all
+		// Promise.all(dfs)
+		// 	.then(function () {
+		// 		alertmessage('success', '兌換成功')
+		// 			.done(function () {
+		// 				location.reload();
+		// 			})
+		// 	})
+		// 	.catch(function (msg) {
+		// 		alertmessage('error', msg);
+		// 	})
+
+		//transferData
+		let transferData = {
+			"editrecord_set": editrecord_set,
+			"date": moment().format('YYYY-MM-DD'),
+			"service_hours": service_hours,
+			"is_exchange": false,
+			"user": cint(userid),
+			"org": cint(org),
+		};
 
 		//client
 		let client = new $.RestClient('/genericUser/api/');
 		client.add('serviceinfos');
-
-		//dfs
-		let dfs = [];
-		_.each(editrecord_set, function (id) {
-
-			//df
-			let df = GenDF();
-
-			//id
-			id = cstr(id) + '/';
-
-			//PATCH
-			client.serviceinfos.addVerb(id, 'PATCH');
-			client.serviceinfos[id]({ "is_exchange": true })
-				.done(function (data) {
-					if (iser(data.editrecord_set)) {
-						df.reject('兌換失敗: ' + '無紀錄被兌換');
-					}
-					else {
-						df.resolve('兌換成功');
-					}
-				})
-				.fail(function (msg) {
-					df.reject('非預期兌換失敗: ' + o2j(msg.responseJSON));
-				})
-
-			//push
-			dfs.push(df);
-
-		})
-
-		//Promise.all
-		Promise.all(dfs)
-			.then(function () {
-				alertmessage('success', '兌換成功')
-					.done(function () {
-						location.reload();
-					})
+		
+		//create
+		client.serviceinfos.create(transferData)
+			.done(function (data) {
+				if (iser(data.editrecord_set)) {
+					//alertmessage
+					alertmessage('error', '兌換失敗: ' + '無紀錄被兌換');
+				}
+				else {
+					//alertmessage
+					alertmessage('success', '兌換成功')
+						.done(function () {
+							location.reload();
+						})
+				}
 			})
-			.catch(function (msg) {
-				alertmessage('error', msg);
+			.fail(function (msg) {
+				//alertmessage
+				alertmessage('error', '非預期兌換失敗: ' + o2j(msg.responseJSON));
 			})
-
-		// //create
-		// client.serviceinfos.create(transferData)
-		// 	.done(function (data) {
-
-		// 		if (iser(data.editrecord_set)) {
-
-		// 			//alertmessage
-		// 			alertmessage('error', '兌換失敗: ' + '無紀錄被兌換');
-
-		// 		}
-		// 		else {
-
-		// 			//alertmessage
-		// 			alertmessage('success', '兌換成功')
-		// 				.done(function () {
-		// 					location.reload();
-		// 				})
-
-		// 		}
-
-		// 	})
-		// 	.fail(function (msg) {
-
-		// 		//alertmessage
-		// 		alertmessage('error', '非預期兌換失敗: ' + o2j(msg.responseJSON));
-
-		// 	})
 
 	}
 
