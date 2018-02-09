@@ -44,7 +44,7 @@ class Command(BaseCommand):
 			auth_phone=True,
 			education=u'學士',
 		)
-		root.set_password('root')
+		root.set_password('eds@2018')
 		root.status = root.STATUS['active']
 		root.save()
 		org = Organization.objects.create(name=u'eDocumentService', address=u'台北市大同區1段149號7樓', email=u'edocumentservice@gmail.com', phone='0917823098', manager=root, is_service_center=True)

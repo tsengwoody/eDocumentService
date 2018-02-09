@@ -335,7 +335,7 @@ def verify_contact_info(request, template='genericUser/verify_contact_info.html'
 			if not cache.has_key(request.user.phone):
 				import random
 				import string
-				vcode = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+				vcode = ''.join(random.choice(string.digits) for _ in range(6))
 				cache.set(request.user.phone, {'vcode': vcode}, 600)
 			else:
 				vcode = cache.get(request.user.phone)['vcode']

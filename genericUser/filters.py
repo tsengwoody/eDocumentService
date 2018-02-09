@@ -6,9 +6,9 @@ from .models import *
 class ServiceInfoExchangeFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
 		is_exchange = request.query_params.get('is_exchange')
-		if is_exchange and exchange in ['true', 'True']:
+		if is_exchange and is_exchange in ['true', 'True']:
 			return queryset.filter(is_exchange=True)
-		elif is_exchange and exchange in ['false', 'False']:
+		elif is_exchange and is_exchange in ['false', 'False']:
 			return queryset.filter(is_exchange=False)
 		else:
 			return queryset
