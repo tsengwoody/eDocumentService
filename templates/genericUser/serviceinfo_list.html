@@ -196,7 +196,8 @@
 		client.add('serviceinfos');
 
 		//read
-		client.serviceinfos.read({ editor_id: userid, exchange: false })
+		//client.serviceinfos.read({ editor_id: userid, exchange: false })
+		client.serviceinfos.read({ user_id: userid, exchange: false })
 			.done(function (data) {
 				//console.log('serviceinfo_ini_dealing',data)
 
@@ -246,7 +247,8 @@
 		client.add('serviceinfos');
 
 		//read
-		client.serviceinfos.read({ editor_id: userid, exchange: true })
+		//client.serviceinfos.read({ editor_id: userid, exchange: true })
+		client.serviceinfos.read({ user_id: userid, is_exchange: true })
 			.done(function (data) {
 				//console.log('serviceinfo_ini_done',data)
 
