@@ -1,0 +1,223 @@
+{% extends "base_nav.html" %}
+{% block title %}
+公告發佈
+{% endblock %}
+
+{% block style %}
+{% load staticfiles %}
+{% endblock %}
+
+{% block header %}
+公告發佈
+{% endblock %}
+
+{% block content %}
+
+{% csrf_token %}
+
+<h3>公告發佈</h3>
+
+<div class="form-horizontal">
+
+	<div class="form-group">
+		<label for="id_category" class="control-label col-sm-1">
+			<font style="color:red">*</font>類別
+		</label>
+		<div class="col-sm-11">
+			<select
+				id="id_category"
+				class="form-control"
+				name="category"
+			>
+				<option value="">---------</option>
+				
+				<!-- v-for 渲染 announcement_category -->
+				<option
+					v-for="item in announcement_category"
+					:value="item.id"
+				>
+					{{ item.title }}
+				</option>
+				<!-- ******************************* -->
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="id_title" class="control-label col-sm-1">
+			<font style="color:red">*</font>標題
+		</label>
+		<div class="col-sm-11">
+			<input
+				id="id_title"
+				class="form-control"
+				name="title"
+				type="text"
+				placeholder="title"
+				required
+			/>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="id_content" class="control-label col-sm-1">
+			<font style="color:red">*</font>內容
+		</label>
+		<div class="col-sm-11">
+			<textarea
+				id="id_content"
+				name="content"
+				maxlength="30"
+			>
+			</textarea>
+		</div>
+	</div>
+
+	<div class="form-group">        
+		<div class="col-sm-offset-1 col-sm-11">
+			<button
+				class="btn btn-primary"
+				type="button"
+				@click="announcement_create()"
+			>
+				發佈
+			</button>
+			<button
+				class="btn btn-danger"
+				type="button"
+				@click="announcement_cancel()"
+			>
+				取消
+			</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	const mv = new Vue({
+		data: function() {
+			return {
+				bchange: false,
+				announcement_category: [
+					{
+						// 這邊可以參考資料結構與類別
+						id: 0,
+						title: '',
+						content: '',
+						datetime: '',
+						category: '',
+					}
+				],
+			}
+		},
+
+		/** 
+		 * 在 Template 與 data 開始掛載之前，先設定好
+		 * jquery.restjs 與 tinymce，
+		 * client.annoucement 指向 `/genericUser/api/announcements`，
+		 * tinymce 進行初始化。
+		 */
+		beforeCreate: function() {
+			const client = new $.RestClient('/genericUser/api/')
+			const tinymceInitializationData = {
+				selector: "#id_content",
+				language:"zh_TW",
+				plugins: [
+					'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+					'searchreplace wordcount visualblocks visualchars code fullscreen',
+					'insertdatetime media nonbreaking save table contextmenu directionality',
+					'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'
+				],
+				toolbar: ' \
+					undo redo \
+					| insert \
+					| styleselect \
+					| bold italic \
+					| alignleft aligncenter alignright alignjustify \
+					| bullist numlist outdent indent \
+					| link image \
+					| print preview media \
+					| forecolor backcolor emoticons \
+					| codesample \
+				'    
+			}
+
+			client.add('announcements')
+			tinymce.init(tinymceInitializationData)
+		},
+
+		// 在 data 已經掛載之後，對 `/genericUser/api/announcements`
+		// 送出 `GET` 並加回傳資料放在 this.announcement_category
+		created: function() {
+			const require = client.announcements.read()
+			const that = this
+
+			require.done(function(res) {
+				that.announcement_category = res
+			})
+		},
+
+		methods: {
+			// 公告發布
+			announcement_create: function() {
+				// 取得當前被填入的資料
+				const transferData = this.announcement_save()
+
+				// 公告用 API `aj_announcement`
+				// 功能: 新增、更新、刪除
+				aj_announcement('create', null, transferData)
+
+					.done(function(data) {
+						alertmessage(data['status'], data['message'])
+							.done(function() {
+								//重新整理
+								window.location.reload();
+							})
+					})
+
+					.fail(function(data){
+						alertmessage(data['status'], data['message']);
+					})
+			},
+
+			// 取消離開檢核
+			announcement_cancel: function() {
+				// 取得當前被填入的資料
+				const transferData = this.announcement_save()
+				
+				// 如果當前有填寫資料，跳 message box 讓使用者判斷
+				// 是否清除紀錄，避免操作失誤。
+				if(!isobjvalueer(transferData)) {
+					alertconfirm('已經填寫資料，是否確定取消?')
+						.done(function() {
+							// 頁面重新整理
+							window.location.reload()
+						})
+				} else {
+					// 頁面重新整理
+					window.location.reload()
+				}
+			},
+			
+			// 儲存資料
+			announcement_save: function() {
+				// 抓取個別資料的值: 標題、選擇公告、公告內容，回傳整理過後的物件。
+				// #? 其中 `公告內容` 以 tinymce 進行編輯。
+				const title = cstrtrim($('#id_title').val())
+				const category = cstrtrim($('#id_category').find('option:selected').val())
+				const content = cstrtrim(tinymce.activeEditor.getContent())
+
+				const transferData = {
+					'title': title,
+					'category': category,
+					'content': content,
+				}
+
+				return transferData;
+			},
+		},
+	})
+
+</script>
+
+{% endblock %}
