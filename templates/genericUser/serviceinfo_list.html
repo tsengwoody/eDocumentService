@@ -26,7 +26,7 @@
 		client.add('editrecords');
 
 		//read
-		client.editrecords.read({ editor_id: userid, is_exchange: false })
+		client.editrecords.read({ editor_id: userid, exchange: false })
 			.done(function (data) {
 				//console.log('serviceinfo_ini_list',data)
 

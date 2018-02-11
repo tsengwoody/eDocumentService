@@ -184,7 +184,7 @@ class Command(BaseCommand):
 		src = BASE_DIR +u'/temp/藍色駭客.zip'
 		with open(src) as book_file:
 			client = Client()
-			client.login(username='root', password='root')
+			client.login(username='root', password='eds@2018')
 			response = client.post(
 				reverse(
 					'ebookSystem:book_create'
@@ -218,7 +218,7 @@ class Command(BaseCommand):
 			partFile.extractall(dst)
 
 		client = Client()
-		client.login(username='root', password='root')
+		client.login(username='root', password='eds@2018')
 		response = client.post(
 			reverse(
 				'ebookSystem:review_document',
@@ -250,7 +250,7 @@ class Command(BaseCommand):
 		src = BASE_DIR +u'/temp/part1-finish-sp.txt'
 		shutil.copy2(src, ebook.get_path('-finish'))
 		client = Client()
-		client.login(username='root', password='root')
+		client.login(username='root', password='eds@2018')
 		response = client.post(
 			reverse(
 				'ebookSystem:review_part',
@@ -281,7 +281,7 @@ class Command(BaseCommand):
 		src = BASE_DIR +u'/temp/part1-finish-sp.txt'
 		shutil.copy2(src, ebook.get_path('-finish'))
 		'''client = Client()
-		client.login(username='root', password='root')
+		client.login(username='root', password='eds@2018')
 		response = client.post(
 			reverse(
 				'ebookSystem:review_part',
@@ -299,7 +299,7 @@ class Command(BaseCommand):
 		src = BASE_DIR +u'/temp/山羊島的藍色奇蹟.zip'
 		with open(src) as book_file:
 			client = Client()
-			client.login(username='root', password='root')
+			client.login(username='root', password='eds@2018')
 			response = client.post(
 				reverse('ebookSystem:book_create'),
 				{
@@ -324,7 +324,7 @@ class Command(BaseCommand):
 
 		book_file = open(BASE_DIR +u'/temp/自創思維.epub')
 		client = Client()
-		client.login(username='root', password='root')
+		client.login(username='root', password='eds@2018')
 		response = client.post(
 			reverse(
 				'ebookSystem:book_upload'
@@ -347,7 +347,7 @@ class Command(BaseCommand):
 		assert len(Book.objects.all())==3, 'create book fail'
 
 		client = Client()
-		client.login(username='root', password='root')
+		client.login(username='root', password='eds@2018')
 		previous_count = len(Announcement.objects.all())
 		response = client.post(
 			reverse(
@@ -368,7 +368,7 @@ class Command(BaseCommand):
 		QAndA.objects.create(question='<p>question 2</p>', answer='<p>answer 2</p>', )
 
 		client = Client()
-		client.login(username='root', password='root')
+		client.login(username='root', password='eds@2018')
 		previous_count = len(LibraryRecord.objects.all())
 		response = client.post(
 			reverse(
