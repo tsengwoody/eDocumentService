@@ -174,13 +174,13 @@ function cint(v) {
 
 
 function cdbl(v) {
-    //轉浮點數
+	//轉浮點數
 
-    if ($.isNumeric(v)) {
-        return _.toFinite(v);
-    }
+	if ($.isNumeric(v)) {
+		return _.toFinite(v);
+	}
 
-    return 0;
+	return 0;
 }
 
 
@@ -1079,9 +1079,9 @@ function pagin(tabid) {
 	let c = '';
 	c += '<div style="text-align:center;">';
 	c += '<ul id="' + tabid + '_pagination" class="pagination" style="margin:0px;" tabid="' + tabid + '" pagenow="1" numrow="' + numrow + '" numperpage="' + numperpage + '" numpage="' + numpage + '">';
-	c += '<li class="prev" style="cursor:pointer;"><a onclick="pagin_change(\'' + tabid + '\',\'-1\')">上一頁</a></li>';
-	c += '<li class=""><a >1 / ' + numpage + '</a></li>';
-	c += '<li class="next" style="cursor:pointer;"><a onclick="pagin_change(\'' + tabid + '\',\'+1\')">下一頁</a></li>';
+	c += '<li class="prev" style="cursor:pointer;"><a href="#" onclick="pagin_change(\'' + tabid + '\',\'-1\')">上一頁</a></li>';
+	c += '<li class=""><a>1 / ' + numpage + '</a></li>';
+	c += '<li class="next" style="cursor:pointer;"><a href="#" onclick="pagin_change(\'' + tabid + '\',\'+1\')">下一頁</a></li>';
 	c += '</ul>';
 	c += '</div>';
 
@@ -1292,14 +1292,14 @@ function aj_delete(url, transferData) {
 }
 
 
-function aj_getcsrf(){
+function aj_getcsrf() {
 	//csrf
 
 	let csrf = $('input[name=csrfmiddlewaretoken]').val();
 	return {
-		'csrf':csrf,
-		'X-CSRFToken':csrf,
-		'X-Requested-With':'XMLHttpRequest',
+		'csrf': csrf,
+		'X-CSRFToken': csrf,
+		'X-Requested-With': 'XMLHttpRequest',
 	};
 }
 
@@ -2417,3 +2417,33 @@ function aj_qanda(mode, aid, transferData) {
 	return df;
 }
 
+
+let gvorg;
+$(function () {
+
+	//client
+	let client = new $.RestClient('/genericUser/api/');
+	client.add('organizations');
+
+	//read
+	client.organizations.read()
+		.done(function (data) {
+			//console.log(data)
+
+			//save
+			gvorg = data;
+
+		})
+
+})
+function getorg(id) {
+	//兌換單位
+
+	//find
+	let r = _.find(gvorg, { id: id });
+	if (iser(r)) {
+		r = {};
+	}
+
+	return r;
+}

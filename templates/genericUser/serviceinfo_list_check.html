@@ -3,5 +3,198 @@
 服務時數確認
 {% endblock %}
 {% block content %}
-<h3>服務時數確認</h3>
+
+
+<script>
+	let dtorg;
+
+
+	$(function () {
+		serviceinfocheck_ini_list();
+	})
+
+
+	function serviceinfocheck_ini_list() {
+		//未兌換服務紀錄
+
+		//client
+		let client = new $.RestClient('/genericUser/api/');
+		client.add('serviceinfos');
+
+		//read
+		client.serviceinfos.read({ exchange: false })
+			.done(function (data) {
+				//console.log('serviceinfocheck_ini_list',data)
+
+				//orderBy
+				data = _.orderBy(data, 'date', 'desc');
+
+				//sr
+				let sr = [];
+				_.each(data, function (v, k) {
+					let o = {
+						'核取': '<label class="checkbox-inline"><input type="checkbox" name="inp_grp_exchange" value="' + v.id + '" service_hours="' + v.service_hours + '">兌換</label>',
+						'兌換日期': v.date,
+						'服務時數': v.service_hours,
+						//'兌換單位': cstr(getorg(v.org).name),
+						'服務紀錄': '<button type="button" class="btn btn-default" onclick="ServiceinfoEditrecord([' + v.editrecord_set + '])">詳細服務紀錄</button>',
+					};
+					sr.push(o);
+				})
+
+				//check
+				if (iser(sr)) {
+					$('#div_serviceinfocheck_list_panel').html('目前無服務紀錄');
+					return;
+				}
+
+				//gentable
+				gentable('div_serviceinfocheck_list', 'div_serviceinfocheck_list_table', sr);
+
+				//table
+				$('#div_serviceinfocheck_list_table').find('tr').each(function () {
+					let tr = $(this);
+					tr.css('text-align', 'center');
+				})
+
+			});
+
+	}
+
+
+	function serviceinfocheck_select_all() {
+		//全選
+
+		$('input[name="inp_grp_exchange"]').prop('checked', true);
+	}
+
+
+	function serviceinfocheck_select_no() {
+		//全不選
+
+		$('input[name="inp_grp_exchange"]').prop('checked', false);
+	}
+
+
+	function serviceinfocheck_select_inv() {
+		//反向選
+
+		$('input[name="inp_grp_exchange"]').each(function () {
+			let inp = $(this);
+			inp.prop('checked', !inp.prop('checked'));
+		})
+	}
+
+	function serviceinfocheck_agree() {
+		//兌換
+
+		//service_hours, editrecord_set
+		let service_hours = 0;
+		let editrecord_set = [];
+		$('input[name="inp_grp_exchange"]:checked').each(function () {
+			let inp = $(this);
+			service_hours += cint(inp.attr('service_hours'));
+			editrecord_set.push(cint(inp.val()));
+		})
+
+		//check
+		if (editrecord_set.length === 0) {
+			alertmessage('error', '至少需一筆紀錄');
+			return;
+		}
+
+		//client
+		let client = new $.RestClient('/genericUser/api/');
+		client.add('serviceinfos');
+		client.serviceinfos.addVerb('is_exchange', 'PATCH');
+
+		//PATCH
+		_.each(editrecord_set,function(id){
+			client.serviceinfos.is_exchange(id,{'is_exchange':true});
+		})
+		
+
+
+
+		// //userid
+		// let userid = $('div[user_id]').attr('user_id');
+
+		// //transferData
+		// let transferData = {
+		// 	//"editrecord_set": editrecord_set,
+		// 	//"date": moment().format('YYYY-MM-DD'),
+		// 	//"service_hours": service_hours,
+		// 	"is_exchange": false,
+		// 	//"user": cint(userid),
+		// 	//"org": cint(org),
+		// };
+
+		// //client
+		// let client = new $.RestClient('/genericUser/api/');
+		// client.add('serviceinfos');
+		// client.serviceinfos.addVerb('is_exchange', 'PATCH');
+		
+		// //create
+		// client.serviceinfos.is_exchange(id,true);
+		// client.serviceinfos.create(transferData)
+		// 	.done(function (data) {
+		// 		if (iser(data.editrecord_set)) {
+		// 			//alertmessage
+		// 			alertmessage('error', '兌換失敗: ' + '無紀錄被兌換');
+		// 		}
+		// 		else {
+		// 			//alertmessage
+		// 			alertmessage('success', '兌換成功')
+		// 				.done(function () {
+		// 					location.reload();
+		// 				})
+		// 		}
+		// 	})
+		// 	.fail(function (msg) {
+		// 		//alertmessage
+		// 		alertmessage('error', '非預期兌換失敗: ' + o2j(msg.responseJSON));
+		// 	})
+
+	}
+
+
+</script>
+
+
+<h3 style="margin:40px 0px 30px 0px;">服務時數確認</h3>
+
+
+<div id="serviceinfocheck_list_div_未兌換">
+
+
+    <h4 style="margin-top:30px;">Step1: 勾選志工所提送的兌換項目</h4>
+
+
+    <hr style="margin-top:5px;">
+
+
+    <div id="div_serviceinfocheck_list_panel" style="margin-bottom:60px;">
+        <button class="btn btn-default" type="Button" onclick="serviceinfocheck_select_all()">全選</button>
+        <button class="btn btn-default" type="Button" onclick="serviceinfocheck_select_no()">全不選</button>
+        <button class="btn btn-default" type="Button" onclick="serviceinfocheck_select_inv()">反向選</button>
+        <div id="div_serviceinfocheck_list"></div>
+    </div>
+
+
+    <h4>Step2: 確認後同意兌換</h4>
+
+
+    <hr style="margin-top:5px;">
+
+
+    <div style="margin-bottom:60px;">
+
+        <button id="btn_serviceinfocheck_agree" type="button" class="btn btn-primary" onclick="serviceinfocheck_agree()">同意兌換</button>
+
+    </div>
+
+
+</div>
+
+
 {% endblock %}

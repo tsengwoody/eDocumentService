@@ -1,0 +1,115 @@
+﻿{% extends "base_nav.html" %} {% block title %} vue tinymce {% endblock %} {% block content %} {% csrf_token %}
+
+
+<script>
+	let vo_tm;
+
+	$(function () {
+
+		//opt
+		let opt = {
+			el: '#' + 'id_vue_tm',
+			data: {
+				content: '<p>qwe</p><p>asd</p>',
+			},
+			methods: {
+
+				fchange: function (e) {
+					console.log('methods fchange', e)
+				},
+				fsave: function (e) {
+					console.log('methods fsave', e)
+				},
+
+			},
+		};
+
+		vo_tm = new Vue(opt);
+
+	})
+
+</script>
+
+
+<script>
+
+
+	//vu-tinymce
+	Vue.component('vu-tinymce', {
+		template: `
+<div>
+
+	<textarea v-bind:id="id" style="min-height:300px;"></textarea>
+
+	<button style="margin-top:15px;" v-on:click="ck_save">Save</button>
+
+</div>
+	`,
+		props: ['content'],
+		data: function () {
+			return {
+				id: 'vu-tinymce-' + Date.now(),
+				ed: null,
+			}
+		},
+		mounted: function () {
+			//console.log('mounted')
+
+			let vo = this;
+
+			//tinymce
+			tinymce.init({
+				selector: '#' + vo.id,
+				language: 'zh_TW',
+				menubar: 'edit insert format table',
+				plugins: 'paste textcolor link table lists advlist hr charmap',
+				toolbar: 'undo redo | fontsizeselect | forecolor backcolor | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent',
+				fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt',
+				paste_data_images: true,
+				setup: function (ed) {
+					ed.on('init', function (e) {
+
+						//style
+						let s = ed.getBody().style;
+						s.fontSize = '12pt';
+						s.fontFamily = '微軟正黑體';
+
+						//setContent
+						ed.setContent(vo.content);
+
+						//event
+						ed.on('input change undo redo', () => {
+							vo.$emit('sharechange', ed.getContent());
+						});
+
+					});
+				},
+			});
+
+		},
+		methods: {
+
+			ck_save: function () {
+				//console.log('methods ck_save')
+
+				let vo = this;
+
+				//getContent
+				let c = tinymce.get(vo.id).getContent();
+
+				//emit
+				vo.$emit('sharesave', c);
+
+			}
+
+		},
+	})
+
+
+</script>
+
+<h3>vue tinymce</h3>
+
+<vu-tinymce id="id_vue_tm" v-bind:content="content" v-on:sharechange="fchange" v-on:sharesave="fsave"></vu-tinymce>
+
+{% endblock %}

@@ -3,7 +3,6 @@
 
 
 <script>
-	let dtorg;
 
 
 	$(function () {
@@ -210,7 +209,7 @@
 					let o = {
 						'兌換日期': v.date,
 						'服務時數': v.service_hours,
-						'兌換單位': cstr(serviceinfo_get_org(v.org).name),
+						'兌換單位': cstr(getorg(v.org).name),
 						'服務紀錄': '<button type="button" class="btn btn-default" onclick="ServiceinfoEditrecord([' + v.editrecord_set + '])">詳細服務紀錄</button>',
 					};
 					sr.push(o);
@@ -261,7 +260,7 @@
 					let o = {
 						'兌換日期': v.date,
 						'服務時數': v.service_hours,
-						'兌換單位': cstr(serviceinfo_get_org(v.org).name),
+						'兌換單位': cstr(getorg(v.org).name),
 						'服務紀錄': '<button type="button" class="btn btn-default" onclick="ServiceinfoEditrecord([' + v.editrecord_set + '])">詳細服務紀錄</button>',
 					};
 					sr.push(o);
@@ -290,38 +289,17 @@
 	function serviceinfo_ini_org() {
 		//兌換中心
 
-		//client
-		let client = new $.RestClient('/genericUser/api/');
-		client.add('organizations');
-
-		//read
-		client.organizations.read()
-			.done(function (data) {
-				//console.log(data)
-
-				//saveas
-				dtorg = data;
-
-				//html
-				let c = '<option value="" selected="selected">---------</option>'
-				_.each(data, function (v) {
-					c += '<option value="' + v.id + '">' + v.name + '</option>';
-				})
-				$('#sel_exchangecenter').html(c);
-
+		_.delay(function () {
+			
+			//html
+			let c = '<option value="" selected="selected">---------</option>'
+			_.each(gvorg, function (v) {
+				c += '<option value="' + v.id + '">' + v.name + '</option>';
 			})
+			$('#sel_exchangecenter').html(c);
 
-	}
+		}, 2000)
 
-
-	function serviceinfo_get_org(id) {
-		//找尋組織
-
-		let r = _.find(dtorg, { id: id });
-		if (iser(r)) {
-			r = {};
-		}
-		return r;
 	}
 
 
@@ -437,7 +415,7 @@
 		//client
 		let client = new $.RestClient('/genericUser/api/');
 		client.add('serviceinfos');
-		
+
 		//create
 		client.serviceinfos.create(transferData)
 			.done(function (data) {
