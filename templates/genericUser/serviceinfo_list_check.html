@@ -1,8 +1,4 @@
-﻿{% extends "base_nav.html" %}
-{% block title %}
-服務時數確認
-{% endblock %}
-{% block content %}
+﻿{% extends "base_nav.html" %} {% block title %} 服務時數確認 {% endblock %} {% block content %}
 
 
 <script>
@@ -109,10 +105,10 @@
 		client.serviceinfos.addVerb('is_exchange', 'PATCH');
 
 		//PATCH
-		_.each(editrecord_set,function(id){
-			client.serviceinfos.is_exchange(id,{'is_exchange':true});
+		_.each(editrecord_set, function (id) {
+			client.serviceinfos.is_exchange(id, { 'is_exchange': true });
 		})
-		
+
 
 
 
@@ -133,7 +129,7 @@
 		// let client = new $.RestClient('/genericUser/api/');
 		// client.add('serviceinfos');
 		// client.serviceinfos.addVerb('is_exchange', 'PATCH');
-		
+
 		// //create
 		// client.serviceinfos.is_exchange(id,true);
 		// client.serviceinfos.create(transferData)
@@ -167,31 +163,31 @@
 <div id="serviceinfocheck_list_div_未兌換">
 
 
-    <h4 style="margin-top:30px;">Step1: 勾選志工所提送的兌換項目</h4>
+	<h4 style="margin-top:30px;">Step1: 勾選志工所提送的兌換項目</h4>
 
 
-    <hr style="margin-top:5px;">
+	<hr style="margin-top:5px;">
 
 
-    <div id="div_serviceinfocheck_list_panel" style="margin-bottom:60px;">
-        <button class="btn btn-default" type="Button" onclick="serviceinfocheck_select_all()">全選</button>
-        <button class="btn btn-default" type="Button" onclick="serviceinfocheck_select_no()">全不選</button>
-        <button class="btn btn-default" type="Button" onclick="serviceinfocheck_select_inv()">反向選</button>
-        <div id="div_serviceinfocheck_list"></div>
-    </div>
+	<div id="div_serviceinfocheck_list_panel" style="margin-bottom:60px;">
+		<button class="btn btn-default" type="Button" onclick="serviceinfocheck_select_all()">全選</button>
+		<button class="btn btn-default" type="Button" onclick="serviceinfocheck_select_no()">全不選</button>
+		<button class="btn btn-default" type="Button" onclick="serviceinfocheck_select_inv()">反向選</button>
+		<div id="div_serviceinfocheck_list"></div>
+	</div>
 
 
-    <h4>Step2: 確認後同意兌換</h4>
+	<h4>Step2: 確認後同意兌換</h4>
 
 
-    <hr style="margin-top:5px;">
+	<hr style="margin-top:5px;">
 
 
-    <div style="margin-bottom:60px;">
+	<div style="margin-bottom:60px;">
 
-        <button id="btn_serviceinfocheck_agree" type="button" class="btn btn-primary" onclick="serviceinfocheck_agree()">同意兌換</button>
+		<button id="btn_serviceinfocheck_agree" type="button" class="btn btn-primary" onclick="serviceinfocheck_agree()">同意兌換</button>
 
-    </div>
+	</div>
 
 
 </div>
