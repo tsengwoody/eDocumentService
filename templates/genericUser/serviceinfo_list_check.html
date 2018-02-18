@@ -1,8 +1,7 @@
-﻿{% extends "base_nav.html" %} {% block title %} 服務時數確認 {% endblock %} {% block content %}
+﻿{% extends "base_nav.html" %} {% block title %} 服務時數確認 {% endblock %} {% block content %} {% csrf_token %}
 
 
 <script>
-	let dtorg;
 
 
 	$(function () {
@@ -32,7 +31,7 @@
 						'核取': '<label class="checkbox-inline"><input type="checkbox" name="inp_grp_exchange" value="' + v.id + '" service_hours="' + v.service_hours + '">兌換</label>',
 						'兌換日期': v.date,
 						'服務時數': v.service_hours,
-						//'兌換單位': cstr(getorg(v.org).name),
+						'兌換單位': cstr(getorg(v.org).name),
 						'服務紀錄': '<button type="button" class="btn btn-default" onclick="ServiceinfoEditrecord([' + v.editrecord_set + '])">詳細服務紀錄</button>',
 					};
 					sr.push(o);
@@ -82,7 +81,7 @@
 	}
 
 	function serviceinfocheck_agree() {
-		//兌換
+		//同意兌換
 
 		//service_hours, editrecord_set
 		let service_hours = 0;
@@ -102,54 +101,41 @@
 		//client
 		let client = new $.RestClient('/genericUser/api/');
 		client.add('serviceinfos');
-		client.serviceinfos.addVerb('is_exchange', 'PATCH');
 
 		//PATCH
+		let dfs = [];
 		_.each(editrecord_set, function (id) {
-			client.serviceinfos.is_exchange(id, { 'is_exchange': true });
+
+			//原patch針對id還要補後斜線
+			//let u = cstr(id) + '/';
+			//client.serviceinfos.addVerb(u, 'PATCH');
+			//client.serviceinfos[u]({ 'is_exchange': true });
+
+			//updatepart
+			let df = client.serviceinfos.updatepart(id, { 'is_exchange': true });
+
+			//push
+			dfs.push(df);
+
 		})
 
+		//Promise.all
+		Promise.all(dfs)
+			.then(function () {
 
+				//alertmessage
+				alertmessage('success', '同意兌換成功')
+					.done(function () {
+						location.reload();
+					})
 
+			})
+			.catch(function (msg) {
 
-		// //userid
-		// let userid = $('div[user_id]').attr('user_id');
+				//alertmessage
+				alertmessage('error', '非預期同意兌換失敗: ' + msg);
 
-		// //transferData
-		// let transferData = {
-		// 	//"editrecord_set": editrecord_set,
-		// 	//"date": moment().format('YYYY-MM-DD'),
-		// 	//"service_hours": service_hours,
-		// 	"is_exchange": false,
-		// 	//"user": cint(userid),
-		// 	//"org": cint(org),
-		// };
-
-		// //client
-		// let client = new $.RestClient('/genericUser/api/');
-		// client.add('serviceinfos');
-		// client.serviceinfos.addVerb('is_exchange', 'PATCH');
-
-		// //create
-		// client.serviceinfos.is_exchange(id,true);
-		// client.serviceinfos.create(transferData)
-		// 	.done(function (data) {
-		// 		if (iser(data.editrecord_set)) {
-		// 			//alertmessage
-		// 			alertmessage('error', '兌換失敗: ' + '無紀錄被兌換');
-		// 		}
-		// 		else {
-		// 			//alertmessage
-		// 			alertmessage('success', '兌換成功')
-		// 				.done(function () {
-		// 					location.reload();
-		// 				})
-		// 		}
-		// 	})
-		// 	.fail(function (msg) {
-		// 		//alertmessage
-		// 		alertmessage('error', '非預期兌換失敗: ' + o2j(msg.responseJSON));
-		// 	})
+			})
 
 	}
 
