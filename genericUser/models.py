@@ -220,13 +220,19 @@ class ServiceInfo(models.Model):
 	def get_page_count(self):
 		page_count = 0
 		for editRecord in self.editrecord_set.all():
-			page_count = page_count +(editRecord.part.end_page -editRecord.part.begin_page +1)
+			try:
+				page_count = page_count +(editRecord.part.end_page -editRecord.part.begin_page +1)
+			except:
+				pass
 		return page_count
 
 	def get_character_count(self):
 		character_count = 0
 		for editRecord in self.editrecord_set.all():
-			i = editRecord.part.get_character_count()
+			try:
+				i = editRecord.part.get_character_count()
+			except:
+				i=0
 			character_count = character_count +i
 		return character_count
 

@@ -79,8 +79,8 @@
 
 		//when
 		$.when(
-			client.editrecords.read({ editor_id: userid, is_exchange: false }),
-			client.editrecords.read({ editor_id: userid, is_exchange: true })
+			client.editrecords.read({ editor_id: userid, exchange: false }),
+			client.editrecords.read({ editor_id: userid, exchange: true })
 		)
 			.done(function (d1, d2) {
 				//console.log('serviceinfo_ini_sta',d1[0],d2[0])
@@ -195,8 +195,8 @@
 		client.add('serviceinfos');
 
 		//read
-		//client.serviceinfos.read({ editor_id: userid, exchange: false })
-		client.serviceinfos.read({ user_id: userid, exchange: false })
+		//client.serviceinfos.read({ editor_id: userid, is_exchange: false })
+		client.serviceinfos.read({ user_id: userid, is_exchange: false })
 			.done(function (data) {
 				//console.log('serviceinfo_ini_dealing',data)
 
@@ -246,7 +246,7 @@
 		client.add('serviceinfos');
 
 		//read
-		//client.serviceinfos.read({ editor_id: userid, exchange: true })
+		//client.serviceinfos.read({ editor_id: userid, is_exchange: true })
 		client.serviceinfos.read({ user_id: userid, is_exchange: true })
 			.done(function (data) {
 				//console.log('serviceinfo_ini_done',data)

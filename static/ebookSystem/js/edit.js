@@ -419,7 +419,7 @@ function createHtmlEditor() {
                     let isbnpart = s.pop();
 
                     //url
-                    let url = 'http://0.0.0.0/ebookSystem/resource/ebooks/' + isbnpart + '/OCR/origin';
+                    let url = '/ebookSystem/api/ebooks/' + isbnpart + '/resource/OCR/origin';
 
                     //aj_text
                     aj_text(url,{})
