@@ -1,0 +1,514 @@
+﻿{% extends "base_nav.html" %} {% block title %} 服務紀錄 {% endblock %} {% block header %} 服務紀錄 {% endblock %} {% block style%}
+{% load staticfiles %} {% endblock %} {% block content %} {% csrf_token %}
+
+
+<script>
+
+
+	$(function () {
+		serviceinfo_ini_list();
+		serviceinfo_ini_sta();
+		serviceinfo_ini_dealing();
+		serviceinfo_ini_done();
+		serviceinfo_ini_org();
+	})
+
+
+	function serviceinfo_ini_list() {
+		//未兌換服務紀錄
+
+		//userid
+		let userid = $('div[search_user_id]').attr('search_user_id');
+
+		//client
+		let client = new $.RestClient('/ebookSystem/api/');
+		client.add('editrecords');
+
+		//read
+		client.editrecords.read({ editor_id: userid, exchange: false })
+			.done(function (data) {
+				//console.log('serviceinfo_ini_list',data)
+
+				//orderBy
+				data = _.orderBy(data, 'get_date', 'desc');
+
+				//sr
+				let sr = [];
+				_.each(data, function (v, k) {
+					let o = {
+						'核取': '<label class="checkbox-inline"><input type="checkbox" name="inp_grp_exchange" value="' + v.id + '" service_hours="' + v.service_hours + '">兌換</label>',
+						'服務時間': v.get_date,
+						'服務時數': v.service_hours,
+						'線上時數': v.stay_hours,
+						'類型': v.category,
+					};
+					sr.push(o);
+				})
+
+				//check
+				if (iser(sr)) {
+					$('#div_serviceinfo_list_panel').html('目前無服務紀錄');
+					$('#sel_exchangecenter').prop('disabled', true);
+					$('#btn_serviceinfo_exchange').attr('onclick', '').prop('disabled', true);
+					return;
+				}
+
+				//gentable
+				gentable('div_serviceinfo_list', 'div_serviceinfo_list_table', sr);
+
+				//table
+				$('#div_serviceinfo_list_table').find('tr').each(function () {
+					let tr = $(this);
+					tr.css('text-align', 'center');
+				})
+
+			});
+
+	}
+
+
+	function serviceinfo_ini_sta() {
+		//服務紀錄月統計
+
+		//userid
+		let userid = $('div[search_user_id]').attr('search_user_id');
+
+		//client
+		let client = new $.RestClient('/ebookSystem/api/');
+		client.add('editrecords');
+
+		//when
+		$.when(
+			client.editrecords.read({ editor_id: userid, exchange: false }),
+			client.editrecords.read({ editor_id: userid, exchange: true })
+		)
+			.done(function (d1, d2) {
+				//console.log('serviceinfo_ini_sta',d1[0],d2[0])
+
+				//d1
+				d1 = _.map(d1[0], function (v) {
+					v['is_exchange'] = false;
+					return v;
+				});
+
+				//d2
+				d2 = _.map(d2[0], function (v) {
+					v['is_exchange'] = true;
+					return v;
+				});
+
+				//concat
+				data = _.concat(d1, d2);
+				//console.log('serviceinfo_ini_sta',data)
+
+				//orderBy
+				data = _.orderBy(data, 'get_date', 'desc');
+
+				//group
+				let r = _.groupBy(data, function (v) {
+					return strleft(v.get_date, 7)
+				});
+				// let keys = _.keys(r);
+				// console.log(r, keys)
+
+				//
+				function cexg(b) {
+					if (b) {
+						return '已兌換';
+					}
+					return '未兌換';
+				}
+
+				//sr
+				let sr = [];
+				_.each(r, function (gv, gk) {
+					let cb = _.countBy(gv, 'is_exchange');
+					_.each(gv, function (v, k) {
+
+						//k first, 當前月
+						if (k === 0) {
+							let o = {
+								'兌換': '<span style="font-weight:bold;">' + gk + '</span>',
+								'服務時間': '',
+								'服務時數': '',
+								'線上時數': '',
+								'類型': '',
+							};
+							sr.push(o);
+						}
+
+						//k general, 一般兌換資料
+						let o = {
+							'兌換': '<span style="margin-left:60px;">' + cexg(v.is_exchange) + '</span>',
+							'服務時間': v.get_date,
+							'服務時數': v.service_hours,
+							'線上時數': v.stay_hours,
+							'類型': v.category,
+						};
+						sr.push(o);
+
+						//k end, 添加月底統計
+						if (k === _.size(gv) - 1) {
+							let o = {
+								'兌換': '<span style="margin-left:60px; font-weight:bold; color:#f26;" aria-label="小計">' + '小計：兌換' + cb.true + '筆，未兌換' + cb.false + '筆' + '</span>',
+								'服務時間': '',
+								'服務時數': '',
+								'線上時數': '',
+								'類型': '',
+							};
+							sr.push(o);
+						}
+
+					})
+				})
+
+				//check
+				if (iser(sr)) {
+					$('#div_serviceinfo_sta_panel').html('目前無服務紀錄');
+					$('#sel_exchangecenter').prop('disabled', true);
+					$('#btn_serviceinfo_exchange').attr('onclick', '').prop('disabled', true);
+					return;
+				}
+
+				//gentable
+				gentable('div_serviceinfo_sta', 'div_serviceinfo_sta_table', sr);
+
+				//table
+				$('#div_serviceinfo_sta_table').find('tr').each(function () {
+					let tr = $(this);
+					tr.find('td:gt(0)').css('text-align', 'center');
+				})
+
+			})
+
+	}
+
+
+	function serviceinfo_ini_dealing() {
+		//兌換中服務紀錄
+
+		//userid
+		let userid = $('div[search_user_id]').attr('search_user_id');
+
+		//client
+		let client = new $.RestClient('/genericUser/api/');
+		client.add('serviceinfos');
+
+		//read
+		//client.serviceinfos.read({ editor_id: userid, is_exchange: false })
+		client.serviceinfos.read({ user_id: userid, is_exchange: false })
+			.done(function (data) {
+				//console.log('serviceinfo_ini_dealing',data)
+
+				//orderBy
+				data = _.orderBy(data, 'date', 'desc');
+
+				//sr
+				let sr = [];
+				_.each(data, function (v, k) {
+					let o = {
+						'兌換日期': v.date,
+						'服務時數': v.service_hours,
+						'兌換單位': cstr(getorg(v.org).name),
+						'服務紀錄': '<button type="button" class="btn btn-default" onclick="ServiceinfoEditrecord([' + v.editrecord_set + '])">詳細服務紀錄</button>',
+					};
+					sr.push(o);
+				})
+
+				//check
+				if (iser(sr)) {
+					$('#div_serviceinfo_dealing_panel').html('目前無服務紀錄');
+					return;
+				}
+
+				//gentable
+				gentable('div_serviceinfo_dealing', 'div_serviceinfo_dealing_table', sr);
+
+				//table
+				$('#div_serviceinfo_dealing_table').find('tr').each(function () {
+					let tr = $(this);
+					tr.css('text-align', 'center');
+				})
+
+			});
+
+	}
+
+
+	function serviceinfo_ini_done() {
+		//已兌換服務紀錄
+
+		//userid
+		let userid = $('div[search_user_id]').attr('search_user_id');
+
+		//client
+		let client = new $.RestClient('/genericUser/api/');
+		client.add('serviceinfos');
+
+		//read
+		//client.serviceinfos.read({ editor_id: userid, is_exchange: true })
+		client.serviceinfos.read({ user_id: userid, is_exchange: true })
+			.done(function (data) {
+				//console.log('serviceinfo_ini_done',data)
+
+				//orderBy
+				data = _.orderBy(data, 'date', 'desc');
+
+				//sr
+				let sr = [];
+				_.each(data, function (v, k) {
+					let o = {
+						'兌換日期': v.date,
+						'服務時數': v.service_hours,
+						'兌換單位': cstr(getorg(v.org).name),
+						'服務紀錄': '<button type="button" class="btn btn-default" onclick="ServiceinfoEditrecord([' + v.editrecord_set + '])">詳細服務紀錄</button>',
+					};
+					sr.push(o);
+				})
+
+				//check
+				if (iser(sr)) {
+					$('#div_serviceinfo_done_panel').html('目前無服務紀錄');
+					return;
+				}
+
+				//gentable
+				gentable('div_serviceinfo_done', 'div_serviceinfo_done_table', sr);
+
+				//table
+				$('#div_serviceinfo_done_table').find('tr').each(function () {
+					let tr = $(this);
+					tr.css('text-align', 'center');
+				})
+
+			});
+
+	}
+
+
+	function serviceinfo_ini_org() {
+		//兌換中心
+
+		_.delay(function () {
+			
+			//html
+			let c = '<option value="" selected="selected">---------</option>'
+			_.each(gvorg, function (v) {
+				c += '<option value="' + v.id + '">' + v.name + '</option>';
+			})
+			$('#sel_exchangecenter').html(c);
+
+		}, 2000)
+
+	}
+
+
+	function serviceinfo_select_all() {
+		//全選
+
+		$('input[name="inp_grp_exchange"]').prop('checked', true);
+	}
+
+
+	function serviceinfo_select_no() {
+		//全不選
+
+		$('input[name="inp_grp_exchange"]').prop('checked', false);
+	}
+
+
+	function serviceinfo_select_inv() {
+		//反向選
+
+		$('input[name="inp_grp_exchange"]').each(function () {
+			let inp = $(this);
+			inp.prop('checked', !inp.prop('checked'));
+		})
+	}
+
+	function serviceinfo_exchange() {
+		//兌換
+
+		//service_hours, editrecord_set
+		let service_hours = 0;
+		let editrecord_set = [];
+		$('input[name="inp_grp_exchange"]:checked').each(function () {
+			let inp = $(this);
+			service_hours += cint(inp.attr('service_hours'));
+			editrecord_set.push(cint(inp.val()));
+		})
+
+		//check
+		if (editrecord_set.length === 0) {
+			alertmessage('error', '至少需一筆紀錄');
+			return;
+		}
+
+		//org
+		let org = $('#sel_exchangecenter').find('option:selected').val();
+
+		//check
+		if (iser(org)) {
+			alertmessage('error', '尚未選擇兌換中心');
+			return;
+		}
+
+		//userid
+		let userid = $('div[search_user_id]').attr('search_user_id');
+
+		//transferData
+		let transferData = {
+			"editrecord_set": editrecord_set,
+			"date": moment().format('YYYY-MM-DD'),
+			"service_hours": service_hours,
+			"is_exchange": false,
+			"user": cint(userid),
+			"org": cint(org),
+		};
+
+		//client
+		let client = new $.RestClient('/genericUser/api/');
+		client.add('serviceinfos');
+
+		//create
+		client.serviceinfos.create(transferData)
+			.done(function (data) {
+
+				if (iser(data.editrecord_set)) {
+					//alertmessage
+					alertmessage('error', '兌換失敗: ' + '無紀錄被兌換');
+				}
+				else {
+					//alertmessage
+					alertmessage('success', '兌換成功')
+						.done(function () {
+							location.reload();
+						})
+				}
+
+			})
+			.fail(function (data) {
+
+				//alertmessage
+				alertmessage('error', '非預期兌換失敗: ' + o2j(data.responseJSON));
+				
+			})
+
+	}
+
+
+</script>
+
+<div search_user_id="{{ search_user.id }}"></div>
+<h3 style="margin:40px 0px 30px 0px;">服務紀錄列表與兌換</h3>
+
+
+<ul class="nav nav-tabs">
+	<li class="active">
+		<a href="#serviceinfo_list_tab_未兌換" name="serviceinfo_list_tab_grp" data-toggle="tab" aria-expanded="true" onclick="pagetab_subtabfix(this);">未兌換</a>
+	</li>
+	<li>
+		<a href="#serviceinfo_list_tab_兌換中" name="serviceinfo_list_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">兌換中</a>
+	</li>
+	<li>
+		<a href="#serviceinfo_list_tab_已兌換" name="serviceinfo_list_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">已兌換</a>
+	</li>
+	<li>
+		<a href="#serviceinfo_list_tab_月統計" name="serviceinfo_list_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">月統計</a>
+	</li>
+</ul>
+
+
+<div class="tab-content" style="padding-bottom:20px;">
+
+	<div id="serviceinfo_list_tab_未兌換" class="tab-pane active">
+		<h4 class="textfornvda">未兌換</h4>
+
+		<div id="serviceinfo_list_div_未兌換">
+
+
+			<h4 style="margin-top:30px;">Step1: 勾選欲兌換之服務紀錄</h4>
+
+
+			<hr style="margin-top:5px;">
+
+
+			<div id="div_serviceinfo_list_panel" style="margin-bottom:60px;">
+				<button class="btn btn-default" type="Button" onclick="serviceinfo_select_all()">全選</button>
+				<button class="btn btn-default" type="Button" onclick="serviceinfo_select_no()">全不選</button>
+				<button class="btn btn-default" type="Button" onclick="serviceinfo_select_inv()">反向選</button>
+				<div id="div_serviceinfo_list"></div>
+			</div>
+
+
+			<h4>Step2: 確認後進行兌換</h4>
+
+
+			<hr style="margin-top:5px;">
+
+
+			<div style="margin-bottom:60px;">
+
+				<div class="form-inline">
+
+					<div class="form-group" style="margin-right:15px;">
+						<label for="sel_exchangecenter" style="margin:0px;">
+							選擇兌換中心
+							<select id="sel_exchangecenter" class="form-control"></select>
+						</label>
+					</div>
+
+				</div>
+
+				<button id="btn_serviceinfo_exchange" type="button" class="btn btn-primary" style="margin-top:10px;" onclick="serviceinfo_exchange()">兌換</button>
+
+			</div>
+
+
+		</div>
+
+	</div>
+
+	<div id="serviceinfo_list_tab_兌換中" class="tab-pane">
+		<h4 class="textfornvda">兌換中</h4>
+
+		<div id="serviceinfo_list_div_兌換中">
+
+			<div id="div_serviceinfo_dealing_panel" style="margin-bottom:40px;">
+				<div id="div_serviceinfo_dealing"></div>
+			</div>
+
+		</div>
+
+	</div>
+
+	<div id="serviceinfo_list_tab_已兌換" class="tab-pane">
+		<h4 class="textfornvda">已兌換</h4>
+
+		<div id="serviceinfo_list_div_已兌換">
+
+			<div id="div_serviceinfo_done_panel" style="margin-bottom:40px;">
+				<div id="div_serviceinfo_done"></div>
+			</div>
+
+		</div>
+
+	</div>
+
+	<div id="serviceinfo_list_tab_月統計" class="tab-pane">
+		<h4 class="textfornvda">月統計</h4>
+
+		<div id="serviceinfo_list_div_月統計">
+
+			<div id="div_serviceinfo_sta_panel" style="margin-bottom:40px;">
+				<div id="div_serviceinfo_sta"></div>
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
+
+{% endblock %}

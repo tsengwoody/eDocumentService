@@ -24,15 +24,16 @@ class UserSerializer(serializers.ModelSerializer):
 		]
 
 from ebookSystem.models import EditRecord
+from ebookSystem.serializers import EditRecordSerializer
 class ServiceInfoSerializer(serializers.ModelSerializer):
 	editrecord_set = serializers.PrimaryKeyRelatedField(many=True, queryset=EditRecord.objects.filter(serviceInfo=None))
 	class Meta:
 		model = ServiceInfo
 		fields = '__all__'
 
-#	def create(self, validated_data):
-#		instance = super(ServiceInfoSerializer, self).create(validated_data)
-#		print type(validated_data)
+class ServiceInfoAddSerializer(ServiceInfoSerializer):
+	editrecordinfo_set = EditRecordSerializer(many=True, read_only=True, source='editrecord_set')
+	userinfo = UserSerializer(read_only=True, source='user')
 
 class AnnouncementSerializer(serializers.ModelSerializer):
 	class Meta:

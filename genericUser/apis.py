@@ -55,11 +55,8 @@ class ServiceInfoViewSet(viewsets.ModelViewSet):
 	serializer_class = ServiceInfoSerializer
 	filter_backends = (ServiceInfoUserFilter, ServiceInfoExchangeFilter,)
 
-	@detail_route(
-		methods=['get','patch'],
-	)
-	def is_exchange(self, request, pk=None, dir=None, resource=None):
-		print request.data
+class ServiceInfoAddViewSet(ServiceInfoViewSet):
+	serializer_class = ServiceInfoAddSerializer
 
 class AnnouncementViewSet(viewsets.ModelViewSet):
 	queryset = Announcement.objects.all()

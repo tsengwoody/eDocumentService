@@ -14,6 +14,7 @@ router.register(r'organizations', apis.OrganizationViewSet)
 router.register(r'qandas', apis.QAndAViewSet)
 router.register(r'serviceinfos', apis.ServiceInfoViewSet)
 router.register(r'users', apis.UserViewSet)
+router.register(r'serviceinfoadds', apis.ServiceInfoAddViewSet)
 
 import copy
 api_urlpatterns = copy.copy(router.urls)
@@ -36,6 +37,7 @@ urlpatterns = [
 	url(r'^upload_progress/$', views.upload_progress, name='upload_progress'),
 	url(r'^event_list/$', views.event_list, name='event_list'),
 	url(r'^serviceinfo_list/$', views.serviceinfo_list, name='serviceinfo_list'),
+	url(r'^serviceinfo_list_search/(?P<username>[\w-]+)/$', views.serviceinfo_list_search, name='serviceinfo_list_search'),
 	url(r'^serviceinfo_list_check/$', views.serviceinfo_list_check, name='serviceinfo_list_check'),
 	url(r'^info/$', views.info, {'template_name': 'genericUser/info.html'}, name='info'),
 	url(r'^change_contact_info/$', views.change_contact_info, {'template_name': 'genericUser/change_contact_info.html'}, name='change_contact_info'),

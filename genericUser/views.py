@@ -271,38 +271,17 @@ def change_contact_info(request, template_name):
 
 @http_response
 def serviceinfo_list(request, template_name='genericUser/serviceinfo_list.html'):
-	'''try:
-		user = User.objects.get(username=username)
-	except:
-		raise Http404("book does not exist")
-	org_list = Organization.objects.all()
-	month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
-	try:
-		current_ServiceInfo = ServiceInfo.objects.get(date=month_day, user=user)
-	except:
-		pass
-	ServiceInfo_list = ServiceInfo.objects.filter(user=user).exclude(date=month_day).order_by('date')'''
-	if request.method == 'POST':
-		if request.POST.has_key('exchange'):
-			try:
-				exchange_serviceInfo = ServiceInfo.objects.get(id=request.POST['exchange'])
-				exchange_serviceInfo.is_exchange = True
-				exchange_serviceInfo.org = Organization.objects.get(id=request.POST['org'])
-				exchange_serviceInfo.save()
-				subject = u'[通知] {0} 申請服務時數'.format(request.user.username)
-				t = get_template('email/serviceinfo_list.txt')
-				body = t.render(Context(locals()))
-				email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[exchange_serviceInfo.org.email])
-				email.send(fail_silently=False)
-				status = u'success'
-				message = u'兌換成功'
-			except BaseException as e:
-				status = u'error'
-				message = u'兌換失敗'
-		else:
-			status = u'error'
-			message = u'兌換失敗'
+	if request.method == 'GET':
 		return locals()
+	'''subject = u'[通知] {0} 申請服務時數'.format(request.user.username)
+	t = get_template('email/serviceinfo_list.txt')
+	body = t.render(Context(locals()))
+	email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[exchange_serviceInfo.org.email])
+	email.send(fail_silently=False)'''
+
+@http_response
+def serviceinfo_list_search(request, username, template_name='genericUser/serviceinfo_list_search.html'):
+	search_user = User.objects.get(username=username)
 	if request.method == 'GET':
 		return locals()
 
