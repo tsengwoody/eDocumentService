@@ -2,25 +2,38 @@
 
 
 <script>
+
+	const tinymce_settings = {
+		language: 'zh_TW',
+		menubar: 'edit insert format table',
+		plugins: 'paste textcolor link table lists advlist hr charmap',
+		toolbar: 'undo redo | fontsizeselect | forecolor backcolor | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+		fontsize_formats: '8pt 10pt 11pt 12pt 14pt 18pt 24pt 36pt',
+		paste_data_images: true,
+		setup: function (ed) {
+			ed.on('init', function (e) {
+
+				//style
+				let s = ed.getBody().style;
+				s.fontSize = '11pt';
+				s.fontFamily = '微軟正黑體';
+
+			});
+		},
+	}
+
 	let vo_tm;
 
 	$(function () {
 
+		//component
+		Vue.component('VueTinymce', Editor);
+		
 		//opt
 		let opt = {
 			el: '#' + 'id_vue_tm',
 			data: {
 				content: '<p>qwe</p><p>asd</p>',
-			},
-			methods: {
-
-				fchange: function (e) {
-					console.log('methods fchange', e)
-				},
-				fsave: function (e) {
-					console.log('methods fsave', e)
-				},
-
 			},
 		};
 
@@ -39,54 +52,13 @@
 		template: `
 <div>
 
-	<textarea v-bind:id="id" style="min-height:300px;"></textarea>
+	<VueTinymce style="height:300px;" v-bind:init="tinymce_settings" v-model="content"></VueTinymce>
 
-	<button style="margin-top:15px;" v-on:click="ck_save">Save</button>
+	<button style="margin-top:15px;" v-on:click="ck_save">log content</button>
 
 </div>
 	`,
 		props: ['content'],
-		data: function () {
-			return {
-				id: 'vu-tinymce-' + Date.now(),
-				ed: null,
-			}
-		},
-		mounted: function () {
-			//console.log('mounted')
-
-			let vo = this;
-
-			//tinymce
-			tinymce.init({
-				selector: '#' + vo.id,
-				language: 'zh_TW',
-				menubar: 'edit insert format table',
-				plugins: 'paste textcolor link table lists advlist hr charmap',
-				toolbar: 'undo redo | fontsizeselect | forecolor backcolor | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent',
-				fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt',
-				paste_data_images: true,
-				setup: function (ed) {
-					ed.on('init', function (e) {
-
-						//style
-						let s = ed.getBody().style;
-						s.fontSize = '12pt';
-						s.fontFamily = '微軟正黑體';
-
-						//setContent
-						ed.setContent(vo.content);
-
-						//event
-						ed.on('input change undo redo', () => {
-							vo.$emit('sharechange', ed.getContent());
-						});
-
-					});
-				},
-			});
-
-		},
 		methods: {
 
 			ck_save: function () {
@@ -94,11 +66,8 @@
 
 				let vo = this;
 
-				//getContent
-				let c = tinymce.get(vo.id).getContent();
-
-				//emit
-				vo.$emit('sharesave', c);
+				//log
+				console.log(vo.content)
 
 			}
 
@@ -108,8 +77,8 @@
 
 </script>
 
-<h3>vue tinymce</h3>
+<h3>官網vue tinymce測試</h3>
 
-<vu-tinymce id="id_vue_tm" v-bind:content="content" v-on:sharechange="fchange" v-on:sharesave="fsave"></vu-tinymce>
+<vu-tinymce id="id_vue_tm" v-bind:content="content"></vu-tinymce>
 
 {% endblock %}
