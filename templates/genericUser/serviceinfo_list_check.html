@@ -14,10 +14,10 @@
 
 		//client
 		let client = new $.RestClient('/genericUser/api/');
-		client.add('serviceinfos');
+		client.add('serviceinfoadds');
 
 		//read
-		client.serviceinfos.read({ is_exchange: false })
+		client.serviceinfoadds.read({ is_exchange: false })
 			.done(function (data) {
 				//console.log('serviceinfocheck_ini_list',data)
 
@@ -31,6 +31,7 @@
 						'核取': '<label class="checkbox-inline"><input type="checkbox" name="inp_grp_exchange" value="' + v.id + '" service_hours="' + v.service_hours + '">兌換</label>',
 						'兌換日期': v.date,
 						'服務時數': v.service_hours,
+						'服務者': v.userinfo.username,
 						'兌換單位': cstr(getorg(v.org).name),
 						'服務紀錄': '<button type="button" class="btn btn-default" onclick="ServiceinfoEditrecord([' + v.editrecord_set + '])">詳細服務紀錄</button>',
 					};
@@ -100,7 +101,7 @@
 
 		//client
 		let client = new $.RestClient('/genericUser/api/');
-		client.add('serviceinfos');
+		client.add('serviceinfoadds');
 
 		//PATCH
 		let dfs = [];
@@ -108,11 +109,11 @@
 
 			//原patch針對id還要補後斜線
 			//let u = cstr(id) + '/';
-			//client.serviceinfos.addVerb(u, 'PATCH');
-			//client.serviceinfos[u]({ 'is_exchange': true });
+			//client.serviceinfoadds.addVerb(u, 'PATCH');
+			//client.serviceinfoadds[u]({ 'is_exchange': true });
 
 			//updatepart
-			let df = client.serviceinfos.updatepart(id, { 'is_exchange': true });
+			let df = client.serviceinfoadds.updatepart(id, { 'is_exchange': true });
 
 			//push
 			dfs.push(df);
