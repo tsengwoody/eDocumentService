@@ -19,12 +19,23 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	search_fields = ('username', 'email',)
 
 	def perform_create(self, serializer):
-		instance = serializer.save()
-		instance.is_license = True
-		instance.auth_email = False
-		instance.auth_phone = False
+		instance = serializer.save(
+			is_license = True,
+			auth_phone = False,
+			auth_email = False,
+		)
 		instance.set_password(self.request.data['password'])
 		instance.save()
+
+	def perform_update(self, serializer):
+		if self.request.data.has_key('email') or self.request.data.has_key('phone'):
+			auth_email = (serializer.validated_data['email'] == serializer.instance.email) & serializer.instance.auth_email
+			auth_phone = (serializer.validated_data['phone'] == serializer.instance.phone) & serializer.instance.auth_phone
+			serializer.save(auth_email=auth_email, auth_phone=auth_phone)
+		else:
+			print 'origin'
+			serializer.save()
+
 
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = None
@@ -59,7 +70,7 @@ class ServiceInfoAddViewSet(ServiceInfoViewSet):
 	serializer_class = ServiceInfoAddSerializer
 
 class AnnouncementViewSet(viewsets.ModelViewSet):
-	queryset = Announcement.objects.all()
+	queryset = Announcement.objects.all().order_by('-datetime')
 	serializer_class = AnnouncementSerializer
 	filter_backends = (filters.OrderingFilter, filters.SearchFilter, AnnouncementCategoryFilter, AnnouncementNewestFilter, )
 	ordering_fields = ('datetime',)

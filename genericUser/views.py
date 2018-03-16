@@ -542,7 +542,7 @@ def announcement_update(request, pk, ):
 		return locals()
 
 @http_response
-def announcement_delete(request, id):
+def announcement_delete(request, pk):
 	if request.method == 'POST' and request.is_ajax():
 		announcement = Announcement.objects.get(id=id)
 		announcement.delete()
