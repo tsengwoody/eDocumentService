@@ -1,5 +1,6 @@
 ﻿# coding: utf-8
 
+import json
 from rest_framework import filters
 from rest_framework import permissions
 from rest_framework import viewsets
@@ -10,11 +11,15 @@ from .filters import *
 from .premissions import *
 from .serializers import *
 
+from django.core.cache import cache
+from django.core.mail import EmailMessage
+from django.template.loader import get_template
+from django.template import Context
 class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
-	permission_classes = (UserDataPermission, )
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter,)
+	#permission_classes = (UserDataPermission, )
+	#filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter,)
 	ordering_fields = ('username',)
 	search_fields = ('username', 'email',)
 
@@ -45,6 +50,83 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			if resource == 'back':
 				fullpath = obj.disability_card_back
 		return fullpath
+
+	@detail_route(
+		methods=['post'],
+		url_name='verify',
+		url_path='action/verify',
+	)
+	def verify(self, request, pk=None):
+		obj = self.get_object()
+		if request.POST.has_key('generate') and request.POST['generate'] == 'email':
+			if not cache.has_key(obj.email):
+				import random
+				import string
+				vcode = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+				cache.set(obj.email, {'vcode': vcode}, 600)
+			else:
+				vcode = cache.get(obj.email)['vcode']
+			subject = u'[驗證] {0} 信箱驗證碼'.format(obj.username)
+			t = get_template('email/email_validate.txt')
+			body = t.render(Context(locals()))
+			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[obj.email])
+			email.send(fail_silently=False)
+			status = 'success'
+			message = u'已寄送到您的電子信箱'
+		elif request.POST.has_key('generate') and request.POST['generate'] == 'phone':
+			if not cache.has_key(request.user.phone):
+				import random
+				import string
+				vcode = ''.join(random.choice(string.digits) for _ in range(6))
+				cache.set(request.user.phone, {'vcode': vcode}, 600)
+			else:
+				vcode = cache.get(request.user.phone)['vcode']
+			data = u'親愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
+			url = 'https://api2.kotsms.com.tw/kotsmsapi-1.php?username={0}&password={1}&dstaddr={2}&smbody={3}'.format(
+				OTP_ACCOUNT, OTP_PASSWORD, request.user.phone, urllib.quote(data.encode('big5'))
+			)
+			session = requests.Session()
+			response = session.get(url)
+			if response.text.split('=')[1] > 0:
+				status = 'success'
+				message = u'已寄送到您的手機'
+			else:
+				status = 'error'
+				message = u'請確認手機號碼是否正確或聯絡系統管理員'
+				return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+		elif request.POST.has_key('verification_code') and request.POST.has_key('type') and request.POST['type'] == 'email':
+			if not cache.has_key(obj.email):
+				status = u'error'
+				message = u'驗證碼已過期，請重新產生驗證碼'
+				return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+			input_vcode = request.POST['verification_code']
+			vcode = cache.get(obj.email)['vcode']
+			if input_vcode == vcode:
+				status = u'success'
+				message = u'信箱驗證通過'
+				obj.auth_email = True
+				obj.save()
+			else:
+				status = u'error'
+				message = u'信箱驗證碼不符'
+				return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+		elif request.POST.has_key('verification_code') and request.POST.has_key('type') and request.POST['type'] == 'phone':
+			if not cache.has_key(obj.phone):
+				status = u'error'
+				message = u'驗證碼已過期，請重新產生驗證碼'
+				return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+			input_vcode = request.POST['verification_code']
+			vcode = cache.get(obj.phone)['vcode']
+			if input_vcode == vcode:
+				status = u'success'
+				message = u'手機驗證通過'
+				obj.auth_phone = True
+				obj.save()
+			else:
+				status = u'error'
+				message = u'手機驗證碼不符'
+				return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+		return Response(data=json.dumps(message), status=status.HTTP_202_ACCEPTED)
 
 	@detail_route(
 		methods=['post'],

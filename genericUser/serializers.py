@@ -16,9 +16,10 @@ class UserSerializer(serializers.ModelSerializer):
 			'is_book',
 			'org',
 			'is_license',
+			'is_active',
 			'is_editor',
 			'is_guest',
-			'is_advanced_editor',
+			'is_manager',
 			'auth_email',
 			'auth_phone',
 		]

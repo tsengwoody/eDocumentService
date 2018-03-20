@@ -734,7 +734,10 @@ class EditRecord(models.Model):
 		unique_together = (('part', 'category', 'number_of_times'),)
 
 	def __unicode__(self):
-		return self.part.ISBN_part
+		try:
+			return self.part.ISBN_part
+		except:
+			return unicode(None)
 
 	def record_info(self):
 		if self.category == 'based':
