@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 {{ request.user }}個人資料
 {% endblock %}
@@ -98,10 +98,9 @@
 		return df;
 	}
 
-
 	function org_srv2ui(org){
 		org=replace(org,'Organization/',''); //暴力改org
-		if(org==='1'){
+		if(org=='1'){
 			org='eDocumentService';
 		}
 		else{
@@ -112,7 +111,7 @@
 
 
 	function org_ui2srv(org){
-		if(org==='eDocumentService'){
+		if(org=='eDocumentService'){
 			org='1'; //暴力改org
 		}
 		else{
