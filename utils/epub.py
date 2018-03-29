@@ -4,6 +4,7 @@ import os
 import shutil
 import sys
 from bs4 import BeautifulSoup, NavigableString
+import ebooklib
 from ebooklib import epub
 
 def through(src, dst):
@@ -90,5 +91,42 @@ def txt2epub(src, dst, line_per_chapter=100, **kwargs):
 
 	shutil.rmtree(temp_folder)
 	return book
+
+def epub2txt(src, dst):
+	content = ''
+	book = epub.read_epub(src)
+
+	for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
+		soup = BeautifulSoup(item.content, 'html5lib')
+		content = content +soup.get_text()
+
+	content = content.replace('\n', '\r\n')
+	with io.open(dst, 'w', encoding='utf-8') as f:
+		f.write(content)
+
+def remove_blankline(src, dst):
+	with io.open(src, 'r', encoding='utf-8') as f:
+		content = f.readlines()
+
+	with io.open(dst, 'w', encoding='utf-8') as f:
+		for l in content:
+			if not l.strip() == '':
+				f.write(l.replace('\n', '\r\n'))
+
+def remove_multiple_blankline(src, dst):
+	blank_flag = False
+	with io.open(src, 'r', encoding='utf-8') as f:
+		content = f.readlines()
+
+	with io.open(dst, 'w', encoding='utf-8') as f:
+		for l in content:
+			if not l.strip() == '':
+				f.write(l.replace('\n', '\r\n'))
+				blank_flag = False
+			else:
+				if not blank_flag:
+					f.write(l.replace('\n', '\r\n'))
+					blank_flag = True
+
 if __name__ == '__main__':
 	pass

@@ -125,11 +125,6 @@
 
 <body>
 	<div user_id="{{ request.user.id }}"></div>
-	<div API="{{ api }}"></div>
-	<div pk="{{ pk }}"></div>
-	{% for i in API_list %}
-	<div API{{ forloop.counter }}="{{ i }}"></div>
-	{% endfor %}
 	{% block tawk %}
 	<!--Start of Tawk.to Script-->
 	<script type="text/javascript">
@@ -145,7 +140,7 @@
 	</script>
 	<!--End of Tawk.to Script-->
 	{% endblock %}
-
+	{% include 'comp/mx_usermodel.html' %}
 	{% include 'comp/mx_book_list_temp.html' %}
 	{% include 'comp/mx_receive_book.html' %}
 	{% include 'comp/mx_find_book.html' %}

@@ -909,6 +909,7 @@ function dict2grid(ar, tabid) {
 	//字典陣列轉出基本table
 
 	//head
+
 	let head = ar[0];
 	head = _.keys(head);
 

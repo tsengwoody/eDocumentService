@@ -426,9 +426,13 @@ def user_update(request, ID, ):
 		elif request.POST['action'] == 'disability_card':
 			try:
 				print user.disability_card_front
+				if not os.path.exists(os.path.dirname(user.disability_card_back)):
+					os.makedirs(os.path.dirname(user.disability_card_back))
 				with open(user.disability_card_back, 'wb') as f:
 					image_content = base64.b64decode(request.POST['back'])
 					f.write(image_content)
+				if not os.path.exists(os.path.dirname(user.disability_card_front)):
+					os.makedirs(os.path.dirname(user.disability_card_front))
 				with open(user.disability_card_front, 'wb') as f:
 					image_content = base64.b64decode(request.POST['front'])
 					f.write(image_content)

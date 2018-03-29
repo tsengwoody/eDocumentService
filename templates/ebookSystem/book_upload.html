@@ -1,9 +1,10 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
+{% load staticfiles %}
 {% block title %}
 電子檔上傳
 {% endblock %}
 {% block style %}
-{% load staticfiles %}
+
 <link href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <!-- <script language="javascript" src="{% static 'ebookSystem/js/getISBN.js' %}"></script> -->
@@ -16,13 +17,20 @@
 
 <form action="" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
 {% csrf_token %}
-	{% if bookForm.errors %}
-		<div class="alert alert-danger" role="alert">
-			{{ bookForm.errors }}
-		</div>
-	{% endif %}
 	<h3><legend>電子檔上傳</legend></h3>
 	{% include 'utils/upload_dialog.html' %}
+	<div class="form-group">
+		<label class="control-label col-sm-2" for="id_search_ISBN"><font style="color:red">*</font>ISBN:</label>
+		<div class="col-sm-3">
+			<input type="text" class="form-control" id="id_search_ISBN" name="ISBN"  placeholder="請輸入正確的ISBN(10碼或13碼）" pattern="(ISBN[-]*(1[03])*[ ]*(: ){0,1})*(([0-9Xx][- ]*){13}|([0-9Xx][- ]*){10})" autofocus required>
+		</div>
+			<input id="get_isbn" type="button" class="btn btn-default" value="取得書籍資訊" onclick="BookfromISBN_get()">
+			<img src="{% static 'ebookSystem/img/load.gif' %}" style="display: none;" width="30px" height="30px" id="id_get_isbn_load_icon" />
+			<input id="get_book_isbnnet" type="button" class="btn btn-default" value="更多查詢方式" onclick="BookfromISBNnet_get()">
+			<a type="button" class="btn btn-default" href="http://isbn.ncl.edu.tw/NCL_ISBNNet/H30_SearchBooks.php?PHPSESSID=3ovphpac0m41ducm3iiak2sfe5&Pact=DisplayAll" target="_blank" id="to_ISBNNet" title="開啟新視窗">國家圖書館書目資料查詢</a>
+		<!-- <input type="button" class="btn btn-default" style="display: none;" value="是否人工輸入？" id="show_prop">-->
+	</div> 
+	<div id="bookinfos_field_div"></div>
 	{% include 'ebookSystem/BookInfo_input.html' %}
 	<div class="form-group">
 		<label class="control-label col-sm-2" for="id_category">類型：</label>

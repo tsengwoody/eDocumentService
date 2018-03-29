@@ -1,0 +1,150 @@
+<script>
+
+	function usermodel_dialog_create(div_id, model_infos) {
+
+		let input_content = ''
+		_.each(model_infos,function(v,k){
+			input_content = input_content
+			+`<label>
+				<span>` +v.label +`</span>
+				<input id="id_usermodel_` +k +`" type="text" class="form-control">
+			</label>`
+		})
+
+		modal_template = `
+		<div id=` +div_id +` class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_downloadbook_title"aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content alert-info" style="background-color: #f5f5f5;">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 id="divmodal_usermodel_title" class="modal-title">基本資料</h4>
+					</div>
+					<div style="padding:40px 10px 20px 10px; background-color:#fafafa;">
+						<div class="form-group form-inline text-center">`
+						+ input_content
+						+`</div>
+					</div>
+					<div class="modal-footer">
+						<button id="divmodal_downloadbook_submit" type="button" class="btn btn-primary">取得</button>
+					</div>
+				</div>
+			</div>
+		</div>`
+		$('#modal_dialog').append(modal_template)
+
+	}
+
+	function usermodel_dialog_default() {
+	}
+
+	function usermodel(id) {
+		//下載書籍或email寄送
+
+		//me
+		//me = $(me);
+
+		//div
+		let div
+		div = $('#divmodal_usermodel');
+		if (div.length <= 0){
+			model_infos = {
+				'email': {
+					'label': '信箱',
+					'type': 'text',
+				}
+			}
+			usermodel_dialog_create("divmodal_usermodel", model_infos)
+
+			div = $('#divmodal_usermodel');
+
+		}
+
+
+		//default
+		usermodel_dialog_default();
+
+		//ok
+		$('#divmodal_downloadbook_submit').off().on('click', function () {
+
+			//ISBN
+			let ISBN = me.attr('ISBN');
+
+			//password
+			let password = $('#divmodal_downloadbook_password').val();
+
+			//transferData
+			let transferData = {
+				'action': action,
+				'password': password,
+			};
+			//console.log(transferData)
+
+			//aj
+			let url;
+			let df;
+			if (ebook === false) {
+				url = '/ebookSystem/book_download/' + ISBN;
+				if (action === 'download') {
+					//console.log('aj_binary',ebook,url,transferData)
+					df = aj_binary(url, transferData);
+				}
+				else {
+					//console.log('aj_post',ebook,url,transferData)
+					df = aj_post(url, transferData);
+				}
+			}
+			else {
+				url = '/ebookSystem/ebook_download/' + ISBN;
+				if (action === 'download') {
+					//console.log('aj_binary',ebook,url,transferData)
+					df = aj_binary(url, transferData);
+				}
+				else {
+					//console.log('aj_post',ebook,url,transferData)
+					df = aj_post(url, transferData);
+				}
+			}
+
+			//df
+			df
+				.done(function (data) {
+					alertmessage(data['status'], data['message']);
+				})
+				.fail(function (data) {
+					alertmessage(data['status'], data['message']);
+				})
+
+			//hide
+			div.modal('hide');
+
+		});
+
+		//hidden
+		div.off().on('hidden.bs.modal', function (e) {
+			lm_minu();
+		})
+
+		//enter
+		$("#divmodal_downloadbook_password").off().on('keypress', function (event) {
+			if (event.which === 13) {
+				event.preventDefault();
+				$('#divmodal_downloadbook_submit').click();
+			}
+		});
+
+		//show
+		lm_add(div);
+		div.modal('show');
+
+		//autofocus
+		_.delay(function () {
+			$('#divmodal_downloadbook_password').focus();
+		}, 500)
+
+	}
+
+</script>
+
+<div id="modal_dialog_usermodel"></div>

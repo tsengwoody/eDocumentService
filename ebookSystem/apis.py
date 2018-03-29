@@ -52,7 +52,7 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 class BookInfoViewSet(viewsets.ModelViewSet):
 	queryset = BookInfo.objects.filter(book__status__gte=Book.STATUS['finish']).order_by('-date')
 	serializer_class = BookInfoSerializer
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, CBCFilter, NewestFilter, HottestFilter, )
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, CBCFilter, NewestFilter, HottestFilter, BookInfoOwnerFilter,)
 	ordering_fields = ('date',)
 	search_fields = ('ISBN', 'bookname', 'author', )
 

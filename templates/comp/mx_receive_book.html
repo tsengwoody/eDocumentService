@@ -1,20 +1,54 @@
 <script>
 
-	function receivebook_default() {
+	function receivebook_dialog_create(div_id) {
+		modal_template = `
+		<div id=` +div_id +` class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_downloadbook_title"aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content alert-info" style="background-color: #f5f5f5;">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 id="divmodal_downloadbook_title" class="modal-title">取得書籍</h4>
+					</div>
+					<div style="padding:40px 10px 20px 10px; background-color:#fafafa;">
+						<div class="form-group form-inline text-center">
+							<label>
+								<span>請輸入密碼</span>
+								<input id="divmodal_downloadbook_password" type="password" class="form-control">
+							</label>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button id="divmodal_downloadbook_submit" type="button" class="btn btn-primary">取得</button>
+					</div>
+				</div>
+			</div>
+		</div>`
+		$('#modal_dialog').append(modal_template)
+
+	}
+
+	function receivebook_dialog_default() {
 		$('#divmodal_downloadbook_password').val('');
 	}
 
-	function receivebook(me, ebook, action) {
+	function receivebook(me, ebook, action, div_id) {
 		//下載書籍或email寄送
 
 		//me
 		me = $(me);
 
 		//div
-		let div = $('#divmodal_downloadbook');
+		let div
+		div = $('#divmodal_downloadbook');
+		if (div.length <= 0){
+			receivebook_dialog_create("divmodal_downloadbook")
+			div = $('#divmodal_downloadbook');
+		}
 
 		//default
-		receivebook_default();
+		receivebook_dialog_default();
 
 		//ok
 		$('#divmodal_downloadbook_submit').off().on('click', function () {
@@ -98,28 +132,4 @@
 
 </script>
 
-
-<div id="divmodal_downloadbook" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_downloadbook_title"
- aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content alert-info" style="background-color: #f5f5f5;">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 id="divmodal_downloadbook_title" class="modal-title">取得書籍</h4>
-			</div>
-			<div style="padding:40px 10px 20px 10px; background-color:#fafafa;">
-				<div class="form-group form-inline text-center">
-					<label>
-						<span>請輸入密碼</span>
-						<input id="divmodal_downloadbook_password" type="password" class="form-control">
-					</label>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button id="divmodal_downloadbook_submit" type="button" class="btn btn-primary">取得</button>
-			</div>
-		</div>
-	</div>
-</div>
+<div id="modal_dialog"></div>

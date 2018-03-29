@@ -19,11 +19,25 @@ class BookOwnerFilter(filters.BaseFilterBackend):
 		else:
 			return queryset
 
+class BookInfoOwnerFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		value = request.query_params.get('owner_id')
+		if value:
+			obj = User.objects.get(id=value)
+			return queryset.filter(book__owner=obj)
+		else:
+			return queryset
+
 class CBCFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
-		chinese_book_category = request.query_params.get('chinese_book_category')
-		if chinese_book_category:
-			return queryset.filter(chinese_book_category__startswith=chinese_book_category)
+		from django.db.models import Q
+		try:
+			chinese_book_category = int(request.query_params.get('chinese_book_category'))
+		except:
+			chinese_book_category = -1
+		if chinese_book_category >= 0 and chinese_book_category <10:
+			CBC = chinese_book_category*100
+			return queryset.filter(chinese_book_category__gt=CBC-1, chinese_book_category__lt=CBC+100)
 		else:
 			return queryset
 

@@ -1,24 +1,90 @@
-{% extends "base_nav.html" %}
-{% load staticfiles %}
-{% block question %}
+﻿{% extends "base_nav.html" %}
+{% block title %}
 平台Q&A
 {% endblock %}
 {% block content %}
 {% csrf_token %} 
 
-
 <script>
-	let vo_qana;
+	let vo_qanda;
 
 	$(function(){
 
 		//refresh
-		qana_refresh();
+		qanda_refresh();
 
 	})
 
-</script>
+	function aj_qanda(mode, aid, transferData) {
+		//Q&A API顯示、新增、更新、刪除
 
+		//df
+		let df = GenDF();
+
+		if (mode === 'create') {
+			let err = [];
+			if (iser(transferData.question)) {
+				err.push('問題不能為空');
+			}
+			if (iser(transferData.answer)) {
+				err.push('回答不能為空');
+			}
+			if (err.length > 0) {
+
+				//msg
+				let msg = _.chain(err)
+					.map(function (v, k) {
+						return '<div style="margin-top:5px;">' + cstr(k + 1) + ': ' + v + '</div>';
+					})
+					.join('')
+					.value();
+				msg = '<div>輸入錯誤訊息如下：</div>' + msg;
+
+				//reject
+				df.reject({ 'status': 'error', 'message': msg });
+
+				return df;
+			}
+		}
+
+		//client
+		let client = new $.RestClient('/genericUser/api/');
+		client.add('qandas');
+
+		if (mode === 'list') {
+			result_client = client.qandas.read();
+		}
+		else if (mode === 'create') {
+			result_client = client.qandas.create(transferData);
+		}
+		else if (mode === 'update') {
+			transferData['id'] = aid;
+			result_client = client.qandas.update(aid, transferData);
+		}
+		else if (mode === 'delete') {
+			result_client = client.qandas.destroy(aid);
+		}
+		else {
+
+			//reject
+			df.reject({ 'status': 'error', 'message': ' mode error' });
+
+			return df;
+		}
+
+		result_client
+			.done(function (data) {
+				df.resolve({
+					'status': 'success',
+					'message': '成功',
+					'content': data,
+				});
+			})
+
+		return df;
+	}
+
+</script>
 
 <script>
 
@@ -26,7 +92,6 @@
 	Vue.component('vu-qanda', {
 		template: `
 	<div>
-
 		<div class="bs-callout bs-callout-info" style="position: relative;" v-for="(qa,iqa) in s.qa" v-if="s.mode==='forshow' || s.mode==='foredit'"> 
 
 			<div style="position: absolute; top:5px; right:5px;" v-if="s.mode==='foredit'">
@@ -37,7 +102,7 @@
 					<span class="glyphicon glyphicon-edit"></span>
 				</button>
 			</div>
-			
+
 			<div v-if="s.mode==='forshow' || s.mode==='foredit'">
 				<div style="font-size:12pt;">
 					<div v-html="qa.question"></div>
@@ -48,7 +113,7 @@
 			</div>
 
 		</div>
-			
+
 		<button type="button" class="btn btn-primary" v-on:click="ckcreate" v-if="s.mode==='foredit'">建立新Q&A</button>
 
 	</div>
@@ -65,7 +130,7 @@
 				.done(function(data){
 					alertmessage(data.status, data.message)
 					.done(function(){
-						qana_refresh(); //refresh
+						qanda_refresh(); //refresh
 					});
 				})
 				.fail(function(data){
@@ -136,46 +201,46 @@
 		},
 	})
 
-	//qana_refresh
-	function qana_refresh(){
+	//qanda_refresh
+	function qanda_refresh(){
 
 		//aj_qanda
-        aj_qanda('list')
-        .done(function(d){
-
+		aj_qanda('list')
+		.done(function(d){
 			//opt
 			let opt={
-                el: '#' + 'id_qanda_list',
-                data: {
-                    s:{
+				el: '#' + 'id_qanda_list',
+				data: {
+					s:{
 						qa:d.content,
+						{% if request.user.is_manager %}
 						mode:'foredit', //forshow foredit
-                    }
-                },
+						{% else %}
+						mode:'forshow', //forshow foredit
+						{% endif %}
+					}
+				},
 			};
-			
+
 			//vo
-			if(iser(vo_qana)){
-				vo_qana = new Vue(opt);
+			if(iser(vo_qanda)){
+				vo_qanda = new Vue(opt);
 			}
 			else{
-				vo_qana.s.qa=d.content;
+				vo_qanda.s.qa=d.content;
 			}
 
 		})
 
 	}
 
-
 </script>
 
 
 <h3>平台Q&A</h3>
 
-
 <div style="padding-bottom:30px;">
-    <vu-qanda id="id_qanda_list" v-bind:s="s"></vu-qanda>
+	<vu-qanda id="id_qanda_list" v-bind:s="s"></vu-qanda>
 </div>
-
 
 {% endblock %}
