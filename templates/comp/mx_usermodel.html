@@ -4,11 +4,21 @@
 
 		let input_content = ''
 		_.each(model_infos,function(v,k){
+			if(v.type==='text'){
 			input_content = input_content
-			+`<label>
-				<span>` +v.label +`</span>
-				<input id="id_usermodel_` +k +`" type="text" class="form-control">
-			</label>`
+				+`<label>
+					<span>` +v.label +`</span>
+					<input id="id_usermodel_` +k +`" name="` +k +`"type="` +v.type +`" class="form-control">
+				</label>`
+			}
+			else if(v.type==='checkbox'){
+				input_content = input_content
+				+`<label>
+					<span>` +v.label +`</span>
+					<input id="id_usermodel_` +k +`" name="` +k +`" type="` +v.type +`" check="` +v.value +`" class="form-control">
+				</label>`
+			}
+
 		})
 
 		modal_template = `
@@ -27,7 +37,7 @@
 						+`</div>
 					</div>
 					<div class="modal-footer">
-						<button id="divmodal_downloadbook_submit" type="button" class="btn btn-primary">取得</button>
+						<button id="divmodal_usermodel_ok" type="button" class="btn btn-primary">確定</button>
 					</div>
 				</div>
 			</div>
@@ -36,7 +46,22 @@
 
 	}
 
-	function usermodel_dialog_default() {
+	function usermodel_dialog_default(id, model_infos) {
+		let client = new $.RestClient('/genericUser/api/');
+		client.add('users');
+
+		//read
+		client.users.read(1)
+			.done(function (data) {
+				_.each(model_infos, function (v, k){
+					if(model_infos[k].type==='text'){
+						$(`#id_usermodel_` +k).val(data[k])
+					}
+					else if(model_infos[k].type==='checkbox'){
+						$(`#id_usermodel_` +k).attr('checked', 'true')
+					}
+				})
+			})
 	}
 
 	function usermodel(id) {
@@ -50,10 +75,42 @@
 		div = $('#divmodal_usermodel');
 		if (div.length <= 0){
 			model_infos = {
+				'username': {
+					'label': '使用者名稱',
+					'type': 'text',
+				},
 				'email': {
 					'label': '信箱',
 					'type': 'text',
-				}
+				},
+				'first_name': {
+					'label': '性氏',
+					'type': 'text',
+				},
+				'last_name': {
+					'label': '名字',
+					'type': 'text',
+				},
+				'phone': {
+					'label': '聯絡電話',
+					'type': 'text',
+				},
+				'birthday': {
+					'label': '生日',
+					'type': 'text',
+				},
+				'education': {
+					'label': '教育程度',
+					'type': 'text',
+				},
+				'is_book': {
+					'label': '訂閱訊息',
+					'type': 'checkbox',
+				},
+				'org': {
+					'label': '隸屬單位',
+					'type': 'text',
+				},
 			}
 			usermodel_dialog_create("divmodal_usermodel", model_infos)
 
@@ -63,28 +120,33 @@
 
 
 		//default
-		usermodel_dialog_default();
+		usermodel_dialog_default(1, model_infos);
 
 		//ok
-		$('#divmodal_downloadbook_submit').off().on('click', function () {
-
-			//ISBN
-			let ISBN = me.attr('ISBN');
-
-			//password
-			let password = $('#divmodal_downloadbook_password').val();
+		$('#divmodal_usermodel_ok').off().on('click', function () {
 
 			//transferData
-			let transferData = {
-				'action': action,
-				'password': password,
-			};
-			//console.log(transferData)
+			let transferData = {};
+
+			$("#divmodal_usermodel :input").filter("[id^=id_usermodel]")
+			.each(function() {
+				transferData[$(this).attr('name')] = $(this).val()
+			})
+			console.log(transferData)
+
+		/*let client = new $.RestClient('/genericUser/api/');
+		client.add('users');
+		client.users.addVerb('partial_update', 'PATCH');
+
+		client.users.partial_update(1, {'email': '123'})
+				.done(function (data) {
+					console.log(data)
+				})*/
 
 			//aj
 			let url;
 			let df;
-			if (ebook === false) {
+			/*if (ebook === false) {
 				url = '/ebookSystem/book_download/' + ISBN;
 				if (action === 'download') {
 					//console.log('aj_binary',ebook,url,transferData)
@@ -114,7 +176,7 @@
 				})
 				.fail(function (data) {
 					alertmessage(data['status'], data['message']);
-				})
+				})*/
 
 			//hide
 			div.modal('hide');
