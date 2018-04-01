@@ -2,28 +2,74 @@
 
 	function usermodel_dialog_create(div_id, model_infos) {
 
-		let input_content = ''
+		let input_content = '';
+		input_content += '<div class="form-horizontal">';
 		_.each(model_infos,function(v,k){
+			
 			if(v.type==='text'){
-			input_content = input_content
-				+`<label>
-					<span>` +v.label +`</span>
-					<input id="id_usermodel_` +k +`" name="` +k +`"type="` +v.type +`" class="form-control">
-				</label>`
+				input_content = input_content
+				+ '<div class="form-group">\
+					<label class="control-label col-sm-2" for="id_usermodel_' + k + '"><font style="color:red">*</font><span>' + v.label + '</span></label>\
+					<div class="col-sm-4">\
+					<input id="id_usermodel_' + k + '" class="form-control" type="' + v.type + '" name="' +k + '" maxlength="30">\
+					</div>\
+					<label class="control-label col-sm-4" for="id_usermodel_' + k + '" style="text-align:left;"><font style="color:red">' + v.remark + '</font></label>\
+				</div>';
 			}
 			else if(v.type==='checkbox'){
+				// check value delete --> no mean?
 				input_content = input_content
-				+`<label>
-					<span>` +v.label +`</span>
-					<input id="id_usermodel_` +k +`" name="` +k +`" type="` +v.type +`" check="` +v.value +`" class="form-control">
-				</label>`
+				+ '<div class="form-group">\
+					<label class="control-label col-sm-2" for="id_usermodel_' + k + '"><font style="color:red">*</font><span>' + v.label + '</span></label>\
+					<div class="col-sm-4">\
+					<input id="id_usermodel_' + k + '" type="' + v.type + '" name="' +k + '" check="">\
+					</div>\
+					<label class="control-label col-sm-4" for="id_usermodel_' + k + '" style="text-align:left;"><font style="color:red">' + v.remark + '</font></label>\
+				</div>';
+			}
+			else if(v.type==='date'){
+				input_content = input_content
+				+ '<div class="form-group">\
+					<label class="control-label col-sm-2" for="id_usermodel_' + k + '"><font style="color:red">*</font><span>' + v.label + '</span></label>\
+					<div class="col-sm-4">\
+					<input id="id_usermodel_' + k + '" name="' +k + '" class="form-control" type="text" data-date-format="yyyy-mm-dd">\
+					</div>\
+					<label class="control-label col-sm-4" for="id_usermodel_' + k + '" style="text-align:left;"><font style="color:red">' + v.remark + '</font></label>\
+				</div>';
+			}
+			else if(v.type==='select'){
+				let select_content = '';
+				if(k==='education'){
+					select_content = '<option value="" selected="selected">---------</option>\
+						<option value="國小">國小</option>\
+						<option value="國中">國中</option>\
+						<option value="高中">高中</option>\
+						<option value="學士">學士</option>\
+						<option value="碩士">碩士</option>';
+				} else if(k==='org'){
+					select_content = '<option>其他</option>\
+						<option>eDocumentService</option>';
+				}
+
+				input_content = input_content
+				+ '<div class="form-group">\
+					<label class="control-label col-sm-2" for="id_usermodel_' + k + '"><font style="color:red">*</font><span>' + v.label + '</span></label>\
+					<div class="col-sm-4">\
+					<select id="id_usermodel_' + k + '" name="' +k + '" class="form-control">'
+					+ select_content +
+					'</select>\
+					</div>\
+					<label class="control-label col-sm-4" for="id_usermodel_' + k + '" style="text-align:left;"><font style="color:red">' + v.remark + '</font></label>\
+				</div>';
+
 			}
 
 		})
+		input_content += '</div>';
 
 		modal_template = `
-		<div id=` +div_id +` class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_downloadbook_title"aria-hidden="true">
-			<div class="modal-dialog" role="document">
+		<div id=` +div_id +` class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="divmodal_downloadbook_title"aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content alert-info" style="background-color: #f5f5f5;">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -32,9 +78,9 @@
 						<h4 id="divmodal_usermodel_title" class="modal-title">基本資料</h4>
 					</div>
 					<div style="padding:40px 10px 20px 10px; background-color:#fafafa;">
-						<div class="form-group form-inline text-center">`
+						`
 						+ input_content
-						+`</div>
+						+`
 					</div>
 					<div class="modal-footer">
 						<button id="divmodal_usermodel_ok" type="button" class="btn btn-primary">確定</button>
@@ -53,15 +99,53 @@
 		//read
 		client.users.read(1)
 			.done(function (data) {
+				console.log(data);
 				_.each(model_infos, function (v, k){
 					if(model_infos[k].type==='text'){
-						$(`#id_usermodel_` +k).val(data[k])
+						$(`#id_usermodel_` +k).val(data[k]);
 					}
 					else if(model_infos[k].type==='checkbox'){
-						$(`#id_usermodel_` +k).attr('checked', 'true')
+						if(data[k] == true){
+							$(`#id_usermodel_` +k).attr('checked', true);
+						} else{
+							$(`#id_usermodel_` +k).attr('checked', false);
+						}
+						
+					}
+					else if(model_infos[k].type==='date'){
+						$(`#id_usermodel_` +k).datepicker("setDate", moment(data[k]).format('YYYY-MM-DD'));
+					}
+					else if(model_infos[k].type==='select'){
+						if(k==='org'){
+							org_name = org_srv2ui(data[k]);
+							// 依照 org text 選擇 selected
+							$('#id_usermodel_'+k + ' option').filter(function () { return $(this).html() == org_name; }).attr('selected', 'selected');
+						} else{
+							$(`#id_usermodel_` +k).val(data[k]);
+						}
 					}
 				})
 			})
+	}
+
+	function org_srv2ui(org){
+		if(org==1){
+			org='eDocumentService';
+		}
+		else{
+			org='其他';
+		}
+		return org;
+	}
+
+	function org_ui2srv(org){
+		if(org=='eDocumentService'){
+			org='1'; //暴力改org
+		}
+		else{
+			org='';
+		}
+		return org;
 	}
 
 	function usermodel(id) {
@@ -78,38 +162,47 @@
 				'username': {
 					'label': '使用者名稱',
 					'type': 'text',
+					'remark': '請填寫使用者名稱，需使用小寫英文字母或數字，首字需為小寫英文字母',
 				},
 				'email': {
 					'label': '信箱',
 					'type': 'text',
+					'remark': '請填寫電子信箱',
 				},
 				'first_name': {
 					'label': '性氏',
 					'type': 'text',
+					'remark': '請填寫中文姓氏',
 				},
 				'last_name': {
 					'label': '名字',
 					'type': 'text',
+					'remark': '請填寫中文名字',
 				},
 				'phone': {
 					'label': '聯絡電話',
 					'type': 'text',
+					'remark': '請填寫手機',
 				},
 				'birthday': {
 					'label': '生日',
-					'type': 'text',
+					'type': 'date',
+					'remark': '請填寫生日，範例日期格式：1989-02-19',
 				},
 				'education': {
 					'label': '教育程度',
-					'type': 'text',
+					'type': 'select',
+					'remark': '請選擇教育程度',
 				},
 				'is_book': {
 					'label': '訂閱訊息',
 					'type': 'checkbox',
+					'remark': '訂閱訊息',
 				},
 				'org': {
 					'label': '隸屬單位',
-					'type': 'text',
+					'type': 'select',
+					'remark': '請選擇所屬單位',
 				},
 			}
 			usermodel_dialog_create("divmodal_usermodel", model_infos)
@@ -130,21 +223,69 @@
 
 			$("#divmodal_usermodel :input").filter("[id^=id_usermodel]")
 			.each(function() {
-				transferData[$(this).attr('name')] = $(this).val()
+				let name = $(this).attr('name');
+				if (name==='is_book') {
+					if ($(this).is(":checked")) {
+						transferData[name] = true;
+					} else {
+						transferData[name] = false;
+					}
+				} 
+				else if (name==='org') {
+					select_org = $(this).find("option:selected").html();
+					transferData[name] = org_ui2srv(select_org);
+				}
+				else {
+					transferData[name] = $(this).val();
+				}
+
+				// transferData[$(this).attr('name')] = $(this).val()
 			})
-			console.log(transferData)
+			console.log(transferData);
 
-		/*let client = new $.RestClient('/genericUser/api/');
-		client.add('users');
-		client.users.addVerb('partial_update', 'PATCH');
+			let url = '/genericUser/api/users/1/';
+			$.ajax({
+			    url: url,
+			    type: 'PATCH',
+			    data: JSON.stringify(transferData),
+			    dataType: 'json',
+		        headers: {
+		          	'x-auth-token': localStorage.accessToken,
+		            "Content-Type": "application/json",
+		            "X-CSRFToken": $('input[name=csrfmiddlewaretoken]').val(),
+		        },
+		        
+			    })
+			    .done(function(response){
+			    	console.log('PATCH success');
+			    	alertmessage('success', '更新完成');
+			    })
+			    .fail(function(response){
+			  		console.log('PATCH fail');
+			  		alertmessage('error', '更新失敗');
+			    })
 
-		client.users.partial_update(1, {'email': '123'})
-				.done(function (data) {
-					console.log(data)
-				})*/
+			// let headers = {
+		 //            'x-auth-token': localStorage.accessToken,
+		 //            "Content-Type": "application/json",
+		 //            "X-CSRFToken": $('input[name=csrfmiddlewaretoken]').val(),
+		 //          };
+			// let client = new $.RestClient('/genericUser/api/');
+			// client.add('users');
+			// client.users.addVerb('partial_update', 'PATCH');
+
+			// client.users.partial_update(1, headers, transferData)
+			// 		.done(function (data) {
+			// 			console.log('patch success')
+			// 			console.log(data)
+			// 		})
+			// 		.fail(function (data) {
+			// 			console.log('patch fail')
+			// 		});
+
 
 			//aj
-			let url;
+			// let url;
 			let df;
 			/*if (ebook === false) {
 				url = '/ebookSystem/book_download/' + ISBN;
