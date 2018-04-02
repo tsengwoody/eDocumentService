@@ -92,6 +92,20 @@ def txt2epub(src, dst, line_per_chapter=100, **kwargs):
 	shutil.rmtree(temp_folder)
 	return book
 
+def html2txt(src, dst):
+	content = ''
+	book = epub.read_epub(src)
+
+	for item in src:
+		with io.open(src, 'r', encoding='utf-8') as f:
+			src_content = f.read()
+			soup = BeautifulSoup(src_content, 'html5lib')
+			content = content +soup.get_text()
+
+	content = content.replace('\n', '\r\n')
+	with io.open(dst, 'w', encoding='utf-8') as f:
+		f.write(content)
+
 def epub2txt(src, dst):
 	content = ''
 	book = epub.read_epub(src)
@@ -103,6 +117,8 @@ def epub2txt(src, dst):
 	content = content.replace('\n', '\r\n')
 	with io.open(dst, 'w', encoding='utf-8') as f:
 		f.write(content)
+
+
 
 def remove_blankline(src, dst):
 	with io.open(src, 'r', encoding='utf-8') as f:

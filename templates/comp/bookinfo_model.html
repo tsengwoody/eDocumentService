@@ -1,0 +1,54 @@
+﻿<script>
+
+	function finish_book(div_id) {
+		//client
+		let client = new $.RestClient('/ebookSystem/api/');
+		client.add('bookinfos');
+
+		//read
+		client.bookinfos.read()
+			.done(function (data) {
+				let sr = [];
+				_.each(data, function (v, k) {
+					let o = {
+						'ISBN': v.ISBN,
+						'書名': v.bookname,
+						'裝訂冊數': v.bookbinding,
+						'版次': v.order,
+						'作者': v.author,
+						'出版社': v.house,
+						'出版日期': v.date,
+					};
+
+					//console.log(user.is_guest);
+					if(user.is_guest){
+						o['動作'] = ''
+							+'<button type="button" class="btn btn-default" ISBN="' +v.ISBN +'" onclick="aj_borrowbook(this, ' +"'" +'check_out' +"'" +')">借閱</button>'
+							+'<a class="btn btn-default" role="button" href="/ebookSystem/library_origin_view?ISBN=' +v.ISBN +'" target="_blank" title="閱讀(另開新視窗)">閱讀</a>';
+					}
+
+					sr.push(o);
+
+				})
+
+				//check
+				if (iser(sr)) {
+					$('#' +div_id).html('目前無資料');
+					return;
+				}
+
+				//gentable
+				let list_table = div_id + '_table' ;
+				gentable(div_id, list_table, sr);
+
+				//table
+				$('#' + list_table).find('tr').each(function () {
+					let tr = $(this);
+					tr.css('text-align', 'center');
+				})
+
+			});
+
+	}
+
+</script>

@@ -1286,6 +1286,18 @@ function aj_post(url, transferData) {
 }
 
 
+function aj_put(url, transferData) {
+	//ajax put
+
+	return aj_send('put', url, transferData);
+}
+
+function aj_patch(url, transferData) {
+	//ajax patch
+
+	return aj_send('patch', url, transferData);
+}
+
 function aj_delete(url, transferData) {
 	//ajax post
 

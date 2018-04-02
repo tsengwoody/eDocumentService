@@ -566,7 +566,7 @@ def book_download(request, ISBN, ):
 
 		#準備所需文件
 		try:
-			attach_file_path = getBook.zip(request.user, request.POST['password'])
+			attach_file_path = getBook.zip(request.user, request.POST['password'], request.POST['format'])
 		except BaseException as e:
 			status = 'error'
 			message = u'準備文件失敗：{0}'.format(unicode(e))

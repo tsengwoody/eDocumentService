@@ -228,21 +228,56 @@ class Book(models.Model):
 
 		return custom_epub
 
-	def zip(self, user, password):
+	def custom_txt_create(self, custom_txt, user):
+		self.check_status()
+		#準備epub文件
+		from ebooklib import epub
+		from utils.epub import html2txt, epub2txt
+		info = {
+			'ISBN': self.book_info.ISBN,
+			'bookname': self.book_info.bookname,
+			'author': self.book_info.author,
+			'date': str(self.book_info.date),
+			'house': self.book_info.house,
+			'language': 'zh',
+		}
+		if self.status == self.STATUS['final']:
+			final_epub = self.path +'/OCR/{0}.epub'.format(self.ISBN)
+			try:
+				epub2txt(final_epub, custom_txt)
+			except BaseException as e:
+				raise SystemError('epub create fail:' +unicode(e))
+		else:
+			final_txt = self.path +'/temp/{0}.temp'.format(self.ISBN)
+			final_dir = os.path.dirname(final_epub)
+			if not os.path.exists(final_dir):
+				os.mkdir(final_dir)
+			try:
+				part_list = [ file.get_clean_file() for file in self.ebook_set.all() ]
+				html2txt(part_list, final_txt)
+			except BaseException as e:
+				raise SystemError('epub create fail (not final):' +unicode(e))
+
+		return custom_txt
+
+	def zip(self, user, password, format):
 		from django.contrib.auth import authenticate
 		user = authenticate(username=user.username, password=password)
 		if user is None:
 			raise SystemError(u'密碼輸入不正確')
 
-		custom_epub = self.path +'/temp/{0}_{1}.epub'.format(self.ISBN, user.username)
-		if not os.path.exists(os.path.dirname(custom_epub)):
-			os.mkdir(os.path.dirname(custom_epub))
-		custom_epub = self.custom_epub_create(custom_epub, user)
+		custom_path = self.path +'/temp/{0}_{1}.{2}'.format(self.ISBN, user.username, format)
+		if not os.path.exists(os.path.dirname(custom_path)):
+			os.mkdir(os.path.dirname(custom_path))
+		if format == 'epub':
+			custom_path = self.custom_epub_create(custom_path, user)
+		elif format == 'txt':
+			custom_path = self.custom_txt_create(custom_path, user)
 
 		#加入壓縮檔內
 		import pyminizip
 		custom_zip = self.path +'/temp/{0}_{1}.zip'.format(self.ISBN, user.username)
-		zip_list = [custom_epub]
+		zip_list = [custom_path]
 		try:
 			pyminizip.compress_multiple(zip_list, custom_zip, password, 5)
 			return custom_zip

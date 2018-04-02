@@ -1,0 +1,74 @@
+﻿{% extends "base_nav.html" %}
+{% load staticfiles %}
+{% block title %}
+書籍管理
+{% endblock %}
+{% block header %}
+書籍管理
+{% endblock %}
+{% block content %}
+<script>
+
+	$(function(){
+
+		let book_manager_ocs={
+			0: {
+				'key': 'inactive',
+				'value': '',
+				'show': '未校對',
+			},	
+			1: {
+				'key': 'edit',
+				'value': '',
+				'show': '校對中',
+			},	
+			2: {
+				'key': 'finish',
+				'value': '',
+				'show': '已校對',
+			},	
+		}
+
+		list_book_manager('book_manager', book_manager_ocs)
+
+	})
+
+	function list_book_manager(block_id, ocs){
+
+		//s
+		function gs(v, k){
+			return {
+				'id':block_id +'_' +v.key,
+				'title':v.show,
+				'name':v.key,
+				'prop':'',
+			}
+		}
+
+		let s=[];
+		_.each(ocs,function(v,k){
+			s.push(gs(v,k));
+		})
+
+		//page
+		let hpage=pagetab(s);
+		$('#' +block_id +'_div').html(hpage);
+		inactive_book(block_id +'_inactive')
+		edit_book(block_id +'_edit')
+		finish_book(block_id +'_finish')
+
+	}
+
+</script>
+
+{% include 'comp/book_model.html' %}
+{% include 'comp/bookinfo_model.html' %}
+{% include 'comp/user_model.html' %}
+
+<form action="" method="post">
+	{% csrf_token %}
+	<h3 class="page-header">書籍管理</h3>
+	<div id="book_manager_div"></div>
+
+</form>
+{% endblock %}

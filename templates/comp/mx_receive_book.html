@@ -1,70 +1,184 @@
 <script>
 
-	function receivebook_dialog_create(div_id) {
+	function dialog_create(root_id, create_id,title, model_infos) {
+
+		let input_content = ''
+		_.each(model_infos,function(v,k){
+
+
+			if(v.type==='checkbox'){
+				input_content = input_content
+				+`<label>
+					<span>` +v.label +`</span>
+					<input
+						id="id_` +create_id +`_` +k +`"
+						name="` +k +`"
+						type="` +v.type +`" class="form-control "
+					>`
+					+ vi.label +`</input>
+				</label>`
+			}
+			else if(v.type==='select'){
+				input_content = input_content
+				+`<label>
+					<span>` +v.label +`</span>`
+					input_content = input_content 
+					+`<select
+						id="id_` +create_id +`_` +k +`"
+						name="` +k +`"
+					>`
+
+					_.each(v.choices,function(vi, ki){
+						input_content = input_content +`<label><option
+							id="id_` +create_id +`_` +k +`_` +ki +`"
+							name="` +k +`"
+							che="` +ki +`"
+							type="` +v.type +`" class="form-control"
+						>`
+						+ vi +`</option></label>`
+					})
+					input_content = input_content +`</select></label>`
+			}
+			else if(v.type==='radio'){
+				input_content = input_content
+				+`<label>
+					<span>` +v.label +`</span>`
+					_.each(v.choices,function(vi){
+						input_content = input_content +`<label><input
+							id="id_` +create_id +`_` +k +`_` +ki +`"
+							name="` +k +`"
+							che="` +ki +`"
+							type="` +v.type +`" class="form-control"
+						>`
+						+ vi +`</input></label>`
+					})
+								input_content = input_content +`</label>`
+			}
+
+			else {
+				input_content = input_content
+				+`<label>
+					<span>` +v.label +`</span>
+					<input 
+						id="id_` +create_id +`_` +k +`"
+						name="` +k +`"
+						type="` +v.type +`" class="form-control"
+					>
+				</label>`
+			}
+
+		})
+
 		modal_template = `
-		<div id=` +div_id +` class="modal fade" tabindex="-1" role="dialog" aria-labelledby="divmodal_downloadbook_title"aria-hidden="true">
+		<div id=` +create_id +` class="modal fade" tabindex="-1" role="dialog" aria-labelledby="` +create_id +`_title"aria-hidden="true">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content alert-info" style="background-color: #f5f5f5;">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
-						<h4 id="divmodal_downloadbook_title" class="modal-title">取得書籍</h4>
+						<h4 id="` +create_id +`_title" class="modal-title">` +title +`</h4>
 					</div>
 					<div style="padding:40px 10px 20px 10px; background-color:#fafafa;">
-						<div class="form-group form-inline text-center">
-							<label>
-								<span>請輸入密碼</span>
-								<input id="divmodal_downloadbook_password" type="password" class="form-control">
-							</label>
-						</div>
+						<div class="form-group form-inline text-center">`
+						+ input_content
+						+`</div>
 					</div>
 					<div class="modal-footer">
-						<button id="divmodal_downloadbook_submit" type="button" class="btn btn-primary">取得</button>
+						<button id="` +create_id +`_ok" type="button" class="btn btn-primary">確定</button>
 					</div>
 				</div>
 			</div>
 		</div>`
-		$('#modal_dialog').append(modal_template)
+		$('#' +root_id).append(modal_template)
 
 	}
 
-	function receivebook_dialog_default() {
-		$('#divmodal_downloadbook_password').val('');
+	function receivebook_default(div_id, model_infos) {
+
+		/*$("#" +div_id +" :input").filter(`[id^=id_` +div_id +`]`)
+			.each(function() {
+				$(this).val('')
+			})
+
+		$("#" +div_id +" option").filter(`[id^=id_` +div_id +`]`)
+			.each(function() {
+				if($(this).attr('che')==='txt'){
+					$(this).attr('selected', '')
+				}
+			})*/
+
 	}
 
-	function receivebook(me, ebook, action, div_id) {
+	function receivebook(me, ebook, action) {
 		//下載書籍或email寄送
 
 		//me
 		me = $(me);
+		//ISBN
+		let ISBN = me.attr('ISBN');
 
 		//div
+		let dialog_id='bookdownload_dialog';
+
 		let div
-		div = $('#divmodal_downloadbook');
+		div = $('#' +dialog_id);
 		if (div.length <= 0){
-			receivebook_dialog_create("divmodal_downloadbook")
-			div = $('#divmodal_downloadbook');
+			title = '取得書籍';
+
+			model_infos = {
+				'format': {
+					'label': '類型',
+					'type': 'select',
+					'choices' : {
+						'epub' :'電子書',
+						'txt': '純文字',
+					},
+				},
+				'password': {
+					'label': '密碼',
+					'type': 'password',
+				},
+			}
+
+			dialog_create("divmodal_dialog_root", dialog_id, title, model_infos)
+
+			div = $('#' +dialog_id);
+
 		}
 
 		//default
-		receivebook_dialog_default();
+		receivebook_default(dialog_id, model_infos);
+
+		r = (_.invert(model_infos.format.choices))['電子書']
+		console.log(r)
 
 		//ok
-		$('#divmodal_downloadbook_submit').off().on('click', function () {
-
-			//ISBN
-			let ISBN = me.attr('ISBN');
-
-			//password
-			let password = $('#divmodal_downloadbook_password').val();
+		$('#' +dialog_id +'_ok').off().on('click', function () {
 
 			//transferData
-			let transferData = {
-				'action': action,
-				'password': password,
-			};
-			//console.log(transferData)
+			let transferData = {};
+
+			$("#" +dialog_id +" :input").filter(`[id^=id_` +dialog_id +`]`)
+			.each(function() {
+				if(0){}
+				else {
+					transferData[$(this).attr('name')] = $(this).val()
+				}
+			})
+
+			$("#" +dialog_id +" :checked")
+			.each(function() {
+				transferData[$(this).attr('name')] = $(this).attr('che')
+			})
+
+			$("#" +dialog_id +" :selected")
+			.each(function() {
+				transferData[$(this).attr('name')] = $(this).attr('che')
+			})
+
+			transferData['action'] = action;
+			console.log(transferData)
 
 			//aj
 			let url;
@@ -112,10 +226,10 @@
 		})
 
 		//enter
-		$("#divmodal_downloadbook_password").off().on('keypress', function (event) {
+		$("#id_" +dialog_id +'_password').off().on('keypress', function (event) {
 			if (event.which === 13) {
 				event.preventDefault();
-				$('#divmodal_downloadbook_submit').click();
+				$('#' +dialog_id +'_ok').click();
 			}
 		});
 
@@ -131,5 +245,3 @@
 	}
 
 </script>
-
-<div id="modal_dialog"></div>
