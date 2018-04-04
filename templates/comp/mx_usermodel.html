@@ -39,17 +39,11 @@
 			}
 			else if(v.type==='select'){
 				let select_content = '';
-				if(k==='education'){
-					select_content = '<option value="" selected="selected">---------</option>\
-						<option value="國小">國小</option>\
-						<option value="國中">國中</option>\
-						<option value="高中">高中</option>\
-						<option value="學士">學士</option>\
-						<option value="碩士">碩士</option>';
-				} else if(k==='org'){
-					select_content = '<option>其他</option>\
-						<option>eDocumentService</option>';
-				}
+
+				_.each(v.choices,function(vi, ki){
+						select_content = select_content +
+						'<option value="' + ki +'" >'+ vi +'</option>';
+					})
 
 				input_content = input_content
 				+ '<div class="form-group">\
@@ -63,7 +57,6 @@
 				</div>';
 
 			}
-
 		})
 		input_content += '</div>';
 
@@ -101,10 +94,7 @@
 			.done(function (data) {
 				console.log(data);
 				_.each(model_infos, function (v, k){
-					if(model_infos[k].type==='text'){
-						$(`#id_usermodel_` +k).val(data[k]);
-					}
-					else if(model_infos[k].type==='checkbox'){
+					if(model_infos[k].type==='checkbox'){
 						if(data[k] == true){
 							$(`#id_usermodel_` +k).attr('checked', true);
 						} else{
@@ -115,37 +105,11 @@
 					else if(model_infos[k].type==='date'){
 						$(`#id_usermodel_` +k).datepicker("setDate", moment(data[k]).format('YYYY-MM-DD'));
 					}
-					else if(model_infos[k].type==='select'){
-						if(k==='org'){
-							org_name = org_srv2ui(data[k]);
-							// 依照 org text 選擇 selected
-							$('#id_usermodel_'+k + ' option').filter(function () { return $(this).html() == org_name; }).attr('selected', 'selected');
-						} else{
-							$(`#id_usermodel_` +k).val(data[k]);
-						}
+					else {
+						$(`#id_usermodel_` +k).val(data[k]).change();
 					}
 				})
 			})
-	}
-
-	function org_srv2ui(org){
-		if(org==1){
-			org='eDocumentService';
-		}
-		else{
-			org='其他';
-		}
-		return org;
-	}
-
-	function org_ui2srv(org){
-		if(org=='eDocumentService'){
-			org='1'; //暴力改org
-		}
-		else{
-			org='';
-		}
-		return org;
 	}
 
 	function usermodel(id) {
@@ -153,6 +117,27 @@
 
 		//me
 		//me = $(me);
+		let org_choices = [];
+		let client = new $.RestClient('/genericUser/api/');
+		client.add('organizations');
+
+		client.organizations.read()
+			.done(function (data) {
+			let $org_select = $('#id_usermodel_org');
+			$org_select.empty();
+			$org_select.append($('<option>', {
+				    value: '',
+				    text: '其它',
+				}));
+
+			_.each(data,function(v,k){
+
+				$org_select.append($('<option>', {
+				    value: v['id'],
+				    text: v['name'],
+				}));
+			})
+		})
 
 		//div
 		let div
@@ -193,6 +178,14 @@
 					'label': '教育程度',
 					'type': 'select',
 					'remark': '請選擇教育程度',
+					'choices' : {
+						'' :'---------',
+						'國小': '國小',
+			            '國中': '國中',
+			            '高中': '高中',
+			            '學士': '學士',
+			            '碩士': '碩士',
+					},
 				},
 				'is_book': {
 					'label': '訂閱訊息',
@@ -231,10 +224,6 @@
 						transferData[name] = false;
 					}
 				} 
-				else if (name==='org') {
-					select_org = $(this).find("option:selected").html();
-					transferData[name] = org_ui2srv(select_org);
-				}
 				else {
 					transferData[name] = $(this).val();
 				}
