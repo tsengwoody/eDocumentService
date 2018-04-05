@@ -1,12 +1,12 @@
 <script>
 
-	function usermodel_dialog_create(root_id, create_id,title, model_infos) {
+	function dialog_create(root_id, create_id,title, model_infos) {
 
 		let input_content = '';
 		input_content += '<div class="form-horizontal">';
 		_.each(model_infos,function(v,k){
 			
-			if(v.type==='text'){
+			if(v.type==='text' || v.type==='password'){
 				input_content = input_content
 				+ '<div class="form-group">\
 					<label class="control-label col-sm-2" for="id_' +create_id +'_' + k + '"><font style="color:red">*</font><span>' + v.label + '</span></label>\
@@ -111,11 +111,7 @@
 			})
 	}
 
-	function usermodel(id) {
-		//下載書籍或email寄送
-
-		//me
-		//me = $(me);
+	function usermodel(user_id) {
 
 		let dialog_id = 'usermodel';
 
@@ -128,15 +124,15 @@
 			let $org_select = $('#id_usermodel_org');
 			$org_select.empty();
 			$org_select.append($('<option>', {
-				    value: '',
-				    text: '其它',
+					value: '',
+					text: '其它',
 				}));
 
 			_.each(data,function(v,k){
 
 				$org_select.append($('<option>', {
-				    value: v['id'],
-				    text: v['name'],
+					value: v['id'],
+					text: v['name'],
 				}));
 			})
 		})
@@ -183,10 +179,10 @@
 					'choices' : {
 						'' :'---------',
 						'國小': '國小',
-			            '國中': '國中',
-			            '高中': '高中',
-			            '學士': '學士',
-			            '碩士': '碩士',
+						'國中': '國中',
+						'高中': '高中',
+						'學士': '學士',
+						'碩士': '碩士',
 					},
 				},
 				'is_book': {
@@ -200,15 +196,14 @@
 					'remark': '請選擇所屬單位',
 				},
 			}
-			usermodel_dialog_create('root_modal_dialog', dialog_id, '基本資料修改', model_infos)
+			dialog_create('divmodal_dialog_root', dialog_id, '基本資料修改', model_infos)
 
 		div = $('#' +dialog_id);
 
 		}
 
-
 		//default
-		usermodel_dialog_default(dialog_id, 1, model_infos);
+		usermodel_dialog_default(dialog_id, user_id, model_infos);
 
 		//ok
 		$('#divmodal_' +dialog_id +'_ok').off().on('click', function () {
@@ -232,83 +227,16 @@
 
 				// transferData[$(this).attr('name')] = $(this).val()
 			})
-			console.log(transferData);
+			//console.log(transferData);
 
-			let url = '/genericUser/api/users/1/';
-			$.ajax({
-			    url: url,
-			    type: 'PATCH',
-			    data: JSON.stringify(transferData),
-			    dataType: 'json',
-		        headers: {
-		          	'x-auth-token': localStorage.accessToken,
-		            "Content-Type": "application/json",
-		            "X-CSRFToken": $('input[name=csrfmiddlewaretoken]').val(),
-		        },
-		        
-			    })
-			    .done(function(response){
-			    	console.log('PATCH success');
-			    	alertmessage('success', '更新完成');
-			    })
-			    .fail(function(response){
-			  		//console.log('PATCH fail');
-			  		alertmessage('error', '更新失敗');
-			    })
-
-			// let headers = {
-		 //            'x-auth-token': localStorage.accessToken,
-		 //            "Content-Type": "application/json",
-		 //            "X-CSRFToken": $('input[name=csrfmiddlewaretoken]').val(),
-		 //          };
-			// let client = new $.RestClient('/genericUser/api/');
-			// client.add('users');
-			// client.users.addVerb('partial_update', 'PATCH');
-
-			// client.users.partial_update(1, headers, transferData)
-			// 		.done(function (data) {
-			// 			//console.log('patch success')
-			// 			console.log(data)
-			// 		})
-			// 		.fail(function (data) {
-			// 			console.log('patch fail')
-			// 		});
-
-
-			//aj
-			// let url;
-			let df;
-			/*if (ebook === false) {
-				url = '/ebookSystem/book_download/' + ISBN;
-				if (action === 'download') {
-					//console.log('aj_binary',ebook,url,transferData)
-					df = aj_binary(url, transferData);
-				}
-				else {
-					//console.log('aj_post',ebook,url,transferData)
-					df = aj_post(url, transferData);
-				}
-			}
-			else {
-				url = '/ebookSystem/ebook_download/' + ISBN;
-				if (action === 'download') {
-					//console.log('aj_binary',ebook,url,transferData)
-					df = aj_binary(url, transferData);
-				}
-				else {
-					//console.log('aj_post',ebook,url,transferData)
-					df = aj_post(url, transferData);
-				}
-			}
-
-			//df
-			df
-				.done(function (data) {
-					alertmessage(data['status'], data['message']);
+			let url = '/genericUser/api/users/' +user_id +'/';
+			rest_aj_send('patch', url, transferData)
+				.done(function(data, textStatus, xhr) {
+					alertmessage('success', '更新已完成'+ data['message']);
 				})
-				.fail(function (data) {
-					alertmessage(data['status'], data['message']);
-				})*/
+				.fail(function(data){
+					alertmessage('error', '失敗' +data['message']);
+				})
 
 			//hide
 			div.modal('hide');
@@ -321,10 +249,10 @@
 		})
 
 		//enter
-		$("#divmodal_downloadbook_password").off().on('keypress', function (event) {
+		$("#id_" +dialog_id +'_password').off().on('keypress', function (event) {
 			if (event.which === 13) {
 				event.preventDefault();
-				$('#divmodal_downloadbook_submit').click();
+				$('#divmodal_' +dialog_id +'_ok').click();
 			}
 		});
 
@@ -340,5 +268,3 @@
 	}
 
 </script>
-
-<div id="root_modal_dialog"></div>
