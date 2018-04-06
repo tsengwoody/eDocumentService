@@ -57,6 +57,20 @@
 				</div>';
 
 			}
+
+			// 信箱/手機 驗證碼
+			else if(v.type==='otp'){
+				input_content = input_content
+				+ '\
+				<div class="form-group">\
+					<label class="control-label col-sm-2" for="id_' +create_id +'_' + k + '"><font style="color:red">*</font><span>' + v.label + '</span></label>\
+					<div class="col-sm-4">\
+					<input id="id_' +create_id +'_' + k + '" name="' +k + '" class="form-control" type="text" data-date-format="yyyy-mm-dd">\
+					</div>\
+					<button type="button" class="btn btn-primary" id="send_otp" value="' + v.remark +'">送出驗證碼</button>\
+					<button type="button" class="btn btn-primary" id="get_otp" value="' + v.remark +'">取得驗證碼</button>\
+				</div>';
+			}
 		})
 		input_content += '</div>';
 
@@ -262,7 +276,7 @@
 
 		//autofocus
 		_.delay(function () {
-			$('#divmodal_downloadbook_password').focus();
+			$('#id_' +dialog_id +'_password').focus();
 		}, 500)
 
 	}
