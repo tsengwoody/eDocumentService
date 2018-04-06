@@ -104,7 +104,7 @@
 		client.add('users');
 
 		//read
-		client.users.read(1)
+		client.users.read(id)
 			.done(function (data) {
 				_.each(model_infos, function (v, k){
 					if(model_infos[k].type==='checkbox'){

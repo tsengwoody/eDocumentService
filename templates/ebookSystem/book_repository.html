@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 平台書庫
 {% endblock %}
@@ -6,9 +6,6 @@
 平台書庫
 {% endblock %}
 {% block content %}
-{% csrf_token %}
-
-
 <script>
 	let user;
 	$(function(){
@@ -184,15 +181,13 @@
 				})
 
 				//check
+				let book_list = block_id +'_' +key +'_' +value;
 				if (iser(sr)) {
-					// $('#div_serviceinfo_list_panel').html('目前無服務紀錄');
-					// $('#sel_exchangecenter').prop('disabled', true);
-					// $('#btn_serviceinfo_exchange').attr('onclick', '').prop('disabled', true);
+					$('#' +book_list).html('目前無書籍資料');
 					return;
 				}
 
 				//gentable
-				let book_list = block_id +'_' +key +'_' +value;
 				let book_list_table = book_list + '_table' ;
 				gentable(book_list, book_list_table, sr);
 
@@ -208,9 +203,8 @@
 
 </script>	
 
+{% csrf_token %}
 <h3>平台書庫</h3>
-
-
 <ul class="nav nav-tabs">
 	<li class="active"><a href="#repository_books_tab_書籍推薦" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="true" onclick="pagetab_subtabfix(this);">書籍推薦</a></li>
 	<li><a href="#repository_books_tab_索引" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">索引</a></li>
@@ -218,7 +212,6 @@
 </ul>
 
 <div class="tab-content" style="padding:20px 0px;">
-
 	<div id="repository_books_tab_書籍推薦" class="tab-pane active">
 		<h4 class="textfornvda">書籍推薦</h4>
 		<div id="book_recommend_div"></div>
@@ -233,20 +226,6 @@
 		<h4 class="textfornvda">查詢</h4>
 
 		<div class="form-inline" style="margin-bottom:20px;">
-<!--
-			<div class="form-group">
-				<label for="inp_ISBN" style="margin-right:15px;">
-					<input id="inp_ISBN" type="radio" name="search_type" value="ISBN" checked="true">
-					ISBN
-				</label>
-			</div>
-			<div class="form-group">
-				<label for="inp_bookname" style="margin-right:15px;">
-					<input id="inp_bookname" type="radio" name="search_type" value="bookname">
-					書名
-				</label>
-			</div>
--->
 			<div class="form-group">
 				<input id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊" maxlength="15">
 			</div>

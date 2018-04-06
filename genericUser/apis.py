@@ -15,11 +15,14 @@ from django.core.cache import cache
 from django.core.mail import EmailMessage
 from django.template.loader import get_template
 from django.template import Context
+
+from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWORD
+
 class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
 	#permission_classes = (UserDataPermission, )
-	#filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter,)
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter,)
 	ordering_fields = ('username',)
 	search_fields = ('username', 'email',)
 
@@ -56,11 +59,12 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		return fullpath
 
 	@detail_route(
-		methods=['post'],
+		methods=['get', 'post'],
 		url_name='verify',
 		url_path='action/verify',
 	)
 	def verify(self, request, pk=None):
+		res = {'message': ''}
 		obj = self.get_object()
 		if request.POST.has_key('generate') and request.POST['generate'] == 'email':
 			if not cache.has_key(obj.email):
@@ -75,8 +79,8 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			body = t.render(Context(locals()))
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[obj.email])
 			email.send(fail_silently=False)
-			status = 'success'
-			message = u'已寄送到您的電子信箱'
+			res['message'] = u'已寄送到您的電子信箱'
+			print vcode
 		elif request.POST.has_key('generate') and request.POST['generate'] == 'phone':
 			if not cache.has_key(request.user.phone):
 				import random
@@ -92,45 +96,37 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			session = requests.Session()
 			response = session.get(url)
 			if response.text.split('=')[1] > 0:
-				status = 'success'
-				message = u'已寄送到您的手機'
+				res['message'] = u'已寄送到您的手機'
 			else:
-				status = 'error'
-				message = u'請確認手機號碼是否正確或聯絡系統管理員'
-				return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+				res['message'] = u'請確認手機號碼是否正確或聯絡系統管理員'
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		elif request.POST.has_key('verification_code') and request.POST.has_key('type') and request.POST['type'] == 'email':
 			if not cache.has_key(obj.email):
-				status = u'error'
-				message = u'驗證碼已過期，請重新產生驗證碼'
-				return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+				res['message'] = u'驗證碼已過期，請重新產生驗證碼'
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 			input_vcode = request.POST['verification_code']
 			vcode = cache.get(obj.email)['vcode']
 			if input_vcode == vcode:
-				status = u'success'
-				message = u'信箱驗證通過'
+				res['message'] = u'信箱驗證通過'
 				obj.auth_email = True
 				obj.save()
 			else:
-				status = u'error'
-				message = u'信箱驗證碼不符'
-				return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+				res['message'] = u'信箱驗證碼不符'
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		elif request.POST.has_key('verification_code') and request.POST.has_key('type') and request.POST['type'] == 'phone':
 			if not cache.has_key(obj.phone):
-				status = u'error'
-				message = u'驗證碼已過期，請重新產生驗證碼'
-				return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+				res['message'] = u'驗證碼已過期，請重新產生驗證碼'
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 			input_vcode = request.POST['verification_code']
 			vcode = cache.get(obj.phone)['vcode']
 			if input_vcode == vcode:
-				status = u'success'
-				message = u'手機驗證通過'
+				res['message'] = u'手機驗證通過'
 				obj.auth_phone = True
 				obj.save()
 			else:
-				status = u'error'
-				message = u'手機驗證碼不符'
-				return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
-		return Response(data=json.dumps(message), status=status.HTTP_202_ACCEPTED)
+				res['message'] = u'手機驗證碼不符'
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	@detail_route(
 		methods=['post'],
