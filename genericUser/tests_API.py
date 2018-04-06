@@ -107,3 +107,20 @@ class UserAPITests(TestCase):
 		from django.contrib.auth import authenticate
 		user = authenticate(username=instance.username, password='new')
 		print user
+
+	def test_user_verify_case(self):
+		client = Client()
+		client.login(username='root', password='root')
+		response = client.post(
+			reverse(
+				'genericUser:api:user-verify',
+				kwargs = {
+					'pk': 1,
+				}
+			),
+			{
+				'generate':'email',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		pk = 1

@@ -15,6 +15,9 @@ from django.core.cache import cache
 from django.core.mail import EmailMessage
 from django.template.loader import get_template
 from django.template import Context
+
+from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWORD
+
 class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
@@ -77,6 +80,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[obj.email])
 			email.send(fail_silently=False)
 			res['message'] = u'已寄送到您的電子信箱'
+			print vcode
 		elif request.POST.has_key('generate') and request.POST['generate'] == 'phone':
 			if not cache.has_key(request.user.phone):
 				import random
