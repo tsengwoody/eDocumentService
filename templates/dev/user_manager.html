@@ -1,0 +1,89 @@
+﻿{% extends "base_nav.html" %}
+{% load staticfiles %}
+{% block title %}
+使用者管理
+{% endblock %}
+{% block content %}
+{% csrf_token %}
+
+<script>
+
+	function UserSearch(){
+		//任意關鍵字搜尋
+
+		//query
+		let query=$('#search_value').val();
+
+		//client
+		let client = new $.RestClient('/genericUser/api/');
+		client.add('users');
+
+		//read
+		client.users.read({'search': query})
+		.done(function(d){
+
+			//alertmessage
+			alertmessage('success', '查詢成功');
+
+			//ar
+			let ar=[];
+			_.each(d,function(v){
+
+				//o
+				let o={};
+
+				//使用者名稱,姓名,郵件,手機
+				o['使用者名稱']=v['username'];
+				o['姓名']=v['first_name'] +v['last_name'];
+				o['郵件']=v['email'];
+				o['手機']=v['phone'];
+
+				//動作
+				let c='';
+				c+='<button class="btn btn-default" type="button" style="margin:0px 3px 3px 0px;" onclick="usermodel('+v['id']+')">基本資料修改</button>';
+				c+='<button class="btn btn-default" type="button" style="margin:0px 3px 3px 0px;" onclick="UserPermission('+v['id']+')">權限設定</button>';
+				c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/ebookSystem/getbookrecord_user/'+v['id']+'/">下載紀錄</a>';
+				c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/genericUser/review_user/'+v['username']+'/">審核</a>';
+				if(v['is_editor']){
+					c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/genericUser/serviceinfo_list_search/'+v['username']+'/">服務紀錄</a>';
+				}
+				if(v['is_guest']){
+					c+='<button class="btn btn-default" type="button" style="margin:0px 3px 3px 0px;" onclick="UserDisabilityCard('+v['id']+')">手冊查閱與上傳</button>';
+				}
+				o['動作']=c;
+
+				//push
+				ar.push(o);
+
+			})
+
+			//gentable
+			gentable('user_manager_div_search','user_manager_div_search_table',ar);
+		})
+		.fail(function(msg){
+			console.log(msg)
+		})
+
+	}
+
+</script>
+
+
+<h3>使用者管理</h3>
+
+<ul class="nav nav-tabs">
+	<li class="active"><a href="#usermanager_tab_查詢" name="usermanager_tab_grp" data-toggle="tab" aria-expanded="true" onclick="pagetab_subtabfix(this);">查詢</a></li>
+</ul>
+
+<div class="tab-content" style="padding:20px 0px;">
+	<div id="usermanager_tab_查詢" class="tab-pane active">
+		<div class="form-inline" style="margin-bottom:20px;">
+			<span>關鍵字查詢：</span>
+			<input id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊">
+			<button class="btn btn-primary" type="button" onclick="UserSearch();">搜尋</button>
+		</div>
+		<div id="user_manager_div_search"></div>
+	</div>
+</div>
+
+{% endblock %}
