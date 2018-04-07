@@ -1,4 +1,47 @@
 ﻿<script>
+	function otp_dialog_create(root_id, create_id,title, model_infos) {
+
+		let input_content = '';
+		input_content += '<div class="form-horizontal">';
+		_.each(model_infos,function(v,k){
+			
+			// 信箱/手機 驗證碼
+			input_content = input_content
+			+ '\
+			<div class="form-group">\
+				<label class="control-label col-sm-2" for="id_' +create_id +'_' + k + '"><font style="color:red">*</font><span>' + v.label + '</span></label>\
+				<div class="col-sm-4">\
+				<input id="id_' +create_id +'_' + k + '" name="' +k + '" class="form-control" type="text">\
+				</div>\
+				<button type="button" class="btn btn-primary" id="send_otp" value="' + v.type +'">送出驗證碼</button>\
+				<button type="button" class="btn btn-primary" id="get_otp" value="' + v.type +'">取得驗證碼</button>\
+				<span id=id_send_info><span>\
+			</div>';
+			
+		})
+		input_content += '</div>';
+
+		modal_template = `
+		<div id="` +create_id +`" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="divmodal_downloadbook_title"aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content alert-info" style="background-color: #f5f5f5;">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 id="divmodal_` +create_id +`_title" class="modal-title">` +title +`</h4>
+					</div>
+					<div style="padding:40px 10px 20px 10px; background-color:#fafafa;">
+						`
+						+ input_content
+						+`
+					</div>
+				</div>
+			</div>
+		</div>`
+		$('#' +root_id).append(modal_template)
+
+	}
 
 	function user_getOTP(user_id, otp_type) {
 
@@ -18,11 +61,10 @@
 			model_infos = {
 				'verification_code': {
 					'label': '驗證碼',
-					'type': 'otp',
-					'remark': otp_type,
+					'type': otp_type,
 				},
 			}
-			dialog_create('divmodal_dialog_root', dialog_id, title, model_infos)
+			otp_dialog_create('divmodal_dialog_root', dialog_id, title, model_infos)
 
 		div = $('#' +dialog_id);
 
@@ -32,7 +74,6 @@
 		$('#get_otp').off().on('click', function () {
 
 			//transferData
-			console.log(otp_type);
 			let transferData = {'generate': otp_type};
 
 			let url = '/genericUser/api/users/' +user_id +'/action/verify/';
@@ -77,7 +118,7 @@
 
 			})
 			transferData['type'] = otp_type;
-			console.log(transferData);
+			// console.log(transferData);
 
 			let url = '/genericUser/api/users/' +user_id +'/action/verify/';
 			rest_aj_send('post', url, transferData)
