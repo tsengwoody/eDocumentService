@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% load staticfiles %}
 {% block title %}
 使用者管理
@@ -42,13 +42,13 @@
 				let c='';
 				c+='<button class="btn btn-default" type="button" style="margin:0px 3px 3px 0px;" onclick="usermodel('+v['id']+')">基本資料修改</button>';
 				c+='<button class="btn btn-default" type="button" style="margin:0px 3px 3px 0px;" onclick="UserPermission('+v['id']+')">權限設定</button>';
-				c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/ebookSystem/getbookrecord_user/'+v['id']+'/">下載紀錄</a>';
 				c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/genericUser/review_user/'+v['username']+'/">審核</a>';
 				if(v['is_editor']){
 					c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/genericUser/serviceinfo_list_search/'+v['username']+'/">服務紀錄</a>';
 				}
 				if(v['is_guest']){
 					c+='<button class="btn btn-default" type="button" style="margin:0px 3px 3px 0px;" onclick="UserDisabilityCard('+v['id']+')">手冊查閱與上傳</button>';
+				c+='<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" href="/ebookSystem/getbookrecord_user/'+v['id']+'/">下載紀錄</a>';
 				}
 				o['動作']=c;
 

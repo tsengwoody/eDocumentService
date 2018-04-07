@@ -13,6 +13,8 @@ from .tests_data import *
 
 import json
 
+
+from django.core import mail
 class UserAPITests(TestCase):
 	fixtures = ['dump.json',]
 
@@ -123,4 +125,5 @@ class UserAPITests(TestCase):
 			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
-		pk = 1
+		self.assertEqual(len(mail.outbox), 1)
+		print mail.outbox[0].body

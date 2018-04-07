@@ -26,9 +26,6 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	ordering_fields = ('username',)
 	search_fields = ('username', 'email',)
 
-	#def partial_update(self, request):
-		#print request.data
-
 	def perform_create(self, serializer):
 		instance = serializer.save(
 			is_license = True,
@@ -79,8 +76,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			body = t.render(Context(locals()))
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[obj.email])
 			email.send(fail_silently=False)
-			res['message'] = u'已寄送到您的電子信箱'
-			print vcode
+			res['detail'] = u'已寄送到您的電子信箱'
 		elif request.POST.has_key('generate') and request.POST['generate'] == 'phone':
 			if not cache.has_key(request.user.phone):
 				import random
@@ -96,35 +92,35 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			session = requests.Session()
 			response = session.get(url)
 			if response.text.split('=')[1] > 0:
-				res['message'] = u'已寄送到您的手機'
+				res['detail'] = u'已寄送到您的手機'
 			else:
-				res['message'] = u'請確認手機號碼是否正確或聯絡系統管理員'
+				res['detail'] = u'請確認手機號碼是否正確或聯絡系統管理員'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		elif request.POST.has_key('verification_code') and request.POST.has_key('type') and request.POST['type'] == 'email':
 			if not cache.has_key(obj.email):
-				res['message'] = u'驗證碼已過期，請重新產生驗證碼'
+				res['detail'] = u'驗證碼已過期，請重新產生驗證碼'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 			input_vcode = request.POST['verification_code']
 			vcode = cache.get(obj.email)['vcode']
 			if input_vcode == vcode:
-				res['message'] = u'信箱驗證通過'
+				res['detail'] = u'信箱驗證通過'
 				obj.auth_email = True
 				obj.save()
 			else:
-				res['message'] = u'信箱驗證碼不符'
+				res['detail'] = u'信箱驗證碼不符'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		elif request.POST.has_key('verification_code') and request.POST.has_key('type') and request.POST['type'] == 'phone':
 			if not cache.has_key(obj.phone):
-				res['message'] = u'驗證碼已過期，請重新產生驗證碼'
+				res['detail'] = u'驗證碼已過期，請重新產生驗證碼'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 			input_vcode = request.POST['verification_code']
 			vcode = cache.get(obj.phone)['vcode']
 			if input_vcode == vcode:
-				res['message'] = u'手機驗證通過'
+				res['detail'] = u'手機驗證通過'
 				obj.auth_phone = True
 				obj.save()
 			else:
-				res['message'] = u'手機驗證碼不符'
+				res['detail'] = u'手機驗證碼不符'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
@@ -140,8 +136,8 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		if user is not None and self.request.data['new_password1'] == self.request.data['new_password2']:
 			user.set_password(self.request.data['new_password1'])
 			user.save()
-			return Response(status=status.HTTP_202_ACCEPTED)
-		return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+			return Response(data={'detail': u'變更密碼成功'}, status=status.HTTP_202_ACCEPTED)
+		return Response(data={'detail': u'變更密碼失敗'}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 class ServiceInfoViewSet(viewsets.ModelViewSet):
 	queryset = ServiceInfo.objects.all()

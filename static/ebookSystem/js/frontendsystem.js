@@ -2501,22 +2501,28 @@ function rest_aj_send(type, url, transferData) {
 			}
 		},
 		'error': function (xhr) {
-			//reject
+
+		//reject
 			let res = {
-				'status': 'error',
-				'message': '伺服器錯誤回應: ' + xhr.responseText,
+				'status': xhr.status,
+				'message': '伺服器錯誤回應: ' +xhr.status +' - ' +xhr.responseText,
 			};
 
 			df.reject(res);
 
 		},
 		success: function(data, textStatus, xhr) {
-			//console.log(typeof(xhr.status))
-			if (xhr.status >= 200 && xhr.status <= 300) 	{
+			if (xhr.status >= 200 && xhr.status < 300) {
 				let res = {
-					'status': 'success',
-					'message': o2j(data),
+					'status': xhr.status,
 				};
+				if (data.hasOwnProperty('detail')){
+					res['message'] = '伺服器成功操作: ' +xhr.status +' - ' +data['detail']
+				}
+				else {
+					res['message'] = '伺服器成功操作: ' +xhr.status +' - '
+				}
+
 				df.resolve(res);
 			}
 			else {
@@ -2532,4 +2538,5 @@ function rest_aj_send(type, url, transferData) {
 	})
 
 	return df;
-}
+
+	}

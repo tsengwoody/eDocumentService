@@ -246,10 +246,10 @@
 			let url = '/genericUser/api/users/' +user_id +'/';
 			rest_aj_send('patch', url, transferData)
 				.done(function(data, textStatus, xhr) {
-					alertmessage('success', '更新已完成'+ data['message']);
+					alertmessage('success', data['message'] +'更新已完成');
 				})
 				.fail(function(data){
-					alertmessage('error', '失敗' +data['message']);
+					alertmessage('error', data['message']);
 				})
 
 			//hide
