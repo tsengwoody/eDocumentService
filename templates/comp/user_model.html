@@ -1,6 +1,6 @@
-﻿<script>
+<script>
 	let user;
-	$(function(){
+	function current_user(){
 
 		let user_id = $('div[user_id]').attr('user_id');
 		if(user_id!='None'){
@@ -22,5 +22,5 @@
 		} else {
 			user = {};
 		}
-	})
+	}
 </script>

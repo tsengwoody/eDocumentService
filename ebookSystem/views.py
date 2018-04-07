@@ -823,7 +823,7 @@ def book_delete(request):
 			user = authenticate(username=request.user.username, password=request.POST['password'])
 			if user is None:
 				raise SystemError(u'使用者驗證失敗')
-			if not getBook.owner == user:
+			if not getBook.owner == user and not user.is_manager:
 				raise SystemError(u'非擁有者無法刪除')
 			if getBook.source == 'self' and getBook.status > getBook.STATUS['inactive']:
 				raise SystemError(u'校對書籍無法刪除')

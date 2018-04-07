@@ -61,7 +61,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		url_path='action/verify',
 	)
 	def verify(self, request, pk=None):
-		res = {'message': ''}
+		res = {}
 		obj = self.get_object()
 		if request.POST.has_key('generate') and request.POST['generate'] == 'email':
 			if not cache.has_key(obj.email):

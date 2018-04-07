@@ -1,10 +1,10 @@
 {% extends "base_nav.html" %}
 {% load staticfiles %}
 {% block title %}
-書籍管理
+校對進度
 {% endblock %}
 {% block header %}
-書籍管理
+校對進度
 {% endblock %}
 {% block content %}
 <script>
@@ -55,9 +55,9 @@
 		//page
 		let hpage=pagetab(s);
 		$('#' +block_id +'_div').html(hpage);
-		inactive_book(block_id +'_inactive', 'all')
-		edit_book(block_id +'_edit', 'all')
-		finish_book(block_id +'_finish', 'all')
+		inactive_book(block_id +'_inactive', user.id)
+		edit_book(block_id +'_edit', user.id)
+		finish_book(block_id +'_finish', user.id)
 
 	}
 
@@ -69,7 +69,7 @@
 
 <form action="" method="post">
 	{% csrf_token %}
-	<h3 class="page-header">書籍管理</h3>
+	<h3 class="page-header">校對進度</h3>
 	<div id="book_manager_div"></div>
 
 </form>
