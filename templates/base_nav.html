@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block nav %}
 {% load staticfiles %}
 <link href="{% static "ebookSystem/css/footer-navbar.css" %}" rel="stylesheet" >
@@ -40,7 +40,7 @@
 						<li><a href="{% url 'manager:event_list' 'ebook' %}">審核校對文件</a></li>
 						<li><a href="{% url 'ebookSystem:bookorder_list' %}">校對順序</a></li>
 						<li><a href="{% url 'manager:event_list' 'applydocumentaction' %}">代掃申請列表</a></li>
-						<li><a href="{% url 'ebookSystem:book_list_manager' %}">書籍管理</a></li>
+						<li><a href="{% url 'ebookSystem:generics' 'book_manager' %}">書籍管理</a></li>
 						{% endif %}
 					</ul>
 				</li>

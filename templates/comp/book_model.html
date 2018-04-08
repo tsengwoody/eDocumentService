@@ -80,6 +80,11 @@
 			book_data = book_data.concat(d2[0])
 
 			_.each(book_data, function (v, k) {
+
+				let action = '';
+				action += `<button class="btn btn-default send_button" type="button" name="set_priority" onclick="BookSetPriority('` +v.ISBN +`')">設定權重</button>`
+				action += `<a href="/ebookSystem/detail/` +v.ISBN +`/">分段資訊</a>`
+
 				let o = {
 					'ISBN': v.ISBN,
 					'書名': v.book_info.bookname,
@@ -87,7 +92,7 @@
 					'已完成段數': v.finish_part_count,
 					'時數': v.service_hours,
 					'權重': v.priority,
-					'動作': `<button class="btn btn-default send_button" type="button" name="set_priority" onclick="BookSetPriority('` +v.ISBN +`')">設定權重</button>`,
+					'動作': action,
 				};
 
 				sr.push(o);

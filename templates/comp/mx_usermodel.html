@@ -142,11 +142,6 @@
 		div = $('#' +dialog_id);
 		if (div.length <= 0){
 			model_infos = {
-				'username': {
-					'label': '使用者名稱',
-					'type': 'text',
-					'remark': '請填寫使用者名稱，需使用小寫英文字母或數字，首字需為小寫英文字母',
-				},
 				'email': {
 					'label': '信箱',
 					'type': 'text',
@@ -232,10 +227,16 @@
 			let url = '/genericUser/api/users/' +user_id +'/';
 			rest_aj_send('patch', url, transferData)
 				.done(function(data, textStatus, xhr) {
-					alertmessage('success', data['message'] +'更新已完成');
+					alertmessage('success', data['message'] +'更新已完成')
+						.done(function () {
+							location.reload(); //重新載入網頁以更新資訊
+						});
 				})
 				.fail(function(data){
-					alertmessage('error', data['message']);
+					alertmessage('error', data['message'])
+					.done(function() {
+						usermodel(user_id)
+					})
 				})
 
 			//hide

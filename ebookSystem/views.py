@@ -45,6 +45,11 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 @http_response
+def generics(request, name):
+	template_name='ebookSystem/{0}.html'.format(name)
+	return locals()
+
+@http_response
 def mathml(request, template_name='ebookSystem/editor.html'):
 	if request.method == 'POST':
 		if request.POST.has_key('set'):
@@ -64,16 +69,6 @@ def mathml(request, template_name='ebookSystem/editor.html'):
 	if request.method == 'GET':
 		status = u'success'
 		message = u'成功獲取內容'
-		return locals()
-
-@user_category_check(['superuser'])
-@http_response
-def book_list_manager(request, template_name='ebookSystem/book_list_manager.html'):
-	books = Book.objects.all()
-	bookinfos = [ book.book_info for book in books ]
-	if request.method == 'POST':
-		return locals()
-	if request.method == 'GET':
 		return locals()
 
 @user_category_check(['manager'])

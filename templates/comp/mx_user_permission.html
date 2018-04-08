@@ -12,7 +12,6 @@
 			.done(function (data) {
 
 				let d = data[0];
-				console.log(d)
 
 				//c
 				let c = '';
@@ -56,6 +55,9 @@
 		//ok
 		$('#divmodal_UserPermission_ok').off().on('click', function () {
 
+			//url
+			let url = '/genericUser/api/users/' +userid +'/'
+
 			//transferData
 			let transferData = {};
 			$('input[name="UserPermission_grp"]').each(function () {
@@ -66,15 +68,15 @@
 			})
 
 			//aj_user_updateid
-			aj_user_updateid(userid, 'role', transferData)
-				.done(function (data) {
-					alertmessage(data.status, data.meUserPermission_InputChangessage)
+			rest_aj_send('patch', url, transferData)
+				.done(function(data, textStatus, xhr) {
+					alertmessage('success', data['message'] +'更新已完成')
 						.done(function () {
 							location.reload(); //重新載入網頁以更新資訊
 						});
 				})
-				.fail(function (data) {
-					alertmessage(data.status, data.message)
+				.fail(function(data){
+					alertmessage('error', data['message'])
 				})
 
 			div.modal('hide');

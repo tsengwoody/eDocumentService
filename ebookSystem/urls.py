@@ -18,7 +18,6 @@ urlpatterns = [
 	url(r'^analyze_part/(?P<ISBN_part>[\d-]+)/$', views.analyze_part, name='analyze_part'),
 	url(r'^book_info/(?P<ISBN>[0-9Xx]+)/$', views.book_info, name='book_info'),
 	url(r'^get_book_info_list/$', views.get_book_info_list, name='get_book_info_list'),
-	url(r'^book_list_manager/$', views.book_list_manager, name='book_list_manager'),
 	url(r'^detail/(?P<book_ISBN>[0-9]+)/$', views.detail, name='detail'),
 	url(r'^detail_manager/(?P<book_ISBN>[0-9]+)/$', views.detail_manager, name='detail_manager'),
 	url(r'^edit/(?P<ISBN_part>[0-9\-]+)/$', views.edit, name='edit'),
@@ -47,4 +46,5 @@ urlpatterns = [
 	url(r'^book_action/$', views.book_action, name='book_action'),
 	url(r'^ebook_change_status/(?P<pk>[\d-]+)/$', views.ebook_change_status, name='ebook_change_status'),
 	url(r'^api/', include(api_urlpatterns, namespace='api')),
+	url(r'^generics/(?P<name>[\w\d]+)/$', views.generics, name='generics'),
 ]
