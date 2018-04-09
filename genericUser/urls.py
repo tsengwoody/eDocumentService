@@ -12,6 +12,7 @@ router = DefaultRouter()
 router.register(r'announcements', apis.AnnouncementViewSet)
 router.register(r'organizations', apis.OrganizationViewSet)
 router.register(r'qandas', apis.QAndAViewSet)
+router.register(r'bannercontents', apis.BannerContentViewSet)
 router.register(r'serviceinfos', apis.ServiceInfoViewSet)
 router.register(r'users', apis.UserViewSet)
 router.register(r'serviceinfoadds', apis.ServiceInfoAddViewSet)
@@ -53,10 +54,6 @@ urlpatterns = [
 	url(r'^announcement_delete/(?P<pk>[0-9]+)/$', views.announcement_delete, name='announcement_delete'),
 	url(r'^announcement_list$', views.announcement_list, name='announcement_list'),
 	url(r'^announcement/(?P<ID>[0-9]+)/$', views.announcement, name='announcement'),
-	url(r'^qanda_create/$', views.qanda_create, name='qanda_create'),
-	url(r'^qanda_update/(?P<id>[0-9]+)/$', views.qanda_update, name='qanda_update'),
-	url(r'^qanda_delete/(?P<id>[0-9]+)/$', views.qanda_delete, name='qanda_delete'),
-	url(r'^qanda_list$', views.qanda_list, name='qanda_list'),
 	url(r'^api/', include(api_urlpatterns, namespace='api')),
 	url(r'^resource/', include(resource_urlpatterns, namespace='resource')),
 	url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),

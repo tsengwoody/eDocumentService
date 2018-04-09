@@ -1,0 +1,243 @@
+{% extends "base_nav.html" %}
+{% block title %}
+平台書庫
+{% endblock %}
+{% block header %}
+平台書庫
+{% endblock %}
+{% block content %}
+<script>
+	let user;
+	$(function(){
+		//初始化頁面
+
+		let user_id = $('div[user_id]').attr('user_id');
+		if(user_id!='None'){
+			//client
+			let client = new $.RestClient('/genericUser/api/', {
+				ajax: {
+					async: false,
+				},
+			});
+
+			client.add('users');
+
+			//read
+			client.users.read(user_id)
+				.done(function (data, textStatus, xhrObject) {
+					user = Object.assign(data);
+					console.log(textStatus)
+				})
+			//console.log(user);
+		} else {
+			user = {};
+		}
+
+		//index ocs
+		let index_ocs={
+			0: {
+				'key': 'chinese_book_category',
+				'value': '0',
+				'show': '總類',
+			},	
+			1: {
+				'key': 'chinese_book_category',
+				'value': '1',
+				'show': '哲學',
+			},
+			2: {
+				'key': 'chinese_book_category',
+				'value': '2',
+				'show': '宗教',
+			},
+			3: {
+				'key': 'chinese_book_category',
+				'value': '3',
+				'show': '科學',
+			},
+			4: {
+				'key': 'chinese_book_category',
+				'value': '4',
+				'show': '應用科學',
+			},
+			5: {
+				'key': 'chinese_book_category',
+				'value': '5',
+				'show': '社會科學',
+			},
+			6: {
+				'key': 'chinese_book_category',
+				'value': '6',
+				'show': '史地類',
+			},
+			7: {
+				'key': 'chinese_book_category',
+				'value': '7',
+				'show': '世界史地',
+			},
+			8: {
+				'key': 'chinese_book_category',
+				'value': '8',
+				'show': '語言文學',
+			},
+			9: {
+				'key': 'chinese_book_category',
+				'value': '9',
+				'show': '藝術',
+			},
+		}
+
+		listcategory('book_index', index_ocs);
+
+		//recommend ocs
+		let recommend_ocs={
+			0: {
+				'key': 'newest',
+				'value': '15',
+				'show': '最新上架',
+			},	
+			1: {
+				'key': 'recommend',
+				'value': '15',
+				'show': '平台推薦',
+			},	
+			2: {
+				'key': 'hottest',
+				'value': '15',
+				'show': '借閱排行',
+			},	
+		}
+
+		listcategory('book_recommend', recommend_ocs);
+
+	})
+
+	function search(){
+		//search
+		//search_value
+		let search_value=$('#search_value').val();
+
+		$('#repository_books_div_查詢').html('<div id="book_list_search_' +search_value +'"></div>')
+		book_list_restAPI('book_list', search_value, 'search');
+		alertmessage('success', '查詢完成，共取得 ' +' 筆資料')
+	}
+
+	function listcategory(block_id, ocs){
+
+		//s
+		function gs(v, k){
+			return {
+				'id':block_id +'_' +v.key +'_' +v.value,
+				'title':v.show,
+				'name':v.key,
+				'prop':'',
+			}
+		}
+		let s=[];
+		_.each(ocs,function(v,k){
+			s.push(gs(v,k));
+		})
+
+		//page
+		let hpage=pagetab(s);
+		$('#' +block_id +'_div').html(hpage);
+
+		//query and table
+		_.each(ocs,function(v,k){
+			book_list_restAPI(block_id, v.value, v.key);
+		})
+
+	}
+
+	function book_list_restAPI(block_id, value, key) {
+		//client
+		let client = new $.RestClient('/ebookSystem/api/');
+		client.add('bookinfos');
+
+		//read
+		client.bookinfos.read({[key]: value})
+			.done(function (data) {
+				let sr = [];
+				_.each(data, function (v, k) {
+					let o = {
+						'ISBN': v.ISBN,
+						'書名': v.bookname,
+						'裝訂冊數': v.bookbinding,
+						'版次': v.order,
+						'作者': v.author,
+						'出版社': v.house,
+						'出版日期': v.date,
+					};
+
+					//console.log(user.is_guest);
+					if(user.is_guest){
+						o['動作'] = ''
+							+'<button type="button" class="btn btn-default" ISBN="' +v.ISBN +'" onclick="aj_borrowbook(this, ' +"'" +'check_out' +"'" +')">借閱</button>'
+							+'<a class="btn btn-default" role="button" href="/ebookSystem/library_origin_view?ISBN=' +v.ISBN +'" target="_blank" title="閱讀(另開新視窗)">閱讀</a>';
+					}
+
+					sr.push(o);
+					//console.log(o);
+				})
+
+				//check
+				let book_list = block_id +'_' +key +'_' +value;
+				if (iser(sr)) {
+					$('#' +book_list).html('目前無書籍資料');
+					return;
+				}
+
+				//gentable
+				let book_list_table = book_list + '_table' ;
+				gentable(book_list, book_list_table, sr);
+
+				//table
+				$('#' + book_list_table).find('tr').each(function () {
+					let tr = $(this);
+					tr.css('text-align', 'center');
+				})
+
+			});
+
+	}
+
+</script>	
+
+{% csrf_token %}
+<h3>平台書庫</h3>
+<ul class="nav nav-tabs">
+	<li class="active"><a href="#repository_books_tab_書籍推薦" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="true" onclick="pagetab_subtabfix(this);">書籍推薦</a></li>
+	<li><a href="#repository_books_tab_索引" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">索引</a></li>
+	<li><a href="#repository_books_tab_查詢" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">查詢</a></li>
+</ul>
+
+<div class="tab-content" style="padding:20px 0px;">
+	<div id="repository_books_tab_書籍推薦" class="tab-pane active">
+		<h4 class="textfornvda">書籍推薦</h4>
+		<div id="book_recommend_div"></div>
+	</div>
+
+	<div id="repository_books_tab_索引" class="tab-pane">
+		<h4 class="textfornvda">索引</h4>
+		<div id="book_index_div"></div>
+	</div>
+
+	<div id="repository_books_tab_查詢" class="tab-pane">
+		<h4 class="textfornvda">查詢</h4>
+
+		<div class="form-inline" style="margin-bottom:20px;">
+			<div class="form-group">
+				<input id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊" maxlength="15">
+			</div>
+			<div class="form-group">
+				<button type="button" class="btn btn-primary" onclick="search();">搜尋</button>
+			</div>
+		</div>
+
+		<div id="repository_books_div_查詢"></div>
+
+	</div>
+
+</div>
+
+{% endblock %}

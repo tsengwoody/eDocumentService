@@ -50,3 +50,8 @@ class OrganizationSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Organization
 		fields = ('__all__')
+
+class BannerContentSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = BannerContent
+		fields = ('__all__')

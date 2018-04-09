@@ -855,14 +855,6 @@ def book_action(request):
 		return locals()
 
 @http_response
-def book_repository(request, template_name='ebookSystem/book_repository.html'):
-	API_list = [
-		reverse('ebookSystem:api:bookinfo-list')
-	]
-	if request.method == 'GET':
-		return locals()
-
-@http_response
 def getbookrecord_user(request, ID, template_name='ebookSystem/getbookrecord_user.html'):
 	user = User.objects.filter(id=ID)
 	gbr_list = GetBookRecord.objects.filter(user=user)
@@ -1047,27 +1039,6 @@ def sc_service(request, template_name='ebookSystem/sc_service.html'):
 @http_response
 def bookorder_list(request, template_name='ebookSystem/bookorder_list.html'):
 	bookorder_list = BookOrder.objects.all().order_by('order')
-	if request.method == 'GET':
-		return locals()
-
-@http_response
-def book_repository_person(request, template_name='ebookSystem/book_repository_person.html'):
-	API_list = [
-		reverse('ebookSystem:api:book-list'),
-		reverse('ebookSystem:api:bookinfo-list'),
-	]
-	edit_book_list = request.user.own_book_set.all().filter(status__lte=Book.STATUS['review'])
-	finish_book_list = request.user.own_book_set.all().filter(status__gte=Book.STATUS['finish'])
-	bookinfos = [ book.book_info for book in finish_book_list ]
-	if request.method == 'POST':
-		if request.POST.has_key('delete'):
-			deleteBook = Book.objects.get(ISBN=request.POST['delete'])
-			deleteBook.delete()
-			status = 'success'
-			message = u'成功刪除文件'
-		edit_book_list = request.user.own_book_set.all().filter(status__lte=Book.STATUS['review'])
-		finish_book_list = request.user.own_book_set.all().filter(status__gte=Book.STATUS['finish'])
-		return locals()
 	if request.method == 'GET':
 		return locals()
 

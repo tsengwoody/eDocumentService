@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block nav %}
 {% load staticfiles %}
 <link href="{% static "ebookSystem/css/footer-navbar.css" %}" rel="stylesheet" >
@@ -67,14 +67,14 @@
 					</ul>
 				</li>
 				{% if request.user.is_guest %}
-				<li><a href="{% url 'ebookSystem:book_repository_person' %}">校對進度</a></li>
+				<li><a href="{% url 'ebookSystem:generics' 'book_manager_person' %}">校對進度</a></li>
 				<li><a href="{% url 'ebookSystem:book_saelf' %}">借閱書櫃</a></li>
 				{% endif %}
 				{% if request.user.is_superuser %}
 				<li><a href="{% url 'account:an_service' %}">分析</a></li>
 				{% endif %}
 				{% endif %}
-				<li><a href="{% url 'ebookSystem:book_repository' %}">平台書庫</a></li>
+				<li><a href="{% url 'ebookSystem:generics' 'book_repository' %}">平台書庫</a></li>
 				{% if not request.user.is_license and request.user.is_authenticated %}
 				<li><a href="{% url 'genericUser:license' %}">簽署隱私權條款</a></li>
 				{% endif %}

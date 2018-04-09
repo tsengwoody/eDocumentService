@@ -364,8 +364,10 @@ class Command(BaseCommand):
 		GetBookRecord.objects.create(book=book, user=root, get_ip='192.168.1.0')
 		GetBookRecord.objects.create(book=book, user=root, get_ip='192.168.1.0')
 
-		QAndA.objects.create(question='<p>question 1</p>', answer='<p>answer 1</p>', )
-		QAndA.objects.create(question='<p>question 2</p>', answer='<p>answer 2</p>', )
+		QAndA.objects.create(question='<p>question 1</p>', answer='<p>answer 1</p>', order=0)
+		QAndA.objects.create(question='<p>question 2</p>', answer='<p>answer 2</p>', order=0)
+		BannerContent.objects.create(title='title 1', content='content 1', order=0)
+		BannerContent.objects.create(title='title 2', content='content 2', order=1)
 
 		client = Client()
 		client.login(username='root', password='eds@2018')

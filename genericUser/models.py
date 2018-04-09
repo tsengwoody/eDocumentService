@@ -253,8 +253,7 @@ class Announcement(models.Model):
 class QAndA(models.Model):
 	question = models.TextField()
 	answer = models.TextField()
-
-	serialized = generic_serialized
+	order = models.IntegerField()
 
 	def __unicode__(self):
 		return self.id
@@ -263,31 +262,10 @@ class BusinessContent(models.Model):
 	name = models.CharField(max_length=100, )
 	content = models.TextField()
 
-class View(models.Model):
-	namespace = models.CharField(max_length=100, )
-	url_name = models.CharField(max_length=100, )
-	permission = models.ManyToManyField('Permission')
-
-	class Meta:
-		unique_together = (('namespace', 'url_name',),)
+class BannerContent(models.Model):
+	title = models.CharField(max_length=100, )
+	content = models.TextField()
+	order = models.IntegerField()
 
 	def __unicode__(self):
-		if self.kwarg:
-			return self.namespace +'-' +self.url_name +'-' +self.kwarg
-		else:
-			return self.namespace +'-' +self.url_name +'-' +'None'
-
-	def check_permission(self, user):
-		if len(self.permission.all()) < 0: return True
-		r = len([permission for permission in user.permission.all() if permission in self.permission.all()])
-		if r > 0: #有交集
-			return True
-		else:
-			return False
-
-class Permission(models.Model):
-	name = models.CharField(max_length=100, unique=True)
-	codename = models.CharField(max_length=255, unique=True)
-
-	def __unicode__(self):
-		return self.name
+		return self.id

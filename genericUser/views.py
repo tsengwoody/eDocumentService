@@ -555,57 +555,6 @@ def announcement_delete(request, pk):
 		return locals()
 
 @http_response
-def qanda_create(request, ):
-	QAndAForm = modelform_factory(QAndA, fields=['question', 'answer', ])
-	if request.method == 'POST' and request.is_ajax():
-		form = QAndAForm(request.POST)
-		if not form.is_valid():
-			status = 'error'
-			message = u'表單驗證失敗' + unicode(form.errors)
-			return locals()
-		form.save()
-		status = 'success'
-		message = u'成功建立Q&A'
-		return locals()
-
-@http_response
-def qanda_update(request, id):
-	QAndAForm = modelform_factory(QAndA, fields=['question', 'answer', ])
-	if request.method == 'POST' and request.is_ajax():
-		qanda = QAndA.objects.get(id=id)
-		form = QAndAForm(request.POST, instance=qanda)
-		if not form.is_valid():
-			status = 'error'
-			message = u'表單驗證失敗' + unicode(form.errors)
-			return locals()
-		form.save()
-		status = 'success'
-		message = u'成功修改Q&A'
-		return locals()
-
-@http_response
-def qanda_delete(request, id):
-	if request.method == 'POST' and request.is_ajax():
-		qanda = QAndA.objects.get(id=id)
-		qanda.delete()
-		status = 'success'
-		message = u'成功刪除Q&A'
-		return locals()
-
-@http_response
-def qanda_list(request, ):
-	if request.method == 'GET' and request.is_ajax():
-		content = [ i.serialized() for i in QAndA.objects.all()]
-		status = 'success'
-		message = u'成功刪除Q&A'
-		return locals()
-
-@http_response
-def qanda_main(request, template_name='genericUser/qanda_main.html'):
-	if request.method == 'GET':
-		return locals()
-
-@http_response
 def getbookrecord_view(request, username, template_name='genericUser/getbookrecord_view.html'):
 	return locals()
 

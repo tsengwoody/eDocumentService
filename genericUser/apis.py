@@ -164,3 +164,8 @@ class OrganizationViewSet(viewsets.ModelViewSet):
 	queryset = Organization.objects.all()
 	serializer_class = OrganizationSerializer
 	permission_classes = (IsManagerOrReadOnly, )
+
+class BannerContentViewSet(viewsets.ModelViewSet):
+	queryset = BannerContent.objects.all()
+	serializer_class = BannerContentSerializer
+	permission_classes = (IsManagerOrReadOnly, )

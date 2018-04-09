@@ -6,8 +6,6 @@ import json
 import mimetypes
 import os
 
-from genericUser.models import View
-
 def user_category_check(category):
 	def user_category_out(view):
 		def user_category_in(request, *args, **kwargs):
