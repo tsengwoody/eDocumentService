@@ -37,13 +37,20 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 	def perform_update(self, serializer):
 		if self.request.data.has_key('email'):
-			auth_email = (serializer.validated_data['email'] == serializer.instance.email) & serializer.instance.auth_email
+			match_email = serializer.validated_data['email'] == serializer.instance.email
+		if self.request.data.has_key('phone'):
+			match_phone = serializer.validated_data['phone'] == serializer.instance.phone
+
+		if self.request.data.has_key('email'):
+			auth_email = match_email & serializer.instance.auth_email
 			serializer.save(auth_email=auth_email)
-		elif self.request.data.has_key('phone'):
-			auth_phone = (serializer.validated_data['phone'] == serializer.instance.phone) & serializer.instance.auth_phone
+		else:
+			serializer.save()
+
+		if self.request.data.has_key('phone'):
+			auth_phone = match_phone & serializer.instance.auth_phone
 			serializer.save(auth_phone=auth_phone)
 		else:
-			print 'origin'
 			serializer.save()
 
 	def get_fullpath(self, obj, dir, resource):

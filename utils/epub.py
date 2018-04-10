@@ -94,10 +94,9 @@ def txt2epub(src, dst, line_per_chapter=100, **kwargs):
 
 def html2txt(src, dst):
 	content = ''
-	book = epub.read_epub(src)
 
 	for item in src:
-		with io.open(src, 'r', encoding='utf-8') as f:
+		with io.open(item, 'r', encoding='utf-8') as f:
 			src_content = f.read()
 			soup = BeautifulSoup(src_content, 'html5lib')
 			content = content +soup.get_text()

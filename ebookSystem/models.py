@@ -218,7 +218,7 @@ class Book(models.Model):
 			if not os.path.exists(final_dir):
 				os.mkdir(final_dir)
 			try:
-				part_list = [ file.get_clean_file() for file in self.ebook_set.all() ]
+				part_list = [ file.get_clean_file() for file in self.ebook_set.all().order_by('part') ]
 				html2epub(part_list, final_epub, **info)
 				book = epub.read_epub(final_epub)
 				book.set_identifier(user.username)
@@ -242,19 +242,19 @@ class Book(models.Model):
 			'language': 'zh',
 		}
 		if self.status == self.STATUS['final']:
-			final_epub = self.path +'/OCR/{0}.epub'.format(self.ISBN)
+			final_txt = self.path +'/OCR/{0}.epub'.format(self.ISBN)
 			try:
-				epub2txt(final_epub, custom_txt)
+				epub2txt(final_txt, custom_txt)
 			except BaseException as e:
 				raise SystemError('epub create fail:' +unicode(e))
 		else:
 			final_txt = self.path +'/temp/{0}.temp'.format(self.ISBN)
-			final_dir = os.path.dirname(final_epub)
+			final_dir = os.path.dirname(final_txt)
 			if not os.path.exists(final_dir):
 				os.mkdir(final_dir)
 			try:
 				part_list = [ file.get_clean_file() for file in self.ebook_set.all() ]
-				html2txt(part_list, final_txt)
+				html2txt(part_list, custom_txt)
 			except BaseException as e:
 				raise SystemError('epub create fail (not final):' +unicode(e))
 
