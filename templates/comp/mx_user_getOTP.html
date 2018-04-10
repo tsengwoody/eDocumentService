@@ -124,7 +124,10 @@
 			rest_aj_send('post', url, transferData)
 				.done(function(data, textStatus, xhr) {
 					// alertmessage('success', '已驗證完成');
-					alertmessage('success', data['message']);
+					alertmessage('success', data['message'])
+						.done(function () {
+							location.reload(); //重新載入網頁以更新資訊
+						});
 				})
 				.fail(function(data){
 					// alertmessage('error', '請重新確認驗證碼');
@@ -155,7 +158,7 @@
 
 		//autofocus
 		_.delay(function () {
-			$('#id_' +dialog_id +'_password').focus();
+			$('#id_' +dialog_id).focus();
 		}, 500)
 
 	}

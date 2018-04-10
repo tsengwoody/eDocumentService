@@ -7,19 +7,14 @@
 {% endblock %}
 {% block style %}
 {% load staticfiles %}
-<link rel=stylesheet href="{% static 'ebookSystem/css/jquery-confirm.css' %}">  
-<script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
-<script language="javascript" src="{% static 'ebookSystem/js/getOTP.js' %}"></script>
-<script language="javascript" src="{% static 'ebookSystem/js/jquery-confirm.js' %}"></script>
-
 {% endblock %}
+
 {% block content %}
+{% include 'comp/mx_user_password.html' %}
+{% include 'comp/mx_user_getOTP.html' %}
 {% csrf_token %}
 
-
 <script>
-	let voUser;
-	let u_original;
 
 	$(function(){
 		let args = ['first_name', 'last_name', 'email', 'phone', 'birthday', 'education', 'is_book', 'org'];
@@ -28,154 +23,34 @@
 		grid2bstable('s_fackbook');
 		grid2bstable('s_google');
 
-		// $('#birthday').datepicker({
-		// 	format: "yyyy-mm-dd",
-		// 	autoclose: true,
-		// 	todayHighlight: true,
-		// 	language: 'zh-TW'
-		// });	
-
 		//displaydata
 		loaddata(args);
 		let userid = $('div[user_id]').attr('user_id');
 
+		// dialog event 
+		$('#user_update').on('click', function(){
+			usermodel(userid);
+		})
 
-		$(document).on('click', '.save', function(){
-			let new_data = {};
-			let userid = $('div[user_id]').attr('user_id');
+		$('#user_change_password').on('click', function(){
+			user_password(userid);
+		})
 
-			_.each(args, function (v, k) {
-				if (v=='is_book') {
-					if (document.getElementById('is_book').checked) {
-						new_data[v] = true;
-					} else {
-						new_data[v] = false;
-					}
-				} 
-				else if (v=='org') {
-					select_org = $("#org option:selected").html();
-					new_data[v] = org_ui2srv(select_org);
-				}
-				else {
-					new_data[v] = document.getElementById(v).value;
-				}
-				
-			})
-			console.log('new_data');
-			console.log(new_data);
-			let url = '/genericUser/api/users/' + userid + '/';
+		$('#user_permission').on('click', function(){
+			UserPermission(userid);
+		})
 
-			    $.ajax({
-			      url: url,
-			      type: 'PATCH',
-			      data: JSON.stringify(new_data),
-		          headers: {
-		            'x-auth-token': localStorage.accessToken,
-		            "Content-Type": "application/json",
-		          },
-		          dataType: 'json',
-			    })
-			    .done(function(response){
-			  //   	if (new_data['org']==='1') {
-					// 	document.getElementById('org').text = 'eDocumentService';
-					// }  else {
-					// 	document.getElementById('org').text = '其他';
-					// }
-					if (new_data['is_book']==false) {
-						document.getElementById('is_book').checked = false;
-					} 
-			    	window.location.reload(true);
-			    })
-			    .fail(function(response){
-			  		console.log('PATCH fail');
-			    })
-		});
+		$('#user_disabilityCard').on('click', function(){
+			UserDisabilityCard(userid);
+		})
 
-		$(document).on('click', '.password_change', function(){
-			$.confirm({
-			    title: '重設密碼',
-			    columnClass: 'col-md-12',
-			    backgroundDismiss: true,
-      			type: 'blue',
-      			content: '' +
-      			'<div class="form-horizontal">' +
+		$('#email_unverified').on('click', function(){
+			user_getOTP(userid, 'email');
+		})
 
-      			'<div class="form-group"><label class="control-label col-sm-2" for="old_password"><font style="color:red">*</font><span>舊密碼</span></label>\
-      			<div class="col-sm-4">\
-      			<input id="old_password" class="form-control" type="password" maxlength="30">\
-      			</div></div>' +
-
-      			'<div class="form-group"><label class="control-label col-sm-2" for="new_password"><font style="color:red">*</font><span>新密碼</span></label><div class="col-sm-4"><input id="new_password" class="form-control" type="password" maxlength="30"></div><label class="control-label col-sm-5" for="new_password" style="text-align:left;"><font style="color:red">請填寫密碼，需8個字元以上，且需使用英文字母、數字或底線</font></label></div>' +
-
-      			'<div class="form-group"><label class="control-label col-sm-2" for="confirm_password"><font style="color:red">*</font><span>確認密碼</span></label><div class="col-sm-4"><input id="confirm_password" class="form-control" type="password" maxlength="30"></div></div>' 
-      			+ '</div>',
-		
-				buttons: {
-			        sure: {
-			          text: '送出',
-			          btnClass: 'btn-red',
-			          action: function(){
-			            let old_password = $('#old_password').val();
-			            let new_password = $('#new_password').val();
-			            let confirm_password = $('#confirm_password').val();
-			            
-			            let err = '';
-
-			            if(new_password.length<8){
-							err = '密碼需8個字元以上';
-						}
-						else if(new_password.length>150){
-							err = '密碼需150個字元以下';
-						}
-						else{
-							let r1=/^[a-zA-Z0-9_]+$/;
-							if (!r1.test(new_password)){
-								err = '密碼需使用大、小寫英文字母、數字與底線';
-							}
-
-							if (new_password!==confirm_password){
-								err = '密碼與確認密碼不相符';
-							}
-
-						}
-
-						if (err) {
-							err = '<div>輸入錯誤訊息如下：</div>' + err;
-							//alertmessage
-							alertmessage('error', err);
-							return;
-						}
-						
-
-			            $.ajax({
-					      url: "/genericUser/api/users/"+ userid +"/action/set_password/",
-					      type: 'POST',
-					      data: {
-					      	'old_password': old_password,
-					      	'new_password1': new_password,
-					      	'new_password2': confirm_password
-					      	}
-					      })
-					      .done(function(response) {      
-						      alertmessage('success', '更變成功請重新登入')
-						      window.location = "/auth/login/";
-						  })
-						  .fail(function(response) {
-						  	alertmessage('error', '請重新確認密碼是否輸入正確');
-						  });
-					    
-			          }
-			        },
-			        cancel: {
-			          text: '取消',
-			          action: function(){
-			          }
-			        }        
-			      }
-
-	
-			});
-		});
+		$('#phone_unverified').on('click', function(){
+			user_getOTP(userid, 'phone');
+		})
 
 	})
 
@@ -183,120 +58,71 @@
 	function loaddata(args){
 		//userid
 		let userid = $('div[user_id]').attr('user_id');
-
-	    $.ajax({
-	      url: "/genericUser/api/users/" + userid + "/resource/disability_card/front/",
-	      type: 'GET',
-	      
-	    })
-	    .done(function(response) {   
-	    	// binary file -> base 64
-	    	// <img src="smiley.gif" alt="Smiley face" height="42" width="42">
-	      	console.log('success');
-	    })
-	    .fail(function() {
-	      console.log('fail');
-	    });
 		  
-
 		//client
-		$.when(
-			$.ajax({
+		$.ajax({
 		      url: "/genericUser/api/users/" + userid + '/',
 		      type: 'GET',
 
-		    }), 
-
-			// $.ajax({
-		 //      url: "/genericUser/api/users/" + userid + "/resource/disability_card/back/",
-		 //      type: 'GET',
-		 //      dataType: "json"
-
-		 //    })
-
-		)
-			.done(function (d1) {
+		})
+		.done(function (data) {
 				
-				console.log(d1);
-				// console.log(d2);
-				// console.log(d3);
-				// console.log(data);
-				document.getElementById('username').innerHTML = d1['username'];
-				_.each(args, function (v, k) {
-					// console.log(data[v]);
-					if (v=='is_book') {
-						if (d1[v]==true) {
-							document.getElementById(v).innerHTML = '是';
-						} else {
-							document.getElementById(v).innerHTML = '否';
-						}
-						
-					} else if (v=='org') {
-						document.getElementById(v).innerHTML = org_srv2ui(d1[v])
-						// if (data[v]==1) {
-						// 	document.getElementById('org').getElementsByTagName('option')[data[v]].selected = 'selected';
-						// } else {
-						// 	document.getElementById(v).text = '其他';
-						// }
-					} else if (v=='birthday') {
-						document.getElementById(v).innerHTML = d1[v];
-						// turn string to Date object
-						// $("#birthday").datepicker("setDate", moment(data[v]).format('YYYY-MM-DD'));
-					} else if (v=='email') {
-						document.getElementById('email_saved').innerHTML = d1[v];
-						if (!d1['auth_email']) {
-							$(".email_verified").hide();
-						} else {
-							$(".email_unverified").hide();
-						}
-
-					} else if (v=='phone') {
-						document.getElementById('phone_saved').innerHTML = d1[v];
-						if (!d1['auth_phone']) {
-							$(".phone_verified").hide();
-						} else {
-							$(".phone_unverified").hide();
-						}
-
+			document.getElementById('username').innerHTML = data['username'];
+			_.each(args, function (v, k) {
+				// console.log(data[v]);
+				if (v=='is_book') {
+					if (data[v]==true) {
+						document.getElementById(v).innerHTML = '是';
 					} else {
-						document.getElementById(v).innerHTML = d1[v];
+						document.getElementById(v).innerHTML = '否';
 					}
 					
-				})
+				} else if (v=='org') {
+					//從 API 獲取 org 選項, 加以呈現
+					let client = new $.RestClient('/genericUser/api/');
+					client.add('organizations');
+					
+					client.organizations.read()
+						.done(function (org_data) {
+							let org_name = '其他';
+							_.each(org_data,function(v,k){
+								if(data['org'] == v['id']) {
+									org_name = v['name'];
+								}
+							})
+							document.getElementById('org').innerHTML = org_name;
+					})
+					
 
+				} else if (v=='email') {
+					document.getElementById('email_saved').innerHTML = data[v];
+					if (!data['auth_email']) {
+						$("#email_verified").hide();
+					} else {
+						$("#email_unverified").hide();
+					}
 
-			});
+				} else if (v=='phone') {
+					document.getElementById('phone_saved').innerHTML = data[v];
+					if (!data['auth_phone']) {
+						$("#phone_verified").hide();
+					} else {
+						$("#phone_unverified").hide();
+					}
+
+				} else {
+					document.getElementById(v).innerHTML = data[v];
+				}
+				
+			})
+		});
 	}
-
-	function org_srv2ui(org){
-		if(org==1){
-			org='eDocumentService';
-		}
-		else{
-			org='其他';
-		}
-		return org;
-	}
-
-
-	function org_ui2srv(org){
-		if(org=='eDocumentService'){
-			org='1'; //暴力改org
-		}
-		else{
-			org='';
-		}
-		return org;
-	}
-
 
 </script>
 
 
 
-
 <h3 >個人資料</h3>
-
 
 <ul class="nav nav-tabs">
 	<li class="active"><a href="#user_infomation_tab_使用者資訊" name="user_infomation_tab_grp" data-toggle="tab" aria-expanded="true" onclick="pagetab_subtabfix(this);">使用者資訊</a></li>
@@ -316,16 +142,13 @@
 				<div class="col-sm-4">
 					<div class="likebtn" id="username"></div>
 				</div>
-				<label class="control-label col-sm-4" for="username" style="text-align:left;"><font style="color:red">請填寫使用者名稱，需使用小寫英文字母或數字，首字需為小寫英文字母</font></label>
 			</div>
-
 
 			<div class="form-group">
 				<label class="control-label col-sm-2" for="first_name"><font style="color:red">*</font><span>姓氏</span></label>
 				<div class="col-sm-4">
 					<div class="likebtn" id="first_name"></div>
 				</div>
-				<label class="control-label col-sm-4" for="first_name" style="text-align:left;"><font style="color:red">請填寫中文姓氏</font></label>
 			</div>
 
 			<div class="form-group">
@@ -333,9 +156,7 @@
 				<div class="col-sm-4">
 					<div class="likebtn" id="last_name"></div>
 				</div>
-				<label class="control-label col-sm-4" for="last_name" style="text-align:left;"><font style="color:red">請填寫中文名子</font></label>
 			</div>
-
 
 			<div class="form-group">
 				<label class="control-label col-sm-2" for="email"><font style="color:red">*</font><span>電子信箱</span></label>
@@ -345,17 +166,13 @@
 						<div class="form-control" id=email_saved style="box-shadow:none; -webkit-box-shadow:none;"></div>
 
 						<span class="input-group-btn">
-							<button class="btn btn-warning email_unverified" type="button">未驗證</button>
-							<button class="btn btn-success email_verified" type="button" disabled>已驗證</button>
+							<button class="btn btn-warning" id="email_unverified" type="button">未驗證</button>
+							<button class="btn btn-success" id="email_verified" type="button" disabled>已驗證</button>
 						</span>
 
 					</div>
-
-					<!-- <div class="likebtn" id="email"></div> -->
 				</div>
-				<label class="control-label col-sm-4" for="email" style="text-align:left;"><font style="color:red">請填寫電子信箱</font></label>
 			</div>
-
 
 			<div class="form-group">
 				<label class="control-label col-sm-2" for="phone"><font style="color:red">*</font><span>聯絡電話</span></label>
@@ -365,93 +182,62 @@
 						<div class="form-control" id=phone_saved style="box-shadow:none; -webkit-box-shadow:none;"></div>
 
 						<span class="input-group-btn">
-							<button class="btn btn-warning phone_unverified" type="button">未驗證</button>
-							<button class="btn btn-success phone_verified" type="button" disabled>已驗證</button>
+							<button class="btn btn-warning" id="phone_unverified" type="button">未驗證</button>
+							<button class="btn btn-success" id="phone_verified" type="button" disabled>已驗證</button>
 						</span>
-
 					</div>
-
-					<!-- <div class="likebtn" id="phone"></div> -->
 				</div>
-				<label class="control-label col-sm-4" for="phone" style="text-align:left;"><font style="color:red">請填寫手機</font></label>
 			</div>
 
 			<div class="form-group">
 				<label class="control-label col-sm-2" for="birthday"><font style="color:red">*</font><span>生日</span></label>
 				<div class="col-sm-4">
-
 					<div class="likebtn" id="birthday"></div>
 				</div>
-				<label class="control-label col-sm-4" for="birthday" style="text-align:left;"><font style="color:red">請填寫生日，範例日期格式：1989-02-19</font></label>
 			</div>
 
 			<div class="form-group">
 				<label class="control-label col-sm-2" for="education"><font style="color:red">*</font><span>教育程度</span></label>
 				<div class="col-sm-4">
-<!-- 					<select id="education" class="form-control" disabled>
-						<option value="" selected="selected">---------</option>
-						<option value="國小">國小</option>
-						<option value="國中">國中</option>
-						<option value="高中">高中</option>
-						<option value="學士">學士</option>
-						<option value="碩士">碩士</option>
-					</select> -->
 					<div class="likebtn" id="education"></div>
 				</div>
-				<label class="control-label col-sm-4" for="education" style="text-align:left;"><font style="color:red">請選擇教育程度</font></label>
 			</div>
 
 			<div class="form-group">
 				<label class="control-label col-sm-2" for="is_book"><font style="color:red">*</font><span>訂閱訊息</span></label>
 				<div class="col-sm-4">
-					<!-- <input id="is_book" type="checkbox" style="height: 30px; line-height: 30px;" disabled> -->
 					<div class="likebtn" id="is_book"></div>
 				</div>
-				<label class="control-label col-sm-4" for="is_book" style="text-align:left;"><font style="color:red">訂閱訊息</font></label>
 			</div>
 
 			<div class="form-group">
 				<label class="control-label col-sm-2" for="org"><font style="color:red">*</font><span>所屬單位</span></label>
 				<div class="col-sm-4">
-<!-- 					<select id="org" class="form-control" disabled>
-						<option value="">其他</option>
-						<option value="1">eDocumentService</option>
-					</select> -->
 					<div class="likebtn" id="org"></div>
 				</div>
-				<label class="control-label col-sm-4" for="org" style="text-align:left;"><font style="color:red">請選擇所屬單位</font></label>
 			</div>
-
 
 			<div class="form-group">
 				<label class="control-label col-sm-2" for="user_front"><font style="color:red">*</font><span>身心障礙手冊正面</span></label>
 				<div class="col-sm-4">
 					<div><img class="img-thumbnail" id="user_front"></div>
-					<!-- <input ref="inp_front" id="user_front" type="file" accept="image/jpg,image/jpeg"> -->
 				</div>
-				<label class="control-label col-sm-5" for="user_front" style="text-align:left;"><font style="color:red">請上傳身心障礙手冊正面掃描檔</font></label>
 			</div>
 
 			<div class="form-group">
 				<label class="control-label col-sm-2" for="user_back"><font style="color:red">*</font><span>身心障礙手冊反面</span></label>
 				<div class="col-sm-4">
 					<div><img class="img-thumbnail" id="user_back"></div>
-					<!-- <input ref="inp_front" id="user_back" type="file" accept="image/jpg,image/jpeg"> -->
 				</div>
-				<label class="control-label col-sm-5" for="user_back" style="text-align:left;"><font style="color:red">請上傳身心障礙手冊反面掃描檔</font></label>
 			</div>
-
 
 			<div class="form-group">
 				<label class="control-label col-sm-2"></label>
 				<div class="col-sm-7">
-					<!-- <a href="/auth/password_change/" class="btn btn-primary password_change">修改密碼</a> -->
-
-					<input type="button" class="btn btn-primary password_change" value="修改密碼">
-					<input type="button" class="btn btn-primary update" value="變更使用者資訊">
-					<input type="button" class="btn btn-primary permission" value="修改權限">
-					<input type="button" class="btn btn-primary disabilityCard" value="手冊上傳">
-
+					<button type="button" class="btn btn-primary" id="user_update">變更使用者資訊</button>
+					<button type="button" class="btn btn-primary" id="user_change_password">修改密碼</button>
+					<button type="button" class="btn btn-primary" id="user_permission">修改權限</button>
+					<button type="button" class="btn btn-primary" id="user_disabilityCard">上傳手冊</button>
 				</div>
 			</div>
 
