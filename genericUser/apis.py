@@ -1,6 +1,8 @@
 ﻿# coding: utf-8
 
 import json
+import requests
+import urllib
 from rest_framework import filters
 from rest_framework import permissions
 from rest_framework import viewsets
