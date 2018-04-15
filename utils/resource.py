@@ -44,7 +44,10 @@ class Resource(APIView):
 				destination.write(chunk)
 		return Response(status=status.HTTP_202_ACCEPTED)
 
+from django.views.decorators.csrf import csrf_exempt
+
 class ResourceViewSet(Resource):
+
 	@detail_route(
 		methods=['get', 'post'],
 		url_name='resource',

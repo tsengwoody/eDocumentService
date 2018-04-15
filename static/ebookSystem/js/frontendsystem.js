@@ -2515,9 +2515,13 @@ function rest_aj_send(type, url, transferData) {
 			if (xhr.status >= 200 && xhr.status < 300) {
 				let res = {
 					'status': xhr.status,
+					'data': data,
+					'message': '',
 				};
-				if (data.hasOwnProperty('detail')){
-					res['message'] = '伺服器成功操作: ' +xhr.status +' - ' +data['detail']
+				if(!iser(data)){
+					if (data.hasOwnProperty('detail')){
+						res['message'] = '伺服器成功操作: ' +xhr.status +' - ' +data['detail']
+					}
 				}
 				else {
 					res['message'] = '伺服器成功操作: ' +xhr.status +' - '
@@ -2539,4 +2543,93 @@ function rest_aj_send(type, url, transferData) {
 
 	return df;
 
+}
+
+function rest_aj_upload(url, file) {
+	//ajax傳送訊息
+
+	//df
+	let df = GenDF();
+
+	//csrfSafeMethod
+	function csrfSafeMethod(method) {
+		return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method)); // these HTTP methods do not require CSRF protection
 	}
+
+	//sameOrigin
+	function sameOrigin(url) {
+		// test that a given url is a same-origin URL, url could be relative or scheme relative or absolute
+		let host = document.location.host; // host + port
+		let protocol = document.location.protocol;
+		let sr_origin = '//' + host;
+		let origin = protocol + sr_origin;
+		// Allow absolute or scheme relative URLs to same origin
+		return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+			(url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+			// or any other URL that isn't scheme relative or absolute i.e relative.
+			!(/^(\/\/|http:|https:).*/.test(url));
+	}
+
+	//FormData
+	let formData = new FormData();
+	formData.append('object', file);
+
+	//ajax
+	$.ajax({
+		url: url,
+		type: 'POST',
+		data: formData,
+		cache: false,
+		processData: false,
+		contentType: false,
+		beforeSend: function (jqXHR, settings) {
+			if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+				let g = aj_getcsrf();
+				jqXHR.setRequestHeader('X-CSRFToken', g.csrf);
+				jqXHR.setRequestHeader('X-Requested-With', g.XMLHttpRequest)
+			}
+		},
+		'error': function (xhr) {
+
+			//reject
+			let res = {
+				'status': xhr.status,
+				'message': '伺服器錯誤回應: ' +xhr.status +' - ' +xhr.responseText,
+				'data': '',
+			};
+
+			df.reject(res);
+
+		},
+		success: function(data, textStatus, xhr) {
+			if (xhr.status >= 200 && xhr.status < 300) {
+				let res = {
+					'status': xhr.status,
+					'message': '',
+					'data': data,
+				};
+				if (data.hasOwnProperty('detail')){
+					res['message'] = '伺服器成功操作: ' +xhr.status +' - ' +data['detail']
+				}
+				else {
+					res['message'] = '伺服器成功操作: ' +xhr.status +' - '
+				}
+
+				df.resolve(res);
+			}
+			else {
+				//reject
+				let res = {
+					'status': 'error',
+					'message': o2j(data),
+					'data': o2j(data),
+				};
+
+				df.reject(res);
+			}
+		}
+	})
+
+	return df;
+
+}

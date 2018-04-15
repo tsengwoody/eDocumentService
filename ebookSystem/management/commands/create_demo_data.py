@@ -366,8 +366,46 @@ class Command(BaseCommand):
 
 		QAndA.objects.create(question='<p>question 1</p>', answer='<p>answer 1</p>', order=0)
 		QAndA.objects.create(question='<p>question 2</p>', answer='<p>answer 2</p>', order=0)
-		BannerContent.objects.create(title='title 1', content='content 1', order=0)
-		BannerContent.objects.create(title='title 2', content='content 2', order=1)
+		BannerContent.objects.create(
+			title='我看不見書，但我想閱讀 - 雲端千眼',
+			content='''
+*	雲端千眼：我看不見書，但我想閱讀
+	*	生活裡沒有書籍，就好像大地沒有陽光；智慧裡沒有書籍，就好像鳥兒沒有翅膀。
+	*	我看不見書，但是我想閱讀。
+	*	給視障者真正的閱讀權，需要各位加入共同參與，不限時地，只需透過網路，成為視障者雲端的眼。
+	*	群眾參與，積砂成塔，邀請志工，期待你的加入。'''
+			,
+			order=0,
+		)
+		BannerContent.objects.create(
+			title='我們可能無法做偉大的事，但可以用偉大的愛做小事 - 招募志工',
+			content='''
+*	加入我們：招募志工
+	*	我們可能無法做偉大的事，但可以用偉大的愛做小事。
+	*	We Want You, Apply Now.'''
+			,
+			order=1,
+		)
+
+		client = Client()
+		client.login(username='root', password='eds@2018')
+		with open('temp/cover1.jpg') as file:
+			response = client.post(
+				'/genericUser/api/bannercontents/1/resource/cover/image/',
+				{
+					'object': file,
+				},
+				HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+			)
+
+		with open('temp/cover2.jpg') as file:
+			response = client.post(
+				'/genericUser/api/bannercontents/2/resource/cover/image/',
+				{
+					'object': file,
+				},
+				HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+			)
 
 		client = Client()
 		client.login(username='root', password='eds@2018')

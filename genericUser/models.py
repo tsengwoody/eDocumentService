@@ -267,5 +267,9 @@ class BannerContent(models.Model):
 	content = models.TextField()
 	order = models.IntegerField()
 
+	def __init__(self, *args, **kwargs):
+		super(BannerContent, self).__init__(*args, **kwargs)
+		self.cover_image = BASE_DIR +'/file/genericUser/BannerContent/{0}/cover/image.jpg'.format(self.id)
+
 	def __unicode__(self):
-		return self.id
+		return unicode(self.id)

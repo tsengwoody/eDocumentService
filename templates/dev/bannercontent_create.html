@@ -1,0 +1,190 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+BannerContent 新增
+{% endblock %}
+{% block content %}
+
+<script>
+
+	Vue.options.delimiters = ['{|{', '}|}'];
+	let vo_bannercontent;
+
+	$(function(){
+
+		//client
+		let client = new $.RestClient('/genericUser/api/');
+		client.add('bannercontents');
+
+		//opt
+		let opt={
+			el: '#id_bannercontent_create',
+			data: {
+				'items': [],
+				'index': -1,
+				'temp': {
+					'id': '',
+					'title': '',
+					'content': '',
+					'order': '',
+				},
+			},
+			computed: {
+				url: function(){
+					u = '/genericUser/api/bannercontents/'
+					if(this.temp.id!=''){
+						u += this.temp.id +'/'
+					}
+					return u
+				},
+			},
+			methods: {
+				upload: function(){
+					let vo = this; //this 在.done內會被復蓋
+
+					let url_resource = '/genericUser/api/bannercontents/' +vo.id +'/resource/cover/image/'
+					let fileCover = document.getElementById('id_cover');
+
+					rest_aj_upload(url_resource, fileCover.files[0])
+					.done(function(data) {
+						alertmessage('success', data['message'] +'已新增')
+						vo.clear()
+					})
+					.fail(function(data){
+						alertmessage('error', data['message'])
+					})
+
+				},
+				list: function () {
+
+					let vo = this
+
+					let client = new $.RestClient('/genericUser/api/');
+					client.add('bannercontents');
+
+					client.bannercontents.read()
+						.done(function (data, textStatus, xhrObject) {
+							vo.items = data
+						})
+				},
+				create: function () {
+					let vo = this
+					transferData = {
+						'title': this.temp.title,
+						'content': this.temp.content,
+					}
+
+					//url
+					let url = '/genericUser/api/bannercontents/'
+
+					//create
+					rest_aj_send('post', url, transferData)
+					.done(function(data, textStatus, xhr) {
+						vo.id = data['data'].id
+						vo.upload()
+						vo.list()
+					})
+					.fail(function(data){
+						alertmessage('error', data['message'])
+					})
+				},
+				read: function (index) {
+					this.index = index
+					if(index==-1){
+						this.clear()
+					}
+					else{
+						this.temp = this.items[index]
+					}
+				},
+				update: function () {
+					rest_aj_send('patch', this.url, this.temp)
+						.done(function (data, textStatus, xhrObject) {
+							alertmessage('success', data['message'] +'已更新')
+						})
+						.fail(function(data){
+							alertmessage('error', data['message'])
+						})
+				},
+				del: function(){
+					let vo=this
+					rest_aj_send('delete', this.url, {})
+						.done(function (data){
+							vo.list()
+							alertmessage('success', '已刪除')
+						})
+						.fail(function(data){
+							alertmessage('error', data['message'])
+						})
+				},
+				clear: function () {
+					this.temp.id = ''
+					this.temp.title = ''
+					this.temp.content = ''
+					this.temp.order = ''
+				},
+			},
+		};
+
+		//vo
+		vo_bannercontent = new Vue(opt);
+
+		vo_bannercontent.list()
+
+		//client list
+		client.bannercontents.read()
+			.done(function (data, textStatus, xhrObject) {
+				//vo_bannercontent.items = data
+			})
+
+	})
+
+</script>
+{% csrf_token %}
+
+<h3>BannerContent 新增</h3>
+<div id="id_bannercontent_create">
+	<div>
+		<a
+			v-on:click="read(-1)"
+			href='#'
+		>新增</a>
+		<a 
+			v-for="(item, index) in items"
+			v-on:click="read(index)"
+			href='#'
+		>{|{ item.title }|}</a>
+	</div>
+	<div>
+		摘要文字
+		{|{ temp.title }|}
+		詳細說明
+		{|{ temp.content }|}
+		圖片內容
+		<img
+			v-if="index!=-1"
+			v-bind:alt="temp.title"
+			v-bind:src="url +`resource/cover/image/`"
+		>
+	</div>
+	<div>
+		<div>
+			摘要文字
+			<input id="id_title" v-model="temp.title" placeholder="title">
+			詳細說明
+			<textarea id="id_content" v-model="temp.content" placeholder="content"></textarea>
+			圖片內容
+			<img
+				v-if="index!=-1"
+				v-bind:alt="temp.title"
+				v-bind:src="url +`resource/cover/image/`"
+			>
+			<input type="file" id="id_cover" name="cover"/>
+		</div>
+		<div>
+			<button v-if="index==-1" v-on:click="create()">新增</button>
+			<button v-else v-on:click="update()">更新</button>
+			<button v-if="index!=-1" v-on:click="del()">刪除</button>
+		</div>
+	</div>
+</div>
+{% endblock %}

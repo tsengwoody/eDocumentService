@@ -174,7 +174,20 @@ class OrganizationViewSet(viewsets.ModelViewSet):
 	serializer_class = OrganizationSerializer
 	permission_classes = (IsManagerOrReadOnly, )
 
-class BannerContentViewSet(viewsets.ModelViewSet):
+class BannerContentViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = BannerContent.objects.all()
 	serializer_class = BannerContentSerializer
 	permission_classes = (IsManagerOrReadOnly, )
+
+	def perform_create(self, serializer):
+		instance = serializer.save(
+			order = len(BannerContent.objects.all()),
+		)
+		instance.save()
+
+	def get_fullpath(self, obj, dir, resource):
+		fullpath = None
+		if dir == 'cover':
+			if resource == 'image':
+				fullpath = obj.cover_image
+		return fullpath
