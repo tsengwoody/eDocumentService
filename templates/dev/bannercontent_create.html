@@ -19,6 +19,7 @@ BannerContent 新增
 		let opt={
 			el: '#id_bannercontent_create',
 			data: {
+				'mode': 'write', //read or write
 				'items': [],
 				'index': -1,
 				'temp': {
@@ -31,7 +32,7 @@ BannerContent 新增
 			computed: {
 				url: function(){
 					u = '/genericUser/api/bannercontents/'
-					if(this.temp.id!=''){
+					if(this.index!=-1){
 						u += this.temp.id +'/'
 					}
 					return u
@@ -39,18 +40,23 @@ BannerContent 新增
 			},
 			methods: {
 				upload: function(){
-					let vo = this; //this 在.done內會被復蓋
 
-					let url_resource = '/genericUser/api/bannercontents/' +vo.id +'/resource/cover/image/'
 					let fileCover = document.getElementById('id_cover');
+					fileObject = fileCover.files[0]
+					if(iser(fileObject)){
+
+					}
+
+					let vo = this; //this 在.done內會被復蓋
+					let url_resource = '/genericUser/api/bannercontents/' +vo.id +'/resource/cover/image/'
 
 					rest_aj_upload(url_resource, fileCover.files[0])
 					.done(function(data) {
-						alertmessage('success', data['message'] +'已新增')
+						alertmessage('success', '成功更新資料(檔案)' +data['message'])
 						vo.clear()
 					})
 					.fail(function(data){
-						alertmessage('error', data['message'])
+						alertmessage('error', '失敗更新資料(檔案)' +data['message'])
 					})
 
 				},
@@ -64,51 +70,69 @@ BannerContent 新增
 					client.bannercontents.read()
 						.done(function (data, textStatus, xhrObject) {
 							vo.items = data
+							vo.read(vo.index)
 						})
 				},
 				create: function () {
+
 					let vo = this
 					transferData = {
 						'title': this.temp.title,
 						'content': this.temp.content,
 					}
 
-					//url
-					let url = '/genericUser/api/bannercontents/'
-
 					//create
-					rest_aj_send('post', url, transferData)
-					.done(function(data, textStatus, xhr) {
-						vo.id = data['data'].id
-						vo.upload()
-						vo.list()
-					})
-					.fail(function(data){
-						alertmessage('error', data['message'])
-					})
-				},
-				read: function (index) {
-					this.index = index
-					if(index==-1){
-						this.clear()
-					}
-					else{
-						this.temp = this.items[index]
-					}
-				},
-				update: function () {
-					rest_aj_send('patch', this.url, this.temp)
-						.done(function (data, textStatus, xhrObject) {
-							alertmessage('success', data['message'] +'已更新')
+					rest_aj_send('post', this.url, this.temp)
+						.done(function(data) {
+							vo.id = data['data'].id
+							vo.upload()
+							vo.list()
 						})
 						.fail(function(data){
 							alertmessage('error', data['message'])
 						})
+
+				},
+				read: function (index) {
+					this.index = index
+					if(index==-1){
+						this.mode = 'write'
+						this.clear()
+					}
+					else{
+						this.mode = 'read'
+						this.temp = this.items[index]
+					}
+				},
+				update: function () {
+
+					let vo = this
+
+					rest_aj_send('patch', this.url, this.temp)
+						.done(function (data) {
+							let fileCover = document.getElementById('id_cover');
+							fileObject = fileCover.files[0]
+							if(!iser(fileObject)){
+								vo.id = data['data'].id
+								vo.upload()
+							}
+							else {
+								alertmessage('success', '成功更新資料' +data['message'])
+							}
+							vo.list()
+						})
+						.fail(function(data){
+							alertmessage('error', data['message'])
+						})
+
 				},
 				del: function(){
+
 					let vo=this
+
 					rest_aj_send('delete', this.url, {})
 						.done(function (data){
+							vo.clear()
 							vo.list()
 							alertmessage('success', '已刪除')
 						})
@@ -117,10 +141,17 @@ BannerContent 新增
 						})
 				},
 				clear: function () {
-					this.temp.id = ''
-					this.temp.title = ''
-					this.temp.content = ''
-					this.temp.order = ''
+					this.index = -1
+					this.temp = {
+						'id': -1,
+						'title': '',
+						'content': '',
+						'order': -1,
+					}
+				},
+				change_mode: function () {
+					if(this.mode=='read'){ this.mode = 'write' }
+					else if(this.mode=='write'){ this.mode = 'read' }
 				},
 			},
 		};
@@ -152,9 +183,15 @@ BannerContent 新增
 			v-for="(item, index) in items"
 			v-on:click="read(index)"
 			href='#'
-		>{|{ item.title }|}</a>
+		>{|{ index+1 }|}. {|{ item.title }|}</a>
 	</div>
-	<div>
+
+	<div v-if="index!=-1">
+		<button v-if="mode=='read'" v-on:click="change_mode">編輯</button>
+		<button v-if="mode=='write'" v-on:click="change_mode">檢視</button>
+	</div>
+
+	<div v-if="mode=='read'">
 		摘要文字
 		{|{ temp.title }|}
 		詳細說明
@@ -166,7 +203,7 @@ BannerContent 新增
 			v-bind:src="url +`resource/cover/image/`"
 		>
 	</div>
-	<div>
+	<div v-if="mode=='write'">
 		<div>
 			摘要文字
 			<input id="id_title" v-model="temp.title" placeholder="title">

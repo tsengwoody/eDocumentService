@@ -42,6 +42,8 @@ class AnnouncementSerializer(serializers.ModelSerializer):
 		fields = ('__all__')
 
 class QAndASerializer(serializers.ModelSerializer):
+	order = serializers.ReadOnlyField()
+
 	class Meta:
 		model = QAndA
 		fields = ('__all__')

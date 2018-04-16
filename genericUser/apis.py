@@ -169,6 +169,12 @@ class QAndAViewSet(viewsets.ModelViewSet):
 	serializer_class = QAndASerializer
 	permission_classes = (IsManagerOrReadOnly, )
 
+	def perform_create(self, serializer):
+		instance = serializer.save(
+			order = len(QAndA.objects.all()),
+		)
+		instance.save()
+
 class OrganizationViewSet(viewsets.ModelViewSet):
 	queryset = Organization.objects.all()
 	serializer_class = OrganizationSerializer

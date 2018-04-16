@@ -256,7 +256,7 @@ class QAndA(models.Model):
 	order = models.IntegerField()
 
 	def __unicode__(self):
-		return self.id
+		return unicode(self.id)
 
 class BusinessContent(models.Model):
 	name = models.CharField(max_length=100, )
