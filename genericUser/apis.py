@@ -24,7 +24,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
 	#permission_classes = (UserDataPermission, )
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter,)
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, UserRoleFilter,)
 	ordering_fields = ('username',)
 	search_fields = ('username', 'email',)
 

@@ -153,6 +153,11 @@ BannerContent 新增
 					if(this.mode=='read'){ this.mode = 'write' }
 					else if(this.mode=='write'){ this.mode = 'read' }
 				},
+				markdown2html: function (text) {
+					var converter = new showdown.Converter()
+					html      = converter.makeHtml(text)
+					return html
+				},
 			},
 		};
 
@@ -225,7 +230,7 @@ BannerContent 新增
 			<br>
 
 			<p class="h5"><strong>詳細說明</strong></p>
-			<p>{|{ temp.content }|}</p>
+			<p v-html="markdown2html(temp.content)"></p>
 		</div>
 		<div v-if="mode=='write'">
 			<form>

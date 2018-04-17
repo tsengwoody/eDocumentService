@@ -12,6 +12,7 @@
 		//任意關鍵字搜尋
 
 		//query
+		let role=$('#id_role').val();
 		let query=$('#search_value').val();
 
 		//client
@@ -19,7 +20,7 @@
 		client.add('users');
 
 		//read
-		client.users.read({'search': query})
+		client.users.read({'search': query, 'role': role})
 		.done(function(d){
 
 			//alertmessage
@@ -79,6 +80,11 @@
 	<div id="usermanager_tab_查詢" class="tab-pane active">
 		<div class="form-inline" style="margin-bottom:20px;">
 			<span>關鍵字查詢：</span>
+			<select id="id_role">
+				<option value="all">全部</option>
+				<option value="editor">志工</option>
+				<option value="guest">視障者</option>
+			</select>
 			<input id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊">
 			<button class="btn btn-primary" type="button" onclick="UserSearch();">搜尋</button>
 		</div>

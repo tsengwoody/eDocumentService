@@ -45,3 +45,16 @@ class UserSelfOrManagerFilter(filters.BaseFilterBackend):
 			return queryset
 		else:
 			return queryset.filter(id=request.user.id)
+
+class UserRoleFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		role = request.query_params.get('role')
+		if role:
+			if role == 'guest':
+				return queryset.filter(is_guest=True)
+			elif role == 'editor':
+				return queryset.filter(is_editor=True)
+			elif role == 'all':
+				return queryset
+		else:
+			return queryset
