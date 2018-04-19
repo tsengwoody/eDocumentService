@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 
 // let comploader={}; //全域組件載入紀錄
