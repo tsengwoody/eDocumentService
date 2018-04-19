@@ -27,6 +27,11 @@ import requests
 import urllib, urllib2
 
 @http_response
+def generics(request, name):
+	template_name='genericUser/{0}.html'.format(name)
+	return locals()
+
+@http_response
 def refactor(request, name):
 	template_name = 'genericUser/refactor/{0}.html'.format(name)
 	model = name.split('-')[0]

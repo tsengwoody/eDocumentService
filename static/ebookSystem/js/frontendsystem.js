@@ -1316,31 +1316,30 @@ function aj_getcsrf() {
 	};
 }
 
+//sameOrigin
+function sameOrigin(url) {
+	// test that a given url is a same-origin URL, url could be relative or scheme relative or absolute
+	let host = document.location.host; // host + port
+	let protocol = document.location.protocol;
+	let sr_origin = '//' + host;
+	let origin = protocol + sr_origin;
+	// Allow absolute or scheme relative URLs to same origin
+	return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+		(url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+		// or any other URL that isn't scheme relative or absolute i.e relative.
+		!(/^(\/\/|http:|https:).*/.test(url));
+}
+
+//csrfSafeMethod
+function csrfSafeMethod(method) {
+	return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method)); // these HTTP methods do not require CSRF protection
+}
 
 function aj_send(type, url, transferData) {
 	//ajax傳送訊息
 
 	//df
 	let df = GenDF();
-
-	//csrfSafeMethod
-	function csrfSafeMethod(method) {
-		return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method)); // these HTTP methods do not require CSRF protection
-	}
-
-	//sameOrigin
-	function sameOrigin(url) {
-		// test that a given url is a same-origin URL, url could be relative or scheme relative or absolute
-		let host = document.location.host; // host + port
-		let protocol = document.location.protocol;
-		let sr_origin = '//' + host;
-		let origin = protocol + sr_origin;
-		// Allow absolute or scheme relative URLs to same origin
-		return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
-			(url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
-			// or any other URL that isn't scheme relative or absolute i.e relative.
-			!(/^(\/\/|http:|https:).*/.test(url));
-	}
 
 	//ajax
 	$.ajax({
@@ -1399,7 +1398,6 @@ function aj_send(type, url, transferData) {
 	return df;
 }
 
-
 function aj_disposition(xhr) {
 	//由 Content-Disposition 取得 filename
 
@@ -1414,7 +1412,6 @@ function aj_disposition(xhr) {
 	}
 	return filename;
 }
-
 
 function aj_text(url, transferData) {
 	//ajax下載text檔案
@@ -1580,7 +1577,6 @@ function aj_booklist_dict(key2head, k) {
 
 }
 
-
 function aj_booklist_dict_array(ar, key2head) {
 	//書籍中英鍵值物件轉換
 
@@ -1600,7 +1596,6 @@ function aj_booklist_dict_array(ar, key2head) {
 
 	return r;
 }
-
 
 function aj_booklist(query_type, query_value) {
 	//API使用book_list查找書籍資訊
@@ -1653,7 +1648,6 @@ function aj_booklist(query_type, query_value) {
 
 	return df;
 }
-
 
 function aj_isbnnet_ISBN(ISBN) {
 	//使用book_info API
@@ -1709,13 +1703,11 @@ function aj_isbnnet_ISBN(ISBN) {
 	return df;
 }
 
-
 function aj_isbnnet(transferData) {
 	//查找[全國新書資訊網]書籍資訊
 
 	return aj_querybooklist('NCL', transferData);
 }
-
 
 function aj_douban(value) {
 	//用value查找[豆瓣]書籍資訊
@@ -1725,7 +1717,6 @@ function aj_douban(value) {
 	};
 	return aj_querybooklist('douban', transferData);
 }
-
 
 function aj_isbnnetanddouban_ISBN(ISBN) {
 	//用ISBN查找[全國新書資訊網]與[豆瓣]書籍資訊
@@ -1799,7 +1790,6 @@ function aj_isbnnetanddouban_ISBN(ISBN) {
 
 	return df;
 }
-
 
 function aj_isbnnetanddouban(value) {
 	//用value查找[全國新書資訊網]與[豆瓣]書籍資訊
@@ -2449,6 +2439,7 @@ $(function () {
 		})
 
 })
+
 function getorg(id) {
 	//兌換單位
 
@@ -2466,25 +2457,6 @@ function rest_aj_send(type, url, transferData) {
 
 	//df
 	let df = GenDF();
-
-	//csrfSafeMethod
-	function csrfSafeMethod(method) {
-		return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method)); // these HTTP methods do not require CSRF protection
-	}
-
-	//sameOrigin
-	function sameOrigin(url) {
-		// test that a given url is a same-origin URL, url could be relative or scheme relative or absolute
-		let host = document.location.host; // host + port
-		let protocol = document.location.protocol;
-		let sr_origin = '//' + host;
-		let origin = protocol + sr_origin;
-		// Allow absolute or scheme relative URLs to same origin
-		return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
-			(url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
-			// or any other URL that isn't scheme relative or absolute i.e relative.
-			!(/^(\/\/|http:|https:).*/.test(url));
-	}
 
 	//ajax
 	$.ajax({
@@ -2550,25 +2522,6 @@ function rest_aj_upload(url, file) {
 
 	//df
 	let df = GenDF();
-
-	//csrfSafeMethod
-	function csrfSafeMethod(method) {
-		return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method)); // these HTTP methods do not require CSRF protection
-	}
-
-	//sameOrigin
-	function sameOrigin(url) {
-		// test that a given url is a same-origin URL, url could be relative or scheme relative or absolute
-		let host = document.location.host; // host + port
-		let protocol = document.location.protocol;
-		let sr_origin = '//' + host;
-		let origin = protocol + sr_origin;
-		// Allow absolute or scheme relative URLs to same origin
-		return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
-			(url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
-			// or any other URL that isn't scheme relative or absolute i.e relative.
-			!(/^(\/\/|http:|https:).*/.test(url));
-	}
 
 	//FormData
 	let formData = new FormData();

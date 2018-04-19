@@ -54,6 +54,7 @@ urlpatterns = [
 	url(r'^announcement_delete/(?P<pk>[0-9]+)/$', views.announcement_delete, name='announcement_delete'),
 	url(r'^announcement_list$', views.announcement_list, name='announcement_list'),
 	url(r'^announcement/(?P<ID>[0-9]+)/$', views.announcement, name='announcement'),
+	url(r'^generics/(?P<name>[\w\d]+)/$', views.generics, name='generics'),
 	url(r'^api/', include(api_urlpatterns, namespace='api')),
 	url(r'^resource/', include(resource_urlpatterns, namespace='resource')),
 	url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),

@@ -6,6 +6,7 @@ from django.db import models
 from django.utils import timezone
 from mysite.settings import BASE_DIR
 import os
+import shutil
 import datetime
 
 def generic_serialized(self):
@@ -273,3 +274,11 @@ class BannerContent(models.Model):
 
 	def __unicode__(self):
 		return unicode(self.id)
+
+	def delete(self, *args, **kwargs):
+		try:
+			path = os.path.dirname(os.path.dirname(self.cover_image))
+			shutil.rmtree(path)
+		except:
+			pass
+		super(BannerContent, self).delete(*args, **kwargs)

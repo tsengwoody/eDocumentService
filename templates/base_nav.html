@@ -27,6 +27,7 @@
 						{% if request.user.is_manager %}
 						<li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
 						<li><a href="{% url 'manager:event_list' 'user' %}">審核會員</a></li>
+						<li><a href="{% url 'genericUser:generics' 'bannercontent_create' %}">管理首頁 Banner</a></li>
 						<li><a href="{% url 'manager:statistics' %}">統計資訊</a></li>
 						<li><a href="{% url 'ebookSystem:message_send' %}">訊息傳送</a></li>
 						<li><a href="{% url 'genericUser:announcement_create' %}">公告發佈</a></li>
