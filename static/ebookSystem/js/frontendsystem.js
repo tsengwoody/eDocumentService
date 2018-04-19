@@ -1,125 +1,125 @@
-'use strict';
+﻿'use strict';
 
 
 // let comploader={}; //全域組件載入紀錄
 
 
 // function inicomp(name){
-//     //初始化組件
-//     let df = GenDF();
+//	 //初始化組件
+//	 let df = GenDF();
 
-//     //infor
-//     let o=inicomp_getinfor(name);
+//	 //infor
+//	 let o=inicomp_getinfor(name);
 
-//     //pre
-//     let dfs=[];
-//     if(o['pre'].length>0){
-//         for(let c of o['pre']){
-//             let s=inicomp(c);
-//             dfs.push(s);
-//         }
-//     }
+//	 //pre
+//	 let dfs=[];
+//	 if(o['pre'].length>0){
+//		 for(let c of o['pre']){
+//			 let s=inicomp(c);
+//			 dfs.push(s);
+//		 }
+//	 }
 
-//     //each
-//     Promise.all(dfs)
-//     .then(function(){
+//	 //each
+//	 Promise.all(dfs)
+//	 .then(function(){
 
-//         //core
-//         return inicomp_load(name);
+//		 //core
+//		 return inicomp_load(name);
 
-//     })
-//     .then(function(){
-//         df.resolve();
-//     })
+//	 })
+//	 .then(function(){
+//		 df.resolve();
+//	 })
 
-//     return df;
+//	 return df;
 // }
 
 
 // function inicomp_load(name){
-//     //載入組件
-//     let df = GenDF();
+//	 //載入組件
+//	 let df = GenDF();
 
-//     if(haskey(comploader,name)){
-//         df.resolve();
-//     }
-//     else{
-//         let o=inicomp_getinfor(name);
-//         let timetag='?'+Date.now();
+//	 if(haskey(comploader,name)){
+//		 df.resolve();
+//	 }
+//	 else{
+//		 let o=inicomp_getinfor(name);
+//		 let timetag='?'+Date.now();
 
-//         if(o['type']==='js'){
-//             $.getScript(o['url']+timetag)
-//             .done(function(){
-//                 console.log('load: '+name+'['+o['type']+']')
+//		 if(o['type']==='js'){
+//			 $.getScript(o['url']+timetag)
+//			 .done(function(){
+//				 console.log('load: '+name+'['+o['type']+']')
 
-//                 //true
-//                 comploader[name]=true;
+//				 //true
+//				 comploader[name]=true;
 
-//                 df.resolve();
-//             })
-//         }
-//         else if(o['type']==='html'){
-//             $.get(o['url']+timetag)
-//             .done(function(h){
-//                 console.log('load: '+name+'['+o['type']+']')
+//				 df.resolve();
+//			 })
+//		 }
+//		 else if(o['type']==='html'){
+//			 $.get(o['url']+timetag)
+//			 .done(function(h){
+//				 console.log('load: '+name+'['+o['type']+']')
 
-//                 //append
-//                 $('body').append(h);
+//				 //append
+//				 $('body').append(h);
 
-//                 //true
-//                 comploader[name]=true;
+//				 //true
+//				 comploader[name]=true;
 
-//                 df.resolve();
-//             })
-//         }
+//				 df.resolve();
+//			 })
+//		 }
 
-//     }
+//	 }
 
-//     return df;
+//	 return df;
 // }
 
 
 // function inicomp_getinfor(name){
-//     //取得組件資訊
+//	 //取得組件資訊
 
-//     let o;
-//     if(name==='tinymce'){
-//         o={
-//             'url':'https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.6.6/tinymce.min.js',
-//             'type':'js',
-//             'pre':[]
-//         }
-//     }
-//     else if(name==='wiriseditor'){
-//         o={
-//             'url':'/static/ebookSystem/js/wiriseditor/wiriseditor.js',
-//             'type':'js',
-//             'pre':[]
-//         }
-//     }
-//     else if(name==='mathjax'){
-//         o={
-//             'url':'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG', //總套件62.9mb太大，直接用cdn
-//             'type':'js',
-//             'pre':[]
-//         }
-//     }
-//     else if(name==='mxeditor'){
-//         o={
-//             'url':'/static/ebookSystem/comp/mxeditor.html',
-//             'type':'html',
-//             'pre':['tinymce','wiriseditor','mathjax']
-//         }
-//     }
-//     else if(name==='mxdownloadbook'){
-//         o={
-//             'url':'/static/ebookSystem/comp/mxdownloadbook.html',
-//             'type':'html',
-//             'pre':[]
-//         }
-//     }
+//	 let o;
+//	 if(name==='tinymce'){
+//		 o={
+//			 'url':'https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.6.6/tinymce.min.js',
+//			 'type':'js',
+//			 'pre':[]
+//		 }
+//	 }
+//	 else if(name==='wiriseditor'){
+//		 o={
+//			 'url':'/static/ebookSystem/js/wiriseditor/wiriseditor.js',
+//			 'type':'js',
+//			 'pre':[]
+//		 }
+//	 }
+//	 else if(name==='mathjax'){
+//		 o={
+//			 'url':'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG', //總套件62.9mb太大，直接用cdn
+//			 'type':'js',
+//			 'pre':[]
+//		 }
+//	 }
+//	 else if(name==='mxeditor'){
+//		 o={
+//			 'url':'/static/ebookSystem/comp/mxeditor.html',
+//			 'type':'html',
+//			 'pre':['tinymce','wiriseditor','mathjax']
+//		 }
+//	 }
+//	 else if(name==='mxdownloadbook'){
+//		 o={
+//			 'url':'/static/ebookSystem/comp/mxdownloadbook.html',
+//			 'type':'html',
+//			 'pre':[]
+//		 }
+//	 }
 
-//     return o;
+//	 return o;
 // }
 
 
@@ -1888,15 +1888,15 @@ function aj_querybooklist(source, transferData) {
 
 	//transferData
 	// let transferData={
-	//     'FO_SchRe1ation0':'Null',
-	//     'FO_SearchField0':'Title',
-	//     'FO_SearchValue0':'新手媽媽',
-	//     'FO_SchRe1ation1':'AND',
-	//     'FO_SearchField1':'',
-	//     'FO_SearchValue1':'',
-	//     'FO_SchRe1ation2':'AND',
-	//     'FO_SearchField2':'',
-	//     'FO_SearchValue2':'',
+	//	 'FO_SchRe1ation0':'Null',
+	//	 'FO_SearchField0':'Title',
+	//	 'FO_SearchValue0':'新手媽媽',
+	//	 'FO_SchRe1ation1':'AND',
+	//	 'FO_SearchField1':'',
+	//	 'FO_SearchValue1':'',
+	//	 'FO_SchRe1ation2':'AND',
+	//	 'FO_SearchField2':'',
+	//	 'FO_SearchValue2':'',
 	// };
 	transferData['source'] = source;
 
@@ -2527,6 +2527,12 @@ function rest_aj_upload(url, file) {
 	let formData = new FormData();
 	formData.append('object', file);
 
+	//gen uuid
+	let uuid=gen_uuid();
+
+
+	let refreshIntervalId="";
+
 	//ajax
 	$.ajax({
 		url: url,
@@ -2535,14 +2541,24 @@ function rest_aj_upload(url, file) {
 		cache: false,
 		processData: false,
 		contentType: false,
+		headers: { 'X-Progress-ID': uuid },
 		beforeSend: function (jqXHR, settings) {
 			if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
 				let g = aj_getcsrf();
 				jqXHR.setRequestHeader('X-CSRFToken', g.csrf);
 				jqXHR.setRequestHeader('X-Requested-With', g.XMLHttpRequest)
 			}
+
+			//show progress bar
+			$('#pleaseWaitDialog').modal('show');
+
 		},
 		'error': function (xhr) {
+
+			//hide progress bar
+			$('#pleaseWaitDialog').modal('hide');
+			if(refreshIntervalId!="")
+				clearInterval(refreshIntervalId);
 
 			//reject
 			let res = {
@@ -2555,6 +2571,12 @@ function rest_aj_upload(url, file) {
 
 		},
 		success: function(data, textStatus, xhr) {
+
+			//hide progress bar
+			$('#pleaseWaitDialog').modal('hide');
+			if(refreshIntervalId!="")
+				clearInterval(refreshIntervalId);
+
 			if (xhr.status >= 200 && xhr.status < 300) {
 				let res = {
 					'status': xhr.status,
@@ -2583,6 +2605,32 @@ function rest_aj_upload(url, file) {
 		}
 	})
 
+	showProgress(uuid)
+	refreshIntervalId=setInterval(function() {
+		showProgress(uuid);
+	},1000);
+
 	return df;
 
+}
+
+function gen_uuid() {
+	var uuid = ""
+	for (var i=0; i < 32; i++) {
+		uuid += Math.floor(Math.random() * 16).toString(16); 
+	}
+	return uuid
+}
+
+function showProgress(uuid) {
+	$.getJSON('/genericUser/upload_progress', {'X-Progress-ID': uuid},function(data,status,xhr){
+		if(data){
+			var progress =parseInt((parseInt(data.uploaded) / parseInt(data.length))*100);
+			//console.log(progress);
+			$('#uploadProgressBar').css('width', progress+'%').attr('aria-valuenow', progress);
+			$('#uploadProgressText').text(progress+'% Complete (success)');
+		}else{
+			return;
+		}
+	});
 }

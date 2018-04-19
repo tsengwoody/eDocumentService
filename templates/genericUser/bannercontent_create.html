@@ -1,4 +1,4 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 管理首頁 Banner
 {% endblock %}
@@ -175,6 +175,9 @@
 	})
 
 </script>
+
+{% include 'comp/upload_dialog.html' %}
+
 {% csrf_token %}
 
 
