@@ -44,13 +44,14 @@
 					let fileCover = document.getElementById('id_cover');
 					fileObject = fileCover.files[0]
 					if(iser(fileObject)){
-
+						alertmessage('error', '檔案尚未選擇')
+						return -1
 					}
 
 					let vo = this; //this 在.done內會被復蓋
 					let url_resource = '/genericUser/api/bannercontents/' +vo.id +'/resource/cover/image/'
 
-					rest_aj_upload(url_resource, fileCover.files[0])
+					rest_aj_upload(url_resource, {'object': fileCover.files[0]})
 					.done(function(data) {
 						alertmessage('success', '成功更新資料(檔案)' +data['message'])
 						vo.clear()

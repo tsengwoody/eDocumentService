@@ -65,16 +65,6 @@ class Book(models.Model):
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8, 'final': 9, }
 
-	def serialized(self):
-		old_serialize = generic_serialized(self)
-		serialize = {}
-		for key in ['finish_date', 'upload_date', ]:
-			serialize.update({
-			key: old_serialize[key],
-		})
-		return serialize
-
-
 	def __unicode__(self):
 		return self.book_info.bookname
 
@@ -95,8 +85,10 @@ class Book(models.Model):
 	def check_status(self):
 		if self.status < 0:
 			return -1
+
 		status = min([ part.status for part in self.ebook_set.all() ])
 		self.status = status
+
 		if self.status_int2str() == 'finish':
 			self.finish_date = max([ i.deadline for i in self.ebook_set.all() ])
 		elif self.status_int2str() == 'final':

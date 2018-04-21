@@ -8,6 +8,7 @@ static/ebookSystem/document/
 static/ebookSystem/disability_card/
 static/readium/
 temp/
+templates/old/
 venv/
 auto.sh
 .idea

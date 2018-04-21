@@ -2517,7 +2517,7 @@ function rest_aj_send(type, url, transferData) {
 
 }
 
-function rest_aj_upload(url, file) {
+function rest_aj_upload(url, transferData) {
 	//ajax傳送訊息
 
 	//df
@@ -2525,7 +2525,9 @@ function rest_aj_upload(url, file) {
 
 	//FormData
 	let formData = new FormData();
-	formData.append('object', file);
+	_.each(transferData, function (v, k){
+		formData.append(k, v);
+	})
 
 	//gen uuid
 	let uuid=gen_uuid();

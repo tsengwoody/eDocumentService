@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block nav %}
 {% load staticfiles %}
 <link href="{% static "ebookSystem/css/footer-navbar.css" %}" rel="stylesheet" >
@@ -49,10 +49,10 @@
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">文件上傳<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						{% if request.user.is_guest %}
-						<li><a href="{% url 'ebookSystem:book_create' %}">掃描檔上傳</a></li>
+						<li><a href="{% url 'ebookSystem:generics' 'book_create' %}">掃描檔上傳</a></li>
 						{% endif %}
 						{% if request.user.is_manager or request.user.is_advanced_editor %}
-						<li><a href="{% url 'ebookSystem:book_upload' %}">電子檔上傳</a></li>
+						<li><a href="{% url 'ebookSystem:generics' 'book_upload' %}">電子檔上傳</a></li>
 						{% endif %}
 					</ul>
 				</li>

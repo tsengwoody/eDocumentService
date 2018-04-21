@@ -186,9 +186,7 @@ class Command(BaseCommand):
 			client = Client()
 			client.login(username='root', password='eds@2018')
 			response = client.post(
-				reverse(
-					'ebookSystem:book_create'
-				),
+				'/ebookSystem/api/books/action/create/',
 				{
 					u'ISBN': u'9789573321569',
 					u'author': u'傑佛瑞.迪佛(Jeffery Deaver)著; 宋瑛堂譯',
@@ -203,8 +201,7 @@ class Command(BaseCommand):
 #				HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 			)
 
-#		print response.json()['message']
-		assert response.status_code == 302, 'status_code' +str(response.status_code)
+		assert response.status_code == 202, 'status_code' +str(response.status_code) +response.content
 		assert len(Book.objects.all())==1, 'create book fail'
 		assert len(EBook.objects.all()) == 10, 'create part fail'
 
@@ -301,7 +298,7 @@ class Command(BaseCommand):
 			client = Client()
 			client.login(username='root', password='eds@2018')
 			response = client.post(
-				reverse('ebookSystem:book_create'),
+				'/ebookSystem/api/books/action/create/',
 				{
 					u'ISBN': u'9789866104626',
 					u'author': u'多利安助川著; 卓惠娟譯',
@@ -315,7 +312,7 @@ class Command(BaseCommand):
 				},
 #				HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 			)
-		assert response.status_code == 302, 'status_code' +str(response.status_code)
+		assert response.status_code == 202, 'status_code' +str(response.status_code)
 		assert len(Book.objects.all())==2, 'create book fail'
 		book = Book.objects.get(ISBN=u'9789866104626')
 		assert os.path.exists(book.path), 'book resource folder not exist'
@@ -326,9 +323,7 @@ class Command(BaseCommand):
 		client = Client()
 		client.login(username='root', password='eds@2018')
 		response = client.post(
-			reverse(
-				'ebookSystem:book_upload'
-			),
+			'/ebookSystem/api/books/action/upload/',
 			{
 				u'ISBN': u'9789863981459',
 				u'author': u'雷德.霍夫曼(Reid Hoffman), 班.卡斯諾查(Ben Casnocha)著; 洪慧芳譯',

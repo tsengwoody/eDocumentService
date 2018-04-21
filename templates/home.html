@@ -1,4 +1,4 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% load staticfiles %}
 {% block title %}
 首頁
@@ -16,6 +16,11 @@
 {% endblock %}
 {% block content %}
 
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+	let vo_bannercontent;
+	Vue.component('vc-bannercontent', {
+		template: `
 <div id="myCarousel" class="carousel slide" data-ride="carousel">
 	<!-- Indicators -->
 	<ol class="carousel-indicators">
@@ -31,14 +36,100 @@
 		<div class="item">
 			<a href="/genericUser/recruit" ><img src="{% static "ebookSystem/img/iwantyou.png" %}" alt="招募志工-我們可能無法做偉大的事，但可以用偉大的愛做小事" title="加入我們" style="height: 480px;width:940px" ></a>
 		</div>
-		<!--
-		<div class="item">
-			<img src="img_flower.jpg" alt="Flower" width="460" height="345">
+	</div>
+
+	<!-- Left and right controls -->
+	<a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev" aria-label="上一頁">
+		<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+		<span class="sr-only">Previous</span>
+	</a>
+	<a class="right carousel-control" href="#myCarousel" role="button" data-slide="next" aria-label="下一頁">
+		<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+		<span class="sr-only">Next</span>
+	</a>
+</div>
+		`,
+		props: ['bannercontentlist'],
+		methods: {},
+	})
+
+	$(function(){
+
+		//client
+		let client = new $.RestClient('/genericUser/api/');
+		client.add('bannercontents');
+
+		client.bannercontents.read()
+		.done(function(d){
+			//opt
+			let opt={
+				el: '#' + 'id_bannercontent_list',
+				data: {
+					bannercontentlist: d,
+				},
+				computed: {
+				},
+				methods: {
+					markdown2html: function (text) {
+						var converter = new showdown.Converter()
+						html      = converter.makeHtml(text)
+						return html
+					},
+				},
+			};
+
+			//vo
+			if(iser(vo_bannercontent)){
+				vo_bannercontent = new Vue(opt);
+			}
+			else{
+				vo_bannercontent.bannercontentlist = d;
+			}
+
+		})
+	})
+</script>
+
+<div id="id_bannercontent_list">
+<div id="myCarousel" class="carousel slide" data-ride="carousel">
+	<!-- Indicators -->
+	<ol class="carousel-indicators">
+		<template 		v-for="(item, index) in bannercontentlist">
+		<li data-target="#myCarousel"
+			v-if="index==0"
+			v-bind:data-slide-to="index"
+			class="active"
+		></li>
+		<li data-target="#myCarousel"
+			v-if="index!=0"
+			v-bind:data-slide-to="index"
+		></li>
+		</template>
+	</ol>
+
+	<!-- Wrapper for slides -->
+	<div class="carousel-inner" role="listbox">
+
+		<template 			v-for="(item, index) in bannercontentlist">
+		<div
+			v-if="index==0"
+			class="item active">
+			<img
+				:src="`/genericUser/api/bannercontents/` +item.id +`/resource/cover/image`"
+				:alt="item.title"
+				:title="item.title"
+				style="height: 480px;width:940px" >
 		</div>
-		<div class="item">
-			<img src="img_flower2.jpg" alt="Flower" width="460" height="345">
+		<div
+			v-if="index!=0"
+			class="item">
+			<img
+				:src="`/genericUser/api/bannercontents/` +item.id +`/resource/cover/image`"
+				:alt="item.title"
+				:title="item.title"
+				style="height: 480px;width:940px" >
 		</div>
-		-->
+		</template>
 	</div>
 
 	<!-- Left and right controls -->
@@ -55,21 +146,13 @@
 <div class="textfornvda">
 	<h4>首頁圖片說明</h4>
 	<ul>
-		<li>雲端千眼：我看不見書，但我想閱讀
-			<ul>
-			<li>生活裡沒有書籍，就好像大地沒有陽光；智慧裡沒有書籍，就好像鳥兒沒有翅膀。</li>
-			<li>我看不見書，但是我想閱讀。</li>
-			<li>給視障者真正的閱讀權，需要各位加入共同參與，不限時地，只需透過網路，成為視障者雲端的眼。</li>
-			<li>群眾參與，積砂成塔，邀請志工，期待你的加入。</li>
-			</ul>
-		</li>
-		<li><a href="/genericUser/recruit">加入我們：招募志工</a>
-			<ul>
-			<li>我們可能無法做偉大的事，但可以用偉大的愛做小事。</li>
-			<li>We Want You, Apply Now.</li>
-			</ul>
-		</li>
+			<li
+				v-for="(item, index) in bannercontentlist"
+			>
+			<div v-html="markdown2html(item.content)"></div>
+			</li>
 	</ul>
+</div>
 </div>
 
 <div class="row" style="padding-top: 20px;">
@@ -82,7 +165,6 @@
 					<a class="btn btn-link" role="button" href="{% url 'genericUser:announcement' announcement.id %}">{{ announcement.datetime.year }}年{{ announcement.datetime.month }}月{{ announcement.datetime.day }}日 {{ announcement.title }}</a>
 				</p>
 				{% endfor %}
-				<!-- <a href='{% url 'genericUser:announcement_list' %}'>公告列表</a> -->
 				<div class="pull-right">
 					<p><a class="btn btn-default center" href="{% url "genericUser:announcement_list" %}" role="button">公告列表 »</a></p>
 				</div>
