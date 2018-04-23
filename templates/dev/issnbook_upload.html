@@ -2,10 +2,7 @@
 {% block title %}
 期刊雜誌電子檔上傳
 {% endblock %}
-{% block style %}
-<link href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
-<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-{% endblock %}
+
 {% block content %}
 
 {% include 'comp/upload_dialog.html' %}
@@ -83,58 +80,59 @@
 <div id="id_issnbook">
 
 	<h3><legend>期刊雜誌電子檔上傳</legend></h3>
+	<div class="form-horizontal">
+		<div class="form-group">
+			<label class="control-label col-sm-2" for="id_category">期刊：</label>
+			<div class="col-sm-3">
+				<select
+					v-model="ISSN_book_info"
+					id="id_issn_book_info" required
+				>
+					<option value="" selected="selected">---------</option>
+					<option v-for="item in issnbookinfo_list" :value="item.ISSN">{|{ item.title }|}</option>
+				</select>
+			</div>
+		</div> 
 
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="id_category">期刊：</label>
-		<div class="col-sm-3">
-			<select
-				v-model="ISSN_book_info"
-				id="id_issn_book_info" required
+		<div class="form-group">
+			<label class="control-label col-sm-2"
+				for="id_volume"
 			>
-				<option value="" selected="selected">---------</option>
-				<option v-for="item in issnbookinfo_list" :value="item.ISSN">{|{ item.title }|}</option>
-			</select>
+				<font style="color:red">*</font>期數
+			</label>
+			<div class="col-sm-3">
+				<input type="text" grp="changemode" class="form-control"
+					id="id_volume"
+					v-model="volume"
+				>
+			</div>
 		</div>
-	</div> 
 
-	<div class="form-group">
-		<label class="control-label col-sm-2"
-			for="id_volume"
-		>
-			<font style="color:red">*</font>期數
-		</label>
-		<div class="col-sm-3">
-			<input type="text" grp="changemode" class="form-control"
-				id="id_volume"
-				v-model="volume"
+		<div class="form-group">
+			<label class="control-label col-sm-2"
+				for="id_date"
 			>
+				<font style="color:red">*</font>出版日期
+			</label>
+			<div class="col-sm-3">
+				<input type="text" grp="changemode" class="form-control"
+					id="id_date"
+					v-model="date"
+				>
+			</div>
 		</div>
-	</div>
 
-	<div class="form-group">
-		<label class="control-label col-sm-2"
-			for="id_date"
-		>
-			<font style="color:red">*</font>出版日期
-		</label>
-		<div class="col-sm-3">
-			<input type="text" grp="changemode" class="form-control"
-				id="id_date"
-				v-model="date"
-			>
-		</div>
-	</div>
-
-	<div class="form-group">
-		<label class="control-label col-sm-2" for="id_fileObject">文件：</label>
-		<div class="col-sm-3">
-			<input class="form-control-file" id="id_fileObject" name="fileObject" type="file" required />		  
-		</div>
-	</div> 
-	<div class="form-group row">
-		<div class="col-sm-offset-2 col-sm-10">
-			<input v-on:click="create()" type="button" class="btn btn-primary upload" value="送出" id="send_id">
-			<input type="reset" class="btn btn-danger" value="重置">
+		<div class="form-group">
+			<label class="control-label col-sm-2" for="id_fileObject">文件：</label>
+			<div class="col-sm-3">
+				<input class="form-control-file" id="id_fileObject" name="fileObject" type="file" required />		  
+			</div>
+		</div> 
+		<div class="form-group row">
+			<div class="col-sm-offset-2 col-sm-10">
+				<input v-on:click="create()" type="button" class="btn btn-primary upload" value="送出" id="send_id">
+				<input type="reset" class="btn btn-danger" value="重置">
+			</div>
 		</div>
 	</div>
 </div>
