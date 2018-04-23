@@ -73,7 +73,7 @@ def library_origin_epub(request, ISBN, token, document_root=None, show_indexes=F
 
 urlpatterns = [
 	url(r'^$', views.home, name='home'),
-	url(r'^dev/(?P<name>[\w\d]+)/$', views.dev, name='dev'),
+	url(r'^dev/(?P<name>[\w\d/_\-]+)/$', views.dev, name='dev'),
 	url(r'^about/(?P<name>[\w]+)$', views.about, name='about'),
 	url(r'^sitemap$', views.sitemap, name='sitemap'),
 	url(r'^error_social_auth$', views.error_social_auth, name='error_social_auth'),

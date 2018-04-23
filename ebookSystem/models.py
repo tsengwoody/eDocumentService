@@ -7,25 +7,10 @@ from genericUser.models import User, ServiceInfo, Event
 import glob,os
 import datetime
 import codecs
+import io
 import shutil
 #from PIL import Image, ImageFont, ImageDraw
 from bs4 import BeautifulSoup, NavigableString
-
-def generic_serialized(self):
-	serialize = {}
-	for field in self._meta.fields:
-		value = getattr(self, field.name)
-		if isinstance(value, models.Model):
-			id_ = field.name +'_id'
-			field_id_value = getattr(self, id_)
-			value = '{0}/{1}'.format(value.__class__.__name__, field_id_value)
-		else:
-			try:
-				json.dumps(value)
-			except:
-				value = unicode(value)
-		serialize.update({field.name: value})
-	return serialize
 
 class BookInfo(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
@@ -40,8 +25,6 @@ class BookInfo(models.Model):
 
 	def __unicode__(self):
 		return self.bookname
-
-	serialized = generic_serialized
 
 class Book(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
@@ -318,13 +301,6 @@ class EBook(models.Model):
 	service_hours = models.IntegerField(default=0)
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8, 'final':9}
-	sc_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='sc_edit_ebook_set')
-	sc_deadline = models.DateField(blank=True, null=True)
-	sc_get_date = models.DateField(blank=True, null=True)
-	sc_service_hours = models.IntegerField(default=0)
-	an_editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='an_edit_ebook_set')
-	an_deadline = models.DateField(blank=True, null=True)
-	an_get_date = models.DateField(blank=True, null=True)
 
 	def get_source_list(self):
 		source_path = self.book.path +u'/source'
@@ -359,13 +335,15 @@ class EBook(models.Model):
 		#正向status變化
 		if direction == 1:
 			if self.status +direction == self.STATUS['active']:
-				self.add_tag()
-				with codecs.open(self.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
-					finishFile.write(u'\ufeff')
+
 				try:
-					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
+					editRecord = EditRecord.objects.get(part=self, number_of_times=self.number_of_times)
 				except:
-					editRecord = EditRecord.objects.create(part=self, category='based', number_of_times=self.number_of_times)
+					editRecord = EditRecord.objects.create(part=self, number_of_times=self.number_of_times)
+
+				# new use DB to storage text
+				editRecord.textimport()
+
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['edit']:
 				self.editor = kwargs['user']
@@ -376,41 +354,16 @@ class EBook(models.Model):
 				self.edited_page = self.end_page -self.begin_page
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['finish']:
-				self.add_template_tag(self.get_path('-finish'), self.get_path('-ge'))
-				self.clean_tag(self.get_path('-ge'), self.get_path('-ge'))
-				self.clean_tag(self.get_path('-ge'), self.get_path('-sc'))
-				try:
-					editRecord = EditRecord.objects.get(part=self, category='based', number_of_times=self.number_of_times)
-					editRecord.record_info()
-				except:
-					return False
-				try:
-					editRecord = EditRecord.objects.get(part=self, category='advanced', number_of_times=self.number_of_times)
-				except:
-					editRecord = EditRecord.objects.create(part=self, category='advanced', number_of_times=self.number_of_times)
-				self.status = self.status +direction
-			elif self.status +direction == self.STATUS['sc_edit']:
-				self.sc_editor = kwargs['user']
-				self.sc_get_date = timezone.now()
-				self.sc_deadline = self.sc_get_date + datetime.timedelta(days=2)
-				self.status = self.status +direction
-			elif self.status +direction == self.STATUS['sc_finish']:
-				shutil.copy2(self.get_path('-sc'), self.get_path('-an'))
-				try:
-					editRecord = EditRecord.objects.get(part=self, category='advanced', number_of_times=self.number_of_times)
-					editRecord.record_info()
-				except:
-					return False
-				self.status = self.status +direction
-			elif self.status +direction == self.STATUS['an_edit']:
-				self.an_editor = kwargs['user']
-				self.an_get_date = timezone.now()
-				self.an_deadline = self.an_get_date + datetime.timedelta(days=1)
-				self.status = self.status +direction
-			elif self.status +direction == self.STATUS['an_finish']:
+
+				editRecord = EditRecord.objects.get(part=self, number_of_times=self.number_of_times)
+				editRecord.record_info()
+				editRecord.textexport()
+
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['final']:
 				self.status = self.status +direction
+			else:
+				return False
 
 		#反向status變化
 		elif direction == -1:
@@ -422,16 +375,6 @@ class EBook(models.Model):
 			elif self.status +direction == self.STATUS['edit']:
 				self.edit_page = 0
 				self.load_full_content()
-				self.status = self.status +direction
-			elif self.status +direction == self.STATUS['finish']:
-				self.sc_editor = None
-				self.sc_get_date = None
-				self.sc_deadline = None
-				self.status = self.status +direction
-			elif self.status +direction == self.STATUS['sc_finish']:
-				self.an_editor = None
-				self.an_get_date = None
-				self.an_deadline = None
 				self.status = self.status +direction
 			else:
 				return False
@@ -470,30 +413,23 @@ class EBook(models.Model):
 	def __unicode__(self):
 		return self.book.book_info.bookname+u'-part'+str(self.part)
 
-	def get_content(self, action='', encoding='utf-8'):
-		filePath = self.get_path(action)
-		with codecs.open(filePath, 'r', encoding=encoding) as sourceFile:
-			source_content = sourceFile.read()
-#		file_head = source_content[0]
-#		source_content = source_content[1:]
-		return source_content
+	def get_content(self):
+		editRecord = EditRecord.objects.get(part=self, number_of_times=self.number_of_times)
+		return editRecord.edit
 
-	def set_content(self, finish_content, edit_content, encoding='utf-8', fileHead = u'\ufeff'):
-		finishFilePath = self.get_path('-finish')
-		editFilePath = self.get_path('-edit')
-		with codecs.open(finishFilePath, 'a', encoding=encoding) as fileWrite:
-			fileWrite.write(finish_content)
-		with codecs.open(editFilePath, 'w', encoding=encoding) as fileWrite:
-			fileWrite.write(edit_content)
+	def set_content(self, finish_content, edit_content):
+		editRecord = EditRecord.objects.get(part=self, number_of_times=self.number_of_times)
+		editRecord.edit = edit_content
+		editRecord.finish += finish_content
+		editRecord.save()
 		return True
 
 	def load_full_content(self):
-		edit_content = self.get_content('-edit')
-		finish_content = self.get_content('-finish')
-		self.set_content('', finish_content +edit_content)
-		with codecs.open(self.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
-			finishFile.write(u' ')
-		return finish_content +edit_content
+		editRecord = EditRecord.objects.get(part=self, number_of_times=self.number_of_times)
+		editRecord.edit = editRecord.finish +editRecord.edit
+		editRecord.finish = ''
+		editRecord.save()
+		return editRecord.edit
 
 	def get_org_image(self, user):
 		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, "org")
@@ -575,12 +511,25 @@ class EBook(models.Model):
 	def add_tag(self, encoding='utf-8'):
 		from utils import tag
 		source = self.get_path()
+		with io.open(source, 'r', encoding='utf-8') as sourceFile:
+			content = sourceFile.read()
+
 		destination = self.get_path('-edit')
-		tag.add_tag(source, destination)
+		with io.open(destination, 'w', encoding='utf-8') as destinationFile:
+			destinationFile.write(tag.add_tag(content))
 
 	def add_template_tag(self, src, dst, encoding='utf-8'):
 		from utils import tag
 		tag.add_template_tag(src, dst)
+
+	def add_template_tag2(self, src, dst, encoding='utf-8'):
+		from utils import tag
+
+		with io.open(src, 'r', encoding='utf-8') as sourceFile:
+			content = sourceFile.read()
+
+		with io.open(dst, 'w', encoding='utf-8') as destinationFile:
+			destinationFile.write(tag.add_template_tag2(content))
 
 	def clean_tag(self, src, dst, template='book_template.html', encoding='utf-8'):
 		from utils import tag
@@ -657,8 +606,6 @@ class EBook(models.Model):
 			dst_content = dstFile.read()
 		dstSoup = BeautifulSoup(dst_content, 'html5lib')
 		dst_content_text = dstSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
-#	with codecs.open('temp.html', 'w', encoding='utf-8') as tempFile:
-#		tempFile.write(dst_content_text)
 		return Levenshtein.distance(src_content_text, dst_content_text)
 
 	@staticmethod
@@ -752,13 +699,15 @@ class EditRecord(models.Model):
 	category = models.CharField(max_length=10, choices=CATEGORY)
 	number_of_times = models.IntegerField()
 	editor = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
+	edit = models.TextField()
+	finish = models.TextField()
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
 	stay_hours = models.IntegerField(default=0)
 	serviceInfo = models.ForeignKey(ServiceInfo,blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
 
 	class Meta:
-		unique_together = (('part', 'category', 'number_of_times'),)
+		unique_together = (('part', 'number_of_times'),)
 
 	def __unicode__(self):
 		try:
@@ -766,19 +715,28 @@ class EditRecord(models.Model):
 		except:
 			return unicode(None)
 
+	def textimport(self):
+		import_source = self.number_of_times -1
+		if import_source == 0:
+			from utils import tag
+			source = self.part.get_path()
+			with io.open(source, 'r', encoding='utf-8') as sourceFile:
+				content = sourceFile.read()
+			self.edit = tag.add_tag(content)
+			self.save()
+		else:
+			source = EditRecord.objects.get(part=self.part, number_of_times=import_source)
+			self.edit = source.finish
+			self.save()
+
+	def textexport(self):
+		pass
+
 	def record_info(self):
-		if self.category == 'based':
-			self.editor = self.part.editor
-			self.get_date = self.part.get_date
-			self.stay_hours = self.part.service_hours
-			self.save()
-			self.service_hours = self.compute_service_hours()
-		elif self.category == 'advanced':
-			self.editor = self.part.sc_editor
-			self.get_date = self.part.sc_get_date
-			self.stay_hours = self.part.service_hours
-			self.save()
-			self.service_hours = self.part.sc_service_hours
+		self.editor = self.part.editor
+		self.get_date = self.part.get_date
+		self.stay_hours = self.part.service_hours
+		self.service_hours = self.compute_service_hours()
 		self.save()
 
 	def group_ServiceInfo(self):
@@ -813,16 +771,9 @@ class EditLog(models.Model):
 	time = models.DateTimeField(default = timezone.now)
 	order = models.IntegerField()
 	edit_count = models.IntegerField()
-#	page = models.IntegerField()
 
 	def __unicode__(self):
 		return self.edit_record.part.ISBN_part +'-{0}'.format(self.order)
-
-'''	class Meta:
-		indexes = [
-			models.Index(fields=['book'], name='book_idx'),
-			models.Index(fields=['part'], name='part_idx'),
-		]'''
 
 def add_watermark(self,text, fontname, fontsize, imagefile, output_dir):
 	img0 = Image.new("RGBA", (1,1))
@@ -843,3 +794,28 @@ def add_watermark(self,text, fontname, fontsize, imagefile, output_dir):
 	img2.save(output_dir + imagefile)
 	del draw0, draw
 	del img0, img, img2
+
+#===== ISSN Book =====
+
+class ISSNBookInfo(models.Model):
+	ISSN = models.CharField(max_length=20, primary_key=True)
+	title = models.CharField(max_length=255)
+	house = models.CharField(max_length=255)
+
+	def __unicode__(self):
+		return self.title
+
+class ISSNBook(models.Model):
+	ISSN_volume = models.CharField(max_length=20, primary_key=True)
+	ISSN_book_info = models.ForeignKey(ISSNBookInfo, on_delete=models.CASCADE)
+	volume = models.IntegerField()
+	date = models.DateField()
+	upload_date = models.DateField(default = timezone.now)
+	owner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL)
+
+	def __init__(self, *args, **kwargs):
+		super(ISSNBook, self).__init__(*args, **kwargs)
+		self.epub_file = BASE_DIR +'/file/ebookSystem/ISSNBook/{0}/ebook/{0}.epub'.format(self.ISSN_volume)
+
+	def __unicode__(self):
+		return self.ISSN_book_info.title +unicode(self.volume)

@@ -442,10 +442,9 @@ def edit_ajax(request, ISBN_part, *args, **kwargs):
 	part = EBook.objects.get(ISBN_part=ISBN_part)
 	part.service_hours = part.service_hours+1
 	part.save()
-	try:
-		editRecord = EditRecord.objects.get(part=part, category='based', number_of_times=part.number_of_times)
-	except:
-		editRecord = EditRecord.objects.create(part=part, category='based', number_of_times=part.number_of_times)
+
+	editRecord = EditRecord.objects.get(part=part, number_of_times=part.number_of_times)
+
 	order = len(EditLog.objects.filter(edit_record=editRecord))
 	EditLog.objects.create(edit_record=editRecord, user=request.user, time=timezone.now(), order=order, edit_count=int(request.POST['online']))
 	response['status'] = u'success'
@@ -455,24 +454,16 @@ def edit_ajax(request, ISBN_part, *args, **kwargs):
 @cache_control(no_store=True, no_cache=True, max_age=0)
 @http_response
 def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args, **kwargs):
-	logger.info('{}/edit\t{}'.format(request.user, resolve(request.path).namespace))
 	try:
 		part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
 	except: 
 		raise Http404("book or part does not exist")
-	if not part.editor == request.user:
-		status = u'error'
-		message = u'您非本文件之校對者！'
-#		permission_denied = True
-		redirect_to = reverse('ebookSystem:service')
-		return locals()
+
 	[scanPageList, defaultPageURL] = part.get_org_image(request.user)
-	editContent = part.get_content('-edit')
+	editContent = part.get_content()
 	if request.method == 'POST':
 		Token = request.session.get('postToken',default=None)
 		userToken = request.POST['postToken']
-#		print ("Token %d",Token)
-#		print (" userToken %d",userToken)
 		if  userToken !=Token:
 			raise Http404("請勿重覆傳送")
 		content = request.POST['content']
@@ -509,11 +500,10 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 			status = 'success'
 			message = u'成功載入全部文件內容'
 		[scanPageList, defaultPageURL] = part.get_org_image(request.user)
-		editContent = part.get_content('-edit')
+		editContent = part.get_content()
 		del request.session['postToken']
 		postToken = uuid.uuid1().hex
 		request.session['postToken'] = postToken
-#		print request.session.get('postToken',default=None)
 		return locals()
 	if request.method == 'GET':
 		postToken = uuid.uuid1().hex

@@ -53,3 +53,16 @@ class EditRecordSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = EditRecord
 		fields = '__all__'
+
+#===== ISSN Book =====
+
+class ISSNBookInfoSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = ISSNBookInfo
+		fields = '__all__'
+
+class ISSNBookSerializer(serializers.ModelSerializer):
+	ISSN_book_info_detail = ISSNBookInfoSerializer(read_only=True)
+	class Meta:
+		model = ISSNBook
+		fields = ('__all__')

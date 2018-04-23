@@ -14,81 +14,6 @@ function getCookie(name) {
 	}
 	return cookieValue;
 }
-/*
-The functions below will create a header with csrftoken
-*/
-
-function csrfSafeMethod(method) {
-	// these HTTP methods do not require CSRF protection
-	return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-}
-function sameOrigin(url) {
-	// test that a given url is a same-origin URL
-	// url could be relative or scheme relative or absolute
-	var host = document.location.host; // host + port
-	var protocol = document.location.protocol;
-	var sr_origin = '//' + host;
-	var origin = protocol + sr_origin;
-	// Allow absolute or scheme relative URLs to same origin
-	return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
-		(url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
-		// or any other URL that isn't scheme relative or absolute i.e relative.
-		!(/^(\/\/|http:|https:).*/.test(url));
-}
-function changePage(offset) {
-	page = document.getElementById("id_page");
-	imgScanPage = $('#scanPage')[0];
-	src = imgScanPage.src;
-	src = src.split('/');
-	dirname = ''
-	for (i = 0; i < src.length - 1; i++) dirname = dirname + src[i] + '/';
-	filename = src[src.length - 1];
-	extensionName = filename.split('.')[1];
-	filename = filename.split('.')[0];
-	scanPageList = document.getElementById("scanPageList");
-	if (scanPageList.selectedIndex + offset >= 0 && scanPageList.selectedIndex + offset < scanPageList.length) {
-		scanPageList.selectedIndex = scanPageList.selectedIndex + offset;
-		page.value = scanPageList.selectedIndex;
-		imgScanPage.src = dirname + scanPageList.options[scanPageList.selectedIndex].value;
-	} else {
-		//dangerAlert('超過頁數範圍惹~');
-		//alertMessageDialog('error','超過頁數範圍惹~');
-		alertmessage('error', '超過頁數範圍惹~');
-	}
-}
-
-function changePageSelect() {
-	page = document.getElementById("id_page");
-	imgScanPage = $('#scanPage')[0];
-	src = imgScanPage.src;
-	//console.log(src);
-	src = src.split('/');
-	dirname = ''
-	for (i = 0; i < src.length - 1; i++)
-		dirname = dirname + src[i] + '/';
-	filename = src[src.length - 1];
-	extensionName = filename.split('.')[1];
-	filename = filename.split('.')[0];
-	scanPageList = document.getElementById("scanPageList");
-	page.value = scanPageList.selectedIndex;
-	imgScanPage.src = dirname + scanPageList.options[scanPageList.selectedIndex].value;
-}
-
-// function alertMessageDialog(status,message) {
-//	 var str=(status=='error')?'danger':'success'
-//	 var dialog='#'+str+'Dialog';
-//	 $(dialog+" .alertMessage").html(message);
-//	 $(dialog).on('shown.bs.modal', function () {
-//		 $(dialog+" .close").focus();
-//	 });
-//	 $(dialog).modal();
-// }
-function adjZoom(value) {
-	if (parseInt(imgSize.value) + parseInt(value) > 0) {
-		imgSize.value = (parseInt(imgSize.value) + parseInt(value)).toString() + '%';
-		$('#scanPage').css('width', imgSize.value);
-	}
-}
 function addMark(strValue, editor) {
 
 	var bm = editor.selection.getBookmark(0);
@@ -200,36 +125,6 @@ function getCursorPosition(editor) {
 
 	return index;
 }
-// function rotateFormat() {
-//	 if ($('#imagePage').hasClass('col-md-6')) { //改上下
-//		 $('#imagePage').removeClass("col-md-6");
-//		 $('#imagePage').addClass("col-md-12");
-
-
-//		 $('#textPage').removeClass("col-md-6");
-//		 $('#textPage').addClass("col-md-12");
-
-//		 $('#textPage').removeClass("towColumn");
-//		 $('#textPage').addClass("oneColumn-text");
-
-//		 $('#imagePage').removeClass("towColumn");
-//		 $('#imagePage').addClass("oneColumn-image");
-//	 } else { //左右
-//		 $('#imagePage').removeClass("col-md-12");
-//		 $('#imagePage').addClass("col-md-6");
-
-//		 $('#textPage').removeClass("col-md-12");
-//		 $('#textPage').addClass("col-md-6");
-
-//		 $('#textPage').removeClass("oneColumn-text");
-//		 $('#textPage').addClass("towColumn");
-
-//		 $('#imagePage').removeClass("oneColumn-image");
-//		 $('#imagePage').addClass("towColumn");
-//	 }
-
-// }
-
 function rotateFormat() {
 
 	let imagePage = $('#imagePage');
@@ -258,24 +153,7 @@ function rotateFormat() {
 }
 
 var editor;
-// function createMathMlEditor() {
-//	 editor = com.wiris.jsEditor.JsEditor.newInstance({ 'language': 'zh' });
-//	 editor.insertInto(document.getElementById('editorContainer'));
-//	 editor.setMathML($("input[name='content']").val());
-// }
-// function submitMathml() {
-//	 //alert(editor.getMathML());
-//	 function_click = true;
-//	 $('form').append($("<input>").attr("type", "hidden").attr("name", "save").val("save"));
-//	 $("input[name='content']").val(editor.getMathML());
-//	 // $('form').append($("<input>").attr("type", "hidden").attr("name", "content").val(editor.getMathML()));
-//	 $('form').submit();
-// }
-// function doGet() {
-//	 console.log(editor.getMathML());
-//	 $('#setValue #message').html(editor.getMathML());
-//	 $('#setValue').css('visibility', 'visible').fadeIn();
-// }
+
 var function_click = false;
 var idel_min = 0;
 var change_count = 0;
@@ -476,26 +354,7 @@ $(document).ready(function () {
 			detectIdel();
 		}, 60000);
 	}
-	// if (url.split('/')[3] == "edit_mathml") {
-	//	 createMathMlEditor();
-	// }
 
-
-	$('#prePage').on("click", function () {
-		changePage(-1);
-	});
-	//nextPage
-	$('#nextPage').on("click", function () {
-		changePage(1);
-	});
-
-
-	$('#zoomIN').on("click", function () {
-		adjZoom(-10);
-	});
-	$('#zoomOUT').on("click", function () {
-		adjZoom(10);
-	});
 	$("#setValue .close").on("click", function () {
 		$('#setValue').hide();
 	});

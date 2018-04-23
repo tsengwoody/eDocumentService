@@ -9,6 +9,8 @@ router.register(r'books', apis.BookViewSet)
 router.register(r'ebooks', apis.EBookViewSet)
 router.register(r'bookinfos', apis.BookInfoViewSet)
 router.register(r'editrecords', apis.EditRecordViewSet)
+router.register(r'issnbookinfos', apis.ISSNBookInfoViewSet)
+router.register(r'issnbooks', apis.ISSNBookViewSet)
 
 import copy
 api_urlpatterns = copy.copy(router.urls)

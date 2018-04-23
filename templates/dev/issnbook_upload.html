@@ -1,0 +1,142 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+期刊雜誌電子檔上傳
+{% endblock %}
+{% block style %}
+<link href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+{% endblock %}
+{% block content %}
+
+{% include 'comp/upload_dialog.html' %}
+
+{% csrf_token %}
+
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+	let vo_issnbook;
+
+	$(function(){
+
+		let opt={
+			el: '#id_issnbook',
+			data: {
+				issnbookinfo_list: {},
+				volume: '',
+				date: '',
+				ISSN_book_info: '',
+			},
+			computed: {
+				ISSN_volume: function(){
+					return this.ISSN_book_info +'-' +this.volume
+				},
+				url: function(){
+					return '/ebookSystem/api/issnbooks/action/upload/'
+				},
+			},
+			methods: {
+				create: function(){
+
+					let fileObject = document.getElementById('id_fileObject').files[0]
+
+					// 確認有選擇檔案
+					if(iser(fileObject)){
+						alertmessage('error', '檔案尚未選擇')
+						return -1
+					}
+
+					transferData = {
+						'ISSN_volume': this.ISSN_volume,
+						'volume': this.volume,
+						'date': this.date,
+						'ISSN_book_info': this.ISSN_book_info,
+						'fileObject': fileObject,
+					}
+
+					console.log(transferData)
+
+					let vo = this; //this 在.done內會被復蓋
+
+					rest_aj_upload(this.url, transferData)
+					.done(function(data) {
+						alertmessage('success', '成功更新資料(檔案)' +data['message'])
+						//vo.clear()
+					})
+					.fail(function(data){
+						alertmessage('error', '失敗更新資料(檔案)' +data['message'])
+					})
+
+				},
+			},
+		}
+
+		vo_issnbook = new Vue(opt);
+		rest_aj_send('get', '/ebookSystem/api/issnbookinfos/', {})
+		.done(function(data) {
+			vo_issnbook.issnbookinfo_list = data['data']
+		})
+
+	})
+
+</script>
+
+<div id="id_issnbook">
+
+	<h3><legend>期刊雜誌電子檔上傳</legend></h3>
+
+	<div class="form-group">
+		<label class="control-label col-sm-2" for="id_category">期刊：</label>
+		<div class="col-sm-3">
+			<select
+				v-model="ISSN_book_info"
+				id="id_issn_book_info" required
+			>
+				<option value="" selected="selected">---------</option>
+				<option v-for="item in issnbookinfo_list" :value="item.ISSN">{|{ item.title }|}</option>
+			</select>
+		</div>
+	</div> 
+
+	<div class="form-group">
+		<label class="control-label col-sm-2"
+			for="id_volume"
+		>
+			<font style="color:red">*</font>期數
+		</label>
+		<div class="col-sm-3">
+			<input type="text" grp="changemode" class="form-control"
+				id="id_volume"
+				v-model="volume"
+			>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label class="control-label col-sm-2"
+			for="id_date"
+		>
+			<font style="color:red">*</font>出版日期
+		</label>
+		<div class="col-sm-3">
+			<input type="text" grp="changemode" class="form-control"
+				id="id_date"
+				v-model="date"
+			>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label class="control-label col-sm-2" for="id_fileObject">文件：</label>
+		<div class="col-sm-3">
+			<input class="form-control-file" id="id_fileObject" name="fileObject" type="file" required />		  
+		</div>
+	</div> 
+	<div class="form-group row">
+		<div class="col-sm-offset-2 col-sm-10">
+			<input v-on:click="create()" type="button" class="btn btn-primary upload" value="送出" id="send_id">
+			<input type="reset" class="btn btn-danger" value="重置">
+		</div>
+	</div>
+</div>
+
+{% endblock %}

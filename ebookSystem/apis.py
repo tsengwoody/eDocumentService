@@ -242,3 +242,39 @@ class EditRecordViewSet(viewsets.ModelViewSet):
 	serializer_class = EditRecordSerializer
 	filter_backends = (filters.OrderingFilter, EditRecordEditorFilter, EditRecordServiceInfoFilter,)
 	ordering_fields = ('username',)
+
+#===== ISSN Book =====
+
+class ISSNBookInfoViewSet(viewsets.ModelViewSet):
+	queryset = ISSNBookInfo.objects.all()
+	serializer_class = ISSNBookInfoSerializer
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, )
+	search_fields = ('ISSN', 'title', )
+
+class ISSNBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
+	queryset = ISSNBook.objects.all().order_by('-date')
+	serializer_class = ISSNBookSerializer
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, )
+	ordering_fields = ('volume',)
+	@list_route(
+		methods=['post'],
+		url_name='upload',
+		url_path='action/upload',
+	)
+	def upload(self, request, pk=None):
+		res = {}
+
+		if request.method == 'POST':
+			serializer = ISSNBookSerializer(data=request.data)
+			if not serializer.is_valid():
+				res['detail'] = u'序列化驗證失敗' + unicode(serializer.errors)
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+			instance = serializer.save()
+
+			try:
+				self.post_resource(instance.epub_file, request.FILES['fileObject'])
+			except:
+				instance.delete()
+
+			res['detail'] = u'成功建立並上傳文件'
+			return Response(data=res, status=status.HTTP_202_ACCEPTED)

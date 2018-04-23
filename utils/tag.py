@@ -34,13 +34,9 @@ def add_base_url(src, id, encoding='utf-8'):
 #		return False
 
 #將txt純文字加入<p> tag
-def add_tag(source, destination, encoding='utf-8'):
-	with io.open(source, 'r', encoding=encoding) as sourceFile:
-		source_content_list = sourceFile.readlines()
-	source_content_list = [ '<p>' +cgi.escape(line).strip() +'</p>' for line in source_content_list ]
-	with codecs.open(destination, 'w', encoding=encoding) as destinationFile:
-		for line in source_content_list:
-			destinationFile.write(line)
+def add_tag(source):
+	source_content_list = [ '<p>' +cgi.escape(line).strip() +'</p>' for line in source.splitlines() ]
+	return ''.join(source_content_list)
 
 #將加入<p>文件加入<head>、<body> html的tag
 def add_template_tag(source, destination, encoding='utf-8'):
@@ -52,6 +48,14 @@ def add_template_tag(source, destination, encoding='utf-8'):
 	source_content = head +source_content +tail
 	with codecs.open(destination, 'w', encoding=encoding) as destinationFile:
 		destinationFile.write(source_content)
+
+#將加入<p>文件加入<head>、<body> html的tag
+def add_template_tag2(source):
+	template_content = u'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title></title></head><body>{}</body></html>'
+	head = template_content.split('{}')[0]
+	tail = template_content.split('{}')[1]
+	return head +source +tail
+
 
 #對校對者所完成的文件進行清理
 def clean_tag(source,  destination, title='', encoding='utf-8'):

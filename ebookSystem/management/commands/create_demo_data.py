@@ -237,7 +237,7 @@ class Command(BaseCommand):
 		count = [0,0,1,2,3]
 		for i in range(90):
 			EditLog.objects.create(
-				edit_record = EditRecord.objects.get(part=ebook, category='based', number_of_times=ebook.number_of_times),
+				edit_record = EditRecord.objects.get(part=ebook, number_of_times=ebook.number_of_times),
 				user = User.objects.get(username='root'),
 				time = timezone.now(),
 				order = i,
@@ -268,7 +268,7 @@ class Command(BaseCommand):
 		count = [0,0,1,2,3]
 		for i in range(80):
 			EditLog.objects.create(
-				edit_record = EditRecord.objects.get(part=ebook, category='based', number_of_times=ebook.number_of_times),
+				edit_record = EditRecord.objects.get(part=ebook, number_of_times=ebook.number_of_times),
 				user = User.objects.get(username='root'),
 				time = timezone.now(),
 				order = i,
@@ -380,6 +380,18 @@ class Command(BaseCommand):
 	*	We Want You, Apply Now.'''
 			,
 			order=1,
+		)
+		instance = ISSNBookInfo.objects.create(
+			ISSN='16822811',
+			title='科學人[中文版]',
+			house='遠流出版事業股份有限公司',
+		)
+		ISSNBook.objects.create(
+			ISSN_volume='16822811-3',
+			ISSN_book_info=instance,
+			volume='3',
+			date='2018-01-01',
+			owner=root,
 		)
 
 		client = Client()
