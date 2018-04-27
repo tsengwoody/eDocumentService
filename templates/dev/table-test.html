@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.js"></script>
+  <title>v-model-with-props</title>
+</head>
+
+<body>
+<!-- component template -->
+<script type="text/x-template" id="table-template">
+	<table>
+		<thead>
+			<tr>
+				<th v-for="key in columns">
+					{|{ key }|}
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr v-for="entry in data">
+				<td v-for="key in columns">
+					{|{ entry[key] }|}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</script>
+
+<!-- demo root element -->
+<div id="book_repository">
+	<table-component
+	:data="data"
+	:columns="columns">
+	</table-component>
+</div>
+
+
+<script>
+	// $(function(){
+	// 	grid2bstable('123')
+	// 	$('#123').find('tr').each(function () {
+	// 		let tr = $(this);
+	// 		tr.css('text-align', 'center');
+	// 	})
+
+	// });
+
+    Vue.options.delimiters = ['{|{', '}|}'];
+	Vue.component('table-component', {
+	  props: {
+        data: Array,  // define type
+        columns: Array,
+	  },
+	  template: '#table-template'
+	})
+
+    new Vue({
+        el: '#book_repository',
+        data: {
+            columns: [],
+            data: [],
+        },
+        created: function () {
+            this.get_table_data();
+        },
+        methods: {
+            get_table_data: function () {
+            	// run ajax get data in the future
+                var self = this;
+                self.columns = ['name', 'power', 'age'];
+                self.data = [
+                    { name: 'Chuck Norris', power: Infinity ,age: 18 },
+                    { name: 'Bruce Lee', power: 9000 ,age: 20 },
+                    { name: 'Jackie Chan', power: 7000 ,age: 22} ,
+                    { name: 'Jet Li', power: 8000 ,age: 24 }
+                ];
+            },
+        }
+    
+    })
+</script>
+
+</body>
+
+</html>

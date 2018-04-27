@@ -157,36 +157,12 @@
 	{% include 'comp/mx_scan_book_editor.html' %}
 	{% include 'comp/mx_serviceinfo_editrecord.html' %}
 
+	<a href="#id_main">移至主內容</a>
 	{% block nav %}
 	{% endblock %}
-<div id="divmodal_dialog_root"></div>
+	<div id="divmodal_dialog_root"></div>
 	<div class="container">
-		<div class="modal fade" id="dangerDialog" role="dialog">
-			<div class="modal-dialog modal-sm">
-				<div class="modal-content alert-danger">
-					<div class="modal-header alert-danger" role="alert">
-						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<strong>Error!!</strong>
-						<div class="alertMessage"></div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="modal fade" id="successDialog" role="dialog">
-			<div class="modal-dialog modal-sm">
-				<div class="modal-content alert-success">
-					<div class="modal-header alert-success" role="alert">
-						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<strong>Success!!</strong>
-						<div class="alertMessage"></div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		{% block message %} {% endblock %}
-		<div role="main">{% block content %}{% endblock %}</div>
+		<div role="main" id="id_main">{% block content %}{% endblock %}</div>
 	</div>
 	{% block footer %}
 	<footer class="footer" role="footer">

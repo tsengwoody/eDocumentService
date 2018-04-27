@@ -339,7 +339,7 @@ class EBook(models.Model):
 				try:
 					editRecord = EditRecord.objects.get(part=self, number_of_times=self.number_of_times)
 				except:
-					editRecord = EditRecord.objects.create(part=self, number_of_times=self.number_of_times)
+					editRecord = EditRecord.objects.create(part=self, number_of_times=self.number_of_times, category=kwargs['category'])
 
 				# new use DB to storage text
 				editRecord.textimport()
@@ -415,14 +415,14 @@ class EBook(models.Model):
 
 	def get_content(self):
 		editRecord = EditRecord.objects.get(part=self, number_of_times=self.number_of_times)
-		return editRecord.edit
+		return (editRecord.finish, editRecord.edit)
 
 	def set_content(self, finish_content, edit_content):
 		editRecord = EditRecord.objects.get(part=self, number_of_times=self.number_of_times)
 		editRecord.edit = edit_content
-		editRecord.finish += finish_content
+		editRecord.finish = finish_content
 		editRecord.save()
-		return True
+		return (editRecord.finish, editRecord.edit)
 
 	def load_full_content(self):
 		editRecord = EditRecord.objects.get(part=self, number_of_times=self.number_of_times)
@@ -610,7 +610,7 @@ class EBook(models.Model):
 
 	@staticmethod
 	def split_content(content):
-		content = content.split('<p>|----------|</p>\r\n')
+		content = content.split('<p>|----------|</p>')
 		finish_content = content[0]
 		edit_content = content[1]
 		if not len(content) == 2:

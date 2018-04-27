@@ -1,0 +1,260 @@
+{% extends "base_nav.html" %}
+{% block title %}
+平台書庫
+{% endblock %}
+
+{% block content %}
+
+<script type="text/x-template" id="table-template">
+	<table>
+		<thead>
+			<tr>
+				<th v-for="(value, key) in data[0]">
+					{|{ key }|}
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr v-for="entry in data">
+				<td v-for="cell in entry">
+					<div v-html="cell"></div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</script>
+
+<script type="text/x-template" id="tab-table-template">
+	<div>
+		<ul class="nav nav-tabs">
+			<template v-for="entry in data">
+				<li><a :href="'#index_tab_' +entry.label" name="index_tab_grp" data-toggle="tab" @click="pagetab_subtabfix(this);">{|{ entry.label }|}</a></li>
+			</template>
+		</ul>
+
+		<div class="tab-content" style="padding:20px 0px;">
+			<div
+				v-for="entry in data"
+				:id="'index_tab_' +entry.label"
+				class="tab-pane"
+			>
+				<h4 class="textfornvda">{|{ entry.label }|}</h4>
+				<table-component
+					:data="entry.data"
+				>
+				</table-component>
+			</div>
+		</div>
+
+	</div>
+
+</script>
+
+<!-- demo root element -->
+
+{% csrf_token %}
+
+<h3>平台書庫</h3>
+
+<ul class="nav nav-tabs">
+	<li class="active"><a href="#book_repository_recommend" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="true" onclick="pagetab_subtabfix(this);">書籍推薦</a></li>
+	<li><a href="#book_repository_index" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">索引</a></li>
+	<li><a href="#book_repository_search" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">查詢</a></li>
+</ul>
+
+<div class="tab-content" style="padding:20px 0px;">
+	<div id="book_repository_recommend" class="tab-pane active">
+		<h4 class="textfornvda">書籍推薦</h4>
+		<tab-table-component :data="data"></tab-table-component>
+	</div>
+	<div id="book_repository_index" class="tab-pane">
+		<h4 class="textfornvda">索引</h4>
+		<tab-table-component :data="data"></tab-table-component>
+	</div>
+	<div id="book_repository_search" class="tab-pane">
+		<h4 class="textfornvda">查詢</h4>
+
+		<div class="form-inline" style="margin-bottom:20px;">
+			<div class="form-group">
+				<input v-model="search_value" id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊" maxlength="15">
+			</div>
+			<div class="form-group">
+				<button type="button" class="btn btn-primary" @click="search()">搜尋</button>
+			</div>
+		</div>
+		<table-component :data="data[0]"></table-component>
+	</div>
+</div>
+
+<script>
+	// $(function(){
+	// 	grid2bstable('123')
+	// 	$('#123').find('tr').each(function () {
+	// 		let tr = $(this);
+	// 		tr.css('text-align', 'center');
+	// 	})
+
+	// });
+
+	Vue.options.delimiters = ['{|{', '}|}'];
+
+	Vue.component('table-component', {
+		props: {
+			data: Array,  // define type
+		},
+		template: '#table-template',
+	})
+
+	Vue.component('tab-table-component', {
+	  props: {
+		data: Array,  // define type
+		},
+		template: '#tab-table-template',
+	})
+
+	new Vue({
+		el: '#book_repository_index',
+		data: {
+			tab_list: {
+				'0': '總類',
+				'1': '哲學',
+				'2': '宗教',
+				'3': '科學',
+				'4': '應用科學',
+				'5': '社會科學',
+				'6': '史地類',
+				'7': '世界史地',
+				'8': '語言文學',
+				'9': '藝術',
+			},
+			data: [],
+		},
+		created: function () {
+			this.get_table_data();
+		},
+		methods: {
+			get_table_data: function () {
+				// run ajax get data
+				var self = this;
+
+				_.each(self.tab_list, function(v, k){
+					rest_aj_send('get', '/ebookSystem/api/bookinfos/', {'chinese_book_category': k})
+					.done(function(data) {
+
+						filter_data = []
+						_.each(data['data'], function(v){
+							filter_data.push({
+								'ISBN': v['ISBN'],
+								'書名': v['bookname'],
+								'裝訂冊數': v['bookbinding'],
+								'版次': v['order'],
+								'作者': v['author'],
+								'出版社': v['house'],
+								'出版日期': v['date'],
+								'動作': `<button type="button" class="btn btn-default" ISBN="` +v.ISBN +`" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>`
+								+`<a class="btn btn-default" role="button" href="/ebookSystem/library_origin_view?ISBN=` +v.ISBN +`" target="_blank" title="閱讀(另開新視窗)">閱讀</a>`,
+							})
+						})
+						self.data.push({
+							'data': filter_data,
+							'label': v,
+						})
+					})
+				})
+
+			},
+		}
+
+	})
+
+	new Vue({
+		el: '#book_repository_recommend',
+		data: {
+			tab_list: {
+				'newest': '最新上架',
+				'recommend': '平台推薦',
+				'hottest': '借閱排行',
+			},
+			data: [],
+		},
+		created: function () {
+			this.get_table_data();
+		},
+		methods: {
+			get_table_data: function () {
+				// run ajax get data
+				var self = this;
+
+				_.each(self.tab_list, function(v, k){
+					td = {}
+					td[k] = 15
+					rest_aj_send('get', '/ebookSystem/api/bookinfos/', td)
+					.done(function(data) {
+
+						filter_data = []
+						_.each(data['data'], function(v){
+							filter_data.push({
+								'ISBN': v['ISBN'],
+								'書名': v['bookname'],
+								'裝訂冊數': v['bookbinding'],
+								'版次': v['order'],
+								'作者': v['author'],
+								'出版社': v['house'],
+								'出版日期': v['date'],
+								'動作': `<button type="button" class="btn btn-default" ISBN="` +v.ISBN +`" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>`
+								+`<a class="btn btn-default" role="button" href="/ebookSystem/library_origin_view?ISBN=` +v.ISBN +`" target="_blank" title="閱讀(另開新視窗)">閱讀</a>`,
+							})
+						})
+						self.data.push({
+							'data': filter_data,
+							'label': v,
+						})
+					})
+				})
+
+			},
+		}
+
+	})
+
+	new Vue({
+		el: '#book_repository_search',
+		data: {
+			search_value: '',
+			data: [],
+		},
+		methods: {
+			search: function () {
+				// run ajax get data
+				var self = this;
+				self.data = []
+
+				rest_aj_send('get', '/ebookSystem/api/bookinfos/', {'search': self.search_value})
+				.done(function(data) {
+
+					filter_data = []
+					_.each(data['data'], function(v){
+						filter_data.push({
+							'ISBN': v['ISBN'],
+							'書名': v['bookname'],
+							'裝訂冊數': v['bookbinding'],
+							'版次': v['order'],
+							'作者': v['author'],
+							'出版社': v['house'],
+							'出版日期': v['date'],
+							'動作': `<button type="button" class="btn btn-default" ISBN="` +v.ISBN +`" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>`
+							+`<a class="btn btn-default" role="button" href="/ebookSystem/library_origin_view?ISBN=` +v.ISBN +`" target="_blank" title="閱讀(另開新視窗)">閱讀</a>`,
+						})
+					})
+					self.data.push(
+						filter_data,
+					)
+					alertmessage('success', '查詢完成，共取得 ' +self.data[0].length +' 筆資料')
+				})
+
+			},
+		}
+
+	})
+</script>
+{% endblock %}

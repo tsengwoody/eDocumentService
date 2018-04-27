@@ -217,6 +217,52 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	serializer_class = EBookSerializer
 	filter_backends = (EBookStatusFilter, EBookEditorFilter,)
 
+	@detail_route(
+		methods=['get', 'post'],
+		url_name='edit',
+		url_path='action/edit',
+	)
+	def edit(self, request, pk=None):
+		res = {}
+
+		obj = self.get_object()
+		if request.method == 'POST':
+			content = request.POST['edit']
+			origin_finish = request.POST['finish']
+			page = request.POST['page']
+			if request.POST['type'] == 'save':
+				try:
+					finishContent, editContent = obj.split_content(content)
+					if finishContent == '' or editContent == '':
+						raise SystemError('save mark error')
+				except BaseException as e:
+					res['detail'] = u'標記位置錯誤或有多個標記'
+					res['detail'] = unicode(e)
+					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+				finishContent = origin_finish + finishContent
+				obj.set_content(finish_content=finishContent, edit_content=editContent)
+				obj.edited_page=int(page)
+				obj.save()
+				res['detail'] = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
+
+			elif request.POST['type'] == 'finish':
+				finishContent = origin_finish + content
+				obj.set_content(finish_content=finishContent, edit_content='')
+				obj.change_status(1, 'review')
+				event = Event.objects.create(creater=request.user, action=obj)
+				res['detail'] = u'完成文件校對，將進入審核'
+			elif request.POST['type'] == 'load':
+				obj.load_full_content()
+				res['detail'] = u'成功載入全部文件內容'
+			res['finish'], res['edit'] = obj.get_content()
+			res['edited_page'] = obj.edited_page
+			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+		if request.method == 'GET':
+			res['finish'], res['edit'] = obj.get_content()
+			res['edited_page'] = obj.edited_page
+			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
 	def get_fullpath(self, ebook, dir, resource):
 		fullpath = None
 		if dir == 'OCR':

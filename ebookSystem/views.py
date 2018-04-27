@@ -86,7 +86,7 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 	if request.method == 'POST':
 		if request.POST['review'] == 'success':
 			for part in book.ebook_set.all():
-				part.change_status(1, 'active')
+				part.change_status(1, 'active', category='based')
 				BookOrder.refresh()
 			status = 'success'
 			message = u'審核通過文件'
@@ -423,6 +423,7 @@ def get_book_info_list(request, template_name='ebookSystem/book_info.html'):
 
 
 def edit_ajax(request, ISBN_part, *args, **kwargs):
+	print request.POST
 	user = request.user
 	response = {}
 	if not getattr(request.user, 'is_editor', None):

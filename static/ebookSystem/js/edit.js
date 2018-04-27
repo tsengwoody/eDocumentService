@@ -1,20 +1,4 @@
-// This function gets cookie with a given name
-function getCookie(name) {
-	var cookieValue = null;
-	if (document.cookie && document.cookie != '') {
-		var cookies = document.cookie.split(';');
-		for (var i = 0; i < cookies.length; i++) {
-			var cookie = jQuery.trim(cookies[i]);
-			// Does this cookie string begin with the name we want?
-			if (cookie.substring(0, name.length + 1) == (name + '=')) {
-				cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-				break;
-			}
-		}
-	}
-	return cookieValue;
-}
-function addMark(strValue, editor) {
+﻿function addMark(strValue, editor) {
 
 	var bm = editor.selection.getBookmark(0);
 	var caretPos = getCursorPosition(editor);
@@ -35,6 +19,7 @@ function addMark(strValue, editor) {
 	editor.insertContent(strValue);
 
 }
+
 function detectIdel() {
 	console.log("idel_min " + idel_min);
 	if (idel_min > 10) {
@@ -44,28 +29,23 @@ function detectIdel() {
 	}
 	idel_min++;
 }
+
 function calMins() {
-	var url = window.location.pathname;
-	var newUrl = "/" + url.split('/')[1] + "/" + "edit_ajax" + "/" + url.split('/')[3] + "/";
-	var transferData = {};
+	let url = window.location.pathname
+	let pk = url.split('/')
+	pk = pk[pk.length-2]
+	editlog_url = '/ebookSystem/edit_ajax/' +pk +'/';
+
+	let transferData = {};
 	transferData["online"] = change_count;
 	transferData["page"] = $('#id_page').val();
-	console.log(transferData);
-	$.ajax({
-		url: newUrl,
-		type: "POST",
-		data: transferData,
-		success: function (json) {
-			change_count = 0;
-			//console.log(json);
-		},
-		error: function (xhr, errmsg, err) {
-			change_count = 0;
-			//alert(xhr.status+" "+xhr.responseText);
-			console.log(xhr.status + ": " + xhr.responseText);
-		}
-	});
+
+	rest_aj_send('post', editlog_url, transferData)
+	.done(function(data) {
+		change_count = 0;
+	})
 }
+
 function setCursorPosition(editor, index) {
 	//get the content in the editor before we add the bookmark... 
 	//use the format: html to strip out any existing meta tags
@@ -94,6 +74,7 @@ function setCursorPosition(editor, index) {
 	//return the bookmark just because
 	return bookmark;
 }
+
 function getCursorPosition(editor) {
 	//set a bookmark so we can return to the current position after we reset the content later
 	var bm = editor.selection.getBookmark(0);
@@ -125,6 +106,7 @@ function getCursorPosition(editor) {
 
 	return index;
 }
+
 function rotateFormat() {
 
 	let imagePage = $('#imagePage');
@@ -157,6 +139,7 @@ var editor;
 var function_click = false;
 var idel_min = 0;
 var change_count = 0;
+
 function createHtmlEditor() {
 
 	// Initialize TinyMCE
@@ -176,7 +159,6 @@ function createHtmlEditor() {
 			});
 
 			editor.on('change', function (e) {
-				//console.log(idel_min);
 				idel_min = 0;
 				change_count++;
 			});
@@ -220,9 +202,29 @@ function createHtmlEditor() {
 				icon: false,
 				onclick: function () {
 					function_click = true;
-					//catchErrorHandling("load","");
-					$('form').append($("<input>").attr("type", "hidden").attr("name", "load").val("load"));
-					$('form').submit();
+
+					let url = window.location.pathname
+					let pk = url.split('/')
+					pk = pk[pk.length-2]
+					url = '/ebookSystem/api/ebooks/' +pk +'/action/edit/'
+
+					let transferData = {};
+					transferData["type"] = 'load'
+					transferData["finish"] = '';
+					transferData["edit"] = '';
+					transferData["page"] = '';
+
+					rest_aj_send('post', url, transferData)
+					.done(function(data) {
+						alertmessage('success', data['message'])
+						.done(function() {
+							location.reload(); //重新載入網頁以更新資訊
+						})
+					})
+					.fail(function(data){
+						alertmessage('error', data['message']);
+					})
+
 				}
 			});
 
@@ -232,15 +234,32 @@ function createHtmlEditor() {
 				icon: false,
 				onclick: function () {
 					if (editor.getContent().indexOf('<p>|----------|</p>') < 0)
-						//alertMessageDialog('error',"未存檔成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下完成按紐");
 						alertmessage('error', '未存檔成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下完成按紐');
 					else {
 						function_click = true;
 						editor.save();
-						//catchErrorHandling("save","");
-						$('form').append($("<input>").attr("type", "hidden").attr("name", "save").val("save"));
-						$('form').submit();
 
+						let url = window.location.pathname
+						let pk = url.split('/')
+						pk = pk[pk.length-2]
+						url = '/ebookSystem/api/ebooks/' +pk +'/action/edit/'
+
+						let transferData = {};
+						transferData["type"] = 'save'
+						transferData["finish"] = $('#id_finish').val();
+						transferData["edit"] = $('#id_edit').val();
+						transferData["page"] = $('#id_page').val();
+
+						rest_aj_send('post', url, transferData)
+						.done(function(data) {
+							alertmessage('success', data['message'])
+							.done(function() {
+								location.reload(); //重新載入網頁以更新資訊
+							})
+						})
+						.fail(function(data){
+							alertmessage('error', data['message']);
+						})
 					}
 				}
 			});
@@ -251,14 +270,32 @@ function createHtmlEditor() {
 				icon: false,
 				onclick: function () {
 					if (editor.getContent().indexOf('<p>|----------|</p>') > 0)
-						//alertMessageDialog('error',"未存檔成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下存檔按紐");
 						alertmessage('error', '未存檔成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下存檔按紐');
 					else {
 						function_click = true;
 						editor.save();
-						//catchErrorHandling("finish","");
-						$('form').append($("<input>").attr("type", "hidden").attr("name", "finish").val("finish"));
-						$('form').submit();
+
+						let url = window.location.pathname
+						let pk = url.split('/')
+						pk = pk[pk.length-2]
+						url = '/ebookSystem/api/ebooks/' +pk +'/action/edit/'
+
+						let transferData = {};
+						transferData["type"] = 'finish'
+						transferData["finish"] = $('#id_finish').val();
+						transferData["edit"] = $('#id_edit').val();
+						transferData["page"] = $('#id_page').val();
+
+						rest_aj_send('post', url, transferData)
+						.done(function(data) {
+							alertmessage('success', data['message'])
+							.done(function() {
+								location.reload(); //重新載入網頁以更新資訊
+							})
+						})
+						.fail(function(data){
+							alertmessage('error', data['message']);
+						})
 
 					}
 				}
@@ -269,14 +306,9 @@ function createHtmlEditor() {
 				name: 'finish',
 				icon: false,
 				onclick: function () {
-					function_click = true;
-					//catchErrorHandling("close","");
 					alertconfirm('是否確定離開?')
 					.done(function(){
-
-						$('form').append($("<input>").attr("type", "hidden").attr("name", "close").val("close"));
-						$('form').submit();
-
+						window.location.href = '/ebookSystem/service/';
 					})
 
 				}
@@ -311,9 +343,7 @@ function createHtmlEditor() {
 
 						//alert
 						alertmessage('success', '成功提交下載原始文字檔');
-					
 					})
-				   
 				}
 			});
 
@@ -321,39 +351,21 @@ function createHtmlEditor() {
 		plugins: ['save table searchreplace'],
 	});
 }
+
 $(document).ready(function () {
-	console.log("ready!");
+
 	function_click = false;
 	idel_min = 0;
 	change_count = 0;
 
-	// var dialog = '#Dialog';
-	// $(dialog).on('shown.bs.modal', function () {
-	//	 $(dialog + " .close").focus();
-	// });
-	// $(dialog).modal();
-
-	var csrftoken = getCookie('csrftoken');
-	$.ajaxSetup({
-		beforeSend: function (xhr, settings) {
-			if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-				// Send the token to same-origin, relative URLs only.
-				// Send the token only if the method warrants CSRF protection
-				// Using the CSRFToken value acquired earlier
-				xhr.setRequestHeader("X-CSRFToken", csrftoken);
-			}
-		}
-	});
-
 	var url = window.location.pathname;
-	if (url.split('/')[2] != "advanced") {
-		createHtmlEditor();
-		//calMins();
-		setInterval(function () {
-			calMins();
-			detectIdel();
-		}, 60000);
-	}
+
+	createHtmlEditor();
+	calMins();
+	setInterval(function () {
+		calMins();
+		detectIdel();
+	}, 60000);
 
 	$("#setValue .close").on("click", function () {
 		$('#setValue').hide();
