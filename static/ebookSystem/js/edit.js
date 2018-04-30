@@ -1,4 +1,4 @@
-﻿function addMark(strValue, editor) {
+function addMark(strValue, editor) {
 
 	var bm = editor.selection.getBookmark(0);
 	var caretPos = getCursorPosition(editor);
@@ -290,7 +290,7 @@ function createHtmlEditor() {
 						.done(function(data) {
 							alertmessage('success', data['message'])
 							.done(function() {
-								location.reload(); //重新載入網頁以更新資訊
+								window.location.href = '/ebookSystem/service/';
 							})
 						})
 						.fail(function(data){

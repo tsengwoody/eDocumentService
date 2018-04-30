@@ -373,7 +373,7 @@ class EBook(models.Model):
 				self.deadline = None
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['edit']:
-				self.edit_page = 0
+				self.edited_page = 0
 				self.load_full_content()
 				self.status = self.status +direction
 			else:
@@ -716,18 +716,8 @@ class EditRecord(models.Model):
 			return unicode(None)
 
 	def textimport(self):
-		import_source = self.number_of_times -1
-		if import_source == 0:
-			from utils import tag
-			source = self.part.get_path()
-			with io.open(source, 'r', encoding='utf-8') as sourceFile:
-				content = sourceFile.read()
-			self.edit = tag.add_tag(content)
-			self.save()
-		else:
-			source = EditRecord.objects.get(part=self.part, number_of_times=import_source)
-			self.edit = source.finish
-			self.save()
+		self.edit = self.source_text()
+		self.save()
 
 	def textexport(self):
 		pass
@@ -764,6 +754,49 @@ class EditRecord(models.Model):
 			except:
 				continue
 		return service_hours
+
+
+	def source_text(self):
+		import_source = self.number_of_times -1
+		if import_source == 0:
+			from utils import tag
+			source = self.part.get_path()
+			with io.open(source, 'r', encoding='utf-8') as sourceFile:
+				content = sourceFile.read()
+			return tag.add_tag(content)
+		else:
+			source = EditRecord.objects.get(part=self.part, number_of_times=import_source)
+			return source.finish
+
+	def destination_text(self):
+		pass
+
+	def diff(self):
+		from difflib import SequenceMatcher
+
+		srcSoup = BeautifulSoup(self.source_text(), 'html5lib')
+		src_content_text = srcSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
+
+		dstSoup = BeautifulSoup(self.finish, 'html5lib')
+		dst_content_text = dstSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
+
+		match = SequenceMatcher(None, src_content_text, dst_content_text).get_matching_blocks()
+		same_character = 0
+		for block in match:
+			same_character = same_character +block.size
+
+		return [len(match), same_character, len(src_content_text), len(dst_content_text)]
+
+	def edit_distance(self):
+		import Levenshtein
+
+		srcSoup = BeautifulSoup(self.source_text(), 'html5lib')
+		src_content_text = srcSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
+
+		dstSoup = BeautifulSoup(self.finish, 'html5lib')
+		dst_content_text = dstSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
+
+		return Levenshtein.distance(src_content_text, dst_content_text)
 
 class EditLog(models.Model):
 	edit_record = models.ForeignKey(EditRecord, blank=True, null=True, on_delete=models.SET_NULL, related_name='editlog_set')

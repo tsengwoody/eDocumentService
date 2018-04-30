@@ -263,6 +263,29 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			res['edited_page'] = obj.edited_page
 			return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
+	@detail_route(
+		methods=['post'],
+		url_name='review',
+		url_path='action/review',
+	)
+	def review(self, request, pk=None):
+		res = {}
+		obj = self.get_object()
+		if not int(request.POST['number_of_times']) == obj.number_of_times:
+			res['detail'] = u'校對次數資訊不符'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		if request.POST['result'] == 'success':
+			obj.change_status(1, 'finish')
+			for event in events:
+				event.response(status='success', message=u'', user=request.user)
+			res['message'] = u'審核通過文件'
+		if request.POST['result'] == 'error':
+			obj.change_status(-1, 'edit')
+			for event in events:
+				event.response(status='error', message=u'', user=request.user)
+			res['message'] = u'審核退回文件'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
 	def get_fullpath(self, ebook, dir, resource):
 		fullpath = None
 		if dir == 'OCR':
@@ -288,6 +311,22 @@ class EditRecordViewSet(viewsets.ModelViewSet):
 	serializer_class = EditRecordSerializer
 	filter_backends = (filters.OrderingFilter, EditRecordEditorFilter, EditRecordServiceInfoFilter,)
 	ordering_fields = ('username',)
+
+	@detail_route(
+		methods=['get', ],
+		url_name='analysis',
+		url_path='action/analysis',
+	)
+	def analysis(self, request, pk=None):
+		res = {}
+
+		obj = self.get_object()
+		[res['len_block'], res['same_character'], res['src_count'], res['dst_count']] = obj.diff()
+		res['edit_distance'] = obj.edit_distance()
+		res['delete_count'] = res['src_count'] -res['same_character']
+		res['insert_count'] = res['dst_count'] -res['same_character']
+		res['diff_count'] = res['dst_count'] -res['src_count']
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 #===== ISSN Book =====
 

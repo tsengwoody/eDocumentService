@@ -460,55 +460,7 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 	except: 
 		raise Http404("book or part does not exist")
 
-	[scanPageList, defaultPageURL] = part.get_org_image(request.user)
-	editContent = part.get_content()
-	if request.method == 'POST':
-		Token = request.session.get('postToken',default=None)
-		userToken = request.POST['postToken']
-		if  userToken !=Token:
-			raise Http404("請勿重覆傳送")
-		content = request.POST['content']
-		if request.POST.has_key('save'):
-			try:
-				[finishContent, editContent] = part.split_content(content)
-				if finishContent == '' or editContent == '':
-					raise SystemError('save mark error')
-			except BaseException as e:
-				status = 'error'
-				message = u'標記位置錯誤或有多個標記'
-				del request.session['postToken']
-				postToken = uuid.uuid1().hex
-				request.session['postToken'] = postToken
-				return locals()
-			part.set_content(finish_content=finishContent, edit_content=editContent)
-			part.edited_page=int(request.POST['page'])
-			part.save()
-			status = 'success'
-			message = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
-		elif request.POST.has_key('close'):
-			status = 'success'
-			message = u'關閉無儲存資料'
-			redirect_to = reverse('ebookSystem:service')
-		elif request.POST.has_key('finish'):
-			part.set_content(finish_content=content, edit_content='')
-			part.change_status(1, 'review')
-			status = 'success'
-			message = u'完成文件校對，將進入審核'
-			redirect_to = reverse('ebookSystem:service')
-			event = Event.objects.create(creater=request.user, action=part)
-		elif request.POST.has_key('load'):
-			part.load_full_content()
-			status = 'success'
-			message = u'成功載入全部文件內容'
-		[scanPageList, defaultPageURL] = part.get_org_image(request.user)
-		editContent = part.get_content()
-		del request.session['postToken']
-		postToken = uuid.uuid1().hex
-		request.session['postToken'] = postToken
-		return locals()
 	if request.method == 'GET':
-		postToken = uuid.uuid1().hex
-		request.session['postToken'] = postToken
 		return locals()
 
 @http_response
@@ -1066,3 +1018,4 @@ def ebook_change_status(request, pk):
 			raise e
 			return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 		return Response(status=status.HTTP_202_ACCEPTED)
+
