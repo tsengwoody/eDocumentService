@@ -9,7 +9,9 @@
 <h3>審核</h3>
 
 <div id="review_ebook">
-	<h4>基本資料</h4>
+	<h4>
+	<span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step1: 基本資料</h4>
+	<hr style="margin-top:5px;">
 	<ul>
 		<li>服務時間：{|{ info.get_date }|}</li>
 		<li>服務時數：{|{ info.service_hours }|}</li>
@@ -17,7 +19,9 @@
 	</ul>
 
 	<!-- step 2 -->
-	<h4>校對差異分析</h4>
+	<h4>
+	<span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step2: 校對差異分析</h4>
+	<hr style="margin-top:5px;">
 	<table class="table table-striped table-hover">
 		<tr>
 			<th>編輯距離</th>
@@ -42,7 +46,9 @@
 	</table>
 
 	<!--step 3-->
-	<h4>審核結果</h4>
+	<h4>
+	<span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step3: 審核結果</h4>
+	<hr style="margin-top:5px;">
 	<div class="form-group">
 		<input type="radio" id="success" value="success" v-model="result">
 		<label for="success">成功</label>

@@ -1,8 +1,38 @@
+<!--  scoped CSS -->
+<style scoped>
+.table {
+  margin: 10px 0px;
+}
+
+.table > thead {
+  background-color: #eee;
+}
+
+.table tr {
+  border: 0px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+.table > thead > tr > th {
+  text-align: center;
+  vertical-align: top;
+  padding: 10px 0px;
+  border: 0px; 
+  border-top: 1px solid #ddd;
+}
+
+.table > tbody > tr > td {
+  vertical-align: top;
+  padding: 5px;
+}
+</style>
+
 <script type="text/x-template" id="table-template">
 	<div v-if="!iser(data)">
-		<table>
+		<table class="table table-hover table-rwd">
 			<thead>
-				<tr>
+				<tr class="tr-only-hide">
 					<th v-for="(value, key) in data[0]">
 						{|{ key }|}
 					</th>
