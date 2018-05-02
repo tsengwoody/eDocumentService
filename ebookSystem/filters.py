@@ -5,9 +5,12 @@ from rest_framework import filters
 class BookStatusFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
 		status = request.query_params.get('status')
-		if status:
-			return queryset.filter(status=int(status))
-		else:
+		try:
+			if status:
+				return queryset.filter(status=int(status))
+			else:
+				return queryset
+		except:
 			return queryset
 
 class BookOwnerFilter(filters.BaseFilterBackend):

@@ -1,0 +1,68 @@
+<script type="text/x-template" id="table-template">
+	<div v-if="!iser(data)">
+		<table>
+			<thead>
+				<tr>
+					<th v-for="(value, key) in data[0]">
+						{|{ key }|}
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="entry in data">
+					<td v-for="cell in entry">
+						<div v-html="cell"></div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div v-else>
+		無資料
+	</div>
+</script>
+
+<script type="text/x-template" id="tab-table-template">
+	<div>
+		<ul class="nav nav-tabs">
+			<template v-for="entry in data">
+				<li><a :href="'#index_tab_' +entry.label" name="index_tab_grp" data-toggle="tab" @click="pagetab_subtabfix(this);">{|{ entry.label }|}</a></li>
+			</template>
+		</ul>
+
+		<div class="tab-content" style="padding:20px 0px;">
+			<div
+				v-for="entry in data"
+				:id="'index_tab_' +entry.label"
+				class="tab-pane"
+			>
+				<h4 class="textfornvda">{|{ entry.label }|}</h4>
+				<table-component
+					:data="entry.data"
+				>
+				</table-component>
+			</div>
+		</div>
+
+	</div>
+
+</script>
+
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+
+	Vue.component('table-component', {
+		props: {
+			data: Array,  // define type
+		},
+		template: '#table-template',
+	})
+
+	Vue.component('tab-table-component', {
+	  props: {
+		data: Array,  // define type
+		},
+		template: '#tab-table-template',
+	})
+
+</script>

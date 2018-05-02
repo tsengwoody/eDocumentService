@@ -1,58 +1,14 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 平台書庫
 {% endblock %}
 
 {% block content %}
 
-<script type="text/x-template" id="table-template">
-	<table>
-		<thead>
-			<tr>
-				<th v-for="(value, key) in data[0]">
-					{|{ key }|}
-				</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr v-for="entry in data">
-				<td v-for="cell in entry">
-					<div v-html="cell"></div>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-</script>
-
-<script type="text/x-template" id="tab-table-template">
-	<div>
-		<ul class="nav nav-tabs">
-			<template v-for="entry in data">
-				<li><a :href="'#index_tab_' +entry.label" name="index_tab_grp" data-toggle="tab" @click="pagetab_subtabfix(this);">{|{ entry.label }|}</a></li>
-			</template>
-		</ul>
-
-		<div class="tab-content" style="padding:20px 0px;">
-			<div
-				v-for="entry in data"
-				:id="'index_tab_' +entry.label"
-				class="tab-pane"
-			>
-				<h4 class="textfornvda">{|{ entry.label }|}</h4>
-				<table-component
-					:data="entry.data"
-				>
-				</table-component>
-			</div>
-		</div>
-
-	</div>
-
-</script>
-
 <!-- demo root element -->
 
 {% csrf_token %}
+{% include 'comp/table_vue_component.html' %}
 
 <h3>平台書庫</h3>
 
@@ -87,30 +43,6 @@
 </div>
 
 <script>
-	// $(function(){
-	// 	grid2bstable('123')
-	// 	$('#123').find('tr').each(function () {
-	// 		let tr = $(this);
-	// 		tr.css('text-align', 'center');
-	// 	})
-
-	// });
-
-	Vue.options.delimiters = ['{|{', '}|}'];
-
-	Vue.component('table-component', {
-		props: {
-			data: Array,  // define type
-		},
-		template: '#table-template',
-	})
-
-	Vue.component('tab-table-component', {
-	  props: {
-		data: Array,  // define type
-		},
-		template: '#tab-table-template',
-	})
 
 	new Vue({
 		el: '#book_repository_index',
@@ -135,9 +67,12 @@
 		methods: {
 			get_table_data: function () {
 				// run ajax get data
-				var self = this;
+				let self = this;
 
+				i=0
 				_.each(self.tab_list, function(v, k){
+					let index = i;
+					i=i+1
 					rest_aj_send('get', '/ebookSystem/api/bookinfos/', {'chinese_book_category': k})
 					.done(function(data) {
 
@@ -156,12 +91,12 @@
 							})
 						})
 						self.data.push({
+							'index': index,
 							'data': filter_data,
 							'label': v,
 						})
 					})
 				})
-
 			},
 		}
 

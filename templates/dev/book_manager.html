@@ -1,0 +1,97 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+書籍管理
+{% endblock %}
+
+{% block content %}
+
+<!-- demo root element -->
+
+{% csrf_token %}
+{% include 'comp/table_vue_component.html' %}
+
+<h3>書籍管理</h3>
+
+<div class="tab-content" style="padding:20px 0px;">
+	<div id="book_manager_search">
+		<h4 class="textfornvda">查詢</h4>
+
+		<div class="form-inline" style="margin-bottom:20px;">
+			<div class="form-group">
+				<select
+					v-model="search_filter"
+					id="id_search_choices" required
+				>
+					<option value="all" selected="selected">全部</option>
+					<option v-for="(value, key) in search_choices" :value="key">{|{ value }|}</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<input v-model="search_value" id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊" maxlength="15">
+			</div>
+			<div class="form-group">
+				<button type="button" class="btn btn-primary" @click="search()">搜尋</button>
+			</div>
+		</div>
+		<table-component :data="data[0]"></table-component>
+	</div>
+</div>
+
+<script>
+
+	new Vue({
+		el: '#book_manager_search',
+		data: {
+			search_choices: {
+				'0': '未審核',
+				'1': '未校對',
+				'2': '校對中',
+				'3': '審核校對中',
+				'4': '已完成',
+			},
+			search_filter: 'all',
+			search_value: '',
+			data: [],
+		},
+		methods: {
+			search: function () {
+				// run ajax get data
+				var self = this;
+				self.data = []
+
+				rest_aj_send('get', '/ebookSystem/api/books/', {'search': self.search_value, 'status': this.search_filter,})
+				.done(function(data) {
+
+					filter_data = []
+					_.each(data['data'], function(v){
+
+						let action = ''
+						action += `<a role="button" class="btn btn-primary" href="/ebookSystem/review_document/` +v.ISBN +`/">審核</button>`
+						action += `<a href="/ebookSystem/detail/` +v.ISBN +`/">分段資訊</a>`
+						action += `<button type="button" class="btn btn-primary" name="set_recommend" onclick="BookSetRecommend('` +v.ISBN +`', 'recommend')">推薦</button>`
+
+						filter_data.push({
+							'ISBN': v.ISBN,
+							'書名': v.book_info.bookname,
+							'頁數/總頁數': v.finish_page_count +'/' +v.page_count,
+							'已完成段數': v.finish_part_count,
+							'時數': v.service_hours,
+							'動作': action,
+						})
+					})
+					self.data.push(
+						filter_data,
+					)
+					alertmessage('success', '查詢完成，共取得 ' +self.data[0].length +' 筆資料')
+				})
+					.fail(function(data){
+						alertmessage('error', data['message'])
+					})
+
+			},
+		}
+
+	})
+
+</script>
+{% endblock %}
