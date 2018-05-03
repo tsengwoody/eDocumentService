@@ -33,11 +33,18 @@ class BookSerializer(serializers.ModelSerializer):
 			'service_hours',
 		]
 
+class EditRecordSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = EditRecord
+		fields = '__all__'
+
 class EBookSerializer(serializers.ModelSerializer):
+	current_editrecord = EditRecordSerializer(read_only=True)
 	scan_image = serializers.ReadOnlyField(source='get_source_list')
 	class Meta:
 		model = EBook
 		fields = [
+			'current_editrecord',
 			'scan_image',
 			'ISBN_part',
 			'book',
@@ -48,11 +55,6 @@ class EBookSerializer(serializers.ModelSerializer):
 			'get_date',
 			'status',
 		]
-
-class EditRecordSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = EditRecord
-		fields = '__all__'
 
 #===== ISSN Book =====
 

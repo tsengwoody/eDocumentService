@@ -321,13 +321,6 @@ class EBook(models.Model):
 				return k
 		return 'unknown'
 
-	def get_character_count(self, encoding='utf-8'):
-		with codecs.open(self.get_file(), 'r', encoding=encoding) as dstFile:
-			dst_content = dstFile.read()
-		dstSoup = BeautifulSoup(dst_content, 'html5lib')
-		dst_content_text = dstSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
-		return len(dst_content_text)
-
 	def change_status(self, direction, status, **kwargs):
 		if not self.status +direction == self.STATUS[status]:
 			raise SystemError('direction and status not match')
@@ -412,6 +405,13 @@ class EBook(models.Model):
 
 	def __unicode__(self):
 		return self.book.book_info.bookname+u'-part'+str(self.part)
+
+	def current_editrecord(self):
+		try:
+			editRecord = EditRecord.objects.get(part=self, number_of_times=self.number_of_times)
+		except:
+			return None
+		return  editRecord
 
 	def get_content(self):
 		editRecord = EditRecord.objects.get(part=self, number_of_times=self.number_of_times)
@@ -595,18 +595,6 @@ class EBook(models.Model):
 				raise e
 			except:
 				raise e
-
-	def edit_distance(self, src, dst, encoding='utf-8'):
-		import Levenshtein
-		with codecs.open(src, 'r', encoding=encoding) as srcFile:
-			src_content = srcFile.read()
-		srcSoup = BeautifulSoup(src_content, 'html5lib')
-		src_content_text = srcSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
-		with codecs.open(dst, 'r', encoding=encoding) as dstFile:
-			dst_content = dstFile.read()
-		dstSoup = BeautifulSoup(dst_content, 'html5lib')
-		dst_content_text = dstSoup.get_text().replace('\n', '').replace('\r', '').replace('   ', '').replace('  ', '').replace(u' ', '')
-		return Levenshtein.distance(src_content_text, dst_content_text)
 
 	@staticmethod
 	def split_content(content):

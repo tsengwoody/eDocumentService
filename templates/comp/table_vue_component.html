@@ -39,13 +39,20 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="entry in data">
+				<tr v-for="entry in show_data" >
 					<td v-for="cell in entry">
 						<div v-html="cell"></div>
 					</td>
 				</tr>
 			</tbody>
 		</table>
+		<div style="text-align:center;">
+			<ul class="pagination" style="margin:0px;">
+				<li class="prev" style="cursor:pointer;"><a href="#" @click="pagin_change(-1)">上一頁</a></li>
+				<li class=""><a>{|{ pagenow }|} / {|{ numpage }|}</a></li>
+				<li class="next" style="cursor:pointer;"><a href="#" @click="pagin_change(1)">下一頁</a></li>
+			</ul>
+		</div>
 	</div>
 	<div v-else>
 		無資料
@@ -79,6 +86,7 @@
 </script>
 
 <script>
+
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	Vue.component('table-component', {
@@ -88,6 +96,53 @@
 	          type: Number,
 	          default: 15
 	        },
+		},
+		data: function () {
+			return {
+				numperpage: 10,
+				pagenow: 1,
+			}
+		},
+		computed: {
+			numpage: function () {
+				return Math.ceil(this.data.length / this.numperpage);
+			},
+			numrow: function () {
+				return this.data.length
+			},
+			show_data: function () {
+				start = this.numperpage *(this.pagenow -1)
+				end = Math.min(this.numperpage *(this.pagenow), this.numrow)
+				return this.data.slice(start, end)
+			},
+		},
+		watch: {
+			data: function (val) {
+				this.pagenow = 1
+			},
+		},
+		methods: {
+			pagin_change: function(oper) {
+				//表格分頁切換
+
+				let pagenow = this.pagenow
+				let numperpage = this.numperpage
+				let numpage = this.numpage
+
+				if (String(oper) === '1') {
+					this.pagenow += 1;
+				}
+				else if (String(oper) === '-1') {
+					this.pagenow -= 1;
+				}
+				else {
+					this.pagenow = cint(oper);
+				}
+
+				//check
+				this.pagenow = Math.max(this.pagenow, 1);
+				this.pagenow = Math.min(this.pagenow, this.numpage);
+			},
 		},
 		template: '#table-template',
 	})

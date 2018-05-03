@@ -1,5 +1,4 @@
 <script>
-	let user;
 	function current_user(){
 
 		let user_id = $('div[user_id]').attr('user_id');
@@ -22,5 +21,6 @@
 		} else {
 			user = {};
 		}
+		return user
 	}
 </script>

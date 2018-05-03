@@ -12,11 +12,14 @@
 	<h4>
 	<span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step1: 基本資料</h4>
 	<hr style="margin-top:5px;">
-	<ul>
-		<li>服務時間：{|{ info.get_date }|}</li>
-		<li>服務時數：{|{ info.service_hours }|}</li>
-		<li>線上時數：{|{ info.stay_hours }|}</li>
-	</ul>
+
+	<template v-if="!iser(info)">
+		<ul>
+			<li>服務時間：{|{ info.get_date }|}</li>
+			<li>服務時數：{|{ info.service_hours }|}</li>
+			<li>線上時數：{|{ info.stay_hours }|}</li>
+		</ul>
+	</template>
 
 	<!-- step 2 -->
 	<h4>
@@ -47,21 +50,26 @@
 
 	<!--step 3-->
 	<h4>
-	<span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step3: 審核結果</h4>
+		<span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step3: 審核結果
+	</h4>
 	<hr style="margin-top:5px;">
-	<div class="form-group">
-		<input type="radio" id="success" value="success" v-model="result">
-		<label for="success">成功</label>
-		<br>
-		<input type="radio" id="error" value="error" v-model="result">
-		<label for="error">退回</label>
-		<br>
-		<template v-if="result=='error'">
-			<label for="reason">原因</label>
-			<input type="text" id="reason" v-model="reason">
-		</template>
-	</div>
-	<button  class="btn btn-primary" @click="review()" type="submit" id="send_id" name="send">送出</button>
+
+	<template v-if="ebook.status==3">
+		<div class="form-group">
+			<input type="radio" id="success" value="success" v-model="result">
+			<label for="success">成功</label>
+			<br>
+			<input type="radio" id="error" value="error" v-model="result">
+			<label for="error">退回</label>
+			<br>
+			<template v-if="result=='error'">
+				<label for="reason">原因</label>
+				<input type="text" id="reason" v-model="reason">
+			</template>
+		</div>
+		<button  class="btn btn-primary" @click="review()" type="submit" id="send_id" name="send">送出</button>
+	</template>
+
 </div>
 
 <script>
@@ -70,17 +78,21 @@
 	new Vue({
 		el: '#review_ebook',
 		data: {
-			info: {},
+			pk: '',
+			ebook: {},
 			analysis: {},
 			reason: '',
 			result: 'success', //success or error
 		},
 		computed: {
+			info: function () {
+				return this.ebook.current_editrecord
+			},
 			url_ebook: function () {
-				return '/ebookSystem/api/ebooks/' +this.info.part +'/'
+				return '/ebookSystem/api/ebooks/' +this.pk +'/'
 			},
 			url_editrecord: function () {
-				return '/ebookSystem/api/editrecords/' +this.pk +'/'
+				return '/ebookSystem/api/editrecords/' +this.info.id +'/'
 			},
 		},
 		created: function () {
@@ -89,14 +101,19 @@
 			this.pk = window.location.pathname.split('/')
 			this.pk = this.pk[this.pk.length-2]
 
-			rest_aj_send('get', this.url_editrecord +'action/analysis/', {})
+			rest_aj_send('get', this.url_ebook, {})
 			.done(function(data) {
-				self.analysis = data['data']
-			})
 
-			rest_aj_send('get', this.url_editrecord, {})
-			.done(function(data) {
-				self.info = data['data']
+				self.ebook = data['data']
+
+				if(iser(self.info)){
+					return -1
+				}
+
+				rest_aj_send('get', self.url_editrecord +'action/analysis/', {})
+				.done(function(data) {
+					self.analysis = data['data']
+				})
 			})
 
 		},

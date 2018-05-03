@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 平台書庫
 {% endblock %}
@@ -42,9 +42,33 @@
 
 <script>
 
+	function bookinfos_data(v){
+
+		action = `<button type="button" class="btn btn-default" ISBN="` +v.ISBN +`" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>`
+			+`<a class="btn btn-default" role="button" href="/ebookSystem/library_origin_view?ISBN=` +v.ISBN +`" target="_blank" title="閱讀(另開新視窗)">閱讀</a>`
+
+		temp_data = {
+			'ISBN': v['ISBN'],
+			'書名': v['bookname'],
+			'裝訂冊數': v['bookbinding'],
+			'版次': v['order'],
+			'作者': v['author'],
+			'出版社': v['house'],
+			'出版日期': v['date'],
+		}
+
+		if(user.is_guest){
+			temp_data['動作'] = action
+		}
+
+		filter_data.push(temp_data)
+
+	}
+
 	new Vue({
 		el: '#book_repository_index',
 		data: {
+			user: {},
 			tab_list: {
 				'0': '總類',
 				'1': '哲學',
@@ -60,6 +84,7 @@
 			data: [],
 		},
 		created: function () {
+			this.user = current_user()
 			this.get_table_data();
 		},
 		methods: {
@@ -75,19 +100,7 @@
 					.done(function(data) {
 
 						filter_data = []
-						_.each(data['data'], function(v){
-							filter_data.push({
-								'ISBN': v['ISBN'],
-								'書名': v['bookname'],
-								'裝訂冊數': v['bookbinding'],
-								'版次': v['order'],
-								'作者': v['author'],
-								'出版社': v['house'],
-								'出版日期': v['date'],
-								'動作': `<button type="button" class="btn btn-default" ISBN="` +v.ISBN +`" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>`
-								+`<a class="btn btn-default" role="button" href="/ebookSystem/library_origin_view?ISBN=` +v.ISBN +`" target="_blank" title="閱讀(另開新視窗)">閱讀</a>`,
-							})
-						})
+						_.each(data['data'], bookinfos_data)
 						self.data.push({
 							'index': index,
 							'data': filter_data,
@@ -125,19 +138,8 @@
 					.done(function(data) {
 
 						filter_data = []
-						_.each(data['data'], function(v){
-							filter_data.push({
-								'ISBN': v['ISBN'],
-								'書名': v['bookname'],
-								'裝訂冊數': v['bookbinding'],
-								'版次': v['order'],
-								'作者': v['author'],
-								'出版社': v['house'],
-								'出版日期': v['date'],
-								'動作': `<button type="button" class="btn btn-default" ISBN="` +v.ISBN +`" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>`
-								+`<a class="btn btn-default" role="button" href="/ebookSystem/library_origin_view?ISBN=` +v.ISBN +`" target="_blank" title="閱讀(另開新視窗)">閱讀</a>`,
-							})
-						})
+						_.each(data['data'], bookinfos_data)
+
 						self.data.push({
 							'data': filter_data,
 							'label': v,
@@ -153,6 +155,7 @@
 	new Vue({
 		el: '#book_repository_search',
 		data: {
+			user: {},
 			search_value: '',
 			data: [],
 		},
@@ -166,19 +169,7 @@
 				.done(function(data) {
 
 					filter_data = []
-					_.each(data['data'], function(v){
-						filter_data.push({
-							'ISBN': v['ISBN'],
-							'書名': v['bookname'],
-							'裝訂冊數': v['bookbinding'],
-							'版次': v['order'],
-							'作者': v['author'],
-							'出版社': v['house'],
-							'出版日期': v['date'],
-							'動作': `<button type="button" class="btn btn-default" ISBN="` +v.ISBN +`" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>`
-							+`<a class="btn btn-default" role="button" href="/ebookSystem/library_origin_view?ISBN=` +v.ISBN +`" target="_blank" title="閱讀(另開新視窗)">閱讀</a>`,
-						})
-					})
+					_.each(data['data'], bookinfos_data)
 					self.data.push(
 						filter_data,
 					)

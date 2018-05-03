@@ -270,6 +270,10 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	)
 	def review(self, request, pk=None):
 		res = {}
+
+		from genericUser.models import Event
+		events = Event.objects.filter(content_type__model='book', object_id=book.ISBN, status=Event.STATUS['review'])
+
 		obj = self.get_object()
 		if not int(request.POST['number_of_times']) == obj.number_of_times:
 			res['detail'] = u'校對次數資訊不符'
