@@ -26,7 +26,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	#permission_classes = (UserDataPermission, )
 	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, UserRoleFilter,)
 	ordering_fields = ('username',)
-	search_fields = ('username', 'email',)
+	search_fields = ('username', 'email', 'first_name', 'last_name',)
 
 	def perform_create(self, serializer):
 		instance = serializer.save(

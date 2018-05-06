@@ -1,0 +1,28 @@
+<script>
+	function current_user(){
+
+		let user
+		let user_id = $('div[user_id]').attr('user_id');
+		if(user_id!='None'){
+			//client
+			let client = new $.RestClient('/genericUser/api/', {
+				ajax: {
+					async: false,
+				},
+			});
+
+			client.add('users');
+
+			//read
+			client.users.read(user_id)
+				.done(function (data, textStatus, xhrObject) {
+					user = Object.assign(data);
+				})
+			//console.log(user);
+		} else {
+			user = {};
+		}
+		return user
+	}
+	let user = current_user()
+</script>

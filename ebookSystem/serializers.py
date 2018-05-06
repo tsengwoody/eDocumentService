@@ -6,8 +6,37 @@ class BookInfoSerializer(serializers.ModelSerializer):
 		model = BookInfo
 		fields = '__all__'
 
+class EditRecordSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = EditRecord
+		exclude = ('edit', 'finish',)
+
+class EBookSerializer(serializers.ModelSerializer):
+	bookname = serializers.ReadOnlyField(source='book.book_info.bookname')
+	current_editrecord = EditRecordSerializer(read_only=True)
+	editrecord_set = EditRecordSerializer(many=True, read_only=True)
+	scan_image = serializers.ReadOnlyField(source='get_source_list')
+
+	class Meta:
+		model = EBook
+		fields = [
+			'bookname',
+			'current_editrecord',
+			'editrecord_set',
+			'scan_image',
+			'ISBN_part',
+			'book',
+			'part',
+			'edited_page',
+			'number_of_times',
+			'deadline',
+			'get_date',
+			'status',
+			'service_hours',
+		]
+
 class BookSerializer(serializers.ModelSerializer):
-	ebook_set = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+	ebook_set = EBookSerializer(many=True, read_only=True)
 	book_info = BookInfoSerializer(read_only=True)
 	finish_page_count = serializers.ReadOnlyField(source='collect_finish_page_count')
 	finish_part_count = serializers.ReadOnlyField(source='collect_finish_part_count')
@@ -31,29 +60,6 @@ class BookSerializer(serializers.ModelSerializer):
 			'finish_page_count',
 			'finish_part_count',
 			'service_hours',
-		]
-
-class EditRecordSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = EditRecord
-		fields = '__all__'
-
-class EBookSerializer(serializers.ModelSerializer):
-	current_editrecord = EditRecordSerializer(read_only=True)
-	scan_image = serializers.ReadOnlyField(source='get_source_list')
-	class Meta:
-		model = EBook
-		fields = [
-			'current_editrecord',
-			'scan_image',
-			'ISBN_part',
-			'book',
-			'part',
-			'edited_page',
-			'number_of_times',
-			'deadline',
-			'get_date',
-			'status',
 		]
 
 #===== ISSN Book =====

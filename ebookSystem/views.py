@@ -45,8 +45,8 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 @http_response
-def generics(request, name):
-	template_name='ebookSystem/{0}.html'.format(name)
+def generics(request, name, pk=None):
+	template_name='ebookSystem/{0}.html'.format(name.split('/')[0])
 	return locals()
 
 @http_response
@@ -101,60 +101,6 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		redirect_to = reverse('manager:event_list', kwargs={'action':'book' })
 		return locals()
 
-@http_response
-def analyze_part(request, ISBN_part, template_name='ebookSystem/analyze_part.html'):
-	try:
-		part = EBook.objects.get(ISBN_part=ISBN_part)
-	except:
-		raise Http404("book does not exist")
-	if request.method == 'GET':
-		[len_block, same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
-		ed = edit_distance(part.get_path(), part.get_path('-finish'))
-		delete_count = src_count -same_character
-		insert_count = dst_count -same_character
-		diff_count = dst_count -src_count
-		if part.get_file() is not None:
-			lc_dict = last_character(part.get_file())
-			lc_list = lc_dict.items()
-			re_dict = find_repeat(part.get_file())
-			re_list = re_dict.items()
-		status = u'success'
-		message = u'分析文件'
-		return locals()
-	if request.method == 'POST':
-		if part.get_file() is None:
-			status = u'error'
-			message = u'文件未就緒'
-			return locals()
-		if request.POST.has_key('download'):
-			download_path = part.get_file()
-			download_filename = os.path.basename(download_path)
-			status = u'success'
-			message = u'下載'
-			return locals()
-		elif request.POST.has_key('upload') and request.FILES.has_key('fileObject'):
-			with open(part.get_file(), 'wb+') as dst:
-				for chunk in request.FILES['fileObject'].chunks():
-					dst.write(chunk)
-			[len_block, same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
-			ed = edit_distance(part.get_path(), part.get_path('-finish'))
-			delete_count = src_count -same_character
-			insert_count = dst_count -same_character
-			diff_count = dst_count -src_count
-			lc_dict = last_character(part.get_file())
-			lc_list = lc_dict.items()
-			re_dict = find_repeat(part.get_file())
-			re_list = re_dict.items()
-			status = u'success'
-			message = u'檔案成功更新'
-			return locals()
-		elif request.POST.has_key('finish'):
-			part.change_status(1, 'an_finish', user=request.user)
-			status = u'success'
-			message = u'完成'
-			redirect_to = reverse('account:an_service')
-			return locals()
-
 @user_category_check(['manager'])
 @http_response
 def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'):
@@ -184,76 +130,6 @@ def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'
 			for event in events:
 				event.response(status='error', message=request.POST['reason'], user=request.user)
 		redirect_to = reverse('manager:event_list', kwargs={'action':'ebook' })
-		return locals()
-
-@http_response
-def review_ApplyDocumentAction(request, id, template_name='ebookSystem/review_ApplyDocumentAction.html'):
-	try:
-		action = ApplyDocumentAction.objects.get(id=id)
-		event = Event.objects.get(content_type__model='applydocumentaction', object_id=action.id, status=Event.STATUS['review'])
-	except:
-		raise Http404("ApplyDocumentAction does not exist")
-	if request.method == 'POST':
-		#book info 設定
-		try:
-			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
-		except:
-			newBookInfo = bookInfoForm.save(commit=False)
-			newBookInfo.ISBN = request.POST['ISBN']
-			newBookInfo.save()
-		#上傳文件設定
-		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
-		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.zip')
-		if os.path.exists(uploadPath):
-			status = 'error'
-			message = u'文件已存在'
-			return locals()
-		handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
-		#壓縮文件測試
-		try:
-			with ZipFile(uploadFilePath, 'r') as uploadFile:
-				uploadFile.testzip()
-				uploadFile.extractall(uploadPath)
-		except:
-			shutil.rmtree(uploadPath)
-			status = 'error'
-			message = u'非正確ZIP文件'
-			return locals()
-		#資料夾檢查
-		from utils import validate
-		try:
-			validate.validate_folder(
-				os.path.join(uploadPath, 'OCR'),
-				os.path.join(uploadPath, 'source'),
-				50
-			)
-		except BaseException as e:
-			shutil.rmtree(uploadPath)
-			status = 'error'
-			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
-			return locals()
-		#建立book object
-		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path=uploadPath, page_per_part=50)
-		try:
-			newBook.set_page_count()
-		except:
-			shutil.rmtree(uploadPath)
-			status = 'error'
-			message = u'set_page_count error'
-			return locals()
-		newBook.scaner = request.user
-		newBook.owner = request.user
-		if request.POST.has_key('designate'):
-			newBook.is_private = True
-		newBook.save()
-		newBook.create_EBook()
-		event = Event.objects.create(creater=request.user, action=newBook)
-		redirect_to = '/'
-		status = 'success'
-		message = u'成功建立並上傳文件'
-		event.response(status=status, message=message, user=request.user)
-		return locals()
-	if request.method == 'GET':
 		return locals()
 
 @http_response
@@ -1018,4 +894,3 @@ def ebook_change_status(request, pk):
 			raise e
 			return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 		return Response(status=status.HTTP_202_ACCEPTED)
-

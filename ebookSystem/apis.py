@@ -106,8 +106,6 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				res['detail'] = u'建立分段失敗'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-			event = Event.objects.create(creater=request.user, action=newBook)
-
 			res['detail'] = u'成功建立並上傳文件'
 			return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
@@ -217,6 +215,60 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	serializer_class = EBookSerializer
 	filter_backends = (EBookStatusFilter, EBookEditorFilter,)
 
+	@list_route(
+		methods=['get', 'post'],
+		url_name='service',
+		url_path='action/service',
+	)
+	def service(self, request, pk=None):
+		res = {}
+
+		if request.method == 'POST':
+			editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
+			GET_MAX_EBOOK = 6
+			if len(editingPartList) >= GET_MAX_EBOOK:
+				res['detail'] = u'您已有超過{0}段文件，請先校對完成再領取'.format(GET_MAX_EBOOK)
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+			try:
+				partialBook = BookOrder.objects.filter(book__status=Book.STATUS['active']).order_by('order')[0].book
+			except BaseException as e:
+				res['detail'] = u'無文件：{0}'.format(unicode(e))
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
+			getPart.change_status(1, 'edit', user=request.user, deadline=datetime.date.today() +datetime.timedelta(days=5))
+			serializer = EBookSerializer(getPart)
+			res['data'] = serializer.data
+			res['detail'] = u'成功取得文件'
+			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+		if request.method == 'GET':
+			try:
+				partialBook = BookOrder.objects.filter(book__status=Book.STATUS['active']).order_by('order')[0].book
+			except BaseException as e:
+				res['detail'] = u'無文件：{0}'.format(unicode(e))
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
+			serializer = EBookSerializer(getPart)
+			res['data'] = serializer.data
+			res['detail'] = u'成功取得文件'
+			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	@detail_route(
+		methods=['post'],
+		url_name='change_status',
+		url_path='action/change_status',
+	)
+	def change_status(self, request, pk=None):
+		res = {}
+
+		obj = self.get_object()
+		direction = int(request.data['direction'])
+		ebook_status = request.data['status']
+		obj.change_status(direction, ebook_status)
+		serializer = EBookSerializer(obj)
+		res['data'] = serializer.data
+		res['detail'] = u'成功取得文件'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
 	@detail_route(
 		methods=['get', 'post'],
 		url_name='edit',
@@ -250,7 +302,6 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				finishContent = origin_finish + content
 				obj.set_content(finish_content=finishContent, edit_content='')
 				obj.change_status(1, 'review')
-				event = Event.objects.create(creater=request.user, action=obj)
 				res['detail'] = u'完成文件校對，將進入審核'
 			elif request.POST['type'] == 'load':
 				obj.load_full_content()
@@ -271,22 +322,15 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	def review(self, request, pk=None):
 		res = {}
 
-		from genericUser.models import Event
-		events = Event.objects.filter(content_type__model='book', object_id=book.ISBN, status=Event.STATUS['review'])
-
 		obj = self.get_object()
 		if not int(request.POST['number_of_times']) == obj.number_of_times:
 			res['detail'] = u'校對次數資訊不符'
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		if request.POST['result'] == 'success':
 			obj.change_status(1, 'finish')
-			for event in events:
-				event.response(status='success', message=u'', user=request.user)
 			res['message'] = u'審核通過文件'
 		if request.POST['result'] == 'error':
 			obj.change_status(-1, 'edit')
-			for event in events:
-				event.response(status='error', message=u'', user=request.user)
 			res['message'] = u'審核退回文件'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 

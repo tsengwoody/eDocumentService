@@ -17,7 +17,6 @@ api_urlpatterns = copy.copy(router.urls)
 
 urlpatterns = [
 	url(r'^mathml', views.mathml, name='mathml'),
-	url(r'^analyze_part/(?P<ISBN_part>[\d-]+)/$', views.analyze_part, name='analyze_part'),
 	url(r'^book_info/(?P<ISBN>[0-9Xx]+)/$', views.book_info, name='book_info'),
 	url(r'^get_book_info_list/$', views.get_book_info_list, name='get_book_info_list'),
 	url(r'^detail/(?P<book_ISBN>[0-9]+)/$', views.detail, name='detail'),
@@ -28,7 +27,6 @@ urlpatterns = [
 	url(r'^full_edit/(?P<ISBN_part>[0-9\-]+)/$', views.full_edit, name='full_edit'),
 	url(r'^review_document/(?P<book_ISBN>[0-9]+)/$', views.review_document, name='review_document'),
 	url(r'^review_part/(?P<ISBN_part>[\d-]+)/$', views.review_part, name='review_part'),
-	url(r'^review_ApplyDocumentAction/(?P<id>[\d-]+)/$', views.review_ApplyDocumentAction, name='review_ApplyDocumentAction'),
 	url(r'^book_download/(?P<ISBN>[0-9]+)$', views.book_download, name='book_download'),
 	url(r'^ebook_download/(?P<ISBN_part>[0-9\-]+)$', views.ebook_download, name='ebook_download'),
 	url(r'^message_send$', views.message_send, name='message_send'),
@@ -46,5 +44,5 @@ urlpatterns = [
 	url(r'^book_action/$', views.book_action, name='book_action'),
 	url(r'^ebook_change_status/(?P<pk>[\d-]+)/$', views.ebook_change_status, name='ebook_change_status'),
 	url(r'^api/', include(api_urlpatterns, namespace='api')),
-	url(r'^generics/(?P<name>[\w\d]+)/$', views.generics, name='generics'),
+	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),
 ]

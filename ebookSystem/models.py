@@ -314,7 +314,6 @@ class EBook(models.Model):
 		except:
 			return {}
 
-
 	def status_int2str(self):
 		for k, v in self.STATUS.iteritems():
 			if v == self.status:
@@ -340,7 +339,7 @@ class EBook(models.Model):
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['edit']:
 				self.editor = kwargs['user']
-				self.get_date = timezone.now()
+				self.get_date = datetime.date.today()
 				self.deadline = kwargs['deadline']
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['review']:
@@ -381,19 +380,6 @@ class EBook(models.Model):
 		self.book.check_status()
 		return self.status
 
-	def get_image(self, user):
-		water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, user.username)
-		source_path = self.book.path +u'/source'
-		fileList=os.listdir(source_path)
-		fileList = sorted(fileList)
-		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
-		scanPageList = scanPageList[self.begin_page:self.end_page+1]
-		if not os.path.exists(water_path +'/' +scanPageList[0]):
-			self.create_watermark_image(user)
-		default_page_url = water_path +u'/' +scanPageList[self.edited_page]
-		default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
-		return [scanPageList, default_page_url]
-
 	def get_path(self, string=''):
 		if string == 'public':
 			return self.book.path.replace('/file', '/static')
@@ -401,7 +387,6 @@ class EBook(models.Model):
 			return self.book.path +'/OCR/part{0}{1}.html'.format(self.part, string)
 		elif string in ['', '-edit', '-finish', '-final', ]:
 			return self.book.path +'/OCR/part{0}{1}.txt'.format(self.part, string)
-
 
 	def __unicode__(self):
 		return self.book.book_info.bookname+u'-part'+str(self.part)
@@ -430,47 +415,6 @@ class EBook(models.Model):
 		editRecord.finish = ''
 		editRecord.save()
 		return editRecord.edit
-
-	def get_org_image(self, user):
-		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, "org")
-		source_path = self.book.path +u'/source'
-		fileList=os.listdir(source_path)
-		fileList = sorted(fileList)
-		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
-		scanPageList = scanPageList[self.begin_page:self.end_page+1]
-		if not os.path.exists(org_path +'/' +scanPageList[0]):
-			self.create_org_image()
-		default_page_url = org_path +u'/' +scanPageList[self.edited_page]
-		default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
-		return [scanPageList, default_page_url]
-
-	def create_org_image(self):
-		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, "org")
-		source_path = self.book.path +u'/source'
-		fileList=os.listdir(source_path)
-		fileList = sorted(fileList)
-		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
-		scanPageList = scanPageList[self.begin_page:self.end_page+1]
-		if os.path.exists(org_path +'/' +scanPageList[0]):
-			return False
-		if not os.path.exists(org_path):
-			os.makedirs(org_path, 0770)
-		for s in scanPageList:
-			shutil.copyfile(source_path +'/' +s, org_path +'/' +s)
-		return True
-
-	def get_image(self, user):
-		water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book.book_info.ISBN, user.username)
-		source_path = self.book.path +u'/source'
-		fileList=os.listdir(source_path)
-		fileList = sorted(fileList)
-		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
-		scanPageList = scanPageList[self.begin_page:self.end_page+1]
-		if not os.path.exists(water_path +'/' +scanPageList[0]):
-			self.create_watermark_image(user)
-		default_page_url = water_path +u'/' +scanPageList[self.edited_page]
-		default_page_url=default_page_url.replace(BASE_DIR +'/static/', '')
-		return [scanPageList, default_page_url]
 
 	def create_watermark_image(self, user):
 		water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}/'.format(self.book.book_info.ISBN, user.username)
@@ -522,42 +466,18 @@ class EBook(models.Model):
 		from utils import tag
 		tag.add_template_tag(src, dst)
 
-	def add_template_tag2(self, src, dst, encoding='utf-8'):
-		from utils import tag
-
-		with io.open(src, 'r', encoding='utf-8') as sourceFile:
-			content = sourceFile.read()
-
-		with io.open(dst, 'w', encoding='utf-8') as destinationFile:
-			destinationFile.write(tag.add_template_tag2(content))
-
-	def clean_tag(self, src, dst, template='book_template.html', encoding='utf-8'):
-		from utils import tag
-		title = self.book.book_info.bookname +'-part{0}'.format(self.part)
-		tag.clean_tag(src, dst, title)
-
 	def replace(self):
 		from utils.replace import replace
 		shutil.copy2(self.get_clean_file(), self.get_path('-re'))
 		replace(self.get_path('-re'))
 		return self.get_path('-re')
 
-	def get_file(self):
-		if self.STATUS['finish'] <= self.status < self.STATUS['sc_finish']:
-			return self.get_path('-ge')
-		elif self.STATUS['sc_finish'] <= self.status < self.STATUS['an_finish']:
-			return self.get_path('-sc')
-		elif self.STATUS['an_finish'] <= self.status < self.STATUS['final']:
-			return self.get_path('-an')
-		elif self.STATUS['final'] <= self.status:
-			return self.get_path('-final')
-		else:
-			return None
-
 	def get_clean_file(self):
 		try:
-			shutil.copy2(self.get_file(), self.get_path('-clean'))
-			return self.get_path('-clean')
+			clean_file = self.path('-clean')
+			with io.open(clean_file, 'w', encoding='utf-8') as f:
+				f.write(self.current_editrecord().finish)
+			return clean_file
 		except:
 			return None
 
@@ -742,7 +662,6 @@ class EditRecord(models.Model):
 			except:
 				continue
 		return service_hours
-
 
 	def source_text(self):
 		import_source = self.number_of_times -1

@@ -1,6 +1,6 @@
 ﻿{% extends "base_nav.html" %}
 {% block title %}
-書籍管理
+分段管理
 {% endblock %}
 
 {% block content %}
@@ -10,10 +10,10 @@
 {% csrf_token %}
 {% include 'comp/table_vue_component.html' %}
 
-<h3>書籍管理</h3>
+<h3>分段管理</h3>
 
 <div class="tab-content" style="padding:20px 0px;">
-	<div id="book_manager_search">
+	<div id="ebook_manager_search">
 		<h4 class="textfornvda">查詢</h4>
 
 		<div class="form-inline" style="margin-bottom:20px;">
@@ -40,7 +40,7 @@
 <script>
 
 	new Vue({
-		el: '#book_manager_search',
+		el: '#ebook_manager_search',
 		data: {
 			search_choices: {
 				'0': '未審核',
@@ -59,23 +59,18 @@
 				var self = this;
 				self.data = []
 
-				rest_aj_send('get', '/ebookSystem/api/books/', {'search': self.search_value, 'status': this.search_filter,})
+				rest_aj_send('get', '/ebookSystem/api/ebooks/', {'search': self.search_value, 'status': this.search_filter,})
 				.done(function(data) {
 
 					filter_data = []
 					_.each(data['data'], function(v){
 
 						let action = ''
-						action += `<a role="button" class="btn btn-primary" href="/ebookSystem/review_document/` +v.ISBN +`/">審核</button>`
-						action += `<a href="/ebookSystem/detail/` +v.ISBN +`/">分段資訊</a>`
-						action += `<button type="button" class="btn btn-primary" name="set_recommend" onclick="BookSetRecommend('` +v.ISBN +`', 'recommend')">推薦</button>`
+						action += `<a role="button" class="btn btn-primary" href="/ebookSystem/generics/review_ebook/` +v.ISBN_part +`/">審核</button>`
 
 						filter_data.push({
-							'ISBN': v.ISBN,
-							'書名': v.book_info.bookname,
-							'頁數/總頁數': v.finish_page_count +'/' +v.page_count,
-							'已完成段數': v.finish_part_count,
-							'時數': v.service_hours,
+							'文件': v.bookname,
+							'段數': v.part,
 							'動作': action,
 						})
 					})

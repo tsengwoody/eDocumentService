@@ -25,7 +25,7 @@
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">管理<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						{% if request.user.is_manager %}
-						<li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
+						<li><a href="{% url 'ebookSystem:generics' 'book_manager' %}">書籍管理</a></li>
 						<li><a href="{% url 'manager:event_list' 'user' %}">審核會員</a></li>
 						<li><a href="{% url 'genericUser:generics' 'bannercontent_create' %}">管理首頁 Banner</a></li>
 						<li><a href="{% url 'manager:statistics' %}">統計資訊</a></li>
@@ -35,10 +35,8 @@
 						<li><a href="{% url 'genericUser:user_manager' %}">使用者管理</a></li>
 						{% endif %}
 						{% if request.user.is_superuser %}
-						<li><a href="{% url 'manager:event_list' 'ebook' %}">審核校對文件</a></li>
+						<li><a href="{% url 'ebookSystem:generics' 'ebook_manager' %}">分段管理</a></li>
 						<li><a href="{% url 'ebookSystem:bookorder_list' %}">校對順序</a></li>
-						<li><a href="{% url 'manager:event_list' 'applydocumentaction' %}">代掃申請列表</a></li>
-						<li><a href="{% url 'ebookSystem:generics' 'book_manager' %}">書籍管理</a></li>
 						{% endif %}
 					</ul>
 				</li>
@@ -68,9 +66,6 @@
 				<li><a href="{% url 'ebookSystem:generics' 'book_manager_person' %}">校對進度</a></li>
 				<li><a href="{% url 'ebookSystem:book_saelf' %}">借閱書櫃</a></li>
 				{% endif %}
-				{% if request.user.is_superuser %}
-				<li><a href="{% url 'account:an_service' %}">分析</a></li>
-				{% endif %}
 				{% endif %}
 				<li><a href="{% url 'ebookSystem:generics' 'book_repository' %}">平台書庫</a></li>
 				{% if not request.user.is_license and request.user.is_authenticated %}
@@ -82,7 +77,6 @@
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false"><span class="glyphicon glyphicon-user"></span>帳號<span class="caret"></span></a>
 					<ul class="dropdown-menu">
-						<li><a href="{% url 'genericUser:event_list' %}">平台消息</a></li>
 						{% if request.user.is_editor %}
 						<li><a href="{% url 'genericUser:serviceinfo_list' %}">服務時數</a></li>
 						{% endif %}
