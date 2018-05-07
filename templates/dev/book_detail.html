@@ -1,4 +1,4 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 書籍詳細
 {% endblock %}
@@ -56,7 +56,7 @@
 		},
 		computed: {
 			url: function () {
-				return '/ebookSystem/api/books/' +this.pk +'/'
+				return '/ebookSystem/api/bookadds/' +this.pk +'/'
 			},
 			ebook: function () {
 				return this.book.ebook_set[this.ebook_index]

@@ -1,11 +1,13 @@
 ﻿{% extends "ebookSystem/review.html" %}
-{% load staticfiles %}
 {% block title %}
 {{ part }}審核
 {% endblock %}
 
 {% block content %}
 {% csrf_token %}
+{% include 'comp/list_vue_component.html' %}
+{% include 'comp/table_vue_component.html' %}
+
 <h3>審核</h3>
 
 <div id="review_ebook">
@@ -13,13 +15,7 @@
 	<span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step1: 基本資料</h4>
 	<hr style="margin-top:5px;">
 
-	<template v-if="!iser(info)">
-		<ul>
-			<li>服務時間：{|{ info.get_date }|}</li>
-			<li>服務時數：{|{ info.service_hours }|}</li>
-			<li>線上時數：{|{ info.stay_hours }|}</li>
-		</ul>
-	</template>
+	<ul-component :data="info"></ul-component>
 
 	<!-- step 2 -->
 	<h4>
@@ -80,19 +76,23 @@
 		data: {
 			pk: '',
 			ebook: {},
+			current_editrecord: {},
 			analysis: {},
 			reason: '',
 			result: 'success', //success or error
 		},
 		computed: {
 			info: function () {
-				return this.ebook.current_editrecord
+				return {
+					'服務時間': this.ebook.get_date,
+					'線上時數': this.ebook.service_hours,
+				}
 			},
 			url_ebook: function () {
 				return '/ebookSystem/api/ebooks/' +this.pk +'/'
 			},
 			url_editrecord: function () {
-				return '/ebookSystem/api/editrecords/' +this.info.id +'/'
+				return '/ebookSystem/api/editrecords/' +this.ebook.current_editrecord.id +'/'
 			},
 		},
 		created: function () {
@@ -106,9 +106,11 @@
 
 				self.ebook = data['data']
 
-				if(iser(self.info)){
+				if(iser(self.ebook.current_editrecord)){
 					return -1
 				}
+
+				self.current_editrecord = self.ebook.current_editrecord
 
 				rest_aj_send('get', self.url_editrecord +'action/analysis/', {})
 				.done(function(data) {

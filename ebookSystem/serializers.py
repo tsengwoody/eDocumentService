@@ -7,6 +7,7 @@ class BookInfoSerializer(serializers.ModelSerializer):
 		fields = '__all__'
 
 class EditRecordSerializer(serializers.ModelSerializer):
+	#editor_name = serializers.ReadOnlyField(read_only=True)
 	class Meta:
 		model = EditRecord
 		exclude = ('edit', 'finish',)
@@ -36,7 +37,7 @@ class EBookSerializer(serializers.ModelSerializer):
 		]
 
 class BookSerializer(serializers.ModelSerializer):
-	ebook_set = EBookSerializer(many=True, read_only=True)
+	#ebook_set = EBookSerializer(many=True, read_only=True)
 	book_info = BookInfoSerializer(read_only=True)
 	finish_page_count = serializers.ReadOnlyField(source='collect_finish_page_count')
 	finish_part_count = serializers.ReadOnlyField(source='collect_finish_part_count')
@@ -61,6 +62,9 @@ class BookSerializer(serializers.ModelSerializer):
 			'finish_part_count',
 			'service_hours',
 		]
+
+class BookAddSerializer(BookSerializer):
+	ebook_set = EBookSerializer(many=True, read_only=True)
 
 #===== ISSN Book =====
 

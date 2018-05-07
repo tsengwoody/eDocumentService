@@ -210,6 +210,9 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			res['detail'] = u'成功建立並上傳文件'
 			return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
+class BookAddViewSet(BookViewSet):
+	serializer_class = BookAddSerializer
+
 class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = EBook.objects.all()
 	serializer_class = EBookSerializer

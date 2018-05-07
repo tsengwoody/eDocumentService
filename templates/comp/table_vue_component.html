@@ -39,7 +39,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="entry in show_data" >
+				<tr v-for="(entry,index) in data" v-if="index>=start&&index<end">
 					<td v-for="cell in entry">
 						<div v-html="cell"></div>
 					</td>
@@ -66,7 +66,6 @@
 				<li :class="{'active':(index===0)}"><a :href="'#index_tab_' +entry.label" name="index_tab_grp" data-toggle="tab" :aria-expanded="!!(index===0)" @click="pagetab_subtabfix(this);">{|{ entry.label }|}</a></li>
 			</template>
 		</ul>
-
 		<div class="tab-content" style="padding:20px 0px;">
 			<div
 				v-for="(entry, index) in data"
@@ -80,9 +79,7 @@
 				</table-component>
 			</div>
 		</div>
-
 	</div>
-
 </script>
 
 <script>
@@ -110,10 +107,11 @@
 			numrow: function () {
 				return this.data.length
 			},
-			show_data: function () {
-				start = this.numperpage *(this.pagenow -1)
-				end = Math.min(this.numperpage *(this.pagenow), this.numrow)
-				return this.data.slice(start, end)
+			start: function () {
+				return this.numperpage *(this.pagenow -1)
+			},
+			end: function () {
+				return Math.min(this.numperpage *(this.pagenow), this.numrow)
 			},
 		},
 		watch: {

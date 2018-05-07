@@ -1,4 +1,4 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 一般校對
 {% endblock %}
@@ -43,8 +43,8 @@
 				// run ajax get data
 				let self = this;
 				self.clear()
-
-				rest_aj_send('get', '/ebookSystem/api/ebooks/', {'editor': user.id, 'status': '2'})
+				console.log(user.id)
+				rest_aj_send('get', '/ebookSystem/api/ebooks/', {'editor_id': user.id, 'status': '2'})
 				.done(function(data) {
 
 					_.each(data['data'],function(v){
@@ -68,7 +68,7 @@
 
 				})
 
-				rest_aj_send('get', '/ebookSystem/api/ebooks/', {'editor': user.id, 'status': '3'})
+				rest_aj_send('get', '/ebookSystem/api/ebooks/', {'editor_id': user.id, 'status': '3'})
 				.done(function(data) {
 
 					_.each(data['data'],function(v){

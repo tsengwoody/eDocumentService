@@ -473,13 +473,10 @@ class EBook(models.Model):
 		return self.get_path('-re')
 
 	def get_clean_file(self):
-		try:
-			clean_file = self.path('-clean')
-			with io.open(clean_file, 'w', encoding='utf-8') as f:
-				f.write(self.current_editrecord().finish)
-			return clean_file
-		except:
-			return None
+		clean_file = self.get_path('-clean')
+		with io.open(clean_file, 'w', encoding='utf-8') as f:
+			f.write(self.current_editrecord().finish)
+		return clean_file
 
 	def zip(self, user, password):
 		from django.contrib.auth import authenticate
