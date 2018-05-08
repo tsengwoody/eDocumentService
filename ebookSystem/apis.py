@@ -257,6 +257,24 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 	@detail_route(
 		methods=['post'],
+		url_name='onactive',
+		url_path='action/onactive',
+	)
+	def onactive(self, request, pk=None):
+		res = {}
+
+		obj = self.get_object()
+		try:
+			obj.onactive()
+			res['detail'] = u'再校對失敗'
+		except BaseException as e:
+			res['detail'] = u'再校對失敗' +str(e)
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		res['detail'] = u'成功再校對'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	@detail_route(
+		methods=['post'],
 		url_name='change_status',
 		url_path='action/change_status',
 	)

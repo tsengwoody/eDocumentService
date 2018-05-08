@@ -68,7 +68,7 @@
 
 						let action = ''
 						action += `<a role="button" class="btn btn-default" href="/ebookSystem/review_document/` +v.ISBN +`/">審核</a>`
-						action += `<a role="button" class="btn btn-default" href="/ebookSystem/detail/` +v.ISBN +`/">分段資訊</a>`
+						action += `<a role="button" class="btn btn-default" href="/ebookSystem/generics/book_detail/` +v.ISBN +`/" target="_blank" title="分段資訊(另開新視窗)">分段資訊</a>`
 						action += `<button type="button" class="btn btn-default" name="set_recommend" onclick="BookSetRecommend('` +v.ISBN +`', 'recommend')">推薦</button>`
 
 						filter_data.push({

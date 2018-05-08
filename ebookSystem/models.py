@@ -320,6 +320,13 @@ class EBook(models.Model):
 				return k
 		return 'unknown'
 
+	def onactive(self):
+		if not self.status == self.STATUS['finish']:
+			raise SystemError('status not finish cant onactive')
+
+		self.change_status(-4, 'inactive')
+		self.change_status(1, 'active', category='based')
+
 	def change_status(self, direction, status, **kwargs):
 		if not self.status +direction == self.STATUS[status]:
 			raise SystemError('direction and status not match')
@@ -370,6 +377,15 @@ class EBook(models.Model):
 				self.status = self.status +direction
 			else:
 				return False
+
+		if direction == -4: #再校對
+				self.number_of_times += 1
+				self.edited_page = 0
+				self.editor=None
+				self.get_date = None
+				self.deadline = None
+				self.service_hours = 0
+				self.status = self.status +direction
 
 		if direction == 9:
 			if self.status +direction == self.STATUS['final']:
@@ -559,24 +575,25 @@ class GetBookRecord(models.Model):
 	def __unicode__(self):
 		return u'{0}-{1}'.format(self.book, self.user)
 
-class LibraryRecord(models.Model):
-	user = models.ForeignKey(User, related_name='libraryrecord_set')
-	book = models.ForeignKey(Book, related_name='libraryrecord_set')
+class Library(models.Model):
 	check_out_time = models.DateTimeField(blank=True, null=True)
 	check_in_time = models.DateTimeField(blank=True, null=True)
 	status = models.BooleanField(default=False)
 
+	class Meta:
+		abstract = True
+
 	def __unicode__(self):
-		return u'{0}-{1}'.format(self.book, self.user)
+		return u'{0}-{1}'.format(self.object, self.user)
 
 	def __init__(self, *args, **kwargs):
-		super(LibraryRecord, self).__init__(*args, **kwargs)
+		super(Library, self).__init__(*args, **kwargs)
 		self.epub = BASE_DIR +'/file/ebookSystem/library/{0}.epub'.format(self.id)
 
 	def check_out(self):
 		if not os.path.exists(os.path.dirname(self.epub)):
 			os.mkdir(os.path.dirname(self.epub))
-		path = self.book.custom_epub_create(self.epub, self.user)
+		path = self.object.custom_epub_create(self.epub, self.user)
 
 		self.check_out_time = timezone.now()
 		self.check_in_time = self.check_out_time +datetime.timedelta(days=30)
@@ -594,6 +611,20 @@ class LibraryRecord(models.Model):
 		except BaseException as e:
 			pass
 		return self.epub
+
+class LibraryRecord(Library):
+	user = models.ForeignKey(User, related_name='libraryrecord_set')
+	object = models.ForeignKey(Book, related_name='libraryrecord_set')
+
+class Recommend(models.Model):
+	content = models.TextField()
+	date = models.DateField(default = timezone.now)
+
+	class Meta:
+		abstract = True
+
+class BookRecommend(models.Model):
+	object = models.ForeignKey(Book, related_name='bookrecommend_set')
 
 class EditRecord(models.Model):
 	part = models.ForeignKey(EBook, blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
