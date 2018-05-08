@@ -50,8 +50,8 @@
 					_.each(data['data'],function(v){
 
 						action = ''
-						action += '<a class="btn btn-link" role="button" href ="/ebookSystem/edit/' +v.ISBN_part +'/">編輯</a>'
-						action += `<button class="btn btn-lg btn-default" type="button" onclick="vo_service.reback_ebook('` +v.ISBN_part +`')">還文件</button>`
+						action += '<a class="btn btn-default" role="button" href ="/ebookSystem/edit/' +v.ISBN_part +'/">編輯</a>'
+						action += `<button class="btn btn-default" type="button" onclick="vo_service.reback_ebook('` +v.ISBN_part +`')">還文件</button>`
 
 						temp_data = {
 							'文件': v['bookname'] +v['part'],
@@ -74,7 +74,7 @@
 					_.each(data['data'],function(v){
 
 						action = ''
-						action += `<button class="btn btn-lg btn-default" type="button" onclick="vo_service.reedit_ebook('` +v.ISBN_part +`')">再編輯</button>`
+						action += `<button class="btn btn-default" type="button" onclick="vo_service.reedit_ebook('` +v.ISBN_part +`')">再編輯</button>`
 
 						temp_data = {
 							'文件': v['bookname'] +v['part'],
