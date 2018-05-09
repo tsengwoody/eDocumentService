@@ -290,7 +290,7 @@ function createHtmlEditor() {
 						.done(function(data) {
 							alertmessage('success', data['message'])
 							.done(function() {
-								window.location.href = '/ebookSystem/service/';
+								window.location.href = '/ebookSystem/generics/service/';
 							})
 						})
 						.fail(function(data){
@@ -308,7 +308,7 @@ function createHtmlEditor() {
 				onclick: function () {
 					alertconfirm('是否確定離開?')
 					.done(function(){
-						window.location.href = '/ebookSystem/service/';
+						window.location.href = '/ebookSystem/generics/service/';
 					})
 
 				}
