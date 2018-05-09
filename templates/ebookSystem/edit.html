@@ -1,12 +1,9 @@
-﻿{% extends "base_nav.html" %} 
+{% extends "base_nav.html" %} 
 {% block title %} 
 編輯{{ part }} 
 {% endblock %} 
-{% block style %}
-<script language="javascript" src="/static/ebookSystem/js/edit.js"></script>
-{% endblock %} 
 {% block content %}
-
+<script language="javascript" src="/static/ebookSystem/js/edit.js"></script>
 <script type="text/javascript"> 
 	Vue.options.delimiters = ['{|{', '}|}'];
 	let vo_ebook_image;

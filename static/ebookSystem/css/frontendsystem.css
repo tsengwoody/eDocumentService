@@ -1,5 +1,5 @@
 html, body {
-    font-family: "å¾®è»Ÿæ­£é»‘é«”","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-family: "·L³n¥¿¶ÂÅé","Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 .loader {
@@ -22,12 +22,12 @@ html, body {
 		min-width: 100%;
 	}
 
-	/*é‡å°trå»åšéš±è—*/
+	/*°w¹ïtr¥h°µÁôÂÃ*/
 	.tr-only-hide {
 		display: none !important;
 	}
 
-	/*è®“trè®Šæˆå€å¡Šä¸»è¦è®“ä»–æœ‰å€‹å€å¡Š*/
+	/*ÅıtrÅÜ¦¨°Ï¶ô¥D­nÅı¥L¦³­Ó°Ï¶ô*/
 	.table-rwd tr{
 		display: block;
 		margin-bottom: 10px;
@@ -52,7 +52,6 @@ html, body {
 
 
 .textfornvda {
-	display:inline-block;
 	overflow-y: scroll;
 	margin:0;
 	padding:0;

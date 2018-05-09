@@ -28,8 +28,6 @@ import shutil
 import uuid
 from django.views.decorators.cache import cache_control
 
-GET_MAX_PART = 3
-
 #logging config
 import logging
 logger = logging.getLogger(__name__)
@@ -101,37 +99,6 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		redirect_to = reverse('manager:event_list', kwargs={'action':'book' })
 		return locals()
 
-@user_category_check(['manager'])
-@http_response
-def review_part(request, ISBN_part, template_name='ebookSystem/review_part.html'):
-	try:
-		part = EBook.objects.get(ISBN_part=ISBN_part)
-	except:
-		raise Http404("book does not exist")
-	events = Event.objects.filter(content_type__model='ebook', object_id=part.ISBN_part, status=Event.STATUS['review'])
-	if request.method == 'GET':
-		[len_block, same_character, src_count, dst_count] = diff(part.get_path(), part.get_path('-finish'))
-		ed = edit_distance(part.get_path(), part.get_path('-finish'))
-		delete_count = src_count -same_character
-		insert_count = dst_count -same_character
-		diff_count = dst_count -src_count
-		return locals()
-	if request.method == 'POST':
-		if request.POST['review'] == 'success':
-			part.change_status(1, 'finish')
-			status = 'success'
-			message = u'審核通過文件'
-			for event in events:
-				event.response(status=status, message=message, user=request.user)
-		if request.POST['review'] == 'error':
-			part.change_status(-1, 'edit')
-			status = 'success'
-			message = u'審核退回文件'
-			for event in events:
-				event.response(status='error', message=request.POST['reason'], user=request.user)
-		redirect_to = reverse('manager:event_list', kwargs={'action':'ebook' })
-		return locals()
-
 @http_response
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
 	users = User.objects.all()
@@ -199,17 +166,6 @@ def detail_manager(request, book_ISBN, template_name='ebookSystem/detail_manager
 			getPart.add_tag()
 			with codecs.open(getPart.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
 				finishFile.write(u'\ufeff')
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
-@http_response
-def edit_log(request, ISBN_part, template_name='ebookSystem/edit_log.html'):
-	try:
-		part = EBook.objects.get(ISBN_part=ISBN_part)
-	except:
-		raise Http404("ebook does not exist")
-	if request.method == 'POST':
 		return locals()
 	if request.method == 'GET':
 		return locals()
@@ -450,183 +406,6 @@ def message_send(request, template_name='ebookSystem/message_send.html', ):
 	if request.method == 'GET':
 		return locals()
 
-@http_response
-def book_create(request, template_name='ebookSystem/book_create.html'):
-	if request.method == 'POST':
-		#book info 設定
-		try:
-			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
-		except:
-			bookInfoForm = BookInfoForm(request.POST)
-			if not bookInfoForm.is_valid():
-				status = 'error'
-				message = u'表單驗證失敗' + str(bookInfoForm.errors)
-				return locals()
-			newBookInfo = bookInfoForm.save()
-		try:
-			book = Book.objects.get(ISBN=request.POST['ISBN'])
-			status = 'error'
-			message = u'文件已存在'
-			return locals()
-		except:
-			pass
-
-		#上傳文件設定
-		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
-		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.zip')
-		handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
-
-		#壓縮文件測試
-		try:
-			with ZipFile(uploadFilePath, 'r') as uploadFile:
-				uploadFile.testzip()
-				uploadFile.extractall(uploadPath)
-		except:
-			shutil.rmtree(uploadPath)
-			status = 'error'
-			message = u'非正確ZIP文件'
-			return locals()
-
-		#資料夾檢查
-		from utils import validate
-		try:
-			validate.validate_folder(
-				os.path.join(uploadPath, 'OCR'),
-				os.path.join(uploadPath, 'source'),
-				50
-			)
-		except BaseException as e:
-			shutil.rmtree(uploadPath)
-			status = 'error'
-			message = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
-			return locals()
-
-		#建立book object
-		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path=uploadPath, page_per_part=50)
-		try:
-			newBook.set_page_count()
-		except:
-			shutil.rmtree(uploadPath)
-			status = 'error'
-			message = u'set_page_count error'
-			return locals()
-		newBook.scaner = request.user
-		newBook.owner = request.user
-		newBook.source = 'self'
-		newBook.save()
-		try:
-			newBook.create_EBook()
-		except BaseException as e:
-			newBook.delete()
-			status = 'error'
-			message = u'建立分段失敗'
-			return locals()
-		event = Event.objects.create(creater=request.user, action=newBook)
-		redirect_to = '/'
-		status = 'success'
-		message = u'成功建立並上傳文件'
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
-@user_category_check(['manager'])
-@http_response
-def book_upload(request, template_name='ebookSystem/book_upload.html'):
-	if request.method == 'POST':
-		#book info 設定
-		try:
-			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
-		except:
-			bookInfoForm = BookInfoForm(request.POST)
-			if not bookInfoForm.is_valid():
-				status = 'error'
-				message = u'表單驗證失敗' + str(bookInfoForm.errors)
-				return locals()
-			newBookInfo = bookInfoForm.save()
-
-		#判斷是否上傳
-		source_priority = {
-			'self': 0,
-			'txt': 1,
-			'epub': 2,
-		}
-		try:
-			book = Book.objects.get(ISBN=request.POST['ISBN'])
-			if source_priority[request.POST['category']] <= source_priority[book.source]:
-				status = 'error'
-				message = u'文件已存在'
-				return locals()
-		except:
-			pass
-
-		#上傳文件設定
-		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
-		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.' +request.POST['category'])
-		handle_uploaded_file(uploadFilePath, request.FILES['fileObject'])
-
-		#根據選擇上傳格式作業
-		final_file = os.path.join(uploadPath, 'OCR') + '/{0}.epub'.format(request.POST['ISBN'], )
-		#txt
-		if request.POST['category'] == 'txt':
-			from ebooklib import epub
-			from utils.epub import txt2epub
-			try:
-				os.makedirs(os.path.dirname(final_file))
-				info = {
-					'ISBN': newBookInfo.ISBN,
-					'bookname': newBookInfo.bookname,
-					'author': newBookInfo.author,
-					'date': str(newBookInfo.date),
-					'house': newBookInfo.house,
-					'language': 'zh',
-				}
-				txt2epub(uploadFilePath, final_file, **info)
-			except BaseException as e:
-				shutil.rmtree(uploadPath)
-				status = 'error'
-				message = u'建立文件失敗' +str(e)
-				return locals()
-
-		#epub
-		if request.POST['category'] == 'epub':
-			from ebooklib import epub
-			from utils.epub import through, add_bookinfo
-			try:
-				os.makedirs(os.path.dirname(final_file))
-				through(uploadFilePath, final_file)
-				book = epub.read_epub(final_file)
-				book = add_bookinfo(
-					book,
-					ISBN = newBookInfo.ISBN,
-					bookname = newBookInfo.bookname,
-					author = newBookInfo.author,
-					date = str(newBookInfo.date),
-					house = newBookInfo.house,
-					language = 'zh',
-				)
-				epub.write_epub(final_file, book, {})
-			except BaseException as e:
-				shutil.rmtree(uploadPath)
-				status = 'error'
-				message = u'建立文件失敗' +str(e)
-				return locals()
-
-		#建立book object和ebook object
-		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path=uploadPath)
-		newBook.scaner = request.user
-		newBook.owner = request.user
-		newBook.source = request.POST['category']
-		newBook.finish_date = timezone.now()
-		newBook.save()
-		ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN'] + '-1', begin_page=-1, end_page=-1)
-		ebook.change_status(9, 'final')
-
-		status = 'success'
-		message = u'成功建立並上傳文件'
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
 from django.contrib.auth import authenticate
 @user_category_check(['manager'])
 @http_response
@@ -763,11 +542,11 @@ def library_action(request, ):
 				status = 'error'
 				message = u'已到達借閱上限，同時可借閱書量為5本，請先歸還書籍再借閱'
 				return locals()
-			if len(lr_user.filter(book=book)) >0:
+			if len(lr_user.filter(object=book)) >0:
 				status = 'error'
 				message = u'已在借閱書櫃無需再借閱'
 				return locals()
-			lr = LibraryRecord.objects.create(user=request.user, book=book)
+			lr = LibraryRecord.objects.create(user=request.user, object=book)
 			lr = LibraryRecord.objects.get(id=lr.id)
 			lr.check_out()
 			status = 'success'
@@ -777,83 +556,9 @@ def library_action(request, ):
 			lr = LibraryRecord.objects.get(id=request.POST['id'])
 			lr.check_in()
 			status = 'success'
-			message = u'成功歸還書籍{0}'.format(lr.book)
+			message = u'成功歸還書籍{0}'.format(lr.object)
 		return locals()
 
-@user_category_check(['editor'])
-@http_response
-def service(request, template_name='ebookSystem/service.html'):
-	editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
-	finishPartList = request.user.edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
-	if request.method == 'POST':
-		if request.POST.has_key('getPart'):
-			if len(editingPartList)>=6:
-				status = 'error'
-				message = u'您已有超過{0}段文件，請先校對完成再領取'.format(GET_MAX_PART)
-				return locals()
-			try:
-				partialBook = BookOrder.objects.filter(book__status=Book.STATUS['active']).order_by('order')[0].book
-			except BaseException as e:
-				status = 'error'
-				message = u'無文件：{0}'.format(unicode(e))
-				return locals()
-			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
-			getPart.change_status(1, 'edit', user=request.user, deadline=timezone.now() +datetime.timedelta(days=5))
-			status = 'success'
-			message = u'成功取得文件{}'.format(getPart.__unicode__())
-		elif request.POST.has_key('rebackPart'):
-			ISBN_part = request.POST.get('rebackPart')
-			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
-			rebackPart.change_status(-1, 'active')
-			status = 'success'
-			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
-		elif request.POST.has_key('reEditPart'):
-			ISBN_part = request.POST.get('reEditPart')
-			reEditPart = EBook.objects.get(ISBN_part = ISBN_part)
-			reEditPart.change_status(-1, 'edit')
-			events = Event.objects.filter(content_type__model='ebook', object_id=reEditPart.ISBN_part, status=Event.STATUS['review'])
-			for event in events:
-				event.delete()
-			status = 'success'
-			message = u'再編輯文件{}'.format(reEditPart.__unicode__())
-		else:
-			status = 'error'
-			message = u'不明的操作'
-		editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
-		finishPartList = request.user.edit_ebook_set.all().filter(status__gte=EBook.STATUS['review'])
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
-@user_category_check(['manager'])
-@http_response
-def sc_service(request, template_name='ebookSystem/sc_service.html'):
-	sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(status=EBook.STATUS['sc_edit'])
-	if request.method == 'POST':
-		if request.POST.has_key('getPart'):
-			if len(sc_editingPartList)>=3:
-				status = 'error'
-				message = u'您已有超過3段文件，請先校對完成再領取'
-				return locals()
-			try:
-				getPart = EBook.objects.filter(status=EBook.STATUS['finish']).order_by('get_date')[0]
-			except BaseException as e:
-				status = 'error'
-				message = u'無文件'
-				return locals()
-			getPart.change_status(1, 'sc_edit', user=request.user)
-			status = 'success'
-			message = u'成功取得文件{}'.format(getPart.__unicode__())
-		elif request.POST.has_key('rebackPart'):
-			ISBN_part = request.POST.get('rebackPart')
-			rebackPart=EBook.objects.get(ISBN_part = ISBN_part)
-			rebackPart.change_status(-1, 'finish')
-			status = 'success'
-			message = u'成功歸還文件{}'.format(rebackPart.__unicode__())
-		sc_editingPartList = request.user.sc_edit_ebook_set.all().filter(status=EBook.STATUS['sc_edit'])
-		return locals()
-	if request.method == 'GET':
-		return locals()
 
 @http_response
 def bookorder_list(request, template_name='ebookSystem/bookorder_list.html'):

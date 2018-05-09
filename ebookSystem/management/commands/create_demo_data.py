@@ -244,23 +244,7 @@ class Command(BaseCommand):
 				edit_count = count[i%5],
 			)
 		assert ebook.change_status(1, 'review'), 'change status error'
-		src = BASE_DIR +u'/temp/part1-finish-sp.txt'
-		shutil.copy2(src, ebook.get_path('-finish'))
-		client = Client()
-		client.login(username='root', password='eds@2018')
-		response = client.post(
-			reverse(
-				'ebookSystem:review_part',
-				kwargs = {
-					'ISBN_part': ebook.ISBN_part,
-				},
-			),
-			{
-				'review': 'success',
-				'reason': '',
-			},
-			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
-		)
+
 
 		ebook = EBook.objects.get(book=book, part=2)
 		assert ebook.change_status(1, 'edit', user=root, deadline='2017-12-31'), 'change status error'
@@ -275,23 +259,6 @@ class Command(BaseCommand):
 				edit_count = count[i%5],
 			)
 		assert ebook.change_status(1, 'review'), 'change status error'
-		src = BASE_DIR +u'/temp/part1-finish-sp.txt'
-		shutil.copy2(src, ebook.get_path('-finish'))
-		'''client = Client()
-		client.login(username='root', password='eds@2018')
-		response = client.post(
-			reverse(
-				'ebookSystem:review_part',
-				kwargs = {
-					'ISBN_part': ebook.ISBN_part,
-				},
-			),
-			{
-				'review': 'success',
-				'reason': '',
-			},
-			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
-		)'''
 
 		src = BASE_DIR +u'/temp/山羊島的藍色奇蹟.zip'
 		with open(src) as book_file:
