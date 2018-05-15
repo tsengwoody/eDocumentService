@@ -29,7 +29,7 @@
 </style>
 
 <script type="text/x-template" id="table-template">
-	<div v-if="!iser(data)" :style="{ fontSize: fontSize + 'px' }">
+	<div v-if="!iser(data)">
 		<table class="table table-hover table-rwd">
 			<thead>
 				<tr class="tr-only-hide">
@@ -89,10 +89,6 @@
 	Vue.component('table-component', {
 		props: {
 			data: Array,  // define type
-			fontSize: {
-	          type: Number,
-	          default: 15
-	        },
 		},
 		data: function () {
 			return {

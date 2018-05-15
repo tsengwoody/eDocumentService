@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh" class="htmlFontSize80">
 
 <head>
 	{% load staticfiles %}
@@ -50,6 +50,12 @@
 	<!-- bootstrap, 3.3.7時NVDA會讀不到modal-->
 	<link rel="stylesheet" href="{% static 'ebookSystem/framework/bootstrap-3.3.4/css/bootstrap.min.css' %}">
 	<script language="javascript" src="{% static 'ebookSystem/framework/bootstrap-3.3.4/js/bootstrap.min.js' %}"></script>
+
+	<!-- font size px -> em to adjust font-size % -->
+	<link rel="stylesheet" href="{% static 'ebookSystem/framework/bootstrap-3.3.4/css/fontSize.css' %}">
+	<!-- font-awesome CDN (small icon) -->
+	<link rel=stylesheet href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
 
 	<!-- bootstrap-docs -->
 	<link rel="stylesheet" href="{% static 'ebookSystem/framework/bootstrap-additional/docs.min.css' %}">
@@ -122,7 +128,6 @@
 		document.write(commoncssjsadd());
 
 	</script>
-
 </head>
 
 <body>
@@ -173,15 +178,21 @@
 				<ul class="list-inline">
 					<li>
 						<a href="{% url 'genericUser:func_desc' %}">關於雲端千眼</a>
+						<div class="textfornvda">
+							關於雲端千眼
+						</div>
 					</li>
 					<li>
 						<a href="{% url 'genericUser:org_info' %}">服務中心資訊</a>
+						<div class="textfornvda">
+							服務中心資訊
+						</div>
 					</li>
 					<li>
 						<div title="建議使用Firefox或Chrome等支援HTML5瀏覽器">
 							建議瀏覽器
 							<div class="textfornvda">
-									建議使用Firefox或Chrome等支援HTML5瀏覽器
+								建議使用Firefox或Chrome等支援HTML5瀏覽器
 							</div>
 						</div>
 					</li>
@@ -189,18 +200,84 @@
 						<div title="建議解析度使用1366x768以上">
 							建議解析度
 							<div class="textfornvda">
-									建議解析度使用1366x768以上
+								建議解析度使用1366x768以上
 							</div>
 						</div>
 					</li>
 					<li>
+						設定文字大小:
+						<i class="fa fa-plus-square fSZ_plus"></i>
+						<i class="fa fa-minus-square fSZ_cut"></i>
+						<div class="textfornvda">
+							設定文字大小按鈕
+						</div>
+					</li>
+					<li>
 						<p>© eDocumentService 2018</p>
+						<div class="textfornvda">
+							copyright of eDocumentService 2018
+						</div>
 					</li>
 				</ul>
 			</div>
 		</div>
 	</footer>
 	{% endblock %}
+
+<script>
+//-------------字級大小設定-------------
+$(function(){
+	var _fontSize = $.cookie('font-size');
+	// var n = 2;
+	var percentage = ["htmlFontSize70",
+					  "htmlFontSize75",
+					  "htmlFontSize80",
+					  "htmlFontSize85",
+					  "htmlFontSize90",
+					  "htmlFontSize95",
+					  "htmlFontSize100",
+					  "htmlFontSize105",
+					  "htmlFontSize110"];
+
+	if (_fontSize && percentage.indexOf(_fontSize)!=-1) {
+		var n = percentage.indexOf(_fontSize);
+	} 
+	else {
+		var n = 2;
+	}
+
+	$(".fSZ_plus").click(function(e) {
+		if ( n<8 ) {
+			n++;
+			$("html").removeClass().addClass(percentage[n]);
+		};
+	});
+	$(".fSZ_cut").click(function(e) {
+		if ( n>=1 ) {
+			n--;
+			$("html").removeClass().addClass(percentage[n]);
+		};
+	});
+});
+</script>
+
+<script>
+//-------------cookie 儲存字體大小設定-------------
+$(function(){
+	var _fontSize = $.cookie('font-size');
+
+	$(".fSZ_plus, .fSZ_cut").click(function(e) {
+		var fontSizeClass = $("html").attr('class');
+		$.cookie("font-size", fontSizeClass, {path:'/'});
+	});
+	
+	if ( $.cookie("font-size")!=null ) {
+		$("html").removeClass().addClass(_fontSize);
+	};
+	
+});
+</script>
+
 </body>
 
 </html>

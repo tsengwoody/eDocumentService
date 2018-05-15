@@ -162,3 +162,40 @@ html, body {
 .bs-callout-info h4 {
     color: #5bc0de;
 }
+
+.htmlFontSize70 {
+	font-size: 70%; 
+}
+.htmlFontSize75 {
+	font-size: 75%; 
+}
+.htmlFontSize80 {
+	font-size: 80%; 
+}
+.htmlFontSize85 {
+	font-size: 85%; 
+}
+.htmlFontSize90 {
+	font-size: 90%; 
+}
+.htmlFontSize95 {
+	font-size: 95%; 
+}
+.htmlFontSize100 {
+	font-size: 100%; 
+}
+.htmlFontSize105 {
+	font-size: 105%; 
+}
+.htmlFontSize110 {
+	font-size: 110%; 
+}
+
+.fSZ_plus, .fSZ_cut {
+	font-size: 1.2em;
+	margin-right: 0.2em;
+}
+
+.fSZ_plus:hover, .fSZ_cut:hover {
+	color: #8d9093;
+}
