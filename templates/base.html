@@ -217,51 +217,9 @@
 	{% endblock %}
 
 <script>
-//-------------字級大小設定-------------
-$(function(){
-	// var _fontSize = $.cookie('font-size');
-	// var n = 2;
-	// var percentage = ["htmlFontSize70",
-	// 				  "htmlFontSize75",
-	// 				  "htmlFontSize80",
-	// 				  "htmlFontSize85",
-	// 				  "htmlFontSize90",
-	// 				  "htmlFontSize95",
-	// 				  "htmlFontSize100",
-	// 				  "htmlFontSize105",
-	// 				  "htmlFontSize110"];
-
-	// if (_fontSize && percentage.indexOf(_fontSize)!=-1) {
-	// 	var n = percentage.indexOf(_fontSize);
-	// } 
-	// else {
-	// 	var n = 2;
-	// }
-
-	// $("#fSZ_plus").click(function(e) {
-	// 	if ( n<8 ) {
-	// 		n++;
-	// 		$("html").removeClass().addClass(percentage[n]);
-	// 	};
-	// });
-	// $("#fSZ_cut").click(function(e) {
-	// 	if ( n>=1 ) {
-	// 		n--;
-	// 		$("html").removeClass().addClass(percentage[n]);
-	// 	};
-	// });
-});
-</script>
-
-<script>
 //-------------cookie 儲存字體大小設定-------------
 $(function(){
 	var _fontSize = $.cookie('font-size');
-
-	// $(".fSZ_plus, .fSZ_cut").click(function(e) {
-	// 	var fontSizeClass = $("html").attr('class');
-	// 	$.cookie("font-size", fontSizeClass, {path:'/'});
-	// });
 	
 	if ( $.cookie("font-size")!=null ) {
 		$("html").removeClass().addClass(_fontSize);
