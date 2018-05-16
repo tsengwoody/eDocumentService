@@ -191,11 +191,30 @@ html, body {
 	font-size: 110%; 
 }
 
-.fSZ_plus, .fSZ_cut {
-	font-size: 1.2em;
-	margin-right: 0.2em;
+#fSZ_plus, #fSZ_cut, #fontSizeDefault {
+	color: darkgray;
+	font-size: 1.5em;
+	margin-left: 0.5em;
+	padding: 0.1em 0.5em;
+	border: 1px solid lightgray;
+	border-radius: 0.3em;
 }
 
-.fSZ_plus:hover, .fSZ_cut:hover {
-	color: #8d9093;
+#fSZ_plus, #fSZ_cut, #fontSizeDefault {
+	background-color: white;
+}
+
+#fSZ_plus:hover, #fSZ_cut:hover, #fontSizeDefault:hover {
+	color: white;
+	background-color: darkgray;
+}
+
+#fontSizeBlock {
+	display: inline-block; 
+	width: 2.5em; 
+	text-align: center; 
+	font-size: 3em; 
+	border-radius: 0.2em; 
+	border: 2px solid lightgray; 
+	margin-left: 1em;
 }
