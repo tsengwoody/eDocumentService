@@ -22,14 +22,21 @@
 						  "htmlFontSize105",
 						  "htmlFontSize110"];
 
-		var _fontSize = $.cookie('font-size');
-		// default font-size 80%
-		showSize = _fontSize.substr(12) - 80;
+		var now_fontSize = $("html").attr('class');
+		var showSize; // show the size % compare to 80%
+		console.log(now_fontSize);
+
+		if (now_fontSize) {
+			// default fontSize 80%
+			showSize = now_fontSize.substr(12) - 80;
+		} else {
+			showSize = 0;
+		}
 
 		$('#fontSizeBlock').html(showSize + '%');
 
-		if (_fontSize && percentage.indexOf(_fontSize)!=-1) {
-			var n = percentage.indexOf(_fontSize);
+		if (now_fontSize && percentage.indexOf(now_fontSize)!=-1) {
+			var n = percentage.indexOf(now_fontSize);
 		} 
 		else {
 			var n = 2;
@@ -102,11 +109,11 @@
 				<h4 id="divmodal_setFontSize_title" class="modal-title">字體大小設定</h4>
 			</div>
 			<div style="padding:20px 20px; background-color:#fafafa;">
-					<span style="font-size: 1.2em;">設定文字大小:</span>
-					<button id=fontSizeDefault>預設</button>
-					<button id=fSZ_plus class="fa fa-plus"></button>
-					<button id=fSZ_cut class="fa fa-minus "></button>
-					<span id=fontSizeBlock></span>
+				<span style="font-size: 1.2em;">設定文字大小:</span>
+				<button id=fontSizeDefault>預設</button>
+				<button id=fSZ_plus>放大</button>
+				<button id=fSZ_cut>縮小</button>
+				<span id=fontSizeBlock></span>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
