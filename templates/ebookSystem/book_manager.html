@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 書籍管理
 {% endblock %}
@@ -60,7 +60,7 @@
 				var self = this;
 				self.data = []
 
-				rest_aj_send('get', '/ebookSystem/api/books/', {'search': self.search_value, 'status': this.search_filter,})
+				rest_aj_send('get', '/ebookSystem/api/books/', {'bookname': self.search_value, 'status': this.search_filter,})
 				.done(function(data) {
 
 					filter_data = []

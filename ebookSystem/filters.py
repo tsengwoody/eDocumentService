@@ -22,6 +22,14 @@ class BookOwnerFilter(filters.BaseFilterBackend):
 		else:
 			return queryset
 
+class BookBooknameFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		bookname = request.query_params.get('bookname')
+		if bookname and not bookname=='':
+			return queryset.filter(book_info__bookname__contains=bookname)
+		else:
+			return queryset
+
 class BookInfoOwnerFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
 		value = request.query_params.get('owner_id')

@@ -1,4 +1,4 @@
-﻿{% extends "ebookSystem/review.html" %}
+{% extends "ebookSystem/review.html" %}
 {% block title %}
 {{ part }}審核
 {% endblock %}
@@ -123,7 +123,7 @@
 			review: function () {
 
 				transferData = {
-					'number_of_times':  this.info.number_of_times,
+					'number_of_times':  this.ebook.number_of_times,
 					'result': this.result,
 					'reason': this.reason,
 				}

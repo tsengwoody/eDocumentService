@@ -3,11 +3,10 @@
 編輯{{ part }} 
 {% endblock %} 
 {% block content %}
-<script language="javascript" src="/static/ebookSystem/js/edit.js"></script>
+<script language="javascript" src="/static/ebookSystem/js/edit.js?180510"></script>
 <script type="text/javascript"> 
 	Vue.options.delimiters = ['{|{', '}|}'];
 	let vo_ebook_image;
-	let vo_ebook_editor;
 
 	window.history.forward("/account/profile/");
 
@@ -58,30 +57,6 @@
 			vo_ebook_image.image = data['data'].scan_image
 			vo_ebook_image.old_edited_page = data['data'].edited_page
 			vo_ebook_image.edited_page = data['data'].edited_page
-		})
-
-		//ebook_editor
-		let ebook_editor_opt={
-			el: '#id_ebook_editor',
-			data: {
-				edit: '',
-				finish: '',
-				edited_page: '',
-				url: '',
-			},
-			computed: {
-			},
-			methods: {
-			},
-		}
-
-		vo_ebook_editor = new Vue(ebook_editor_opt);
-
-		rest_aj_send('get', '/ebookSystem/api/ebooks/' +pk +'/action/edit/', {})
-		.done(function(data) {
-			vo_ebook_editor.finish = data['data'].finish
-			vo_ebook_editor.edit = data['data'].edit
-			vo_ebook_editor.edited_page = data['data'].edited_page
 		})
 
 	})
@@ -148,8 +123,10 @@
 			</div>
 		</div>
 		<div id="id_ebook_editor" class="col-md-6">
-			<div id="id_finish" name="finish" style="display: none">{|{ finish }|}</div>
-			<textarea autocomplete="off" id="id_edit" name="edit" style="height:400px;">{|{ edit }|}</textarea>
+
+			<textarea id="id_finish" name="finish" style="display: none">{{ part.current_editrecord.finish }}</textarea>
+			<textarea autocomplete="off" id="id_edit" name="edit" style="height:400px;">{{ part.current_editrecord.edit }}</textarea>
+
 			<input type="hidden" name="postToken" id="postToken" value="{{postToken}}" />
 		</div>
 	</div>

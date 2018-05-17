@@ -34,10 +34,10 @@
 						<li><a href="{% url 'genericUser:serviceinfo_list_check' %}">服務時數確認</a></li>
 						<li><a href="{% url 'ebookSystem:generics' 'book_manager' %}">書籍管理</a></li>
 						<li><a href="{% url 'genericUser:user_manager' %}">使用者管理</a></li>
+						<li><a href="{% url 'ebookSystem:bookorder_list' %}">校對順序</a></li>
 						{% endif %}
 						{% if request.user.is_superuser %}
 						<li><a href="{% url 'ebookSystem:generics' 'ebook_manager' %}">分段管理</a></li>
-						<li><a href="{% url 'ebookSystem:bookorder_list' %}">校對順序</a></li>
 						{% endif %}
 					</ul>
 				</li>

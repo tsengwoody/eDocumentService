@@ -71,7 +71,10 @@ def library_origin_epub(request, ISBN, token, document_root=None, show_indexes=F
 #	if token == cache.get('token.' +str(request.user.id)):
 	return response
 
+from django.views.static import serve
+
 urlpatterns = [
+	#url(r'^static/(?P<path>.*)$', serve, {'document_root': BASE_DIR +'/static/'}),
 	url(r'^$', views.home, name='home'),
 	url(r'^dev/(?P<name>[\w\d/_\-]+)/$', views.dev, name='dev'),
 	url(r'^about/(?P<name>[\w]+)$', views.about, name='about'),
@@ -81,7 +84,6 @@ urlpatterns = [
 	url(r'^library_origin_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{32,32})/$', library_origin_epub),
 	url(r'^admin/', include(admin.site.urls)),
 	url(r'social-auth/', include('social_django.urls', namespace='social')),
-	url(r'^account/', include('account.urls', namespace="account", app_name="account")),
 	url(r'^ebookSystem/', include('ebookSystem.urls', namespace="ebookSystem")),
 	url(r'^genericUser/', include('genericUser.urls', namespace="genericUser")),
 	url(r'^manager/', include('manager.urls', namespace="manager")),

@@ -16,7 +16,8 @@ from utils.resource import *
 class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
-	filter_backends = (BookStatusFilter, BookOwnerFilter,)
+	filter_backends = (BookStatusFilter, BookOwnerFilter, BookBooknameFilter,)
+	ordering_fields = ('upload_date',)
 	#permission_classes = (BookDataPermission, )
 
 	def get_fullpath(self, obj, dir, resource):

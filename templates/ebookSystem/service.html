@@ -108,16 +108,19 @@
 			reback_ebook: function (ISBN_part) {
 				let self = this
 
-				rest_aj_send('post', '/ebookSystem/api/ebooks/' +ISBN_part +'/action/change_status/', {'direction': '-1', 'status': 'active'})
-				.done(function(data) {
-					ebook = data['data'].data
-					alertmessage('success', '成功歸還文件：' +ebook.bookname +ebook.part)
-					.done(function () {
-					self.refresh()
+				alertconfirm('還文件後該文件將提供其他校對者領取，且無法獲得校對時數，是否確定還文件?')
+				.done(function(){
+					rest_aj_send('post', '/ebookSystem/api/ebooks/' +ISBN_part +'/action/change_status/', {'direction': '-1', 'status': 'active'})
+					.done(function(data) {
+						ebook = data['data'].data
+						alertmessage('success', '成功歸還文件：' +ebook.bookname +ebook.part)
+						.done(function () {
+						self.refresh()
+						})
 					})
-				})
-				.fail(function(data){
-					alertmessage('error', data['message'])
+					.fail(function(data){
+						alertmessage('error', data['message'])
+					})
 				})
 			},
 			reedit_ebook: function (ISBN_part) {

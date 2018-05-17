@@ -163,17 +163,13 @@ class Event(models.Model):
 		if isinstance(self.action, Book):
 			return reverse('ebookSystem:review_document', kwargs={'book_ISBN':self.action.ISBN})
 		elif isinstance(self.action, EBook):
-			return reverse('ebookSystem:review_part', kwargs={'ISBN_part':self.action.ISBN_part})
+			return '/ebookSystem/review_ebook/' +self.action.ISBN_part
 		elif isinstance(self.action, User):
 			return reverse('genericUser:review_user', kwargs={'username':self.action.username })
 
 	def event_category(self):
-		if isinstance(self.action, ReviseContentAction):
-			return u'更正事件'
-		elif isinstance(self.action, Book):
+		if isinstance(self.action, Book):
 			return u'上傳文件'
-		elif isinstance(self.action, ApplyDocumentAction):
-			return u'代掃辨識'
 
 	def response(self, status ,message, user):
 		self.time_reply = timezone.now()
