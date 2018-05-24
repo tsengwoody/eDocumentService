@@ -63,7 +63,7 @@
 	<div>
 		<ul class="nav nav-tabs">
 			<template v-for="(entry, index) in data">
-				<li :class="{'active':(index===0)}"><a :href="'#index_tab_' +entry.label" name="index_tab_grp" data-toggle="tab" :aria-expanded="!!(index===0)" @click="pagetab_subtabfix(this);">{|{ entry.label }|}</a></li>
+				<li role="tab" :class="{'active':(index===0)}"><a :href="'#index_tab_' +entry.label" name="index_tab_grp" data-toggle="tab" :aria-expanded="!!(index===0)" @click="pagetab_subtabfix(this);">{|{ entry.label }|}</a></li>
 			</template>
 		</ul>
 		<div class="tab-content" style="padding:20px 0px;">

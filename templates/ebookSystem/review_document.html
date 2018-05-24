@@ -37,7 +37,7 @@
 
 				//step2
 				let c2 = _.map(ebook_set, function (h, k) {
-					let pn = 'Part' + (k + 1);
+					let pn = 'Part' + h.split('-')[1];
 					return '<button class="btn btn-default" type="button" style="margin:0px 5px 5px 0px;" onclick="ScanBookEditor(\'掃描內容瀏覽\',\'' + h + '\')">' + pn + '</button>';
 				})
 				$('#step2_items').html(c2);

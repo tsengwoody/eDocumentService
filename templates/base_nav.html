@@ -25,7 +25,7 @@
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">管理<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						{% if request.user.is_manager %}
-						<li><a href="{% url 'manager:event_list' 'book' %}">審核上傳文件</a></li>
+						<li><a href="{% url 'ebookSystem:generics' 'book_unreview_list' %}">上傳文件審核</a></li>
 						<li><a href="{% url 'manager:event_list' 'user' %}">審核會員</a></li>
 						<li><a href="{% url 'genericUser:generics' 'bannercontent_create' %}">管理首頁 Banner</a></li>
 						<li><a href="{% url 'manager:statistics' %}">統計資訊</a></li>
@@ -79,6 +79,7 @@
 						<li><a href="{% url 'genericUser:serviceinfo_list' %}">服務時數</a></li>
 						{% endif %}
 						<li><a href="{% url 'genericUser:info' %}">個人資料</a></li>
+						<li><a href="#" onclick="setFontSize()">字體設定</a></li>
 					</ul>
 				</li>
 				<li><a href="{% url 'logout' %}"><span class="glyphicon  glyphicon-log-out"></span>登出</a></li>

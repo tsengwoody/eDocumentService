@@ -1,0 +1,55 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+上傳文件審核
+{% endblock %}
+{% block content %}
+{% csrf_token %}
+{% include 'comp/table_vue_component.html' %}
+<h3>上傳文件審核</h3>
+<div class="tab-content" style="padding:20px 0px;">
+	<div id="book_unreview_list">
+		<table-component :data="data[0]"></table-component>
+	</div>
+</div>
+
+<script>
+
+	new Vue({
+		el: '#book_unreview_list',
+		data: {
+			data: [],
+		},
+		created: function () {
+			let self = this
+
+			rest_aj_send('get', '/ebookSystem/api/books/', {'status': '0',})
+				.done(function(data) {
+
+					filter_data = []
+					_.each(data['data'], function(v){
+
+						let action = ''
+						action += `<a role="button" class="btn btn-default" target="_blank" title="審核(另開新視窗)" href="/ebookSystem/review_document/` +v.ISBN +`/">審核</a>`
+						filter_data.push({
+							'書名': v.book_info.bookname,
+							'上傳日期': v.upload_date,
+							'動作': action,
+						})
+					})
+					self.data.push(
+						filter_data,
+					)
+					//alertmessage('success', '查詢完成，共取得 ' +self.data[0].length +' 筆資料')
+				})
+				.fail(function(data){
+					alertmessage('error', data['message'])
+				})
+
+		},
+		methods: {
+		}
+
+	})
+
+</script>
+{% endblock %}
