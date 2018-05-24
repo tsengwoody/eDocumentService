@@ -24,7 +24,6 @@
 
 		var now_fontSize = $("html").attr('class');
 		var showSize; // show the size % compare to 80%
-		console.log(now_fontSize);
 
 		if (now_fontSize) {
 			// default fontSize 80%
@@ -79,6 +78,20 @@
 			div.modal('hide');
 		});
 
+		$('#divmodal_setFontSize_cancel').off().on('click', function () {
+			// reset to cookie setup or default size
+			var _fontSize = $.cookie('font-size');
+			if ( _fontSize != null ) {
+				$("html").removeClass().addClass(_fontSize);
+			} 
+			else {
+				$("html").removeClass().addClass("htmlFontSize80");
+			}
+
+			div.modal('hide');
+		});
+
+
 		//hidden
 		div.off().on('hidden.bs.modal', function (e) {
 			lm_minu();
@@ -116,7 +129,7 @@
 				<span id=fontSizeBlock></span>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
+				<button id="divmodal_setFontSize_cancel" type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
 				<button id="divmodal_setFontSize_ok" type="button" class="btn btn-primary">確定</button>
 			</div>
 		</div>
