@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %} {% block title %} 服務時數確認 {% endblock %} {% block content %} {% csrf_token %}
+{% extends "base_nav.html" %} {% block title %} 服務時數確認 {% endblock %} {% block content %} {% csrf_token %}
 
 
 <script>
@@ -17,7 +17,7 @@
 		client.add('serviceinfoadds');
 
 		//read
-		client.serviceinfoadds.read({ is_exchange: false })
+		client.serviceinfoadds.read({ is_exchange: false, 'ordering': 'user',  })
 			.done(function (data) {
 				//console.log('serviceinfocheck_ini_list',data)
 

@@ -151,7 +151,8 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 class ServiceInfoViewSet(viewsets.ModelViewSet):
 	queryset = ServiceInfo.objects.all()
 	serializer_class = ServiceInfoSerializer
-	filter_backends = (ServiceInfoUserFilter, ServiceInfoExchangeFilter,)
+	filter_backends = (filters.OrderingFilter, ServiceInfoUserFilter, ServiceInfoExchangeFilter,)
+	ordering_fields = ('user',)
 
 class ServiceInfoAddViewSet(ServiceInfoViewSet):
 	serializer_class = ServiceInfoAddSerializer
