@@ -526,13 +526,6 @@ def library_origin_view(request, template_name='ebookSystem/library_origin_view.
 		return locals()
 
 @http_response
-def book_saelf(request, template_name='ebookSystem/book_saelf.html'):
-	if request.method == 'GET':
-		lr_out_list = LibraryRecord.objects.filter(user=request.user, status=True)
-		lr_in_list = LibraryRecord.objects.filter(user=request.user, status=False)
-		return locals()
-
-@http_response
 def library_action(request, ):
 	if request.method == 'POST' and request.is_ajax():
 		if request.POST['action'] == 'check_out':

@@ -119,3 +119,22 @@ class EditRecordServiceInfoFilter(filters.BaseFilterBackend):
 			return queryset.filter(serviceInfo=None)
 		else:
 			return queryset
+
+class LibraryRecordUserFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		user_id = request.query_params.get('user_id')
+		if user_id:
+			user = User.objects.get(id=user_id)
+			return queryset.filter(user=user)
+		else:
+			return queryset
+
+class LibraryRecordStatusFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		status = request.query_params.get('status')
+		if status and status in ['true', 'True']:
+			return queryset.filter(status=True)
+		elif status and status in ['false', 'False']:
+			return queryset.filter(status=False)
+		else:
+			return queryset

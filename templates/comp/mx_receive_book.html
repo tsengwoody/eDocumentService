@@ -22,7 +22,7 @@
 		//me
 		me = $(me);
 		//ISBN
-		let ISBN = me.attr('ISBN');
+		let pk = me.attr('pk');
 
 		//div
 		let dialog_id='bookdownload_dialog';
@@ -33,7 +33,7 @@
 			title = '取得書籍';
 
 			model_infos = {
-				'format': {
+				'fileformat': {
 					'label': '類型',
 					'type': 'select',
 					'remark': '',
@@ -89,9 +89,9 @@
 			let url;
 			let df;
 			if (ebook === false) {
-				url = '/ebookSystem/book_download/' + ISBN;
+				url = '/ebookSystem/api/libraryrecords/' +pk +'/action/download/'
 				if (action === 'download') {
-					//console.log('aj_binary',ebook,url,transferData)
+					console.log('aj_binary',ebook,url,transferData)
 					df = aj_binary(url, transferData);
 				}
 				else {

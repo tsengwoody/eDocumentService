@@ -66,15 +66,26 @@ class BookSerializer(serializers.ModelSerializer):
 class BookAddSerializer(BookSerializer):
 	ebook_set = EBookSerializer(many=True, read_only=True)
 
+class BookRecommendSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = BookRecommend
+		fields = ('__all__')
+
+class LibraryRecordSerializer(serializers.ModelSerializer):
+	object = BookSerializer(read_only=True,)
+	class Meta:
+		model = LibraryRecord
+		fields = ('__all__')
+
 #===== ISSN Book =====
 
-class ISSNBookInfoSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = ISSNBookInfo
-		fields = '__all__'
-
 class ISSNBookSerializer(serializers.ModelSerializer):
-	ISSN_book_info_detail = ISSNBookInfoSerializer(read_only=True)
 	class Meta:
 		model = ISSNBook
 		fields = ('__all__')
+
+class ISSNBookInfoSerializer(serializers.ModelSerializer):
+	issnbook_set = ISSNBookSerializer(many=True, read_only=True)
+	class Meta:
+		model = ISSNBookInfo
+		fields = '__all__'

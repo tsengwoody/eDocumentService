@@ -1,0 +1,94 @@
+{% extends "base_nav.html" %}
+{% block title %}
+期刊雜誌
+{% endblock %}
+{% block content %}
+
+{% csrf_token %}
+{% include 'comp/list_vue_component.html' %}
+{% include 'comp/table_vue_component.html' %}
+
+<div id="issnbook_repository" class="container">
+	<h3>平台書庫</h3>
+	<div class="row">
+		<div class="col-sm-3 col-md-3">
+			<div class="panel-group">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<span class="glyphicon glyphicon-folder-close"></span>&nbsp;&nbsp;期刊雜誌列表
+						</h4>
+					</div>
+
+					<div class="panel-collapse">
+						<ul class="list-group">
+							<li class="list-group-item" v-for="(item, index) in issnbook_list"><a 
+								v-on:click="read(index)"
+								href='#'
+							>{|{ item.title }|}</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-9 col-md-9">
+			<h4>基本資訊</h4>
+			<ul-component :data="info"></ul-component>
+			<h4>個期列表</h4>
+			<table-component :data="issnbooks"></table-component>
+
+		</div>
+	</div>
+</div>
+
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+	vo_issnbook_repository = new Vue({
+		el: '#issnbook_repository',
+		data: {
+			issnbook_list: {},
+			index: 0,
+			url: '/ebookSystem/api/issnbookinfos/',
+		},
+		computed: {
+			issnbook: function () {
+				return this.issnbook_list[this.index]
+			},
+			info: function () {
+				return {
+					'ISSN': this.issnbook.ISSN,
+					'名稱': this.issnbook.title,
+					'出版單位': this.issnbook.house,
+				}
+			},
+			issnbooks: function () {
+				temp = []
+				_.each(this.issnbook_list[this.index].issnbook_set, function(v) {
+					temp.push({
+						'期數': v.volume,
+						'出版日期': v.date,
+						'動作': '',
+					})
+				})
+				return temp
+			},
+		},
+		created: function () {
+			let self = this
+
+			rest_aj_send('get', this.url, {})
+			.done(function(data) {
+				self.issnbook_list = data['data']
+			})
+
+		},
+		methods: {
+			read: function (index) {
+				this.index = index
+			},
+		},
+
+	})
+
+</script>
+{% endblock %}

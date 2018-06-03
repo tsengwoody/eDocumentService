@@ -12,6 +12,8 @@ router.register(r'bookinfos', apis.BookInfoViewSet)
 router.register(r'editrecords', apis.EditRecordViewSet)
 router.register(r'issnbookinfos', apis.ISSNBookInfoViewSet)
 router.register(r'issnbooks', apis.ISSNBookViewSet)
+router.register(r'bookrecommends', apis.BookRecommendViewSet)
+router.register(r'libraryrecords', apis.LibraryRecordViewSet)
 
 import copy
 api_urlpatterns = copy.copy(router.urls)
@@ -34,7 +36,6 @@ urlpatterns = [
 	url(r'^library_view$', views.library_view, name='library_view'),
 	url(r'^library_origin_view$', views.library_origin_view, name='library_origin_view'),
 	url(r'^library_action$', views.library_action, name='library_action'),
-	url(r'^book_saelf$', views.book_saelf, name='book_saelf'),
 	url(r'^bookorder_list$', views.bookorder_list, name='bookorder_list'),
 	url(r'^book_action/$', views.book_action, name='book_action'),
 	url(r'^ebook_change_status/(?P<pk>[\d-]+)/$', views.ebook_change_status, name='ebook_change_status'),

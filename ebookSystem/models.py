@@ -589,11 +589,13 @@ class Library(models.Model):
 	def __init__(self, *args, **kwargs):
 		super(Library, self).__init__(*args, **kwargs)
 		self.epub = BASE_DIR +'/file/ebookSystem/library/{0}.epub'.format(self.id)
+		self.txt = BASE_DIR +'/file/ebookSystem/library/{0}.txt'.format(self.id)
 
 	def check_out(self):
 		if not os.path.exists(os.path.dirname(self.epub)):
 			os.mkdir(os.path.dirname(self.epub))
 		path = self.object.custom_epub_create(self.epub, self.user)
+		path = self.object.custom_txt_create(self.txt, self.user)
 
 		self.check_out_time = timezone.now()
 		self.check_in_time = self.check_out_time +datetime.timedelta(days=30)

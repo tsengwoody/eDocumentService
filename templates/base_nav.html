@@ -49,6 +49,7 @@
 						{% endif %}
 						{% if request.user.is_manager or request.user.is_advanced_editor %}
 						<li><a href="{% url 'ebookSystem:generics' 'book_upload' %}">電子檔上傳</a></li>
+						<li><a href="{% url 'ebookSystem:generics' 'issnbook_upload' %}">期刊雜誌上傳</a></li>
 						{% endif %}
 					</ul>
 				</li>
@@ -62,10 +63,11 @@
 				</li>
 				{% if request.user.is_guest %}
 				<li><a href="{% url 'ebookSystem:generics' 'book_manager_person' %}">校對進度</a></li>
-				<li><a href="{% url 'ebookSystem:book_saelf' %}">借閱書櫃</a></li>
+				<li><a href="{% url 'ebookSystem:generics' 'book_shelf' %}">借閱書櫃</a></li>
 				{% endif %}
 				{% endif %}
 				<li><a href="{% url 'ebookSystem:generics' 'book_repository' %}">平台書庫</a></li>
+				<li><a href="{% url 'ebookSystem:generics' 'issnbook_repository' %}">期刊雜誌</a></li>
 				{% if not request.user.is_license and request.user.is_authenticated %}
 				<li><a href="{% url 'genericUser:license' %}">簽署隱私權條款</a></li>
 				{% endif %}

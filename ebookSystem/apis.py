@@ -398,6 +398,36 @@ class EditRecordViewSet(viewsets.ModelViewSet):
 		res['diff_count'] = res['dst_count'] -res['src_count']
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
+class BookRecommendViewSet(viewsets.ModelViewSet):
+	queryset = BookRecommend.objects.all().order_by('-date')
+	serializer_class = BookRecommendSerializer
+
+class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
+	queryset = LibraryRecord.objects.all()
+	serializer_class = LibraryRecordSerializer
+	filter_backends = (LibraryRecordUserFilter, LibraryRecordStatusFilter)
+
+	@detail_route(
+		methods=['get', 'post'],
+		url_name='download',
+		url_path='action/download',
+	)
+	def download(self, request, pk=None):
+		res = {}
+
+		obj = self.get_object()
+
+		from django.contrib.auth import authenticate
+		user = authenticate(username=request.user.username, password=request.POST['password'])
+		if not user is None:
+			if request.POST['fileformat'] == 'epub':
+				return self.get_resource(obj.epub)
+			elif request.POST['fileformat'] == 'txt':
+				return self.get_resource(obj.txt)
+		else:
+			res['detail'] = u'身份認證失敗'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+
 #===== ISSN Book =====
 
 class ISSNBookInfoViewSet(viewsets.ModelViewSet):

@@ -1,0 +1,86 @@
+{% extends "base_nav.html" %}
+{% block title %}
+借閱書櫃
+{% endblock %}
+{% block content %}
+{% csrf_token %}
+{% include 'comp/table_vue_component.html' %}
+
+<div id="book_shelf" class="container">
+	<h3>借閱書櫃</h3>
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="#book_shelf_checkout" name="book_shelf_tab_grp" data-toggle="tab" aria-expanded="true">正借閱書籍</a></li>
+		<li><a href="#book_shelf_checkin" name="book_shelf_tab_grp" data-toggle="tab" aria-expanded="false">借閱歷史紀錄</a></li>
+	</ul>
+	<div class="tab-content" style="padding:20px 0px;">
+		<div id="book_shelf_checkout" class="tab-pane active">
+			<h4>正借閱書籍</h3>
+			<table-component :data="checkout_show"></table-component>
+		</div>
+		<div id="book_shelf_checkin" class="tab-pane active">
+			<h4>借閱歷史紀錄</h3>
+			<table-component :data="checkin_show"></table-component>
+		</div>
+	</div>
+</div>
+
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+	vo_book_shelf = new Vue({
+		el: '#book_shelf',
+		data: {
+			checkout_list: [],
+			checkin_list: [],
+		},
+		computed: {
+			checkout_show: function () {
+				temp = []
+				_.each(this.checkout_list, function(v) {
+
+					action = ''
+					action += `<a class="btn btn-default" role="button" href="/ebookSystem/library_view?ISBN=` +v.id +`" target="_blank" title="閱讀(另開新視窗)">閱讀</a>`
+					action += `<button type="button" class="btn btn-default" pk="` +v.id +`" onclick="receivebook(this, false, 'download')">下載</button>`
+					action += `<button type="button" class="btn btn-default" id="` +v.id +`" onclick="aj_borrowbook(this, 'check_in')">歸還</button>`
+
+					temp.push({
+						'書名': v.object.book_info.bookname,
+						'借出日期': v.check_out_time,
+						'到期日期': v.check_in_time,
+						'動作': action,
+					})
+
+				})
+				return temp
+			},
+			checkin_show: function () {
+				temp = []
+				_.each(this.checkin_list, function(v) {
+
+					temp.push({
+						'書名': v.object,
+						'借出日期': v.check_out_time,
+						'歸還日期': v.check_in_time,
+					})
+
+				})
+				return temp
+			},
+		},
+		created: function () {
+			let self = this;
+
+			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'user_id': user.id, 'status': 'true'})
+			.done(function(data) {
+				self.checkout_list = data['data']
+			})
+
+			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'user_id': user.id, 'status': 'false'})
+			.done(function(data) {
+				self.checkin_list = data['data']
+			})
+
+		},
+	})
+</script>
+
+{% endblock %}

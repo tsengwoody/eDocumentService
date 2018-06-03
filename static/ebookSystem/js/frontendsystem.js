@@ -1479,10 +1479,16 @@ function aj_binary(url, transferData) {
 			let csrf = $('input[name=csrfmiddlewaretoken]').val();
 			jqXHR.setRequestHeader('X-CSRFToken', csrf);
 			jqXHR.setRequestHeader("X-Requested-With", "XMLHttpRequest")
-		}
-	})
-		.done(function (bdata, status, xhr) {
-
+		},
+		'error': function (xhr) {
+			//reject
+			let res = {
+				'status': 'error',
+				'message': '伺服器錯誤回應: ' +xhr.status,
+			};
+			df.reject(res);
+		},
+		success: function(bdata, textStatus, xhr) {
 			if (bdata.type === 'application/octet-stream') {
 
 				//downloadfile
@@ -1498,10 +1504,6 @@ function aj_binary(url, transferData) {
 
 			}
 			else {
-				// console.log('aj_binary: bdata.type error');
-				// console.log(bdata);
-				// console.log(status);
-				// console.log(xhr);
 
 				//blob to string
 				blob2str(bdata)
@@ -1514,21 +1516,8 @@ function aj_binary(url, transferData) {
 					})
 
 			}
-
-		})
-		.fail(function (xhr) {
-			// console.log('aj_binary: ajax error');
-			// console.log(xhr);
-			// console.log(xhr.responseText); //會沒有responseText, 只好回傳xhr文字
-
-			//reject
-			let res = {
-				'status': 'error',
-				'message': '伺服器錯誤回應: ' + o2j(xhr),
-			};
-			df.reject(res);
-
-		})
+		},
+	})
 
 	return df;
 }
@@ -2474,7 +2463,7 @@ function rest_aj_send(type, url, transferData) {
 		},
 		'error': function (xhr) {
 
-		//reject
+			//reject
 			let res = {
 				'status': xhr.status,
 				'message': '伺服器錯誤回應: ' +xhr.status +' - ' +xhr.responseText,
