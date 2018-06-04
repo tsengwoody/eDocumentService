@@ -218,3 +218,9 @@ html, body {
 	border: 2px solid lightgray; 
 	margin-left: 1em;
 }
+
+.y-scroll-box {
+	height: 25em; 
+	overflow-x: hidden;
+	overflow-y: auto;
+}
