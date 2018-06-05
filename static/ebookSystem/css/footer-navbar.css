@@ -23,7 +23,7 @@ code {
 }
 .footer {
     text-align: center;
-    padding-top: 15px;
+    /*padding-top: 15px;*/
     min-height:50px;
     /*margin-top: 20px;*/
     border-top: 1px solid #e5e5e5;
@@ -33,6 +33,18 @@ code {
     margin-bottom: 0;
     color: #777;
 }
+
+.footer .pull-left {
+  padding-top: 15px;
+}
+
+.footer #logo {
+   height: 45px; 
+   float: left;
+   padding-top: 5px;
+   padding-left: 5px;
+}
+
 .muted {
     color: #999999;
 }
