@@ -167,11 +167,14 @@
 						}
 					});
 
-					// let keys = Object.keys(data.data);
-					// _.each(keys, function(v, k){
-					// 	vo.infos[v] = data.data[v];
-					// }); 					// 為什麼這樣不行?
-					vo.infos = data.data;   // 這個可以
+					 let keys = Object.keys(data.data);
+					 _.each(keys, function(v, k){
+					 	vo.infos[v] = data.data[v];
+					 }); 					// 為什麼這樣不行?
+					r = Object.assign(vo.infos)
+					vo.infos = r
+					console.log(r)
+					//vo.infos = data.data;   // 這個可以
 				})
 
 				let org_url = '/genericUser/api/organizations/';

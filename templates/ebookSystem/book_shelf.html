@@ -17,7 +17,7 @@
 			<h4>正借閱書籍</h3>
 			<table-component :data="checkout_show"></table-component>
 		</div>
-		<div id="book_shelf_checkin" class="tab-pane active">
+		<div id="book_shelf_checkin" class="tab-pane">
 			<h4>借閱歷史紀錄</h3>
 			<table-component :data="checkin_show"></table-component>
 		</div>
@@ -44,8 +44,8 @@
 
 					temp.push({
 						'書名': v.object.book_info.bookname,
-						'借出日期': v.check_out_time,
-						'到期日期': v.check_in_time,
+						'借出日期': v.check_out_time.slice(0,10),
+						'到期日期': v.check_in_time.slice(0,10),
 						'動作': action,
 					})
 
@@ -57,9 +57,9 @@
 				_.each(this.checkin_list, function(v) {
 
 					temp.push({
-						'書名': v.object,
-						'借出日期': v.check_out_time,
-						'歸還日期': v.check_in_time,
+						'書名': v.object.book_info.bookname,
+						'借出日期': v.check_out_time.slice(0,10),
+						'歸還日期': v.check_in_time.slice(0,10),
 					})
 
 				})

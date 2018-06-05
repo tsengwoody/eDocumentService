@@ -407,6 +407,13 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	serializer_class = LibraryRecordSerializer
 	filter_backends = (LibraryRecordUserFilter, LibraryRecordStatusFilter)
 
+	def get_fullpath(self, obj, dir, resource):
+		fullpath = None
+		if dir == 'source':
+			if resource in ['epub', 'txt', 'zip', ]:
+				fullpath = getattr(obj, resource, '')
+		return fullpath
+
 	@detail_route(
 		methods=['get', 'post'],
 		url_name='download',
@@ -414,19 +421,18 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	)
 	def download(self, request, pk=None):
 		res = {}
-
 		obj = self.get_object()
-
-		from django.contrib.auth import authenticate
-		user = authenticate(username=request.user.username, password=request.POST['password'])
-		if not user is None:
-			if request.POST['fileformat'] == 'epub':
-				return self.get_resource(obj.epub)
-			elif request.POST['fileformat'] == 'txt':
-				return self.get_resource(obj.txt)
-		else:
-			res['detail'] = u'身份認證失敗'
-			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		if request.method == 'POST':
+			from django.contrib.auth import authenticate
+			user = authenticate(username=request.user.username, password=request.POST['password'])
+			if not user is None:
+				if request.POST['fileformat'] == 'epub':
+					return self.get_resource(obj.epub)
+				elif request.POST['fileformat'] == 'txt':
+					return self.get_resource(obj.txt)
+			else:
+				res['detail'] = u'身份認證失敗'
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 #===== ISSN Book =====
 

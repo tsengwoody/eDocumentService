@@ -610,6 +610,7 @@ class Library(models.Model):
 		self.save()
 		try:
 			os.remove(self.epub)
+			os.remove(self.txt)
 		except BaseException as e:
 			pass
 		return self.epub

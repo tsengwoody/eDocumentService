@@ -10,7 +10,6 @@ from django.utils import timezone
 
 from ebookSystem.models import *
 from genericUser.models import *
-from account.views import *
 from ebookSystem.views import *
 from genericUser.views import *
 from mysite.views import register

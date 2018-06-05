@@ -544,7 +544,6 @@ def library_action(request, ):
 			lr.check_out()
 			status = 'success'
 			message = u'成功借閱書籍{0}'.format(book)
-			redirect_to = reverse('ebookSystem:book_saelf')
 		elif request.POST['action'] == 'check_in':
 			lr = LibraryRecord.objects.get(id=request.POST['id'])
 			lr.check_in()
