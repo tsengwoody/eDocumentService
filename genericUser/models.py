@@ -251,6 +251,12 @@ class QAndA(models.Model):
 	question = models.TextField()
 	answer = models.TextField()
 	order = models.IntegerField()
+	CATEGORY = (
+		(u'platform' , u'平台'),
+		(u'volunteer', u'志工'),
+		(u'vip', u'視障者'),
+	)
+	category = models.CharField(max_length=10, choices=CATEGORY)
 
 	def __unicode__(self):
 		return unicode(self.id)

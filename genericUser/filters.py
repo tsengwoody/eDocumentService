@@ -58,3 +58,11 @@ class UserRoleFilter(filters.BaseFilterBackend):
 				return queryset
 		else:
 			return queryset
+
+class QAndACategoryFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		category = request.query_params.get('category')
+		if category:
+			return queryset.filter(category=category)
+		else:
+			return queryset

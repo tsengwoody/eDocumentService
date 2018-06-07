@@ -168,6 +168,7 @@ class AnnouncementViewSet(viewsets.ModelViewSet):
 class QAndAViewSet(viewsets.ModelViewSet):
 	queryset = QAndA.objects.all()
 	serializer_class = QAndASerializer
+	filter_backends = (QAndACategoryFilter,)
 	permission_classes = (IsManagerOrReadOnly, )
 
 	def perform_create(self, serializer):

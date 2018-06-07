@@ -116,26 +116,8 @@
 		let dialog_id = 'usermodel';
 
 		let org_choices = [];
-		let client = new $.RestClient('/genericUser/api/');
+		let client = new $.RestClient('/genericUser/api/', )
 		client.add('organizations');
-
-		client.organizations.read()
-			.done(function (data) {
-			let $org_select = $('#id_usermodel_org');
-			$org_select.empty();
-			$org_select.append($('<option>', {
-					value: '',
-					text: '其它',
-				}));
-
-			_.each(data,function(v,k){
-
-				$org_select.append($('<option>', {
-					value: v['id'],
-					text: v['name'],
-				}));
-			})
-		})
 
 		//div
 		let div
@@ -193,9 +175,27 @@
 			}
 			dialog_create('divmodal_dialog_root', dialog_id, '基本資料修改', model_infos)
 
-		div = $('#' +dialog_id);
+			div = $('#' +dialog_id);
 
 		}
+
+		client.organizations.read()
+			.done(function (data) {
+			let $org_select = $('#id_usermodel_org');
+			$org_select.empty();
+			$org_select.append($('<option>', {
+					value: '',
+					text: '其它',
+				}));
+
+			_.each(data,function(v,k){
+
+				$org_select.append($('<option>', {
+					value: v['id'],
+					text: v['name'],
+				}));
+			})
+		})
 
 		//default
 		usermodel_dialog_default(dialog_id, user_id, model_infos);

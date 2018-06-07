@@ -1,18 +1,28 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
-平台Q&A
+Q&A
 {% endblock %}
 {% block content %}
-{% include 'comp/qanda_vue_component.html' %}
 {% csrf_token %} 
 
 <script>
-	let vo_qanda;
-
 	$(function(){
 
-		//refresh
-		qanda_refresh();
+		//opt
+		let opt={
+			el: '#' + 'id_qanda_list',
+			data: {
+				'categorys': {
+					'platform': '平台',
+					'volunteer': '志工',
+					'vip': '視障者',
+				},
+			},
+		};
+
+		//vo
+		let vo_qanda = new Vue(opt);
+
 
 	})
 
@@ -87,47 +97,152 @@
 
 </script>
 
-<script>
+<script type="text/x-template" id="qanda-list-template">
+	<div>
+		<div class="bs-callout bs-callout-info" style="position: relative;" v-for="(qa,iqa) in qandas" v-if="mode==='forshow' || mode==='foredit'"> 
 
-	//qanda_refresh
-	function qanda_refresh(){
+			<div style="position: absolute; top:5px; right:5px;" v-if="mode==='foredit'">
+				<button type="button" class="close" style="margin-left:5px;" title="刪除" aria-label="刪除" v-on:click="ckdelete(qa)">
+					<span class="glyphicon glyphicon-remove-sign"></span>
+				</button>
+				<button type="button" class="close" style="margin-left:5px;" title="編輯" aria-label="編輯" v-on:click="ckupdate(qa)">
+					<span class="glyphicon glyphicon-edit"></span>
+				</button>
+			</div>
 
-		//aj_qanda
-		aj_qanda('list')
-		.done(function(d){
-			//opt
-			let opt={
-				el: '#' + 'id_qanda_list',
-				data: {
-					s:{
-						qa:d.content,
-						{% if request.user.is_manager %}
-						mode:'foredit', //forshow foredit
-						{% else %}
-						mode:'forshow', //forshow foredit
-						{% endif %}
-					}
-				},
-			};
+			<div v-if="mode==='forshow' || mode==='foredit'">
+				<div style="font-size:12pt;">
+					<div v-html="qa.question"></div>
+				</div> 
+				<div style="font-size:12pt; margin-top:10px;">
+					<div v-html="qa.answer"></div>
+				</div> 
+			</div>
 
-			//vo
-			if(iser(vo_qanda)){
-				vo_qanda = new Vue(opt);
-			}
-			else{
-				vo_qanda.s.qa=d.content;
-			}
+		</div>
 
-		})
+		<button type="button" class="btn btn-primary" v-on:click="ckcreate" v-if="mode==='foredit'">建立新Q&A</button>
 
-	}
-
+	</div>
 </script>
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+	Vue.component('vu-qanda', {
+		template: '#qanda-list-template',
+		props: {
+			'category': String,
+			'mode': String,
+		},
 
-<h3>平台Q&A</h3>
+		data: function () {
+			return {
+				qandas:{},
+			}
+		},
+		created: function () {
+			this.cklist()
+		},
+		methods: {
+			operate:function(mode,aid,transferData){
+				let self = this
+				//aj_qanda
+				aj_qanda(mode,aid,transferData)
+				.done(function(data){
+					alertmessage(data.status, data.message)
+					.done(function(){
+						self.cklist()
+					});
+				})
+				.fail(function(data){
+					alertmessage(data.status, data.message)
+				})
 
-<div style="padding-bottom:30px;">
-	<vu-qanda id="id_qanda_list" v-bind:s="s"></vu-qanda>
+			},
+			cklist: function () {
+				let self = this;
+				rest_aj_send('get', '/genericUser/api/qandas/', {'category': self.category,})
+				.done(function(data) {
+					self.qandas = data['data']
+				})
+
+			},
+			ckdelete: function (qa) {
+
+				let vo = this;
+
+				alertconfirm('是否確定刪除?')
+				.done(function(){
+
+					//operate
+					vo.operate('delete',qa.id,null);
+
+				})
+				
+			},
+
+			ckupdate: function (qa) {
+
+				let vo = this;
+
+				//AboutQAndA
+				AboutQAndA(qa.question,qa.answer, qa.category)
+				.done(function(nq,na, nc){
+					
+					//transferData
+					let transferData={
+						question:nq,
+						answer:na,
+						category:nc,
+					};
+
+					//operate
+					vo.operate('update',qa.id,transferData);
+
+				})
+
+			},
+
+			ckcreate: function () {
+				//console.log('methods ckcreate')
+
+				let vo = this;
+
+				//AboutQAndA
+				AboutQAndA('' ,'' ,'志工')
+				.done(function(nq,na){
+					
+					//transferData
+					let transferData={
+						question:nq,
+						answer:na,
+						category:nc,
+					};
+					console.log(transferData)
+					//operate
+					vo.operate('create',null,transferData);
+
+				})
+
+			},
+
+		},
+	})
+</script>
+<div id="id_qanda_list">
+	<h3>Q&A</h3>
+	<ul class="nav nav-tabs">
+		<template v-for="(v, k, index) in categorys">
+			<li :class="{'active':(index===0)}"><a :href="'#qanda_' +k" name="qanda_tab_grp" data-toggle="tab" :aria-expanded="!!(index===0)">{|{ v }|}</a></li>
+		</template>
+	</ul>
+	<div class="tab-content" style="padding:20px 0px;">
+		<template v-for="(v, k, index) in categorys">
+			<div :id="'qanda_' +k" class="tab-pane" :class="{'active':(index===0)}">
+				<h4>{|{ v }|}</h4>
+				<vu-qanda v-bind:mode="'foredit'" v-bind:category="k"></vu-qanda>
+			</div>
+		</template>
+	</div>
 </div>
 
 {% endblock %}

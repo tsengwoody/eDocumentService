@@ -1,4 +1,4 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 平台Q&A
 {% endblock %}
@@ -86,11 +86,7 @@
 
 </script>
 
-<script>
-
-	//vu-qanda
-	Vue.component('vu-qanda', {
-		template: `
+<script type="text/x-template" id="qanda-list-template">
 	<div>
 		<div class="bs-callout bs-callout-info" style="position: relative;" v-for="(qa,iqa) in s.qa" v-if="s.mode==='forshow' || s.mode==='foredit'"> 
 
@@ -117,7 +113,13 @@
 		<button type="button" class="btn btn-primary" v-on:click="ckcreate" v-if="s.mode==='foredit'">建立新Q&A</button>
 
 	</div>
-	`,
+</script>
+
+<script>
+
+	//vu-qanda
+	Vue.component('vu-qanda', {
+		template: '#qanda-list-template',
 		props: ['s'],
 
 		methods: {
@@ -160,15 +162,16 @@
 				let vo = this;
 
 				//AboutQAndA
-				AboutQAndA(qa.question,qa.answer)
-				.done(function(nq,na){
+				AboutQAndA(qa.question,qa.answer, qa.category)
+				.done(function(nq,na, nc){
 					
 					//transferData
 					let transferData={
 						question:nq,
 						answer:na,
+						category:nc,
 					};
-
+					console.log(transferData)
 					//operate
 					vo.operate('update',qa.id,transferData);
 
@@ -182,15 +185,16 @@
 				let vo = this;
 
 				//AboutQAndA
-				AboutQAndA('','')
+				AboutQAndA('' ,'' ,'志工')
 				.done(function(nq,na){
 					
 					//transferData
 					let transferData={
 						question:nq,
 						answer:na,
+						category:nc,
 					};
-
+					console.log(transferData)
 					//operate
 					vo.operate('create',null,transferData);
 

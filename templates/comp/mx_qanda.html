@@ -13,7 +13,7 @@
 
 	});
 
-	function AboutQAndA(q, a) {
+	function AboutQAndA(q, a, c,) {
 		//顯示與編輯Q&A
 
 		//df
@@ -25,6 +25,7 @@
 		//setContent
 		tinymce.get('divmodal_qanda_question').setContent(q);
 		tinymce.get('divmodal_qanda_answer').setContent(a);
+		$('#qanda_category').val(c);
 
 		//ok
 		$('#divmodal_qanda_save').off().on('click', function () {
@@ -32,11 +33,12 @@
 			//getContent
 			let nq = tinymce.get('divmodal_qanda_question').getContent();
 			let na = tinymce.get('divmodal_qanda_answer').getContent();
+			let nc = $('#qanda_category').val();
 
 			//resolve
-			if (!_.isEqual(q, nq) || !_.isEqual(a, na)) {
-				df.resolve(nq, na);
-			}
+			//if (!_.isEqual(q, nq) || !_.isEqual(a, na) || !_.isEqual(c, nc)) {
+				df.resolve(nq, na, nc);
+			//}
 
 			div.modal('hide');
 		});
@@ -74,6 +76,11 @@
 			<div style="padding:20px 20px; background-color:#fafafa;">
 
 				<div class="row">
+					<select class="form-control" id="qanda_category">
+						<option value="platform">平台</option>
+						<option value="volunteer">志工</option>
+						<option value="vip">視障者</option>
+				</select>
 					<div class="col-sm-6">
 						<label for="divmodal_qanda_question">問題Question</label>
 						<div id="divmodal_qanda_question"></div>
