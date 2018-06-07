@@ -83,7 +83,7 @@
 
 				let action = '';
 				action += `<button class="btn btn-default send_button" type="button" name="set_priority" onclick="BookSetPriority('` +v.ISBN +`')">設定權重</button>`
-				action += `<a href="/ebookSystem/detail/` +v.ISBN +`/">分段資訊</a>`
+				action += `<a class="btn btn-default" href="/ebookSystem/detail/` +v.ISBN +`/">分段資訊</a>`
 
 				let o = {
 					'ISBN': v.ISBN,
