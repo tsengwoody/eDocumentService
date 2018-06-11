@@ -16,6 +16,7 @@ router.register(r'bannercontents', apis.BannerContentViewSet)
 router.register(r'serviceinfos', apis.ServiceInfoViewSet)
 router.register(r'users', apis.UserViewSet)
 router.register(r'serviceinfoadds', apis.ServiceInfoAddViewSet)
+router.register(r'disabilitycards', apis.DisabilityCardViewSet)
 
 import copy
 api_urlpatterns = copy.copy(router.urls)

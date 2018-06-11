@@ -1,4 +1,4 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 調出視窗測試
 {% endblock %}
@@ -7,187 +7,256 @@
 {% csrf_token %}
 
 <template id="bs-modal">
-    <div class="modal fade" :id="modalName" tabindex="-1" role="dialog" :aria-labelledby="modalName+'Label'" aria-hidden="true">
-      	<div class="modal-dialog modal-lg" role="document">
-        	<div class="modal-content alert-info" style="background-color: #f5f5f5;">
-          		<div class="modal-header">
-              
-	            	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-
-	            	<slot name="header">
-	                	<h4 class="modal-title" id="myModalLabel">Modal title</h4>
-	            	</slot>
-          		</div>
+	<div class="modal fade" :id="modalName" tabindex="-1" role="dialog" :aria-labelledby="modalName+'Label'" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content alert-info" style="background-color: #f5f5f5;">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<slot name="header">
+						<h4 class="modal-title" id="myModalLabel">Modal title</h4>
+					</slot>
+				</div>
 				<div class="modal-body">
 					<slot name="body">
 						default body
 					</slot>
 				</div>
-          		<div class="modal-footer">
-            		<slot name="footer">
-              			<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
-              			<button type="button" class="btn btn-primary">儲存</button>
-            		</slot>
-          		</div>
-        	</div>
-      	</div>
-    </div>    
+				<div class="modal-footer">
+					<slot name="footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+						<button type="button" class="btn btn-primary">儲存</button>
+					</slot>
+				</div>
+			</div>
+		</div>
+	</div>		
 </template>
-    
+
 <template id="bs-form-group">
-    <div class="form-horizontal">
-        <template v-for="(detail, field) in model_infos">
-            <div class="form-group">
-                <label class="control-label col-sm-2" :for="'id_' + div_id +'_' + field"><font style="color:red">*</font><span>{|{ detail.label }|}</span></label>
-                <div class="col-sm-4">
-                    <input v-if="detail.type === 'text'" 
-                    maxlength="30"
-                    class="form-control" 
-                    :type="detail.type" 
-                    :id="'id_' + div_id +'_' + field" 
-                    :name="field" 
-                    v-model="infos[field]">
-
-                    <input v-if="detail.type === 'checkbox'" 
-                    :type="detail.type" 
-                    :id="'id_' + div_id +'_' + field" 
-                    :name="field" 
-                    :checked="infos[field]"
-                    v-model="infos[field]">
-
-                    <input v-if="detail.type === 'date'" 
-                    class="form-control"
-                    data-date-format="yyyy-mm-dd"
-                    type="text" 
-                    :id="'id_' + div_id +'_' + field" 
-                    :name="field"
-                    v-model="infos[field]">
-
-                    <select v-if="detail.type === 'select'"
-                    class="form-control"
-                    :id="'id_' + div_id +'_' + field"
-                    :name="field"
-                    v-model="infos[field]">
-                    	<template v-for="(name, val) in detail.choices">
-	                    	<option
-	                    	:value="val">
-	                    		{|{ name }|}
-	                    	</option>
-                    	</template>
-                    </select>
-                    
-		            <template v-if="detail.type === 'radio'" 
-		            v-for="(name, val) in detail.choices">
-		            	<label class="radio-inline">
-						<input 
-						type="radio" 
+	<div class="form-horizontal">
+		<template v-for="(detail, field) in model_infos">
+			<div class="form-group">
+				<label class="control-label col-sm-2" :for="'id_' + div_id +'_' + field"><font style="color:red">*</font><span>{|{ detail.label }|}</span></label>
+				<div class="col-sm-4">
+					<input v-if="detail.type === 'text'" 
+						maxlength="30"
+						class="form-control" 
+						:type="detail.type" 
+						:id="'id_' + div_id +'_' + field" 
 						:name="field" 
+						v-model="infos[field]"
+					>
+
+					<input v-if="detail.type === 'checkbox'" 
+						:type="detail.type" 
+						:id="'id_' + div_id +'_' + field" 
+						:name="field" 
+						:checked="infos[field]"
+						v-model="infos[field]"
+					>
+
+					<input v-if="detail.type === 'date'" 
+						class="form-control"
+						data-date-format="yyyy-mm-dd"
+						type="text" 
+						:id="'id_' + div_id +'_' + field" 
+						:name="field"
+						v-model="infos[field]"
+					>
+
+					<select v-if="detail.type === 'select'"
+						class="form-control"
 						:id="'id_' + div_id +'_' + field"
-						:value="val"
-						v-model="infos[field]" 
+						:name="field"
+						v-model="infos[field]"
+					>
+						<template v-for="(name, val) in detail.choices">
+							<option :value="val">{|{ name }|}</option>
+						</template>
+					</select>
+
+					<template
+						v-if="detail.type === 'radio'" 
+						v-for="(name, val) in detail.choices"
+					>
+						<label class="radio-inline">
+						<input 
+							type="radio" 
+							:name="field" 
+							:id="'id_' + div_id +'_' + field"
+							:value="val"
+							v-model="infos[field]" 
 						> 
 						{|{ name }|}
 						</label>
 					</template>
-                </div>
-                <label class="control-label col-sm-4" :for="'id_' + div_id +'_' + field" style="text-align:left;"><font style="color:red">{|{ detail.remark }|}</font></label>
-            </div>
-
-        </template>
-    </div>
+				</div>
+				<label class="control-label col-sm-4" :for="'id_' + div_id +'_' + field" style="text-align:left;"><font style="color:red">{|{ detail.remark }|}</font></label>
+			</div>
+		</template>
+	</div>
 </template>
 
-
 <div id="app">
-    <button type="button" class="btn btn-primary" data-toggle="modal" :data-target="'#'+name">Modal</button>
+	<button type="button" class="btn btn-primary" data-toggle="modal" :data-target="'#'+name">Modal</button>
+	<modal-component :modal-name="name">
 
-    <modal-component
-        :modal-name="name"
-    >
+		<template slot="header">
+			<h4 class="modal-title" id="myModalLabel">{|{ title }|}</h4>
+		</template>
 
-    <template slot="header">
-        <h4 class="modal-title" id="myModalLabel">{|{ title }|}</h4>
-    </template>
-    
-    <template slot="body">
-        <form-component
-        :div_id="name"
-        :model_infos="model_infos"
-        :url="url"
-        ref="foo"
-        ></form-component>
-    </template>
-    
-    <template slot="footer">
-  		<button type="button" class="btn btn-default" data-dismiss="modal" onclick="vo_book.$refs.foo.get_info()">關閉</button>
-		<button type="button" class="btn btn-primary" onclick="vo_book.$refs.foo.update_info()">儲存</button>
-    </template>
-    
-    </modal-component>   
+		<template slot="body">
+			<form-component
+			:div_id="name"
+			:model_infos="model_infos"
+			:url="url"
+			ref="foo"
+			></form-component>
+		</template>
+
+		<template slot="footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal" onclick="vo_book.$refs.foo.get_info()">關閉</button>
+			<button type="button" class="btn btn-primary" onclick="vo_book.$refs.foo.update_info()">儲存</button>
+		</template>
+
+	</modal-component>	 
+
 </div>
-    
+
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 	let vo_book;
 
 	Vue.component('modal-component', {
-	    template: '#bs-modal',
-	    props: {
-	        modalName: String,  // define type
-	    },
+		template: '#bs-modal',
+		props: {
+			modalName: String,	// define type
+		},
 	});
-	    
-	Vue.component('form-component', {
-	    template: '#bs-form-group',
-	    props: {
-	        div_id: String,  // define type
-	        model_infos: Object,
-	        url: String,
-	    },
-	    data: function(){
-	    	return {
-	    		infos: {},
-	    	}
-	    },
 
-	    watch: {
+	$(function(){
+		let user_id = $('div[user_id]').attr('user_id');
+		let opt = {
+			el: '#app',
+			data: {
+				name: "usermodel",
+				title: "更改使用者資訊",
+				user_id: user_id,
+				model_infos : {
+							'email': {
+									'label': '信箱',
+									'type': 'text',
+									'remark': '請填寫電子信箱',
+							},
+							'first_name': {
+									'label': '性氏',
+									'type': 'text',
+									'remark': '請填寫中文姓氏',
+							},
+							'last_name': {
+									'label': '名字',
+									'type': 'text',
+									'remark': '請填寫中文名字',
+							},
+							'phone': {
+									'label': '聯絡電話',
+									'type': 'text',
+									'remark': '請填寫手機',
+							},
+							'birthday': {
+									'label': '生日',
+									'type': 'date',
+									'remark': '請填寫生日，範例日期格式：1989-02-19',
+							},
+							'education': {
+									'label': '教育程度',
+									'type': 'select',
+									'remark': '請選擇教育程度',
+									'choices' : {
+											'' :'---------',
+											'國小': '國小',
+											'國中': '國中',
+											'高中': '高中',
+											'學士': '學士',
+											'碩士': '碩士',
+									},
+							},
+							'is_book': {
+									'label': '訂閱訊息',
+									'type': 'checkbox',
+									'remark': '訂閱訊息',
+							},
+							'org': {
+									'label': '隸屬單位',
+									'type': 'select',
+									'remark': '請選擇所屬單位',
+									'choices' : {
+										'' :'其它',
+									},
+							},
+				},
+				infos: {},
+			},
+			computed: {
+				url: function(){
+					return '/genericUser/api/users/' + this.user_id + '/';
+				},
+			},
+		};		
+
+		vo_book = new Vue(opt);
+
+		$(document).on('change', 'input[name=birthday]', function (e) {
+			// jQuery DatePicker 的物件值會和 VueJs 的值分開，導致vue js 無法抓到所選擇的值，這裡使用 jQuery 的 onchange 事件來解決這個問題
+						vo_book.$refs.foo.infos['birthday'] = $(this).val();
+		});
+
+	});
+
+	Vue.component('form-component', {
+		template: '#bs-form-group',
+		props: {
+			div_id: String,	// define type
+			model_infos: Object,
+			url: String,
+		},
+		data: function(){
+			return {
+				infos: {},
+			}
+		},
+		watch: {
 			infos: function() {
 				$(`#id_` +this.div_id +`_` +'birthday').datepicker("setDate", moment(this.infos['birthday']).format('YYYY-MM-DD'));
 			},
 		},
-	    methods: {
-	    	get_info() {
-	    		let vo = this;
-	    		rest_aj_send('get', this.url, {})
-	    		.done(function(data) {
-	    			_.each(data.data, function(v, k){
+		methods: {
+			get_info: function() {
+				let vo = this;
+				rest_aj_send('get', this.url, {})
+				.done(function(data) {
+					_.each(data.data, function(v, k){
 						if(iser(v)) {
 							// deal with undefined value
 							data.data[k] = '';
 						}
 					});
 
-					 let keys = Object.keys(data.data);
-					 _.each(keys, function(v, k){
-					 	vo.infos[v] = data.data[v];
-					 }); 					// 為什麼這樣不行?
-					r = Object.assign(vo.infos)
-					vo.infos = r
-					console.log(r)
-					//vo.infos = data.data;   // 這個可以
+					let keys = Object.keys(data.data);
+					vo.infos = data.data;	 // 這個可以
 				})
 
 				let org_url = '/genericUser/api/organizations/';
-	    		rest_aj_send('get', org_url, {})
-	    		.done(function(data) {
+				rest_aj_send('get', org_url, {})
+				.done(function(data) {
 					_.each(data.data, function(v, k){
 						vo.model_infos.org.choices[v.id] = v.name;
 					});
 				})
-	    	},
-	    	update_info: function() {
-	    		let vo = this;
-	    		rest_aj_send('patch', this.url, this.infos)
+			},
+			update_info: function() {
+				let vo = this;
+				rest_aj_send('patch', this.url, this.infos)
 				.done(function(data, textStatus, xhr) {
 					alertmessage('success', data['message'] +'更新已完成')
 						.done(function () {
@@ -200,89 +269,12 @@
 						vo.get_info();
 					})
 				})
-	    	}
-	    },
-	    mounted () {
-	    	this.get_info();
-	    },
-	});
-
-	$(function(){
-		let user_id = $('div[user_id]').attr('user_id');
-		let opt = {
-		  	el: '#app',
-		  	data: {
-			    name: "usermodel",
-			    title: "更改使用者資訊",
-			    user_id: user_id,
-			    model_infos : {
-			        'email': {
-			            'label': '信箱',
-			            'type': 'text',
-			            'remark': '請填寫電子信箱',
-			        },
-			        'first_name': {
-			            'label': '性氏',
-			            'type': 'text',
-			            'remark': '請填寫中文姓氏',
-			        },
-			        'last_name': {
-			            'label': '名字',
-			            'type': 'text',
-			            'remark': '請填寫中文名字',
-			        },
-			        'phone': {
-			            'label': '聯絡電話',
-			            'type': 'text',
-			            'remark': '請填寫手機',
-			        },
-			        'birthday': {
-			            'label': '生日',
-			            'type': 'date',
-			            'remark': '請填寫生日，範例日期格式：1989-02-19',
-			        },
-			        'education': {
-			            'label': '教育程度',
-			            'type': 'select',
-			            'remark': '請選擇教育程度',
-			            'choices' : {
-			                '' :'---------',
-			                '國小': '國小',
-			                '國中': '國中',
-			                '高中': '高中',
-			                '學士': '學士',
-			                '碩士': '碩士',
-			            },
-			        },
-			        'is_book': {
-			            'label': '訂閱訊息',
-			            'type': 'checkbox',
-			            'remark': '訂閱訊息',
-			        },
-			        'org': {
-			            'label': '隸屬單位',
-			            'type': 'select',
-			            'remark': '請選擇所屬單位',
-			            'choices' : {
-			            	'' :'其它',
-			            },
-			        },
-			    },
-			    infos: {},
-		  	},
-		    
-		  	computed: {
-				url: function(){
-					return '/genericUser/api/users/' + this.user_id + '/';
-				},
 			},
-		};		
-
-		vo_book = new Vue(opt);
-		$(document).on('change', 'input[name=birthday]', function (e) {
-			// jQuery DatePicker 的物件值會和 VueJs 的值分開，導致vue js 無法抓到所選擇的值，這裡使用 jQuery 的 onchange 事件來解決這個問題
-            vo_book.$refs.foo.infos['birthday'] = $(this).val();
-        });
+		},
+		mounted () {
+			this.get_info();
+		},
 	});
+
 </script>
 {% endblock %}

@@ -139,6 +139,33 @@ class User(AbstractUser):
 			current_ServiceInfo = None
 		return current_ServiceInfo
 
+class DisabilityCard(models.Model):
+	owner = models.ForeignKey(User, related_name='disabilitycard_set')
+	name = models.CharField(max_length=10)
+	identity_card_number = models.CharField(max_length=10)
+	address = models.CharField(max_length=255,)
+	identification_date = models.DateField()
+	renew_date = models.DateField()
+	LEVEL = (
+	(u'mild', u'輕度'),
+		(u'moderate', u'中度'),
+		(u'severe', u'重度'),
+		(u'profound' , u'極重度'),
+	)
+	level = models.CharField(max_length=10, choices=LEVEL)
+	CATEGORY = (
+		(u'vi' , u'視障'),
+	)
+	category = models.CharField(max_length=10, choices=CATEGORY)
+
+	def __unicode__(self):
+		return self.name +'-' +str(self.id)
+
+	def __init__(self, *args, **kwargs):
+		super(DisabilityCard, self).__init__(*args, **kwargs)
+		self.front = BASE_DIR +'/file/genericUser/DisabilityCard/{0}/{0}_front.jpg'.format(self.id)
+		self.back = BASE_DIR +'/file/genericUser/DisabilityCard/{0}/{0}_back.jpg'.format(self.id)
+
 class Event(models.Model):
 	creater = models.ForeignKey(User, related_name='event_creater_set')
 	time = models.DateTimeField(auto_now_add=True)

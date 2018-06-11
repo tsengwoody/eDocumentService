@@ -24,6 +24,11 @@ class UserSerializer(serializers.ModelSerializer):
 			'auth_phone',
 		]
 
+class DisabilityCardSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = DisabilityCard
+		fields = '__all__'
+
 from ebookSystem.models import EditRecord
 from ebookSystem.serializers import EditRecordSerializer
 class ServiceInfoSerializer(serializers.ModelSerializer):
