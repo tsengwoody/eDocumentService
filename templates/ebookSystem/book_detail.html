@@ -7,7 +7,7 @@
 {% csrf_token %}
 {% include 'comp/list_vue_component.html' %}
 {% include 'comp/table_vue_component.html' %}
-{% include 'utils/book_assign.html' %}
+{% include 'comp/ebook_assign_component.html' %}
 
 <div id="book_detail" class="container">
 	<h3>書籍詳細</h3>
@@ -18,7 +18,7 @@
 	</ul>
 	<div class="tab-content" style="padding:20px 0px;">
 		<div id="book_detail_overall" class="tab-pane active">
-			<h4>總覽</h3>
+			<h4>總覽</h4>
 			<div class="row">
 				<button type="button" class="btn btn-default" :ISBN="pk" onclick="receivebook(this, false, 'download')">預覽</button>
 				<table-component :data="overall"></table-component>
@@ -26,7 +26,7 @@
 		</div>
 
 		<div id="book_detail_editrecord" class="tab-pane">
-			<h4>校對紀錄</h3>
+			<h4>校對紀錄</h4>
 			<div class="row">
 				<div class="col-sm-3 col-md-3">
 					<div class="panel-group y-scroll-box">
@@ -50,18 +50,46 @@
 					</div>
 				</div>
 				<div class="col-sm-9 col-md-9">
-					<h4>分段基本資訊</h3>
+					<h4>分段基本資訊</h4>
 					<ul-component :data="info"></ul-component>
 					<h4>分段校對紀錄</h4>
 					<table-component :data="editrecords"></table-component>
-
 				</div>
 			</div>
 		</div>
 	</div>
+
+	<!-- component -->
+	<modal-component
+        :modal-name="name"
+    >
+
+    <template slot="header">
+        <h4 class="modal-title">{|{ title }|}</h4>
+    </template>
+    
+    <template slot="body">
+        <assign-component 
+        :isbn_part="isbn_part" 
+        :bus="bus">
+        </assign-component>
+    </template>
+    
+    <template slot="footer">
+  		<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+		<button type="button" class="btn btn-primary" @click="submit_assign">儲存</button>
+    </template>
+    
+    </modal-component>   
+
 </div>
 
 <script>
+	function changeISBN(isbn){
+		// 還沒想到怎麼解決, action 內因為是 string 無法執行 vue @click，先偷用這招
+		vo_book_detail.changeISBN(isbn);
+	}
+
 	Vue.options.delimiters = ['{|{', '}|}'];
 	vo_book_detail = new Vue({
 		el: '#book_detail',
@@ -69,6 +97,11 @@
 			pk: '',
 			book: {},
 			ebook_index: 0,
+
+			name: 'book_assign',
+			title: '指派',
+			isbn_part: '',
+			bus: new Vue(),
 		},
 		computed: {
 			url: function () {
@@ -76,10 +109,11 @@
 			},
 			overall: function () {
 				temp = []
+				let vo = this;
 				_.each(this.book.ebook_set, function(v) {
 
 					action = ''
-					//if(v.status == 1) action += `<button type="button" class="btn btn-default" id="assign_id" name="assign" data-whatever="assign" data-toggle="modal" data-target="#bookAssignModal" data-isbn="` +v.ISBN_part +`" value="` +v.ISBN_part +`">指派</button>`
+					if(v.status == 1) action += `<button type="button" class="btn btn-default" data-toggle="modal" data-target="#` + vo.name + `" onclick="changeISBN('` + v.ISBN_part + `')">指派</button>`
 					//action += `<button class="btn btn-default" onclick="vo_book_detail.onactive('` +v.ISBN_part +`')">再校對</button>`
 
 					temp.push({
@@ -94,29 +128,35 @@
 				return temp
 			},
 			ebook: function () {
-				return this.book.ebook_set[this.ebook_index]
+				if (!iser(this.book.ebook_set)) {
+					return this.book.ebook_set[this.ebook_index];
+				}	
 			},
 			editrecords: function () {
 				temp = []
-				_.each(this.ebook.editrecord_set, function(v) {
-					temp.push({
-						'次數': v.number_of_times,
-						'領取日期': v.get_date,
-						'線上時數': v.stay_hours,
-						'服務時數': v.service_hours,
-						'校對者': v.editor,
-						'類型': v.category,
+				if (!iser(this.ebook)) {
+					_.each(this.ebook.editrecord_set, function(v) {
+						temp.push({
+							'次數': v.number_of_times,
+							'領取日期': v.get_date,
+							'線上時數': v.stay_hours,
+							'服務時數': v.service_hours,
+							'校對者': v.editor,
+							'類型': v.category,
+						})
 					})
-				})
-				return temp
+					return temp
+				}
 			},
 			info: function () {
-				return {
-					'段數': this.ebook.part,
-					'狀態': this.ebook.status,
-					'時數': this.ebook.service_hours,
-					'頁數/總頁數': this.ebook.edited_page+1 +'/50',
-					'預計完成日期': this.ebook.deadline,
+				if (!iser(this.ebook)) {
+					return {
+						'段數': this.ebook.part,
+						'狀態': this.ebook.status,
+						'時數': this.ebook.service_hours,
+						'頁數/總頁數': this.ebook.edited_page+1 +'/50',
+						'預計完成日期': this.ebook.deadline,
+					}
 				}
 			},
 		},
@@ -128,7 +168,6 @@
 			.done(function(data) {
 				self.book = data['data']
 			})
-
 		},
 		methods: {
 			read: function (index) {
@@ -137,8 +176,7 @@
 			onactive: function (ISBN_part) {
 				let self = this
 
-				url = '/ebookSystem/api/ebooks/' +ISBN_part +'/action/onactive/'
-				console.log(url)
+				url = '/ebookSystem/api/ebooks/' +ISBN_part +'/action/onactive/';
 				rest_aj_send('post', url, {})
 				.done(function(data) {
 					alertmessage('success', data['message'])
@@ -151,10 +189,14 @@
 				.fail(function(data){
 					alertmessage('error', data['message'])
 				})
-
 			},
+			changeISBN: function (isbn_part){
+				this.isbn_part = isbn_part;
+			},
+			submit_assign() {
+		      this.bus.$emit('submit');
+		    }
 		},
-
 	})
 
 </script>

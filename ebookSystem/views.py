@@ -101,7 +101,7 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 
 @http_response
 def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
-	users = User.objects.all()
+	users = User.objects.all().order_by('username')
 	try:
 		book = Book.objects.get(ISBN=book_ISBN)
 	except:
@@ -491,6 +491,7 @@ def library_view(request, template_name='ebookSystem/library_view.html'):
 		token = uuid.uuid4().hex
 		cache.set('token.' +str(request.user.id), token, 100)
 		path = '/library_epub/' +str(lr.id) +'/' +token
+		#path = '/ebookSystem/api/libraryrecords/{0}/resource/source/epub'.format(str(lr.id))
 		base64_path = base64.b64encode(path)
 		return locals()
 

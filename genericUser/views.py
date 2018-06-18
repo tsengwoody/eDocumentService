@@ -462,9 +462,9 @@ def user_view(request, ID):
 def user_list(request):
 	if request.method == 'GET' and request.is_ajax():
 		if request.GET['query_field'] == 'all':
-			user_list = User.objects.all()
+			user_list = User.objects.all().order_by('username')
 		else:
-			user_list = User.objects.filter(**{request.GET['query_field']: request.GET['query_value']})
+			user_list = User.objects.filter(**{request.GET['query_field']: request.GET['query_value']}).order_by('username')
 		content = [ user.serialized(request.GET['action']) for user in user_list ]
 		status = 'success'
 		message = u''

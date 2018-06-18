@@ -267,11 +267,33 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		obj = self.get_object()
 		try:
 			obj.onactive()
-			res['detail'] = u'再校對失敗'
+			res['detail'] = u'再校對已成功'
 		except BaseException as e:
 			res['detail'] = u'再校對失敗' +str(e)
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		res['detail'] = u'成功再校對'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	@detail_route(
+		methods=['post'],
+		url_name='assign',
+		url_path='action/assign',
+	)
+	def assign(self, request, pk=None):
+		res = {}
+
+		user = User.objects.get(id=request.POST['id'])
+		deadline = request.POST['deadline'].split('-')
+		deadline = [ int(v) for v in deadline ]
+		deadline = timezone.datetime(deadline[0], deadline[1], deadline[2])
+
+		obj = self.get_object()
+		try:
+			obj.change_status(1, 'edit', user=user, deadline=deadline)
+		except BaseException as e:
+			res['detail'] = u'指派失敗' +str(e)
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		res['detail'] = u'指派已成功'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	@detail_route(
