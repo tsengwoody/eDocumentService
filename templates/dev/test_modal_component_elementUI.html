@@ -9,22 +9,18 @@
 <template id="bs-form-group">
 	<el-form label-width="80px" style="margin-left: 50px;">
 		<template v-for="(detail, field) in model_infos">
-
 			<el-form-item :label="detail.label">
 				<el-col :span="8" style="margin-right: 10px;">
 					<el-input v-if="detail.type === 'text'"
-						:id="field"
 						v-model="infos[field]" 
 					></el-input>
 				
 					<el-switch v-if="detail.type === 'switch'"
-						:id="field"
 						v-model="infos[field]"
 					></el-switch>
 
 					<el-date-picker v-if="detail.type === 'date'" 
 						v-model="infos[field]"
-						:id="field"
 						type="date"
 						value-format="yyyy-MM-dd"   
 						placeholder="yyyy-MM-dd"
@@ -61,7 +57,7 @@
 </template>
 
 <div id="app">
-	<button type="button" class="btn btn-primary" data-toggle="modal" :data-target="'#'+name">Modal</button>
+	<button type="button" class="btn btn-primary" data-toggle="modal" :data-target="'#'+name" @click="refresh_info">Modal</button>
 	<modal-component :modal-name="name">
 
 		<template slot="header">
@@ -77,7 +73,7 @@
 		</template>
 
 		<template slot="footer">
-			<button type="button" class="btn btn-default" data-dismiss="modal" @click="refresh_info">關閉</button>
+			<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
 			<button type="button" class="btn btn-primary" @click="update_info">儲存</button>
 		</template>
 
@@ -172,7 +168,6 @@
 									]
 							},
 				},
-				infos: {},
 			},
 			computed: {
 				url: function(){
@@ -198,31 +193,12 @@
 		data: function(){
 			return {
 				infos: {},
+				orig_infos: {},
 			}
 		},
 		methods: {
-			get_info: function() {
-				let vo = this;
-				rest_aj_send('get', this.url, {})
-				.done(function(data) {
-					_.each(data.data, function(v, k){
-						if(iser(v)) {
-							// deal with undefined value
-							data.data[k] = '';
-						}
-					});
-
-					vo.infos = data.data;
-				})
-
-				let org_url = '/genericUser/api/organizations/';
-				rest_aj_send('get', org_url, {})
-				.done(function(data) {
-					_.each(data.data, function(v, k){
-						// vo.model_infos.org.choices[v.id] = v.name;
-						vo.model_infos.org.choices.push({id: v.id, label: v.name})
-					});
-				})
+			refresh_info: function() {
+				this.infos = _.cloneDeep(this.orig_infos);
 			},
 			update_info: function() {
 				let vo = this;
@@ -236,16 +212,35 @@
 				.fail(function(data){
 					alertmessage('error', data['message'])
 					.done(function() {
-						vo.get_info();
+						vo.refresh_info();
 					})
 				})
 			},
 		},
 		created() {
-			this.get_info();
+			let vo = this;
+			rest_aj_send('get', this.url, {})
+			.done(function(data) {
+				_.each(data.data, function(v, k){
+					if(iser(v)) {
+						// deal with undefined value
+						data.data[k] = '';
+					}
+				});
+				vo.infos = data.data;
+				vo.orig_infos = _.cloneDeep(data.data); // back up
+			})
+
+			let org_url = '/genericUser/api/organizations/';
+			rest_aj_send('get', org_url, {})
+			.done(function(data) {
+				_.each(data.data, function(v, k){
+					vo.model_infos.org.choices.push({id: v.id, label: v.name})
+				});
+			})
 		},
 		mounted () {
-			this.bus.$on('refresh', this.get_info);
+			this.bus.$on('refresh', this.refresh_info);
 			this.bus.$on('update', this.update_info);
 		},
 	});
