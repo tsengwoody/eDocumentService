@@ -1,0 +1,130 @@
+{% extends "base_nav.html" %}
+{% block title %}
+公告發佈
+{% endblock %}
+
+{% block style %}
+{% load staticfiles %}
+{% endblock %}
+
+{% block header %}
+公告發佈
+{% endblock %}
+
+{% block content %}
+
+{% csrf_token %} 
+<h3>公告發佈</h3>
+
+<div class="form-horizontal" id=app>
+
+	<div class="form-group">
+		<label for="id_category" class="control-label col-sm-1"><font style="color:red">*</font>類別</label>
+		<div class="col-sm-11">
+			<select
+				class="form-control"
+				v-model="category"
+			>
+				<option value="">---------</option>
+				{% for category in announcement_category %}
+				<option value="{{ category.0 }}">{{ category.1 }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="id_title" class="control-label col-sm-1"><font style="color:red">*</font>標題</label>
+		<div class="col-sm-11">
+			<input
+				maxlength="30"
+				class="form-control" 
+				type=text
+				placeholder="title"
+				required
+				v-model="title"
+			>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="id_content" class="control-label col-sm-1"><font style="color:red">*</font>內容</label>
+		<div class="col-sm-11">
+			<editor v-model="content" :init="tinymce_init"></editor>
+		</div>
+		
+	</div>
+
+	<div class="form-group">        
+		<div class="col-sm-offset-1 col-sm-11">
+			<button type="button" class="btn btn-primary" @click="create()">發佈</button>
+			<button type="button" class="btn btn-danger" @click="cancel()">取消</button>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+	let tinymce_init = {
+			selector: "#id_content",
+			language:"zh_TW",
+			plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
+			toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample'
+		};
+
+	Vue.options.delimiters = ['{|{', '}|}'];
+	let vm = {
+		el: '#app',
+		data: { 
+			title: '',
+			category: '',
+			content: '',
+			tinymce_init: tinymce_init,
+		},
+		components: {
+			'editor': Editor
+		},
+		computed: {
+			transferData: function(){
+				return {
+					'title': this.title,
+					'category': this.category,
+					'content': this.content,
+				}
+			}
+		},
+		methods: {
+			cancel: function(){
+				if(!isobjvalueer(this.transferData)){
+					alertconfirm('已經填寫資料，是否確定取消?')
+					.done(function(){
+						//重新整理
+						window.location.reload();
+					})
+				}
+				else{
+					//重新整理
+					window.location.reload();
+				}
+			},
+			create: function(){
+				aj_announcement('create',null,this.transferData)
+				.done(function(data){
+					alertmessage(data['status'], data['message'])
+					.done(function(){
+						//重新整理
+						window.location.reload();
+					})
+				})
+				.fail(function(data){
+				    alertmessage(data['status'], data['message']);
+				})
+			}
+		}
+	}
+
+	var app = new Vue(vm);
+});
+</script>
+
+{% endblock %}
