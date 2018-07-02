@@ -42,6 +42,7 @@ class ServiceInfoAddSerializer(ServiceInfoSerializer):
 	userinfo = UserSerializer(read_only=True, source='user')
 
 class AnnouncementSerializer(serializers.ModelSerializer):
+	datetime = serializers.ReadOnlyField()
 	class Meta:
 		model = Announcement
 		fields = ('__all__')

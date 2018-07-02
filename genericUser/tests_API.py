@@ -20,7 +20,7 @@ class UserAPITests(TestCase):
 
 	def test_user_cl_case(self):
 		client = Client()
-		client.login(username='root', password='root')
+		client.login(username='root', password='eds@2018')
 		response = client.post(
 			reverse(
 				'genericUser:api:user-list',
@@ -35,12 +35,11 @@ class UserAPITests(TestCase):
 				'education':u'碩士',
 				'is_book':'on',
 				'org':u'1',
-			'is_license':True,
+				'is_license':True,
 				'is_editor':True,
 				'is_guest':False,
-			'is_advanced_editor':False,
-			'auth_email':False,
-			'auth_phone':False,
+				'auth_email':True,
+				'auth_phone':True,
 				'password':'demo-editor',
 				'confirm_password':'demo-editor',
 			},
@@ -50,10 +49,12 @@ class UserAPITests(TestCase):
 		instance = User.objects.get(id=pk)
 		from django.contrib.auth import authenticate
 		user = authenticate(username=instance.username, password='demo-editor')
+		print response.status_code
+		print json.loads(response.content.decode('utf-8'))['auth_email']
 
 	def test_user_update_case(self):
 		client = Client()
-		client.login(username='root', password='root')
+		client.login(username='root', password='eds@2018')
 		response = client.put(
 			reverse(
 				'genericUser:api:user-detail',
@@ -72,12 +73,12 @@ class UserAPITests(TestCase):
 				'education':u'碩士',
 				'is_book':'on',
 				'org':u'1',
-			'is_license':True,
+				'is_license':True,
 				'is_editor':True,
 				'is_guest':False,
-			'is_advanced_editor':False,
-			'auth_email':False,
-			'auth_phone':False,
+				'is_advanced_editor':False,
+				'auth_email':False,
+				'auth_phone':False,
 			},
 			content_type=MULTIPART_CONTENT,
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
@@ -89,7 +90,7 @@ class UserAPITests(TestCase):
 
 	def test_user_set_password_case(self):
 		client = Client()
-		client.login(username='root', password='root')
+		client.login(username='root', password='eds@2018')
 		response = client.post(
 			reverse(
 				'genericUser:api:user-set-password',
@@ -98,7 +99,7 @@ class UserAPITests(TestCase):
 				}
 			),
 			{
-				'old_password':'root',
+				'old_password':'eds@2018',
 				'new_password1':'new',
 				'new_password2':'new',
 			},
@@ -112,7 +113,7 @@ class UserAPITests(TestCase):
 
 	def test_user_verify_case(self):
 		client = Client()
-		client.login(username='root', password='root')
+		client.login(username='root', password='eds@2018')
 		response = client.post(
 			reverse(
 				'genericUser:api:user-verify',

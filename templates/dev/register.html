@@ -1,0 +1,103 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+註冊
+{% endblock %}
+{% block content %}
+
+{% csrf_token %}
+
+<div id="genericUser_register">
+	<form-component
+		:model_infos="model_infos"
+		:url="url"
+		:bus="bus"
+	></form-component>
+</div>
+
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+
+	vo_genericUser_register = new Vue({
+		el: '#genericUser_register',
+		data: {
+			bus: new Vue(),
+			url: '',
+			bus: new Vue(),
+			model_infos : {
+				'username': {
+					'label': '使用者名稱',
+					'type': 'text',
+					'remark': '請使用小寫英文字母或數字，首字必需為小寫英文字母',
+				},
+				'first_name': {
+					'label': '姓氏',
+					'type': 'text',
+					'remark': '請填寫中文姓氏',
+				},
+				'last_name': {
+					'label': '名字',
+					'type': 'text',
+					'remark': '請填寫中文名字',
+				},
+				'email': {
+					'label': '電子信箱',
+					'type': 'email',
+					'remark': '請填寫電子信箱',
+				},
+				'phone': {
+					'label': '聯絡電話',
+					'type': 'text',
+					'remark': '請填寫手機',
+				},
+				'birthday': {
+					'label': '生日',
+					'type': 'date',
+					'remark': '請填寫生日，範例日期格式：1989-02-19',
+				},
+				'education': {
+					'label': '教育程度',
+					'type': 'select',
+					'remark': '請選擇教育程度',
+					'choices' : {
+						'' :'---------',
+						'國小': '國小',
+						'國中': '國中',
+						'高中': '高中',
+						'學士': '學士',
+						'碩士': '碩士',
+					},
+				},
+				'is_book': {
+					'label': '訂閱訊息',
+					'type': 'checkbox',
+					'remark': '訂閱訊息',
+				},
+				'org': {
+					'label': '所屬單位',
+					'type': 'select',
+					'remark': '請選擇所屬單位',
+					'choices' : {
+						'' :'其它',
+					},
+				},
+			},
+		},
+		computed: {
+		},
+		created() {
+			let vo = this;
+			let org_url = '/genericUser/api/organizations/';
+			rest_aj_send('get', org_url, {})
+			.done(function(data) {
+					_.each(data.data, function(v, k){
+						vo.model_infos.org.choices[v.id] = v.name;
+					});
+			})
+		},
+		methods: {
+		},
+	});
+
+</script>
+
+{% endblock %}

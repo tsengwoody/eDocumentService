@@ -1,4 +1,4 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 公告發佈
 {% endblock %}
@@ -26,9 +26,9 @@
 				v-model="category"
 			>
 				<option value="">---------</option>
-				{% for category in announcement_category %}
-				<option value="{{ category.0 }}">{{ category.1 }}</option>
-				{% endfor %}
+				<option value="平台消息">平台消息</option>
+				<option value="新書推薦">新書推薦</option>
+				<option value="志工快訊">志工快訊</option>
 			</select>
 		</div>
 	</div>
@@ -108,16 +108,16 @@ $(function(){
 				}
 			},
 			create: function(){
-				aj_announcement('create',null,this.transferData)
+				rest_aj_send('post', '/genericUser/api/announcements/', this.transferData)
 				.done(function(data){
-					alertmessage(data['status'], data['message'])
+					alertmessage('success', data['message'] +'成功新建公告',)
 					.done(function(){
 						//重新整理
 						window.location.reload();
 					})
 				})
 				.fail(function(data){
-				    alertmessage(data['status'], data['message']);
+				    alertmessage('error', data['message']);
 				})
 			}
 		}

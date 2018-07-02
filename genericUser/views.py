@@ -27,8 +27,8 @@ import requests
 import urllib, urllib2
 
 @http_response
-def generics(request, name):
-	template_name='genericUser/{0}.html'.format(name)
+def generics(request, name, pk=None):
+	template_name='genericUser/{0}.html'.format(name.split('/')[0])
 	return locals()
 
 @http_response
