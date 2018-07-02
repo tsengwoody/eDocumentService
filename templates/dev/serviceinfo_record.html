@@ -1,0 +1,172 @@
+{% extends "base_nav.html" %}
+{% block title %}
+服務紀錄
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+{% include 'dev/table_component_div.html' %}
+
+<div id="serviceinfo_record" class="container">
+	<h3>服務紀錄</h3>
+
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="#serviceinfo_record_notyetredeem" name="serviceinfo_record_tab_grp" data-toggle="tab" aria-expanded="true">未兌換</a></li>
+		<li><a href="#serviceinfo_record_redeeming" name="serviceinfo_record_tab_grp" data-toggle="tab" aria-expanded="false">兌換中</a></li>
+		<li><a href="#serviceinfo_record_redeemed" name="serviceinfo_record_tab_grp" data-toggle="tab" aria-expanded="false">已兌換</a></li>
+	</ul>
+	<div class="tab-content" style="padding:20px 0px;">
+		<div id="serviceinfo_record_notyetredeem" class="tab-pane active">
+			<h4>未兌換</h4>
+			<table-component :data="editrecords">
+				<template slot="核取" slot-scope="props">
+			      <input type="checkbox" v-model="props.entry">
+			    </template>
+			</table-component>
+<!-- 			<div class="row">
+				<div role="table" class=table>
+					<div role="rowgroup" class=thead>
+						<div role="row" class=tr>
+							<div role="columnheader" class=cell>核取</div>
+							<div role="columnheader" class=cell>服務時間</div>
+							<div role="columnheader" class=cell>服務時數</div>
+							<div role="columnheader" class=cell>線上時數</div>
+							<div role="columnheader" class=cell>類型</div>
+						</div>
+					</div>
+					<div role="rowgroup" class=tbody>
+						<div role="row" v-for="(entry, index) in editrecords" class=tr>
+							<div role="cell" data-title="核取" class=cell>{|{ entry.id }|}</div>
+							<div role="cell" data-title="服務時間" class=cell>{|{ entry.get_date }|}</div>
+							<div role="cell" data-title="服務時數" class=cell>{|{ entry.service_hours }|}</div>
+							<div role="cell" data-title="線上時數" class=cell>{|{ entry.stay_hours }|}</div>
+							<div role="cell" data-title="類型" class=cell>{|{ entry.category }|}</div>
+						</div>
+					</div>
+				</div>
+			</div> -->
+		</div>
+
+		<div id="serviceinfo_record_redeeming" class="tab-pane">
+			<h4>兌換中</h4>
+			<table-component :data="exchange_false_serviceinfos"></table-component>
+<!-- 			<div class="row">
+				<div role="table" class=table>
+					<div role="rowgroup" class=thead>
+						<div role="row" class=tr>
+							<div role="columnheader" class=cell>兌換日期</div>
+							<div role="columnheader" class=cell>服務時數</div>
+							<div role="columnheader" class=cell>兌換單位</div>
+							<div role="columnheader" class=cell>服務紀錄</div>
+						</div>
+					</div>
+					<div role="rowgroup" class=tbody>
+						<div role="row" v-for="(entry, index) in exchange_false_serviceinfos" class=tr>
+							<div role="cell" data-title="兌換日期" class=cell>{|{ entry.date }|}</div>
+							<div role="cell" data-title="服務時數" class=cell>{|{ entry.service_hours }|}</div>
+							<div role="cell" data-title="兌換單位" class=cell>{|{ entry.org }|}</div>
+							<div role="cell" data-title="服務紀錄" class=cell>{|{ entry.editrecord_set }|}</div>
+						</div>
+					</div>
+				</div>
+			</div> -->
+		</div>
+
+		<div id="serviceinfo_record_redeemed" class="tab-pane">
+			<h4>已兌換</h4>
+			<table-component :data="exchange_true_serviceinfos"></table-component>
+<!-- 			<div class="row">
+				<div role="table" class=table>
+					<div role="rowgroup" class=thead>
+						<div role="row" class=tr>
+							<div role="columnheader" class=cell>兌換日期</div>
+							<div role="columnheader" class=cell>服務時數</div>
+							<div role="columnheader" class=cell>兌換單位</div>
+							<div role="columnheader" class=cell>服務紀錄</div>
+						</div>
+					</div>
+					<div role="rowgroup" class=tbody>
+						<div role="row" v-for="(entry, index) in exchange_true_serviceinfos" class=tr>
+							<div role="cell" data-title="兌換日期" class=cell>{|{ entry.date }|}</div>
+							<div role="cell" data-title="服務時數" class=cell>{|{ entry.service_hours }|}</div>
+							<div role="cell" data-title="兌換單位" class=cell>{|{ entry.org }|}</div>
+							<div role="cell" data-title="服務紀錄" class=cell>{|{ entry.editrecord_set }|}</div>
+						</div>
+					</div>
+				</div>
+			</div> -->
+		</div>
+
+	</div>
+</div>
+<script>
+	function serviceinfos_data(v){
+		temp_data = {
+			'兌換日期': v['date'],
+			'服務時數': v['service_hours'],
+			'兌換單位': cstr(getorg(v.org).name),
+			'服務紀錄': '<button type="button" class="btn btn-default" onclick="ServiceinfoEditrecord([' + v.editrecord_set + '])">詳細服務紀錄</button>',
+		};
+
+		filter_data.push(temp_data);
+	}
+
+	Vue.options.delimiters = ['{|{', '}|}'];
+	vo_serviceinfo_record = new Vue({
+		el: '#serviceinfo_record',
+		data: {
+			editrecords: [],
+			editrecords_columns: [
+
+
+			],
+			exchange_false_serviceinfos: [],
+			exchange_true_serviceinfos: [],
+			exchange_serviceinfos_columns: {
+				date: '兌換日期',
+			},
+			erurl: '',
+			siurl: '',
+			editrecord_checks: [],
+		},
+		created: function () {
+			let self = this
+
+			self.erurl = '/ebookSystem/api/editrecords/'
+			rest_aj_send('get', self.erurl, {'editor_id': user.id, 'exchange': 'false',})
+			.done(function(data) {
+				_.each(data['data'], function(v){
+					temp_data = {
+						'核取': v['id'],
+						'服務時間': v['get_date'],
+						'服務時數': v['service_hours'],
+						'線上時數': v['stay_hours'],
+						'類型': v['category'],
+					};
+					checks_data = {
+						id: v['id'],
+						selected: false,
+					};
+					self.editrecords.push(temp_data);
+					self.editrecord_checks.push(checks_data);
+				})
+			})
+
+			self.siurl = '/genericUser/api/serviceinfos/'
+			rest_aj_send('get', self.siurl, {'user_id': user.id, 'is_exchange': 'false',})
+			.done(function(data) {
+				filter_data = [];
+				_.each(data['data'], serviceinfos_data)
+				self.exchange_false_serviceinfos = filter_data;
+			})
+			rest_aj_send('get', self.siurl, {'user_id': user.id, 'is_exchange': 'true',})
+			.done(function(data) {
+				filter_data = [];
+				_.each(data['data'], serviceinfos_data)
+				self.exchange_true_serviceinfos = filter_data;
+			})
+
+		},
+	})
+</script>
+{% endblock %}
