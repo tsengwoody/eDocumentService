@@ -1,0 +1,212 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+服務紀錄
+{% endblock %}
+
+{% block style %}
+<style type="text/css">
+div.table {
+	width: 100%;
+    max-width: 100%;
+	display: table;
+	border-collapse: collapse;
+	border-spacing: 0px;
+	margin: 10px 0px;
+	border-color: grey;
+}
+
+div.table .thead{
+	background-color: #eee;
+	display: table-header-group;
+}
+
+div.table .tr {
+	display: table-row;
+    border: 0px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+div.table .tbody{
+	display: table-row-group;
+}
+
+.thead .cell, .tr .cell{
+	display: table-cell;
+	padding: 5px;
+	border-top: 0px;
+}
+
+.thead .cell{
+	font-weight: bold;
+	line-height: 1.42857;
+    vertical-align: top;
+    padding: 10px 0px;
+}
+
+div.tbody .cell {
+	border-top: 1px solid rgb(221, 221, 221);
+	vertical-align: top;
+    line-height: 1.42857;
+    padding: 8px;
+}
+
+@media only screen and (max-width:760px) {
+	div.table {
+		display: block;
+		margin: 1em auto;
+	}
+
+	div.table .thead{
+		display: none;
+	}
+
+	div.table .tbody{
+		display: block;
+	}
+
+	div.table .tr{
+		display: block;
+		border: #ddd 1px solid;
+		margin-bottom: 10px;
+		text-align: left;
+	}
+	.tr .cell{
+		display: inline-block;
+		width: 100%;
+		border: none;
+	}
+	.tr .cell::before{
+		content: attr(data-title);
+		display: inline-block;
+		width: auto;
+		min-width: 40%;
+		font-weight: 900;
+	}
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<div id="serviceinfo_record" class="container">
+	<h3>服務紀錄</h3>
+
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="#serviceinfo_record_notyetredeem" name="serviceinfo_record_tab_grp" data-toggle="tab" aria-expanded="true">未兌換</a></li>
+		<li><a href="#serviceinfo_record_redeeming" name="serviceinfo_record_tab_grp" data-toggle="tab" aria-expanded="false">兌換中</a></li>
+		<li><a href="#serviceinfo_record_redeemed" name="serviceinfo_record_tab_grp" data-toggle="tab" aria-expanded="false">已兌換</a></li>
+	</ul>
+	<div class="tab-content" style="padding:20px 0px;">
+		<div id="serviceinfo_record_notyetredeem" class="tab-pane active">
+			<h4>未兌換</h4>
+			<div class="row">
+				<div role="table" class=table>
+					<div role="rowgroup" class=thead>
+						<div role="row" class=tr>
+							<div role="columnheader" class=cell>核取</div>
+							<div role="columnheader" class=cell>服務時間</div>
+							<div role="columnheader" class=cell>服務時數</div>
+							<div role="columnheader" class=cell>線上時數</div>
+							<div role="columnheader" class=cell>類型</div>
+						</div>
+					</div>
+					<div role="rowgroup" class=tbody>
+						<div role="row" v-for="(entry, index) in editrecords" class=tr>
+							<div role="cell" data-title="核取" class=cell>{|{ entry.id }|}</div>
+							<div role="cell" data-title="服務時間" class=cell>{|{ entry.get_date }|}</div>
+							<div role="cell" data-title="服務時數" class=cell>{|{ entry.service_hours }|}</div>
+							<div role="cell" data-title="線上時數" class=cell>{|{ entry.stay_hours }|}</div>
+							<div role="cell" data-title="類型" class=cell>{|{ entry.category }|}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="serviceinfo_record_redeeming" class="tab-pane">
+			<h4>兌換中</h4>
+			<div class="row">
+				<div role="table" class=table>
+					<div role="rowgroup" class=thead>
+						<div role="row" class=tr>
+							<div role="columnheader" class=cell>兌換日期</div>
+							<div role="columnheader" class=cell>服務時數</div>
+							<div role="columnheader" class=cell>兌換單位</div>
+							<div role="columnheader" class=cell>服務紀錄</div>
+						</div>
+					</div>
+					<div role="rowgroup" class=tbody>
+						<div role="row" v-for="(entry, index) in exchange_false_serviceinfos" class=tr>
+							<div role="cell" data-title="兌換日期" class=cell>{|{ entry.date }|}</div>
+							<div role="cell" data-title="服務時數" class=cell>{|{ entry.service_hours }|}</div>
+							<div role="cell" data-title="兌換單位" class=cell>{|{ entry.org }|}</div>
+							<div role="cell" data-title="服務紀錄" class=cell>{|{ entry.editrecord_set }|}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="serviceinfo_record_redeemed" class="tab-pane">
+			<h4>已兌換</h4>
+			<div class="row">
+				<div role="table" class=table>
+					<div role="rowgroup" class=thead>
+						<div role="row" class=tr>
+							<div role="columnheader" class=cell>兌換日期</div>
+							<div role="columnheader" class=cell>服務時數</div>
+							<div role="columnheader" class=cell>兌換單位</div>
+							<div role="columnheader" class=cell>服務紀錄</div>
+						</div>
+					</div>
+					<div role="rowgroup" class=tbody>
+						<div role="row" v-for="(entry, index) in exchange_true_serviceinfos" class=tr>
+							<div role="cell" data-title="兌換日期" class=cell>{|{ entry.date }|}</div>
+							<div role="cell" data-title="服務時數" class=cell>{|{ entry.service_hours }|}</div>
+							<div role="cell" data-title="兌換單位" class=cell>{|{ entry.org }|}</div>
+							<div role="cell" data-title="服務紀錄" class=cell>{|{ entry.editrecord_set }|}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+	vo_serviceinfo_record = new Vue({
+		el: '#serviceinfo_record',
+		data: {
+			editrecords: [],
+			exchange_false_serviceinfos: [],
+			exchange_true_serviceinfos: [],
+			erurl: '',
+			siurl: '',
+			editrecord_checks: [],
+		},
+		created: function () {
+			let self = this
+
+			self.erurl = '/ebookSystem/api/editrecords/'
+			rest_aj_send('get', self.erurl, {'editor_id': user.id, 'exchange': 'false',})
+			.done(function(data) {
+				self.editrecords = data['data']
+			})
+
+			self.siurl = '/genericUser/api/serviceinfos/'
+			rest_aj_send('get', self.siurl, {'user_id': user.id, 'is_exchange': 'false',})
+			.done(function(data) {
+				self.exchange_false_serviceinfos = data['data']
+			})
+			rest_aj_send('get', self.siurl, {'user_id': user.id, 'is_exchange': 'true',})
+			.done(function(data) {
+				self.exchange_true_serviceinfos = data['data']
+			})
+
+		},
+	})
+</script>
+{% endblock %}
