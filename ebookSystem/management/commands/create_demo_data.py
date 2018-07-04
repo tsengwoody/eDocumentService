@@ -51,6 +51,34 @@ class Command(BaseCommand):
 		root.save()
 
 		client = Client()
+		client.login(username='root', password='eds@2018')
+		previous_count = len(DisabilityCard.objects.all())
+		response = client.post(
+			reverse('genericUser:api:disabilitycard-list'),
+			{
+				"identity_card_number": "A129417526",
+				"name": "曾奕勳",
+				"address": "台北市大同區迪化街1段149號7樓",
+				"identification_date": "2018-01-01",
+				"renew_date": "2018-09-01",
+				"level": "severe",
+				"category": "vi",
+				"owner": 1,
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+		assert len(DisabilityCard.objects.all()) == previous_count +1, 'create announcement fail'
+
+		pk = json.loads(response.content.decode('utf-8'))["identity_card_number"]
+		dc = DisabilityCard.objects.get(identity_card_number=pk)
+		dirname = os.path.dirname(dc.front)
+		if not os.path.exists(dirname):
+			os.makedirs(dirname, 0755)
+		shutil.copy2('temp/dcf.jpg', dc.front,)
+		shutil.copy2('temp/dcb.jpg', dc.back,)
+
+
+		client = Client()
 		response = client.post(
 			reverse('register'),
 			{
@@ -312,7 +340,7 @@ class Command(BaseCommand):
 		previous_count = len(Announcement.objects.all())
 		response = client.post(
 			reverse(
-				'genericUser:announcement_create'
+				'genericUser:api:announcement-list'
 			),
 			{
 				'title': u'title',
@@ -347,6 +375,7 @@ class Command(BaseCommand):
 			,
 			order=1,
 		)
+
 		instance = ISSNBookInfo.objects.create(
 			ISSN='16822811',
 			title='科學人[中文版]',

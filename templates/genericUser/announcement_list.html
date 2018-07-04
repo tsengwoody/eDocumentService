@@ -1,8 +1,5 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
-公告列表
-{% endblock %}
-{% block header %}
 公告列表
 {% endblock %}
 
@@ -38,7 +35,7 @@
 					let o = {
 						'標題': v.title,
 						'發佈日期': v.datetime,  
-						'動作': '<a class="btn btn-link" role="button" href="/genericUser/announcement/'+v.id+'/">閱讀全文</a>',
+						'動作': '<a class="btn btn-link" role="button" href="/genericUser/generics/announcement/'+v.id+'/">閱讀全文</a>',
 					};
 					sr.push(o);
 					//console.log(o);

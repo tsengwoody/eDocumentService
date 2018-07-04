@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% load staticfiles %}
 {% block title %}
 首頁
@@ -162,11 +162,11 @@
 			<div class="panel-body">
 				{% for announcement in announcement_list|slice:":5" %}
 				<p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-					<a class="btn btn-link" role="button" href="{% url 'genericUser:announcement' announcement.id %}">{{ announcement.datetime.year }}年{{ announcement.datetime.month }}月{{ announcement.datetime.day }}日 {{ announcement.title }}</a>
+					<a class="btn btn-link" role="button" href="/genericUser/generics/announcement/{{ announcement.id }}/">{{ announcement.datetime.year }}年{{ announcement.datetime.month }}月{{ announcement.datetime.day }}日 {{ announcement.title }}</a>
 				</p>
 				{% endfor %}
 				<div class="pull-right">
-					<p><a class="btn btn-default center" href="{% url "genericUser:announcement_list" %}" role="button">公告列表 »</a></p>
+					<p><a class="btn btn-default center" href="/genericUser/generics/announcement_list/" role="button">公告列表 »</a></p>
 				</div>
 			</div>
 		</div>

@@ -22,6 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
 			'is_manager',
 			'auth_email',
 			'auth_phone',
+		'disabilitycard_set',
 		]
 
 class DisabilityCardSerializer(serializers.ModelSerializer):

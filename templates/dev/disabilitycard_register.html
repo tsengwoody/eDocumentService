@@ -1,0 +1,303 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+身心障礙手冊登錄
+{% endblock %}
+{% block content %}
+<template id="drf-model">
+	<div class="form-group">
+		<label
+			:for="'id_' +keys"
+			class="control-label col-sm-3"
+		>{|{ model_info.label }|}</label>
+		<template v-if="mode==='read'">
+			<div
+				v-if="model_info.type==='choice'"
+				class="col-sm-9"
+			>{|{ value2display_name(value, model_info.choices) }|}</div>
+			>{|{ value }|}</div>
+			<div
+				v-else
+				class="col-sm-9"
+			>{|{ value }|}</div>
+		</template>
+		<template v-if="mode==='write'">
+			<input
+				v-if="model_info.type==='string'"
+				v-bind:value="value"
+				v-on:input="$emit('input', $event.target.value)"
+				v-bind:id="'id_' +keys"
+				class="col-sm-9"
+			>
+			<select
+				v-if="model_info.type==='choice'"
+				v-bind:value="value"
+				v-on:input="$emit('input', $event.target.value)"
+				v-bind:id="'id_' +keys"
+				class="col-sm-9"
+			>
+				<option
+					v-for="item in model_info.choices"
+					:value="item.value"
+				>
+					{|{ item.display_name }|}
+				</option>
+			</select>
+			<el-date-picker
+				v-if="model_info.type==='date'"
+				v-bind:value="value"
+				v-on:input="$emit('input', $event)"
+				v-bind:id="'id_' +keys"
+				class="col-sm-9"
+				value-format="yyyy-MM-dd"   
+				placeholder="yyyy-MM-dd"
+				size=small
+				style="width: 100%;"
+			></el-date-picker>
+		</template>
+	</div>
+</template>
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+
+	Vue.component('drf-model', {
+		template: '#drf-model',
+		props: ['model_info', 'keys', 'value', 'mode',],
+		methods: {
+			value2display_name: function (value, choices) {
+				display_name = value
+				_.each(choices, function(v){
+					if(v['value'] === value){
+						display_name = v['display_name']
+					}
+				})
+				return display_name
+			},
+		},
+		created() {
+
+		},
+		mounted () {
+
+		},
+	})
+</script>
+{% csrf_token %}
+
+<div id="disabilitycard_register" class="container">
+	<h3>身心障礙手冊登錄</h3>
+	<div class="row">
+		<div class="col-sm-6 col-md-6">
+			<img
+				:src="url +'resource/source/front'"
+				alt="身心障礙手冊正面"
+			>
+			<input
+				v-if="mode==='create' || mode==='update'"
+				type="file"
+			>
+			<img
+				:src="url +'resource/source/back'"
+				alt="身心障礙手冊反面"
+			>
+			<input
+				v-if="mode==='create' || mode==='update'"
+				type="file"
+			>
+		</div>
+
+		<div class="col-sm-6 col-md-6">
+			<div class="form-group">
+				<label for="id_status" class="control-label col-sm-3">狀態</label>
+				<div class="col-sm-9">{|{ disabilitycard.is_active }|}</div>
+			</div>
+
+			<drf-model
+					v-if="mode==='read' || mode==='update'"
+					:keys="'identity_card_number'"
+					:model_info="model_info.identity_card_number"
+				mode="read"
+				v-model="disabilitycard_temp.identity_card_number"
+			></drf-model>
+			<drf-model
+					v-if="mode==='create'"
+					:keys="'identity_card_number'"
+					:model_info="model_info.identity_card_number"
+				mode="write"
+				v-model="disabilitycard_temp.identity_card_number"
+			></drf-model>
+
+			<drf-model
+				v-for="item in ['name', 'address', 'category', 'level', 'identification_date', 'renew_date',]"
+				v-if="mode==='read'"
+				:keys="item"
+				:model_info="model_info[item]"
+				mode="read"
+				v-model="disabilitycard_temp[item]"
+			></drf-model>
+			<drf-model
+				v-for="item in ['name', 'address', 'category', 'level', 'identification_date', 'renew_date',]"
+				v-if="mode==='create' || mode==='update'"
+				:keys="item"
+				:model_info="model_info[item]"
+				mode="write"
+				v-model="disabilitycard_temp[item]"
+			></drf-model>
+
+		</div>
+	</div>
+
+		<button
+			@click="mode_change('create')"
+		>新建模式</button>
+
+	<div
+		v-if="mode==='create'"
+	>
+		<button
+			@click="create()"
+		>新建</button>
+	</div>
+
+	<div
+		v-if="mode==='update'"
+	>
+		<button
+			@click="cancel()"
+		>取消</button>
+		<button
+			@click="update()"
+		>更新</button>
+	</div>
+
+	<div
+		v-if="mode==='read'"
+	>
+		<button
+			@click="mode_change('update')"
+		>編輯</button>
+		<button
+			v-if="!disabilitycard.is_active"
+			@click="active(true)"
+		>啟用</button>
+		</button>
+		<button
+			v-if="disabilitycard.is_active"
+			@click="active(false)"
+		>停用</button>
+	</div>
+
+
+</div>
+
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+	vo_disabilitycard_register = new Vue({
+		el: '#disabilitycard_register',
+		data: {
+			disabilitycard: {
+				"identity_card_number": "",
+				"name": "",
+				"address": "",
+				"identification_date": "",
+				"renew_date": "",
+				"level": "",
+				"category": "",
+				"owner": "",
+				is_active: '',
+			},
+			url: '',
+			mode: '',
+			model_info: {},
+			disabilitycard_temp: {},
+			temp: '',
+		},
+		computed: {
+
+		},
+		created: function () {
+			let self = this
+			rest_aj_send('options', '/genericUser/api/disabilitycards/', {})
+			.done(function(data) {
+				self.model_info = data['data'].actions.POST
+			})
+
+			if(!iser(user.disabilitycard_set[0])){
+				self.url = '/genericUser/api/disabilitycards/' +user.disabilitycard_set[0] +'/'
+				rest_aj_send('get', self.url, {})
+				.done(function(data) {
+					_.each(self.disabilitycard, function(v,k){
+						self.disabilitycard[k] = data['data'][k]
+						self.disabilitycard_temp[k] = data['data'][k]
+					})
+				})
+				self.mode = 'read'
+			} else {
+				self.url = '/genericUser/api/disabilitycards/'
+				self.mode = 'create'
+			}
+		},
+		methods: {
+			active: function (status) {
+				let self = this
+				self.disabilitycard.is_active = self.disabilitycard_temp.is_active = status
+				rest_aj_send('put', self.url, self.disabilitycard)
+				.done(function(data) {
+					if(status){ alertmessage('success', '成功啟用手冊') }
+					else if(!status){ alertmessage('success', '成功停用手冊') }
+				})
+				.fail(function(data){
+				    alertmessage('error', data['message']);
+				})
+
+			},
+			create: function () {
+				let self = this
+
+				rest_aj_send('post', '/genericUser/api/disabilitycards/', self.disabilitycard)
+				.done(function(data) {
+					alertmessage('success', '成功新建手冊')
+					.done(function(){
+						self.mode_change('read')
+					})
+				})
+				.fail(function(data){
+				    alertmessage('error', data['message']);
+				})
+
+			},
+			cancel: function () {
+				let self = this
+
+				_.each(self.disabilitycard_temp, function(v,k){
+					self.disabilitycard_temp[k] = self.disabilitycard[k]
+				})
+
+				self.mode_change('read')
+			},
+			update: function () {
+				let self = this
+
+				_.each(self.disabilitycard_temp, function(v,k){
+					self.disabilitycard[k] = self.disabilitycard_temp[k]
+				})
+
+				rest_aj_send('put', self.url, self.disabilitycard)
+				.done(function(data) {
+					alertmessage('success', '成功修改手冊')
+					.done(function(){
+						self.mode_change('read')
+					})
+				})
+				.fail(function(data){
+				    alertmessage('error', data['message']);
+				})
+
+			},
+			mode_change: function (mode) {
+				this.mode = mode
+			},
+		},
+	})
+
+</script>
+{% endblock %}
