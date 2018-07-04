@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 公告發佈
 {% endblock %}
@@ -13,104 +13,22 @@
 
 {% block content %}
 
-<script>
-	let bchange=false;
-
-	$(function(){
-
-		//tinymce
-		tinymce.init({
-			selector: "#id_content",
-			language:"zh_TW",
-			plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
-			toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample'
-		});
-
-		//onchange
-		bchange=true
-
-	})
-
-	function announcement_save(){
-		//儲存資料
-
-		//title
-		let title=cstrtrim($('#id_title').val());
-
-		//category
-		let category=cstrtrim($('#id_category').find('option:selected').val());
-
-		//content
-		let content=cstrtrim(tinymce.activeEditor.getContent());
-
-		//transferData
-		let transferData={
-			'title':title,
-			'category':category,
-			'content':content,
-		};
-
-		return transferData;
-	}
-
-	function announcement_cancel(){
-		//取消離開檢核
-
-		//transferData
-		let transferData=announcement_save();
-		
-		//check
-		if(!isobjvalueer(transferData)){
-			alertconfirm('已經填寫資料，是否確定取消?')
-			.done(function(){
-				//重新整理
-				window.location.reload();
-			})
-		}
-		else{
-			//重新整理
-			window.location.reload();
-		}
-
-	}
-
-	function announcement_create(){
-		//公告發佈
-
-		//transferData
-		let transferData=announcement_save();
-
-		//aj_announcement
-		aj_announcement('create',null,transferData)
-		.done(function(data){
-			alertmessage(data['status'], data['message'])
-			.done(function(){
-				//重新整理
-				window.location.reload();
-			})
-		})
-		.fail(function(data){
-		    alertmessage(data['status'], data['message']);
-		})
-		
-	}
-
-</script>
-
 {% csrf_token %} 
-
 <h3>公告發佈</h3>
 
-<div class="form-horizontal">
+<div class="form-horizontal" id=app>
 
 	<div class="form-group">
 		<label for="id_category" class="control-label col-sm-1"><font style="color:red">*</font>類別</label>
 		<div class="col-sm-11">
-			<select id="id_category" class="form-control" name="category">
+			<select
+				class="form-control"
+				v-model="category"
+			>
 				<option value="">---------</option>
-				{% for category in announcement_category %}
-				<option value="{{ category.0 }}">{{ category.1 }}</option>
-				{% endfor %}
+				<option value="平台消息">平台消息</option>
+				<option value="新書推薦">新書推薦</option>
+				<option value="志工快訊">志工快訊</option>
 			</select>
 		</div>
 	</div>
@@ -118,24 +36,95 @@
 	<div class="form-group">
 		<label for="id_title" class="control-label col-sm-1"><font style="color:red">*</font>標題</label>
 		<div class="col-sm-11">
-			<input id="id_title" class="form-control" name="title" type="text" placeholder="title" required />
+			<input
+				maxlength="30"
+				class="form-control" 
+				type=text
+				placeholder="title"
+				required
+				v-model="title"
+			>
 		</div>
 	</div>
 
 	<div class="form-group">
 		<label for="id_content" class="control-label col-sm-1"><font style="color:red">*</font>內容</label>
 		<div class="col-sm-11">
-			<textarea id="id_content" name="content" maxlength="30"></textarea>
+			<editor v-model="content" :init="tinymce_init"></editor>
 		</div>
+		
 	</div>
 
 	<div class="form-group">        
 		<div class="col-sm-offset-1 col-sm-11">
-			<button type="button" class="btn btn-primary" onclick="announcement_create();">發佈</button>
-			<button type="button" class="btn btn-danger" onclick="announcement_cancel();">取消</button>
+			<button type="button" class="btn btn-primary" @click="create()">發佈</button>
+			<button type="button" class="btn btn-danger" @click="cancel()">取消</button>
 		</div>
 	</div>
-	
 </div>
+
+<script type="text/javascript">
+$(function(){
+	let tinymce_init = {
+			selector: "#id_content",
+			language:"zh_TW",
+			plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
+			toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample'
+		};
+
+	Vue.options.delimiters = ['{|{', '}|}'];
+	let vm = {
+		el: '#app',
+		data: { 
+			title: '',
+			category: '',
+			content: '',
+			tinymce_init: tinymce_init,
+		},
+		components: {
+			'editor': Editor
+		},
+		computed: {
+			transferData: function(){
+				return {
+					'title': this.title,
+					'category': this.category,
+					'content': this.content,
+				}
+			}
+		},
+		methods: {
+			cancel: function(){
+				if(!isobjvalueer(this.transferData)){
+					alertconfirm('已經填寫資料，是否確定取消?')
+					.done(function(){
+						//重新整理
+						window.location.reload();
+					})
+				}
+				else{
+					//重新整理
+					window.location.reload();
+				}
+			},
+			create: function(){
+				rest_aj_send('post', '/genericUser/api/announcements/', this.transferData)
+				.done(function(data){
+					alertmessage('success', data['message'] +'成功新建公告',)
+					.done(function(){
+						//重新整理
+						window.location.reload();
+					})
+				})
+				.fail(function(data){
+				    alertmessage('error', data['message']);
+				})
+			}
+		}
+	}
+
+	var app = new Vue(vm);
+});
+</script>
 
 {% endblock %}

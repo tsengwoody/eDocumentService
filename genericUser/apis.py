@@ -148,9 +148,18 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			return Response(data={'detail': u'變更密碼成功'}, status=status.HTTP_202_ACCEPTED)
 		return Response(data={'detail': u'變更密碼失敗'}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-class DisabilityCardViewSet(viewsets.ModelViewSet):
+class DisabilityCardViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = DisabilityCard.objects.all()
 	serializer_class = DisabilityCardSerializer
+
+	def get_fullpath(self, obj, dir, resource):
+		fullpath = None
+		if dir == 'source':
+			if resource == 'front':
+				fullpath = obj.front
+			if resource == 'back':
+				fullpath = obj.back
+		return fullpath
 
 class ServiceInfoViewSet(viewsets.ModelViewSet):
 	queryset = ServiceInfo.objects.all()

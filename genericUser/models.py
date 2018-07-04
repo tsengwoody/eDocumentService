@@ -140,10 +140,10 @@ class User(AbstractUser):
 		return current_ServiceInfo
 
 class DisabilityCard(models.Model):
+	identity_card_number = models.CharField(max_length=10, primary_key=True)
 	owner = models.ForeignKey(User, related_name='disabilitycard_set')
 	name = models.CharField(max_length=10)
-	identity_card_number = models.CharField(max_length=10)
-	address = models.CharField(max_length=255,)
+	address = models.CharField(max_length=255)
 	identification_date = models.DateField()
 	renew_date = models.DateField()
 	LEVEL = (
@@ -157,14 +157,15 @@ class DisabilityCard(models.Model):
 		(u'vi' , u'視障'),
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
+	is_active = models.BooleanField(default=False)
 
 	def __unicode__(self):
-		return self.name +'-' +str(self.id)
+		return self.identity_card_number
 
 	def __init__(self, *args, **kwargs):
 		super(DisabilityCard, self).__init__(*args, **kwargs)
-		self.front = BASE_DIR +'/file/genericUser/DisabilityCard/{0}/{0}_front.jpg'.format(self.id)
-		self.back = BASE_DIR +'/file/genericUser/DisabilityCard/{0}/{0}_back.jpg'.format(self.id)
+		self.front = BASE_DIR +'/file/genericUser/DisabilityCard/{0}/{0}_front.jpg'.format(self.identity_card_number)
+		self.back = BASE_DIR +'/file/genericUser/DisabilityCard/{0}/{0}_back.jpg'.format(self.identity_card_number)
 
 class Event(models.Model):
 	creater = models.ForeignKey(User, related_name='event_creater_set')

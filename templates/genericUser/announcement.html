@@ -1,243 +1,168 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
-{{ announcement.title }} | 公告
-{% endblock %}
-{% block header %}
-{{ announcement.title }} | 公告
+公告內容
 {% endblock %}
 {% block content %}
 
-<script>
-	let announcement_transferData_temp;
-
-	$(function(){
-
-		//view
-		announcement_change('view');
-
-		//btn
-		$('#id_tolist, #id_toedit').show();
-		$('#id_update, #id_cancel, #id_delete').hide();
-
-	})
-
-	function announcement_change(mode){
-		//公告模式切換
-
-		if(mode==='view'){
-			//顯示
-			$('[mode="ori"]').show();
-			$('[mode="mod"]').hide();
-		}
-		else if(mode==='edit'){
-
-			//編修
-			$('[mode="ori"]').hide();
-			$('[mode="mod"]').show();
-
-			//btn
-			$('#id_tolist, #id_toedit').hide();
-			$('#id_update, #id_cancel, #id_delete').show();
-
-			//title
-			let t=$('[mode="ori"][kind="title"]').html();
-			$('[mode="mod"][kind="title"]').val(t);
-
-			//category
-			let c=$('[mode="ori"][kind="category"]').html();
-			let o=$('[mode="mod"][kind="category"]').find('option');
-			o.prop('selected',false);
-			o.filter('[value="'+c+'"]').prop('selected',true);
-
-			//content
-			let n=$('[mode="ori"][kind="content"]').html();
-			
-			//tinymce
-			tinymce.init({
-				selector: "#id_content",
-				language:"zh_TW",
-				plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
-				toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample',
-				setup: function (editor) {
-					editor.on('init', function () {
-
-						//setContent
-						tinymce.activeEditor.setContent(n);
-
-						//save
-						announcement_transferData_temp=announcement_save();
-					
-					});
-				}
-			});
-
-		}
-		else{
-			console.log('mode error');
-			return;
-		}
-
-	}
-
-	function announcement_save(){
-		//儲存資料
-		
-		//title
-		let title=cstrtrim($('[mode="mod"][kind="title"]').val());
-
-		//category
-		let category=cstrtrim($('[mode="mod"][kind="category"]').find('option:selected').val());
-
-		//content
-		let content=cstrtrim(tinymce.activeEditor.getContent());
-
-		//transferData
-		let transferData={
-			'title':title,
-			'category':category,
-			'content':content,
-		};
-
-		return transferData;
-	}
-
-	function announcement_cancel(){
-		//取消離開檢核
-
-		//transferData
-		let transferData=announcement_save();
-		
-		//check
-		if(!announcement_checkdata_equal()){
-			alertconfirm('資料已變更，是否確定取消?')
-			.done(function(){
-				//重新整理
-				window.location.reload();
-			})
-		}
-		else{
-			//重新整理
-			window.location.reload();
-		}
-
-	}
-
-	function announcement_checkdata_equal(){
-		//檢核資料是否相同
-
-		//transferData
-		let transferData=announcement_save();
-
-		//return
-		return _.isEqual(announcement_transferData_temp, transferData);
-	}
-
-	function announcement_update(me){
-		//update
-
-		announcement_operate(me,'update');
-	}
-
-	function announcement_delete(me){
-		//delete
-
-		alertconfirm('是否確定刪除?')
-		.done(function(){
-			announcement_operate(me,'delete');
-		})
-	}
-
-	function announcement_operate(me,mode){
-		//公告編修或刪除
-
-		//me
-		me=$(me);
-
-		//aid
-		let aid=me.attr('aid');
-
-		//check same
-		if(mode==='update'){
-			if(announcement_checkdata_equal()){
-				alertmessage('error', '資料未有更動');
-				return;
-			}
-		}
-
-		//transferData
-		let transferData=announcement_save();
-
-		//aj_announcement
-		aj_announcement(mode,aid,transferData)
-		.done(function(data){
-			alertmessage(data['status'], data['message'])
-			.done(function(){
-				//自動轉址回公告列表
-				window.location='/genericUser/announcement_list';
-			})
-		})
-		.fail(function(data){
-		    alertmessage(data['status'], data['message']);
-		})
-		
-	}
-
-</script>
-
 {% csrf_token %} 
 
-<h3>公告資訊</h3>
-
-<div class="form-horizontal">
-
+<div id="id_announcement" class="form-horizontal">
+	<h3>公告內容</h3>
 	<div class="form-group">
 		<label for="id_category" class="control-label col-sm-1"><font style="color:red">*</font>類別</label>
 		<div class="col-sm-11">
-			<div kind="category" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">{{announcement.category}}</div>
-			<select id="id_category" kind="category" mode="mod" class="form-control">
-				<option value="">---------</option>
-				<option value="平台消息">平台消息</option>
-				<option value="新書推薦">新書推薦</option>
-				<option value="志工快訊">志工快訊</option>
-			</select>
+			<div v-if="mode=='read'" class="panel panel-default" style="margin:0px; padding:5px 10px;">{|{ announcement.category }|}</div>
+			<template v-if="mode=='write'">
+				<select v-model="announcement.category" class="form-control">
+					<option value="">---------</option>
+					<option value="平台消息">平台消息</option>
+					<option value="新書推薦">新書推薦</option>
+					<option value="志工快訊">志工快訊</option>
+				</select>
+			</template>
 		</div>
 	</div>
 
 	<div class="form-group">
 		<label for="id_title" class="control-label col-sm-1"><font style="color:red">*</font>標題</label>
 		<div class="col-sm-11">
-			<div kind="title" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">{{ announcement.title }}</div>
-			<input id="id_title" kind="title" mode="mod" class="form-control" type="text"/>
+			<div v-if="mode=='read'" class="panel panel-default" style="margin:0px; padding:5px 10px;">{|{ announcement.title }|}</div>
+			<template v-if="mode=='write'">
+				<input v-model="announcement.title" class="form-control" type="text"/>
+			</template>
 		</div>
 	</div>
 
-	{% autoescape off %}
 	<div class="form-group">
 		<label for="id_content" class="control-label col-sm-1"><font style="color:red">*</font>內容</label>
 		<div class="col-sm-11">
-			<div kind="content" mode="ori" class="panel panel-default" style="margin:0px; padding:5px 10px;">
-				{{ announcement.content }}
+			<div v-if="mode=='read'" v-html="announcement.content" class="panel panel-default" style="margin:0px; padding:5px 10px;"></div>
+			<div v-if="mode=='write'" class="form-control" >
+				<editor
+					v-model="announcement.content"
+					:init="tinymce_init">
+				</editor>
 			</div>
-			<div id="id_content" kind="content" mode="mod" class="form-control" >{{ announcement.content }}</div>
 		</div>
 	</div>
-	{% endautoescape %}
 
 	<div class="form-group">        
 		<div class="col-sm-offset-1 col-sm-11">
 
-			<button id="id_tolist" type="button" class="btn btn-default" onclick="window.location='/genericUser/announcement_list'">返回公告列表</button>
-
-			{% if request.user.is_manager %}
-			<button id="id_toedit" type="button" class="btn btn-primary" onclick="announcement_change('edit');">進行修改</button>
-			<button id="id_update" type="button" class="btn btn-primary" aid="{{ announcement.id }}" onclick="announcement_update(this);">儲存</button>
-			<button id="id_cancel" type="button" class="btn btn-default" onclick="announcement_cancel();">取消</button>
-			<button id="id_delete" type="button" class="btn btn-danger" aid="{{ announcement.id }}" onclick="announcement_delete(this);">刪除</button>
-			{% endif %}
+			<button
+				v-if="mode=='read'"
+				class="btn btn-default"
+				onclick="window.location='/genericUser/announcement_list'"
+			>返回公告列表</button>
+			<template v-if="user.is_manager===true">
+				<button
+					v-if="mode=='read'"
+					@click="write_mode()"
+					class="btn btn-primary"
+				>進行修改</button>
+				<button
+					v-if="mode=='write'"
+					@click="update()"
+					class="btn btn-primary"
+				>儲存</button>
+				<button
+					v-if="mode=='write'"
+					@click="cancel()"
+					class="btn btn-primary"
+				>取消</button>
+				<button
+					v-if="mode=='write'"
+					@click="deletes()"
+					class="btn btn-danger"
+				>刪除</button>
+			</template>
 
 		</div>
 	</div>
-	
 </div>
+
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+	vo_announcement = new Vue({
+		el: '#id_announcement',
+		data: {
+			announcement: {},
+			url: '',
+			mode: 'read', //read or write
+			tinymce_init: {
+				selector: "#id_content",
+				language:"zh_TW",
+				plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
+				toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample',
+			},
+		},
+		components: {
+			'editor': Editor
+		},
+		created() {
+			let self = this
+
+			let pk = window.location.pathname.split('/')
+			pk = pk[pk.length-2]
+
+			self.url = '/genericUser/api/announcements/' +pk +'/'
+
+			rest_aj_send('get', self.url, {})
+			.done(function(data) {
+				self.announcement = data['data']
+			})
+		},
+		methods: {
+			read_mode: function(){
+				this.mode = 'read'
+			},
+			write_mode: function(){
+				this.mode = 'write'
+			},
+			update: function(){
+				let self = this
+
+				rest_aj_send('patch', self.url, self.announcement)
+				.done(function(data){
+					alertmessage('success', '成功修改公告')
+					.done(function(){
+						self.mode = 'read'
+					})
+				})
+				.fail(function(data){
+				    alertmessage('error', data['message']);
+				})
+			},
+			cancel: function(){
+				let self = this
+				rest_aj_send('get', self.url, {})
+				.done(function(data) {
+					self.announcement.category = data['data'].category
+					self.announcement.title = data['data'].title
+					self.announcement.content = data['data'].content
+				})
+				this.mode = 'read'
+			},
+			deletes: function(){
+				let self = this
+
+				alertconfirm('是否確定刪除公告?')
+				.done(function(){
+					rest_aj_send('delete', self.url, {})
+					.done(function(data){
+						alertmessage('success', '成功刪除公告')
+						.done(function(){
+							window.location='/genericUser/announcement_list';
+						})
+					})
+					.fail(function(data){
+					    alertmessage('error', data['message']);
+					})
+				})
+			},
+		},
+
+	});
+</script>
 
 {% endblock %}
