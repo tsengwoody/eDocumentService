@@ -161,11 +161,20 @@ class DisabilityCardViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				fullpath = obj.back
 		return fullpath
 
-class ServiceInfoViewSet(viewsets.ModelViewSet):
+class ServiceInfoViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = ServiceInfo.objects.all()
 	serializer_class = ServiceInfoSerializer
 	filter_backends = (filters.OrderingFilter, ServiceInfoUserFilter, ServiceInfoExchangeFilter,)
 	ordering_fields = ('user',)
+
+	@list_route(
+		methods=['get'],
+		url_name='exchange_false_export',
+		url_path='action/exchange_false_export',
+	)
+	def exchange_false_export(self, request, pk=None):
+		path = ServiceInfo.exchange_false_export()
+		return self.get_resource(path)
 
 class ServiceInfoAddViewSet(ServiceInfoViewSet):
 	serializer_class = ServiceInfoAddSerializer

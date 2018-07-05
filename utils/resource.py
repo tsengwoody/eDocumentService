@@ -48,6 +48,19 @@ from django.views.decorators.csrf import csrf_exempt
 
 class ResourceViewSet(Resource):
 
+	@list_route(
+		methods=['get', 'post'],
+		url_name='resource-list',
+		url_path='resource/(?P<dir>[\w]+)/(?P<resource>[\d\w]+)',
+	)
+	def resource_list(self, request, pk=None, dir=None, resource=None):
+		fullpath = self.get_fullpath_list(dir, resource)
+		if request.method == 'GET':
+			return self.get_resource(fullpath)
+		if request.method == 'POST':
+			return self.post_resource(fullpath, request.FILES['object'])
+
+
 	@detail_route(
 		methods=['get', 'post'],
 		url_name='resource',

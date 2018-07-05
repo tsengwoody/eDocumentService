@@ -5,6 +5,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
 from mysite.settings import BASE_DIR
+
+import io
 import os
 import shutil
 import datetime
@@ -229,6 +231,31 @@ class ServiceInfo(models.Model):
 
 	def __unicode__(self):
 		return self.user.username +str(self.date)
+
+	@classmethod
+	def exchange_false_export(cls):
+		serviceinfos = cls.objects.filter(is_exchange=False)
+		export = '\t'.join([u'序號', u'帳號', u'姓名', u'起始日期', u'結束日期', u'合計時數',]) +'\r\n'
+		for serviceinfo in serviceinfos:
+			get_dates = [editrecord.get_date for editrecord in serviceinfo.editrecord_set.all()]
+			export += '\t'.join([
+				unicode(serviceinfo.id),
+				serviceinfo.user.username,
+				serviceinfo.user.first_name +serviceinfo.user.last_name,
+				unicode(min(get_dates)),
+				unicode(max(get_dates)),
+				unicode(serviceinfo.service_hours),
+			]) + '\r\n'
+
+		path = os.path.join(BASE_DIR, 'file', 'temp', 'serviceinfois_exchange_false_export.txt')
+		dirname = os.path.dirname(path)
+		if not os.path.exists(dirname):
+			os.makedirs(dirname, 0755)
+
+		with io.open(path, 'w', encoding='utf-8') as f:
+			f.write(export)
+
+		return path
 
 	def get_stay_hours(self):
 		stay_hours = 0
