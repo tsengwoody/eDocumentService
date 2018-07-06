@@ -22,6 +22,8 @@ class UserSerializer(serializers.ModelSerializer):
 			'is_manager',
 			'auth_email',
 			'auth_phone',
+			'auth_editor',
+			'auth_guest',
 		'disabilitycard_set',
 		]
 

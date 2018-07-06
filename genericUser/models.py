@@ -64,8 +64,21 @@ class User(AbstractUser):
 		self.disability_card_back = BASE_DIR +'/static/ebookSystem/disability_card/{0}/{0}_back.jpg'.format(self.username)
 		self.has_disability_card = os.path.exists(BASE_DIR +'/static/ebookSystem/disability_card/{0}/'.format(self.username))
 
+	def auth_base(self):
+		return self.is_license & self.auth_email & self.auth_phone
+
+	def auth_editor(self):
+		base = self.is_license & self.auth_email & self.auth_phone
+		return base & self.is_editor
+
+	def auth_guest(self):
+		base = self.is_license & self.auth_email & self.auth_phone
+		return base & self.is_guest
+
 	def __unicode__(self):
 		return self.first_name +self.last_name
+
+
 
 	def serialized(self, action):
 		old_serialize = generic_serialized(self)

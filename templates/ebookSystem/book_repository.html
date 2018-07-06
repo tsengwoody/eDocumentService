@@ -1,4 +1,4 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 平台書庫
 {% endblock %}
@@ -57,7 +57,7 @@
 			'出版日期': v['date'],
 		}
 
-		if(user.is_guest){
+		if(user.auth_guest){
 			temp_data['動作'] = action
 		}
 

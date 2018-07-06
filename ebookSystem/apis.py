@@ -1,6 +1,6 @@
 ﻿# coding: utf-8
 
-from rest_framework import status
+from rest_framework import permissions, status
 from rest_framework.decorators import api_view
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
@@ -427,7 +427,8 @@ class BookRecommendViewSet(viewsets.ModelViewSet):
 class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = LibraryRecord.objects.all()
 	serializer_class = LibraryRecordSerializer
-	filter_backends = (LibraryRecordUserFilter, LibraryRecordStatusFilter)
+	filter_backends = (LibraryRecordUserFilter, LibraryRecordStatusFilter,)
+	permission_classes = (permissions.IsAuthenticated,)
 
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = None
