@@ -37,7 +37,7 @@
 		<label for="id_content" class="control-label col-sm-1"><font style="color:red">*</font>內容</label>
 		<div class="col-sm-11">
 			<div v-if="mode=='read'" v-html="announcement.content" class="panel panel-default" style="margin:0px; padding:5px 10px;"></div>
-			<div v-if="mode=='write'" class="form-control" >
+			<div v-if="mode=='write'">
 				<editor
 					v-model="announcement.content"
 					:init="tinymce_init">
