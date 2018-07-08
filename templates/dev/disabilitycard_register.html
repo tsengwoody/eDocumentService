@@ -1,59 +1,59 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 身心障礙手冊登錄
 {% endblock %}
 {% block content %}
 <template id="drf-model">
-	<div class="form-group">
-		<label
-			:for="'id_' +keys"
-			class="control-label col-sm-3"
-		>{|{ model_info.label }|}</label>
-		<template v-if="mode==='read'">
-			<div
-				v-if="model_info.type==='choice'"
-				class="col-sm-9"
-			>{|{ value2display_name(value, model_info.choices) }|}</div>
-			>{|{ value }|}</div>
-			<div
-				v-else
-				class="col-sm-9"
-			>{|{ value }|}</div>
-		</template>
-		<template v-if="mode==='write'">
-			<input
-				v-if="model_info.type==='string'"
-				v-bind:value="value"
-				v-on:input="$emit('input', $event.target.value)"
-				v-bind:id="'id_' +keys"
-				class="col-sm-9"
-			>
-			<select
-				v-if="model_info.type==='choice'"
-				v-bind:value="value"
-				v-on:input="$emit('input', $event.target.value)"
-				v-bind:id="'id_' +keys"
-				class="col-sm-9"
-			>
-				<option
-					v-for="item in model_info.choices"
-					:value="item.value"
+	<div class="form-horizontal">
+		<div class="form-group">
+			<label
+				:for="'id_' +keys"
+				class="col-sm-3"
+			>{|{ convertTitle[keys] }|}</label>
+			<template v-if="mode==='read'">
+				<div
+					v-if="model_info.type==='choice'"
+					class="col-sm-9"
+				>{|{ value2display_name(value, model_info.choices) }|}</div>
+				<div
+					v-else
+					class="col-sm-9"
+				>{|{ value }|}</div>
+			</template>
+			<template v-if="mode==='write'">
+				<input
+					v-if="model_info.type==='string'"
+					v-bind:value="value"
+					v-on:input="$emit('input', $event.target.value)"
+					v-bind:id="'id_' +keys"
+					class="col-sm-9 form-control"
 				>
-					{|{ item.display_name }|}
-				</option>
-			</select>
-			<el-date-picker
-				v-if="model_info.type==='date'"
-				v-bind:value="value"
-				v-on:input="$emit('input', $event)"
-				v-bind:id="'id_' +keys"
-				class="col-sm-9"
-				value-format="yyyy-MM-dd"   
-				placeholder="yyyy-MM-dd"
-				size=small
-				style="width: 100%;"
-			></el-date-picker>
-		</template>
+				<select
+					v-if="model_info.type==='choice'"
+					v-bind:value="value"
+					v-on:input="$emit('input', $event.target.value)"
+					v-bind:id="'id_' +keys"
+					class="col-sm-9 form-control"
+				>
+					<option
+						v-for="item in model_info.choices"
+						:value="item.value"
+					>
+						{|{ item.display_name }|}
+					</option>
+				</select>
+				<el-date-picker
+					v-if="model_info.type==='date'"
+					v-bind:value="value"
+					v-on:input="$emit('input', $event)"
+					v-bind:id="'id_' +keys"
+					value-format="yyyy-MM-dd"   
+					placeholder="yyyy-MM-dd"
+					size=small
+					style="width: 100%;"
+				></el-date-picker>
+			</template>
+		</div>
 	</div>
 </template>
 <script>
@@ -87,28 +87,46 @@
 	<h3>身心障礙手冊登錄</h3>
 	<div class="row">
 		<div class="col-sm-6 col-md-6">
-			<img
+			<img v-if="img_base64_front"
+				:src="'data:image/jpeg;base64,' + img_base64_front"
+				:base64="img_base64_front"
+				alt="身心障礙手冊正面"
+				class=img-thumbnail
+			>
+			<img v-else
 				:src="url +'resource/source/front'"
 				alt="身心障礙手冊正面"
+				class=img-thumbnail
 			>
 			<input
 				v-if="mode==='create' || mode==='update'"
+				@change="ch_img($event.target,'front')"
 				type="file"
 			>
-			<img
+			<img v-if="img_base64_back"
+				:src="'data:image/jpeg;base64,' + img_base64_back"
+				:base64="img_base64_back"
+				alt="身心障礙手冊正面"
+				class=img-thumbnail
+			>
+			<img v-else
 				:src="url +'resource/source/back'"
 				alt="身心障礙手冊反面"
+				class=img-thumbnail
 			>
 			<input
 				v-if="mode==='create' || mode==='update'"
 				type="file"
+				@change="ch_img($event.target,'back')"
 			>
 		</div>
 
 		<div class="col-sm-6 col-md-6">
-			<div class="form-group">
-				<label for="id_status" class="control-label col-sm-3">狀態</label>
-				<div class="col-sm-9">{|{ disabilitycard.is_active }|}</div>
+			<div class="form-horizontal" v-if="mode==='read' || mode==='update'">
+				<div class="form-group">
+					<label for="id_status" class="col-sm-3">狀態</label>
+					<div class="col-sm-9">{|{ disabilitycard.is_active }|}</div>
+				</div>
 			</div>
 
 			<drf-model
@@ -143,53 +161,62 @@
 				v-model="disabilitycard_temp[item]"
 			></drf-model>
 
+			<div
+				v-if="mode==='create'"
+			>
+				<button
+					@click="create()"
+					class="btn btn-default" 
+				>新建</button>
+			</div>
+
+			<div
+				v-if="mode==='update'"
+			>
+				<button
+					@click="cancel()"
+					class="btn btn-default" 
+				>取消</button>
+				<button
+					@click="update()"
+					class="btn btn-default" 
+				>更新</button>
+			</div>
+
+			<div
+				v-if="mode==='read'"
+			>
+				<button
+					@click="mode_change('update')"
+					class="btn btn-default" 
+				>編輯</button>
+				<button
+					v-if="!disabilitycard.is_active"
+					@click="active(true)"
+					class="btn btn-default" 
+				>啟用</button>
+				<button
+					v-if="disabilitycard.is_active"
+					@click="active(false)"
+					class="btn btn-default" 
+				>停用</button>
+			</div>
+
 		</div>
 	</div>
-
-		<button
-			@click="mode_change('create')"
-		>新建模式</button>
-
-	<div
-		v-if="mode==='create'"
-	>
-		<button
-			@click="create()"
-		>新建</button>
-	</div>
-
-	<div
-		v-if="mode==='update'"
-	>
-		<button
-			@click="cancel()"
-		>取消</button>
-		<button
-			@click="update()"
-		>更新</button>
-	</div>
-
-	<div
-		v-if="mode==='read'"
-	>
-		<button
-			@click="mode_change('update')"
-		>編輯</button>
-		<button
-			v-if="!disabilitycard.is_active"
-			@click="active(true)"
-		>啟用</button>
-		</button>
-		<button
-			v-if="disabilitycard.is_active"
-			@click="active(false)"
-		>停用</button>
-	</div>
-
-
 </div>
 
 <script>
+	let convertTitle = {
+		"identity_card_number": "身分證字號",
+		"name": "姓名",
+		"address": "地址",
+		"identification_date": "辨識日期",
+		"renew_date": "更新日期",
+		"level": "程度",
+		"category": "類別",
+	};
+
 	Vue.options.delimiters = ['{|{', '}|}'];
 	vo_disabilitycard_register = new Vue({
 		el: '#disabilitycard_register',
@@ -209,7 +236,8 @@
 			mode: '',
 			model_info: {},
 			disabilitycard_temp: {},
-			temp: '',
+			img_base64_front: '',
+			img_base64_back: '',
 		},
 		computed: {
 
@@ -272,7 +300,9 @@
 					self.disabilitycard_temp[k] = self.disabilitycard[k]
 				})
 
-				self.mode_change('read')
+				self.mode_change('read');
+				self.img_base64_front = '';
+				self.img_base64_back = '';
 			},
 			update: function () {
 				let self = this
@@ -295,6 +325,17 @@
 			},
 			mode_change: function (mode) {
 				this.mode = mode
+			},
+			ch_img: function(me, kind){
+				let self = this;
+
+				readfile(me)
+				.done(function (bs) {
+					let v = bin2base64(bs2barr(bs));
+					if(kind==='front') self.img_base64_front = v;
+					else self.img_base64_back = v;
+					// cv_img_set(kind, v)
+				})
 			},
 		},
 	})
