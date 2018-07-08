@@ -1,9 +1,10 @@
-﻿{% extends "base_nav.html" %}
-{% block title %}服務紀錄{% endblock %}
-{% block header %}服務紀錄{% endblock %}
-{% block content %}
-{% csrf_token %}
+﻿{% extends "base_nav.html" %} {% block title %} 服務紀錄 {% endblock %} {% block header %} 服務紀錄 {% endblock %} {% block style%}
+{% load staticfiles %} {% endblock %} {% block content %} {% csrf_token %}
+
+
 <script>
+
+
 	$(function () {
 		serviceinfo_ini_list();
 		serviceinfo_ini_sta();
@@ -11,6 +12,7 @@
 		serviceinfo_ini_done();
 		serviceinfo_ini_org();
 	})
+
 
 	function serviceinfo_ini_list() {
 		//未兌換服務紀錄
@@ -34,7 +36,7 @@
 				let sr = [];
 				_.each(data, function (v, k) {
 					let o = {
-						'編號': '<label class="checkbox-inline"><input type="checkbox" hidden name="inp_grp_exchange" value="' + v.id + '" service_hours="' + v.service_hours + '">' +v.id +'</label>',
+						'核取': '<label class="checkbox-inline"><input type="checkbox" name="inp_grp_exchange" value="' + v.id + '" service_hours="' + v.service_hours + '">兌換</label>',
 						'服務時間': v.get_date,
 						'服務時數': v.service_hours,
 						'線上時數': v.stay_hours,
@@ -63,6 +65,7 @@
 			});
 
 	}
+
 
 	function serviceinfo_ini_sta() {
 		//服務紀錄月統計
@@ -180,6 +183,7 @@
 
 	}
 
+
 	function serviceinfo_ini_dealing() {
 		//兌換中服務紀錄
 
@@ -229,6 +233,7 @@
 			});
 
 	}
+
 
 	function serviceinfo_ini_done() {
 		//已兌換服務紀錄
@@ -280,6 +285,7 @@
 
 	}
 
+
 	function serviceinfo_ini_org() {
 		//兌換中心
 
@@ -296,17 +302,20 @@
 
 	}
 
+
 	function serviceinfo_select_all() {
 		//全選
 
 		$('input[name="inp_grp_exchange"]').prop('checked', true);
 	}
 
+
 	function serviceinfo_select_no() {
 		//全不選
 
 		$('input[name="inp_grp_exchange"]').prop('checked', false);
 	}
+
 
 	function serviceinfo_select_inv() {
 		//反向選
@@ -319,9 +328,6 @@
 
 	function serviceinfo_exchange() {
 		//兌換
-
-		//全選
-		serviceinfo_select_all()
 
 		//service_hours, editrecord_set
 		let service_hours = 0;
@@ -364,8 +370,8 @@
 		let client = new $.RestClient('/genericUser/api/');
 		client.add('serviceinfos');
 
+		console.log(transferData['editrecord_set'])
 		//create
-		console.log(self.transferData['editrecord_set'])
 		client.serviceinfos.create(transferData)
 			.done(function (data) {
 
@@ -429,9 +435,9 @@
 
 
 			<div id="div_serviceinfo_list_panel" style="margin-bottom:60px;">
-				<!--<button class="btn btn-default" type="Button" onclick="serviceinfo_select_all()">全選</button>
+				<button class="btn btn-default" type="Button" onclick="serviceinfo_select_all()">全選</button>
 				<button class="btn btn-default" type="Button" onclick="serviceinfo_select_no()">全不選</button>
-				<button class="btn btn-default" type="Button" onclick="serviceinfo_select_inv()">反向選</button>-->
+				<button class="btn btn-default" type="Button" onclick="serviceinfo_select_inv()">反向選</button>
 				<div id="div_serviceinfo_list"></div>
 			</div>
 
@@ -504,5 +510,6 @@
 	</div>
 
 </div>
+
 
 {% endblock %}

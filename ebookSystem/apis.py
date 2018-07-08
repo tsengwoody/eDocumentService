@@ -218,6 +218,7 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = EBook.objects.all()
 	serializer_class = EBookSerializer
 	filter_backends = (EBookStatusFilter, EBookEditorFilter,)
+	permission_classes = (permissions.IsAuthenticated,)
 
 	@list_route(
 		methods=['get', 'post'],
@@ -399,10 +400,11 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 	search_fields = ('ISBN', 'bookname', 'author', )
 
 class EditRecordViewSet(viewsets.ModelViewSet):
-	queryset = EditRecord.objects.all()
+	queryset = EditRecord.objects.all().order_by('-get_date')
 	serializer_class = EditRecordSerializer
 	filter_backends = (filters.OrderingFilter, EditRecordEditorFilter, EditRecordServiceInfoFilter,)
 	ordering_fields = ('username',)
+	permission_classes = (permissions.IsAuthenticated,)
 
 	@detail_route(
 		methods=['get', ],

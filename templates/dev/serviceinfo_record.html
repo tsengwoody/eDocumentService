@@ -18,11 +18,42 @@
 	<div class="tab-content" style="padding:20px 0px;">
 		<div id="serviceinfo_record_notyetredeem" class="tab-pane active">
 			<h4>未兌換</h4>
-			<table-component :data="editrecords" :columns="editrecords_columns">
-				<template slot="id" slot-scope="props">
-			      	<input type="checkbox" v-model="editrecord_checks" :value="props.item.id">
-			    </template>
-			</table-component>
+			<h4 style="margin-top:30px;">Step1: 勾選欲兌換之服務紀錄</h4>
+			<hr style="margin-top:5px;">
+			<div style="margin-bottom:60px;">
+				<button class="btn btn-default" @click="editrecord_select_all()">全選</button>
+				<button class="btn btn-default" @click="editrecord_checks=[]">全不選</button>
+				<button class="btn btn-default" type="Button" @click="editrecord_select_inv()">反向選</button>
+				<table-component :data="editrecords" :columns="editrecords_columns">
+					<template slot="id" slot-scope="props">
+				      	<input type="checkbox" v-model="editrecord_checks" :value="props.item.id">
+				    </template>
+				</table-component>
+			</div>
+			<h4>Step2: 確認後進行兌換</h4>
+			<hr style="margin-top:5px;">
+			{|{ transferData }|}
+			<div style="margin-bottom:60px;">
+				<div class="form-inline">
+					<div class="form-group" style="margin-right:15px;">
+						<label for="sel_exchangecenter" style="margin:0px;">
+							選擇兌換中心
+							<select v-model="org_select" class="form-control">
+								<option
+									v-for="item in org_list"
+									:value="item.id"
+								>
+									{|{ item.name }|}
+								</option>
+							</select>
+						</label>
+					</div>
+				</div>
+				<button
+					@click="serviceinfo_create()"
+					class="btn btn-primary" style="margin-top:10px;"
+				>兌換</button>
+			</div>
 		</div>
 
 		<div id="serviceinfo_record_redeeming" class="tab-pane">
@@ -77,44 +108,113 @@
 				org: '兌換單位',
 				editrecord_set: '服務紀錄',
 			},
-			erurl: '',
-			siurl: '',
+			org_list: [],
+			erurl: '/ebookSystem/api/editrecords/',
+			siurl: '/genericUser/api/serviceinfos/',
 			editrecord_checks: [],
+			org_select: '1',
+		},
+		computed: {
+			transferData: function(){
+				return {
+					"editrecord_set": this.editrecord_checks,
+					"date": moment().format('YYYY-MM-DD'),
+					"service_hours": this.service_hours,
+					"is_exchange": false,
+					"user": user.id,
+					"org": this.org_select,
+				}
+			},
+			service_hours: function(){
+				let self = this
+
+				service_hour = 0
+				_.each(self.editrecords, function(v){
+					if(_.includes(self.editrecord_checks, v.id)){
+						service_hour += v.service_hours
+					}
+				})
+				return service_hour
+			},
 		},
 		created: function () {
-			let self = this
-
-			self.erurl = '/ebookSystem/api/editrecords/'
-			rest_aj_send('get', self.erurl, {'editor_id': user.id, 'exchange': 'false',})
-			.done(function(data) {
-				_.each(data['data'], function(v){
-					temp_data = {
-						id: v['id'],
-						get_date: v['get_date'],
-						service_hours: v['service_hours'],
-						stay_hours: v['stay_hours'],
-						category: v['category'],
-					};
-					self.editrecords.push(temp_data);
-				})
-			})
-
-			self.siurl = '/genericUser/api/serviceinfos/'
-			rest_aj_send('get', self.siurl, {'user_id': user.id, 'is_exchange': 'false',})
-			.done(function(data) {
-				filter_data = [];
-				_.each(data['data'], serviceinfos_data)
-				self.exchange_false_serviceinfos = filter_data;
-			})
-			rest_aj_send('get', self.siurl, {'user_id': user.id, 'is_exchange': 'true',})
-			.done(function(data) {
-				filter_data = [];
-				_.each(data['data'], serviceinfos_data)
-				self.exchange_true_serviceinfos = filter_data;
-			})
-
+			this.client = new $.RestClient('/genericUser/api/');
+			this.client.add('serviceinfos');
+			this.refresh()
 		},
 		methods: {
+			refresh: function(){
+				let self = this
+
+				self.editrecords = []
+				self.editrecord_checks = []
+				rest_aj_send('get', self.erurl, {'editor_id': user.id, 'exchange': 'false',})
+				.done(function(data) {
+					_.each(data['data'], function(v){
+						temp_data = {
+							id: v['id'],
+							get_date: v['get_date'],
+							service_hours: v['service_hours'],
+							stay_hours: v['stay_hours'],
+							category: v['category'],
+						};
+						self.editrecords.push(temp_data);
+						self.editrecord_checks.push(v.id)
+					})
+				})
+
+				rest_aj_send('get', self.siurl, {'user_id': user.id, 'is_exchange': 'false',})
+				.done(function(data) {
+					filter_data = [];
+					_.each(data['data'], serviceinfos_data)
+					self.exchange_false_serviceinfos = filter_data;
+				})
+				rest_aj_send('get', self.siurl, {'user_id': user.id, 'is_exchange': 'true',})
+				.done(function(data) {
+					filter_data = [];
+					_.each(data['data'], serviceinfos_data)
+					self.exchange_true_serviceinfos = filter_data;
+				})
+
+				rest_aj_send('get', '/genericUser/api/organizations/', {})
+				.done(function(data) {
+					self.org_list = data['data']
+				})
+
+			},
+			editrecord_select_all: function(){
+				let self = this
+
+				_.each(self.editrecords, function(v){
+					self.editrecord_checks.push(v.id)
+				})
+			},
+			editrecord_select_inv: function(){
+				let self = this
+
+				temp = []
+				_.each(self.editrecords, function(v){
+					if(!_.includes(self.editrecord_checks, v.id)){
+					temp.push(v.id)
+					}
+				})
+				self.editrecord_checks = temp
+			},
+			serviceinfo_create: function(){
+				let self = this
+
+				//create
+				self.client.serviceinfos.create(self.transferData)
+				.done(function(data) {
+					alertmessage('success', '申請兌換時數' +o2j(data['service_hours']) +'，請等待核發。')
+					self.refresh()
+
+				})
+				.fail(function(data){
+					alertmessage('error', data['message'])
+				})
+
+			},
 			serviceinfoEditrecord: function(editrecord_set){
 				ServiceinfoEditrecord(editrecord_set);
 			}
