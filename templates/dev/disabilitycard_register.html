@@ -1,4 +1,4 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 身心障礙手冊登錄
 {% endblock %}
@@ -52,6 +52,13 @@
 					size=small
 					style="width: 100%;"
 				></el-date-picker>
+				<input
+					v-if="model_info.type==='field'"
+					v-bind:value="value"
+					v-on:input="$emit('input', $event.target.value)"
+					v-bind:id="'id_' +keys"
+					class="col-sm-9 form-control"
+				>
 			</template>
 		</div>
 	</div>
@@ -101,12 +108,13 @@
 			<input
 				v-if="mode==='create' || mode==='update'"
 				@change="ch_img($event.target,'front')"
+				id="id_front"
 				type="file"
 			>
 			<img v-if="img_base64_back"
 				:src="'data:image/jpeg;base64,' + img_base64_back"
 				:base64="img_base64_back"
-				alt="身心障礙手冊正面"
+				alt="身心障礙手冊反面"
 				class=img-thumbnail
 			>
 			<img v-else
@@ -116,8 +124,9 @@
 			>
 			<input
 				v-if="mode==='create' || mode==='update'"
-				type="file"
 				@change="ch_img($event.target,'back')"
+				type="file"
+				id="id_back"
 			>
 		</div>
 
@@ -128,6 +137,21 @@
 					<div class="col-sm-9">{|{ disabilitycard.is_active }|}</div>
 				</div>
 			</div>
+
+			<drf-model
+					v-if="mode==='read' || mode==='update'"
+					:keys="'owner'"
+					:model_info="model_info.owner"
+				mode="read"
+				v-model="disabilitycard_temp.owner"
+			></drf-model>
+			<drf-model
+					v-if="mode==='create'"
+					:keys="'owner'"
+					:model_info="model_info.owner"
+				mode="write"
+				v-model="disabilitycard_temp.owner"
+			></drf-model>
 
 			<drf-model
 					v-if="mode==='read' || mode==='update'"
@@ -208,11 +232,12 @@
 
 <script>
 	let convertTitle = {
+		"owner": "擁有者",
 		"identity_card_number": "身分證字號",
 		"name": "姓名",
 		"address": "地址",
-		"identification_date": "辨識日期",
-		"renew_date": "更新日期",
+		"identification_date": "鑑定日期",
+		"renew_date": "有效日期",
 		"level": "程度",
 		"category": "類別",
 	};
@@ -221,6 +246,7 @@
 	vo_disabilitycard_register = new Vue({
 		el: '#disabilitycard_register',
 		data: {
+			pk: -1,
 			disabilitycard: {
 				"identity_card_number": "",
 				"name": "",
@@ -250,7 +276,8 @@
 			})
 
 			if(!iser(user.disabilitycard_set[0])){
-				self.url = '/genericUser/api/disabilitycards/' +user.disabilitycard_set[0] +'/'
+				self.pk = user.disabilitycard_set[0]
+				self.url = '/genericUser/api/disabilitycards/' +self.pk +'/'
 				rest_aj_send('get', self.url, {})
 				.done(function(data) {
 					_.each(self.disabilitycard, function(v,k){
@@ -281,7 +308,8 @@
 			create: function () {
 				let self = this
 
-				rest_aj_send('post', '/genericUser/api/disabilitycards/', self.disabilitycard)
+
+				rest_aj_send('post', '/genericUser/api/disabilitycards/', self.disabilitycard_temp)
 				.done(function(data) {
 					alertmessage('success', '成功新建手冊')
 					.done(function(){
@@ -314,9 +342,9 @@
 				rest_aj_send('put', self.url, self.disabilitycard)
 				.done(function(data) {
 					alertmessage('success', '成功修改手冊')
-					.done(function(){
-						self.mode_change('read')
-					})
+					self.mode_change('read')
+					//self.pk = data['data'].identity_card_number
+					self.upload(self.pk)
 				})
 				.fail(function(data){
 				    alertmessage('error', data['message']);
@@ -336,6 +364,40 @@
 					else self.img_base64_back = v;
 					// cv_img_set(kind, v)
 				})
+			},
+			upload: function(pk){
+				let self = this
+
+				let fileFront = document.getElementById('id_front');
+					fileObject = fileFront.files[0]
+					if(iser(fileObject)){
+						alertmessage('error', '身心障礙手冊正面檔案尚未選擇')
+						return -1
+					}
+
+				let fileBack = document.getElementById('id_back');
+					fileObject = fileBack.files[0]
+					if(iser(fileObject)){
+						alertmessage('error', '身心障礙手冊反面檔案尚未選擇')
+						return -1
+					}
+
+				let resource_url = '/genericUser/api/disabilitycards/' +pk +'/resource/source/'
+
+				rest_aj_upload(resource_url +'front/', {'object': fileFront.files[0]})
+				.done(function(data) {
+					rest_aj_upload(resource_url +'back/', {'object': fileBack.files[0]})
+					.done(function(data) {
+						alertmessage('success', '成功上傳手冊')
+					})
+					.fail(function(data){
+						alertmessage('error', '失敗上傳手冊反面')
+					})
+				})
+				.fail(function(data){
+					alertmessage('error', '失敗上傳手冊正面')
+				})
+
 			},
 		},
 	})

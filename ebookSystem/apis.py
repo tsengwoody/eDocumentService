@@ -18,10 +18,13 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	serializer_class = BookSerializer
 	filter_backends = (BookStatusFilter, BookOwnerFilter, BookBooknameFilter,)
 	ordering_fields = ('upload_date',)
+	permission_classes = (permissions.IsAuthenticated,)
 	#permission_classes = (BookDataPermission, )
 
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = None
+		if not self.request.user.is_manager:
+			return ''
 		if dir == 'OCR':
 			if resource in ['epub', ]:
 				fullpath = obj.path +'/OCR/{0}.{1}'.format(obj.ISBN, resource)
