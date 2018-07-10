@@ -3,92 +3,8 @@
 身心障礙手冊登錄
 {% endblock %}
 {% block content %}
-<template id="drf-model">
-	<div class="form-horizontal">
-		<div class="form-group">
-			<label
-				:for="'id_' +keys"
-				class="col-sm-3"
-			>{|{ convertTitle[keys] }|}</label>
-			<template v-if="mode==='read'">
-				<div
-					v-if="model_info.type==='choice'"
-					class="col-sm-9"
-				>{|{ value2display_name(value, model_info.choices) }|}</div>
-				<div
-					v-else
-					class="col-sm-9"
-				>{|{ value }|}</div>
-			</template>
-			<template v-if="mode==='write'">
-				<input
-					v-if="model_info.type==='string'"
-					v-bind:value="value"
-					v-on:input="$emit('input', $event.target.value)"
-					v-bind:id="'id_' +keys"
-					class="col-sm-9 form-control"
-				>
-				<select
-					v-if="model_info.type==='choice'"
-					v-bind:value="value"
-					v-on:input="$emit('input', $event.target.value)"
-					v-bind:id="'id_' +keys"
-					class="col-sm-9 form-control"
-				>
-					<option
-						v-for="item in model_info.choices"
-						:value="item.value"
-					>
-						{|{ item.display_name }|}
-					</option>
-				</select>
-				<el-date-picker
-					v-if="model_info.type==='date'"
-					v-bind:value="value"
-					v-on:input="$emit('input', $event)"
-					v-bind:id="'id_' +keys"
-					value-format="yyyy-MM-dd"   
-					placeholder="yyyy-MM-dd"
-					size=small
-					style="width: 100%;"
-				></el-date-picker>
-				<input
-					v-if="model_info.type==='field'"
-					v-bind:value="value"
-					v-on:input="$emit('input', $event.target.value)"
-					v-bind:id="'id_' +keys"
-					class="col-sm-9 form-control"
-				>
-			</template>
-		</div>
-	</div>
-</template>
-<script>
-	Vue.options.delimiters = ['{|{', '}|}'];
-
-	Vue.component('drf-model', {
-		template: '#drf-model',
-		props: ['model_info', 'keys', 'value', 'mode',],
-		methods: {
-			value2display_name: function (value, choices) {
-				display_name = value
-				_.each(choices, function(v){
-					if(v['value'] === value){
-						display_name = v['display_name']
-					}
-				})
-				return display_name
-			},
-		},
-		created() {
-
-		},
-		mounted () {
-
-		},
-	})
-</script>
 {% csrf_token %}
+{% include 'comp/drf.vue' %}
 
 <div id="disabilitycard_register" class="container">
 	<h3>身心障礙手冊登錄</h3>
@@ -140,21 +56,6 @@
 
 			<drf-model
 					v-if="mode==='read' || mode==='update'"
-					:keys="'owner'"
-					:model_info="model_info.owner"
-				mode="read"
-				v-model="disabilitycard_temp.owner"
-			></drf-model>
-			<drf-model
-					v-if="mode==='create'"
-					:keys="'owner'"
-					:model_info="model_info.owner"
-				mode="write"
-				v-model="disabilitycard_temp.owner"
-			></drf-model>
-
-			<drf-model
-					v-if="mode==='read' || mode==='update'"
 					:keys="'identity_card_number'"
 					:model_info="model_info.identity_card_number"
 				mode="read"
@@ -169,7 +70,7 @@
 			></drf-model>
 
 			<drf-model
-				v-for="item in ['name', 'address', 'category', 'level', 'identification_date', 'renew_date',]"
+				v-for="item in ['owner', 'name', 'address', 'category', 'level', 'identification_date', 'renew_date',]"
 				v-if="mode==='read'"
 				:keys="item"
 				:model_info="model_info[item]"
@@ -177,7 +78,7 @@
 				v-model="disabilitycard_temp[item]"
 			></drf-model>
 			<drf-model
-				v-for="item in ['name', 'address', 'category', 'level', 'identification_date', 'renew_date',]"
+				v-for="item in ['owner', 'name', 'address', 'category', 'level', 'identification_date', 'renew_date',]"
 				v-if="mode==='create' || mode==='update'"
 				:keys="item"
 				:model_info="model_info[item]"
@@ -270,9 +171,24 @@
 		},
 		created: function () {
 			let self = this
+			self.client = new $.RestClient('/genericUser/api/');
+			self.client.add('users');
+
+				user_list = []
+				self.client.users.read()
+				.done(function(data) {
+					_.each(data, function(v){
+						user_list.push({
+							'display_name': v.username,
+							'value': v.id,
+						})
+					})
+				})
+
 			rest_aj_send('options', '/genericUser/api/disabilitycards/', {})
 			.done(function(data) {
 				self.model_info = data['data'].actions.POST
+				self.model_info.owner.choices = user_list
 			})
 
 			if(!iser(user.disabilitycard_set[0])){
