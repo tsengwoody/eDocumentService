@@ -11,7 +11,7 @@
 				:id="'index_tab_' +entry.value"
 				:class="{'tab-pane':true, 'active':(index===0)}"
 			>
-				<h4 class="textfornvda">{|{ entry.display_name }|}</h4>
+				<h4 class="sr-only">{|{ entry.display_name }|}</h4>
 				<div v-if="$scopedSlots[entry.type]">
 					<slot :name="entry.type" :item="entry.data"></slot>
 				</div>
