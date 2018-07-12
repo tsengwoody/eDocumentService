@@ -224,3 +224,9 @@ html, body {
 	overflow-x: hidden;
 	overflow-y: auto;
 }
+
+.y-scroll-box-lg {
+	height: 35em; 
+	overflow-x: hidden;
+	overflow-y: auto;
+}

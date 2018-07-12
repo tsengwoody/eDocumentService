@@ -46,7 +46,7 @@
 			>
 		</div>
 
-		<div class="col-sm-6 col-md-6">
+		<div class="col-sm-6 col-md-6 y-scroll-box-lg">
 			<div class="form-horizontal" v-if="mode==='read' || mode==='update'">
 				<div class="form-group">
 					<label for="id_status" class="col-sm-3">狀態</label>
@@ -54,37 +54,39 @@
 				</div>
 			</div>
 
-			<drf-model
-					v-if="mode==='read' || mode==='update'"
-					:keys="'identity_card_number'"
-					:model_info="model_info.identity_card_number"
-				mode="read"
-				v-model="disabilitycard_temp.identity_card_number"
-			></drf-model>
-			<drf-model
-					v-if="mode==='create'"
-					:keys="'identity_card_number'"
-					:model_info="model_info.identity_card_number"
-				mode="write"
-				v-model="disabilitycard_temp.identity_card_number"
-			></drf-model>
+			<div class="form-horizontal">
+				<drf-model
+						v-if="mode==='read' || mode==='update'"
+						:keys="'identity_card_number'"
+						:model_info="model_info.identity_card_number"
+					mode="read"
+					v-model="disabilitycard_temp.identity_card_number"
+				></drf-model>
+				<drf-model
+						v-if="mode==='create'"
+						:keys="'identity_card_number'"
+						:model_info="model_info.identity_card_number"
+					mode="write"
+					v-model="disabilitycard_temp.identity_card_number"
+				></drf-model>
 
-			<drf-model
-				v-for="item in ['owner', 'name', 'address', 'category', 'level', 'identification_date', 'renew_date',]"
-				v-if="mode==='read'"
-				:keys="item"
-				:model_info="model_info[item]"
-				mode="read"
-				v-model="disabilitycard_temp[item]"
-			></drf-model>
-			<drf-model
-				v-for="item in ['owner', 'name', 'address', 'category', 'level', 'identification_date', 'renew_date',]"
-				v-if="mode==='create' || mode==='update'"
-				:keys="item"
-				:model_info="model_info[item]"
-				mode="write"
-				v-model="disabilitycard_temp[item]"
-			></drf-model>
+				<drf-model
+					v-for="item in ['owner', 'name', 'address', 'category', 'level', 'identification_date', 'renew_date',]"
+					v-if="mode==='read'"
+					:keys="item"
+					:model_info="model_info[item]"
+					mode="read"
+					v-model="disabilitycard_temp[item]"
+				></drf-model>
+				<drf-model
+					v-for="item in ['owner', 'name', 'address', 'category', 'level', 'identification_date', 'renew_date',]"
+					v-if="mode==='create' || mode==='update'"
+					:keys="item"
+					:model_info="model_info[item]"
+					mode="write"
+					v-model="disabilitycard_temp[item]"
+				></drf-model>
+			</div>
 
 			<div
 				v-if="mode==='create'"
