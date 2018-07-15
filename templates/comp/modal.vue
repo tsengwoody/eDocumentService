@@ -1,22 +1,22 @@
 <template id="modal-template">
-	<div class="modal fade" :id="modalName" tabindex="-1" role="dialog" :aria-labelledby="modalName+'Label'" aria-hidden="true">
+	<div class="modal fade" :id="id_modal" tabindex="-1" role="dialog" role="dialog" aria-hidden="true">
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content alert-info" style="background-color: #f5f5f5;">
 				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span>&times;</span></button>
 					<slot name="header">
-						<h4 class="modal-title" id="myModalLabel">Modal title</h4>
+						<h4 class="modal-title">Modal title</h4>
 					</slot>
 				</div>
 				<div class="modal-body">
 					<slot name="body">
-						default body
+						<p>default body</p>
 					</slot>
 				</div>
 				<div class="modal-footer">
 					<slot name="footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
-						<button type="button" class="btn btn-primary">儲存</button>
+						<button class="btn btn-default" data-dismiss="modal">關閉</button>
+						<button class="btn btn-primary">儲存</button>
 					</slot>
 				</div>
 			</div>
@@ -26,10 +26,10 @@
 
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
-	Vue.component('modal-component', {
+	Vue.component('modal', {
 		template: '#modal-template',
 		props: {
-			modalName: String,	// define type
+			id_modal: String,	// define type
 		},
 	});
 </script>

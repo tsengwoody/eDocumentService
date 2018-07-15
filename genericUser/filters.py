@@ -3,6 +3,16 @@
 from rest_framework import filters
 from .models import *
 
+class DisabilityCardActiveFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		is_active = request.query_params.get('is_active')
+		if is_active and is_active in ['true', 'True']:
+			return queryset.filter(is_active=True)
+		elif is_active and is_active in ['false', 'False']:
+			return queryset.filter(is_active=False)
+		else:
+			return queryset
+
 class ServiceInfoExchangeFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
 		is_exchange = request.query_params.get('is_exchange')

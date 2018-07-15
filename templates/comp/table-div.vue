@@ -1,4 +1,4 @@
-﻿<!--  scoped CSS -->
+<!--  scoped CSS -->
 <style scoped>
 div.table {
 	width: 100%;

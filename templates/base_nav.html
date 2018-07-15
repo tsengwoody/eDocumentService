@@ -59,7 +59,7 @@
 						</ul>
 					</li>
 					{% if request.user.auth_guest %}
-						<li><a href="{% url 'ebookSystem:generics' 'book_manager_person' %}">校對進度</a></li>
+						<li><a href="{% url 'ebookSystem:generics' 'book_person' %}">校對進度</a></li>
 						<li><a href="{% url 'ebookSystem:generics' 'book_shelf' %}">借閱書櫃</a></li>
 					{% endif %}
 				{% endif %}

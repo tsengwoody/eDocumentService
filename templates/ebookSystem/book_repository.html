@@ -4,9 +4,9 @@
 {% endblock %}
 
 {% block content %}
-
 {% csrf_token %}
-{% include 'comp/table_vue_component.html' %}
+{% include 'comp/table-div.vue' %}
+{% include 'comp/tab.vue' %}
 
 <h3>平台書庫</h3>
 
@@ -19,15 +19,39 @@
 <div class="tab-content" style="padding:20px 0px;">
 	<div id="book_repository_recommend" class="tab-pane active">
 		<h4 class="textfornvda">書籍推薦</h4>
-		<tab-table-component :data="data"></tab-table-component>
+		<tab :data="data">
+			<template slot="table" slot-scope="props">
+				<table-div :datas="props.item.datas" :header="props.item.header">
+					<template slot="action" slot-scope="props">
+						<button class="btn btn-default" :ISBN="props.item" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>
+						<a class="btn btn-default" role="button"
+							:href="'/ebookSystem/library_origin_view?ISBN=' +props.item"
+							target="_blank" title="閱讀(另開新視窗)"
+						>閱讀</a>
+					</template>
+				</table-div>
+			</template>
+		</tab>
 	</div>
 	<div id="book_repository_index" class="tab-pane">
 		<h4 class="textfornvda">索引</h4>
-		<tab-table-component :data="data"></tab-table-component>
+		<tab :data="data">
+			<template slot="table" slot-scope="props">
+				<table-div :datas="props.item.datas" :header="props.item.header">
+					<template slot="action" slot-scope="props">
+						<button class="btn btn-default" :ISBN="props.item.ISBN" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>
+						<a class="btn btn-default" role="button"
+							:href="'/ebookSystem/library_origin_view?ISBN=' +props.item"
+							target="_blank" title="閱讀(另開新視窗)"
+						>閱讀</a>
+					</template>
+				</table-div>
+			</template>
+		</tab>
+		</tab>
 	</div>
 	<div id="book_repository_search" class="tab-pane">
 		<h4 class="textfornvda">查詢</h4>
-
 		<div class="form-inline" style="margin-bottom:20px;">
 			<div class="form-group">
 				<input v-model="search_value" id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊" maxlength="15">
@@ -36,53 +60,80 @@
 				<button type="button" class="btn btn-primary" @click="search()">搜尋</button>
 			</div>
 		</div>
-		<table-component :data="data[0]"></table-component>
+		<table-div :datas="bookinfos.datas" :header="bookinfos.header">
+			<template slot="action" slot-scope="props">
+				<button class="btn btn-default" :ISBN="props.item" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>
+				<a class="btn btn-default" role="button"
+					:href="'/ebookSystem/library_origin_view?ISBN=' +props.item"
+					target="_blank" title="閱讀(另開新視窗)"
+				>閱讀</a>
+			</template>
+		</table-div>
 	</div>
 </div>
 
 <script>
 
 	function bookinfos_data(v){
-
-		action = `<button type="button" class="btn btn-default" ISBN="` +v.ISBN +`" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>`
-			+`<a class="btn btn-default" role="button" href="/ebookSystem/library_origin_view?ISBN=` +v.ISBN +`" target="_blank" title="閱讀(另開新視窗)">閱讀</a>`
-
 		temp_data = {
-			'ISBN': v['ISBN'],
-			'書名': v['bookname'],
-			'裝訂冊數': v['bookbinding'],
-			'版次': v['order'],
-			'作者': v['author'],
-			'出版社': v['house'],
-			'出版日期': v['date'],
-		}
-
-		if(user.auth_guest){
-			temp_data['動作'] = action
+			"ISBN": v['ISBN'],
+			"bookname": v['bookname'],
+			"bookbinding": v['bookbinding'],
+			"order": v['order'],
+			"author": v['author'],
+			"house": v['house'],
+			"date": v['date'],
+			"action": v['ISBN'],
 		}
 
 		filter_data.push(temp_data)
 
 	}
 
+	bookinfo_columns = {
+		"ISBN": "ISBN",
+		"bookname": "書名",
+		"bookbinding": "裝訂冊數",
+		"order": "版次",
+		"author": "作者",
+		"house": "出版社",
+		"date": "出版日期",
+		"action": "動作",
+	}
+
+	Vue.options.delimiters = ['{|{', '}|}'];
+
 	new Vue({
-		el: '#book_repository_index',
+		el: '#book_repository_recommend',
 		data: {
-			tab_list: {
-				'0': '總類',
-				'1': '哲學',
-				'2': '宗教',
-				'3': '科學',
-				'4': '應用科學',
-				'5': '社會科學',
-				'6': '史地類',
-				'7': '世界史地',
-				'8': '語言文學',
-				'9': '藝術',
-			},
-			data: [],
+			bookinfo_columns: bookinfo_columns,
+			data: [
+				{
+					'order': 0,
+					'display_name': '最新上架',
+					'value': 'newest',
+					'type': 'table',
+					'data': '',
+				},
+				{
+					'order': 1,
+					'display_name': '平台推薦',
+					'value': 'recommend',
+					'type': 'table',
+					'data': '',
+				},
+				{
+					'order': 2,
+					'display_name': '借閱排行',
+					'value': 'hottest',
+					'type': 'table',
+					'data': '',
+				},
+			],
 		},
 		created: function () {
+			this.client = new $.RestClient('/ebookSystem/api/');
+			this.client.add('bookinfos');
 			this.get_table_data();
 		},
 		methods: {
@@ -90,92 +141,160 @@
 				// run ajax get data
 				let self = this;
 
-				i=0
-				_.each(self.tab_list, function(v, k){
-					let index = i;
-					i=i+1
-					rest_aj_send('get', '/ebookSystem/api/bookinfos/', {'chinese_book_category': k})
+				_.each(self.data, function(v){
+					query = {}
+					query[v.value] = 8
+					self.client.bookinfos.read(query)
 					.done(function(data) {
 
 						filter_data = []
-						_.each(data['data'], bookinfos_data)
-						self.data.push({
-							'index': index,
-							'data': filter_data,
-							'label': v,
-						})
+						_.each(data, bookinfos_data)
+						v.data = {}
+						v.data['header'] = bookinfo_columns
+						v.data['datas'] = filter_data
+
 					})
 				})
 			},
-		}
-
+		},
 	})
 
 	new Vue({
-		el: '#book_repository_recommend',
+		el: '#book_repository_index',
 		data: {
-			tab_list: {
-				'newest': '最新上架',
-				'recommend': '平台推薦',
-				'hottest': '借閱排行',
-			},
-			data: [],
+			bookinfo_columns: bookinfo_columns,
+			data: [
+				{
+					'order': 0,
+					'display_name': '總類',
+					'value': '0',
+					'type': 'table',
+					'data': '',
+				},
+				{
+					'order': 1,
+					'display_name': '哲學',
+					'value': '1',
+					'type': 'table',
+					'data': '',
+				},
+				{
+					'order': 2,
+					'display_name': '宗教',
+					'value': '2',
+					'type': 'table',
+					'data': '',
+				},
+				{
+					'order': 3,
+					'display_name': '科學',
+					'value': '3',
+					'type': 'table',
+					'data': '',
+				},
+				{
+					'order': 4,
+					'display_name': '應用科學',
+					'value': '4',
+					'type': 'table',
+					'data': '',
+				},
+				{
+					'order': 5,
+					'display_name': '社會科學',
+					'value': '5',
+					'type': 'table',
+					'data': '',
+				},
+				{
+					'order': 6,
+					'display_name': '史地類',
+					'value': '6',
+					'type': 'table',
+					'data': '',
+				},
+				{
+					'order': 7,
+					'display_name': '世界史地',
+					'value': '7',
+					'type': 'table',
+					'data': '',
+				},
+				{
+					'order': 8,
+					'display_name': '語言文學',
+					'value': '8',
+					'type': 'table',
+					'data': '',
+				},
+				{
+					'order': 9,
+					'display_name': '乙術',
+					'value': '9',
+					'type': 'table',
+					'data': '',
+				},
+			],
 		},
 		created: function () {
+			this.client = new $.RestClient('/ebookSystem/api/');
+			this.client.add('bookinfos');
 			this.get_table_data();
 		},
 		methods: {
 			get_table_data: function () {
 				// run ajax get data
-				var self = this;
+				let self = this;
 
-				_.each(self.tab_list, function(v, k){
-					td = {}
-					td[k] = 15
-					rest_aj_send('get', '/ebookSystem/api/bookinfos/', td)
+				_.each(self.data, function(v){
+
+					query = {'chinese_book_category': v.value}
+					self.client.bookinfos.read(query)
 					.done(function(data) {
 
 						filter_data = []
-						_.each(data['data'], bookinfos_data)
+						_.each(data, bookinfos_data)
+						v.data = {}
+						v.data['header'] = bookinfo_columns
+						v.data['datas'] = filter_data
 
-						self.data.push({
-							'data': filter_data,
-							'label': v,
-						})
 					})
 				})
-
 			},
 		}
-
 	})
 
 	new Vue({
 		el: '#book_repository_search',
 		data: {
 			search_value: '',
-			data: [],
+			bookinfos: '',
+			bookinfo_columns: bookinfo_columns,
+		},
+		created: function () {
+			this.client = new $.RestClient('/ebookSystem/api/');
+			this.client.add('bookinfos');
 		},
 		methods: {
 			search: function () {
-				// run ajax get data
-				var self = this;
-				self.data = []
 
-				rest_aj_send('get', '/ebookSystem/api/bookinfos/', {'search': self.search_value})
+				let self = this
+
+				query = {'search': self.search_value}
+				self.client.bookinfos.read(query)
 				.done(function(data) {
 
 					filter_data = []
-					_.each(data['data'], bookinfos_data)
-					self.data.push(
-						filter_data,
-					)
-					alertmessage('success', '查詢完成，共取得 ' +self.data[0].length +' 筆資料')
+					_.each(data, bookinfos_data)
+					self.bookinfos = {}
+					self.bookinfos['header'] = bookinfo_columns
+					self.bookinfos['datas'] = filter_data
+					alertmessage('success', '查詢完成，共取得 ' +self.bookinfos.datas.length +' 筆資料')
 				})
 
 			},
-		}
-
+		},
 	})
+
 </script>
 {% endblock %}
