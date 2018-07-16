@@ -454,6 +454,9 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			from django.contrib.auth import authenticate
 			user = authenticate(username=request.user.username, password=request.POST['password'])
 			if not user is None:
+				from utils.other import get_client_ip
+				get_ip = get_client_ip(request)
+				GetBookRecord.objects.create(book=obj.object, user=request.user, get_ip=get_ip)
 				if request.POST['fileformat'] == 'epub':
 					return self.get_resource(obj.epub)
 				elif request.POST['fileformat'] == 'txt':

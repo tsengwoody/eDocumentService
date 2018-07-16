@@ -100,77 +100,6 @@ def review_document(request, book_ISBN, template_name='ebookSystem/review_docume
 		return locals()
 
 @http_response
-def detail(request, book_ISBN, template_name='ebookSystem/detail.html'):
-	users = User.objects.all().order_by('username')
-	try:
-		book = Book.objects.get(ISBN=book_ISBN)
-	except:
-		raise Http404("book does not exist")
-	if request.method == 'POST':
-		if request.POST.has_key('email'):
-			from django.core.mail import EmailMessage
-			getPart = EBook.objects.get(ISBN_part=request.POST['email'])
-			attach_file_path = getPart.zip(request.user, request.POST['password'])
-			if not attach_file_path:
-				status = 'error'
-				message = u'準備文件失敗'
-				return locals()
-			subject = u'[文件] {0}'.format(getPart)
-			body = u'新愛的{0}您好：\n'.format(request.user.username)
-			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
-			email.attach_file(attach_file_path)
-			email.send(fail_silently=False)
-			status = 'success'
-			message = u'已寄送到您的電子信箱'
-			os.remove(attach_file_path)
-		elif request.POST.has_key('assign'):
-			getPart = EBook.objects.get(ISBN_part=request.POST['assign'])
-			user = User.objects.get(username=request.POST['username'])
-			deadline = request.POST['deadline'].split('-')
-			deadline = [ int(v) for v in deadline ]
-			deadline = timezone.datetime(deadline[0], deadline[1], deadline[2])
-			getPart.change_status(1, 'edit', user=user, deadline=deadline)
-			status = u'success'
-			message = u'指派校對成功'
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
-@user_category_check(['manager'])
-@http_response
-def detail_manager(request, book_ISBN, template_name='ebookSystem/detail_manager.html'):
-	try:
-		book = Book.objects.get(ISBN=book_ISBN)
-	except:
-		raise Http404("book does not exist")
-	if request.method == 'POST':
-		if request.POST.has_key('upload'):
-			getPart = EBook.objects.get(ISBN_part=request.POST['upload'])
-			uploadFilePath = os.path.join(getPart.book.path, '{0}.zip'.format(getPart.ISBN_part))
-			with open(uploadFilePath, 'wb+') as dst:
-				for chunk in request.FILES['fileObject'].chunks():
-					dst.write(chunk)
-			try:
-				with ZipFile(uploadFilePath, 'r') as uploadFile:
-					uploadFile.testzip()
-					uploadFile.extractall(getPart.book.path +'/OCR')
-			except BaseException as e:
-				print e
-				os.remove(uploadFilePath)
-				status = 'error'
-				message = u'非正確ZIP文件'
-				return locals()
-			os.remove(uploadFilePath)
-		elif request.POST.has_key('reset'):
-			getPart = EBook.objects.get(ISBN_part=request.POST['reset'])
-			getPart.add_tag()
-			with codecs.open(getPart.get_path('-finish'), 'w', encoding='utf-8') as finishFile:
-				finishFile.write(u'\ufeff')
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
-@http_response
 def book_info(request, ISBN, template_name='ebookSystem/book_info.html'):
 	ISBN = request.POST['ISBN']
 	if len(ISBN) == 10 and not ISBN10_check(ISBN):
@@ -295,98 +224,7 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 	if request.method == 'GET':
 		return locals()
 
-@http_response
-def full_edit(request, ISBN_part, template_name='ebookSystem/full_edit.html'):
-	try:
-		part = EBook.objects.get(ISBN_part=ISBN_part)
-	except:
-		raise Http404("book does not exist")
-	[scanPageList, defaultPageURL] = part.get_org_image(request.user)
-	editContent = part.get_content('-sc')
-	if request.method == 'POST':
-		with codecs.open(part.get_path('-sc'), 'w', encoding='utf-8') as scFile:
-			scFile.write(u'\ufeff' +request.POST['content'])
-		return locals()
-	if request.method == 'GET':
-		return locals()
-
 #==========
-@user_category_check(['guest'])
-@http_response
-def book_download(request, ISBN, ):
-	if request.method == 'POST' and request.is_ajax():
-		if not request.user.is_guest:
-				status = 'error'
-				message = u'取得文件失敗：您並非視障者權限'
-				return locals()
-
-		DOWNLOAD_MIN_DURATION_TIME = 86400
-		MIN_DURATION_TIME = 86400
-		getBook = Book.objects.get(ISBN=ISBN)
-		gbr = GetBookRecord.objects.filter(book=getBook, user=request.user)
-#		if len(gbr) <= 0:
-		if not getBook.owner == request.user and len(gbr) <= 0:
-			try:
-				allow_download = cache.get(request.user.username)['get_book']
-				status = 'error'
-				message = u'取得文件失敗：1天內僅能下載1本新書，下次可下載的時間為{0}'.format(timezone.localtime(allow_download))
-				return locals()
-			except BaseException as e:
-				pass
-
-		#準備所需文件
-		try:
-			attach_file_path = getBook.zip(request.user, request.POST['password'], request.POST['format'])
-		except BaseException as e:
-			status = 'error'
-			message = u'準備文件失敗：{0}'.format(unicode(e))
-			return locals()
-
-		if request.POST['action'] == 'download':
-			download_path = attach_file_path
-			download_filename = os.path.basename(attach_file_path)
-		elif request.POST['action'] == 'email':
-			subject = u'[文件] {0}'.format(getBook)
-			body = u'新愛的{0}您好：\n'.format(request.user.username)
-			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[request.user.email])
-			email.attach_file(attach_file_path)
-			email.send(fail_silently=False)
-			status = 'success'
-			message = u'已寄送到您的電子信箱'
-
-		from utils.other import get_client_ip
-		get_ip = get_client_ip(request)
-		GetBookRecord.objects.create(book=getBook, user=request.user, get_ip=get_ip)
-		'''if len(gbr) <= 0:
-			cache.set(request.user.username, {'get_book': timezone.now() +datetime.timedelta(seconds=MIN_DURATION_TIME)}, MIN_DURATION_TIME)
-		else:
-			pass'''
-
-		return locals()
-
-@http_response
-def ebook_download(request, ISBN_part, ):
-	if request.method == 'POST' and request.is_ajax():
-		getPart = EBook.objects.get(ISBN_part=ISBN_part)
-		try:
-			if request.POST['action'] == 'view':
-				attach_file_path = getPart.get_clean_file()
-			elif request.POST['action'] == 'view_se':
-				attach_file_path = getPart.get_clean_file()
-				attach_file_path = getPart.replace()
-			elif request.POST['action'] == 'download_full':
-				attach_file_path = getPart.zip_full()
-			elif request.POST['action'] == 'download':
-				attach_file_path = getPart.zip(request.user, request.POST['password'])
-			else:
-				attach_file_path = None
-		except BaseException as e:
-			status = 'error'
-			message = u'準備文件失敗'
-			return locals()
-		download_path = attach_file_path
-		download_filename = os.path.basename(attach_file_path)
-		return locals()
 
 @http_response
 def message_send(request, template_name='ebookSystem/message_send.html', ):
@@ -451,33 +289,6 @@ def book_action(request):
 		status = 'success'
 		message = u'book {0}: success'.format(request.POST['action'])
 		return locals()
-
-@http_response
-def getbookrecord_user(request, ID, template_name='ebookSystem/getbookrecord_user.html'):
-	user = User.objects.filter(id=ID)
-	gbr_list = GetBookRecord.objects.filter(user=user)
-	if request.method == 'GET':
-		return locals()
-
-import mimetypes
-import os
-from django.http import FileResponse, Http404, HttpResponse, HttpResponseNotModified
-
-def epub(request, ISBN):
-	book = Book.objects.get(ISBN=ISBN)
-#	fullpath = book.path +'/OCR/{0}.epub'.format(book.ISBN)
-	fullpath = '/django/eDocumentService/file/ebookSystem/document/9789863981459/OCR/9789863981459.epub'
-
-	statobj = os.stat(fullpath)
-	content_type, encoding = mimetypes.guess_type(fullpath)
-	content_type = content_type or 'application/octet-stream'
-	response = FileResponse(open(fullpath, 'rb'), content_type=content_type)
-#	response["Last-Modified"] = http_date(statobj.st_mtime)
-#	if stat.S_ISREG(statobj.st_mode):
-#		response["Content-Length"] = statobj.st_size
-	if encoding:
-		response["Content-Encoding"] = encoding
-	return response
 
 @http_response
 def library_view(request, template_name='ebookSystem/library_view.html'):
