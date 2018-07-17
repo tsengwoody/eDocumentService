@@ -176,6 +176,7 @@
 			},
 		},
 		created: function () {
+			this.bus.$on('instance-set', this.instance_set)
 			let self = this
 			self.client = new $.RestClient('/genericUser/api/')
 			self.client.add('users');
@@ -203,8 +204,6 @@
 				self.model_info = _.clone(data.actions.POST)
 				self.model_info.owner.choices = self.user_list
 			})
-
-			this.bus.$on('instance-set', this.instance_set)
 		},
 		methods: {
 			instance_set: function (event) {
@@ -220,19 +219,20 @@
 				}
 			},
 			refresh: function () {
+				this.mode = 'read'
 				let self = this
 					self.client.disabilitycards.read(self.pk)
 					.done(function(data) {
 						_.each(self.disabilitycard, function(v,k){
 							self.disabilitycard[k] = data[k]
 						})
+						self.disabilitycard_temp = _.clone(self.disabilitycard)
 					})
 					.fail(function(data) {
 						self.mode = 'create'
 						self.disabilitycard = {}
+						self.disabilitycard_temp = _.clone(self.disabilitycard)
 					})
-
-					self.disabilitycard_temp = _.clone(self.disabilitycard)
 
 			},
 			active: function (status) {

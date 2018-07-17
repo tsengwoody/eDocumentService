@@ -8,30 +8,10 @@
 {% include 'comp/disabilitycard.vue' %}
 
 <div id="disabilitycard_register" class="container">
-	<button class="btn btn-primary"
-		data-toggle="modal" :data-target="'#dm'"
-		@click="bus.$emit('instance-set', 'A129417526')"
-	>
-		手冊登錄
-	</button>
-	<modal :id_modal="'dm'">
-		<template slot="header">
-			<h4 class="modal-title">身心障礙手冊登錄</h4>
-		</template>
-		<template slot="body">
 	<disabilitycard
 		:bus="bus">
 	>
 	</disabilitycard>
-		</template>
-
-		<template slot="footer">
-			<button class="btn btn-default" data-dismiss="modal">關閉</button>
-			<button class="btn btn-primary">儲存</button>
-		</template>
-
-	</modal>
-
 </div>
 
 <script>
@@ -40,6 +20,9 @@
 		el: '#disabilitycard_register',
 		data: {
 			bus: new Vue(),
+		},
+		mounted: function () {
+			this.bus.$emit('instance-set', user.disabilitycard_set[0])
 		},
 	})
 

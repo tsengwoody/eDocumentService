@@ -1,4 +1,4 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 使用者管理
 {% endblock %}
@@ -7,6 +7,7 @@
 {% include 'comp/table-div.vue' %}
 {% include 'comp/modal.vue' %}
 {% include 'comp/disabilitycard.vue' %}
+{% include 'comp/serviceinfo_record.vue' %}
 
 <div id="user_manager">
 	<h2>使用者管理</h2>
@@ -33,9 +34,15 @@
 			<button class="btn btn-primary"
 				v-if="props.item.is_guest"
 				data-toggle="modal" :data-target="'#dm'"
-				@click="bus.$emit('instance-set', props.item.disabilitycard_set[0])"
+				@click="dm_bus.$emit('instance-set', props.item.disabilitycard_set[0])"
 			>
 				手冊登錄
+			</button>
+			<button class="btn btn-primary"
+				data-toggle="modal" :data-target="'#sr'"
+				@click="sr_bus.$emit('instance-set', props.item.id)"
+			>
+				服務紀錄
 			</button>
 		</template>
 	</table-div>
@@ -45,7 +52,7 @@
 		</template>
 		<template slot="body">
 	<disabilitycard
-		:bus="bus">
+		:bus="dm_bus"
 	>
 	</disabilitycard>
 		</template>
@@ -56,6 +63,24 @@
 		</template>
 
 	</modal>
+	<modal :id_modal="'sr'">
+		<template slot="header">
+			<h4 class="modal-title">服務紀錄</h4>
+		</template>
+		<template slot="body">
+			<serviceinfo_record
+				:bus="sr_bus"
+			>
+			</serviceinfo_record>
+		</template>
+
+		<template slot="footer">
+			<button class="btn btn-default" data-dismiss="modal">關閉</button>
+			<button class="btn btn-primary">儲存</button>
+		</template>
+
+	</modal>
+
 </div>
 
 <script>
@@ -64,7 +89,8 @@
 	new Vue({
 		el: '#user_manager',
 		data: {
-			bus: new Vue(),
+			dm_bus: new Vue(),
+			sr_bus: new Vue(),
 			user_header: {
 				"username": "使用者名稱",
 				"name": "姓名",

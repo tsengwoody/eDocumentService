@@ -1,13 +1,5 @@
-{% extends "base_nav.html" %}
-{% block title %}
-服務紀錄
-{% endblock %}
-
-{% block content %}
-{% csrf_token %}
-{% include 'comp/table-div.vue' %}
-
-<div id="serviceinfo_record" class="container">
+<template id="serviceinfo_record">
+<div class="container">
 	<h3>服務紀錄</h3>
 
 	<ul class="nav nav-tabs">
@@ -75,43 +67,36 @@
 		</div>
 	</div>
 </div>
+</template>
 <script>
-	function serviceinfos_data(v){
-		temp_data = {
-			date: v['date'],
-			service_hours: v['service_hours'],
-			org: cstr(getorg(v.org).name),
-			editrecord_set: v.editrecord_set,
-		};
-
-		filter_data.push(temp_data);
-	}
-
 	Vue.options.delimiters = ['{|{', '}|}'];
-	vo_serviceinfo_record = new Vue({
-		el: '#serviceinfo_record',
-		data: {
-			editrecords: [],
-			editrecords_columns: {
-				id: '核取',
-				get_date: '服務時間',
-				service_hours: '服務時數',
-				stay_hours: '線上時數',
-				category: '類型',
-			},
-			exchange_false_serviceinfos: [],
-			exchange_true_serviceinfos: [],
-			exchange_serviceinfos_columns: {
-				date: '兌換日期',
-				service_hours: '服務時數',
-				org: '兌換單位',
-				editrecord_set: '服務紀錄',
-			},
-			org_list: [],
-			erurl: '/ebookSystem/api/editrecords/',
-			siurl: '/genericUser/api/serviceinfos/',
-			editrecord_checks: [],
-			org_select: '1',
+
+	Vue.component('serviceinfo_record', {
+		template: '#serviceinfo_record',
+		props: ['bus',],
+		data: function(){
+			return {
+				pk: '',
+				editrecords: [],
+				editrecords_columns: {
+					id: '核取',
+					get_date: '服務時間',
+					service_hours: '服務時數',
+					stay_hours: '線上時數',
+					category: '類型',
+				},
+				exchange_false_serviceinfos: [],
+				exchange_true_serviceinfos: [],
+				exchange_serviceinfos_columns: {
+					date: '兌換日期',
+					service_hours: '服務時數',
+					org: '兌換單位',
+					editrecord_set: '服務紀錄',
+				},
+				org_list: [],
+				editrecord_checks: [],
+				org_select: '1',
+			}
 		},
 		computed: {
 			transferData: function(){
@@ -120,7 +105,7 @@
 					"date": moment().format('YYYY-MM-DD'),
 					"service_hours": this.service_hours,
 					"is_exchange": false,
-					"user": user.id,
+					"user": this.pk,
 					"org": this.org_select,
 				}
 			},
@@ -142,15 +127,32 @@
 			this.clientg.add('organizations');
 			this.clientb = new $.RestClient('/ebookSystem/api/');
 			this.clientb.add('editrecords');
-			this.refresh()
+			this.bus.$on('instance-set', this.instance_set)
+		},
+		mounted: function () {
+			this.instance_set(this.pk)
 		},
 		methods: {
+			instance_set: function (event) {
+				this.pk = event
+				this.refresh()
+			},
+			serviceinfo_datas: function(v){
+				temp_data = {
+					date: v['date'],
+					service_hours: v['service_hours'],
+					org: cstr(getorg(v.org).name),
+					editrecord_set: v.editrecord_set,
+				};
+
+				filter_data.push(temp_data);
+			},
 			refresh: function(){
 				let self = this
 
 				self.editrecords = []
 				self.editrecord_checks = []
-				query = {'editor_id': user.id, 'exchange': 'false',}
+				query = {'editor_id': self.pk, 'exchange': 'false',}
 				self.clientb.editrecords.read(query)
 				.done(function(data) {
 					_.each(data, function(v){
@@ -166,19 +168,19 @@
 					})
 				})
 
-				query = {'user_id': user.id, 'is_exchange': 'false',}
+				query = {'user_id': self.pk, 'is_exchange': 'false',}
 				self.clientg.serviceinfos.read(query)
 				.done(function(data) {
 					filter_data = [];
-					_.each(data, serviceinfos_data)
+					_.each(data, self.serviceinfo_datas)
 					self.exchange_false_serviceinfos = filter_data;
 				})
 
-				query = {'user_id': user.id, 'is_exchange': 'true',}
+				query = {'user_id': self.pk, 'is_exchange': 'true',}
 				self.clientg.serviceinfos.read(query)
 				.done(function(data) {
 					filter_data = [];
-					_.each(data, serviceinfos_data)
+					_.each(data, self.serviceinfos_datas)
 					self.exchange_true_serviceinfos = filter_data;
 				})
 
@@ -186,7 +188,6 @@
 				.done(function(data) {
 					self.org_list = data
 				})
-
 			},
 			editrecord_select_all: function(){
 				let self = this
@@ -209,7 +210,16 @@
 			serviceinfo_create: function(){
 				let self = this
 
-				//create
+				if(iser(self.editrecord_checks)){
+					alertmessage('error', '請至少選擇一筆服務紀錄。')
+					return -1
+				}
+
+				if(iser(self.org_select)){
+					alertmessage('error', '請選擇兌換中心。')
+					return -1
+				}
+
 				self.clientg.serviceinfos.create(self.transferData)
 				.done(function(data) {
 					alertmessage('success', '申請兌換時數' +o2j(data['service_hours']) +'，請等待核發。')
@@ -223,8 +233,8 @@
 			},
 			serviceinfoEditrecord: function(editrecord_set){
 				ServiceinfoEditrecord(editrecord_set);
-			}
-		}
+			},
+		},
 	})
+
 </script>
-{% endblock %}

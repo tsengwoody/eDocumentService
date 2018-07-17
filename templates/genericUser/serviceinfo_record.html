@@ -1,0 +1,30 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+服務紀錄
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+{% include 'comp/table-div.vue' %}
+{% include 'comp/serviceinfo_record.vue' %}
+
+<div id="serviceinfo" class="container">
+	<serviceinfo_record
+		:bus="bus"
+	>
+	</serviceinfo_record>
+</div>
+<script>
+
+	Vue.options.delimiters = ['{|{', '}|}'];
+	vo_serviceinfo_record = new Vue({
+		el: '#serviceinfo',
+		data: {
+			bus: new Vue(),
+		},
+mounted: function () {
+			this.bus.$emit('instance-set', user.id)
+		},
+	})
+</script>
+{% endblock %}
