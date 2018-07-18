@@ -43,7 +43,10 @@
 			<div class="form-horizontal" v-if="mode==='read' || mode==='update'">
 				<div class="form-group">
 					<label for="id_status" class="col-sm-3">狀態</label>
-					<div class="col-sm-9">{|{ disabilitycard.is_active }|}</div>
+					<div class="col-sm-9">
+						<p v-if="disabilitycard.is_active">啟用</p>
+						<p v-if="!disabilitycard.is_active">停用</p>
+					</div>
 				</div>
 			</div>
 
@@ -110,16 +113,18 @@
 					@click="mode_change('update')"
 					class="btn btn-default" 
 				>編輯</button>
-				<button
-					v-if="!disabilitycard.is_active"
-					@click="active(true)"
-					class="btn btn-default" 
-				>啟用</button>
-				<button
-					v-if="disabilitycard.is_active"
-					@click="active(false)"
-					class="btn btn-default" 
-				>停用</button>
+				<template v-if="user.is_manager">
+					<button
+						v-if="!disabilitycard.is_active"
+						@click="active(true)"
+						class="btn btn-default" 
+					>啟用</button>
+					<button
+						v-if="disabilitycard.is_active"
+						@click="active(false)"
+						class="btn btn-default" 
+					>停用</button>
+				</template>
 			</div>
 
 		</div>
@@ -260,8 +265,8 @@
 						self.mode_change('read')
 					})
 				})
-				.fail(function(data){
-				    alertmessage('error', data);
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', xhr.responseText)
 				})
 
 			},
@@ -278,12 +283,12 @@
 				self.disabilitycard = _.clone(self.disabilitycard_temp)
 				self.client.disabilitycards.update(self.pk, self.disabilitycard)
 				.done(function(data) {
-					alertmessage('success', '成功修改手冊')
+					alertmessage('success', '成功修改手冊資料')
 					self.mode_change('read')
 					self.upload(self.pk)
 				})
-				.fail(function(data){
-				    alertmessage('error', data['message']);
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', xhr.responseText)
 				})
 
 			},
@@ -303,36 +308,49 @@
 			},
 			upload: function(pk){
 				let self = this
-
-				let fileFront = document.getElementById('id_front');
-					fileObject = fileFront.files[0]
-					if(iser(fileObject)){
-						alertmessage('error', '身心障礙手冊正面檔案尚未選擇')
-						return -1
-					}
-
-				let fileBack = document.getElementById('id_back');
-					fileObject = fileBack.files[0]
-					if(iser(fileObject)){
-						alertmessage('error', '身心障礙手冊反面檔案尚未選擇')
-						return -1
-					}
-
 				let resource_url = '/genericUser/api/disabilitycards/' +pk +'/resource/source/'
 
-				rest_aj_upload(resource_url +'front/', {'object': fileFront.files[0]})
-				.done(function(data) {
-					rest_aj_upload(resource_url +'back/', {'object': fileBack.files[0]})
-					.done(function(data) {
+				let fileFront = document.getElementById('id_front');
+				let aj_front = null
+				fileFrontObject = fileFront.files[0]
+				if(!iser(fileFrontObject)){
+					aj_front = rest_aj_upload(resource_url +'front/', {'object': fileFrontObject})
+				}
+
+				let fileBack = document.getElementById('id_back');
+				let aj_back = null
+				fileBackObject = fileBack.files[0]
+				if(!iser(fileBackObject)){
+					aj_back = rest_aj_upload(resource_url +'back/', {'object': fileBackObject})
+				}
+
+				if(!iser(aj_front) && !iser(aj_back)){
+					$.when(aj_front, aj_back)
+					.done(function(front_data, back_data) {
 						alertmessage('success', '成功上傳手冊')
+					})
+					.fail(function(data){
+						alertmessage('error', '失敗上傳手冊')
+					})
+				}
+				else if(!iser(aj_front)){
+					aj_front
+					.done(function(data) {
+						alertmessage('success', '成功上傳手冊正面')
+					})
+					.fail(function(data){
+						alertmessage('error', '失敗上傳手冊正面')
+					})
+				}
+				else if(!iser(aj_back)){
+					aj_back
+					.done(function(data) {
+						alertmessage('success', '成功上傳手冊反面')
 					})
 					.fail(function(data){
 						alertmessage('error', '失敗上傳手冊反面')
 					})
-				})
-				.fail(function(data){
-					alertmessage('error', '失敗上傳手冊正面')
-				})
+				}
 			},
 		},
 

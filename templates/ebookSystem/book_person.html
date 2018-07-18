@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 校對進度
 {% endblock %}
@@ -164,9 +164,9 @@
 			c2 = self.client.books.read({'status': 2, 'owner_id': user.id})
 			$.when(c1, c2)
 				.done(function(data1, data2) {
-				book_data = []
-				book_data = book_data.concat(data1[0])
-				book_data = book_data.concat(data2[0])
+					book_data = []
+					book_data = book_data.concat(data1[0])
+					book_data = book_data.concat(data2[0])
 					filter_data = []
 					_.each(book_data, active_book_datas)
 					self.data[1].data = {}
