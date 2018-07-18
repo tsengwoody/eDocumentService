@@ -1,5 +1,5 @@
 <template id="serviceinfo_record">
-<div class="container">
+<div>
 	<h3>服務紀錄</h3>
 
 	<ul class="nav nav-tabs">

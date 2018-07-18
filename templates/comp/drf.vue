@@ -15,7 +15,7 @@
 			>{|{ value }|}</div>
 		</template>
 		<template v-if="mode==='write'">
-		<div class="col-sm-9">
+		<div class="col-sm-6">
 			<input
 				v-if="model_info.type==='string'"
 				v-bind:value="value"
