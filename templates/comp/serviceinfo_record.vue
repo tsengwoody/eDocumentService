@@ -129,9 +129,6 @@
 			this.clientb.add('editrecords');
 			this.bus.$on('instance-set', this.instance_set)
 		},
-		mounted: function () {
-			this.instance_set(this.pk)
-		},
 		methods: {
 			instance_set: function (event) {
 				this.pk = event

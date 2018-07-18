@@ -8,6 +8,7 @@
 {% include 'comp/disabilitycard.vue' %}
 
 <div id="disabilitycard_register" class="container">
+	<h2>身心障礙手冊登錄</h2>
 	<disabilitycard
 		:bus="bus">
 	>
@@ -20,9 +21,15 @@
 		el: '#disabilitycard_register',
 		data: {
 			bus: new Vue(),
+			pk: '',
 		},
 		mounted: function () {
-			this.bus.$emit('instance-set', user.disabilitycard_set[0])
+			this.pk = window.location.pathname.split('/')
+			this.pk = this.pk[this.pk.length-2]
+			if(this.pk==='disabilitycard_register'){
+				this.pk = user.disabilitycard_set[0]
+			}
+			this.bus.$emit('instance-set', this.pk)
 		},
 	})
 

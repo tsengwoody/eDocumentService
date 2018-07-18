@@ -333,7 +333,6 @@
 				.fail(function(data){
 					alertmessage('error', '失敗上傳手冊正面')
 				})
-
 			},
 		},
 

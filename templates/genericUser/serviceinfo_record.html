@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 服務紀錄
 {% endblock %}
@@ -21,9 +21,15 @@
 		el: '#serviceinfo',
 		data: {
 			bus: new Vue(),
+			pk: '',
 		},
 mounted: function () {
-			this.bus.$emit('instance-set', user.id)
+			this.pk = window.location.pathname.split('/')
+			this.pk = this.pk[this.pk.length-2]
+			if(this.pk==='serviceinfo_record'){
+				this.pk = user.id
+			}
+			this.bus.$emit('instance-set', this.pk)
 		},
 	})
 </script>

@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 使用者管理
 {% endblock %}
@@ -31,19 +31,35 @@
 			<button class="btn btn-default" style="margin:0px 3px 3px 0px;" @click="UserPermission(props.item.id)">權限設定</button>
 			<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" :href="'/genericUser/review_user/' +props.item.username +'/'">審核</a>
 			<a v-if="props.item.is_editor" class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" :href="'/genericUser/serviceinfo_list_search/' +props.item.username +'/'">服務紀錄</a>
-			<button class="btn btn-primary"
+			<!--<button class="btn btn-primary"
 				v-if="props.item.is_guest"
 				data-toggle="modal" :data-target="'#dm'"
 				@click="dm_bus.$emit('instance-set', props.item.disabilitycard_set[0])"
 			>
 				手冊登錄
-			</button>
-			<button class="btn btn-primary"
+			</button>-->
+			<a
+				v-bind:href="'/genericUser/generics/disabilitycard_register/' +props.item.disabilitycard_set[0] +'/'"
+				class="btn btn-primary"
+				role="button"
+							target="blank" title="(另開新視窗)"
+			>
+				手冊登錄
+			</a>
+			<!--<button class="btn btn-primary"
 				data-toggle="modal" :data-target="'#sr'"
 				@click="sr_bus.$emit('instance-set', props.item.id)"
 			>
 				服務紀錄
-			</button>
+			</button>-->
+			<a
+				v-bind:href="'/genericUser/generics/serviceinfo_record/' +props.item.id +'/'"
+				class="btn btn-primary"
+				role="button"
+							target="blank" title="(另開新視窗)"
+			>
+				服務紀錄
+			</a>
 		</template>
 	</table-div>
 	<modal :id_modal="'dm'">
@@ -69,7 +85,7 @@
 		</template>
 		<template slot="body">
 			<serviceinfo_record
-				:bus="sr_bus"
+				v-bind:bus="sr_bus"
 			>
 			</serviceinfo_record>
 		</template>
