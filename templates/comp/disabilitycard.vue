@@ -260,8 +260,9 @@
 				self.client.disabilitycards.create(self.disabilitycard_temp)
 				.done(function(data) {
 					alertmessage('success', '成功新建手冊')
-					self.pk = data.identity_card_number
-					self.refresh()
+					.done(function() {
+						window.location.reload()
+					})
 				})
 				.fail(function(xhr, result, statusText){
 					alertmessage('error', xhr.responseText)
