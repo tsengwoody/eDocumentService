@@ -77,7 +77,7 @@ div.tbody .cell {
 	}
 	.tr .cell::before{
 		content: attr(data-title);
-		display: inline-block;
+		display: block;
 		width: auto;
 		min-width: 40%;
 		font-weight: 900;

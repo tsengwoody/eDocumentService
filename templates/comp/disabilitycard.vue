@@ -2,7 +2,7 @@
 <template id="disabilitycard">
 <div id="disabilitycard_register" class="container">
 	<div class="row">
-		<div class="col-sm-6 col-md-6">
+		<div class="col-sm-4 col-md-4">
 			<img v-if="img_base64_front"
 				:src="'data:image/jpeg;base64,' + img_base64_front"
 				:base64="img_base64_front"
@@ -39,7 +39,7 @@
 			>
 		</div>
 
-		<div class="col-sm-6 col-md-6 y-scroll-box-lg">
+		<div class="col-sm-6 col-md-6">
 			<div class="form-horizontal" v-if="mode==='read' || mode==='update'">
 				<div class="form-group">
 					<label for="id_status" class="col-sm-3">狀態</label>
