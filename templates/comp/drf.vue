@@ -7,11 +7,11 @@
 		<template v-if="mode==='read'">
 			<div
 				v-if="model_info.type==='choice' || model_info.type==='field'"
-				class="col-sm-9"
+				class="col-sm-6"
 			>{|{ value2display_name(value, model_info.choices) }|}</div>
 			<div
 				v-else
-				class="col-sm-9"
+				class="col-sm-6"
 			>{|{ value }|}</div>
 		</template>
 		<template v-if="mode==='write'">
