@@ -1,4 +1,4 @@
-<template id="serviceinfo_record">
+﻿<template id="serviceinfo_record">
 <div>
 	<h3>服務紀錄</h3>
 
@@ -51,8 +51,8 @@
 			<h4>兌換中</h4>
 			<table-div :datas="exchange_false_serviceinfos" :header="exchange_serviceinfos_columns">
 				<template slot="editrecord_set" slot-scope="props">
-			      	<button type="button" class="btn btn-default" @click="serviceinfoEditrecord(props.item)">詳細服務紀錄</button>
-			    </template>
+					<button class="btn btn-default" @click="editrecords_detail(props.item); openDialog('editrecords_detail', this);">詳細服務紀錄</button>
+				</template>
 			</table-div>
 
 		</div>
@@ -61,10 +61,24 @@
 			<h4>已兌換</h4>
 			<table-div :datas="exchange_true_serviceinfos" :header="exchange_serviceinfos_columns">
 				<template slot="editrecord_set" slot-scope="props">
-			      	<button type="button" class="btn btn-default" @click="serviceinfoEditrecord(props.item)">詳細服務紀錄</button>
-			    </template>
+					<button class="btn btn-default" @click="editrecords_detail(props.item); openDialog('editrecords_detail', this);">詳細服務紀錄</button>
+				</template>
 			</table-div>
 		</div>
+
+		<div>
+			<modal :id_modal="'editrecords_detail'">
+				<template slot="header">
+					<h4 class="modal-title">詳細服務紀錄</h4>
+				</template>
+
+				<template slot="body">
+					<table-div :datas="detail_editrecords" :header="detail_editrecords_columns">
+				</template>
+
+			</modal>
+		</div>
+
 	</div>
 </div>
 </template>
@@ -92,6 +106,14 @@
 					service_hours: '服務時數',
 					org: '兌換單位',
 					editrecord_set: '服務紀錄',
+				},
+				detail_editrecords: [],
+				detail_editrecords_columns: {
+					part: '文件',
+					get_date: '服務時間',
+					service_hours: '服務時數',
+					stay_hours: '線上時數',
+					category: '類型',
 				},
 				org_list: [],
 				editrecord_checks: [],
@@ -139,7 +161,7 @@
 					date: v['date'],
 					service_hours: v['service_hours'],
 					org: cstr(getorg(v.org).name),
-					editrecord_set: v.editrecord_set,
+					editrecord_set: v.editrecordinfo_set,
 				};
 
 				filter_data.push(temp_data);
@@ -228,8 +250,8 @@
 				})
 
 			},
-			serviceinfoEditrecord: function(editrecord_set){
-				ServiceinfoEditrecord(editrecord_set);
+			editrecords_detail: function(editrecords){
+				this.detail_editrecords = editrecords
 			},
 		},
 	})

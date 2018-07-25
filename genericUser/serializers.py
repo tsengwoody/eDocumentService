@@ -35,6 +35,7 @@ class DisabilityCardSerializer(serializers.ModelSerializer):
 from ebookSystem.models import EditRecord
 from ebookSystem.serializers import EditRecordSerializer
 class ServiceInfoSerializer(serializers.ModelSerializer):
+	editrecordinfo_set = EditRecordSerializer(many=True, read_only=True, source='editrecord_set')
 	editrecord_set = serializers.PrimaryKeyRelatedField(many=True, queryset=EditRecord.objects.filter(serviceInfo=None))
 	class Meta:
 		model = ServiceInfo

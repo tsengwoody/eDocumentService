@@ -30,10 +30,10 @@
 			<button class="btn btn-default" style="margin:0px 3px 3px 0px;" @click="usermodel(props.item.id)">基本資料修改</button>
 			<button class="btn btn-default" style="margin:0px 3px 3px 0px;" @click="UserPermission(props.item.id)">權限設定</button>
 			<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" :href="'/genericUser/review_user/' +props.item.username +'/'" role="button">審核</a>
+			<!--data-toggle="modal" :data-target="'#'"-->
 			<button class="btn btn-primary"
 				v-if="props.item.is_guest"
-				data-toggle="modal" :data-target="'#dm'"
-				@click="dm_bus.$emit('instance-set', props.item.disabilitycard_set[0])"
+				@click="dm_bus.$emit('instance-set', props.item.disabilitycard_set[0]); openDialog('dm', this);"
 			>
 				手冊登錄
 			</button>
@@ -45,13 +45,12 @@
 			>
 				手冊登錄
 			</a>-->
-			<!--<button class="btn btn-primary"
-				data-toggle="modal" :data-target="'#sr'"
+			<button class="btn btn-primary"
 				v-if="props.item.is_editor"
-				@click="sr_bus.$emit('instance-set', props.item.id)"
+				@click="sr_bus.$emit('instance-set', props.item.id); openDialog('sr', this);"
 			>
-				服務紀錄
-			</button>-->
+				服務紀錄(modal)
+			</button>-
 			<a
 				v-if="props.item.is_editor"
 				v-bind:href="'/genericUser/generics/serviceinfo_record/' +props.item.id +'/'"
@@ -91,10 +90,10 @@
 			</serviceinfo_record>
 		</template>
 
-		<template slot="footer">
+		<!--<template slot="footer">
 			<button class="btn btn-default" data-dismiss="modal">關閉</button>
 			<button class="btn btn-primary">儲存</button>
-		</template>
+		</template>-->
 
 	</modal>
 

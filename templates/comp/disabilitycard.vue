@@ -164,7 +164,17 @@
 					is_active: '',
 				},
 				model_info: {},
-				disabilitycard_temp: {},
+				disabilitycard_temp: {
+					"identity_card_number": "",
+					"name": "",
+					"address": "",
+					"identification_date": "",
+					"renew_date": "",
+					"level": "",
+					"category": "",
+					"owner": "",
+					is_active: '',
+				},
 				img_base64_front: '',
 				img_base64_back: '',
 				user_list: [],
@@ -212,6 +222,7 @@
 		},
 		methods: {
 			instance_set: function (event) {
+				console.log(event)
 				this.pk = event
 
 				if(iser(this.pk)){
@@ -230,13 +241,12 @@
 					.done(function(data) {
 						_.each(self.disabilitycard, function(v,k){
 							self.disabilitycard[k] = data[k]
+							//self.disabilitycard_temp[k] = data[k]
 						})
 						self.disabilitycard_temp = _.clone(self.disabilitycard)
 					})
-					.fail(function(data) {
+					.fail(function(xhr, result, statusText){
 						self.mode = 'create'
-						self.disabilitycard = {}
-						self.disabilitycard_temp = _.clone(self.disabilitycard)
 					})
 
 			},
@@ -260,9 +270,8 @@
 				self.client.disabilitycards.create(self.disabilitycard_temp)
 				.done(function(data) {
 					alertmessage('success', '成功新建手冊')
-					.done(function() {
-						window.location.reload()
-					})
+					self.pk = data.identity_card_number
+					self.refresh()
 				})
 				.fail(function(xhr, result, statusText){
 					alertmessage('error', xhr.responseText)

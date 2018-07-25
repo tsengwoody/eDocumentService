@@ -23,16 +23,9 @@ api_urlpatterns = copy.copy(router.urls)
 
 import rest_framework
 
-resource_urlpatterns = [
-	url(r'^users/(?P<pk>[\d-]+)/(?P<dir>[\w]+)/(?P<resource>[\d\w]+)/$', views.UserResource.as_view(), name='user-resource'),
-]
-
 urlpatterns = [
-	url(r'^refactor/(?P<name>[\w-]+)/$', views.refactor, name='refactor'),
-	url(r'^refactor/(?P<name>[\w-]+)/(?P<pk>[\d-]+)/$', views.refactor_detail, name='refactor-detail'),
 	url(r'^user_guide', views.user_guide, name='user_guide'),
 	url(r'^recruit', views.recruit, name='recruit'),
-	url(r'^apply_document/$', views.apply_document, name='apply_document'),
 	url(r'^func_desc/$', views.func_desc, name='func_desc'),
 	url(r'^org_info$', views.org_info, name='org_info'),
 	url(r'^license/$', views.license, name='license'),
@@ -40,18 +33,9 @@ urlpatterns = [
 	url(r'^event_list/$', views.event_list, name='event_list'),
 	url(r'^serviceinfo_list/$', views.serviceinfo_list, name='serviceinfo_list'),
 	url(r'^serviceinfo_list_search/(?P<username>[\w-]+)/$', views.serviceinfo_list_search, name='serviceinfo_list_search'),
-	url(r'^serviceinfo_list_check/$', views.serviceinfo_list_check, name='serviceinfo_list_check'),
-	url(r'^info/$', views.info, {'template_name': 'genericUser/info.html'}, name='info'),
-	url(r'^change_contact_info/$', views.change_contact_info, {'template_name': 'genericUser/change_contact_info.html'}, name='change_contact_info'),
 	url(r'^retrieve_password/$', views.retrieve_password, name='retrieve_password'),
 	url(r'^review_user/(?P<username>[\w-]+)/$', views.review_user, name='review_user'),
-	url(r'^verify_contact_info/$', views.verify_contact_info, name='verify_contact_info'),
-	url(r'^user_update/(?P<ID>\d+)/$', views.user_update, name='user_update'),
-	url(r'^user_list/$', views.user_list, name='user_list'),
-	url(r'^user_view/(?P<ID>\d+)/$', views.user_view, name='user_view'),
-	url(r'^user_manager/$', views.user_manager, name='user_manager'),
 	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),
 	url(r'^api/', include(api_urlpatterns, namespace='api')),
-	url(r'^resource/', include(resource_urlpatterns, namespace='resource')),
 	url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
