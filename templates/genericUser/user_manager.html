@@ -50,7 +50,7 @@
 				@click="sr_bus.$emit('instance-set', props.item.id); openDialog('sr', this);"
 			>
 				服務紀錄(modal)
-			</button>-
+			</button>
 			<a
 				v-if="props.item.is_editor"
 				v-bind:href="'/genericUser/generics/serviceinfo_record/' +props.item.id +'/'"
