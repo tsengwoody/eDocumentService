@@ -63,6 +63,11 @@ class OrganizationSerializer(serializers.ModelSerializer):
 		model = Organization
 		fields = ('__all__')
 
+class BusinessContentSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = BusinessContent
+		fields = ('__all__')
+
 class BannerContentSerializer(serializers.ModelSerializer):
 	id = serializers.ReadOnlyField()
 	order = serializers.ReadOnlyField()

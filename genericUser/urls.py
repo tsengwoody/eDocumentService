@@ -2,15 +2,11 @@ from django.conf.urls import include, url
 
 from . import views
 from . import apis
-
-organization_list = apis.OrganizationViewSet.as_view({
-	'get': 'list',
-})
-
 from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'announcements', apis.AnnouncementViewSet)
 router.register(r'organizations', apis.OrganizationViewSet)
+router.register(r'businesscontents', apis.OrganizationViewSet)
 router.register(r'qandas', apis.QAndAViewSet)
 router.register(r'bannercontents', apis.BannerContentViewSet)
 router.register(r'serviceinfos', apis.ServiceInfoViewSet)

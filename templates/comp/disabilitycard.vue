@@ -110,6 +110,7 @@
 				v-if="mode==='read'"
 			>
 				<button
+					v-if="!disabilitycard_temp.is_active"
 					@click="mode_change('update')"
 					class="btn btn-default" 
 				>編輯</button>
@@ -222,7 +223,6 @@
 		},
 		methods: {
 			instance_set: function (event) {
-				console.log(event)
 				this.pk = event
 
 				if(iser(this.pk)){

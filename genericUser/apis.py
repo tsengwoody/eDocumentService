@@ -151,7 +151,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 class DisabilityCardViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = DisabilityCard.objects.all()
 	serializer_class = DisabilityCardSerializer
-	filter_backends = (filters.OrderingFilter, DisabilityCardActiveFilter,)
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, DisabilityCardActiveFilter,)
 
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = None
@@ -205,6 +205,10 @@ class OrganizationViewSet(viewsets.ModelViewSet):
 	queryset = Organization.objects.all()
 	serializer_class = OrganizationSerializer
 	permission_classes = (IsManagerOrReadOnly, )
+
+class OrganizationViewSet(viewsets.ModelViewSet):
+	queryset = BusinessContent.objects.all()
+	serializer_class = BusinessContentSerializer
 
 class BannerContentViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = BannerContent.objects.all()

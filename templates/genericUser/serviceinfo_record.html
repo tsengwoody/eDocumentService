@@ -23,7 +23,7 @@
 			bus: new Vue(),
 			pk: '',
 		},
-mounted: function () {
+		mounted: function () {
 			this.pk = window.location.pathname.split('/')
 			this.pk = this.pk[this.pk.length-2]
 			if(this.pk==='serviceinfo_record'){
