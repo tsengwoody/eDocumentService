@@ -206,7 +206,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
 	serializer_class = OrganizationSerializer
 	permission_classes = (IsManagerOrReadOnly, )
 
-class OrganizationViewSet(viewsets.ModelViewSet):
+class BusinessContentViewSet(viewsets.ModelViewSet):
 	queryset = BusinessContent.objects.all()
 	serializer_class = BusinessContentSerializer
 
