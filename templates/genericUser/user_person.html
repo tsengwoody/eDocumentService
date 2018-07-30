@@ -60,7 +60,6 @@
 				<button class="btn btn-primary" @click="user_password(userID)">修改密碼</button>
 				<button class="btn btn-primary"
 					v-if="user.is_guest"
-					data-toggle="modal" :data-target="'#dm'"
 				@click="dm_bus.$emit('instance-set', user.disabilitycard_set[0]); openDialog('dm', this);"
 				>
 					<div v-if="user.disabilitycard_set[0]">手冊查閱編修</div>

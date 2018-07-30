@@ -46,13 +46,13 @@
 			>
 				手冊登錄
 			</a>-->
-			<!--<button class="btn btn-primary"
+			<button class="btn btn-primary"
 				v-if="props.item.is_editor"
 				@click="sr_bus.$emit('instance-set', props.item.id); openDialog('sr', this);"
 			>
-				服務紀錄(modal)
-			</button>-->
-			<a
+				服務紀錄
+			</button>
+			<!--<a
 				v-if="props.item.is_editor"
 				v-bind:href="'/genericUser/generics/serviceinfo_record/' +props.item.id +'/'"
 				class="btn btn-primary"
@@ -60,7 +60,7 @@
 							target="blank" title="(另開新視窗)"
 			>
 				服務紀錄
-			</a>
+			</a>-->
 		</template>
 	</table-div>
 	<modal :id_modal="'dm'">
