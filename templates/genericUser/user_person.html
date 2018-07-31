@@ -17,7 +17,8 @@
 				<label class="control-label col-sm-2" :for="key"><font style="color:red">*</font><span>{|{ data_header[key] }|}</span></label>
 				<div class="col-sm-4">
 					<div class="input-group">
-						<div class="form-control" style="box-shadow:none; -webkit-box-shadow:none;">{|{ value }|}</div>
+
+						<div class="likebtn">{|{ value }|}</div>
 
 						<span class="input-group-btn">
 							<button class="btn btn-success" disabled v-if="auth_email">已驗證</button>
@@ -33,7 +34,8 @@
 				<label class="control-label col-sm-2" :for="key"><font style="color:red">*</font><span>{|{ data_header[key] }|}</span></label>
 				<div class="col-sm-4">
 					<div class="input-group">
-						<div class="form-control" id=phone_saved style="box-shadow:none; -webkit-box-shadow:none;">{|{ value }|}</div>
+						
+						<div class="likebtn">{|{ value }|}</div>
 
 						<span class="input-group-btn">
 							<button class="btn btn-success" disabled v-if="auth_phone">已驗證</button>
