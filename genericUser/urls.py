@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'announcements', apis.AnnouncementViewSet)
 router.register(r'organizations', apis.OrganizationViewSet)
-router.register(r'businesscontents', apis.OrganizationViewSet)
+router.register(r'businesscontents', apis.BusinessContentViewSet)
 router.register(r'qandas', apis.QAndAViewSet)
 router.register(r'bannercontents', apis.BannerContentViewSet)
 router.register(r'serviceinfos', apis.ServiceInfoViewSet)
@@ -24,11 +24,8 @@ urlpatterns = [
 	url(r'^recruit', views.recruit, name='recruit'),
 	url(r'^func_desc/$', views.func_desc, name='func_desc'),
 	url(r'^org_info$', views.org_info, name='org_info'),
-	url(r'^license/$', views.license, name='license'),
 	url(r'^upload_progress/$', views.upload_progress, name='upload_progress'),
 	url(r'^event_list/$', views.event_list, name='event_list'),
-	url(r'^serviceinfo_list/$', views.serviceinfo_list, name='serviceinfo_list'),
-	url(r'^serviceinfo_list_search/(?P<username>[\w-]+)/$', views.serviceinfo_list_search, name='serviceinfo_list_search'),
 	url(r'^retrieve_password/$', views.retrieve_password, name='retrieve_password'),
 	url(r'^review_user/(?P<username>[\w-]+)/$', views.review_user, name='review_user'),
 	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),

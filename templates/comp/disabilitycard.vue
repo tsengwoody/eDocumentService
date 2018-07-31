@@ -259,8 +259,8 @@
 					if(status){ alertmessage('success', '成功啟用手冊') }
 					else if(!status){ alertmessage('success', '成功停用手冊') }
 				})
-				.fail(function(data){
-				    alertmessage('error', data['message']);
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', xhr.responseText)
 				})
 
 			},

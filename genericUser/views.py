@@ -122,17 +122,6 @@ def org_info(request, template_name='genericUser/org_info.html'):
 	if request.method == 'GET':
 		return locals()
 
-
-def license(request, template_name='genericUser/license.html'):
-	if request.method == 'POST':
-		if 'is_privacy' in request.POST:
-			request.user.is_license = True
-			request.user.permission.add(Permission.objects.get(codename='license'))
-			request.user.save()
-		return redirect('/')
-	if request.method == 'GET':
-		return render(request, template_name, locals())
-
 def func_desc(request, template_name='genericUser/func_desc.html'):
 	return render(request, template_name, locals())
 
@@ -168,18 +157,8 @@ def review_user(request, username, template_name='genericUser/review_user.html')
 				event.response(status='error', message=request.POST['reason'], user=request.user)
 		return locals()
 
-@http_response
-def serviceinfo_list(request, template_name='genericUser/serviceinfo_list.html'):
-	if request.method == 'GET':
-		return locals()
-	'''subject = u'[通知] {0} 申請服務時數'.format(request.user.username)
+'''subject = u'[通知] {0} 申請服務時數'.format(request.user.username)
 	t = get_template('email/serviceinfo_list.txt')
 	body = t.render(Context(locals()))
 	email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[exchange_serviceInfo.org.email])
 	email.send(fail_silently=False)'''
-
-@http_response
-def serviceinfo_list_search(request, username, template_name='genericUser/serviceinfo_list_search.html'):
-	search_user = User.objects.get(username=username)
-	if request.method == 'GET':
-		return locals()

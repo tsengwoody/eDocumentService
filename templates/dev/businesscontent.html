@@ -1,0 +1,25 @@
+{% extends "base_nav.html" %}
+{% block title %}
+關於
+{% endblock %}
+{% block content %}
+{% include 'comp/businesscontent.vue' %}
+
+<div id="businesscontent_page">
+	<businesscontent :pk="pk"></businesscontent>
+</div>
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+	new Vue({
+		el: '#businesscontent_page',
+		data: {
+			pk: '',
+		},
+		created: function () {
+			this.pk = window.location.pathname.split('/')
+			this.pk = this.pk[this.pk.length-2]
+		},
+	})
+
+</script>
+{% endblock %}

@@ -330,7 +330,7 @@ class QAndA(models.Model):
 		return unicode(self.id)
 
 class BusinessContent(models.Model):
-	name = models.CharField(max_length=100, )
+	name = models.CharField(max_length=100, primary_key=True)
 	content = models.TextField()
 
 class BannerContent(models.Model):
