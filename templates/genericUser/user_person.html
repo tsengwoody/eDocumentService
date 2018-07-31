@@ -58,13 +58,22 @@
 			<div class="col-sm-7">
 				<button class="btn btn-primary" @click="usermodel(userID)">變更使用者資訊</button>
 				<button class="btn btn-primary" @click="user_password(userID)">修改密碼</button>
-				<button class="btn btn-primary"
+				<!--<button class="btn btn-primary"
 					v-if="user.is_guest"
-				@click="dm_bus.$emit('instance-set', user.disabilitycard_set[0]); openDialog('dm', this);"
+					@click="dm_bus.$emit('instance-set', user.disabilitycard_set[0]); openDialog('dm', this);"
 				>
 					<div v-if="user.disabilitycard_set[0]">手冊查閱編修</div>
 					<div v-else>手冊新建登錄</div>
-				</button>
+				</button>-->
+				<a
+					v-bind:href="'/genericUser/generics/disabilitycard_register/' +user.disabilitycard_set[0] +'/'"
+					class="btn btn-primary"
+					role="button"
+								target="blank" title="(另開新視窗)"
+				>
+					<div v-if="user.disabilitycard_set[0]">手冊查閱編修</div>
+					<div v-else>手冊新建登錄</div>
+				</a>
 			</div>
 		</div>
 	</div>
