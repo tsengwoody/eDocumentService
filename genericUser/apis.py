@@ -30,6 +30,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 	def perform_create(self, serializer):
 		instance = serializer.save(
+			is_active = True,
 			is_license = True,
 			auth_phone = False,
 			auth_email = False,

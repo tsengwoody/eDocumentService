@@ -100,7 +100,7 @@ def register(request, template_name='registration/register.html'):
 			pass
 		status = 'success'
 		message = u'資料填寫成功，需完成電子信箱與聯絡電話驗證才算完成註冊'
-		redirect_to = reverse('genericUser:info')
+		redirect_to = '/'
 		return locals()
 	if request.method == 'GET':
 		registerUserForm = RegisterUserForm()
@@ -125,7 +125,7 @@ def login(request, template_name='registration/login.html', authentication_form=
 
 		auth_login(request, form.get_user())
 		if not request.user.is_license:
-			redirect_to='/genericUser/license/'
+			redirect_to='/genericUser/generics/license/'
 		else:
 			redirect_to = '/'
 		from django.contrib.sessions.models import Session
