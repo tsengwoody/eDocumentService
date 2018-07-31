@@ -38,27 +38,27 @@
 				@input="$emit('input', $event.target.value)"
 			>
 				<option
-					v-for="(name, val) in model_info.choices"
-					:value="val"
+					v-for="el in model_info.choices"
+					:value="el.value"
 				>
-					{|{ name }|}
+					{|{ el.display_name }|}
 				</option>
 			</select>
 
 			<template
 				v-if="model_info.type === 'radio'" 
-				v-for="(name, val) in model_info.choices"
+				v-for="el in model_info.choices"
 			>
 				
 				<label class="radio-inline">
 				<input 
 					type="radio" 
-					:id="val"
-					:value="val"
+					:id="el.value"
+					:value="el.value"
 					@input="$emit('input', $event.target.value)"
-					:checked="val == value"
+					:checked="el.value == value"
 				> 
-					{|{ name }|}
+					{|{ el.display_name }|}
 				</label>
 			</template>
 		</div>
