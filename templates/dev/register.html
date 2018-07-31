@@ -97,7 +97,6 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 		</div>
 	</div>
 
-
 	<div class="form-group">
 		<label class="control-label col-sm-2 col-sm-offset-2"></label>
 		<div class="col-sm-7">
@@ -175,14 +174,32 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 					'label': '教育程度',
 					'type': 'select',
 					'remark': '請選擇教育程度',
-					'choices' : {
-						'' :'---------',
-						'國小': '國小',
-						'國中': '國中',
-						'高中': '高中',
-						'學士': '學士',
-						'碩士': '碩士',
-					},
+					'choices' : [
+						{
+							'value': '',
+							'display_name': '---------',
+						},
+						{
+							'value': '國小',
+							'display_name': '國小',
+						},
+						{
+							'value': '國中',
+							'display_name': '國中',
+						},
+						{
+							'value': '高中',
+							'display_name': '高中',
+						},
+						{
+							'value': '學士',
+							'display_name': '學士',
+						},
+						{
+							'value': '碩士',
+							'display_name': '碩士',
+						},
+					],
 				},
 				'is_book': {
 					'label': '訂閱訊息',
@@ -193,18 +210,27 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 					'label': '所屬單位',
 					'type': 'select',
 					'remark': '請選擇所屬單位',
-					'choices' : {
-						'': '其它',
-					},
+					'choices': [
+						{
+							'value': '',
+							'display_name': '其它',
+						},
+					],
 				},
 				'role': {
 					'label': '角色',
 					'type': 'radio',
 					'remark': '請填寫角色',
-					'choices' : {
-						'editor': '志工',
-						'guest': '視障者',
-					},
+					'choices' : [
+						{
+							'value': 'editor',
+							'display_name': '志工',
+						},
+						{
+							'value': 'guest',
+							'display_name': '視障者',
+						},
+					],
 				},
 			},
 		},
@@ -219,8 +245,11 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 			
 			client.organizations.read()
 			.done(function (org_data) {
-				_.each(org_data,function(v,k){
-					vo.model_infos.org.choices[v.id] = v.name;
+				_.each(org_data, function(v,k){
+					vo.model_infos.org.choices.push({
+						'value': v.id,
+						'display_name': v.name,
+					})
 				})
 			})
 		},
