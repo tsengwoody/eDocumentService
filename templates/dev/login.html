@@ -1,0 +1,79 @@
+{% extends "base_nav.html" %}
+{% block title %}
+登錄
+{% endblock %}
+{% block content %}
+{% csrf_token %}
+{% include 'comp/drf.vue' %}
+
+<div id="login">
+	<h2>登錄</h2>
+	<drf-model
+		keys="username"
+		:model_info="model_info.username"
+		mode="write"
+		v-model="username"
+	></drf-model>
+	<drf-model
+		keys="password"
+		:model_info="model_info.password"
+		mode="write"
+		v-model="password"
+	></drf-model>
+	<button
+		@click="login()"
+	>登錄</button>
+</div>
+
+<script>
+	let convertTitle = {
+		"username": "使用者名稱",
+		"password": "密碼",
+	}
+	Vue.options.delimiters = ['{|{', '}|}'];
+	new Vue({
+		el: '#login',
+		data: {
+			username: '',
+			password: '',
+			model_info: {
+				'username': {
+					'label': '使用者名稱',
+					'type': 'string',
+				},
+				password: {
+					'label': '使用者名稱',
+					'type': 'password',
+				},
+			},
+		},
+		created: function () {
+			this.client = new $.RestClient('/genericUser/api/')
+			this.client.add('users');
+			this.client.users.addVerb('login', 'POST', {
+				url: 'action/login/',
+			});
+		},
+		methods: {
+			login: function () {
+				let self = this
+				rest_aj_send('post', '/genericUser/api/users/action/login/', {
+					username: self.username,
+					password: self.password,
+				})
+				.done(function(data) {
+					alertmessage('success', data.data.detail)
+					.done(function() {
+						window.location.replace('/')
+					})
+				})
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', xhr.responseText)
+				})
+
+			},
+		},
+	})
+
+</script>
+{% endblock %}

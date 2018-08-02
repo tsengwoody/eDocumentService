@@ -8,6 +8,7 @@
 {% include 'comp/modal.vue' %}
 {% include 'comp/disabilitycard.vue' %}
 {% include 'comp/serviceinfo_record.vue' %}
+{% include 'comp/user_permission.vue' %}
 
 <div id="user_manager">
 	<h2>使用者管理</h2>
@@ -28,9 +29,13 @@
 	>
 		<template slot="action" slot-scope="props">
 			<button class="btn btn-default" style="margin:0px 3px 3px 0px;" @click="usermodel(props.item.id)">基本資料修改</button>
-			<button class="btn btn-default" style="margin:0px 3px 3px 0px;" @click="UserPermission(props.item.id)">權限設定</button>
+			<button
+				class="btn btn-primary"
+				@click="$refs.up.instance_set(props.item.id); openDialog('up', this);"
+			>
+				權限設定
+			</button>
 			<a class="btn btn-default" style="padding:6px 12px; margin:0px 3px 3px 0px;" :href="'/genericUser/review_user/' +props.item.username +'/'" role="button">審核</a>
-			<!--data-toggle="modal" :data-target="'#'"-->
 			<button class="btn btn-primary"
 				v-if="props.item.is_guest"
 				@click="dm_bus.$emit('instance-set', props.item.disabilitycard_set[0]); openDialog('dm', this);"
@@ -46,6 +51,7 @@
 			>
 				手冊登錄
 			</a>-->
+			<!--data-toggle="modal" :data-target="'#'"-->
 			<button class="btn btn-primary"
 				v-if="props.item.is_editor"
 				@click="sr_bus.$emit('instance-set', props.item.id); openDialog('sr', this);"
@@ -68,10 +74,10 @@
 			<h4 class="modal-title">身心障礙手冊登錄</h4>
 		</template>
 		<template slot="body">
-	<disabilitycard
-		:bus="dm_bus"
-	>
-	</disabilitycard>
+			<disabilitycard
+				:bus="dm_bus"
+			>
+			</disabilitycard>
 		</template>
 
 		<template slot="footer">
@@ -80,6 +86,7 @@
 		</template>
 
 	</modal>
+
 	<modal :id_modal="'sr'">
 		<template slot="header">
 			<h4 class="modal-title">服務紀錄</h4>
@@ -89,6 +96,21 @@
 				v-bind:bus="sr_bus"
 			>
 			</serviceinfo_record>
+		</template>
+
+		<!--<template slot="footer">
+			<button class="btn btn-default" data-dismiss="modal">關閉</button>
+			<button class="btn btn-primary">儲存</button>
+		</template>-->
+
+	</modal>
+
+	<modal :id_modal="'up'">
+		<template slot="header">
+			<h4 class="modal-title">權限設定</h4>
+		</template>
+		<template slot="body">
+			<user_permission pk="0" ref="up"></user_permission>
 		</template>
 
 		<!--<template slot="footer">

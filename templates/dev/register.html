@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 註冊
 {% endblock %}
@@ -401,18 +401,32 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 				}
 				delete this.infos.role;
 
-				let vo = this;
+				let self = this;
 				rest_aj_send('post', '/genericUser/api/users/', this.infos)
 				.done(function(data, textStatus, xhr) {
-					alertmessage('success', data['message'] +'已成功完成註冊')
-						.done(function () {
-							window.location = "/auth/login/";
-						});
+					alertmessage('success', '成功註冊帳號')
+					.done(function() {
+						self.login(self.infos.username, self.infos.password)
+					})
 				})
 				.fail(function(data){
 					alertmessage('error', data['message'])
 				})
-			}
+			},
+			login: function (username, password) {
+				console.log(username)
+				rest_aj_send('post', '/genericUser/api/users/action/login/', {
+					username: username,
+					password: password,
+				})
+				.done(function(data) {
+					window.location.replace('/genericUser/generics/user_person/')
+				})
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', xhr.responseText)
+				})
+
+			},
 		},
 	});
 

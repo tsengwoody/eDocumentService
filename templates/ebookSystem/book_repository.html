@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 平台書庫
 {% endblock %}
@@ -39,7 +39,7 @@
 			<template slot="table" slot-scope="props">
 				<table-div :datas="props.item.datas" :header="props.item.header">
 					<template slot="action" slot-scope="props">
-						<button class="btn btn-default" :ISBN="props.item.ISBN" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>
+						<button class="btn btn-default" :ISBN="props.item" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>
 						<a class="btn btn-default" role="button"
 							:href="'/ebookSystem/library_origin_view?ISBN=' +props.item"
 							target="_blank" title="閱讀(另開新視窗)"
@@ -98,7 +98,9 @@
 		"author": "作者",
 		"house": "出版社",
 		"date": "出版日期",
-		"action": "動作",
+	}
+	if(user.is_guest){
+		bookinfo_columns['action'] = '動作'
 	}
 
 	Vue.options.delimiters = ['{|{', '}|}'];

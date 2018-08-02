@@ -65,6 +65,31 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				fullpath = obj.disability_card_back
 		return fullpath
 
+	@list_route(
+		methods=['post', 'get'],
+		url_name='login',
+		url_path='action/login',
+	)
+	def login(self, request, pk=None):
+		res = {}
+
+		from django.contrib.auth import (login as auth_login, logout as auth_logout, update_session_auth_hash, authenticate,)
+		user = authenticate(username=request.POST['username'], password=request.POST['password'])
+		if user is None:
+			res['detail'] = u'帳號或密碼錯誤，請確認輸入的帳號密碼'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+		auth_login(request, user)
+		from django.contrib.sessions.models import Session
+		for session in Session.objects.all():
+			try:
+				if int(session.get_decoded()['_auth_user_id']) == request.user.id and request.user.username != 'root':
+					session.delete()
+			except:
+				pass
+		res['detail'] = u'成功登錄平台'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
 	@detail_route(
 		methods=['get', 'post'],
 		url_name='verify',

@@ -47,6 +47,14 @@
 				size=small
 				style="width: 100%;"
 			></el-date-picker>
+			<input
+				v-if="model_info.type==='password'"
+				v-bind:value="value"
+				v-on:input="$emit('input', $event.target.value)"
+				v-bind:id="'id_' +keys"
+				type="password"
+				class="form-control"
+			>
 		</div>
 		</template>
 	</div>
