@@ -596,6 +596,8 @@ class Library(models.Model):
 			os.mkdir(os.path.dirname(self.epub))
 		path = self.object.custom_epub_create(self.epub, self.user)
 		path = self.object.custom_txt_create(self.txt, self.user)
+		from utils.epub import remove_blankline
+		remove_blankline(path, path)
 
 		self.check_out_time = timezone.now()
 		self.check_in_time = self.check_out_time +datetime.timedelta(days=30)

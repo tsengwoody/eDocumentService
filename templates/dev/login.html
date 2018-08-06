@@ -26,10 +26,6 @@
 </div>
 
 <script>
-	let convertTitle = {
-		"username": "使用者名稱",
-		"password": "密碼",
-	}
 	Vue.options.delimiters = ['{|{', '}|}'];
 	new Vue({
 		el: '#login',
@@ -42,7 +38,7 @@
 					'type': 'string',
 				},
 				password: {
-					'label': '使用者名稱',
+					'label': '密碼',
 					'type': 'password',
 				},
 			},

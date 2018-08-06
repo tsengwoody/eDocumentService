@@ -125,7 +125,8 @@ def remove_blankline(src, dst):
 
 	with io.open(dst, 'w', encoding='utf-8') as f:
 		for l in content:
-			if not l.strip() == '':
+			#if not l.strip() == '':
+			if not l.isspace():
 				f.write(l.replace('\n', '\r\n'))
 
 def remove_multiple_blankline(src, dst):
@@ -135,7 +136,8 @@ def remove_multiple_blankline(src, dst):
 
 	with io.open(dst, 'w', encoding='utf-8') as f:
 		for l in content:
-			if not l.strip() == '':
+			#if not l.strip() == '':
+			if not l.isspace():
 				f.write(l.replace('\n', '\r\n'))
 				blank_flag = False
 			else:

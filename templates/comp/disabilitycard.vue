@@ -133,17 +133,6 @@
 </div>
 </template>
 <script>
-	let convertTitle = {
-		"owner": "擁有者",
-		"identity_card_number": "身分證字號",
-		"name": "姓名",
-		"address": "地址",
-		"identification_date": "鑑定日期",
-		"renew_date": "有效日期",
-		"level": "程度",
-		"category": "類別",
-	};
-
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	Vue.component('disabilitycard', {
@@ -219,6 +208,16 @@
 			.done(function(data) {
 				self.model_info = _.clone(data.actions.POST)
 				self.model_info.owner.choices = self.user_list
+				self.model_info.identity_card_number.label = '身份證字號'
+				self.model_info.owner.label = '擁有者'
+				self.model_info.owner.label = '擁有者'
+				self.model_info.name.label = '姓名'
+				self.model_info.address.label = '地址'
+				self.model_info.category.label = '類別'
+				self.model_info.identification_date.label = '鑑定日期'
+				self.model_info.renew_date.label = '有效日期'
+				self.model_info.level.label = '程度'
+
 			})
 		},
 		methods: {

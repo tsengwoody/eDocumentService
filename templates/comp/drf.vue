@@ -3,7 +3,7 @@
 		<label
 			:for="'id_' +keys"
 			class="col-sm-3"
-		>{|{ convertTitle[keys] }|}</label>
+		>{|{ model_info.label }|}</label>
 		<template v-if="mode==='read'">
 			<div
 				v-if="model_info.type==='choice' || model_info.type==='field'"

@@ -4,81 +4,125 @@
 {% endblock %}
 {% block content %}
 {% csrf_token %}
-{% include 'comp/table_vue_component.html' %}
+{% include 'comp/book_download.vue' %}
+{% include 'comp/table-div.vue' %}
 
 <div id="book_shelf" class="container">
-	<h3>借閱書櫃</h3>
+	<h2>借閱書櫃</h3>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="#book_shelf_checkout" name="book_shelf_tab_grp" data-toggle="tab" aria-expanded="true">正借閱書籍</a></li>
 		<li><a href="#book_shelf_checkin" name="book_shelf_tab_grp" data-toggle="tab" aria-expanded="false">借閱歷史紀錄</a></li>
 	</ul>
 	<div class="tab-content" style="padding:20px 0px;">
 		<div id="book_shelf_checkout" class="tab-pane active">
-			<h4>正借閱書籍</h3>
-			<table-component :data="checkout_show"></table-component>
+			<h3>正借閱書籍</h3>
+			<table-div :datas="checkout_list" :header="checkout_header">
+				<template slot="action" slot-scope="props">
+					<a
+						class="btn btn-default" role="button"
+						:href="'/ebookSystem/library_view?ISBN=' +props.item"
+						target="_blank" title="閱讀(另開新視窗)"
+					>閱讀</a>`
+					<button
+						class="btn btn-default"
+						@click="$refs.db.instance_set(props.item.id); openDialog('db', this);"
+					>下載</button>`
+					<button
+						class="btn btn-default"
+						:id="props.item"
+						onclick="aj_borrowbook(this, 'check_in')"
+					>歸還</button>`
+				</template>
+			</table-div>
 		</div>
 		<div id="book_shelf_checkin" class="tab-pane">
-			<h4>借閱歷史紀錄</h3>
-			<table-component :data="checkin_show"></table-component>
+			<h3>借閱歷史紀錄</h3>
+			<table-div :datas="checkin_list" :header="checkin_header">
+			</table-div>
 		</div>
 	</div>
+	<modal :id_modal="'db'">
+		<template slot="header">
+			<h4 class="modal-title">取得書籍</h4>
+		</template>
+		<template slot="body">
+			<book_download
+				pk="0"
+				ref="db"
+			>
+			</book_download>
+		</template>
+
+		<template slot="footer">
+			<button class="btn btn-primary" @click=" $refs.db.object_get()">確定</button>
+		</template>
+
+	</modal>
 </div>
 
 <script>
+
+	function checkout_datas(v){
+		temp_data = {
+			'bookname': v.object.book_info.bookname,
+			'check_out_time': v.check_out_time.slice(0,10),
+			'check_in_time': v.check_in_time.slice(0,10),
+			'action': v,
+		}
+
+		filter_data.push(temp_data)
+
+	}
+
+	function checkin_datas(v){
+		temp_data = {
+			'bookname': v.object.book_info.bookname,
+			'check_out_time': v.check_out_time.slice(0,10),
+			'check_in_time': v.check_in_time.slice(0,10),
+		}
+
+		filter_data.push(temp_data)
+
+	}
+
 	Vue.options.delimiters = ['{|{', '}|}'];
 	vo_book_shelf = new Vue({
 		el: '#book_shelf',
 		data: {
+			checkout_header: {
+				'bookname': '書名',
+				'check_out_time': '借出日期',
+				'check_in_time': '到期日期',
+				'action': '動作',
+			},
 			checkout_list: [],
+			checkin_header: {
+				'bookname': '書名',
+				'check_out_time': '借出日期',
+				'check_in_time': '到期日期',
+			},
 			checkin_list: [],
 		},
 		computed: {
-			checkout_show: function () {
-				temp = []
-				_.each(this.checkout_list, function(v) {
-
-					action = ''
-					action += `<a class="btn btn-default" role="button" href="/ebookSystem/library_view?ISBN=` +v.id +`" target="_blank" title="閱讀(另開新視窗)">閱讀</a>`
-					action += `<button type="button" class="btn btn-default" pk="` +v.id +`" onclick="receivebook(this, false, 'download')">下載</button>`
-					action += `<button type="button" class="btn btn-default" id="` +v.id +`" onclick="aj_borrowbook(this, 'check_in')">歸還</button>`
-
-					temp.push({
-						'書名': v.object.book_info.bookname,
-						'借出日期': v.check_out_time.slice(0,10),
-						'到期日期': v.check_in_time.slice(0,10),
-						'動作': action,
-					})
-
-				})
-				return temp
-			},
-			checkin_show: function () {
-				temp = []
-				_.each(this.checkin_list, function(v) {
-
-					temp.push({
-						'書名': v.object.book_info.bookname,
-						'借出日期': v.check_out_time.slice(0,10),
-						'歸還日期': v.check_in_time.slice(0,10),
-					})
-
-				})
-				return temp
-			},
 		},
-		created: function () {
+		mounted: function () {
 			let self = this;
 
 			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'user_id': user.id, 'status': 'true'})
 			.done(function(data) {
-				self.checkout_list = data['data']
+				filter_data = []
+				_.each(data['data'], checkout_datas)
+				self.checkout_list = filter_data
 			})
 
 			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'user_id': user.id, 'status': 'false'})
 			.done(function(data) {
-				self.checkin_list = data['data']
+				filter_data = []
+				_.each(data['data'], checkin_datas)
+				self.checkin_list = filter_data
 			})
-
+		},
+		methods: {
 		},
 	})
 </script>

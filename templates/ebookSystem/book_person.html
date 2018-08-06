@@ -47,9 +47,9 @@
 		temp_data = {
 			"ISBN": v.book_info.ISBN,
 			"bookname": v.book_info.bookname,
-		"owner": v.owner,
-		"upload_date": v.upload_date,
-		"inactive_book_action": v,
+			"owner": v.owner,
+			"upload_date": v.upload_date,
+			"inactive_book_action": v,
 		}
 
 		filter_data.push(temp_data)
@@ -142,6 +142,8 @@
 			this.client = new $.RestClient('/ebookSystem/api/');
 			this.client.add('books');
 			this.client.add('bookinfos');
+		},
+		mounted: function () {
 			this.get_table_data();
 		},
 		methods: {
