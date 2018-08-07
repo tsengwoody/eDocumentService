@@ -16,7 +16,6 @@
 				<div class="modal-footer">
 					<slot name="footer">
 						<button onclick="closeDialog(this)" class="btn btn-default" data-dismiss="modal">關閉</button>
-						<button class="btn btn-primary">儲存</button>
 					</slot>
 				</div>
 			</div>

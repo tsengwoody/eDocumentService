@@ -1,13 +1,30 @@
+<style scoped>
+
+#permissionDiv {
+	padding: 0px 0px 0px 20px; 
+	background-color:#fafafa;
+}
+
+input[type=checkbox] {
+	margin:0px 3px 0px 0px; 
+	padding:0px; 
+	cursor:pointer;
+}
+
+</style>
+
 <template id="user_permission">
-	<div class="row">
-		<div>使用者名稱：{|{ username }|}</div>
-		<div v-for="(value, key) in user_permission">
-			<label><input
-				type="checkbox"
-				v-model="user_permission[key]"
-			>{|{ permission_label[key] }|}</input></label>
+	<div id="permissionDiv" class="row">
+		<h4>使用者名稱：{|{ username }|}</h4>
+		<div style="margin:20px;">
+			<div v-for="(value, key) in user_permission" style="margin-bottom: 15px;">
+				<label><input
+					type="checkbox"
+					v-model="user_permission[key]"
+				>{|{ permission_label[key] }|}</label>
+			</div>
+			<button class="btn btn-default" @click="permission_update()">變更</button>
 		</div>
-		<ddiv><button @click="permission_update()">變更</button></div>
 	</div>
 </template>
 <script>

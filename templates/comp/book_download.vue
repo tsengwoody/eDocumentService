@@ -1,19 +1,19 @@
 {% include 'comp/drf.vue' %}
+{% include 'dev/form.vue' %}
+
 <template id="book_download">
-	<div class="row">
-		<drf-model
-			keys="fileformat"
+	<div class="form-horizontal">
+		<form-drf 
 			:model_info="model_info.fileformat"
-			mode="write"
+			:field="'fileformat'"
 			v-model="fileformat"
-		></drf-model>
-		<drf-model
-			keys="password"
+		></form-drf>
+
+		<form-drf 
 			:model_info="model_info.password"
-			mode="write"
+			:field="'password'"
 			v-model="password"
-		></drf-model>
-		<button @click="object_get()">下載</button>
+		></form-drf>
 	</div>
 </template>
 <script>
@@ -54,7 +54,7 @@ function post(path, params, method) {
 				model_info: {
 					'fileformat': {
 						'label': '類型',
-						'type': 'choice',
+						'type': 'select',
 						'choices': [
 							{
 								'display_name': '電子書(epub)',
