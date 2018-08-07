@@ -1,6 +1,6 @@
 ﻿<template id="bs-form-group">
 	<div class="form-group">
-		<label class="control-label col-sm-2 col-sm-offset-2" :for="field"><font style="color:red">*</font><span>{|{ model_info.label }|}</span></label>
+		<label :class="['control-label col-sm-2', offsetClass]" :for="field"><font style="color:red">*</font><span>{|{ model_info.label }|}</span></label>
 		<div class="col-sm-3">
 			<input
 				v-if="model_info.type === 'text' || model_info.type === 'email' || model_info.type === 'password'"
@@ -62,7 +62,7 @@
 				</label>
 			</template>
 		</div>
-		<label class="control-label col-sm-4" :for="field" style="text-align:left;"><font style="color:red">{|{ model_info.remark }|}</font></label>
+		<label v-if="!iser(model_info.remark)" class="control-label col-sm-4" :for="field" style="text-align:left;"><font style="color:red">{|{ model_info.remark }|}</font></label>
 	</div>
 </template>
 
@@ -71,8 +71,17 @@
 
 	Vue.component('form-drf', {
 		template: '#bs-form-group',
-		props: ['model_info', 'field', 'value'],
+		props: {
+			model_info: Object,
+			field: String,
+			value: [String, Boolean],
+			offsetClass: {
+				type: String,
+				default: '',
+			},
+		},
 		methods: {
+
 		},
 	});
 

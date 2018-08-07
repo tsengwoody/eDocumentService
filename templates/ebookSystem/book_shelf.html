@@ -22,16 +22,16 @@
 						class="btn btn-default" role="button"
 						:href="'/ebookSystem/library_view?ISBN=' +props.item"
 						target="_blank" title="閱讀(另開新視窗)"
-					>閱讀</a>`
+					>閱讀</a>
 					<button
 						class="btn btn-default"
 						@click="$refs.db.instance_set(props.item.id); openDialog('db', this);"
-					>下載</button>`
+					>下載</button>
 					<button
 						class="btn btn-default"
 						:id="props.item"
 						onclick="aj_borrowbook(this, 'check_in')"
-					>歸還</button>`
+					>歸還</button>
 				</template>
 			</table-div>
 		</div>
