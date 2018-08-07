@@ -66,6 +66,22 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		return fullpath
 
 	@list_route(
+		methods=['post'],
+		url_name='authenticate',
+		url_path='action/authenticate',
+	)
+	def authenticate(self, request, pk=None):
+		res = {}
+
+		from django.contrib.auth import authenticate as auth
+		user = auth(username=request.POST['username'], password=request.POST['password'])
+		if user is None:
+			res['detail'] = u'失敗使用者驗證'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		else:
+			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	@list_route(
 		methods=['post', 'get'],
 		url_name='login',
 		url_path='action/login',

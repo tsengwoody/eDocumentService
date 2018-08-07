@@ -90,10 +90,18 @@ function post(path, params, method) {
 			},
 			object_get: function () {
 				let self = this
-				let url = '/ebookSystem/api/libraryrecords/' +self.pk +'/action/download/'
-				let csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-				//let csrf = $('input[name=csrfmiddlewaretoken]').val();
-				post(url, {'fileformat': this.fileformat, 'password': this.password, 'csrfmiddlewaretoken': csrf}, 'post')
+
+				let authenticate_url = '/genericUser/api/users/action/authenticate/'
+				rest_aj_send('post', authenticate_url, {'username': user.username, 'password': this.password,})
+				.done(function(data) {
+					let url = '/ebookSystem/api/libraryrecords/' +self.pk +'/action/download/'
+					let csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+					post(url, {'fileformat': self.fileformat, 'password': self.password, 'csrfmiddlewaretoken': csrf}, 'post')
+				})
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', '失敗使用者驗證')
+				})
+
 			},
 		},
 	})
