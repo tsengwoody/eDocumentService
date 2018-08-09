@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 借閱書櫃
 {% endblock %}
@@ -20,7 +20,7 @@
 				<template slot="action" slot-scope="props">
 					<a
 						class="btn btn-default" role="button"
-						:href="'/ebookSystem/library_view?ISBN=' +props.item"
+						:href="'/ebookSystem/library_view?ISBN=' +props.item.id"
 						target="_blank" title="閱讀(另開新視窗)"
 					>閱讀</a>
 					<button

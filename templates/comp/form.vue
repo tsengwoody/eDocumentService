@@ -1,114 +1,87 @@
 <template id="bs-form-group">
-	<div class="form-horizontal">
-		<template v-for="(detail, field) in model_infos">
-			<div class="form-group">
-				<label class="control-label col-sm-2" :for="field"><font style="color:red">*</font><span>{|{ detail.label }|}</span></label>
-				<div class="col-sm-4">
-					<input v-if="detail.type === 'text' || detail.type === 'email'" 
-						maxlength="30"
-						class="form-control" 
-						:type="detail.type" 
-						:id="field" 
-						v-model="infos[field]"
-					>
+	<div class="form-group">
+		<label :class="['control-label col-sm-2', offsetClass]" :for="field"><font style="color:red">*</font><span>{|{ model_info.label }|}</span></label>
+		<div class="col-sm-3">
+			<input
+				v-if="model_info.type === 'text' || model_info.type === 'email' || model_info.type === 'password'"
+				class="form-control" 
+				:type="model_info.type" 
+				:id="field"
+				:value="value"
+				@input="$emit('input', $event.target.value)"
+			>
 
-					<input v-if="detail.type === 'checkbox'" 
-						:type="detail.type" 
-						:id="field" 
-						:checked="infos[field]"
-						v-model="infos[field]"
-					>
+			<input
+				v-if="model_info.type === 'checkbox'"
+				:type="model_info.type" 
+				:id="field"
+				:value="value"
+				@change="$emit('input', $event.target.checked)"
+				:checked="value == true"
+				style="height: 30px; line-height: 30px;"
+			>
 
-					<el-date-picker v-if="detail.type === 'date'" 
-						v-model="infos[field]"
-						:id="field"
-						value-format="yyyy-MM-dd"   
-						placeholder="yyyy-MM-dd"
-						size=small
-						style="width: 100%;"
-					></el-date-picker>
+			<el-date-picker v-if="model_info.type === 'date'"
+				:id="field"
+				:value="value"
+				@input="$emit('input', $event)"
+				value-format="yyyy-MM-dd"   
+				placeholder="yyyy-MM-dd"
+				size=small
+				style="width: 100%;"
+			></el-date-picker>
 
-					<select v-if="detail.type === 'select'"
-						class="form-control"
-						:id="field"
-						v-model="infos[field]"
-					>
-						<template v-for="(name, val) in detail.choices">
-							<option :value="val">{|{ name }|}</option>
-						</template>
-					</select>
+			<select v-if="model_info.type === 'select'"
+				class="form-control"
+				:id="field"
+				:value="value"
+				@input="$emit('input', $event.target.value)"
+			>
+				<option
+					v-for="el in model_info.choices"
+					:value="el.value"
+				>
+					{|{ el.display_name }|}
+				</option>
+			</select>
 
-					<template
-						v-if="detail.type === 'radio'" 
-						v-for="(name, val) in detail.choices"
-					>
-						<label class="radio-inline">
-						<input 
-							type="radio" 
-							:id="field"
-							:value="val"
-							v-model="infos[field]" 
-						> 
-						{|{ name }|}
-						</label>
-					</template>
-				</div>
-				<label class="control-label col-sm-4" :for="field" style="text-align:left;"><font style="color:red">{|{ detail.remark }|}</font></label>
-			</div>
-		</template>
+			<template
+				v-if="model_info.type === 'radio'" 
+				v-for="el in model_info.choices"
+			>
+				
+				<label class="radio-inline">
+				<input 
+					type="radio" 
+					:id="el.value"
+					:value="el.value"
+					@input="$emit('input', $event.target.value)"
+					:checked="el.value == value"
+				> 
+					{|{ el.display_name }|}
+				</label>
+			</template>
+		</div>
+		<label v-if="!iser(model_info.remark)" class="control-label col-sm-4" :for="field" style="text-align:left;"><font style="color:red">{|{ model_info.remark }|}</font></label>
 	</div>
 </template>
 
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
-	Vue.component('form-component', {
+	Vue.component('form-drf', {
 		template: '#bs-form-group',
-		props: ['model_infos', 'url', 'bus'],
-		data: function(){
-			return {
-				infos: {},
-				orig_infos: {},
-			}
+		props: {
+			model_info: Object,
+			field: String,
+			value: [String, Boolean],
+			offsetClass: {
+				type: String,
+				default: '',
+			},
 		},
 		methods: {
-			refresh_info: function() {
-				this.infos = _.cloneDeep(this.orig_infos);
-			},
-			update_info: function() {
-				let vo = this;
-				rest_aj_send('patch', this.url, this.infos)
-				.done(function(data, textStatus, xhr) {
-					alertmessage('success', data['message'] +'更新已完成')
-						.done(function () {
-							location.reload(); //重新載入網頁以更新資訊
-						});
-				})
-				.fail(function(data){
-					alertmessage('error', data['message'])
-					.done(function() {
-						vo.refresh_info();
-					})
-				})
-			},
-		},
-		created() {
-			let vo = this;
-			rest_aj_send('get', this.url, {})
-			.done(function(data) {
-				_.each(data.data, function(v, k){
-					if(iser(v)) {
-						// deal with undefined value
-						data.data[k] = '';
-					}
-				});
-				vo.infos = data.data;
-				vo.orig_infos = _.cloneDeep(data.data); // back up
-			})
-		},
-		mounted () {
-			this.bus.$on('refresh', this.refresh_info);
-			this.bus.$on('update', this.update_info);
+
 		},
 	});
 
