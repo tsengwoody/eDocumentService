@@ -1,5 +1,4 @@
-{% include 'comp/drf.vue' %}
-{% include 'dev/form.vue' %}
+{% include 'comp/form.vue' %}
 
 <template id="book_download">
 	<div class="form-horizontal">

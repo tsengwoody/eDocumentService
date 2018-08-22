@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 書籍詳細
 {% endblock %}
@@ -75,7 +75,7 @@
 		</template>   
 		<template slot="body">
 			<assign-component 
-				isbn_part="0"
+				:isbn_part="isbn_part" 
 				ref="bs">
 			</assign-component>
 		</template>

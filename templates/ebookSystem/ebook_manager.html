@@ -5,14 +5,11 @@
 
 {% block content %}
 
-<!-- demo root element -->
-
 {% csrf_token %}
-{% include 'comp/table_vue_component.html' %}
-
-<h3>分段管理</h3>
+{% include 'comp/table-div.vue' %}
 
 <div class="tab-content" style="padding:20px 0px;">
+<h2>分段管理</h2>
 	<div id="ebook_manager_search">
 		<h4 class="textfornvda">查詢</h4>
 

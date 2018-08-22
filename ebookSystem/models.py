@@ -107,39 +107,6 @@ class Book(models.Model):
 			self.save()
 			return True
 
-	def get_org_image(self, user):
-		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book_info.ISBN, "org")
-		source_path = self.path +u'/source'
-		fileList=os.listdir(source_path)
-		fileList = sorted(fileList)
-		scan_page_list = [scan_page for scan_page in fileList if scan_page.split('.')[-1].lower() == 'jpg']
-		scan_page_lists = []
-		for i in range(self.part_count-1):
-			scan_page_lists.append(
-				scan_page_list[i*self.page_per_part:(i+1)*self.page_per_part]
-			)
-		scan_page_lists.append(
-				scan_page_list[(self.part_count-1)*self.page_per_part:]
-		)
-		if not os.path.exists(org_path +'/' +scan_page_list[0]):
-			self.create_org_image()
-		default_page_url_list = [ u'{0}/{1}'.format(org_path, scan_page_list[i*self.page_per_part]).replace(BASE_DIR +'/static/', '') for i in range(self.part_count)]
-		return [scan_page_lists, default_page_url_list]
-
-	def create_org_image(self):
-		org_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}'.format(self.book_info.ISBN, "org")
-		source_path = self.path +u'/source'
-		fileList=os.listdir(source_path)
-		fileList = sorted(fileList)
-		scanPageList=[scanPage for scanPage in fileList if scanPage.split('.')[-1].lower() == 'jpg']
-		if os.path.exists(org_path +'/' +scanPageList[0]):
-			return False
-		if not os.path.exists(org_path):
-			os.makedirs(org_path, 0770)
-		for s in scanPageList:
-			shutil.copyfile(source_path +'/' +s, org_path +'/' +s)
-		return True
-
 	def set_page_count(self):
 		source = self.path + u'/source'
 		sourceFileList=os.listdir(source)

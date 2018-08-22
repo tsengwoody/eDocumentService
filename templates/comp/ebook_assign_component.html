@@ -1,4 +1,4 @@
-﻿<script type="text/x-template" id="assign-template">
+<script type="text/x-template" id="assign-template">
 	<div class="form-horizontal">
 		<div class="form-group">
 			<label class="control-label col-sm-4">搜尋</label>
@@ -45,13 +45,12 @@
 
 	Vue.component('assign-component', {
 		template: '#assign-template',
-		props: ['isbn_part', 'bus'],
+		props: ['isbn_part'],
 		data: function(){
 			return {
 				// assign data
 				assign_user: '',
 				deadline: '',	
-
 				users: [],		 // present users
 				orig_users: [],  // save api source users
 				filter_word: '',
@@ -63,6 +62,9 @@
 			},
 		},
 		methods: {
+			instance_set: function(pk){
+				this.isbn_part = pk
+			},
 			save_assign: function(){
 				self = this;
 				// post to assign
@@ -113,7 +115,7 @@
 			vo.deadline = d.getFullYear()+'-'+(d.getMonth() + 1)+'-'+(d.getDate()+3); 
 		},
 		mounted () {
-			this.bus.$on('submit', this.save_assign)
+			//this.bus.$on('submit', this.save_assign)
 		}
 	})
 

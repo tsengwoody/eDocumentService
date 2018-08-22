@@ -152,7 +152,7 @@ div.tbody .cell {
 			},
 		},
 		watch: {
-			data: function (val) {
+			datas: function (val) {
 				this.pagenow = 1
 			},
 		},

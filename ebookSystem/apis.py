@@ -35,6 +35,26 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			pass
 		return fullpath
 
+	@detail_route(
+		methods=['post'],
+		url_name='review',
+		url_path='action/review',
+	)
+	def review(self, request, pk=None):
+		res = {}
+
+		obj = self.get_object()
+
+		if request.POST['result'] == 'success':
+			for part in obj.ebook_set.all():
+				part.change_status(1, 'active', category='based')
+			BookOrder.refresh()
+			res['message'] = u'審核通過文件'
+		elif request.POST['review'] == 'error':
+			book.delete()
+			res['message'] = u'審核退回文件'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
 	@list_route(
 		methods=['post'],
 		url_name='upload_self',

@@ -215,7 +215,7 @@
 				self.model_info.address.label = '地址'
 				self.model_info.category.label = '類別'
 				self.model_info.identification_date.label = '鑑定日期'
-				self.model_info.renew_date.label = '有效日期'
+				self.model_info.renew_date.label = '重新鑑定日期'
 				self.model_info.level.label = '程度'
 
 			})
@@ -226,8 +226,12 @@
 
 				if(iser(this.pk)){
 					this.mode = 'create'
-					this.disabilitycard = {}
-					this.disabilitycard_temp = _.clone(this.disabilitycard)
+					_.each(this.disabilitycard, function(v, k){
+						this.disabilitycard[k] = ''
+					})
+					_.each(this.disabilitycard_temp, function(v, k){
+						this.disabilitycard_temp[k] = ''
+					})
 				}
 				else {
 					this.refresh()
@@ -240,9 +244,8 @@
 					.done(function(data) {
 						_.each(self.disabilitycard, function(v,k){
 							self.disabilitycard[k] = data[k]
-							//self.disabilitycard_temp[k] = data[k]
+							self.disabilitycard_temp[k] = data[k]
 						})
-						self.disabilitycard_temp = _.clone(self.disabilitycard)
 					})
 					.fail(function(xhr, result, statusText){
 						self.mode = 'create'
@@ -252,8 +255,7 @@
 			active: function (status) {
 				let self = this
 				self.disabilitycard.is_active = self.disabilitycard_temp.is_active = status
-				//rest_aj_send('put', self.url, self.disabilitycard)
-				self.client.disabilitycards.update(self.pk, self.disabilitycard)
+				self.client.disabilitycards.updatepart(self.pk, {'is_active' :status})
 				.done(function(data) {
 					if(status){ alertmessage('success', '成功啟用手冊') }
 					else if(!status){ alertmessage('success', '成功停用手冊') }
@@ -266,6 +268,7 @@
 			create: function () {
 				let self = this
 
+				self.disabilitycard_temp.is_active = 'false'
 				self.client.disabilitycards.create(self.disabilitycard_temp)
 				.done(function(data) {
 					alertmessage('success', '成功新建手冊')

@@ -4,11 +4,24 @@
 {% endblock %}
 {% block content %}
 {% csrf_token %}
-{% include 'comp/table_vue_component.html' %}
+{% include 'comp/table-div.vue' %}
 <h3>上傳文件審核</h3>
 <div class="tab-content" style="padding:20px 0px;">
 	<div id="book_unreview_list">
-		<table-component :data="data[0]"></table-component>
+		<table-div :header="book_header" :datas="book_datas">
+			<template slot="action" slot-scope="props">
+				<a
+					role="button" class="btn btn-default"
+					:href="'/ebookSystem/review_document/' +props.item.ISBN +'/'"
+					target="blank" title="(另開新視窗)"
+				>審核</a>
+				<a
+					role="button" class="btn btn-default"
+					:href="'/ebookSystem/generics/book_detail/' +props.item.ISBN +'/'"
+					target="blank" title="(另開新視窗)"
+				>分段資訊</a>
+			</template>
+		</table-div>
 	</div>
 </div>
 
@@ -17,38 +30,43 @@
 	new Vue({
 		el: '#book_unreview_list',
 		data: {
-			data: [],
+			book_header: {
+				'ISBN': 'ISBN',
+				'bookname': '書名',
+				'page': '頁數/總頁數',
+				'finish_part_count': '已完成段數',
+				'service_hours': '時數',
+				'action': '動作',
+			},
+			book_datas: [],
 		},
 		created: function () {
+			this.client = new $.RestClient('/ebookSystem/api/');
+			this.client.add('books');
+			this.client.add('bookadds');
+
 			let self = this
-
-			rest_aj_send('get', '/ebookSystem/api/books/', {'status': '0',})
-				.done(function(data) {
-
-					filter_data = []
-					_.each(data['data'], function(v){
-
-						let action = ''
-						action += `<a role="button" class="btn btn-default" target="_blank" title="審核(另開新視窗)" href="/ebookSystem/review_document/` +v.ISBN +`/">審核</a>`
-						filter_data.push({
-							'書名': v.book_info.bookname,
-							'上傳日期': v.upload_date,
-							'動作': action,
-						})
+			self.client.books.read({'status': '0',})
+			.done(function(data) {
+				filter_data = []
+				_.each(data, function(v){
+					filter_data.push({
+						'ISBN': v.ISBN,
+						'bookname': v.book_info.bookname,
+						'page': v.finish_page_count +'/' +v.page_count,
+						'finish_part_count': v.finish_part_count,
+						'service_hours': v.service_hours,
+						'action': v,
 					})
-					self.data.push(
-						filter_data,
-					)
-					//alertmessage('success', '查詢完成，共取得 ' +self.data[0].length +' 筆資料')
 				})
-				.fail(function(data){
-					alertmessage('error', data['message'])
-				})
+				self.book_datas = filter_data,
+				alertmessage('success', '查詢完成，共取得 ' +self.book_datas.length +' 筆資料')
+			})
+			.fail(function(xhr, result, statusText){
+				alertmessage('error', xhr.responseText)
+			})
 
 		},
-		methods: {
-		}
-
 	})
 
 </script>
