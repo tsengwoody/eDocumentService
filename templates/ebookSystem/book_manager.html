@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 書籍管理
 {% endblock %}
@@ -10,8 +10,6 @@
 <div class="tab-content" style="padding:20px 0px;">
 	<h2>書籍管理</h2>
 	<div id="book_manager_search">
-		<h4 class="textfornvda">查詢</h4>
-
 		<div class="form-inline" style="margin-bottom:20px;">
 			<div class="form-group">
 				<select
@@ -102,7 +100,7 @@
 					alertmessage('error', xhr.responseText)
 				})
 			},
-		}
+		},
 	})
 
 </script>

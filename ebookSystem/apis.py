@@ -422,6 +422,13 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 	ordering_fields = ('date',)
 	search_fields = ('ISBN', 'bookname', 'author', )
 
+class BookOrderViewSet(viewsets.ModelViewSet):
+	queryset = BookOrder.objects.all()
+	serializer_class = BookOrderSerializer
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, )
+	search_fields = ('order',)
+	permission_classes = (permissions.IsAuthenticated,)
+
 class EditRecordViewSet(viewsets.ModelViewSet):
 	queryset = EditRecord.objects.all().order_by('-get_date')
 	serializer_class = EditRecordSerializer

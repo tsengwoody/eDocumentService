@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 書籍詳細
 {% endblock %}
@@ -187,16 +187,19 @@
 				let self = this
 
 				url = '/ebookSystem/api/ebooks/' +ISBN_part +'/action/onactive/';
-				rest_aj_send('post', url, {})
-				.done(function(data) {
-					alertmessage('success', data['message'])
-					rest_aj_send('get', self.url, {})
+				alertconfirm('是否確定再校對?')
+				.done(function(){
+					rest_aj_send('post', url, {})
 					.done(function(data) {
-						self.book = data['data']
+						alertmessage('success', data['message'])
+						rest_aj_send('get', self.url, {})
+						.done(function(data) {
+							self.book = data['data']
+						})
 					})
-				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+					.fail(function(xhr, result, statusText){
+						alertmessage('error', xhr.responseText)
+					})
 				})
 			},
 		},

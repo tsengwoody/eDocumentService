@@ -263,7 +263,6 @@
 				.fail(function(xhr, result, statusText){
 					alertmessage('error', xhr.responseText)
 				})
-
 			},
 			create: function () {
 				let self = this
@@ -274,6 +273,7 @@
 					alertmessage('success', '成功新建手冊')
 					self.pk = data.identity_card_number
 					self.refresh()
+					self.bus.$emit('instance-refresh', 'refresh')
 				})
 				.fail(function(xhr, result, statusText){
 					alertmessage('error', xhr.responseText)

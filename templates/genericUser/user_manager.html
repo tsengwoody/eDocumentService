@@ -21,7 +21,7 @@
 				<option value="guest">視障者</option>
 			</select>
 			<input v-model="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊">
-			<button class="btn btn-primary" @click="user_search();">搜尋</button>
+			<button class="btn btn-primary" @click="user_refresh('search');">搜尋</button>
 		</div>
 	<table-div
 		:header="user_header"
@@ -137,17 +137,17 @@
 			temp_dcpk: '',
 		},
 		created: function () {
+			//this.dm_bus.$on('instance-refresh', this.user_refresh)
 			this.client = new $.RestClient('/genericUser/api/');
 			this.client.add('users');
 		},
 		methods: {
-			user_search: function () {
+			user_refresh: function (reason) {
 				let self = this;
 
 				query = {}
 				self.client.users.read({'search': self.search_value, 'role': self.search_role})
 				.done(function(data){
-
 					filter_data = []
 					_.each(data,function(v){
 						temp_data = {
@@ -157,11 +157,10 @@
 							"phone": v.phone,
 							"action": v,
 						}
-
 						filter_data.push(temp_data)
 					})
 					self.datas = filter_data
-					alertmessage('success', '查詢完成，共取得 ' +self.datas.length +' 筆資料');
+					if(reason==='search'){ alertmessage('success', '查詢完成，共取得 ' +self.datas.length +' 筆資料'); }
 				})
 			},
 		},

@@ -66,6 +66,13 @@ class BookSerializer(serializers.ModelSerializer):
 class BookAddSerializer(BookSerializer):
 	ebook_set = EBookSerializer(many=True, read_only=True)
 
+class BookOrderSerializer(serializers.ModelSerializer):
+	bookname = serializers.ReadOnlyField(source='book.book_info.bookname')
+	status = serializers.ReadOnlyField(source='book.status')
+	class Meta:
+		model = BookOrder
+		fields = ('__all__')
+
 class BookRecommendSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = BookRecommend
