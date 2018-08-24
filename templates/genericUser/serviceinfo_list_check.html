@@ -17,6 +17,7 @@
 		<button class="btn btn-default" @click="serviceinfo_select_all()">全選</button>
 		<button class="btn btn-default" @click="serviceinfo_checks=[]">全不選</button>
 		<button class="btn btn-default" @click="serviceinfo_select_inv()">反向選</button>
+		<button class="btn btn-default" onclick="window.location.replace('/genericUser/api/serviceinfos/action/exchange_false_export/')">匯出</button>
 		<table-div :datas="serviceinfo_datas" :header="serviceinfo_header">
 			<template slot="check" slot-scope="props">
 				<input type="checkbox" v-model="serviceinfo_checks" :value="props.item.id">
@@ -30,7 +31,7 @@
 	<hr style="margin-top:5px;">
 	<div style="margin-bottom:60px;">
 		<button
-			@click="'1'"
+			@click="serviceinfo_exchange()"
 			class="btn btn-primary" style="margin-top:10px;"
 		>同意兌換</button>
 	</div>
@@ -96,6 +97,37 @@
 				})
 				.fail(function(xhr, result, statusText){
 					alertmessage('error', xhr.responseText)
+				})
+			},
+			serviceinfo_exchange: function(){
+				let self = this
+
+				if(iser(self.serviceinfo_checks)){
+					alertmessage('error', '請至少選擇一筆兌換紀錄。')
+					return -1
+				}
+
+				//PATCH
+				let dfs = [];
+				_.each(self.serviceinfo_checks, function (v) {
+
+					//updatepart
+					let df = self.client.serviceinfos.updatepart(v, { 'is_exchange': true });
+
+					//push
+					dfs.push(df);
+				})
+
+				//Promise.all
+				Promise.all(dfs)
+				.then(function () {
+					alertmessage('success', '同意兌換成功')
+					.done(function () {
+						self.get_serviceinfo_data()
+					})
+				})
+				.catch(function (msg) {
+					alertmessage('error', '非預期同意兌換失敗: ' + msg);
 				})
 			},
 			serviceinfo_select_all: function(){

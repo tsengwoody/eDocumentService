@@ -1,0 +1,44 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+獲取書籍資訊
+{% endblock %}
+{% block content %}
+{% csrf_token %}
+<div id="isbn2bookinfo">
+{|{ bookinfo }|}
+</div>
+
+<script>
+
+	Vue.options.delimiters = ['{|{', '}|}'];
+	vo_book_detail = new Vue({
+		el: '#isbn2bookinfo',
+		data: {
+			bookinfo: {},
+		},
+		created: function () {
+			this.client = new $.RestClient('/ebookSystem/api/');
+			this.client.add('bookinfos');
+		},
+		mounted: function () {
+			this.get_bookinfo_datas();
+		},
+		methods: {
+			get_bookinfo_datas: function () {
+				let self = this;
+				rest_aj_send('post', '/ebookSystem/api/bookinfos/action/isbn2bookinfo/', {'ISBN': '9789863600800', 'source': 'NCL',})
+				.done(function(data) {
+					self.bookinfo = data.data
+				})
+				.fail(function(xhr, result, statusText){
+					console.log(xhr)
+					alertmessage('error', xhr)
+				})
+
+			},
+
+		},
+	})
+
+</script>
+{% endblock %}

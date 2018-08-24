@@ -20,7 +20,6 @@ import copy
 api_urlpatterns = copy.copy(router.urls)
 
 urlpatterns = [
-	url(r'^mathml', views.mathml, name='mathml'),
 	url(r'^book_info/(?P<ISBN>[0-9Xx]+)/$', views.book_info, name='book_info'),
 	url(r'^get_book_info_list/$', views.get_book_info_list, name='get_book_info_list'),
 	url(r'^edit/(?P<ISBN_part>[0-9\-]+)/$', views.edit, name='edit'),

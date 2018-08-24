@@ -422,6 +422,87 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 	ordering_fields = ('date',)
 	search_fields = ('ISBN', 'bookname', 'author', )
 
+	@list_route(
+		methods=['post'],
+		url_name='isbn2bookinfo',
+		url_path='action/isbn2bookinfo',
+	)
+	def isbn2bookinfo(self, request, pk=None):
+		from utils.crawler import *
+		res = {}
+
+		ISBN = request.POST['ISBN']
+		if len(ISBN) == 10 and not ISBN10_check(ISBN):
+			res['detail'] = u'ISBN10碼錯誤'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		if len(ISBN) == 13 and not ISBN13_check(ISBN):
+			res['detail'] = u'ISBN13碼錯誤'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		if len(ISBN) == 10:
+			ISBN = ISBN10_to_ISBN13(ISBN)
+
+		if request.POST['source'] == 'NCL':
+			#=====NCL=====
+			try:
+				[res['ISBN'], res['bookname'], res['author'], res['house'], res['date'], res['bookbinding'], res['chinese_book_category'], res['order']] = get_ncl_bookinfo(ISBN)
+				res['source'] = 'NCL'
+			except BaseException as e:
+				res['detail'] = u'NCL 無資料'
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+		elif request.POST['source'] == 'douban':
+			#=====douban=====
+			try:
+				[res['ISBN'], res['bookname'], res['author'], res['house'], res['date'], res['bookbinding']] = get_douban_bookinfo(ISBN)
+				res['chinese_book_category'], res['order'] = ('', '')
+				res['source'] = 'douban'
+			except BaseException as e:
+				res['detail'] = u'douban 無資料'
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+		res['message'] = u'成功取得資料'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	@list_route(
+		methods=['post'],
+		url_name='key2bookinfo',
+		url_path='action/key2bookinfo',
+	)
+	def key2bookinfo(self, request, pk=None):
+		from utils.crawler import *
+		res = {}
+
+		if request.POST['source'] == 'NCL':
+			p_logic = re.compile(r'FO_SchRe1ation(?P<count>\d+)')
+			p_field = re.compile(r'FO_SearchField(?P<count>\d+)')
+			p_value = re.compile(r'FO_SearchValue(?P<count>\d+)')
+
+			query_dict = {}
+			for k,v in request.POST.iteritems():
+				search_logic = p_logic.search(k)
+				search_field = p_field.search(k)
+				search_value = p_value.search(k)
+				if search_logic or search_field or search_value:
+					query_dict[k] = v
+
+			try:
+				res['bookinfo_list'] = get_ncl_bookinfo_list(query_dict)
+				res['source'] = 'NCL'
+			except BaseException as e:
+				res['detail'] = u'查詢書籍錯誤。{0}'.format(unicode(e))
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+		elif request.POST['source'] == 'douban':
+			try:
+				res['bookinfo_list'] = get_douban_bookinfo_list(request.POST['search_query'])
+				res['source'] = 'douban'
+			except BaseException as e:
+				res['detail'] = u'查詢書籍錯誤。{0}'.format(unicode(e))
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+		res['message'] = u'成功取得資料'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
 class BookOrderViewSet(viewsets.ModelViewSet):
 	queryset = BookOrder.objects.all()
 	serializer_class = BookOrderSerializer
