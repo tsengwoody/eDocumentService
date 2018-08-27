@@ -323,6 +323,7 @@ class QAndA(models.Model):
 		(u'platform' , u'平台'),
 		(u'volunteer', u'志工'),
 		(u'vip', u'視障者'),
+		(u'tutorial', u'教學'),
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
 
