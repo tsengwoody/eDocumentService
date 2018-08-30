@@ -1,128 +1,5 @@
 'use strict';
 
-
-// let comploader={}; //全域組件載入紀錄
-
-
-// function inicomp(name){
-//	 //初始化組件
-//	 let df = GenDF();
-
-//	 //infor
-//	 let o=inicomp_getinfor(name);
-
-//	 //pre
-//	 let dfs=[];
-//	 if(o['pre'].length>0){
-//		 for(let c of o['pre']){
-//			 let s=inicomp(c);
-//			 dfs.push(s);
-//		 }
-//	 }
-
-//	 //each
-//	 Promise.all(dfs)
-//	 .then(function(){
-
-//		 //core
-//		 return inicomp_load(name);
-
-//	 })
-//	 .then(function(){
-//		 df.resolve();
-//	 })
-
-//	 return df;
-// }
-
-
-// function inicomp_load(name){
-//	 //載入組件
-//	 let df = GenDF();
-
-//	 if(haskey(comploader,name)){
-//		 df.resolve();
-//	 }
-//	 else{
-//		 let o=inicomp_getinfor(name);
-//		 let timetag='?'+Date.now();
-
-//		 if(o['type']==='js'){
-//			 $.getScript(o['url']+timetag)
-//			 .done(function(){
-//				 console.log('load: '+name+'['+o['type']+']')
-
-//				 //true
-//				 comploader[name]=true;
-
-//				 df.resolve();
-//			 })
-//		 }
-//		 else if(o['type']==='html'){
-//			 $.get(o['url']+timetag)
-//			 .done(function(h){
-//				 console.log('load: '+name+'['+o['type']+']')
-
-//				 //append
-//				 $('body').append(h);
-
-//				 //true
-//				 comploader[name]=true;
-
-//				 df.resolve();
-//			 })
-//		 }
-
-//	 }
-
-//	 return df;
-// }
-
-
-// function inicomp_getinfor(name){
-//	 //取得組件資訊
-
-//	 let o;
-//	 if(name==='tinymce'){
-//		 o={
-//			 'url':'https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.6.6/tinymce.min.js',
-//			 'type':'js',
-//			 'pre':[]
-//		 }
-//	 }
-//	 else if(name==='wiriseditor'){
-//		 o={
-//			 'url':'/static/ebookSystem/js/wiriseditor/wiriseditor.js',
-//			 'type':'js',
-//			 'pre':[]
-//		 }
-//	 }
-//	 else if(name==='mathjax'){
-//		 o={
-//			 'url':'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG', //總套件62.9mb太大，直接用cdn
-//			 'type':'js',
-//			 'pre':[]
-//		 }
-//	 }
-//	 else if(name==='mxeditor'){
-//		 o={
-//			 'url':'/static/ebookSystem/comp/mxeditor.html',
-//			 'type':'html',
-//			 'pre':['tinymce','wiriseditor','mathjax']
-//		 }
-//	 }
-//	 else if(name==='mxdownloadbook'){
-//		 o={
-//			 'url':'/static/ebookSystem/comp/mxdownloadbook.html',
-//			 'type':'html',
-//			 'pre':[]
-//		 }
-//	 }
-
-//	 return o;
-// }
-
-
 function urlparam() {
 	//解析網址參數
 
@@ -143,7 +20,6 @@ function urlparam() {
 	return ar;
 }
 
-
 function sep(c, t) {
 	//將字串c使用t分割，並回傳非空字串結果s
 
@@ -161,7 +37,6 @@ function sep(c, t) {
 	return s;
 }
 
-
 function cint(v) {
 	//轉整數
 
@@ -171,7 +46,6 @@ function cint(v) {
 
 	return 0;
 }
-
 
 function cdbl(v) {
 	//轉浮點數
@@ -183,7 +57,6 @@ function cdbl(v) {
 	return 0;
 }
 
-
 function cstr(v) {
 	//轉字串
 
@@ -193,13 +66,11 @@ function cstr(v) {
 	return String(v);
 }
 
-
 function cstrtrim(v) {
 	//轉字串並刪除前後空白
 
 	return String(v).trim();
 }
-
 
 function isundefined(v) {
 	//判斷是否為undefined
@@ -208,14 +79,12 @@ function isundefined(v) {
 	return c === '[object Undefined]';
 }
 
-
 function isnull(v) {
 	//判斷是否為null
 
 	let c = Object.prototype.toString.call(v);
 	return c === '[object Null]';
 }
-
 
 function isempty(v) {
 	//判斷是否為空物件
@@ -229,7 +98,6 @@ function isempty(v) {
 	return false;
 }
 
-
 function iszerolength(v) {
 	//判斷是否為無內容陣列
 
@@ -242,7 +110,6 @@ function iszerolength(v) {
 	return false;
 }
 
-
 function isnothing(v) {
 	//判斷是否為空字串
 
@@ -251,7 +118,6 @@ function isnothing(v) {
 	}
 	return false;
 }
-
 
 function iser(v) {
 	//判斷是否為泛用無效
@@ -274,7 +140,6 @@ function iser(v) {
 	return false;
 }
 
-
 function isarrer(ar) {
 	//陣列元素是否皆為iser
 
@@ -282,7 +147,6 @@ function isarrer(ar) {
 		return iser(v);
 	})
 }
-
 
 function isobjvalueer(obj) {
 	//字典物件內值是否皆為iser
@@ -292,14 +156,11 @@ function isobjvalueer(obj) {
 	})
 }
 
-
-
 function iselmexist(id) {
 	//判斷元素是否存在
 
 	return !(document.getElementById(id) === null);
 }
-
 
 function iscontainaz09(c) {
 	//判斷字串是否包含英文與數字
@@ -308,14 +169,12 @@ function iscontainaz09(c) {
 	return reg.test(c);
 }
 
-
 function isarr(v) {
 	//判斷是否為陣列
 
 	let c = Object.prototype.toString.call(v);
 	return c === '[object Array]';
 }
-
 
 function isfun(v) {
 	//判斷是否為函數
@@ -324,13 +183,11 @@ function isfun(v) {
 	return c === '[object Function]';
 }
 
-
 function isnum(v) {
 	//判斷是否為數字
 
 	return $.isNumeric(v);
 }
-
 
 function isstr(v) {
 	//判斷是否為字串
@@ -339,14 +196,12 @@ function isstr(v) {
 	return c === '[object String]';
 }
 
-
 function isobj(v) {
 	//判斷是否為物件
 
 	let c = Object.prototype.toString.call(v);
 	return c === '[object Object]';
 }
-
 
 function binstr(s, ins) {
 	//判斷字串s是否「包含、出現」任一字串陣列ins內元素
@@ -375,7 +230,6 @@ function binstr(s, ins) {
 
 	return false;
 }
-
 
 function arrhas(ltar, ltcontain) {
 	//判斷任一字串陣列ltar內元素，是否「等於」任一字串陣列ltcontain內元素
@@ -413,7 +267,6 @@ function arrhas(ltar, ltcontain) {
 	return false;
 }
 
-
 function haskey(obj, key) {
 	//判斷物件是否有key屬性
 
@@ -423,11 +276,9 @@ function haskey(obj, key) {
 	return (key in obj);
 }
 
-
 function prt(o) {
 	console.log(o2j(o));
 }
-
 
 function o2j(v) {
 	//物件轉json文字
@@ -443,7 +294,6 @@ function o2j(v) {
 	return c;
 }
 
-
 function j2o(v) {
 	//json文字轉物件
 
@@ -457,7 +307,6 @@ function j2o(v) {
 	return c;
 }
 
-
 function utoa(str) {
 	//任意字串轉base64字串
 
@@ -467,7 +316,6 @@ function utoa(str) {
 	return r;
 }
 
-
 function atou(str) {
 	//base64字串轉任意字串
 
@@ -476,7 +324,6 @@ function atou(str) {
 
 	return r;
 }
-
 
 function o2b(obj) {
 	//物件轉base64字串
@@ -491,7 +338,6 @@ function o2b(obj) {
 	return r;
 }
 
-
 function b2o(str) {
 	//base64字串轉物件
 
@@ -504,7 +350,6 @@ function b2o(str) {
 
 	return r;
 }
-
 
 function blob2str(bdata) {
 	//blob轉字串
@@ -532,7 +377,6 @@ function blob2str(bdata) {
 	return df;
 }
 
-
 function replace(c, t, r) {
 	//取代字串
 
@@ -542,46 +386,38 @@ function replace(c, t, r) {
 	return rr;
 }
 
-
 function strleft(c, n) {
 	//取字串左邊n個字元
 	return c.substr(0, n);
 }
-
 
 function strright(c, n) {
 	//取字串右邊n個字元
 	return c.substr(c.length - n, n);
 }
 
-
 function strmid(c, s, n) {
 	//取字串中位置s開始後n個字元
 	return c.substring((s - 1), (s + n - 1));
 }
-
 
 function strdelleft(c, n) {
 	//刪除字串左邊n個字元
 	return strright(c, c.length - n);
 }
 
-
 function strdelright(c, n) {
 	//刪除字串右邊n個字元
 	return strleft(c, c.length - n);
 }
 
-
 function GenID() {
 	return Math.uuid(32);
 }
 
-
 function GenDF() {
 	return $.Deferred();;
 }
-
 
 function alertDialog(json) {
 	//原ajaxSubmit.js的alertDialog, 強制轉用alertmessage
@@ -605,7 +441,6 @@ function alertDialog(json) {
 
 }
 
-
 function keyspace2enter(event, me) {
 	//空白space鍵轉click, 因瀏覽器中nvda使用space點擊無法觸發完整click事件
 
@@ -613,7 +448,6 @@ function keyspace2enter(event, me) {
 		$(me).click();
 	}
 }
-
 
 function arr2dict(v) {
 	//陣列轉字典物件
@@ -630,7 +464,6 @@ function arr2dict(v) {
 	})
 	return r;
 }
-
 
 function arrarymerge(ar1, ar2, key) {
 	//合併物件陣列
@@ -664,7 +497,6 @@ function arrarymerge(ar1, ar2, key) {
 	return ar;
 }
 
-
 function dtarrsortkeys(dtarr, keys) {
 	//重排取物件陣列keys
 
@@ -679,20 +511,17 @@ function dtarrsortkeys(dtarr, keys) {
 	return r;
 }
 
-
 function base642bin(c) {
 	//base64字串轉binary
 
 	return base64js.toByteArray(c);
 }
 
-
 function bin2base64(b) {
 	//binary轉base64字串
 
 	return base64js.fromByteArray(b);
 }
-
 
 function bs2barr(bs) {
 	//Binary String Array轉Binary Uint8 Array，應用於input file使用readAsBinaryString讀檔之資料
@@ -704,7 +533,6 @@ function bs2barr(bs) {
 	}
 	return arr;
 }
-
 
 function downloadfile(cfn, bindata) {
 	//下載binary資料成為檔案, 使用標籤a與blob物件直接將bindata下載成為檔案
@@ -723,7 +551,6 @@ function downloadfile(cfn, bindata) {
 
 }
 
-
 function downloadtext(cfn, ccont) {
 	//下載text資料成為utf-8檔案
 
@@ -740,7 +567,6 @@ function downloadtext(cfn, ccont) {
 	document.body.removeChild(a);
 
 }
-
 
 function readfile(me) {
 	//讀取檔案
@@ -773,7 +599,6 @@ function readfile(me) {
 
 	return df;
 }
-
 
 function trapfocus() {
 	//trap focus
@@ -808,6 +633,7 @@ function trapfocus() {
 
 	});
 }
+
 function untrapfocus() {
 	//un-trap focus
 
@@ -815,6 +641,7 @@ function untrapfocus() {
 	let namespace = element.attr('id');
 	element.off('keydown.' + namespace);
 }
+
 (function ($) {
 	//註冊trapfocus,untrapfocus
 	$.fn.extend({
@@ -822,7 +649,6 @@ function untrapfocus() {
 		untrapfocus: untrapfocus
 	});
 })(jQuery);
-
 
 let modalinfors = [];
 function lm_add(o) {
@@ -854,7 +680,6 @@ function lm_add(o) {
 	}, 750)
 
 }
-
 
 function lm_minu() {
 
@@ -904,7 +729,6 @@ function lm_minu() {
 
 }
 
-
 function dict2grid(ar, tabid) {
 	//字典陣列轉出基本table
 
@@ -934,7 +758,6 @@ function dict2grid(ar, tabid) {
 
 	return c;
 }
-
 
 function grid2bstable(tabid) {
 	//基本table賦予class與sytle
@@ -1000,7 +823,6 @@ function grid2bstable(tabid) {
 
 }
 
-
 function pagetab(data) {
 	//產生分頁頁籤
 
@@ -1032,7 +854,6 @@ function pagetab(data) {
 	return c;
 }
 
-
 function pagetab_subtabfix(me) {
 	//修正多層分頁會於上層切換分頁時，導致次分頁aria-expanded都被改為ture，使nvda無法順利讀取
 
@@ -1052,128 +873,6 @@ function pagetab_subtabfix(me) {
 	}, 300)
 
 }
-
-
-function pagin(tabid) {
-	//添加表格分頁功能
-
-	//tab
-	let tab = $('#' + tabid);
-
-	//trs
-	let trs = tab.find('tbody').find('tr');
-
-	//numrow
-	let numrow = trs.length;
-
-	//numperpage
-	let numperpage = 10;
-
-	//check
-	if (numrow <= numperpage) {
-		return;
-	}
-
-	//numpage
-	let numpage = Math.ceil(numrow / numperpage);
-
-	let c = '';
-	c += '<div style="text-align:center;">';
-	c += '<ul id="' + tabid + '_pagination" class="pagination" style="margin:0px;" tabid="' + tabid + '" pagenow="1" numrow="' + numrow + '" numperpage="' + numperpage + '" numpage="' + numpage + '">';
-	c += '<li class="prev" style="cursor:pointer;"><a href="#" onclick="pagin_change(\'' + tabid + '\',\'-1\')">上一頁</a></li>';
-	c += '<li class=""><a>1 / ' + numpage + '</a></li>';
-	c += '<li class="next" style="cursor:pointer;"><a href="#" onclick="pagin_change(\'' + tabid + '\',\'+1\')">下一頁</a></li>';
-	c += '</ul>';
-	c += '</div>';
-
-	//after
-	tab.after(c);
-
-	//change
-	pagin_change(tabid, 1)
-
-}
-
-
-function pagin_change(tabid, oper) {
-	//表格分頁切換
-
-	let tab = $('#' + tabid);
-	let pag = $('#' + tabid + '_pagination');
-	let pagenow = cint(pag.attr('pagenow'));
-	let numperpage = cint(pag.attr('numperpage'));
-	let numpage = cint(pag.attr('numpage'));
-
-	//pagenow
-	if (String(oper) === '+1') {
-		pagenow += 1;
-	}
-	else if (String(oper) === '-1') {
-		pagenow -= 1;
-	}
-	else {
-		pagenow = cint(oper);
-	}
-
-	//check
-	pagenow = Math.max(pagenow, 1);
-	pagenow = Math.min(pagenow, numpage);
-
-	//save
-	pag.attr('pagenow', pagenow);
-
-	//show pagenow
-	pag.find('li').eq(1).find('a').html(pagenow + ' / ' + numpage);
-
-	//disabled li
-	pag.find('li').removeClass('disabled');
-	if (pagenow === 1) {
-		pag.find('li').eq(0).addClass('disabled');
-	}
-	else if (pagenow === numpage) {
-		pag.find('li').eq(2).addClass('disabled');
-	}
-
-	//trs
-	let trs = tab.find('tbody').find('tr');
-
-	//each
-	trs.each(function (i) {
-		let tr = $(this);
-		let j = i + 1;
-
-		if (j >= numperpage * (pagenow - 1) + 1 && j <= numperpage * (pagenow)) {
-			tr.css('display', ''); //透過tr的class來決定display，使能支援rwd class
-			//tr.show();
-		}
-		else {
-			tr.hide();
-		}
-	})
-
-	//scrollParent scroll to Top
-	tab.scrollParent().scrollTop(0);
-
-}
-
-
-function gentable(divid, tabid, ar) {
-	//於div內由資料ar快速產生有樣式與具分頁功能的table
-
-	//dict2grid
-	let h = dict2grid(ar, tabid);
-
-	//table html
-	$('#' + divid).html(h);
-
-	//table style
-	grid2bstable(tabid);
-
-	//pagin
-	pagin(tabid);
-
-}
-
 
 let gvselscr = {
 	tar: '',
@@ -1271,47 +970,30 @@ function selscr_find(idtar, cdir) {
 
 }
 
-
-function aj_get(url, transferData) {
-	//ajax get
-
-	return aj_send('get', url, transferData);
+function getCookie(name) {
+	var cookieValue = null;
+	if (document.cookie && document.cookie != '') {
+		var cookies = document.cookie.split(';');
+		for (var i = 0; i < cookies.length; i++) {
+			var cookie = jQuery.trim(cookies[i]);
+			// Does this cookie string begin with the name we want?
+			if (cookie.substring(0, name.length + 1) == (name + '=')) {
+				cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+				break;
+			}
+		}
+	}
+	return cookieValue;
 }
-
-
-function aj_post(url, transferData) {
-	//ajax post
-
-	return aj_send('post', url, transferData);
-}
-
-
-function aj_put(url, transferData) {
-	//ajax put
-
-	return aj_send('put', url, transferData);
-}
-
-function aj_patch(url, transferData) {
-	//ajax patch
-
-	return aj_send('patch', url, transferData);
-}
-
-function aj_delete(url, transferData) {
-	//ajax post
-
-	return aj_send('delete', url, transferData);
-}
-
 
 function aj_getcsrf() {
 	//csrf
 
-	let csrf = $('input[name=csrfmiddlewaretoken]').val();
+	let csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val();
+	let csrftoken = getCookie('csrftoken');
 	return {
-		'csrf': csrf,
-		'X-CSRFToken': csrf,
+		'csrf': csrfmiddlewaretoken,
+		'X-CSRFToken': csrftoken,
 		'X-Requested-With': 'XMLHttpRequest',
 	};
 }
@@ -1462,7 +1144,6 @@ function aj_text(url, transferData) {
 	return df;
 }
 
-
 function aj_binary(url, transferData) {
 	//ajax下載binary檔案
 
@@ -1521,7 +1202,6 @@ function aj_binary(url, transferData) {
 
 	return df;
 }
-
 
 function aj_booklist_dict(key2head, k) {
 	//書籍中英鍵值轉換
@@ -1584,58 +1264,6 @@ function aj_booklist_dict_array(ar, key2head) {
 	})
 
 	return r;
-}
-
-function aj_booklist(query_type, query_value) {
-	//API使用book_list查找書籍資訊
-
-	//df
-	let df = GenDF();
-
-	//url
-	let url = '/ebookSystem/book_list'; //post會加「/」而get不會
-
-	//transferData
-	let transferData = {
-		'query_type': query_type,
-		'query_value': query_value
-	};
-
-	//aj_get
-	aj_get(url, transferData)
-		.done(function (data) {
-
-			if (data['status'] === 'success') {
-
-				//o
-				let o = data['content']['book'];
-
-				//p
-				let p = [];
-				_.each(o, function (v, k) {
-					p.push(v[1]);
-				})
-
-				if (p.length > 0) {
-					df.resolve(p);
-				}
-				else {
-					df.reject('無書籍資料');
-				}
-
-			}
-			else {
-				//console.log(data['message']);
-				df.reject('無書籍資料');
-			}
-
-		})
-		.fail(function (msg) {
-			//console.log(msg)
-			df.reject('無書籍資料');
-		})
-
-	return df;
 }
 
 function aj_isbnnet_ISBN(ISBN) {
@@ -1786,10 +1414,6 @@ function aj_isbnnetanddouban(value) {
 	//df
 	let df = GenDF();
 
-	// let r=[{"ISBN":"9789869534239","書名":"新手媽媽的育兒療癒科學: 面對產後憂鬱、不安與孤獨、嬰兒夜哭、反抗期、夫妻失和等問題,用科學事實來建立妳的輕鬆教養術!","作者":"NHK特別採訪小組著; 張佩瑩譯","出版社":"大家","出版日期":"2017-11-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789574350605","書名":"新手媽媽坐月子到宅服務創新方案規劃與執行","作者":"杜佩紋著","出版社":"杜佩紋","出版日期":"2017-10-01","裝訂方式":"平裝","圖書類號":"429","版次":"","來源":"NCL"},{"ISBN":"9789869359382","書名":"新手媽媽哺乳親餵的24堂課","作者":"Jack Newman, Teresa Pitman作; 葉織茵、劉宜佳、鄭勝得翻譯","出版社":"臺灣愛思唯爾","出版日期":"2017-06-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789865786731","書名":"第一胎照書養!新手媽媽的第一本懷孕手冊","作者":"陳艾竹編","出版社":"維他命文化","出版日期":"2016-11-01","裝訂方式":"平裝","圖書類號":"429","版次":"初版","來源":"NCL"},{"ISBN":"9789869237673","書名":"新手媽媽必備的第1本DVD寶寶按摩指南","作者":"小谷博子監修; 沙子芳譯","出版社":"睿其書房","出版日期":"2016-02-01","裝訂方式":"平裝附數位影音光碟","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789866062582","書名":"嬰兒副食品聖經: 新手媽媽必學205道副食品食譜","作者":"趙小英著; 李靜宜譯","出版社":"橘子文化","出版日期":"2013-10-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789868932197","書名":"好孕一點都不難:  解決新手媽媽困擾的實踐全書","作者":"池下育子等監修","出版社":"方舟文化","出版日期":"2013-09-01","裝訂方式":"平裝","圖書類號":"429","版次":"初版","來源":"NCL"},{"ISBN":"9789868889682","書名":"新手媽媽一試就成功: 寶寶食譜全圖解","作者":"鍾毓珊著","出版社":"幸福文化","出版日期":"2013-05-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789868905573","書名":"幹嘛要有小孩?: 一位新手媽媽的真實告白","作者":"潔西卡.瓦蘭提作; 陳品秀譯","出版社":"行人文化實驗室","出版日期":"2013-05-01","裝訂方式":"平裝","圖書類號":"544","版次":"初版","來源":"NCL"},{"ISBN":"9789575659684","書名":"餵母乳 不煩惱!新手媽媽看這裡就對了!","作者":"赤すぐ編輯部文字; 統一翻譯社翻譯","出版社":"臺視文化","出版日期":"2013-03-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789868892613","書名":"寶寶出生關鍵100天照顧秘笈: 小兒名醫與10位新手媽媽的對談","作者":"陳素華總編輯","出版社":"聲活工坊文化","出版日期":"2013-01-01","裝訂方式":"平裝附光碟片","圖書類號":"","版次":"","來源":"NCL"},{"ISBN":"9789863012276","書名":"新手媽媽一定要學的哺乳經(簡體字版)","作者":"磊立同行著","出版社":"大眾國際書局","出版日期":"2012-12-01","裝訂方式":"平裝","圖書類號":"","版次":"","來源":"NCL"},{"ISBN":"9789866247521","書名":"新手媽媽一定要學的哺乳經","作者":"磊立同行著","出版社":"養沛文化館","出版日期":"2012-08-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789866701344","書名":"為什麼媽媽需要粉紅色手提包?: 新手媽媽的優雅生活","作者":"史黛芬妮.施奈德(Stephanie Schneider)著; 謝靜怡譯","出版社":"飛寶國際文化","出版日期":"2009-11-01","裝訂方式":"精裝","圖書類號":"192","版次":"初版","來源":"NCL"},{"ISBN":"9789868171985","書名":"新手媽媽的第一本書: 胎教","作者":"沈靜作","出版社":"喜樂亞","出版日期":"2006-08-01","裝訂方式":"平裝附光碟片","圖書類號":"429","版次":"一版","來源":"NCL"},{"ISBN":"9789861610504","書名":"第一次當媽媽就上手: 新手媽媽完全生活指南","作者":"Debra Glibert Rosenberg, Mary Susan Miller合著; 李明芝譯","出版社":"信誼基金","出版日期":"2005-06-01","裝訂方式":"平裝","圖書類號":"544","版次":"初版","來源":"NCL"},{"ISBN":"9789572965818","書名":"新手媽媽的280天","作者":"石芳瑜著","出版社":"華谷文化","出版日期":"2004-06-01","裝訂方式":"平裝","圖書類號":"429","版次":"初版","來源":"NCL"},{"ISBN":"9789572897713","書名":"新手媽媽育兒寶典","作者":"周晴芸編著","出版社":"咖啡田文化館","出版日期":"2003-10-01","裝訂方式":"平裝","圖書類號":"428","版次":"初版","來源":"NCL"},{"ISBN":"9789576488641","書名":"新手媽媽必讀手冊","作者":"塚田一郎著; 盛勤譯","出版社":"書泉","出版日期":"2001-08-01","裝訂方式":"平裝","圖書類號":"429","版次":"初版","來源":"NCL"},{"ISBN":"9789578253711","書名":"新手媽媽百科","作者":"嬰兒與母親編輯部編著","出版社":"婦幼家庭","出版日期":"2001-05-01","裝訂方式":"平裝","圖書類號":"","版次":"1版","來源":"NCL"},{"ISBN":"9789578253568","書名":"新手媽媽","作者":"嬰兒與母親編輯部編著","出版社":"婦幼家庭","出版日期":"2000-12-01","裝訂方式":"平裝","圖書類號":"429","版次":"1版","來源":"NCL"},{"ISBN":"9789578253063","書名":"新手媽媽育嬰指南","作者":"嬰兒與母親雜誌社編輯部撰文","出版社":"婦幼家庭","出版日期":"1999-01-01","裝訂方式":"平裝","圖書類號":"428","版次":"1版","來源":"NCL"},{"ISBN":"9789578456778","書名":"新手媽媽育兒經","作者":"張震山作","出版社":"藝賞圖書","出版日期":"1998-11-01","裝訂方式":"平裝","圖書類號":"","版次":"初版","來源":"NCL"}];
-	// df.resolve(r);
-	// return df;
-
 	//df, d
 	let df_isbnnet = GenDF();
 	let df_douban = GenDF();
@@ -1890,7 +1514,7 @@ function aj_querybooklist(source, transferData) {
 	transferData['source'] = source;
 
 	//aj_post
-	aj_post(url, transferData)
+	aj_send('post', url, transferData)
 		.done(function (data) {
 			//console.log(data)
 
@@ -1946,337 +1570,6 @@ function aj_querybooklist(source, transferData) {
 	return df;
 }
 
-
-function aj_announcement(mode, aid, transferData) {
-	//公告API新增、更新、刪除
-
-	//df
-	let df = GenDF();
-
-	//url
-	let url;
-	if (mode === 'create') {
-		//create不用給aid
-		url = '/genericUser/announcement_create'; //不能於最後有反斜線
-	}
-	else if (mode === 'update') {
-		url = '/genericUser/announcement_update/' + aid + '/';
-	}
-	else if (mode === 'delete') {
-		url = '/genericUser/announcement_delete/' + aid + '/';
-	}
-	else {
-
-		//reject
-		df.reject({ 'status': 'error', 'message': ' mode error' });
-
-		return df;
-	}
-
-	//check
-	let err = [];
-	if (iser(transferData.title)) {
-		err.push('標題不能為空');
-	}
-	if (iser(transferData.category)) {
-		err.push('類別需選擇其中一種');
-	}
-	if (iser(transferData.content)) {
-		err.push('內容不能為空');
-	}
-	if (err.length > 0) {
-
-		//msg
-		let msg = _.chain(err)
-			.map(function (v, k) {
-				return '<div style="margin-top:5px;">' + cstr(k + 1) + ': ' + v + '</div>';
-			})
-			.join('')
-			.value();
-		msg = '<div>輸入錯誤訊息如下：</div>' + msg;
-
-		//reject
-		df.reject({ 'status': 'error', 'message': msg });
-
-		return df;
-	}
-
-	//aj_post
-	aj_post(url, transferData)
-		.done(function (data) {
-			df.resolve(data);
-		})
-		.fail(function (data) {
-			df.reject(data);
-		})
-
-	return df;
-}
-
-
-function aj_borrowbook(me, action) {
-	//使用library_action API進行借還閱
-
-	//df
-	//let df = GenDF();
-
-	//me
-	me = $(me);
-
-	//transferData
-	let transferData = {
-		'action': action,
-	};
-
-	//url
-	let url = '/ebookSystem/library_action'; //不能於最後有反斜線
-	if (action === 'check_out') {
-		transferData['ISBN'] = me.attr('ISBN');
-	}
-	else if (action === 'check_in') {
-		transferData['id'] = me.attr('id');
-	}
-	else {
-		//df.reject({'status':'error','message':' mode error'});
-		//return df;
-	}
-
-	//aj_post
-	aj_post(url, transferData)
-		.done(function (data) {
-			alertmessage(data.status, data.message)
-				.done(function () {
-					if (action === 'check_in') {
-						location.reload(); //歸還需重新載入網頁以更新資訊
-					}
-				});
-			//df.resolve(data);
-		})
-		.fail(function (data) {
-			alertmessage(data.status, data.message);
-			//df.reject(data);
-		})
-
-	//return df;
-}
-
-
-function aj_user_dict() {
-	//user API key轉換資訊
-	let d = {
-		'birthday': '生日',
-		'education': '教育',
-		'email': '郵件',
-		'org': '單位',
-		'phone': '手機',
-		'username': '使用者名稱',
-		'name': '姓名', //'first_name'+'last_name'
-		'is_book': '訂閱訊息',
-		'auth_email': '驗證電子郵件',
-		'auth_phone': '驗證手機',
-		'is_active': '登錄權限',
-		'is_editor': '校對權限',
-		'is_guest': '來賓權限',
-	};
-	return d;
-}
-
-
-function aj_user_key2head(key) {
-	//user API的key轉中文
-	let d = aj_user_dict();
-	if (haskey(d, key)) {
-		return d[key];
-	}
-	return key;
-}
-
-
-function aj_user_head2key(head) {
-	//user API的中文轉key
-	let d = aj_user_dict();
-	d = _.invert(d);
-	if (haskey(d, head)) {
-		return d[head];
-	}
-	return head;
-}
-
-
-function aj_user_key2head_array(ar) {
-	//陣列物件key轉中文
-
-	//r
-	let r = [];
-	_.each(ar, function (v, k) {
-
-		//add name
-		if (haskey(v, 'first_name') && haskey(v, 'last_name')) {
-			v['name'] = v['first_name'] + v['last_name'];
-		}
-
-		//newkey
-		let o = {};
-		_.each(v, function (value, key) {
-			let newkey = aj_user_key2head(key);
-			o[newkey] = value;
-		})
-
-		//push
-		r.push(o);
-
-	})
-
-	return r;
-}
-
-
-function aj_user_head2key_array(ar) {
-	//陣列物件中文轉key
-
-	//r
-	let r = [];
-	_.each(ar, function (v, k) {
-
-		//newkey
-		let o = {};
-		_.each(v, function (value, key) {
-			let newkey = aj_user_head2key(key);
-			o[newkey] = value;
-		})
-
-		//push
-		r.push(o);
-
-	})
-
-	return r;
-}
-
-
-function aj_user_querylist_combine() {
-	//使用API user_list結合info,role取得使用者資訊
-
-	//df
-	let df = GenDF();
-
-	//when
-	$.when(aj_user_querylist('info'), aj_user_querylist('role'))
-		.done(function (ar1, ar2) {
-
-			//arrarymerge
-			let ar = arrarymerge(ar1, ar2, 'id');
-
-			//resolve
-			df.resolve(ar);
-
-		})
-		.fail(function (msg) {
-			//reject
-			df.reject(msg);
-		})
-
-	return df;
-}
-
-
-function aj_user_querylist(action) {
-	//使用API user_list
-
-	//df
-	let df = GenDF();
-
-	//url
-	let url = '/genericUser/user_list/';
-
-	//transferData
-	let transferData = {
-		'query_field': 'all',
-		'query_value': '',
-		'action': action,
-	};
-
-	//aj_get
-	aj_get(url, transferData)
-		.done(function (data) {
-
-			//ar
-			let ar = aj_user_key2head_array(data['content']);
-
-			//resolve
-			df.resolve(ar);
-
-		})
-		.fail(function (data) {
-			df.reject(data['message']);
-		})
-
-	return df;
-}
-
-
-function aj_user_queryid(id, action) {
-	//使用API user_view
-
-	//df
-	let df = GenDF();
-
-	//url
-	let url = '/genericUser/user_view/' + id + '/';
-
-	//transferData
-	let transferData = {
-		'action': action,
-	};
-
-	//aj_get
-	aj_get(url, transferData)
-		.done(function (data) {
-
-			//d
-			let d = [data['content']];
-			//console.log(d)
-
-			//ar
-			let ar = aj_user_key2head_array(d);
-
-			//resolve
-			df.resolve(ar);
-
-		})
-		.fail(function (data) {
-			df.reject(data['message']);
-		})
-
-	return df;
-}
-
-
-function aj_user_updateid(id, action, transferData) {
-	//使用API user_update
-
-	//df
-	let df = GenDF();
-
-	//url
-	let url = '/genericUser/user_update/' + id + '/';
-
-	//transferData
-	transferData['action'] = action;
-
-	//aj_post
-	aj_post(url, transferData)
-		.done(function (data) {
-			df.resolve(data);
-		})
-		.fail(function (data) {
-			df.reject(data);
-		})
-
-	return df;
-}
-
-
 function aj_booksetpriority(password, ISBN, priority) {
 	//使用API book_action
 
@@ -2295,7 +1588,7 @@ function aj_booksetpriority(password, ISBN, priority) {
 	};
 
 	//aj_post
-	aj_post(url, transferData)
+	aj_send('post', url, transferData)
 		.done(function (data) {
 			df.resolve(data);
 		})
@@ -2304,141 +1597,6 @@ function aj_booksetpriority(password, ISBN, priority) {
 		})
 
 	return df;
-}
-
-
-function aj_bookdeleterepository(password, ISBN) {
-	//使用API book_delete
-
-	//df
-	let df = GenDF();
-
-	//url
-	let url = '/ebookSystem/book_delete/';
-
-	//transferData
-	let transferData = {
-		'ISBN': ISBN,
-		'password': password,
-	};
-
-	//aj_post
-	aj_post(url, transferData)
-		.done(function (data) {
-			df.resolve(data);
-		})
-		.fail(function (data) {
-			df.reject(data);
-		})
-
-	return df;
-}
-
-
-function aj_qanda(mode, aid, transferData) {
-	//Q&A API顯示、新增、更新、刪除
-
-	//df
-	let df = GenDF();
-
-	//url
-	let url;
-	if (mode === 'list') {
-		url = '/genericUser/qanda_list'; //不能於最後有反斜線
-	}
-	else if (mode === 'create') {
-		url = '/genericUser/qanda_create/'; //create不用給aid
-	}
-	else if (mode === 'update') {
-		url = '/genericUser/qanda_update/' + aid + '/';
-	}
-	else if (mode === 'delete') {
-		url = '/genericUser/qanda_delete/' + aid + '/';
-	}
-	else {
-
-		//reject
-		df.reject({ 'status': 'error', 'message': ' mode error' });
-
-		return df;
-	}
-
-	//check
-	if (mode === 'create') {
-		let err = [];
-		if (iser(transferData.question)) {
-			err.push('問題不能為空');
-		}
-		if (iser(transferData.answer)) {
-			err.push('回答不能為空');
-		}
-		if (err.length > 0) {
-
-			//msg
-			let msg = _.chain(err)
-				.map(function (v, k) {
-					return '<div style="margin-top:5px;">' + cstr(k + 1) + ': ' + v + '</div>';
-				})
-				.join('')
-				.value();
-			msg = '<div>輸入錯誤訊息如下：</div>' + msg;
-
-			//reject
-			df.reject({ 'status': 'error', 'message': msg });
-
-			return df;
-		}
-	}
-
-	//aj
-	let aj;
-	if (mode === 'list') {
-		aj = aj_get;
-	}
-	else {
-		aj = aj_post;
-	}
-	aj(url, transferData)
-		.done(function (data) {
-			df.resolve(data);
-		})
-		.fail(function (data) {
-			df.reject(data);
-		})
-
-	return df;
-}
-
-
-let gvorg;
-$(function () {
-
-	//client
-	let client = new $.RestClient('/genericUser/api/');
-	client.add('organizations');
-
-	//read
-	client.organizations.read()
-		.done(function (data) {
-			//console.log(data)
-
-			//save
-			gvorg = data;
-
-		})
-
-})
-
-function getorg(id) {
-	//兌換單位
-
-	//find
-	let r = _.find(gvorg, { id: id });
-	if (iser(r)) {
-		r = {};
-	}
-
-	return r;
 }
 
 function rest_aj_send(type, url, transferData) {
@@ -2457,7 +1615,7 @@ function rest_aj_send(type, url, transferData) {
 		beforeSend: function (jqXHR, settings) {
 			if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
 				let g = aj_getcsrf();
-				jqXHR.setRequestHeader('X-CSRFToken', g.csrf);
+				jqXHR.setRequestHeader('X-CSRFToken', g['X-CSRFToken']);
 				jqXHR.setRequestHeader('X-Requested-With', g.XMLHttpRequest)
 			}
 		},

@@ -3,8 +3,8 @@
 書籍詳細
 {% endblock %}
 {% block content %}
-
 {% csrf_token %}
+{% include 'comp/book_origin_download.vue' %}
 {% include 'comp/list_vue_component.html' %}
 {% include 'comp/ebook_assign_component.html' %}
 {% include 'comp/table-div.vue' %}
@@ -20,7 +20,10 @@
 		<div id="book_detail_overall" class="tab-pane active">
 			<h4>總覽</h4>
 			<div class="row">
-				<button type="button" class="btn btn-default" :ISBN="pk" onclick="receivebook(this, false, 'download')">預覽</button>
+				<button
+					class="btn btn-default"
+					@click="$refs.db.instance_set(pk); 	openDialog('db', this);"
+				>下載</button>
 				<table-div :header="overall_header" :datas="overall_datas">
 					<template slot="action" slot-scope="props">
 						<button
@@ -69,6 +72,23 @@
 			</div>
 		</div>
 	</div>
+	<modal :id_modal="'db'">
+		<template slot="header">
+			<h4 class="modal-title">取得書籍</h4>
+		</template>
+		<template slot="body">
+			<book_origin_download
+				pk="0"
+				ref="db"
+			>
+			</book_origin_download>
+		</template>
+
+		<template slot="footer">
+			<button class="btn btn-primary" @click=" $refs.db.object_get()">確定</button>
+		</template>
+
+	</modal>
 	<modal :id_modal="'bs'">
 		<template slot="header">
 			<h4 class="modal-title">指派</h4>

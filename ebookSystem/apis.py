@@ -37,6 +37,23 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 	@detail_route(
 		methods=['post'],
+		url_name='download',
+		url_path='action/download',
+	)
+	def download(self, request, pk=None):
+		res = {}
+		obj = self.get_object()
+		try:
+			file_path = obj.zip(request.user, request.POST['password'], request.POST['fileformat'])
+		except BaseException as e:
+			res['detail'] = u'準備文件失敗： {}'.format(unicode(e))
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+		return self.get_resource(file_path)
+
+
+	@detail_route(
+		methods=['post'],
 		url_name='review',
 		url_path='action/review',
 	)
@@ -415,6 +432,9 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			pass
 		return fullpath
 
+
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 class BookInfoViewSet(viewsets.ModelViewSet):
 	queryset = BookInfo.objects.filter(book__status__gte=Book.STATUS['finish']).order_by('-date')
 	serializer_class = BookInfoSerializer
@@ -422,6 +442,7 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 	ordering_fields = ('date',)
 	search_fields = ('ISBN', 'bookname', 'author', )
 
+	@method_decorator(ensure_csrf_cookie)
 	@list_route(
 		methods=['post'],
 		url_name='isbn2bookinfo',

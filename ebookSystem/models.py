@@ -54,7 +54,6 @@ class Book(models.Model):
 	def delete(self, *args, **kwargs):
 		try:
 			shutil.rmtree(self.path)
-			Event.objects.filter(content_type__model='book', object_id=self.ISBN, ).delete()
 		except:
 			pass
 		super(Book, self).delete(*args, **kwargs)

@@ -166,7 +166,16 @@ def get_douban_bookinfo_list(query_text):
 		except BaseException as e:
 			bookbinding = ''
 
-		bookinfo_list.append((get_ISBN, bookname, author, house, date, bookbinding,))
+		bookinfo_list.append({
+			'ISBN': get_ISBN,
+			'bookname': bookname,
+			'author': author,
+			'house': house,
+			'date': date,
+			'bookbinding': bookbinding,
+			'chinese_book_category': '',
+			'order': '',
+		})
 
 	return bookinfo_list
 
@@ -334,7 +343,16 @@ def get_ncl_bookinfo_list(query_dict):
 			except BaseException as e:
 				order = ''
 
-			bookinfo_list.append((get_ISBN, bookname, author, house, date, bookbinding, chinese_book_category, order, ))
+			bookinfo_list.append({
+				'ISBN': get_ISBN,
+				'bookname': bookname,
+				'author': author,
+				'house': house,
+				'date': date,
+				'bookbinding': bookbinding,
+				'chinese_book_category': chinese_book_category,
+				'order': order,
+			})
 
 	return bookinfo_list
 

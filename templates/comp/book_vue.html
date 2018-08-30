@@ -1,4 +1,7 @@
-﻿<script>
+{% include 'comp/table-div.vue' %}
+{% include 'comp/modal.vue' %}
+{% include 'comp/bookinfo_search.vue' %}
+<script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 	let vo_book;
 
@@ -119,26 +122,19 @@
 					})
 
 				},
-				search_ISBN_info_more: function(){
+				search_ISBN_info_more: function(data){
+					let self = this
 
-					let vo = this
-
-					FindBook()
-					.done(function(data){
-
-						//show
-						vo.search_ISBN = data['ISBN']; //若查詢ISBN10會自動轉ISBN13，故要重新更新
-						vo.temp['ISBN'].value = data['ISBN'];
-						vo.temp['bookname'].value = data['書名'];
-						vo.temp['author'].value = data['作者'];
-						vo.temp['date'].value = data['出版日期'];
-						vo.temp['house'].value = data['出版社'];
-						vo.temp['bookbinding'].value = data['裝訂方式'];
-						vo.temp['chinese_book_category'].value = data['圖書類號'];
-						vo.temp['order'].value = data['版次'];
-						vo.temp['source'].value = data['來源'];
-
-					})
+					self.search_ISBN = data['ISBN']; //若查詢ISBN10會自動轉ISBN13，故要重新更新
+					self.temp['ISBN'].value = data['ISBN'];
+					self.temp['bookname'].value = data['bookname'];
+					self.temp['author'].value = data['author'];
+					self.temp['date'].value = data['date'];
+					self.temp['house'].value = data['house'];
+					self.temp['bookbinding'].value = data['bookbinding'];
+					self.temp['chinese_book_category'].value = data['chinese_book_category'];
+					self.temp['order'].value = data['order'];
+					self.temp['source'].value = data['source'];
 
 				},
 				create: function(){
@@ -206,7 +202,10 @@
 					v-on:click="search_ISBN_info()"
 				>
 				<img src="/static/ebookSystem/img/load.gif" v-bind:style="{ display:loading }" width="30px" height="30px" id="id_get_isbn_load_icon" />
-				<input id="get_book_isbnnet" type="button" class="btn btn-default" value="更多查詢方式" v-on:click="search_ISBN_info_more()">
+				<button
+					class="btn btn-primary"
+					@click="openDialog('bis', this);"
+				>更多查詢方式</button>
 				<a type="button" class="btn btn-default" href="http://isbn.ncl.edu.tw/NCL_ISBNNet/H30_SearchBooks.php?PHPSESSID=3ovphpac0m41ducm3iiak2sfe5&Pact=DisplayAll" target="_blank" id="to_ISBNNet" title="開啟新視窗">國家圖書館書目資料查詢</a>
 			<!-- <input type="button" class="btn btn-default" style="display: none;" value="是否人工輸入？" id="show_prop">-->
 		</div> 
@@ -257,4 +256,12 @@
 			</div>
 		</div>
 	</div>
+	<modal :id_modal="'bis'">
+		<template slot="header">
+			<h4 class="modal-title">更多查詢方式</h4>
+		</template>
+		<template slot="body">
+			<bookinfo_search v-on:bookinfo-out="search_ISBN_info_more($event)"></bookinfo_search>
+		</template>
+	</modal>
 </div>

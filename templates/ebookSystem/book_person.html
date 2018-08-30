@@ -15,7 +15,7 @@
 			<table-div :datas="props.item.datas" :header="props.item.header">
 				<template slot="inactive_book_action" slot-scope="props">
 					<a v-if="user.is_manager" class="btn btn-default" role="button" :href="'/ebookSystem/review_document/' +props.item.ISBN +'/'" target="_blank" title="審核(另開新視窗)">審核</a>
-					<button class="btn btn-default send_button" @click="BookDeleterePository(props.item.ISBN)">刪除</button>
+					<button class="btn btn-default" @click="book_del(props.item.ISBN)">刪除</button>
 				</template>
 				<template slot="active_book_action" slot-scope="props">
 					<button class="btn btn-default send_button" @click="BookSetPriority(props.item.ISBN)">設定權重</button>
@@ -162,9 +162,9 @@
 				})
 
 				//active book
-			c1 = self.client.books.read({'status': 1, 'owner_id': user.id})
-			c2 = self.client.books.read({'status': 2, 'owner_id': user.id})
-			$.when(c1, c2)
+				c1 = self.client.books.read({'status': 1, 'owner_id': user.id})
+				c2 = self.client.books.read({'status': 2, 'owner_id': user.id})
+				$.when(c1, c2)
 				.done(function(data1, data2) {
 					book_data = []
 					book_data = book_data.concat(data1[0])
@@ -187,6 +187,23 @@
 					self.data[2].data['datas'] = filter_data
 				})
 
+			},
+			book_del: function (pk) {
+				let self = this
+
+				alertconfirm('確認刪除書籍 id:' +pk)
+				.done(function(){
+					self.client.books.del(pk)
+					.done(function(data) {
+						alertmessage('success', '成功刪除 Q&A id:' +pk)
+						.done(function(){
+							self.get_table_data()
+						})
+					})
+					.fail(function(xhr, result, statusText){
+						alertmessage('error', xhr.responseText)
+					})
+				})
 			},
 		},
 	})
