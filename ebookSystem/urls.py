@@ -20,8 +20,6 @@ import copy
 api_urlpatterns = copy.copy(router.urls)
 
 urlpatterns = [
-	url(r'^book_info/(?P<ISBN>[0-9Xx]+)/$', views.book_info, name='book_info'),
-	url(r'^get_book_info_list/$', views.get_book_info_list, name='get_book_info_list'),
 	url(r'^edit/(?P<ISBN_part>[0-9\-]+)/$', views.edit, name='edit'),
 	url(r'^edit_ajax/(?P<ISBN_part>[0-9\-]+)/$', views.edit_ajax, name='edit_ajax'),
 	url(r'^review_document/(?P<book_ISBN>[0-9]+)/$', views.review_document, name='review_document'),
@@ -30,7 +28,6 @@ urlpatterns = [
 	url(r'^library_view$', views.library_view, name='library_view'),
 	url(r'^library_origin_view$', views.library_origin_view, name='library_origin_view'),
 	url(r'^library_action$', views.library_action, name='library_action'),
-	url(r'^bookorder_list$', views.bookorder_list, name='bookorder_list'),
 	url(r'^book_action/$', views.book_action, name='book_action'),
 	url(r'^ebook_change_status/(?P<pk>[\d-]+)/$', views.ebook_change_status, name='ebook_change_status'),
 	url(r'^api/', include(api_urlpatterns, namespace='api')),

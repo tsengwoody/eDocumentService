@@ -34,16 +34,20 @@ class DisabilityCardSerializer(serializers.ModelSerializer):
 
 from ebookSystem.models import EditRecord
 from ebookSystem.serializers import EditRecordSerializer
+class OrganizationSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Organization
+		fields = ('__all__')
+
 class ServiceInfoSerializer(serializers.ModelSerializer):
-	editrecordinfo_set = EditRecordSerializer(many=True, read_only=True, source='editrecord_set')
 	editrecord_set = serializers.PrimaryKeyRelatedField(many=True, queryset=EditRecord.objects.filter(serviceInfo=None))
+	editrecordinfo_set = EditRecordSerializer(many=True, read_only=True, source='editrecord_set')
+	userinfo = UserSerializer(read_only=True, source='user')
+	orginfo = OrganizationSerializer(read_only=True, source='org')
+
 	class Meta:
 		model = ServiceInfo
 		fields = '__all__'
-
-class ServiceInfoAddSerializer(ServiceInfoSerializer):
-	editrecordinfo_set = EditRecordSerializer(many=True, read_only=True, source='editrecord_set')
-	userinfo = UserSerializer(read_only=True, source='user')
 
 class AnnouncementSerializer(serializers.ModelSerializer):
 	datetime = serializers.ReadOnlyField()
@@ -56,11 +60,6 @@ class QAndASerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = QAndA
-		fields = ('__all__')
-
-class OrganizationSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = Organization
 		fields = ('__all__')
 
 class BusinessContentSerializer(serializers.ModelSerializer):

@@ -220,9 +220,6 @@ class ServiceInfoViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		path = ServiceInfo.exchange_false_export()
 		return self.get_resource(path)
 
-class ServiceInfoAddViewSet(ServiceInfoViewSet):
-	serializer_class = ServiceInfoAddSerializer
-
 class AnnouncementViewSet(viewsets.ModelViewSet):
 	queryset = Announcement.objects.all().order_by('-datetime')
 	serializer_class = AnnouncementSerializer
