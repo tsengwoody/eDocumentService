@@ -3,14 +3,26 @@
 教學內容
 {% endblock %}
 {% block content %}
-{% include 'comp/table-div.vue' %}
+{% include 'comp/table-div-row.vue' %}
 {% csrf_token %} 
 
 <div id="qanda_tutorial">
 	<h2>教學內容</h2>
-	<table-div :header="qanda_tutorial_header" :datas="qanda_tutorial_datas">
+	<button
+		class="btn btn-primary"
+		@click="qanda_create()"
+	>新建</button>
+	<table-div-row :header="qanda_tutorial_header" :datas="qanda_tutorial_datas">
 		<template slot="order" slot-scope="props">
 			{|{ props.item.order +1 }|}
+		</template>
+		<template slot="question" slot-scope="props">
+			<div v-html="props.item"></div>
+		</template>
+		<template slot="answer" slot-scope="props">
+			<div v-html="props.item"></div>
+		</template>
+		<template slot="action" slot-scope="props">
 			<button
 				class="btn btn-primary"
 				@click="openDialog('qm', this);"
@@ -21,34 +33,26 @@
 				@click="qanda_del(props.item.id)"
 			>刪除</button>
 		</template>
-		<template slot="question" slot-scope="props">
-			<div v-html="props.item"></div>
-		</template>
-		<template slot="answer" slot-scope="props">
-			<div v-html="props.item"></div>
-		</template>
-	</table-div>
-	<button
-		class="btn btn-primary"
-		@click="qanda_create()"
-	>新建</button>
+	</table-div-row>
+
 	<modal id_modal="qm">
 		<template slot="header">
 			<h4 class="modal-title">Q&A 編修</h4>
 		</template>
 		<template slot="body">
-		<div class="form-group">
-			<label for="id_question" class="control-label col-sm-1"><font style="color:red">*</font>問題</label>
-			<div class="col-sm-11">
+			<div class="form-group">
+				<label for="id_question" class="control-label"><font style="color:red">*</font>問題</label>
 				<editor id="id_question" v-model="qanda_instance.question" :init="tinymce_init"></editor>
+				{|{ qanda_instance.question }|}
 			</div>
-		</div>
-		<div class="form-group">
-			<label for="id_answer" class="control-label col-sm-1"><font style="color:red">*</font>回答</label>
-			<div class="col-sm-11">
+			
+			<hr>
+			<div class="form-group">
+				<label for="id_answer" class="control-label"><font style="color:red">*</font>回答</label>
 				<editor id="id_answer" v-model="qanda_instance.answer" :init="tinymce_init"></editor>
+				{|{ qanda_instance.answer }|}
 			</div>
-		</div>
+			
 		</template>
 	</modal>
 </div>
@@ -56,10 +60,10 @@
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	let tinymce_init = {
-			selector: "#id_content",
-			language:"zh_TW",
-			plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
-			toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample'
+		selector: "editor",
+		language:"zh_TW",
+		plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
+		toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample'
 	};
 
 	new Vue({
@@ -69,6 +73,7 @@
 				'order': '項次',
 				'question': '問題',
 				'answer': '回答',
+				'action': '動作'
 			},
 			qanda_tutorial_datas: [],
 			qanda_instance: {

@@ -79,15 +79,16 @@ div.tbody .cell {
 		content: attr(data-title);
 		display: block;
 		width: auto;
-		min-width: 40%;
+/*		min-width: 40%;*/
 		font-weight: 900;
+		font-size: 1.2em;
 	}
 }
 </style>
 
 <script type="text/x-template" id="table-template">
 	<div>
-		<div v-if="!iser(datas)" class="row">
+		<div v-if="!iser(datas)">
 			<div role="table" class="table">
 				<div role="rowgroup" class=thead>
 					<div role="row" class=tr>
