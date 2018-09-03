@@ -5,9 +5,10 @@
 {% block content %}
 
 {% csrf_token %} 
+{% include 'comp/file_manager.vue' %}
 
 <div id="id_announcement" class="form-horizontal">
-	<h3>公告內容</h3>
+	<h2>公告內容</h2>
 	<div class="form-group">
 		<label for="id_category" class="control-label col-sm-1"><font style="color:red">*</font>類別</label>
 		<div class="col-sm-11">
@@ -46,6 +47,10 @@
 		</div>
 	</div>
 
+	<h2>檔案</h2>
+	<file_manager
+		:url="url +'resource/attachment/'"
+	></file_manager>
 	<div class="form-group">        
 		<div class="col-sm-offset-1 col-sm-11">
 
@@ -89,6 +94,7 @@
 			announcement: {},
 			url: '',
 			mode: 'read', //read or write
+			attachment_name: '',
 			tinymce_init: {
 				selector: "#id_content",
 				language:"zh_TW",
@@ -99,7 +105,7 @@
 		components: {
 			'editor': Editor
 		},
-		created() {
+		created: function(){
 			let self = this
 
 			let pk = window.location.pathname.split('/')
@@ -161,7 +167,6 @@
 				})
 			},
 		},
-
 	});
 </script>
 

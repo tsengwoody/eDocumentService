@@ -109,7 +109,7 @@ div.tbody .cell {
 					</div>
 				</div>
 			</div>
-			<div style="text-align:center;">
+			<div v-if="numpage>1" style="text-align:center;">
 				<ul class="pagination" style="margin:0px;">
 					<li class="prev" style="cursor:pointer;"><a href="#" @click="pagin_change(-1)">上一頁</a></li>
 					<li class=""><a>{|{ pagenow }|} / {|{ numpage }|}</a></li>

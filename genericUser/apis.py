@@ -220,13 +220,17 @@ class ServiceInfoViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		path = ServiceInfo.exchange_false_export()
 		return self.get_resource(path)
 
-class AnnouncementViewSet(viewsets.ModelViewSet):
+class AnnouncementViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = Announcement.objects.all().order_by('-datetime')
 	serializer_class = AnnouncementSerializer
 	filter_backends = (filters.OrderingFilter, filters.SearchFilter, AnnouncementCategoryFilter, AnnouncementNewestFilter, )
 	ordering_fields = ('datetime',)
 	search_fields = ('category',)
 	permission_classes = (IsManagerOrReadOnly, )
+
+	def get_fullpath(self, obj, dir, resource):
+		fullpath = os.path.join(obj.path, dir, resource)
+		return fullpath
 
 class QAndAViewSet(viewsets.ModelViewSet):
 	queryset = QAndA.objects.all()

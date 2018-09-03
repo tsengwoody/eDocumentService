@@ -312,8 +312,19 @@ class Announcement(models.Model):
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
 
+	def __init__(self, *args, **kwargs):
+		super(Announcement, self).__init__(*args, **kwargs)
+		self.path = BASE_DIR +'/file/genericUser/Announcement/{0}/'.format(self.id)
+
 	def __unicode__(self):
 		return self.title
+
+	def delete(self, *args, **kwargs):
+		try:
+			shutil.rmtree(self.path)
+		except:
+			pass
+		super(Announcement, self).delete(*args, **kwargs)
 
 class QAndA(models.Model):
 	question = models.TextField()
