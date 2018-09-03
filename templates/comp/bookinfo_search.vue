@@ -14,7 +14,7 @@
 						<a @click="source='ncl'" href="#divmodal_FindBook_tab_adv" data-toggle="tab" aria-expanded="false">國圖查詢</a>
 					</li>
 				</ul>
-				<div class="tab-content" style="background-color:#fff;">
+				<div class="tab-content">
 					<div id="divmodal_FindBook_tab_easy" class="tab-pane active">
 						<div style="margin:20px 0px 10px 0px;">輸入書籍ISBN或書名進行查詢：</div>
 						<input v-model="intergrate_value" type="text" class="form-control">
@@ -101,7 +101,7 @@
 			</div>
 		</template>
 		<template slot="footer">
-			<button class="btn btn-danger">取消</button>
+			<button class="btn btn-danger" onclick="closeDialog(this)">取消</button>
 			<button
 				v-if="mode==='request'"
 				@click="FindBook()"
