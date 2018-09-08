@@ -112,14 +112,29 @@
 
 				if(fileExtension && nameExtension) {
 					if(fileExtension !== nameExtension) {
-						self.resource_name = resource_name + '.' + fileExtension;
-						// alertmessage('question', '檔案附檔名不一致')
+						alertconfirm('檔案附檔名不一致，是否自動加上副檔名?')
+						.done(function(){
+							self.resource_name = resource_name + '.' + fileExtension;
+							self.upload_file(self.url +self.resource_name +'/', {'object': fileresourceObject})
+						})
+					} else {
+						self.upload_file(self.url +self.resource_name +'/', {'object': fileresourceObject})
 					}
-				} else if (fileExtension && !nameExtension) {
-					self.resource_name = resource_name + '.' + fileExtension;
 				} 
+				else if (fileExtension && !nameExtension) {
+					alertconfirm('檔案名稱未包含附檔名，確定後系統將自動加入')
+					.done(function(){
+						self.resource_name = resource_name + '.' + fileExtension;
+						self.upload_file(self.url +self.resource_name +'/', {'object': fileresourceObject})
+					})
+				} else {
+					self.upload_file(self.url +self.resource_name +'/', {'object': fileresourceObject})
+				}
+			},
+			upload_file: function(path, object){
+				let self = this;
 
-				rest_aj_upload(self.url +self.resource_name +'/', {'object': fileresourceObject})
+				rest_aj_upload(path, object)
 				.done(function(data) {
 					self.$emit('change')
 					alertmessage('success', '成功上傳檔案')
@@ -131,7 +146,6 @@
 					console.log(xhr)
 					alertmessage('error', xhr.message)
 				})
-
 			},
 			delete_resource: function(){
 				let self = this
