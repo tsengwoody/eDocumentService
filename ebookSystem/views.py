@@ -139,27 +139,6 @@ def message_send(request, template_name='ebookSystem/message_send.html', ):
 		return locals()
 
 from django.contrib.auth import authenticate
-@user_category_check(['manager'])
-@http_response
-def book_delete(request):
-	if request.method == 'POST' and request.is_ajax():
-		getBook = Book.objects.get(ISBN=request.POST['ISBN'])
-		try:
-			user = authenticate(username=request.user.username, password=request.POST['password'])
-			if user is None:
-				raise SystemError(u'使用者驗證失敗')
-			if not getBook.owner == user and not user.is_manager:
-				raise SystemError(u'非擁有者無法刪除')
-			if getBook.source == 'self' and getBook.status > getBook.STATUS['inactive']:
-				raise SystemError(u'校對書籍無法刪除')
-			getBook.delete()
-		except BaseException as e:
-			status = 'error'
-			message = u'文件刪除失敗: {0}'.format(unicode(e))
-			return locals()
-		status = 'success'
-		message = u'文件刪除成功: finish'
-		return locals()
 
 @http_response
 def book_action(request):
@@ -229,32 +208,6 @@ def library_origin_view(request, template_name='ebookSystem/library_origin_view.
 		cache.set('token.' +str(request.user.id), token, 10)
 		path = '/library_origin_epub/' +book.ISBN +'/' +token
 		base64_path = base64.b64encode(path)
-		return locals()
-
-@http_response
-def library_action(request, ):
-	if request.method == 'POST' and request.is_ajax():
-		if request.POST['action'] == 'check_out':
-			book = Book.objects.get(ISBN=request.POST['ISBN'])
-			lr_user = request.user.libraryrecord_set.filter(status=True)
-			if len(lr_user) >5:
-				status = 'error'
-				message = u'已到達借閱上限，同時可借閱書量為5本，請先歸還書籍再借閱'
-				return locals()
-			if len(lr_user.filter(object=book)) >0:
-				status = 'error'
-				message = u'已在借閱書櫃無需再借閱'
-				return locals()
-			lr = LibraryRecord.objects.create(user=request.user, object=book)
-			lr = LibraryRecord.objects.get(id=lr.id)
-			lr.check_out()
-			status = 'success'
-			message = u'成功借閱書籍{0}'.format(book)
-		elif request.POST['action'] == 'check_in':
-			lr = LibraryRecord.objects.get(id=request.POST['id'])
-			lr.check_in()
-			status = 'success'
-			message = u'成功歸還書籍{0}'.format(lr.object)
 		return locals()
 
 #=====file=====

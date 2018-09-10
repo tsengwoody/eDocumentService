@@ -1,4 +1,4 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 借閱書櫃
 {% endblock %}
@@ -29,8 +29,7 @@
 					>下載</button>
 					<button
 						class="btn btn-default"
-						:id="props.item.id"
-						onclick="aj_borrowbook(this, 'check_in')"
+						@click="check_inout(props.item.id, 'check_in')"
 					>歸還</button>
 				</template>
 			</table-div>
@@ -123,6 +122,29 @@
 			})
 		},
 		methods: {
+			check_inout: function (pk, action) {
+				let self = this
+
+				rest_aj_send('post', '/ebookSystem/api/libraryrecords/' +pk +'/action/check_inout/', {'action': action,})
+				.done(function(data) {
+					let message = ''
+					if(action==='check_in'){
+						message = '成功歸還書籍'
+						alertmessage('success', message)
+						.done(function() {
+							window.location.reload()
+						})
+					}
+					if(action==='check_out'){
+						message = '成功借閱書籍'
+						alertmessage('success', message)
+					}
+				})
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', xhr.message)
+				})
+
+			},
 		},
 	})
 </script>

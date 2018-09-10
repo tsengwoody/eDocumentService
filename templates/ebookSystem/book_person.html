@@ -7,6 +7,7 @@
 {% csrf_token %}
 {% include 'comp/table-div.vue' %}
 {% include 'comp/tab.vue' %}
+{% include 'comp/bookinfo_repository.vue' %}
 
 <div id="book_person">
 	<h2>校對進度</h2>
@@ -21,14 +22,10 @@
 					<button class="btn btn-default send_button" @click="BookSetPriority(props.item.ISBN)">設定權重</button>
 					<a class="btn btn-default" :href="'/ebookSystem/generics/book_detail/' +props.item.ISBN +'/'" target="_blank" title="分段資訊(另開新視窗)">分段資訊</a>
 				</template>
-				<template slot="bookinfo_action" slot-scope="props">
-					<button class="btn btn-default" :ISBN="props.item" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>
-					<a class="btn btn-default" role="button"
-						:href="'/ebookSystem/library_origin_view?ISBN=' +props.item"
-						target="_blank" title="閱讀(另開新視窗)"
-					>閱讀</a>
-				</template>
 			</table-div>
+		</template>
+		<template slot="bookinfo_repository_table" slot-scope="props">
+			<bookinfo_repository :datas="props.item.datas" :header="props.item.header"></bookinfo_repository>
 		</template>
 	</tab>
 </div>
@@ -89,7 +86,7 @@
 		"author": "作者",
 		"house": "出版社",
 		"date": "出版日期",
-		"bookinfo_action": "動作",
+		"action": "動作",
 	}
 
 	function bookinfo_datas(v){
@@ -101,7 +98,7 @@
 			"author": v['author'],
 			"house": v['house'],
 			"date": v['date'],
-			"bookinfo_action": v['ISBN'],
+			"action": v['ISBN'],
 		}
 
 		filter_data.push(temp_data)
@@ -119,7 +116,7 @@
 					'order': 0,
 					'display_name': '已校對',
 					'value': 'finish',
-					'type': 'table',
+					'type': 'bookinfo_repository_table',
 					'data': '',
 				},
 				{

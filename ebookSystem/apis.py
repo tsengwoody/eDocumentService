@@ -571,6 +571,41 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				fullpath = getattr(obj, resource, '')
 		return fullpath
 
+	@list_route(
+		methods=['post'],
+		url_name='check_create',
+		url_path='action/check_create',
+	)
+	def check_create(self, request, pk=None):
+		res = {}
+		book = Book.objects.get(ISBN=request.POST['ISBN'])
+		lr_user = request.user.libraryrecord_set.filter(status=True)
+		if len(lr_user) >5:
+			res['message'] = u'已到達借閱上限，同時可借閱書量為5本，請先歸還書籍再借閱'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		if len(lr_user.filter(object=book)) >0:
+			res['message'] = u'已在借閱書櫃無需再借閱'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+		lr = LibraryRecord.objects.create(user=request.user, object=book)
+		res['id'] = lr.id
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	@detail_route(
+		methods=['post'],
+		url_name='check_inout',
+		url_path='action/check_inout',
+	)
+	def check_inout(self, request, pk=None):
+		res = {}
+		obj = self.get_object()
+		if request.POST['action'] == 'check_out':
+			obj.check_out()
+			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+		elif request.POST['action'] == 'check_in':
+			obj.check_in()
+			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
 	@detail_route(
 		methods=['get', 'post'],
 		url_name='download',

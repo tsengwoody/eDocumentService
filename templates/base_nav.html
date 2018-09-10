@@ -29,11 +29,12 @@
 								<li><a href="{% url 'ebookSystem:generics' 'book_manager' %}">書籍管理</a></li>
 								<!--<li><a href="{% url 'genericUser:generics' 'disabilitycard_manager' %}">手冊管理</a></li>-->
 								<li><a href="{% url 'genericUser:generics' 'user_manager' %}">使用者管理</a></li>
+								<li><a href="{% url 'genericUser:generics' 'disabilitycard_manager' %}">身障手冊管理</a></li>
 								<li><a href="{% url 'genericUser:generics' 'serviceinfo_list_check' %}">服務時數確認</a></li>
 								<li><a href="{% url 'ebookSystem:generics' 'bookorder_list' %}">校對順序</a></li>
 								<li><a href="{% url 'manager:statistics' %}">統計資訊</a></li>
 								<li><a href="{% url 'genericUser:generics' 'bannercontent_create' %}">管理首頁 Banner</a></li>
-								<li><a href="{% url 'ebookSystem:message_send' %}">訊息傳送</a></li>
+								<li><a href="{% url 'genericUser:generics' 'user_email' %}">訊息傳送</a></li>
 								<li><a href="{% url 'genericUser:generics' 'announcement_create' %}">公告發佈</a></li>
 							{% endif %}
 							{% if request.user.is_superuser %}
@@ -85,11 +86,12 @@
 					<li><a href="{% url 'logout' %}"><span class="glyphicon  glyphicon-log-out"></span>登出</a></li>
 				{% else %}
 					<li><a href="/genericUser/generics/login/"><span class="glyphicon  glyphicon-log-out">登入</a></li>
-					<li><a href="{% url 'register' %}"><span class="glyphicon glyphicon-user">註冊</a></li>
+					<li><a href="{% url 'genericUser:generics' 'register' %}"><span class="glyphicon glyphicon-user">註冊</a></li>
 				{% endif %}
 				<li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">關於</a>
 					<ul class="dropdown-menu">
+						<li><a href="{% url 'genericUser:generics' 'qanda_tutorial' %}">教學內容</a></li>
 						<li><a href="{% url 'about' 'user_guide' %}">平台使用指南</a></li>
 						<li><a href="{% url 'about' 'qanda' %}">平台Q&A</a></li>
 						<li><a href="{% url 'about' 'contact' %}">聯絡資訊</a></li>

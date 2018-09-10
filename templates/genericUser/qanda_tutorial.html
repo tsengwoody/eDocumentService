@@ -1,4 +1,4 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 教學內容
 {% endblock %}
@@ -9,6 +9,7 @@
 <div id="qanda_tutorial">
 	<h2>教學內容</h2>
 	<button
+		v-if="user.is_manager"
 		class="btn btn-primary"
 		@click="qanda_create()"
 	>新建</button>
@@ -24,11 +25,13 @@
 		</template>
 		<template slot="action" slot-scope="props">
 			<button
+				v-if="user.is_manager"
 				class="btn btn-primary"
 				@click="openDialog('qm', this);"
 			>編輯</button>
 			<!--data-toggle="modal" :data-target="'#qm'"-->
 			<button
+				v-if="user.is_manager"
 				class="btn btn-primary"
 				@click="qanda_del(props.item.id)"
 			>刪除</button>
@@ -99,7 +102,7 @@
 				self.qanda_tutorial_datas = []
 
 				//self.client.qandas.read({'category': 'tutorial'})
-				self.client.qandas.read()
+				self.client.qandas.read({'category': 'tutorial'})
 				.done(function(data){
 					filter_data = []
 					_.each(data,function(v){

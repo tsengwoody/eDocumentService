@@ -1,12 +1,11 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 一般校對
 {% endblock %}
 
 {% block content %}
-
 {% csrf_token %}
-{% include 'comp/table_vue_component.html' %}
+{% include 'comp/table-div.vue' %}
 
 <div id="service">
 
@@ -17,12 +16,21 @@
 
 	<div>
 		<h4 class="page-header">正校對文件</h4>
-		<table-component :data="edit_ebook"></table-component>
+		<table-div :datas="edit_ebook" :header="edit_ebook_header">
+			<template slot="action" slot-scope="props">
+				<a class="btn btn-default" role="button" :href="'/ebookSystem/edit/' +props.item.ISBN_part +'/'">編輯</a>
+				<button class="btn btn-default" @click="reback_ebook(props.item.ISBN_part)">還文件</button>
+			</template>
+		</table-div>
 	</div>
 
 	<div>
 		<h4 class="page-header">審核中的文件</h4>
-		<table-component :data="finish_ebook"></table-component>
+		<table-div :datas="finish_ebook" :header="finish_ebook_header">
+			<template slot="action" slot-scope="props">
+				<button class="btn btn-default" @click="reedit_ebook(props.item.ISBN_part)">再編輯</button>
+			</template>
+		</table-div>
 	</div>
 
 </div>
@@ -32,10 +40,27 @@
 	vo_service = new Vue({
 		el: '#service',
 		data: {
+			edit_ebook_header: {
+				'document': '文件',
+				'page': '頁數/總頁數',
+				'get_date': '領取日期',
+				'deadline': '期限',
+				'status': '狀態',
+				'action': '動作',
+			},
 			edit_ebook: [],
+			finish_ebook_header: {
+				'document': '文件',
+				'service_hours': '服務時數',
+				'get_date': '領取日期',
+				'category': '類型',
+				'action': '動作',
+			},
 			finish_ebook: [],
 		},
 		created: function () {
+			this.client = new $.RestClient('/ebookSystem/api/');
+			this.client.add('ebooks');
 			this.refresh()
 		},
 		methods: {
@@ -43,47 +68,34 @@
 				// run ajax get data
 				let self = this;
 				self.clear()
-				console.log(user.id)
-				rest_aj_send('get', '/ebookSystem/api/ebooks/', {'editor_id': user.id, 'status': '2'})
+
+				self.client.ebooks.read({'editor_id': user.id, 'status': '2'})
 				.done(function(data) {
 
-					_.each(data['data'],function(v){
+					_.each(data,function(v){
 
-						action = ''
-						action += '<a class="btn btn-default" role="button" href ="/ebookSystem/edit/' +v.ISBN_part +'/">編輯</a>'
-						action += `<button class="btn btn-default" type="button" onclick="vo_service.reback_ebook('` +v.ISBN_part +`')">還文件</button>`
-
-						temp_data = {
-							'文件': v['bookname'] +v['part'],
-							'頁數/總頁數': v.edited_page+1 +'/50',
-							'領取日期': v.get_date,
-							'期限': v.deadline,
-							'狀態': v.status,
-							'動作':action,
-						}
-						self.edit_ebook.push(temp_data)
-
+						self.edit_ebook.push({
+							'document': v['bookname'] +v['part'],
+							'page': v.edited_page+1 +'/50',
+							'get_date': v.get_date,
+							'deadline': v.deadline,
+							'status': v.status,
+							'action': v,
+						})
 					})
-
-
 				})
 
-				rest_aj_send('get', '/ebookSystem/api/ebooks/', {'editor_id': user.id, 'status': '3'})
+				self.client.ebooks.read({'editor_id': user.id, 'status': '3'})
 				.done(function(data) {
 
-					_.each(data['data'],function(v){
-
-						action = ''
-						action += `<button class="btn btn-default" type="button" onclick="vo_service.reedit_ebook('` +v.ISBN_part +`')">再編輯</button>`
-
-						temp_data = {
-							'文件': v['bookname'] +v['part'],
-							'時數': v.service_hours,
-							'領取日期': v.get_date,
-							'類型': v.current_editrecord.category,
-							'動作':action,
-						}
-						self.finish_ebook.push(temp_data)
+					_.each(data,function(v){
+						self.finish_ebook.push({
+							'document': v['bookname'] +v['part'],
+							'service_hours': v.service_hours,
+							'get_date': v.get_date,
+							'category': v.current_editrecord.category,
+							'action': v,
+						})
 					})
 
 				})

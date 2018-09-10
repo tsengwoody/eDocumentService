@@ -1,5 +1,6 @@
 ﻿# coding: utf-8
 
+from django.db.models import F,Q
 from rest_framework import filters
 from .models import *
 
@@ -55,6 +56,25 @@ class UserSelfOrManagerFilter(filters.BaseFilterBackend):
 			return queryset
 		else:
 			return queryset.filter(id=request.user.id)
+
+class UserAuthFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		auth = request.query_params.get('auth')
+		if auth:
+			if auth == 'false' or auth == 'False':
+				return queryset.filter(
+					Q(auth_email=False)
+					| Q(auth_phone=False)
+				).filter(is_editor=False)
+			elif auth == 'true' or auth == 'True':
+				return queryset.filter(
+					Q(auth_email=True)
+					& Q(auth_phone=True)
+				).filter(is_editor=False)
+			else:
+				return queryset
+		else:
+			return queryset
 
 class UserRoleFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):

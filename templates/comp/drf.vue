@@ -55,6 +55,21 @@
 				type="password"
 				class="form-control"
 			>
+			<template
+				v-if="model_info.type === 'radio'" 
+				v-for="el in model_info.choices"
+			>
+				<label class="radio-inline">
+				<input 
+					type="radio" 
+					:id="'id_' +el.value"
+					:value="el.value"
+					@input="$emit('input', $event.target.value)"
+					:checked="el.value == value"
+				> 
+					{|{ el.display_name }|}
+				</label>
+			</template>
 		</div>
 		</template>
 	</div>

@@ -23,8 +23,8 @@ from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWOR
 class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
-	#permission_classes = (UserDataPermission, )
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, UserRoleFilter,)
+	#permission_classes = (permissions.IsAuthenticated,)
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, UserRoleFilter, UserAuthFilter)
 	ordering_fields = ('username',)
 	search_fields = ('username', 'email', 'first_name', 'last_name',)
 
@@ -104,6 +104,26 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			except:
 				pass
 		res['detail'] = u'成功登錄平台'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	@list_route(
+		methods=['post'],
+		url_name='email',
+		url_path='action/email',
+	)
+	def email(self, request, pk=None):
+		res = {}
+
+		from django.core.mail import EmailMessage
+		if request.POST['category'] == 'editor':
+			user_email_list = [ i.email for i in User.objects.filter(is_editor=True) if i.is_book and i.auth_email ]
+		if request.POST['category'] == 'guest':
+			user_email_list = [ i.email for i in User.objects.filter(is_guest=True) if i.is_book and i.auth_email ]
+		subject = request.POST['subject']
+		body = request.POST['body']
+		email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[SERVICE], bcc=user_email_list)
+		email.send(fail_silently=False)
+
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	@detail_route(
@@ -187,6 +207,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		if user is not None and self.request.data['new_password1'] == self.request.data['new_password2']:
 			user.set_password(self.request.data['new_password1'])
 			user.save()
+			update_session_auth_hash(request, user)
 			return Response(data={'detail': u'變更密碼成功'}, status=status.HTTP_202_ACCEPTED)
 		return Response(data={'detail': u'變更密碼失敗'}, status=status.HTTP_406_NOT_ACCEPTABLE)
 

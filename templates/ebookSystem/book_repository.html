@@ -5,10 +5,10 @@
 
 {% block content %}
 {% csrf_token %}
-{% include 'comp/table-div.vue' %}
 {% include 'comp/tab.vue' %}
+{% include 'comp/bookinfo_repository.vue' %}
 
-<h3>平台書庫</h3>
+<h2>平台書庫</h2>
 
 <ul class="nav nav-tabs">
 	<li class="active"><a href="#book_repository_recommend" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="true" onclick="pagetab_subtabfix(this);">書籍推薦</a></li>
@@ -18,40 +18,24 @@
 
 <div class="tab-content" style="padding:20px 0px;">
 	<div id="book_repository_recommend" class="tab-pane active">
-		<h4 class="textfornvda">書籍推薦</h4>
+		<h3 class="textfornvda">書籍推薦</h3>
 		<tab :data="data">
 			<template slot="table" slot-scope="props">
-				<table-div :datas="props.item.datas" :header="props.item.header">
-					<template slot="action" slot-scope="props">
-						<button class="btn btn-default" :ISBN="props.item" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>
-						<a class="btn btn-default" role="button"
-							:href="'/ebookSystem/library_origin_view?ISBN=' +props.item"
-							target="_blank" title="閱讀(另開新視窗)"
-						>閱讀</a>
-					</template>
-				</table-div>
+				<bookinfo_repository :datas="props.item.datas" :header="props.item.header"></bookinfo_repository>
 			</template>
 		</tab>
 	</div>
 	<div id="book_repository_index" class="tab-pane">
-		<h4 class="textfornvda">索引</h4>
+		<h3 class="textfornvda">索引</h3>
 		<tab :data="data">
 			<template slot="table" slot-scope="props">
-				<table-div :datas="props.item.datas" :header="props.item.header">
-					<template slot="action" slot-scope="props">
-						<button class="btn btn-default" :ISBN="props.item" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>
-						<a class="btn btn-default" role="button"
-							:href="'/ebookSystem/library_origin_view?ISBN=' +props.item"
-							target="_blank" title="閱讀(另開新視窗)"
-						>閱讀</a>
-					</template>
-				</table-div>
+				<bookinfo_repository :datas="props.item.datas" :header="props.item.header"></bookinfo_repository>
 			</template>
 		</tab>
 		</tab>
 	</div>
 	<div id="book_repository_search" class="tab-pane">
-		<h4 class="textfornvda">查詢</h4>
+		<h3 class="textfornvda">查詢</h3>
 		<div class="form-inline" style="margin-bottom:20px;">
 			<div class="form-group">
 				<input v-model="search_value" id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊" maxlength="15">
@@ -60,15 +44,7 @@
 				<button type="button" class="btn btn-primary" @click="search()">搜尋</button>
 			</div>
 		</div>
-		<table-div :datas="bookinfos.datas" :header="bookinfos.header">
-			<template slot="action" slot-scope="props">
-				<button class="btn btn-default" :ISBN="props.item" onclick="aj_borrowbook(this, 'check_out' )">借閱</button>
-				<a class="btn btn-default" role="button"
-					:href="'/ebookSystem/library_origin_view?ISBN=' +props.item"
-					target="_blank" title="閱讀(另開新視窗)"
-				>閱讀</a>
-			</template>
-		</table-div>
+		<bookinfo_repository :datas="bookinfos.datas" :header="bookinfos.header"></bookinfo_repository>
 	</div>
 </div>
 

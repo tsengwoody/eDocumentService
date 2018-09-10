@@ -19,6 +19,7 @@
 				<option value="all">全部</option>
 				<option value="editor">志工</option>
 				<option value="guest">視障者</option>
+				<option value="unauth">視障者(未驗證)</option>
 			</select>
 			<input v-model="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊">
 			<button class="btn btn-default" @click="user_refresh('search');">搜尋</button>
@@ -145,8 +146,14 @@
 			user_refresh: function (reason) {
 				let self = this;
 
-				query = {}
-				self.client.users.read({'search': self.search_value, 'role': self.search_role})
+				if(self.search_role==='unauth'){
+					query = {'search': self.search_value, 'auth': 'false'}
+				}
+				else {
+					query = {'search': self.search_value, 'role': self.search_role}
+				}
+
+				self.client.users.read(query)
 				.done(function(data){
 					filter_data = []
 					_.each(data,function(v){
@@ -162,6 +169,11 @@
 					self.datas = filter_data
 					if(reason==='search'){ alertmessage('success', '查詢完成，共取得 ' +self.datas.length +' 筆資料'); }
 				})
+				.fail(function(xhr, result, statusText){
+					console.log(xhr)
+				})
+
+
 			},
 		},
 	})
