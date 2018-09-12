@@ -1664,6 +1664,24 @@ function rest_aj_send(type, url, transferData) {
 
 }
 
+function rest_aj_send_memory(type, url, data, memory) {
+	//用key作紀錄
+
+	//df
+	let df = GenDF();
+
+	rest_aj_send(type, url, data)
+	.done(function(data) {
+		data['memory'] = memory
+		df.resolve(data)
+	})
+	.fail(function(xhr, result, statusText){
+		data['key'] = key
+		df.reject(data)
+	})
+	return df
+}
+
 function rest_aj_upload(url, transferData) {
 	//ajax傳送訊息
 
@@ -1782,4 +1800,37 @@ function showProgress(uuid) {
 			return;
 		}
 	});
+}
+
+(function($) {
+	$.extendObjectArray = (destArr, srcArr, key) => {
+		srcArr.forEach(srcObj => (existObj => {
+			if (existObj.length) {
+				$.extend(true, destArr[destArr.indexOf(existObj[0])], srcObj);
+			} else {
+				destArr.push(srcObj);
+			}
+		})(destArr.filter(v => v[key] === srcObj[key])));
+		return destArr;
+	};
+})(jQuery);
+
+function compare(key, order){
+	function desc(a,b) {
+		if (a[key] < b[key])
+			return 1;
+		if (a[key] > b[key])
+			return -1;
+		return 0;
+	}
+	function asc(a,b) {
+		if (a[key] < b[key])
+			return -1;
+		if (a[key] > b[key])
+			return 1;
+		return 0;
+	}
+	if(order==='desc'){return desc}
+	if(order==='asc'){return asc}
+	return asc
 }

@@ -70,7 +70,7 @@ def library_origin_epub(request, ISBN, token, document_root=None, show_indexes=F
 		response["Content-Encoding"] = encoding
 #	if token == cache.get('token.' +str(request.user.id)):
 	return response
-
+from . import apis
 from django.views.static import serve
 
 urlpatterns = [
@@ -83,13 +83,14 @@ urlpatterns = [
 	url(r'^library_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{32,32})/$', library_epub),
 	url(r'^library_origin_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{32,32})/$', library_origin_epub),
 	url(r'^admin/', include(admin.site.urls)),
-	url(r'social-auth/', include('social_django.urls', namespace='social')),
+	#url(r'social-auth/', include('social_django.urls', namespace='social')),
 	url(r'^ebookSystem/', include('ebookSystem.urls', namespace="ebookSystem")),
 	url(r'^genericUser/', include('genericUser.urls', namespace="genericUser")),
 	url(r'^manager/', include('manager.urls', namespace="manager")),
-	url(r'^auth/password_change/$', views.password_change, name='password_change'),
+	url(r'^api/statistics/(?P<action>[\d\w]+)/$', apis.Statistics.as_view()),
 	url(r'^auth/register/$', views.register, name='register'),
 	url(r'^auth/login/$', views.login, name='login'),
 	url(r'^auth/logout/$', views.logout_user, name='logout'),
-#	url(r'^auth/', include('django.contrib.auth.urls',)),
+	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),
+	#url(r'^auth/', include('django.contrib.auth.urls',)),
 ]
