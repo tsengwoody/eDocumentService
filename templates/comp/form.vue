@@ -1,7 +1,7 @@
 <template id="bs-form-group">
 	<div class="form-group">
-		<label :class="['control-label col-sm-2', offsetClass]" :for="field"><font style="color:red">*</font><span>{|{ model_info.label }|}</span></label>
-		<div class="col-sm-3">
+		<label :class="['control-label', labelClass, offsetClass]" :for="field"><font style="color:red">*</font><span>{|{ model_info.label }|}</span></label>
+		<div :class="inputClass">
 			<input
 				v-if="model_info.type === 'text' || model_info.type === 'email' || model_info.type === 'password'"
 				class="form-control" 
@@ -61,6 +61,16 @@
 					{|{ el.display_name }|}
 				</label>
 			</template>
+
+			<textarea v-if="model_info.type === 'textarea'"
+				class="form-control" 
+				:id="field"
+				:value="value"
+				@input="$emit('input', $event.target.value)"
+				rows="10"
+			>
+				
+			</textarea>
 		</div>
 		<label v-if="!iser(model_info.remark)" class="control-label col-sm-4" :for="field" style="text-align:left;"><font style="color:red">{|{ model_info.remark }|}</font></label>
 	</div>
@@ -78,6 +88,14 @@
 			offsetClass: {
 				type: String,
 				default: '',
+			},
+			labelClass: {
+				type: String,
+				default: 'col-sm-2',
+			},
+			inputClass: {
+				type: String,
+				default: 'col-sm-3',
 			},
 		},
 		methods: {

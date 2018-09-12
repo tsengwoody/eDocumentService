@@ -93,11 +93,11 @@ div.tbody .cell {
 				<div role="rowgroup" class=thead>
 					<div role="row" class=tr>
 						<div v-for="(value, key) in header" role="columnheader" class=cell>
-							<button
+							<a role="button"
 								@click="order(key)"
 							>
 								{|{ value }|}
-							</button>
+							</a>
 						</div>
 					</div>
 				</div>

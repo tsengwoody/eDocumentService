@@ -4,30 +4,42 @@
 訊息傳送
 {% endblock %}
 {% block content %}
-{% include 'comp/drf.vue' %}
+{% include 'comp/form.vue' %}
 {% csrf_token %}
 
 <div id="user_email">
 	<h2>訊息傳送</h2>
-				<drf-model
-						:keys="'category'"
-						:model_info="model_info.category"
-					mode="write"
-					v-model="category"
-				></drf-model>
-				<drf-model
-						:keys="'subject'"
-						:model_info="model_info.subject"
-					mode="write"
-					v-model="subject"
-				></drf-model>
-				<drf-model
-						:keys="'body'"
-						:model_info="model_info.body"
-					mode="write"
-					v-model="body"
-				></drf-model>
-				<button class="btn btn-default" @click="send_email()">傳送</button>
+	<div class="form-horizontal">
+		<form-drf
+			:keys="'category'"
+			:model_info="model_info.category"
+			:label-class="'col-sm-1'"
+			:input-class="'col-sm-11'"
+			mode="write"
+			v-model="category"
+		></form-drf>
+		<form-drf
+			:keys="'subject'"
+			:model_info="model_info.subject"
+			:label-class="'col-sm-1'"
+			:input-class="'col-sm-11'"
+			mode="write"
+			v-model="subject"
+		></form-drf>
+		<form-drf
+			:keys="'body'"
+			:model_info="model_info.body"
+			:label-class="'col-sm-1'"
+			:input-class="'col-sm-11'"
+			mode="write"
+			v-model="body"
+		></form-drf>
+		<div class="form-group">
+			<div class="col-sm-offset-1 col-sm-11">
+				<button class="btn btn-primary" @click="send_email()">傳送</button>
+			</div>	
+		</div>
+	</div>
 </div>
 
 <script>
@@ -43,7 +55,6 @@
 				'category': {
 					'label': '類型',
 					'type': 'radio',
-					'remark': '請選擇類型',
 					'choices' : [
 						{
 							'value': 'editor',
@@ -57,13 +68,11 @@
 				},
 				'subject': {
 					'label': '主指',
-					'type': 'string',
-					'remark': '請填寫主指',
+					'type': 'text',
 				},
 				'body': {
 					'label': '內容',
-					'type': 'string',
-					'remark': '請填寫內容',
+					'type': 'textarea',
 				},
 			},
 		},
