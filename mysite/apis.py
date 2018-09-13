@@ -64,12 +64,12 @@ class Statistics(APIView):
 		download_count = query.count()
 
 		res['result'].append({
-			'book': 'all',
+			'groupfield': 'all',
 			'count': download_count,
 		})
 		r = query.values('book').annotate(count=Count('book')) 
 		r = [{
-			'book': BookInfo.objects.get(ISBN=i['book']).bookname,
+			'groupfield': BookInfo.objects.get(ISBN=i['book']).bookname,
 			'count': i['count'],
 		} for i in r if i['book']]
 		res['result'].extend(r)
@@ -88,12 +88,12 @@ class Statistics(APIView):
 		download_count = query.count()
 
 		res['result'].append({
-			'user': 'all',
+			'groupfield': 'all',
 			'count': download_count,
 		})
 		r = query.values('user').annotate(count=Count('user'))
 		r = [{
-			'user': User.objects.get(id=i['user']).username,
+			'groupfield': User.objects.get(id=i['user']).username,
 			'count': i['count'],
 		} for i in r if i['user']]
 		res['result'].extend(r)
@@ -112,12 +112,12 @@ class Statistics(APIView):
 		count = query.count()
 
 		res['result'].append({
-			'editor': 'all',
+			'groupfield': 'all',
 			'count': count,
 		})
 		r = query.values('editor').annotate(count=Count('editor'))
 		r = [{
-			'editor': User.objects.get(id=i['editor']).username,
+			'groupfield': User.objects.get(id=i['editor']).username,
 			'count': i['count'],
 		} for i in r if i['editor'] ]
 		res['result'].extend(r)

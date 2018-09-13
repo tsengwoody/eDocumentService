@@ -23,9 +23,9 @@
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">統計<span class="caret"></span></a>
 						<ul class="dropdown-menu">
 							{% if request.user.is_manager %}
-								<li><a href="">書籍下載</a></li>
-								<li><a href="">使用者下載</a></li>
-								<li><a href="">使用者校對</a></li>
+								<li><a href="/generics/book_download/">書籍下載</a></li>
+								<li><a href="/generics/user_download/">使用者下載</a></li>
+								<li><a href="/generics/book_editrecord/">使用者校對</a></li>
 							{% endif %}
 						</ul>
 					</li>

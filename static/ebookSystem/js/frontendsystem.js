@@ -1834,3 +1834,58 @@ function compare(key, order){
 	if(order==='asc'){return asc}
 	return asc
 }
+
+function fill_cell(array, fields, value){
+	_.each(array, function(v){
+		_.each(fields, function(field){
+		if(!v.hasOwnProperty(field))
+			v[field] = value
+		})
+	})
+}
+
+function genMonth(v){
+	let today = new Date()
+	let year, month, date
+
+	year = today.getFullYear()
+	month = today.getMonth()+1
+	date = today.getDate()
+
+	let year_begin, month_begin, year_end, month_end
+
+	if(month-v<=0){
+		year_begin = year -1
+		month_begin = month-v+12
+	}
+	else {
+		year_begin = year
+		month_begin = month-v
+	}
+
+	if(month-v+1<=0){
+		year_end = year -1
+		month_end = month-v+1+12
+	}
+	else {
+		year_end = year
+		month_end = month-v+1
+	}
+
+	let begin_time, end_time
+
+	if(!(v===0)){
+		begin_time = year_begin.toString() +'-' +month_begin.toString() +'-01'
+		end_time = year_end.toString() +'-' +month_end.toString() +'-01'
+	}
+	else {
+		begin_time = year.toString() +'-' +month.toString() +'-01'
+		end_time = year.toString() +'-' +month.toString() +'-' +(date+1).toString()
+	}
+
+	return {
+		'begin_time': begin_time,
+		'end_time': end_time,
+	}
+
+}

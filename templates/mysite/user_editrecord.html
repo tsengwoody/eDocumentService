@@ -1,14 +1,14 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
-書籍下載
+使用者校對
 {% endblock %}
 {% block content %}
 
 {% csrf_token %}
 {% include 'comp/table-div-order.vue' %}
 
-<div id="book_download">
-	<h2>書籍下載</h2>
+<div id="user_editrecord">
+	<h2>使用者校對</h2>
 	<table-div
 		:header="statistics_header"
 		:datas="statistics_datas"
@@ -16,12 +16,11 @@
 </div>
 
 <script>
-
 	new Vue({
-		el: '#book_download',
+		el: '#user_editrecord',
 		data: {
 			statistics_header: {
-				'groupfield': '書名',
+				'groupfield': '使用者名稱',
 				'all': '全部期間',
 			},
 			statistics_datas: [],
@@ -39,7 +38,7 @@
 				let querys = []
 				let keys = []
 
-				let all_query = rest_aj_send_memory('get', '/api/statistics/book_download/', {}, {'key': 'all'})
+				let all_query = rest_aj_send_memory('get', '/api/statistics/user_editrecord/', {}, {'key': 'all'})
 				querys.push(all_query)
 
 				all_query
@@ -64,7 +63,7 @@
 					end_time = time['end_time']
 
 					key = 'month' +v
-					let month_query = rest_aj_send_memory('get', '/api/statistics/book_download/', {'begin_time': begin_time, 'end_time': end_time,}, {'key': key})
+					let month_query = rest_aj_send_memory('get', '/api/statistics/user_editrecord/', {'begin_time': begin_time, 'end_time': end_time,}, {'key': key})
 					querys.push(month_query)
 					keys.push(key)
 						self.statistics_header[key] = begin_time.split('-')[0] +'年' +begin_time.split('-')[1] +'月'

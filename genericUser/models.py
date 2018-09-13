@@ -73,7 +73,14 @@ class User(AbstractUser):
 
 	def auth_guest(self):
 		base = self.is_license & self.auth_email & self.auth_phone
-		return base & self.is_guest
+		return base & self.is_guest & self.auth_disabilitycard()
+
+	def auth_disabilitycard(self):
+		base = self.is_license & self.auth_email & self.auth_phone
+		try:
+			return base & self.disabilitycard_set.all()[0].is_active
+		except:
+			return False
 
 	def __unicode__(self):
 		return self.first_name +self.last_name
