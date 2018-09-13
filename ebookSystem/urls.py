@@ -26,7 +26,6 @@ urlpatterns = [
 	url(r'^library_view$', views.library_view, name='library_view'),
 	url(r'^library_origin_view$', views.library_origin_view, name='library_origin_view'),
 	url(r'^book_action/$', views.book_action, name='book_action'),
-	url(r'^ebook_change_status/(?P<pk>[\d-]+)/$', views.ebook_change_status, name='ebook_change_status'),
 	url(r'^api/', include(api_urlpatterns, namespace='api')),
 	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),
 ]

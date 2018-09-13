@@ -92,11 +92,15 @@ div.tbody .cell {
 			<div role="table" class="table">
 				<div role="rowgroup" class=thead>
 					<div role="row" class=tr>
-						<div v-for="(value, key) in header" role="columnheader" class=cell>
+						<div v-for="(v, k) in header" role="columnheader" class=cell>
 							<a role="button"
-								@click="order(key)"
+								@click="order(k)"
 							>
-								{|{ value }|}
+								<div v-if="k===key">
+									<div v-if="orderby==='asc'">▲</div>
+									<div v-if="orderby==='desc'">▼</div>
+								</div>
+								{|{ v }|}
 							</a>
 						</div>
 					</div>
@@ -194,8 +198,11 @@ div.tbody .cell {
 						this.orderby = 'asc'
 					}
 					else {
-						this.orderby = 'asc'
+						this.orderby = 'desc'
 					}
+				}
+				else {
+					this.orderby = 'desc'
 				}
 				this.key = key
 				this.datas.sort(compare(this.key, this.orderby))

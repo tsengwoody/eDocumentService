@@ -1,9 +1,5 @@
-﻿{% extends "base_nav.html" %}
-{% block title %}
-書籍下載
-{% endblock %}
-{% block content %}
-{% csrf_token %}
+{% extends "base_nav.html" %} {% load staticfiles %} {% block content %} {% csrf_token %}
+
 
 <script>
 
@@ -87,16 +83,25 @@
 </script>
 
 
-<h2>待審核文件</h2>
-<h3>Step1: 基本資料</h3>
+<h3 style="margin:40px 0px 30px 0px;">待審核文件：
+	<span id="div_rwdoc_name"></span>
+</h3>
+
+
+<h4>
+	<span class="glyphicon glyphicon-check" aria-hidden="true"></span> Step1: 基本資料</h4>
 <hr style="margin-top:5px;">
 <div id="step1_items" style="margin-bottom:40px;"></div>
 
-<h3>Step2: 掃描內容</h3>
+
+<h4>
+	<span class="glyphicon glyphicon-check" aria-hidden="true"></span> Step2: 掃描內容</h4>
 <hr style="margin-top:5px;">
 <div id="step2_items" style="margin-bottom:40px;"></div>
 
-<h4>Step3: 審查結果</h4>
+
+<h4>
+	<span class="glyphicon glyphicon-check" aria-hidden="true"></span> Step3: 審查結果</h4>
 <hr style="margin-top:5px;">
 <div id="step3_items" style="margin-bottom:40px;">
 
@@ -116,4 +121,6 @@
 	<button type="button" class="btn btn-primary send_form" style="margin-top:10px;" onclick="SendReviewResult()">送出</button>
 
 </div>
+
+
 {% endblock %}

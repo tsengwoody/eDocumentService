@@ -120,23 +120,6 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 
 #==========
 
-@http_response
-def message_send(request, template_name='ebookSystem/message_send.html', ):
-	if request.method == 'POST' and request.is_ajax():
-		from django.core.mail import EmailMessage
-		if request.POST['action'] == 'editor_send':
-			user_email_list = [ i.email for i in User.objects.filter(is_editor=True) if i.is_book and i.auth_email ]
-		if request.POST['action'] == 'guest_send':
-			user_email_list = [ i.email for i in User.objects.filter(is_guest=True) if i.is_book and i.auth_email ]
-		subject = request.POST['subject']
-		body = request.POST['body']
-		email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[SERVICE], bcc=user_email_list)
-		email.send(fail_silently=False)
-		status = 'success'
-		message = u'訊息傳送成功'
-		return locals()
-	if request.method == 'GET':
-		return locals()
 
 from django.contrib.auth import authenticate
 
@@ -209,37 +192,3 @@ def library_origin_view(request, template_name='ebookSystem/library_origin_view.
 		path = '/library_origin_epub/' +book.ISBN +'/' +token
 		base64_path = base64.b64encode(path)
 		return locals()
-
-#=====file=====
-from django.http import Http404
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.views import APIView
-from rest_framework import status
-from rest_framework.response import Response
-from genericUser.premissions import IsManager
-
-@api_view(['POST',])
-def ebook_change_status(request, pk):
-	try:
-		ebook = EBook.objects.get(ISBN_part=pk)
-	except EBook.DoesNotExist:
-		return Response(status=status.HTTP_404_NOT_FOUND)
-	if request.method == 'POST':
-		try:
-			user = User.objects.get(id=request.POST['user_id'])
-		except:
-			user = None
-		try:
-			deadline = request.POST['deadline'].split('-')
-			deadline = [ int(v) for v in deadline ]
-			deadline = timezone.datetime(deadline[0], deadline[1], deadline[2])
-		except:
-			deadline = None
-
-		direction = int(request.POST['direction'])
-		try:
-			ebook.change_status(direction=direction, status=request.POST['status'], user=user, deadline=deadline)
-		except BaseException as e:
-			raise e
-			return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-		return Response(status=status.HTTP_202_ACCEPTED)
