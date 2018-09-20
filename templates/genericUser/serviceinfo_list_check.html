@@ -30,6 +30,10 @@
 	<hr style="margin-top:5px;">
 	<div style="margin-bottom:60px;">
 		<button
+			@click="serviceinfo_cancel()"
+			class="btn btn-primary" style="margin-top:10px;"
+		>退回兌換</button>
+		<button
 			@click="serviceinfo_exchange()"
 			class="btn btn-primary" style="margin-top:10px;"
 		>同意兌換</button>
@@ -121,6 +125,37 @@
 				Promise.all(dfs)
 				.then(function () {
 					alertmessage('success', '同意兌換成功')
+					.done(function () {
+						self.get_serviceinfo_data()
+					})
+				})
+				.catch(function (msg) {
+					alertmessage('error', '非預期同意兌換失敗: ' + msg);
+				})
+			},
+			serviceinfo_cancel: function(){
+				let self = this
+
+				if(iser(self.serviceinfo_checks)){
+					alertmessage('error', '請至少選擇一筆兌換紀錄。')
+					return -1
+				}
+
+				//PATCH
+				let dfs = [];
+				_.each(self.serviceinfo_checks, function (v) {
+
+					//updatepart
+					let df = self.client.serviceinfos.del(v);
+
+					//push
+					dfs.push(df);
+				})
+
+				//Promise.all
+				Promise.all(dfs)
+				.then(function () {
+					alertmessage('success', '退回兌換申請')
 					.done(function () {
 						self.get_serviceinfo_data()
 					})

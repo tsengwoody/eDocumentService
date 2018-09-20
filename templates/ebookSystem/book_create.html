@@ -4,13 +4,11 @@
 {% endblock %}
 
 {% block content %}
-
+<div category="self"></div>
 {% include 'comp/book_vue.html' %}
 {% include 'comp/mx_find_book.html' %}
 {% include 'comp/upload_dialog.html' %}
 
 {% csrf_token %}
-
-<div category="self"></div>
 
 {% endblock %}

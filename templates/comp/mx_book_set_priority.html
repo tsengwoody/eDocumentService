@@ -26,13 +26,13 @@
 			//aj_booksetpriority
 			aj_booksetpriority(password, ISBN, priority)
 				.done(function (data) {
-					alertmessage(data.status, data.message)
+					alertmessage('success', '成功設定權重')
 						.done(function () {
 							location.reload(); //重新載入網頁以更新資訊
 						});
 				})
 				.fail(function (data) {
-					alertmessage(data.status, data.message)
+					alertmessage('error', xhr)
 				})
 
 			div.modal('hide');

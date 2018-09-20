@@ -86,7 +86,6 @@
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
-	let category = $('div[category]').attr('category');
 	new Vue(
 		{
 			el: '#id_book',
@@ -131,7 +130,7 @@
 						'show': '來源',
 					},
 				},
-				category: category,
+				category: '',
 			},
 			computed: {
 				loading: function(){
@@ -143,6 +142,9 @@
 					if(this.category=='epub' || this.category=='txt') return '/ebookSystem/api/books/action/upload/'
 					else if(this.category=='self') return '/ebookSystem/api/books/action/create/'
 				},
+			},
+			mounted: function(){
+				this.category = category = $('div[category]').attr('category');
 			},
 			methods: {
 				search_ISBN_info: function(){
@@ -162,24 +164,22 @@
 					vo.mode = 'search';
 
 					//aj_isbnnetanddouban_ISBN
-					aj_isbnnetanddouban_ISBN(this.search_ISBN)
-
+					vo.aj_ncl_douban_ISBN(this.search_ISBN)
 					.done(function(data){
-
 						//alertmessage
 						alertmessage('success', '查詢成功');
 
 						//show
 						vo.search_ISBN = data['ISBN']; //若查詢ISBN10會自動轉ISBN13，故要重新更新
 						vo.temp['ISBN'].value = data['ISBN'];
-						vo.temp['bookname'].value = data['書名'];
-						vo.temp['author'].value = data['作者'];
-						vo.temp['date'].value = data['出版日期'];
-						vo.temp['house'].value = data['出版社'];
-						vo.temp['bookbinding'].value = data['裝訂方式'];
-						vo.temp['chinese_book_category'].value = data['圖書類號'];
-						vo.temp['order'].value = data['版次'];
-						vo.temp['source'].value = data['來源'];
+						vo.temp['bookname'].value = data['bookname'];
+						vo.temp['author'].value = data['author'];
+						vo.temp['date'].value = data['date'];
+						vo.temp['house'].value = data['house'];
+						vo.temp['bookbinding'].value = data['bookbinding'];
+						vo.temp['chinese_book_category'].value = data['chinese_book_category'];
+						vo.temp['order'].value = data['order'];
+						vo.temp['source'].value = data['source'];
 
 					})
 					.fail(function(data){
@@ -200,6 +200,57 @@
 						vo.mode = 'input';
 					})
 
+				},
+				aj_ncl_douban_ISBN: function(value){
+					//用ISBN查找[全國新書資訊網]與[豆瓣]書籍資訊，並以[全國新書資訊網]優先
+					let self = this
+
+					//df
+					let df = GenDF();
+
+					let ncl_data = [];
+					let ncl_df = GenDF()
+
+					let douban_data = [];
+					let douban_df = GenDF()
+
+					rest_aj_send('post', '/ebookSystem/api/bookinfos/action/isbn2bookinfo/', {'ISBN': value, 'source':'NCL',})
+					.done(function (data) {
+						ncl_data = data['data'].bookinfo
+						douban_df.resolve(douban_data);
+					})
+					.fail(function(xhr, result, statusText){
+						console.log(xhr)
+					})
+					.always(function () {
+						ncl_df.resolve(ncl_data);
+					})
+
+					rest_aj_send('post', '/ebookSystem/api/bookinfos/action/isbn2bookinfo/', {'ISBN': value, 'source':'douban',})
+					.done(function (data) {
+						douban_data = data['data'].bookinfo
+					})
+					.fail(function(xhr, result, statusText){
+						console.log(xhr)
+					})
+					.always(function () {
+						douban_df.resolve(douban_data);
+					})
+
+					//when
+					$.when(ncl_df, douban_df)
+					.done(function (data1, data2) {
+						if(!iser(data1.ISBN)){
+							df.resolve(data1);
+						}
+						else if(!iser(data2.ISBN)){
+							df.resolve(data2);
+						}
+						else {
+							df.reject('無書籍資料');
+						}
+					})
+					return df;
 				},
 				search_ISBN_info_more: function(data){
 					let self = this

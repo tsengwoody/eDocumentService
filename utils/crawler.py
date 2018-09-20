@@ -84,7 +84,17 @@ def get_douban_bookinfo(ISBN):
 	pattern = re.compile(ur'装帧')
 	item = soup.find("span", text=pattern)
 	bookbinding = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
-	return [get_ISBN, bookname, author, house, date, bookbinding]
+
+	return {
+		'ISBN': get_ISBN,
+		'bookname': bookname,
+		'author': author,
+		'house': house,
+		'date': date,
+		'bookbinding' :bookbinding,
+		'chinese_book_category': '',
+		'order': '',
+	}
 
 def get_douban_bookinfo_list(query_text):
 	browser = webdriver.PhantomJS(service_log_path=LOG_DIR +'/ghostdriver.log')
@@ -270,9 +280,18 @@ def get_ncl_bookinfo(ISBN):
 				order = unicode(data_tags[7].string).replace(u' ', '')
 			except BaseException as e:
 				order = ''
-			return [get_ISBN, bookname, author, house, date, bookbinding, chinese_book_category, order]
+			return {
+				'ISBN': get_ISBN,
+				'bookname': bookname,
+				'author': author,
+				'house': house,
+				'date': date,
+				'bookbinding' :bookbinding,
+				'chinese_book_category': chinese_book_category,
+				'order': order,
+			}
 
-	return []
+	return {}
 
 def get_ncl_bookinfo_list(query_dict):
 	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/H30_SearchBooks.php'

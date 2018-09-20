@@ -125,38 +125,6 @@ def org_info(request, template_name='genericUser/org_info.html'):
 def func_desc(request, template_name='genericUser/func_desc.html'):
 	return render(request, template_name, locals())
 
-@user_category_check(['manager'])
-@http_response
-def review_user(request, username, template_name='genericUser/review_user.html'):
-	try:
-		user = User.objects.get(username=username)
-	except:
-		raise Http404("user does not exist")
-	events = Event.objects.filter(content_type__model='user', object_id=user.id, status=Event.STATUS['review'])
-	sourcePath = BASE_DIR + '/static/ebookSystem/disability_card/{0}'.format(user.username)
-	DCDir = BASE_DIR + '/static/ebookSystem/disability_card/{0}'.format(user.username)
-	DCDir_url = DCDir.replace(BASE_DIR + '/static/', '')
-	if request.method == 'GET':
-		return locals()
-	if request.method == 'POST':
-		for item in ['active', 'editor', 'guest', 'manager', 'advanced_editor', ]:
-			exec("user.is_{0} = True if request.POST.has_key('{0}') else False".format(item))
-		if request.POST['review'] == 'success':
-			user.status = user.STATUS['active']
-			user.save()
-			redirect_to = reverse('manager:event_list', kwargs={'action': 'user'})
-			status = 'success'
-			message = u'完成審核權限開通'
-			for event in events:
-				event.response(status=status, message=message, user=request.user)
-		elif request.POST['review'] == 'error':
-			redirect_to = reverse('manager:event_list', kwargs={'action': 'user'})
-			status = 'success'
-			message = u'資料異常退回'
-			for event in events:
-				event.response(status='error', message=request.POST['reason'], user=request.user)
-		return locals()
-
 '''subject = u'[通知] {0} 申請服務時數'.format(request.user.username)
 	t = get_template('email/serviceinfo_list.txt')
 	body = t.render(Context(locals()))

@@ -72,6 +72,22 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			res['message'] = u'審核退回文件'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
+	@detail_route(
+		methods=['post'],
+		url_name='set_priority',
+		url_path='action/set_priority',
+	)
+	def set_priority(self, request, pk=None):
+		res = {}
+		obj = self.get_object()
+		try:
+			res['priority'] = priority = int(request.POST['priority'])
+			obj.priority = priority
+			obj.save()
+		except BaseException as e:
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
 	@list_route(
 		methods=['post'],
 		url_name='upload_self',
@@ -465,8 +481,8 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 		if request.POST['source'] == 'NCL':
 			#=====NCL=====
 			try:
-				[res['ISBN'], res['bookname'], res['author'], res['house'], res['date'], res['bookbinding'], res['chinese_book_category'], res['order']] = get_ncl_bookinfo(ISBN)
-				res['source'] = 'NCL'
+				res['bookinfo'] = get_ncl_bookinfo(ISBN)
+				res['bookinfo']['source'] = 'NCL'
 			except BaseException as e:
 				res['detail'] = u'NCL 無資料'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -474,9 +490,8 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 		elif request.POST['source'] == 'douban':
 			#=====douban=====
 			try:
-				[res['ISBN'], res['bookname'], res['author'], res['house'], res['date'], res['bookbinding']] = get_douban_bookinfo(ISBN)
-				res['chinese_book_category'], res['order'] = ('', '')
-				res['source'] = 'douban'
+				res['bookinfo'] = get_douban_bookinfo(ISBN)
+				res['bookinfo']['source'] = 'douban'
 			except BaseException as e:
 				res['detail'] = u'douban 無資料'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -508,7 +523,8 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 
 			try:
 				res['bookinfo_list'] = get_ncl_bookinfo_list(query_dict)
-				res['source'] = 'NCL'
+				for r in res['bookinfo_list']:
+					r['source'] = 'NCL'
 			except BaseException as e:
 				res['detail'] = u'查詢書籍錯誤。{0}'.format(unicode(e))
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -516,7 +532,8 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 		elif request.POST['source'] == 'douban':
 			try:
 				res['bookinfo_list'] = get_douban_bookinfo_list(request.POST['search_query'])
-				res['source'] = 'douban'
+				for r in res['bookinfo_list']:
+					r['source'] = 'douban'
 			except BaseException as e:
 				res['detail'] = u'查詢書籍錯誤。{0}'.format(unicode(e))
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)

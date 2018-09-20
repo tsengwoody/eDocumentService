@@ -1,4 +1,5 @@
 ﻿# coding=utf-8
+import cgi
 import io
 import os
 import shutil
@@ -63,6 +64,9 @@ def html2epub(part_list, dst, **kwargs):
 	return book
 
 def txt2epub(src, dst, line_per_chapter=100, **kwargs):
+	template_content = u'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title></title></head><body>{}</body></html>'
+	START_HTML = template_content.split('{}')[0]
+	END_HTML = template_content.split('{}')[1]
 
 	temp_folder = os.path.join(os.path.dirname(src), 'epub_temp')
 	if not os.path.exists(temp_folder):
@@ -73,23 +77,20 @@ def txt2epub(src, dst, line_per_chapter=100, **kwargs):
 			if index % line_per_chapter == 0:
 				part = index/line_per_chapter + 1
 				try:
+					fw.write(END_HTML)
 					fw.close()
 				except BaseException as e:
 					pass
 				temp_file = temp_folder +'/part{0}.txt'.format(part)
-				fw = io.open(temp_file, 'w', encoding='utf-8')
 				part_list.append(temp_file)
-			fw.write(line)
+				fw = io.open(temp_file, 'w', encoding='utf-8')
+				fw.write(START_HTML)
+			fw.write('<p>' +cgi.escape(line).strip() +'</p>')
 		fw.close()
-
-	from tag import add_tag, add_template_tag
-	for f in part_list:
-		add_tag(f, f,)
-		add_template_tag(f, f, )
 
 	book = html2epub(part_list, dst, **kwargs)
 
-	shutil.rmtree(temp_folder)
+	#shutil.rmtree(temp_folder)
 	return book
 
 def html2txt(src, dst):

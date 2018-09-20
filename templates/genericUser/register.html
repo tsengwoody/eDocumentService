@@ -404,7 +404,7 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 				let self = this;
 				rest_aj_send('post', '/genericUser/api/users/', this.infos)
 				.done(function(data, textStatus, xhr) {
-					alertmessage('success', '成功註冊帳號')
+					alertmessage('success', '成功註冊帳號，請至「帳號>個人資料」頁面驗證手機與電子信箱，視障者需額外登錄身障手冊，方可開始使用。')
 					.done(function() {
 						self.login(self.infos.username, self.infos.password)
 					})

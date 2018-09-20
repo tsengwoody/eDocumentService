@@ -27,7 +27,7 @@
 			<button
 				v-if="user.is_manager"
 				class="btn btn-primary"
-				@click="openDialog('qm', this);"
+				@click="qanda_update(props.item.id)"
 			>編輯</button>
 			<!--data-toggle="modal" :data-target="'#qm'"-->
 			<button
@@ -139,6 +139,35 @@
 					})
 
 				})
+			},
+			qanda_update: function (pk) {
+				let self = this;
+				self.client.qandas.read(pk)
+				.done(function(data) {
+					_.each(self.qanda_instance, function(v, k){
+						self.qanda_instance[k] = data[k]
+					})
+				})
+				let qa = self.qanda_instance
+
+				//AboutQAndA
+				AboutQAndA(qa.question,qa.answer, qa.category)
+				.done(function(nq,na, nc){
+					self.qanda_instance.question = nq
+					self.qanda_instance.answer = na
+					self.qanda_instance.category = nc
+					self.client.qandas.update(pk, self.qanda_instance)
+					.done(function(data) {
+						alertmessage('success', '成功更新教學內容。')
+						.done(function(data) {
+							self.qanda_list_refresh()
+						})
+					})
+					.fail(function(xhr, result, statusText){
+						alertmessage('error', xhr.responseText)
+					})
+				})
+
 			},
 			qanda_del: function (pk) {
 				let self = this

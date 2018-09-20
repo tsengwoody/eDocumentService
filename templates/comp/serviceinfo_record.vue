@@ -1,4 +1,4 @@
-﻿<template id="serviceinfo_record">
+<template id="serviceinfo_record">
 <div>
 	<h3>服務紀錄</h3>
 
@@ -160,7 +160,7 @@
 				temp_data = {
 					date: v['date'],
 					service_hours: v['service_hours'],
-					org: cstr(getorg(v.org).name),
+					'org': v['orginfo'].name,
 					editrecord_set: v.editrecordinfo_set,
 				};
 
@@ -236,6 +236,11 @@
 
 				if(iser(self.org_select)){
 					alertmessage('error', '請選擇兌換中心。')
+					return -1
+				}
+
+				if(self.service_hours<60){
+					alertmessage('error', '單筆申請服務時數需超過1小時。')
 					return -1
 				}
 
