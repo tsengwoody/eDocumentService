@@ -8,11 +8,16 @@ import requests
 import urllib,urllib2
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+options = Options()
+options.add_argument("--headless")
 LOG_DIR = os.path.dirname(os.path.abspath(__file__))
 
 #=====douban=====
 def get_douban_bookinfo(ISBN):
-	browser = webdriver.PhantomJS(service_log_path=LOG_DIR +'/ghostdriver.log')
+	#browser = webdriver.PhantomJS(service_log_path=LOG_DIR +'/ghostdriver.log')
+	browser = webdriver.Firefox(firefox_options=options, log_path=LOG_DIR +'/ghostdriver.log')
+
 	url = u'https://book.douban.com/subject_search'
 	values = {}
 	values['search_text'] = ISBN.encode('utf-8')
@@ -97,7 +102,9 @@ def get_douban_bookinfo(ISBN):
 	}
 
 def get_douban_bookinfo_list(query_text):
-	browser = webdriver.PhantomJS(service_log_path=LOG_DIR +'/ghostdriver.log')
+	#browser = webdriver.PhantomJS(service_log_path=LOG_DIR +'/ghostdriver.log')
+	browser = webdriver.Firefox(firefox_options=options, log_path=LOG_DIR +'/ghostdriver.log')
+
 	url = u'https://book.douban.com/subject_search'
 	values = {}
 	values['search_text'] = query_text.encode('utf-8')

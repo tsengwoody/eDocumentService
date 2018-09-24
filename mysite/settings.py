@@ -48,7 +48,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'social_django',
     'ebookSystem',
     'genericUser',
     'rest_framework',
@@ -229,3 +228,9 @@ from .account_info import *
         'rest_framework.authentication.SessionAuthentication',
     )
 }'''
+
+BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'

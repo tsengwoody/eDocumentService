@@ -47,36 +47,6 @@ def generics(request, name, pk=None):
 	template_name='ebookSystem/{0}.html'.format(name.split('/')[0])
 	return locals()
 
-@user_category_check(['manager'])
-@http_response
-def review_document(request, book_ISBN, template_name='ebookSystem/review_document.html'):
-	try:
-		book = Book.objects.get(ISBN=book_ISBN)
-	except:
-		raise Http404("book does not exist")
-	events = Event.objects.filter(content_type__model='book', object_id=book.ISBN, status=Event.STATUS['review'])
-
-	if request.method == 'GET':
-		return locals()
-
-	if request.method == 'POST':
-		if request.POST['review'] == 'success':
-			for part in book.ebook_set.all():
-				part.change_status(1, 'active', category='based')
-				BookOrder.refresh()
-			status = 'success'
-			message = u'審核通過文件'
-			for event in events:
-				event.response(status=status, message=message, user=request.user)
-		if request.POST['review'] == 'error':
-			book.delete()
-			status = 'success'
-			message = u'審核退回文件'
-			for event in events:
-				event.response(status='error', message=request.POST['reason'], user=request.user)
-		redirect_to = reverse('manager:event_list', kwargs={'action':'book' })
-		return locals()
-
 def edit_ajax(request, ISBN_part, *args, **kwargs):
 	print request.POST
 	user = request.user

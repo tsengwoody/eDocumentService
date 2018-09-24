@@ -23,8 +23,8 @@ import base64
 import json
 import shutil
 import datetime
-import requests
-import urllib, urllib2
+
+
 
 @http_response
 def generics(request, name, pk=None):
@@ -86,12 +86,6 @@ def retrieve_password(request, template_name='genericUser/retrieve_password.html
 	if request.method == 'GET':
 		return locals()
 
-def user_guide(request, template_name='genericUser/user_guide.html'):
-	return render(request, template_name, locals())
-
-def recruit(request, template_name='genericUser/recruit.html'):
-	return render(request, template_name, locals())
-
 def upload_progress(request):
 	"""
 	Return JSON object with information about the progress of an upload.
@@ -109,10 +103,6 @@ def upload_progress(request):
 		return HttpResponse(json.dumps(data), content_type="application/json")
 	else:
 		return HttpResponseServerError('Server Error: You must provide X-Progress-ID header or query param.')
-
-def event_list(request, template_name = 'genericUser/event_list.html'):
-	events = Event.objects.filter(creater=request.user)
-	return render(request, template_name, locals())
 
 @http_response
 def org_info(request, template_name='genericUser/org_info.html'):
