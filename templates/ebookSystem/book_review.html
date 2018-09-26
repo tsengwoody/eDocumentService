@@ -24,12 +24,13 @@
 	<h3><span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step2: 掃描內容</h3>
 	<hr style="margin-top:5px;">
 
-	<div v-for="item in book.ebook_set">
+	<template  v-for="item in book.ebook_set">
 		<button
+			style="margin: 0.5em;"
 			class="btn btn-default"
 			@click="ScanBookEditor('掃描內容瀏覽', item.ISBN_part)"
 		>分段{|{ item.part }|}</button>
-	</div>
+	</template>
 
 	<!--step 3-->
 	<h3><span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step3: 審核結果</h3>

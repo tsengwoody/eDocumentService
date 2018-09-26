@@ -96,11 +96,11 @@ div.tbody .cell {
 							<a role="button"
 								@click="order(k)"
 							>
-								<div v-if="k===key">
-									<div v-if="orderby==='asc'">▲</div>
-									<div v-if="orderby==='desc'">▼</div>
-								</div>
 								{|{ v }|}
+								<template v-if="k===key">
+									<template v-if="orderby==='asc'">▲</template>
+									<template v-if="orderby==='desc'">▼</template>
+								</template>
 							</a>
 						</div>
 					</div>
