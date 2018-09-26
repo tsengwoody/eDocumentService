@@ -57,6 +57,14 @@ class UserSelfOrManagerFilter(filters.BaseFilterBackend):
 		else:
 			return queryset.filter(id=request.user.id)
 
+class UserOrganizationFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		org = request.query_params.get('org')
+		if org:
+			return queryset.filter(org=org)
+		else:
+			return queryset
+
 class UserAuthFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
 		auth = request.query_params.get('auth')

@@ -20,13 +20,17 @@ def sizeof_fmt(num, suffix='B'):
 	return "%.1f%s%s" % (num, 'Yi', suffix)
 
 class Resource(APIView):
-	resourceClass = None
 
-	def get_object(self, pk):
-		try:
-			return self.resourceClass.objects.get(pk=pk)
-		except self.resourceClass.DoesNotExist:
-			raise Http404
+	def resource(self, request, dir, resource):
+		fullpath = self.get_fullpath(dir, resource)
+		if request.method == 'GET':
+			return self.get_resource(fullpath)
+		if request.method == 'POST':
+			return self.post_resource(fullpath, request.FILES['object'])
+
+	def category(self, request, dir):
+		fullpath = self.get_fullpath(dir, resource='')
+		return self.get_resource_list(fullpath)
 
 	def get_resource(self, fullpath):
 		# Respect the If-Modified-Since header.
