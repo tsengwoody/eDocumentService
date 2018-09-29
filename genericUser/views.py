@@ -34,7 +34,6 @@ def generics(request, name, pk=None):
 @http_response
 def retrieve_password(request, template_name='genericUser/retrieve_password.html'):
 	if request.method == 'POST':
-		print request.POST['rpw_email']
 		if not request.POST['username']=='':
 			try:
 				birthday = request.POST['rpw_birthday'].split('-')
@@ -111,9 +110,6 @@ def org_info(request, template_name='genericUser/org_info.html'):
 		return locals()
 	if request.method == 'GET':
 		return locals()
-
-def func_desc(request, template_name='genericUser/func_desc.html'):
-	return render(request, template_name, locals())
 
 '''subject = u'[通知] {0} 申請服務時數'.format(request.user.username)
 	t = get_template('email/serviceinfo_list.txt')

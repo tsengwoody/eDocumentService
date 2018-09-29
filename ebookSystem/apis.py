@@ -451,6 +451,7 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
+from utils.crawler import *
 class BookInfoViewSet(viewsets.ModelViewSet):
 	queryset = BookInfo.objects.filter(book__status__gte=Book.STATUS['finish']).order_by('-date')
 	serializer_class = BookInfoSerializer
@@ -465,7 +466,6 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 		url_path='action/isbn2bookinfo',
 	)
 	def isbn2bookinfo(self, request, pk=None):
-		from utils.crawler import *
 		res = {}
 
 		ISBN = request.POST['ISBN']
@@ -505,7 +505,6 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 		url_path='action/key2bookinfo',
 	)
 	def key2bookinfo(self, request, pk=None):
-		from utils.crawler import *
 		res = {}
 
 		if request.POST['source'] == 'NCL':
@@ -514,7 +513,8 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 			p_value = re.compile(r'FO_SearchValue(?P<count>\d+)')
 
 			query_dict = {}
-			for k,v in request.POST.iteritems():
+			#for k,v in request.POST.iteritems():
+			for k,v in request.POST.items():
 				search_logic = p_logic.search(k)
 				search_field = p_field.search(k)
 				search_value = p_value.search(k)

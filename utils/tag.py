@@ -25,7 +25,6 @@ def add_base_url(src, id, encoding='utf-8'):
 	tags = soup.find_all(src=re.compile('^[\d\w]+'))
 	for tag in tags:
 		tag['src'] = base_url +tag['src']
-		print tag['src']
 	with codecs.open(src, 'w', encoding=encoding) as dstFile:
 		dst_content = soup.prettify(formatter='html').replace(u'\n', u'\r\n')
 		dstFile.write(dst_content)

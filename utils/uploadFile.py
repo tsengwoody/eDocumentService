@@ -4,7 +4,7 @@ import os
 def handle_uploaded_file(path, file):
 	dirname = os.path.dirname(path)
 	if not os.path.exists(dirname):
-		os.makedirs(dirname, 0755)
+		os.makedirs(dirname, '0755')
 	with open(path, 'wb+') as destination:
 		for chunk in file.chunks():
 			destination.write(chunk)

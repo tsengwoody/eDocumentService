@@ -10,6 +10,7 @@ static/readium/
 temp/
 templates/old/
 venv/
+venvpy3/
 auto.sh
 .idea
 ebookSystem/fixtures

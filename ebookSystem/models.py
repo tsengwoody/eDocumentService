@@ -409,7 +409,7 @@ class EBook(models.Model):
 		if os.path.exists(water_path +'/' +scanPageList[0]):
 			return False
 		if not os.path.exists(water_path):
-			os.makedirs(water_path, 0770)
+			os.makedirs(water_path, '0770')
 		for s in scanPageList:
 			image_file=source_path +'/' +s
 			self.add_watermark(str(user.username), font_file, 52, image_file, water_path)
@@ -729,7 +729,6 @@ def add_watermark(self,text, fontname, fontsize, imagefile, output_dir):
 	img2.paste(img, (px, py), img)
 	imagefile = imagefile.split('/')[-1]
 	imagefile = imagefile
-	print output_dir+" "+imagefile + " saved..."
 	img2.save(output_dir + imagefile)
 	del draw0, draw
 	del img0, img, img2

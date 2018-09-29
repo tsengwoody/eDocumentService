@@ -215,6 +215,7 @@ class DisabilityCardViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = DisabilityCard.objects.all()
 	serializer_class = DisabilityCardSerializer
 	filter_backends = (filters.OrderingFilter, filters.SearchFilter, DisabilityCardActiveFilter,)
+	search_fields = ('identity_card_number', 'name',)
 
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = None

@@ -1,11 +1,11 @@
 ﻿# coding: utf-8
 import codecs
-import cookielib
+#import cookielib
 import datetime
 import os
 import re
 import requests
-import urllib,urllib2
+import urllib
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
@@ -413,9 +413,9 @@ def ISBN10_to_ISBN13(ISBN):
 import sys
 if __name__ == '__main__':
 	r = get_ncl_bookinfo(u'9789573321569')
-	print r[1]
+	print(r[1])
 	r = get_douban_bookinfo(u'9787801871527')
-	print r[1]
+	print(r[1])
 	r_list = get_douban_bookinfo_list(u'天藍色')
 	for i in r_list:
-		print i[1]
+		print(i[1])

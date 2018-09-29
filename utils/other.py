@@ -10,7 +10,6 @@ def month_gen(date=datetime.date.today(), count=6):
 
 if __name__ == '__main__':
 	l=month_gen()
-	print l
 
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')

@@ -14,14 +14,8 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import generic
 from .models import *
-from .forms import *
-from genericUser.models import Event
 from mysite.settings import BASE_DIR, SERVICE
-from utils.analysis import *
-from utils.crawler import *
 from utils.decorator import *
-from utils.uploadFile import handle_uploaded_file
-from utils.resource import *
 import os
 import json
 import shutil
@@ -48,7 +42,6 @@ def generics(request, name, pk=None):
 	return locals()
 
 def edit_ajax(request, ISBN_part, *args, **kwargs):
-	print request.POST
 	user = request.user
 	response = {}
 	if not getattr(request.user, 'is_editor', None):

@@ -19,7 +19,6 @@ api_urlpatterns = copy.copy(router.urls)
 import rest_framework
 
 urlpatterns = [
-	url(r'^func_desc/$', views.func_desc, name='func_desc'),
 	url(r'^org_info$', views.org_info, name='org_info'),
 	url(r'^upload_progress/$', views.upload_progress, name='upload_progress'),
 	url(r'^retrieve_password/$', views.retrieve_password, name='retrieve_password'),
