@@ -99,23 +99,6 @@ class Command(BaseCommand):
 			}
 		)
 
-		client = Client()
-		response = client.post(
-			reverse(
-				'genericUser:review_user',
-				kwargs = {
-					'username': 'demo-editor',
-				},
-			),
-			{
-				'active': 'on',
-				'editor': 'on',
-#				'guest': 'on',
-				'review': 'success',
-				'reason': '',
-			},
-		)
-
 		editor = User.objects.get(username='demo-editor')
 		editor.auth_email = True
 		editor.auth_phone = True
@@ -146,22 +129,6 @@ class Command(BaseCommand):
 				}
 			)
 
-		response = client.post(
-			reverse(
-				'genericUser:review_user',
-				kwargs = {
-					'username': 'demo-guest',
-				},
-			),
-			{
-				'active': 'on',
-#				'editor': 'on',
-				'guest': 'on',
-				'review': 'success',
-				'reason': '',
-			},
-		)
-
 		guest = User.objects.get(username='demo-guest')
 		guest.auth_email = True
 		guest.auth_phone = True
@@ -184,22 +151,6 @@ class Command(BaseCommand):
 				'role':'Editor',
 				'professional_field':u'資訊工程學',
 				'is_privacy':True,
-			},
-		)
-
-		response = client.post(
-			reverse(
-				'genericUser:review_user',
-				kwargs = {
-					'username': 'demo-manager',
-				},
-			),
-			{
-				'active': 'on',
-				'editor': 'on',
-				'manager': 'on',
-				'review': 'success',
-				'reason': '',
 			},
 		)
 
@@ -244,14 +195,9 @@ class Command(BaseCommand):
 		client = Client()
 		client.login(username='root', password='eds@2018')
 		response = client.post(
-			reverse(
-				'ebookSystem:review_document',
-				kwargs = {
-					'book_ISBN': '9789573321569',
-				},
-			),
+			'/ebookSystem/api/books/9789573321569/action/review/',
 			{
-				'review': 'success',
+				'result': 'success',
 				'reason': '',
 			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
@@ -408,18 +354,3 @@ class Command(BaseCommand):
 				},
 				HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 			)
-
-		client = Client()
-		client.login(username='root', password='eds@2018')
-		previous_count = len(LibraryRecord.objects.all())
-		response = client.post(
-			reverse(
-				'ebookSystem:library_action'
-			),
-			{
-				'ISBN': '9789863981459',
-				'action': 'check_out',
-			},
-			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
-		)
-		assert len(LibraryRecord.objects.all()) == previous_count +1, 'create announcement fail'

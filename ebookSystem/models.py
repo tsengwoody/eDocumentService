@@ -409,7 +409,7 @@ class EBook(models.Model):
 		if os.path.exists(water_path +'/' +scanPageList[0]):
 			return False
 		if not os.path.exists(water_path):
-			os.makedirs(water_path, '0770')
+			os.makedirs(water_path, 755)
 		for s in scanPageList:
 			image_file=source_path +'/' +s
 			self.add_watermark(str(user.username), font_file, 52, image_file, water_path)

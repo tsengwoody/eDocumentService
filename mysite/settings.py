@@ -25,13 +25,13 @@ SECRET_KEY = 'e_#e-byj7#a+$v7#wmocwd8wp)+&wajk0axt70dl@)nsx!*glq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 import socket
-if socket.gethostname() == 'edoc':
+if socket.gethostname() == 'edspro':
     DEBUG = False
 else:
     DEBUG = True
 
 
-if socket.gethostname() == 'edoc':
+if socket.gethostname() == 'edspro':
     ALLOWED_HOSTS = ['edocumentservice.org', 'www.edocumentservice.org', '104.155.204.241']
     SECURE_SSL_REDIRECT = True
 
@@ -90,13 +90,13 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 database = os.environ.get('DATABASE')
-if socket.gethostname() == 'edoc':
+if socket.gethostname() == 'edspro':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'eDocumentService',
-            'USER': 'eDocDB',
-            'PASSWORD': 'eDocDB!@#',
+            'USER': 'root',
+            'PASSWORD': 'eds@2018',
             'HOST': '127.0.0.1',
             'PORT': '3306',
         }
@@ -162,7 +162,7 @@ from django.conf import global_settings
 FILE_UPLOAD_HANDLERS = ['utils.cache.UploadProgressCachedHandler', ] + global_settings.FILE_UPLOAD_HANDLERS
 #FILE_UPLOAD_HANDLERS = ('utils.uploadFile.ProgressUploadSessionHandler', ) + global_settings.FILE_UPLOAD_HANDLERS
 
-if socket.gethostname() == 'edoc':
+if socket.gethostname() == 'edspro':
 	EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 else:
 	EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

@@ -265,7 +265,7 @@ class ServiceInfo(models.Model):
 		path = os.path.join(BASE_DIR, 'file', 'temp', 'serviceinfois_exchange_false_export.txt')
 		dirname = os.path.dirname(path)
 		if not os.path.exists(dirname):
-			os.makedirs(dirname, '0755')
+			os.makedirs(dirname, 755)
 
 		with io.open(path, 'w', encoding='utf-8') as f:
 			f.write(export)
