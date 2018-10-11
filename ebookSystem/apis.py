@@ -144,7 +144,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 			#建立book object
-			newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path=uploadPath, page_per_part=50)
+			newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], page_per_part=50)
 			try:
 				newBook.set_page_count()
 			except:
@@ -251,7 +251,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 			#建立book object和ebook object
 			try:
-				newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], path=uploadPath)
+				newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'])
 			except:
 				newBook = Book.objects.get(ISBN=request.POST['ISBN'])
 
@@ -262,7 +262,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			newBook.save()
 
 			ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN'] + '-1', begin_page=-1, end_page=-1)
-			ebook.change_status(9, 'final')
+			ebook.change_status(5, 'final')
 
 			res['detail'] = u'成功建立並上傳文件'
 			return Response(data=res, status=status.HTTP_202_ACCEPTED)

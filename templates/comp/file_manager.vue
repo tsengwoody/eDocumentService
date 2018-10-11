@@ -13,6 +13,7 @@
 					@click="window.location.replace(url +props.item.name +'/')"
 				>下載</button>
 				<button
+					v-if="user.is_manager"
 					class="btn btn-default"
 					@click="
 						resource_name=props.item.name;
@@ -21,6 +22,7 @@
 					"
 				>更新</button>
 				<button
+					v-if="user.is_manager"
 					class="btn btn-default"
 					@click="
 						resource_name=props.item.name;
@@ -31,6 +33,7 @@
 			</template>
 		</table-div>
 		<button
+			v-if="user.is_manager"
 			class="btn btn-default"
 			@click="
 				resource_name='';

@@ -127,7 +127,7 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 				'org': '',
 				'password': '',
 				'confirm_password': '',
-				'role': '',
+				'role': 'editor',
 			},
 			model_infos : {
 				'username': {
@@ -219,7 +219,7 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 				},
 				'role': {
 					'label': '角色',
-					'type': 'radio',
+					'type': 'select',
 					'remark': '請填寫角色',
 					'choices' : [
 						{
@@ -236,7 +236,7 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 		},
 		computed: {
 		},
-		created() {
+		created: function(){
 			let vo = this;
 			vo.usertermsContent = document.getElementById('tmp_userterms').innerHTML;
 
@@ -358,7 +358,8 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 				}
 
 				//role
-				if(this.infos.role===''){
+				let role = this.infos.role;
+				if(role===''){
 					err.push('角色尚未選擇');
 				}
 
@@ -399,7 +400,7 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 					this.infos.is_editor = false;
 					this.infos.is_guest = true;
 				}
-				delete this.infos.role;
+				//delete this.infos.role;
 
 				let self = this;
 				rest_aj_send('post', '/genericUser/api/users/', this.infos)

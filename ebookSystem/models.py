@@ -29,7 +29,6 @@ class BookInfo(models.Model):
 class Book(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
 	book_info = models.OneToOneField(BookInfo, related_name='book')
-	path = models.CharField(max_length=255, blank=True, null=True)
 	page_count = models.IntegerField(default = -1)
 	part_count = models.IntegerField(default = 1)
 	page_per_part = models.IntegerField(default=-1)
@@ -46,7 +45,11 @@ class Book(models.Model):
 	)
 	source = models.CharField(max_length=20, choices=SOURCE)
 	status = models.IntegerField(default=0)
-	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8, 'final': 9, }
+	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'final': 5, }
+
+	def __init__(self, *args, **kwargs):
+		super(Book, self).__init__(*args, **kwargs)
+		self.path = BASE_DIR +'/file/ebookSystem/document/{0}'.format(self.ISBN)
 
 	def __unicode__(self):
 		return self.book_info.bookname
@@ -71,9 +74,9 @@ class Book(models.Model):
 		status = min([ part.status for part in self.ebook_set.all() ])
 		self.status = status
 
-		if self.status_int2str() == 'finish':
+		if self.status == self.STATUS['finish']:
 			self.finish_date = max([ i.deadline for i in self.ebook_set.all() ])
-		elif self.status_int2str() == 'final':
+		elif self.status == self.STATUS['final']:
 			pass
 		self.save()
 		return status
@@ -266,7 +269,7 @@ class EBook(models.Model):
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
 	status = models.IntegerField(default=0)
-	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'sc_edit':5, 'sc_finish':6, 'an_edit':7, 'an_finish':8, 'final':9}
+	STATUS = {'inactive':0, 'active':1, 'edit':2, 'review':3, 'finish':4, 'final': 5, }
 
 	def get_source_list(self):
 		source_path = self.book.path +u'/source'
@@ -353,7 +356,7 @@ class EBook(models.Model):
 				self.service_hours = 0
 				self.status = self.status +direction
 
-		if direction == 9:
+		if direction == 5:
 			if self.status +direction == self.STATUS['final']:
 				self.status = self.status +direction
 
@@ -433,26 +436,6 @@ class EBook(models.Model):
 		img2.save(output_dir + imagefile)
 		del draw0, draw
 		del img0, img, img2
-
-	def add_tag(self, encoding='utf-8'):
-		from utils import tag
-		source = self.get_path()
-		with io.open(source, 'r', encoding='utf-8') as sourceFile:
-			content = sourceFile.read()
-
-		destination = self.get_path('-edit')
-		with io.open(destination, 'w', encoding='utf-8') as destinationFile:
-			destinationFile.write(tag.add_tag(content))
-
-	def add_template_tag(self, src, dst, encoding='utf-8'):
-		from utils import tag
-		tag.add_template_tag(src, dst)
-
-	def replace(self):
-		from utils.replace import replace
-		shutil.copy2(self.get_clean_file(), self.get_path('-re'))
-		replace(self.get_path('-re'))
-		return self.get_path('-re')
 
 	def get_clean_file(self):
 		clean_file = self.get_path('-clean')
