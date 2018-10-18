@@ -134,40 +134,40 @@ def get_douban_bookinfo_detail(url, session):
 	#item = info.find_all('span')
 
 	try:
-		pattern = re.compile(ur'ISBN')
+		pattern = re.compile(r'ISBN')
 		item = soup.find("span", text=pattern)
 		get_ISBN = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
 
 		bookname_soup = soup.find('span', property="v:itemreviewed")
 		bookname = unicode(bookname_soup.string)
 		try:
-			pattern = re.compile(ur'副标题')
+			pattern = re.compile(r'副标题')
 			item = soup.find("span", text=pattern)
 			subtitle = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
 			bookname = u'{0}, {1}'.format(bookname, subtitle)
 		except:
 			pass
 		try:
-			pattern = re.compile(ur'原作名')
+			pattern = re.compile(r'原作名')
 			item = soup.find("span", text=pattern)
 			orgtitle = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
 			bookname = u'{0}; {1}'.format(bookname, orgtitle)
 		except:
 			pass
-		pattern = re.compile(ur'作者')
+		pattern = re.compile(r'作者')
 		item = soup.find("span", text=pattern)
 		author = unicode(item.next_sibling.next_sibling.string).replace(' ', '').replace('\n', '')
 		try:
-			pattern = re.compile(ur'译者')
+			pattern = re.compile(r'译者')
 			item = soup.find("span", text=pattern)
 			translator = unicode(item.next_sibling.next_sibling.string).replace(' ', '').replace('\n', '')
 			author = u'{0}作; {1}译'.format(author, translator)
 		except:
 			pass
-		pattern = re.compile(ur'出版社')
+		pattern = re.compile(r'出版社')
 		item = soup.find("span", text=pattern)
 		house = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
-		pattern = re.compile(ur'出版年')
+		pattern = re.compile(r'出版年')
 		item = soup.find("span", text=pattern)
 		date = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
 		year = int(date.split('-')[0])
@@ -176,7 +176,7 @@ def get_douban_bookinfo_detail(url, session):
 	except BaseException as e:
 		return []
 	try:
-		pattern = re.compile(ur'装帧')
+		pattern = re.compile(r'装帧')
 		item = soup.find("span", text=pattern)
 		bookbinding = unicode(item.next_sibling.string).replace(' ', '').replace('\n', '')
 	except BaseException as e:
@@ -239,7 +239,7 @@ def get_ncl_bookinfo(ISBN):
 	soup = BeautifulSoup(res, 'html5lib')
 	data_tags = soup.find_all('td', class_=u'資料列_1')
 
-	pattern = re.compile(ur'找到 (\d{1,}) 筆')
+	pattern = re.compile(r'找到 (\d{1,}) 筆')
 	record_count = pattern.search(res).group(1)
 	record_count = int(record_count)
 
@@ -289,7 +289,7 @@ def get_ncl_bookinfo_list(query_dict):
 	soup = BeautifulSoup(res, 'html5lib')
 	data_tags = soup.find_all('td', class_=u'資料列_1')
 
-	pattern = re.compile(ur'找到 (\d{1,}) 筆')
+	pattern = re.compile(r'找到 (\d{1,}) 筆')
 	record_count = pattern.search(res).group(1)
 	record_count = int(record_count)
 
@@ -330,7 +330,7 @@ def get_ncl_bookinfo_detail(url, session):
 	for j in range(len(advance_info)):
 		try:
 			get_ISBN = unicode(advance_info[j*7 +0].string).replace(u' ', '')
-			pattern = re.compile(ur'(\d{13,13}).*')
+			pattern = re.compile(r'(\d{13,13}).*')
 			get_ISBN = pattern.search(get_ISBN).group(1)
 			bookname = unicode(data_tags[1].string).replace(u' ', '')
 			author = unicode(data_tags[3].string).replace(u' ', '')
@@ -344,13 +344,13 @@ def get_ncl_bookinfo_detail(url, session):
 
 		try:
 			bookbinding = unicode(advance_info[j*7 +0].string).replace(u' ', '')
-			pattern = re.compile(ur'\((.*)\)')
+			pattern = re.compile(r'\((.*)\)')
 			bookbinding = pattern.search(bookbinding).group(1)
 		except BaseException as e:
 			bookbinding = ''
 		try:
 			chinese_book_category = unicode(data_tags[9].string).replace(u' ', '')
-			pattern = re.compile(ur'(\d{3,3}).*')
+			pattern = re.compile(r'(\d{3,3}).*')
 			chinese_book_category = pattern.search(chinese_book_category).group(1)
 		except BaseException as e:
 			chinese_book_category = ''

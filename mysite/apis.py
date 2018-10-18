@@ -93,7 +93,7 @@ class Statistics(APIView):
 		})
 		r = query.values('user').annotate(count=Count('user'))
 		r = [{
-			'groupfield': User.objects.get(id=i['user']).username,
+			'groupfield': User.objects.get(id=i['user']).first_name +User.objects.get(id=i['user']).last_name,
 			'count': i['count'],
 		} for i in r if i['user']]
 		res['result'].extend(r)

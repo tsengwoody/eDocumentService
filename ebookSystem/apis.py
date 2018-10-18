@@ -579,7 +579,7 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = LibraryRecord.objects.all()
 	serializer_class = LibraryRecordSerializer
 	filter_backends = (LibraryRecordUserFilter, LibraryRecordStatusFilter,)
-	permission_classes = (permissions.IsAuthenticated,)
+	permission_classes = (permissions.IsAuthenticated, ManagerOrOwner)
 
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = None
@@ -604,7 +604,7 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			res['message'] = u'已在借閱書櫃無需再借閱'
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-		lr = LibraryRecord.objects.create(user=request.user, object=book)
+		lr = LibraryRecord.objects.create(owner=request.user, object=book)
 		res['id'] = lr.id
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 

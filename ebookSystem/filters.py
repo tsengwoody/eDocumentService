@@ -125,7 +125,7 @@ class LibraryRecordUserFilter(filters.BaseFilterBackend):
 		user_id = request.query_params.get('user_id')
 		if user_id:
 			user = User.objects.get(id=user_id)
-			return queryset.filter(user=user)
+			return queryset.filter(owner=user)
 		else:
 			return queryset
 

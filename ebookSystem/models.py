@@ -543,8 +543,8 @@ class Library(models.Model):
 	def check_out(self):
 		if not os.path.exists(os.path.dirname(self.epub)):
 			os.mkdir(os.path.dirname(self.epub))
-		path = self.object.custom_epub_create(self.epub, self.user)
-		path = self.object.custom_txt_create(self.txt, self.user)
+		path = self.object.custom_epub_create(self.epub, self.owner)
+		path = self.object.custom_txt_create(self.txt, self.owner)
 		from utils.epub import remove_blankline
 		remove_blankline(path, path)
 
@@ -567,7 +567,7 @@ class Library(models.Model):
 		return self.epub
 
 class LibraryRecord(Library):
-	user = models.ForeignKey(User, related_name='libraryrecord_set')
+	owner = models.ForeignKey(User, related_name='libraryrecord_set')
 	object = models.ForeignKey(Book, related_name='libraryrecord_set')
 
 class Recommend(models.Model):

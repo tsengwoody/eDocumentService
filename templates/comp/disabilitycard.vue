@@ -272,6 +272,7 @@
 				.done(function(data) {
 					alertmessage('success', '成功新建手冊')
 					self.pk = data.identity_card_number
+					self.upload(self.pk)
 					self.refresh()
 					self.bus.$emit('instance-refresh', 'refresh')
 				})

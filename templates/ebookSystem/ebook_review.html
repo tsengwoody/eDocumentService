@@ -143,6 +143,9 @@
 				rest_aj_send('post', '/ebookSystem/api/ebooks/' +self.pk +'/action/review/', transferData)
 				.done(function(data) {
 					alertmessage('success', '審核已完成' +data['message'])
+					.done(function() {
+						window.location.replace('/ebookSystem/generics/ebook_review_list/')
+					})
 				})
 				.fail(function(data){
 					alertmessage('error', '' +data['message'])
