@@ -1,5 +1,4 @@
-{% include 'comp/drf.vue' %}
-<template id="disabilitycard">
+<template>
 <div id="disabilitycard_register" class="container">
 	<div class="row">
 		<div class="col-sm-4 col-md-4">
@@ -135,9 +134,11 @@
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
-	Vue.component('disabilitycard', {
-		template: '#disabilitycard',
+	module.exports = {
 		props: ['bus',],
+		components: {
+			'drf-model': httpVueLoader('/static/ebookSystem/js/vue-component/drf.vue'),
+		},
 		data: function(){
 			return {
 				mode: 'read',
@@ -367,6 +368,6 @@
 			},
 		},
 
-	})
+	}
 
 </script>

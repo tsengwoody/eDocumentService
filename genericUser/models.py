@@ -309,6 +309,7 @@ class Announcement(models.Model):
 	datetime = models.DateField(default = timezone.now)
 	CATEGORY = (
 		(u'平台消息' , u'平台消息'),
+		(u'天橋說書' , u'天橋說書'),
 		(u'新書推薦' , u'新書推薦'),
 		(u'志工快訊' , u'志工快訊'),
 	)

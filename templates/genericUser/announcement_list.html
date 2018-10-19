@@ -5,8 +5,6 @@
 
 {% block content %}
 {% csrf_token %}
-{% include 'comp/table-div.vue' %}
-{% include 'comp/tab.vue' %}
 
 <div id="announcement_list">
 	<h2>公告列表</h2>
@@ -24,11 +22,17 @@
 		</template>
 	</tab>
 </div>
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	new Vue({
 		el: '#announcement_list',
+		components: {
+			'bookinfo_repository': httpVueLoader('/static/ebookSystem/js/vue-component/bookinfo_repository.vue'),
+			'tab': httpVueLoader('/static/ebookSystem/js/vue-component/tab.vue'),
+			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+		},
 		data: {
 			announcement_columns: {
 				'title': '標題',
@@ -45,13 +49,20 @@
 				},
 				{
 					'order': 1,
+					'display_name': '天橋說書',
+					'value': '天橋說書',
+					'type': 'table',
+					'data': '',
+				},
+				{
+					'order': 2,
 					'display_name': '新書推薦',
 					'value': '新書推薦',
 					'type': 'table',
 					'data': '',
 				},
 				{
-					'order': 2,
+					'order': 3,
 					'display_name': '志工快訊',
 					'value': '志工快訊',
 					'type': 'table',
@@ -62,46 +73,32 @@
 		created: function () {
 			this.client = new $.RestClient('/genericUser/api/');
 			this.client.add('announcements');
-
-			let self = this;
-
-			_.each(self.data, function(v){
-				query = {'category': v.value}
-
-				self.client.announcements.read(query)
-				.done(function(data) {
-
-					filter_data = []
-					_.each(data, function(v){
-						temp_data = {
-							"id": v.id,
-							"title": v['title'],
-							"datetime": v['datetime'],
-							"action": v.id,
-						}
-
-						filter_data.push(temp_data)
-					})
-					v.data = filter_data
-
-				})
-			})
+		},
+		mounted: function () {
+			this.get_table_data()
 		},
 		methods: {
 			get_table_data: function () {
-				// run ajax get data
 				let self = this;
 
 				_.each(self.data, function(v){
-					query = {}
-					query[v.value] = 8
-					self.client.bookinfos.read(query)
+					query = {'category': v.value}
+
+					self.client.announcements.read(query)
 					.done(function(data) {
 
 						filter_data = []
-						_.each(data, bookinfos_data)
-						v.data = filter_data
+						_.each(data, function(v){
+							temp_data = {
+								"id": v.id,
+								"title": v['title'],
+								"datetime": v['datetime'],
+								"action": v.id,
+							}
 
+							filter_data.push(temp_data)
+						})
+						v.data = filter_data
 					})
 				})
 			},

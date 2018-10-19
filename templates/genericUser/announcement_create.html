@@ -2,15 +2,12 @@
 {% block title %}
 公告發佈
 {% endblock %}
-
 {% block style %}
 {% load staticfiles %}
 {% endblock %}
-
 {% block header %}
 公告發佈
 {% endblock %}
-
 {% block content %}
 
 {% csrf_token %} 
@@ -27,6 +24,7 @@
 			>
 				<option value="">---------</option>
 				<option value="平台消息">平台消息</option>
+				<option value="天橋說書">天橋說書</option>
 				<option value="新書推薦">新書推薦</option>
 				<option value="志工快訊">志工快訊</option>
 			</select>
@@ -64,16 +62,15 @@
 </div>
 
 <script type="text/javascript">
-$(function(){
-	let tinymce_init = {
-			selector: "#id_content",
-			language:"zh_TW",
-			plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
-			toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample'
-		};
 
-	Vue.options.delimiters = ['{|{', '}|}'];
-	let vm = {
+	let tinymce_init = {
+		selector: "#id_content",
+		language:"zh_TW",
+		plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
+		toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample'
+	};
+
+	new Vue({
 		el: '#app',
 		data: { 
 			title: '',
@@ -91,7 +88,7 @@ $(function(){
 					'category': this.category,
 					'content': this.content,
 				}
-			}
+			},
 		},
 		methods: {
 			cancel: function(){
@@ -110,10 +107,10 @@ $(function(){
 			create: function(){
 				rest_aj_send('post', '/genericUser/api/announcements/', this.transferData)
 				.done(function(data){
-					alertmessage('success', data['message'] +'成功新建公告',)
+					alertmessage('success', '成功新建公告',)
 					.done(function(){
 						//重新整理
-						window.location.reload();
+						window.location.replace('/genericUser/generics/announcement/' +data.data['id'] +'/')
 					})
 				})
 				.fail(function(data){
@@ -121,10 +118,7 @@ $(function(){
 				})
 			}
 		}
-	}
+	})
 
-	var app = new Vue(vm);
-});
 </script>
-
 {% endblock %}

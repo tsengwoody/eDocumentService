@@ -5,7 +5,6 @@
 {% block content %}
 
 {% csrf_token %} 
-{% include 'comp/file_manager.vue' %}
 
 <div id="id_announcement" class="form-horizontal">
 	<h2>公告內容</h2>
@@ -86,10 +85,15 @@
 	</div>
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
-	vo_announcement = new Vue({
+	new Vue({
 		el: '#id_announcement',
+		components: {
+			'editor': Editor,
+			'file_manager': httpVueLoader('/static/ebookSystem/js/vue-component/file_manager.vue'),
+		},
 		data: {
 			announcement: {},
 			url: '',
@@ -102,10 +106,7 @@
 				toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample',
 			},
 		},
-		components: {
-			'editor': Editor
-		},
-		created: function(){
+		mounted: function(){
 			let self = this
 
 			let pk = window.location.pathname.split('/')
