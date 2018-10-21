@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
 {% csrf_token %}
-{% include 'comp/table-div.vue' %}
+
 <h2>上傳文件審核</h2>
 <div class="tab-content" style="padding:20px 0px;">
 	<div id="book_unreview_list">
@@ -25,10 +25,14 @@
 	</div>
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 
 	new Vue({
 		el: '#book_unreview_list',
+		components: {
+			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+		},
 		data: {
 			book_header: {
 				'ISBN': 'ISBN',

@@ -5,8 +5,6 @@
 
 {% block content %}
 {% csrf_token %}
-{% include 'comp/tab.vue' %}
-{% include 'comp/bookinfo_repository.vue' %}
 
 <h2>平台書庫</h2>
 
@@ -48,64 +46,68 @@
 	</div>
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 
 	function bookinfos_data(v){
 		temp_data = {
-			"ISBN": v['ISBN'],
-			"bookname": v['bookname'],
-			"bookbinding": v['bookbinding'],
-			"order": v['order'],
-			"author": v['author'],
-			"house": v['house'],
-			"date": v['date'],
-			"action": v['ISBN'],
+			ISBN: v['ISBN'],
+			bookname: v['bookname'],
+			bookbinding: v['bookbinding'],
+			order: v['order'],
+			author: v['author'],
+			house: v['house'],
+			date: v['date'],
+			action: v['ISBN'],
 		}
 
 		filter_data.push(temp_data)
 
 	}
 
-	bookinfo_columns = {
-		"ISBN": "ISBN",
-		"bookname": "書名",
-		"bookbinding": "裝訂冊數",
-		"order": "版次",
-		"author": "作者",
-		"house": "出版社",
-		"date": "出版日期",
+	let bookinfo_columns = {
+		ISBN: "ISBN",
+		bookname: "書名",
+		bookbinding: "裝訂冊數",
+		order: "版次",
+		author: "作者",
+		house: "出版社",
+		date: "出版日期",
 	}
 	if(user.auth_guest){
 		bookinfo_columns['action'] = '動作'
 	}
 
 	Vue.options.delimiters = ['{|{', '}|}'];
-
 	new Vue({
 		el: '#book_repository_recommend',
+		components: {
+			'tab': httpVueLoader('/static/ebookSystem/js/vue-component/tab.vue'),
+			'bookinfo_repository': httpVueLoader('/static/ebookSystem/js/vue-component/bookinfo_repository.vue'),
+		},
 		data: {
 			bookinfo_columns: bookinfo_columns,
 			data: [
 				{
-					'order': 0,
-					'display_name': '最新上架',
-					'value': 'newest',
-					'type': 'table',
-					'data': '',
+					order: 0,
+					display_name: '最新上架',
+					value: 'newest',
+					type: 'table',
+					data: '',
 				},
 				{
-					'order': 1,
-					'display_name': '平台推薦',
-					'value': 'recommend',
-					'type': 'table',
-					'data': '',
+					order: 1,
+					display_name: '平台推薦',
+					value: 'recommend',
+					type: 'table',
+					data: '',
 				},
 				{
-					'order': 2,
-					'display_name': '借閱排行',
-					'value': 'hottest',
-					'type': 'table',
-					'data': '',
+					order: 2,
+					display_name: '借閱排行',
+					value: 'hottest',
+					type: 'table',
+					data: '',
 				},
 			],
 		},
@@ -139,6 +141,10 @@
 
 	new Vue({
 		el: '#book_repository_index',
+		components: {
+			'tab': httpVueLoader('/static/ebookSystem/js/vue-component/tab.vue'),
+			'bookinfo_repository': httpVueLoader('/static/ebookSystem/js/vue-component/bookinfo_repository.vue'),
+		},
 		data: {
 			bookinfo_columns: bookinfo_columns,
 			data: [
@@ -244,6 +250,10 @@
 
 	new Vue({
 		el: '#book_repository_search',
+		components: {
+			'tab': httpVueLoader('/static/ebookSystem/js/vue-component/tab.vue'),
+			'bookinfo_repository': httpVueLoader('/static/ebookSystem/js/vue-component/bookinfo_repository.vue'),
+		},
 		data: {
 			search_value: '',
 			bookinfos: '',

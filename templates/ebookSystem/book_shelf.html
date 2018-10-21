@@ -4,8 +4,6 @@
 {% endblock %}
 {% block content %}
 {% csrf_token %}
-{% include 'comp/book_download.vue' %}
-{% include 'comp/table-div.vue' %}
 
 <div id="book_shelf" class="container">
 	<h2>借閱書櫃</h3>
@@ -59,46 +57,49 @@
 	</modal>
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 
 	function checkout_datas(v){
 		temp_data = {
-			'bookname': v.object.book_info.bookname,
-			'check_out_time': v.check_out_time.slice(0,10),
-			'check_in_time': v.check_in_time.slice(0,10),
-			'action': v,
+			bookname: v.object.book_info.bookname,
+			check_out_time: v.check_out_time.slice(0,10),
+			check_in_time: v.check_in_time.slice(0,10),
+			action: v,
 		}
 
 		filter_data.push(temp_data)
-
 	}
 
 	function checkin_datas(v){
 		temp_data = {
-			'bookname': v.object.book_info.bookname,
-			'check_out_time': v.check_out_time.slice(0,10),
-			'check_in_time': v.check_in_time.slice(0,10),
+			bookname: v.object.book_info.bookname,
+			check_out_time: v.check_out_time.slice(0,10),
+			check_in_time: v.check_in_time.slice(0,10),
 		}
 
 		filter_data.push(temp_data)
-
 	}
 
 	Vue.options.delimiters = ['{|{', '}|}'];
 	vo_book_shelf = new Vue({
 		el: '#book_shelf',
+		components: {
+			'book_download': httpVueLoader('/static/ebookSystem/js/vue-component/book_download.vue'),
+			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+		},
 		data: {
 			checkout_header: {
-				'bookname': '書名',
-				'check_out_time': '借出日期',
-				'check_in_time': '到期日期',
-				'action': '動作',
+				bookname: '書名',
+				check_out_time: '借出日期',
+				check_in_time: '到期日期',
+				action: '動作',
 			},
 			checkout_list: [],
 			checkin_header: {
-				'bookname': '書名',
-				'check_out_time': '借出日期',
-				'check_in_time': '到期日期',
+				bookname: '書名',
+				check_out_time: '借出日期',
+				check_in_time: '到期日期',
 			},
 			checkin_list: [],
 		},
@@ -109,21 +110,21 @@
 
 			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'user_id': user.id, 'status': 'true'})
 			.done(function(data) {
-				filter_data = []
+				let filter_data = [];
 				_.each(data['data'], checkout_datas)
 				self.checkout_list = filter_data
 			})
 
 			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'user_id': user.id, 'status': 'false'})
 			.done(function(data) {
-				filter_data = []
+				let filter_data = [];
 				_.each(data['data'], checkin_datas)
-				self.checkin_list = filter_data
+				self.checkin_list = filter_data;
 			})
 		},
 		methods: {
 			check_inout: function (pk, action) {
-				let self = this
+				let self = this;
 
 				rest_aj_send('post', '/ebookSystem/api/libraryrecords/' +pk +'/action/check_inout/', {'action': action,})
 				.done(function(data) {
@@ -132,11 +133,11 @@
 						message = '成功歸還書籍'
 						alertmessage('success', message)
 						.done(function() {
-							window.location.reload()
+							window.location.reload();
 						})
 					}
 					if(action==='check_out'){
-						message = '成功借閱書籍'
+						message = '成功借閱書籍';
 						alertmessage('success', message)
 					}
 				})

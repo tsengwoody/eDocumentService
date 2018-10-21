@@ -4,10 +4,6 @@
 {% endblock %}
 {% block content %}
 {% csrf_token %}
-{% include 'comp/book_origin_download.vue' %}
-{% include 'comp/list_vue_component.html' %}
-{% include 'comp/ebook_assign_component.html' %}
-{% include 'comp/table-div.vue' %}
 
 <div id="book_detail" class="container">
 	<h3>書籍詳細</h3>
@@ -104,33 +100,40 @@
 				@click="$refs.bs.save_assign()"
 			>指派</button>
 		</template>
-	</modal      >
+	</modal>
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 
 	Vue.options.delimiters = ['{|{', '}|}'];
-	vo_book_detail = new Vue({
+	new Vue({
 		el: '#book_detail',
+		components: {
+			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+			'book_origin_download': httpVueLoader('/static/ebookSystem/js/vue-component/book_origin_download.vue'),
+			'ul-component': httpVueLoader('/static/ebookSystem/js/vue-component/list_vue_component.vue'),
+			'assign-component': httpVueLoader('/static/ebookSystem/js/vue-component/ebook_assign_component.vue'),
+		},
 		data: {
 			pk: '',
 			book: {},
 			overall_header: {
-				'part': '段數',
-				'status': '狀態',
-				'edited_page': '頁數',
-				'get_date': '領取日期',
-				'deadline': '期限',
-				'action': '動作',
+				part: '段數',
+				status: '狀態',
+				edited_page: '頁數',
+				get_date: '領取日期',
+				deadline: '期限',
+				action: '動作',
 			},
 			overall_datas: [],
 			editrecord_header: {
-				'number_of_times': '次數',
-				'get_date': '領取日期',
-				'stay_hours': '線上時數',
-				'service_hours': '服務時數',
-				'editor': '校對者',
-				'category': '類型',
+				number_of_times: '次數',
+				get_date: '領取日期',
+				stay_hours: '線上時數',
+				service_hours: '服務時數',
+				editor: '校對者',
+				category: '類型',
 			},
 			ebook_index: 0,
 			isbn_part: '',
@@ -145,7 +148,7 @@
 				}	
 			},
 			editrecord_datas: function () {
-				temp = []
+				let temp = [];
 				if (!iser(this.ebook)) {
 					_.each(this.ebook.editrecord_set, function(v) {
 						temp.push({

@@ -17,6 +17,7 @@
 			:field="'username'"
 			:offset-class="'col-sm-offset-3'"
 			v-model="username"
+			@keyup.enter.native="login()"
 		></form-drf>
 
 		<form-drf 
@@ -24,6 +25,7 @@
 			:field="'password'"
 			:offset-class="'col-sm-offset-3'"
 			v-model="password"
+			@keyup.enter.native="login()"
 		></form-drf>
 
 		<div class="form-group">

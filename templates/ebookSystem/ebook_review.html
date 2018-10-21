@@ -75,11 +75,15 @@
 
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	new Vue({
 		el: '#ebook_review',
+		components: {
+			'ul-component': httpVueLoader('/static/ebookSystem/js/vue-component/list_vue_component.vue'),
+		},
 		data: {
 			pk: '',
 			ebook: {},
@@ -110,10 +114,8 @@
 
 				self.client.ebooks.read(self.pk)
 				.done(function(data) {
-					self.ebook = data
-					self.current_editrecord = data.current_editrecord
-
-
+					self.ebook = data;
+					self.current_editrecord = data.current_editrecord;
 
 					rest_aj_send('get', '/ebookSystem/api/editrecords/' +self.current_editrecord.id +'/action/analysis/', {})
 					.done(function(data) {
@@ -132,12 +134,12 @@
 
 			},
 			review: function () {
-				let self = this
+				let self = this;
 
-				transferData = {
-					'number_of_times':  this.ebook.number_of_times,
-					'result': this.result,
-					'reason': this.reason,
+				let transferData = {
+					number_of_times: this.ebook.number_of_times,
+					result: this.result,
+					reason: this.reason,
 				}
 
 				rest_aj_send('post', '/ebookSystem/api/ebooks/' +self.pk +'/action/review/', transferData)

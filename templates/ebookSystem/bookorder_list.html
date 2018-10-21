@@ -4,7 +4,6 @@
 {% endblock %}
 {% block content %}
 {% csrf_token %}
-{% include 'comp/table-div.vue' %}
 
 <div id="bookorder_list">
 	<h2>校對順序</h2>
@@ -13,15 +12,19 @@
 	</table-div>
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 
 	new Vue({
 		el: '#bookorder_list',
+		components: {
+			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+		},
 		data: {
 			bookorder_header: {
-				'order': '順序',
-				'bookname': '書名',
-				'status': '狀態',
+				order: '順序',
+				bookname: '書名',
+				status: '狀態',
 			},
 			bookorder_datas: [],
 		},
@@ -32,15 +35,15 @@
 			let self = this
 			self.client.bookorders.read()
 			.done(function(data) {
-				filter_data = []
+				let filter_data = [];
 				_.each(data, function(v){
 					filter_data.push({
-						'order': v.order,
-						'bookname': v.bookname,
-						'status': v.status,
+						order: v.order,
+						bookname: v.bookname,
+						status: v.status,
 					})
 				})
-				self.bookorder_datas = filter_data
+				self.bookorder_datas = filter_data;
 			})
 			.fail(function(xhr, result, statusText){
 				alertmessage('error', xhr.responseText)
