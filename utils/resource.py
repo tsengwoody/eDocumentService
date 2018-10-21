@@ -83,7 +83,7 @@ class ResourceViewSet(Resource):
 	@list_route(
 		methods=['get', 'post'],
 		url_name='resource-list',
-		url_path='resource/(?P<dir>[\w]+)/(?P<resource>[\d\w\-.]+)',
+		url_path='resource/(?P<dir>[\d\w]+)/(?P<resource>.+)',
 	)
 	def resource_list(self, request, pk=None, dir=None, resource=None):
 		fullpath = self.get_fullpath_list(dir, resource)
@@ -95,7 +95,7 @@ class ResourceViewSet(Resource):
 	@detail_route(
 		methods=['get', 'post', 'delete'],
 		url_name='resource',
-		url_path='resource/(?P<dir>[\w]+)/(?P<resource>[\d\w\-.]+)',
+		url_path='resource/(?P<dir>[\d\w]+)/(?P<resource>.+)',
 	)
 	def resource(self, request, pk=None, dir=None, resource=None):
 		obj = self.get_object()
@@ -110,7 +110,7 @@ class ResourceViewSet(Resource):
 	@list_route(
 		methods=['get'],
 		url_name='category-list',
-		url_path='resource/(?P<dir>[\w]+)',
+		url_path='resource/(?P<dir>[\d\w]+)',
 	)
 	def category_list(self, request, pk=None, dir=None):
 		return self.get_resource_list()
@@ -118,7 +118,7 @@ class ResourceViewSet(Resource):
 	@detail_route(
 		methods=['get'],
 		url_name='category',
-		url_path='resource/(?P<dir>[\w]+)',
+		url_path='resource/(?P<dir>[\d\w]+)',
 	)
 	def category(self, request, pk=None, dir=None):
 		obj = self.get_object()

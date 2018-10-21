@@ -91,5 +91,7 @@ urlpatterns = [
 	url(r'^auth/logout/$', views.logout_user, name='logout'),
 	url(r'^statistics_old/$', views.statistics, name='statistics'),
 	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),
+	url(r'^api/ddm/(?P<action>[\d\w]+)/(?P<dir>[\d\w]+)/$', apis.Ddm.as_view()),
+	url(r'^api/ddm/(?P<action>[\d\w]+)/(?P<dir>[\d\w]+)/(?P<resource>.+)/$', apis.Ddm.as_view()),
 	#url(r'^auth/', include('django.contrib.auth.urls',)),
 ]

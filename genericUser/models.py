@@ -238,14 +238,14 @@ class Organization(models.Model):
 		return self.name
 
 class ServiceInfo(models.Model):
-	user = models.ForeignKey(User, related_name='serviceinfo_set')
+	owner = models.ForeignKey(User, related_name='serviceinfo_set')
 	org = models.ForeignKey(Organization, blank=True, null=True, related_name='serviceinfo_set')
 	date = models.DateField()
 	service_hours = models.IntegerField(default=0)
 	is_exchange = models.BooleanField(default=False)
 
 	def __unicode__(self):
-		return self.user.username +str(self.date)
+		return self.owner.username +str(self.date)
 
 	@classmethod
 	def exchange_false_export(cls):
@@ -255,8 +255,8 @@ class ServiceInfo(models.Model):
 			get_dates = [editrecord.get_date for editrecord in serviceinfo.editrecord_set.all()]
 			export += '\t'.join([
 				unicode(serviceinfo.id),
-				serviceinfo.user.username,
-				serviceinfo.user.first_name +serviceinfo.user.last_name,
+				serviceinfo.owner.username,
+				serviceinfo.owner.first_name +serviceinfo.owner.last_name,
 				unicode(min(get_dates)),
 				unicode(max(get_dates)),
 				unicode(serviceinfo.service_hours),

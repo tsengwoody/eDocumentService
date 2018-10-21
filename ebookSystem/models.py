@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models import F,Q
 from django.utils import timezone
 from mysite.settings import BASE_DIR
-from genericUser.models import User, ServiceInfo, Event
+from genericUser.models import User, ServiceInfo, Organization
 import glob,os
 import datetime
 import codecs
@@ -35,6 +35,7 @@ class Book(models.Model):
 	finish_date = models.DateField(blank=True, null=True)
 	priority = models.IntegerField(default=9)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
+	org = models.ForeignKey(Organization,blank=True, null=True, on_delete=models.SET_NULL, related_name='book_set', )
 	owner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='own_book_set')
 	upload_date = models.DateField(default = timezone.now)
 	is_private = models.BooleanField(default=False)
@@ -144,7 +145,7 @@ class Book(models.Model):
 			'house': self.book_info.house,
 			'language': 'zh',
 		}
-		if self.status == self.STATUS['final']:
+		if self.status == 5:
 			final_epub = self.path +'/OCR/{0}.epub'.format(self.ISBN)
 			try:
 				book = epub.read_epub(final_epub)
@@ -533,7 +534,7 @@ class Library(models.Model):
 		abstract = True
 
 	def __unicode__(self):
-		return u'{0}-{1}'.format(self.object, self.user)
+		return u'{0}-{1}'.format(self.object, self.owner)
 
 	def __init__(self, *args, **kwargs):
 		super(Library, self).__init__(*args, **kwargs)

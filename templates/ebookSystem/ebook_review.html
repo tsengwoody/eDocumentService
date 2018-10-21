@@ -149,6 +149,9 @@
 				})
 				.fail(function(data){
 					alertmessage('error', '' +data['message'])
+					.done(function() {
+						window.location.replace('/ebookSystem/generics/ebook_review_list/')
+					})
 				})
 
 			},

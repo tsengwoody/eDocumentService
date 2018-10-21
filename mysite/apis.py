@@ -1,6 +1,7 @@
 ﻿# coding: utf-8
 
 import datetime
+import os
 
 from django.db.models import Count
 
@@ -11,6 +12,8 @@ from rest_framework import permissions, status
 
 from ebookSystem.models import *
 from genericUser.models import *
+
+from utils.resource import Resource
 
 class Statistics(APIView):
 	begin_time = None
@@ -124,5 +127,25 @@ class Statistics(APIView):
 
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-		#end_time = datetime.datetime.now()
-		#begin_time = datetime.datetime.now() +datetime.timedelta(days=-200)
+class Ddm(Resource):
+
+	def get(self, request, action=None, *args, **kwargs):
+		res = {}
+		if action:
+			if action == 'resource' and kwargs.has_key('resource'):
+				return self.resource(request, kwargs['dir'], kwargs['resource'])
+			elif action == 'resource' and not kwargs.has_key('resource'):
+				return self.category(request, kwargs['dir'])
+			else:
+				return getattr(self, action)(request)
+
+	def resource(self, request, dir=None, resource=None):
+		fullpath = os.path.join(BASE_DIR, 'file' ,'ddm', dir, resource)
+		if request.method == 'GET':
+			return self.get_resource(fullpath)
+		if request.method == 'POST':
+			return self.post_resource(fullpath, request.FILES['object'])
+
+	def category(self, request, dir=None):
+		fullpath = os.path.join(BASE_DIR, 'file' ,'ddm', dir)
+		return self.get_resource_list(fullpath)

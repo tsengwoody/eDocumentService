@@ -104,11 +104,19 @@
 				rest_aj_send('post', '/ebookSystem/api/books/' +self.pk +'/action/review/', transferData)
 				.done(function(data) {
 					alertmessage('success', '審核已完成' +data['data']['message'])
+					.done(function() {
+						window.location.replace('/ebookSystem/generics/book_review_list/')
+					})
 				})
 				.fail(function(data){
-					alertmessage('error', xhr)
+					alertmessage('error', o2j(data))
+					.done(function() {
+						window.location.replace('/ebookSystem/generics/book_review_list/')
+					})
 				})
+				.always(function () {
 
+				})
 			},
 		}
 

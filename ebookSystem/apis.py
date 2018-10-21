@@ -67,8 +67,8 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				part.change_status(1, 'active', category='based')
 			BookOrder.refresh()
 			res['message'] = u'審核通過文件'
-		elif request.POST['review'] == 'error':
-			book.delete()
+		elif request.POST['result'] == 'error':
+			obj.delete()
 			res['message'] = u'審核退回文件'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
