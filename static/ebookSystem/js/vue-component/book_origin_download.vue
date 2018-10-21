@@ -1,6 +1,4 @@
-{% include 'comp/form.vue' %}
-
-<template id="book_origin_download">
+<template>
 	<div class="form-horizontal">
 		<form-drf 
 			:model_info="model_info.fileformat"
@@ -41,61 +39,61 @@ function post(path, params, method) {
 	form.submit();
 }
 
-	Vue.options.delimiters = ['{|{', '}|}'];
-
-	Vue.component('book_origin_download', {
-		template: '#book_origin_download',
+	module.exports = {
 		props: ['pk',],
+		components: {
+			'form-drf': httpVueLoader('/static/ebookSystem/js/vue-component/form.vue'),
+		},
 		data: function(){
 			return {
 				fileformat: 'epub',
 				password: '',
 				model_info: {
-					'fileformat': {
-						'label': '類型',
-						'type': 'select',
-						'choices': [
+					fileformat: {
+						label: '類型',
+						type: 'select',
+						choices: [
 							{
-								'display_name': '電子書(epub)',
-								'value': 'epub',
+								display_name: '電子書(epub)',
+								value: 'epub',
 							},
 							{
-								'display_name': '純文字(txt)',
-								'value': 'txt',
+								display_name: '純文字(txt)',
+								value: 'txt',
 							},
 						],
 					},
 					password: {
-						'label': '密碼',
-						'type': 'password',
+						label: '密碼',
+						type: 'password',
 					},
 				},
 			}
 		},
 		created: function () {
-			let self = this
+			let self = this;
 		},
 		mounted: function () {
-			this.refresh()
+			this.refresh();
 		},
 		methods: {
 			instance_set: function (event) {
-				this.pk = event
-				this.refresh()
+				this.pk = event;
+				this.refresh();
 			},
 			refresh: function () {
-				this.fileformat = 'epub'
-				this.password = ''
+				this.fileformat = 'epub';
+				this.password = '';
 			},
 			object_get: function () {
-				let self = this
+				let self = this;
 
-				let authenticate_url = '/genericUser/api/users/action/authenticate/'
+				let authenticate_url = '/genericUser/api/users/action/authenticate/';
 				rest_aj_send('post', authenticate_url, {'username': user.username, 'password': this.password,})
 				.done(function(data) {
-					let url = '/ebookSystem/api/books/' +self.pk +'/action/download/'
+					let url = '/ebookSystem/api/books/' +self.pk +'/action/download/';
 					let csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-					post(url, {'fileformat': self.fileformat, 'password': self.password, 'csrfmiddlewaretoken': csrf}, 'post')
+					post(url, {fileformat: self.fileformat, password: self.password, csrfmiddlewaretoken: csrf}, 'post')
 				})
 				.fail(function(xhr, result, statusText){
 					alertmessage('error', '失敗使用者驗證')
@@ -103,6 +101,6 @@ function post(path, params, method) {
 
 			},
 		},
-	})
+	};
 
 </script>

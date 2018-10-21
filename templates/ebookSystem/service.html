@@ -5,7 +5,6 @@
 
 {% block content %}
 {% csrf_token %}
-{% include 'comp/table-div.vue' %}
 
 <div id="service">
 
@@ -35,26 +34,30 @@
 
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 
-	vo_service = new Vue({
+	new Vue({
 		el: '#service',
+		components: {
+			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+		},
 		data: {
 			edit_ebook_header: {
-				'document': '文件',
-				'page': '頁數/總頁數',
-				'get_date': '領取日期',
-				'deadline': '期限',
-				'status': '狀態',
-				'action': '動作',
+				document: '文件',
+				page: '頁數/總頁數',
+				get_date: '領取日期',
+				deadline: '期限',
+				status: '狀態',
+				action: '動作',
 			},
 			edit_ebook: [],
 			finish_ebook_header: {
-				'document': '文件',
-				'service_hours': '服務時數',
-				'get_date': '領取日期',
-				'category': '類型',
-				'action': '動作',
+				document: '文件',
+				service_hours: '服務時數',
+				get_date: '領取日期',
+				category: '類型',
+				action: '動作',
 			},
 			finish_ebook: [],
 		},
@@ -67,7 +70,7 @@
 			refresh: function () {
 				// run ajax get data
 				let self = this;
-				self.clear()
+				self.clear();
 
 				self.client.ebooks.read({'editor_id': user.id, 'status': '2'})
 				.done(function(data) {
@@ -75,12 +78,12 @@
 					_.each(data,function(v){
 
 						self.edit_ebook.push({
-							'document': v['bookname'] +v['part'],
-							'page': v.edited_page+1 +'/50',
-							'get_date': v.get_date,
-							'deadline': v.deadline,
-							'status': v.status,
-							'action': v,
+							document: v['bookname'] +v['part'],
+							page: v.edited_page+1 +'/50',
+							get_date: v.get_date,
+							deadline: v.deadline,
+							status: v.status,
+							action: v,
 						})
 					})
 				})
@@ -90,11 +93,11 @@
 
 					_.each(data,function(v){
 						self.finish_ebook.push({
-							'document': v['bookname'] +v['part'],
-							'service_hours': v.service_hours,
-							'get_date': v.get_date,
-							'category': v.current_editrecord.category,
-							'action': v,
+							document: v['bookname'] +v['part'],
+							service_hours: v.service_hours,
+							get_date: v.get_date,
+							category: v.current_editrecord.category,
+							action: v,
 						})
 					})
 
@@ -109,7 +112,7 @@
 					ebook = data['data'].data
 					alertmessage('success', '成功取得文件：' +ebook.bookname +ebook.part)
 					.done(function () {
-					self.refresh()
+						self.refresh();
 					})
 				})
 				.fail(function(data){
@@ -118,7 +121,7 @@
 
 			},
 			reback_ebook: function (ISBN_part) {
-				let self = this
+				let self = this;
 
 				alertconfirm('還文件後該文件將提供其他校對者領取，且無法獲得校對時數，是否確定還文件?')
 				.done(function(){
@@ -127,7 +130,7 @@
 						ebook = data['data'].data
 						alertmessage('success', '成功歸還文件：' +ebook.bookname +ebook.part)
 						.done(function () {
-						self.refresh()
+							self.refresh();
 						})
 					})
 					.fail(function(data){
@@ -136,14 +139,14 @@
 				})
 			},
 			reedit_ebook: function (ISBN_part) {
-				let self = this
+				let self = this;
 
 				rest_aj_send('post', '/ebookSystem/api/ebooks/' +ISBN_part +'/action/change_status/', {'direction': '-1', 'status': 'edit'})
 				.done(function(data) {
 					ebook = data['data'].data
 					alertmessage('success', '成功再編輯文件：' +ebook.bookname +ebook.part)
 					.done(function () {
-					self.refresh()
+						self.refresh();
 					})
 				})
 				.fail(function(data){
@@ -151,8 +154,8 @@
 				})
 			},
 			clear: function () {
-				this.edit_ebook = []
-				this.finish_ebook = []
+				this.edit_ebook = [];
+				this.finish_ebook = [];
 			},
 		},
 

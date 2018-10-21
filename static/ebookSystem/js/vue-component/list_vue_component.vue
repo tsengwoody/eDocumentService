@@ -1,4 +1,4 @@
-<script type="text/x-template" id="ul-template">
+<template>
 	<div v-if="!iser(data)" :style="{ fontSize: fontSize + 'px' }">
 		<ul>
 			<li v-for="(value, key) in data">
@@ -9,13 +9,10 @@
 	<div v-else>
 		無資料
 	</div>
-</script>
+</template>
 
 <script>
-
-	Vue.options.delimiters = ['{|{', '}|}'];
-
-	Vue.component('ul-component', {
+	module.exports = {
 		props: {
 			data: Array,  // define type
 			fontSize: {
@@ -49,7 +46,6 @@
 		},
 		methods: {
 		},
-		template: '#ul-template',
-	})
+	};
 
 </script>

@@ -9,7 +9,7 @@
 			>閱讀</a>
 		</template>
 	</table-div>
-</div>`
+</div>
 </template>
 
 <script>

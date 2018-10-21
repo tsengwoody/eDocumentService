@@ -1,6 +1,4 @@
-{% include 'comp/form.vue' %}
-
-<template id="book_origin_download">
+<template>
 	<div class="form-horizontal">
 		<form-drf 
 			:model_info="model_info.fileformat"
@@ -15,6 +13,7 @@
 		></form-drf>
 	</div>
 </template>
+
 <script>
 
 function post(path, params, method) {
@@ -41,11 +40,11 @@ function post(path, params, method) {
 	form.submit();
 }
 
-	Vue.options.delimiters = ['{|{', '}|}'];
-
-	Vue.component('book_origin_download', {
-		template: '#book_origin_download',
+	module.exports = {
 		props: ['pk',],
+		components: {
+			'form-drf': httpVueLoader('/static/ebookSystem/js/vue-component/form.vue'),
+		},
 		data: function(){
 			return {
 				fileformat: 'epub',
@@ -93,7 +92,7 @@ function post(path, params, method) {
 				let authenticate_url = '/genericUser/api/users/action/authenticate/'
 				rest_aj_send('post', authenticate_url, {'username': user.username, 'password': this.password,})
 				.done(function(data) {
-					let url = '/ebookSystem/api/books/' +self.pk +'/action/download/'
+					let url = '/ebookSystem/api/libraryrecords/' +self.pk +'/action/download/'
 					let csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
 					post(url, {'fileformat': self.fileformat, 'password': self.password, 'csrfmiddlewaretoken': csrf}, 'post')
 				})
@@ -103,6 +102,6 @@ function post(path, params, method) {
 
 			},
 		},
-	})
+	};
 
 </script>
