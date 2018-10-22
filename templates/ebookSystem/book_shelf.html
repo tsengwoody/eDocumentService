@@ -60,27 +60,6 @@
 <script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 
-	function checkout_datas(v){
-		temp_data = {
-			bookname: v.object.book_info.bookname,
-			check_out_time: v.check_out_time.slice(0,10),
-			check_in_time: v.check_in_time.slice(0,10),
-			action: v,
-		}
-
-		filter_data.push(temp_data)
-	}
-
-	function checkin_datas(v){
-		temp_data = {
-			bookname: v.object.book_info.bookname,
-			check_out_time: v.check_out_time.slice(0,10),
-			check_in_time: v.check_in_time.slice(0,10),
-		}
-
-		filter_data.push(temp_data)
-	}
-
 	Vue.options.delimiters = ['{|{', '}|}'];
 	vo_book_shelf = new Vue({
 		el: '#book_shelf',
@@ -111,14 +90,27 @@
 			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'user_id': user.id, 'status': 'true'})
 			.done(function(data) {
 				let filter_data = [];
-				_.each(data['data'], checkout_datas)
+				_.each(data['data'], function(v){
+					filter_data.push({
+						bookname: v.object.book_info.bookname,
+						check_out_time: v.check_out_time.slice(0,10),
+						check_in_time: v.check_in_time.slice(0,10),
+						action: v,
+					})
+				})
 				self.checkout_list = filter_data
 			})
 
 			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'user_id': user.id, 'status': 'false'})
 			.done(function(data) {
 				let filter_data = [];
-				_.each(data['data'], checkin_datas)
+				_.each(data['data'], function(v){
+					filter_data.push({
+						bookname: v.object.book_info.bookname,
+						check_out_time: v.check_out_time.slice(0,10),
+						check_in_time: v.check_in_time.slice(0,10),
+					})
+				})
 				self.checkin_list = filter_data;
 			})
 		},
