@@ -1,13 +1,10 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 校對進度
 {% endblock %}
 
 {% block content %}
 {% csrf_token %}
-{% include 'comp/table-div.vue' %}
-{% include 'comp/tab.vue' %}
-{% include 'comp/bookinfo_repository.vue' %}
 
 <div id="book_person">
 	<h2>校對進度</h2>
@@ -29,7 +26,7 @@
 		</template>
 	</tab>
 </div>
-
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 
 	inactive_book_header = {
@@ -105,10 +102,13 @@
 
 	}
 
-	Vue.options.delimiters = ['{|{', '}|}'];
-
 	new Vue({
 		el: '#book_person',
+		components: {
+			'bookinfo_repository': httpVueLoader('/static/ebookSystem/js/vue-component/bookinfo_repository.vue'),
+			'tab': httpVueLoader('/static/ebookSystem/js/vue-component/tab.vue'),
+			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+		},
 		data: {
 			bookinfo_header: bookinfo_header,
 			data: [

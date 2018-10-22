@@ -4,7 +4,6 @@
 訊息傳送
 {% endblock %}
 {% block content %}
-{% include 'comp/form.vue' %}
 {% csrf_token %}
 
 <div id="user_email">
@@ -42,11 +41,15 @@
 	</div>
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	new Vue({
 		el: '#user_email',
+		components: {
+			'form-drf': httpVueLoader('/static/ebookSystem/js/vue-component/form.vue'),
+		},
 		data: {
 			category: 'editor',
 			subject: '',
@@ -84,11 +87,18 @@
 			send_email: function () {
 				let self = this
 
-				post_data = {
+				if(iser(self.category) | iser(self.subject) | iser(self.body)){
+					alertmessage('error', '尚有欄位未填寫')
+					return -1
+					}
+
+					post_data = {
 					'category': self.category,
 					'subject': self.subject,
 					'body': self.body,
 				}
+
+
 				rest_aj_send('post', '/genericUser/api/users/action/email/', post_data)
 				.done(function(data) {
 					alertmessage('success', '成功傳送訊息')

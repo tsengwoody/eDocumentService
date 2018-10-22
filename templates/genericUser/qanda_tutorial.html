@@ -1,9 +1,8 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 教學內容
 {% endblock %}
 {% block content %}
-{% include 'comp/table-div-row.vue' %}
 {% csrf_token %} 
 
 <div id="qanda_tutorial">
@@ -59,6 +58,7 @@
 		</template>
 	</modal>
 </div>
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
@@ -71,6 +71,10 @@
 
 	new Vue({
 		el: '#qanda_tutorial',
+		components: {
+			'editor': Editor,
+			'table-div-row': httpVueLoader('/static/ebookSystem/js/vue-component/table-div-row.vue'),
+		},
 		data: {
 			qanda_tutorial_header: {
 				'order': '項次',
@@ -85,9 +89,6 @@
 				'answer': '',
 				'order': '',
 			},
-		},
-		components: {
-			'editor': Editor
 		},
 		created: function () {
 			this.client = new $.RestClient('/genericUser/api/');

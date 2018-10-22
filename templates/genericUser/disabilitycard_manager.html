@@ -4,9 +4,6 @@
 {% endblock %}
 {% block content %}
 {% csrf_token %}
-{% include 'comp/table-div.vue' %}
-{% include 'comp/modal.vue' %}
-{% include 'comp/disabilitycard.vue' %}
 
 <div id="disabilitycard_manager">
 	<h2>身心障礙手冊管理</h2>
@@ -50,11 +47,17 @@
 	</modal>
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	new Vue({
 		el: '#disabilitycard_manager',
+		components: {
+			'disabilitycard': httpVueLoader('/static/ebookSystem/js/vue-component/disabilitycard.vue'),
+			'modal': httpVueLoader('/static/ebookSystem/js/vue-component/modal.vue'),
+			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+		},
 		data: {
 			dm_bus: new Vue(),
 			search_choices: {

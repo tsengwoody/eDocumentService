@@ -14,11 +14,16 @@
 	>
 	</serviceinfo_record>
 </div>
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
-
 	Vue.options.delimiters = ['{|{', '}|}'];
-	vo_serviceinfo_record = new Vue({
+
+	new Vue({
 		el: '#serviceinfo',
+		components: {
+			'serviceinfo_record': httpVueLoader('/static/ebookSystem/js/vue-component/serviceinfo_record.vue'),
+			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+		},
 		data: {
 			bus: new Vue(),
 			pk: '',

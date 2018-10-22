@@ -1,11 +1,10 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 書籍管理
 {% endblock %}
 {% block content %}
 
 {% csrf_token %}
-{% include 'comp/table-div.vue' %}
 
 <div class="tab-content" style="padding:20px 0px;">
 	<h2>書籍管理</h2>
@@ -45,10 +44,14 @@
 	</div>
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 
 	new Vue({
 		el: '#book_manager_search',
+		components: {
+			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue')
+		},
 		data: {
 			search_choices: {
 				'0': '未審核',

@@ -3,7 +3,6 @@
 註冊
 {% endblock %}
 {% block content %}
-{% include 'comp/form.vue' %}
 {% csrf_token %}
 
 <script id="tmp_userterms" type="text">*使用者條款
@@ -106,11 +105,15 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 	</div>
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	vo_genericUser_register = new Vue({
 		el: '#genericUser_register',
+		components: {
+			'form-drf': httpVueLoader('/static/ebookSystem/js/vue-component/form.vue'),
+		},
 		data: {
 			// bus: new Vue(),
 			usertermsContent: '',
@@ -432,5 +435,4 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 	});
 
 </script>
-
 {% endblock %}

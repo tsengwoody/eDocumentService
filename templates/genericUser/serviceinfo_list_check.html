@@ -6,7 +6,6 @@
 {% block content %}
 
 {% csrf_token %}
-{% include 'comp/table-div.vue' %}
 
 <div id="serviceinfo_check">
 	<h2>服務時數確認</h2>
@@ -48,10 +47,14 @@
 	</modal>
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 
 	new Vue({
 		el: '#serviceinfo_check',
+		components: {
+			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+		},
 		data: {
 			serviceinfo_header: {
 				'check': '核取',

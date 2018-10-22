@@ -41,10 +41,15 @@
 	</div>
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
+
 	new Vue({
 		el: '#login',
+		components: {
+			'form-drf': httpVueLoader('/static/ebookSystem/js/vue-component/form.vue'),
+		},
 		data: {
 			username: '',
 			password: '',

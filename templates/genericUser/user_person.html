@@ -1,15 +1,13 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 {{ request.user }}個人資料
 {% endblock %}
 {% block content %}
 
 {% csrf_token %}
-{% include 'comp/mx_user_password.html' %}
 {% include 'comp/mx_user_getOTP.html' %}
-{% include 'comp/disabilitycard.vue' %}
 
-<div id="user_infomation_div">
+<div id="user_person">
 	<h3>個人資料</h3>
 	<div class="form-horizontal">
 		<template v-for="(value, key) in filter_data">
@@ -59,7 +57,10 @@
 			<label class="control-label col-sm-2"></label>
 			<div class="col-sm-7">
 				<button class="btn btn-primary" @click="usermodel(userID)">變更使用者資訊</button>
-				<button class="btn btn-primary" @click="user_password(userID)">修改密碼</button>
+				<button
+					class="btn btn-primary"
+					@click="openDialog('spm', this);"
+				>修改密碼</button>
 					<button class="btn btn-primary"
 					v-if="user.is_guest"
 					@click="dm_bus.$emit('instance-set', user.disabilitycard_set[0]); openDialog('dm', this);"
@@ -80,6 +81,21 @@
 		</div>
 	</div>
 
+	<modal :id_modal="'spm'">
+		<template slot="header">
+			<h4 class="modal-title">修改密碼</h4>
+		</template>   
+		<template slot="body">
+			<set_password ref="spm"></set_password>
+		</template>
+		<template slot="footer">
+
+			<button
+				@click="$refs.spm.set_password(user.id)"
+			>送出</button>
+		</template>
+	</modal>
+
 	<modal :id_modal="'dm'">
 		<template slot="header">
 			<h4 class="modal-title">身心障礙手冊登錄</h4>
@@ -96,11 +112,15 @@
 	</modal>
 </div>
 
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
-	Vue.options.delimiters = ['{|{', '}|}'];
 
-	let opt = {
-		el: '#user_infomation_div',
+	new Vue({
+		el: '#user_person',
+		components: {
+			'disabilitycard': httpVueLoader('/static/ebookSystem/js/vue-component/disabilitycard.vue'),
+			'set_password': httpVueLoader('/static/ebookSystem/js/vue-component/set_password.vue'),
+		},
 		data: {
 			dm_bus: new Vue(),
 			user: user,
@@ -143,10 +163,8 @@
 					}
 				})
 			})
-		}
-	};
-	new Vue(opt);
+		},
+	})
 
 </script>
-
 {% endblock %}

@@ -108,6 +108,45 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 	@list_route(
 		methods=['post'],
+		url_name='retrieve_up',
+		url_path='action/retrieve_up',
+	)
+	def retrieve_up(self, request, pk=None):
+		res = {}
+		if request.POST['action'] == 'reset_password':
+			try:
+				birthday = request.POST['birthday'].split('-')
+				birthday = [ int(i) for i in birthday ]
+				birthday = datetime.date(birthday[0], birthday[1], birthday[2])
+				user = User.objects.get(username=request.POST['username'], birthday=birthday)
+			except:
+				res['message'] = u'無法取得使用者資料，請確認填寫的資料是否無誤'
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+			import random
+			import string
+			reset_password = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+			user.set_password(reset_password)
+			subject = u'重設密碼郵件'
+			message = u'您的新密碼為：{0}'.format(reset_password)
+			user.email_user(subject=subject, message=message)
+			user.save()
+		elif request.POST['action'] == 'get_user':
+			try:
+				birthday = request.POST['birthday'].split('-')
+				birthday = [ int(i) for i in birthday ]
+				birthday = datetime.date(birthday[0], birthday[1], birthday[2])
+				user = User.objects.get(email=request.POST['email'], birthday=birthday)
+			except:
+				res['message'] = u'無法取得使用者資料，請確認填寫的資料是否無誤'
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+			subject = u'取得username郵件'
+			message = u'您的username為：{0}'.format(user.username)
+			user.email_user(subject=subject, message=message)
+
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	@list_route(
+		methods=['post'],
 		url_name='email',
 		url_path='action/email',
 	)
@@ -202,7 +241,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	)
 	def set_password(self, request, pk=None):
 		obj = self.get_object()
-		from django.contrib.auth import authenticate
+		from django.contrib.auth import authenticate, update_session_auth_hash
 		user = authenticate(username=obj.username, password=self.request.data['old_password'])
 		if user is not None and self.request.data['new_password1'] == self.request.data['new_password2']:
 			user.set_password(self.request.data['new_password1'])
