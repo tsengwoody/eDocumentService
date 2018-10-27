@@ -127,7 +127,7 @@
 					"date": moment().format('YYYY-MM-DD'),
 					"service_hours": this.service_hours,
 					"is_exchange": false,
-					"user": this.pk,
+					"owner": this.pk,
 					"org": this.org_select,
 				}
 			},

@@ -579,7 +579,7 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = LibraryRecord.objects.all()
 	serializer_class = LibraryRecordSerializer
 	filter_backends = (LibraryRecordUserFilter, LibraryRecordStatusFilter,)
-	permission_classes = (permissions.IsAuthenticated, ManagerOrOwner)
+	permission_classes = (permissions.IsAuthenticated, ManagerOrOwner,)
 
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = None

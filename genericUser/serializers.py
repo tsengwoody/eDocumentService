@@ -42,7 +42,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
 class ServiceInfoSerializer(serializers.ModelSerializer):
 	editrecord_set = serializers.PrimaryKeyRelatedField(many=True, queryset=EditRecord.objects.filter(serviceInfo=None))
 	editrecordinfo_set = EditRecordSerializer(many=True, read_only=True, source='editrecord_set')
-	userinfo = UserSerializer(read_only=True, source='user')
+	userinfo = UserSerializer(read_only=True, source='owner')
 	orginfo = OrganizationSerializer(read_only=True, source='org')
 
 	class Meta:
