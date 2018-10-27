@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 公告內容
 {% endblock %}
@@ -49,6 +49,12 @@
 	<h2>附件檔案</h2>
 	<file_manager
 		:url="url +'resource/attachment/'"
+		:permission="{
+			'create': {'is_manager': true,},
+			'read': {'is_all': true,},
+			'update': {'is_manager': true,},
+			'delete': {'is_manager': true,},
+		}"
 	></file_manager>
 	<div class="form-group">        
 		<div class="col-sm-offset-1 col-sm-11">

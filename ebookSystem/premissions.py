@@ -10,7 +10,7 @@ class ManagerOrOwner(permissions.BasePermission):
 
 	def has_object_permission(self, request, view, obj):
 		is_manager = hasattr(request.user, 'is_manager') and request.user.is_manager
-		is_owner = hasattr(request.user, 'owner') and (obj.owner == request.user)
+		is_owner = obj.owner == request.user
 		return is_manager or is_owner
 
 class BookDataPermission(permissions.BasePermission):

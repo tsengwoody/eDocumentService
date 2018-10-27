@@ -76,6 +76,12 @@
 					{% endif %}
 				{% endif %}
 				<li><a href="{% url 'ebookSystem:generics' 'book_repository' %}">平台書庫</a></li>
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">專案合作<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+							<li><a href="/generics/ddm/">法鼓山(107年度)</a></li>
+					</ul>
+				</li>
 				{% if request.user.is_authenticated and not request.user.is_license %}
 					<li><a href="{% url 'genericUser:generics' 'license' %}">簽署使用條款</a></li>
 				{% endif %}

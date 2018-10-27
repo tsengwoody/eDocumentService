@@ -24,13 +24,22 @@ class Resource(APIView):
 	def resource(self, request, dir, resource):
 		fullpath = self.get_fullpath(dir, resource)
 		if request.method == 'GET':
-			return self.get_resource(fullpath)
+			try:
+				return self.get_resource(fullpath)
+			except OSError as e:
+				return Response(data={'detail' :unicode(e)}, status=status.HTTP_404_NOT_FOUND)
 		if request.method == 'POST':
-			return self.post_resource(fullpath, request.FILES['object'])
+			try:
+				return self.post_resource(fullpath, request.FILES['object'])
+			except OSError as e:
+				return Response(data={'detail' :unicode(e)}, status=status.HTTP_404_NOT_FOUND)
 
 	def category(self, request, dir):
 		fullpath = self.get_fullpath(dir, resource='')
-		return self.get_resource_list(fullpath)
+		try:
+			return self.get_resource_list(fullpath)
+		except OSError as e:
+			return Response(data={'detail' :unicode(e)}, status=status.HTTP_404_NOT_FOUND)
 
 	def get_resource(self, fullpath):
 		# Respect the If-Modified-Since header.
@@ -88,9 +97,15 @@ class ResourceViewSet(Resource):
 	def resource_list(self, request, pk=None, dir=None, resource=None):
 		fullpath = self.get_fullpath_list(dir, resource)
 		if request.method == 'GET':
-			return self.get_resource(fullpath)
+			try:
+				return self.get_resource(fullpath)
+			except OSError as e:
+				return Response(data={'detail' :unicode(e)}, status=status.HTTP_404_NOT_FOUND)
 		if request.method == 'POST':
-			return self.post_resource(fullpath, request.FILES['object'])
+			try:
+				return self.post_resource(fullpath, request.FILES['object'])
+			except OSError as e:
+				return Response(data={'detail' :unicode(e)}, status=status.HTTP_404_NOT_FOUND)
 
 	@detail_route(
 		methods=['get', 'post', 'delete'],
@@ -101,11 +116,20 @@ class ResourceViewSet(Resource):
 		obj = self.get_object()
 		fullpath = self.get_fullpath(obj, dir, resource)
 		if request.method == 'GET':
-			return self.get_resource(fullpath)
+			try:
+				return self.get_resource(fullpath)
+			except OSError as e:
+				return Response(data={'detail' :unicode(e)}, status=status.HTTP_404_NOT_FOUND)
 		if request.method == 'POST':
-			return self.post_resource(fullpath, request.FILES['object'])
+			try:
+				return self.post_resource(fullpath, request.FILES['object'])
+			except OSError as e:
+				return Response(data={'detail' :unicode(e)}, status=status.HTTP_404_NOT_FOUND)
 		if request.method == 'DELETE':
-			return self.delete_resource(fullpath)
+			try:
+				return self.delete_resource(fullpath)
+			except OSError as e:
+				return Response(data={'detail' :unicode(e)}, status=status.HTTP_404_NOT_FOUND)
 
 	@list_route(
 		methods=['get'],
@@ -113,7 +137,10 @@ class ResourceViewSet(Resource):
 		url_path='resource/(?P<dir>[\d\w]+)',
 	)
 	def category_list(self, request, pk=None, dir=None):
-		return self.get_resource_list()
+		try:
+			return self.get_resource_list()
+		except OSError as e:
+			return Response(data={'detail' :unicode(e)}, status=status.HTTP_404_NOT_FOUND)
 
 	@detail_route(
 		methods=['get'],
@@ -123,4 +150,7 @@ class ResourceViewSet(Resource):
 	def category(self, request, pk=None, dir=None):
 		obj = self.get_object()
 		fullpath = self.get_fullpath(obj, dir, resource='')
-		return self.get_resource_list(fullpath)
+		try:
+			return self.get_resource_list(fullpath)
+		except OSError as e:
+			return Response(data={'detail' :unicode(e)}, status=status.HTTP_404_NOT_FOUND)

@@ -269,7 +269,7 @@ class ServiceInfoViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = ServiceInfo.objects.all().order_by('-date')
 	serializer_class = ServiceInfoSerializer
 	filter_backends = (filters.OrderingFilter, ServiceInfoUserFilter, ServiceInfoExchangeFilter,)
-	ordering_fields = ('user',)
+	ordering_fields = ('owner',)
 	permission_classes = (permissions.IsAuthenticated,)
 
 	@list_route(

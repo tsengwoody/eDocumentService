@@ -7,11 +7,12 @@
 			>
 				<template slot="action" slot-scope="props">
 					<button
+						v-if="button_permission(user, 'read')"
 						class="btn btn-default"
 						@click="window.location.replace(url +props.item.name +'/')"
 					>下載</button>
 					<button
-						v-if="user.is_manager"
+						v-if="button_permission(user, 'update')"
 						class="btn btn-default"
 						@click="
 							resource_name=props.item.name;
@@ -20,7 +21,7 @@
 						"
 					>更新</button>
 					<button
-						v-if="user.is_manager"
+						v-if="button_permission(user, 'delete')"
 						class="btn btn-default"
 						@click="
 							resource_name=props.item.name;
@@ -31,7 +32,7 @@
 				</template>
 			</table-div>
 			<button
-				v-if="user.is_manager"
+				v-if="button_permission(user, 'create')"
 				class="btn btn-default"
 				@click="
 					resource_name='';
@@ -54,7 +55,7 @@
 <script>
 
 	module.exports = {
-		props: ['url',],
+		props: ['url', 'permission',],
 		components: {
 			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
 			'file_upload': httpVueLoader('/static/ebookSystem/js/vue-component/file_upload.vue'),
@@ -78,6 +79,14 @@
 			this.get_resource_file_datas()
 		},
 		methods: {
+			button_permission: function(u, crud){
+				p = this.permission
+				if(u.is_editor&&p[crud].is_editor){ return true }
+				else if(u.is_guest&&p[crud].is_guest){ return true }
+				else if(u.is_manager&&p[crud].is_manager){ return true }
+				else if(p[crud].is_all){ return true }
+				else {return false}
+			},
 			get_resource_file_datas: function(resource_name){
 				let self = this
 
