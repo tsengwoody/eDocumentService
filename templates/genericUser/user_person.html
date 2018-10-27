@@ -86,12 +86,13 @@
 			<h4 class="modal-title">修改密碼</h4>
 		</template>   
 		<template slot="body">
-			<set_password ref="spm"></set_password>
+			<div class="form-horizontal">
+				<set_password ref="spm"></set_password>
+			</div>
 		</template>
 		<template slot="footer">
-
-			<button
-				@click="$refs.spm.set_password(user.id)"
+			<button class="btn btn-default"
+				@click="change_password"
 			>送出</button>
 		</template>
 	</modal>
@@ -107,7 +108,7 @@
 			</disabilitycard>
 		</template>
 		<template slot="footer">
-						<button onclick="closeDialog(this)" class="btn btn-default" data-dismiss="modal">關閉</button>
+			<button onclick="closeDialog(this)" class="btn btn-default" data-dismiss="modal">關閉</button>
 		</template>
 	</modal>
 </div>
@@ -164,6 +165,12 @@
 				})
 			})
 		},
+		methods: {
+			change_password: function() {
+				$refs.spm.set_password(user.id);
+				closeDialog($refs.spm);
+			}
+		}
 	})
 
 </script>

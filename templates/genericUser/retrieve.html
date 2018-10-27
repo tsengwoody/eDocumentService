@@ -20,7 +20,6 @@
 				<form-drf 
 					:model_info="model_info.username"
 					:field="'username'"
-					:offset-class="'col-sm-offset-3'"
 					v-model="username"
 					@keyup.enter.native="reset_password()"
 				></form-drf>
@@ -28,12 +27,15 @@
 				<form-drf 
 					:model_info="model_info.birthday_p"
 					:field="'birthday_p'"
-					:offset-class="'col-sm-offset-3'"
 					v-model="birthday_p"
 					@keyup.enter.native="reset_password()"
 				></form-drf>
 
-				<button class="form-control btn btn-primary" @click="reset_password()">送出</button>
+				<div class="form-group">
+					<div class="col-sm-3 col-sm-offset-2">
+						<button class="form-control btn btn-primary" @click="reset_password()">送出</button>
+					</div>
+				</div>
 
 			</div>
 		</div>
@@ -43,7 +45,6 @@
 				<form-drf 
 					:model_info="model_info.email"
 					:field="'email'"
-					:offset-class="'col-sm-offset-3'"
 					v-model="email"
 					@keyup.enter.native="get_user()"
 				></form-drf>
@@ -51,13 +52,15 @@
 				<form-drf 
 					:model_info="model_info.birthday_u"
 					:field="'birthday_u'"
-					:offset-class="'col-sm-offset-3'"
 					v-model="birthday_u"
 					@keyup.enter.native="get_user()"
 				></form-drf>
-
-				<button class="form-control btn btn-primary" @click="get_user()">送出</button>
-
+				
+				<div class="form-group">
+					<div class="col-sm-3 col-sm-offset-2">
+						<button class="form-control btn btn-primary" @click="get_user()">送出</button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
