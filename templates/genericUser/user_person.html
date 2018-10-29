@@ -167,8 +167,8 @@
 		},
 		methods: {
 			change_password: function() {
-				$refs.spm.set_password(user.id);
-				closeDialog($refs.spm);
+				this.$refs.spm.set_password(user.id);
+				closeDialog(this.$refs.spm);
 			}
 		}
 	})

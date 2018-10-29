@@ -20,16 +20,6 @@
 				<li class="dropdown"><a href="/sitemap">網站導覽</a></li>
 				{% if request.user.auth_base %}
 					<li class="dropdown">
-						<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">統計<span class="caret"></span></a>
-						<ul class="dropdown-menu">
-							{% if request.user.is_manager %}
-								<li><a href="/generics/book_download/">書籍下載</a></li>
-								<li><a href="/generics/user_download/">使用者下載</a></li>
-								<li><a href="/generics/user_editrecord/">使用者校對</a></li>
-							{% endif %}
-						</ul>
-					</li>
-					<li class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">管理<span class="caret"></span></a>
 						<ul class="dropdown-menu">
 							{% if request.user.is_manager %}
@@ -49,6 +39,16 @@
 							{% if request.user.is_superuser %}
 								<li><a href="{% url 'ebookSystem:generics' 'ebook_manager' %}">分段管理</a></li>
 							{% endif %}
+							<li class="dropdown">
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">統計<span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									{% if request.user.is_manager %}
+										<li><a href="/generics/book_download/">書籍下載</a></li>
+										<li><a href="/generics/user_download/">使用者下載</a></li>
+										<li><a href="/generics/user_editrecord/">使用者校對</a></li>
+									{% endif %}
+								</ul>
+							</li>
 						</ul>
 					</li>
 					<li class="dropdown">
