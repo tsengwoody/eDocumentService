@@ -1,25 +1,19 @@
 ﻿# coding: utf-8
+import base64
 import codecs
 import datetime
-import base64
-from zipfile import ZipFile
+import json
+import os
+import uuid
+
 from django.core.cache import cache
-from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse, resolve
-from django.db.models import F,Q
-from django.forms import modelform_factory
 from django.http import HttpResponseRedirect,HttpResponse, Http404
 from django.shortcuts import render
 from django.utils import timezone
-from django.utils.decorators import method_decorator
-from django.views import generic
 from .models import *
 from mysite.settings import BASE_DIR, SERVICE
 from utils.decorator import *
-import os
-import json
-import shutil
-import uuid
 from django.views.decorators.cache import cache_control
 
 #logging config

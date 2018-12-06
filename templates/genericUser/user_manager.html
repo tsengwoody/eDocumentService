@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 使用者管理
 {% endblock %}
@@ -143,6 +143,8 @@
 			//this.dm_bus.$on('instance-refresh', this.user_refresh)
 			this.client = new $.RestClient('/genericUser/api/');
 			this.client.add('users');
+		},
+		mounted: function () {
 		},
 		methods: {
 			user_refresh: function (reason) {

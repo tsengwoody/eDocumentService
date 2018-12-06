@@ -1,11 +1,10 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 書籍下載
 {% endblock %}
 {% block content %}
 
 {% csrf_token %}
-{% include 'comp/table-div-order.vue' %}
 
 <div id="book_download">
 	<h2>書籍下載</h2>
@@ -19,6 +18,9 @@
 
 	new Vue({
 		el: '#book_download',
+		components: {
+			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div-order.vue'),
+		},
 		data: {
 			statistics_header: {
 				'groupfield': '書名',

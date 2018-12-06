@@ -1563,6 +1563,10 @@ function genMonth(v){
 		year_end = year -1
 		month_end = month-v+1+12
 	}
+	else if(month-v+1>12){
+		year_end = year +1
+		month_end = month-v+1-12
+	}
 	else {
 		year_end = year
 		month_end = month-v+1

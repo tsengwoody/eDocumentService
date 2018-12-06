@@ -1,0 +1,129 @@
+﻿{% extends "base_nav.html" %}
+{% load staticfiles %}
+{% block title %}
+網站導覽
+{% endblock %}
+{% block header %}
+網站導覽
+{% endblock %}
+{% block content %}
+
+<script>
+
+	function connclick(me){
+		//a元素觸發連結href得針對原生dom
+		me=$(me);
+		let sid=me.attr('sid');
+		$('a[connsid="'+sid+'"]')[0].click(); 
+	}
+
+	function addchild(me){
+
+		//o
+		let o=me.children('a');
+
+		//sid
+		let sid=_.uniqueId();
+
+		//add connsid
+		o.attr('connsid',sid);
+
+		//s
+		let s={
+			'text':o.text(),
+			'sid':sid,
+			'data':[],
+		};
+
+		return s
+	}
+
+	function addparent(me){
+	
+		//o
+		let o=me.children('a');
+
+		//sid
+		let sid=_.uniqueId();
+
+		//add connsid
+		o.attr('connsid',sid);
+
+		//lis
+		let ss=[];
+		let lis=me.find('ul li').each(function(){
+			let oo=$(this);
+			ss.push(addchild(oo));
+		})
+
+		//push
+		let s={
+			'text':o.text(),
+			'sid':sid,
+			'data':ss,
+		};
+
+		return s;
+	}
+
+	function genmap(s){
+
+		//c
+		let c='';
+		_.each(s,function(v,k){
+			c+='<li style="margin-top:10px;">';
+			c+='<a href="#" sid="'+v['sid']+'" style="cursor:pointer;" onclick="connclick(this);">'+(k+1)+'. '+v['text']+'</a>';
+			
+			if(v['data'].length>0){
+				c+='<ul>';
+				_.each(v['data'],function(vv,kk){
+					c+='<li><a href="#" sid="'+vv['sid']+'" style="cursor:pointer;" onclick="connclick(this);">'+(k+1)+'.'+(kk+1)+'. '+vv['text']+'</a></li>';
+				})
+				c+='</ul>';
+			}
+
+			c+='</li>';
+		})
+
+		return c;
+	}
+
+	$(function(){
+
+		//span_more
+		console.log($('div[user_id]').attr('user_id'),$('div[user_id]').attr('user_id')==='None')
+		if($('div[user_id]').attr('user_id')==='None'){
+			$('#span_more').show();
+		}
+		
+		//s
+		let s=[];
+
+		//logo
+		let logo=$('div.navbar-header');
+		s.push(addchild(logo));
+		
+		//navbar-nav
+		$('ul[class="nav navbar-nav"]').children('li').each(function(){
+			let me=$(this);
+			s.push(addparent(me));
+		})
+
+		//navbar-right
+		$('ul[class="nav navbar-nav navbar-right"]').children('li:eq(0),li:eq(2)').each(function(){
+			let me=$(this);
+			s.push(addparent(me));
+		})
+
+		//html
+		$('#ul_sitemap').html(genmap(s));
+
+	});
+
+</script>
+
+<h3>網站導覽 <span id="span_more" class="label label-warning" style="display:none; font-size:12pt;">登入後有更多使用者功能!</span></h3>
+
+<ul id="ul_sitemap"></ul>
+
+{% endblock %}

@@ -1,0 +1,447 @@
+﻿<template>
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+					<span class="sr-only">功能選單</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/">eDocumentService</a>
+			</div>
+			<div id="navbar" class="collapse navbar-collapse navbar-dark bg-inverse">
+				<ul class="nav navbar-nav">
+					<template v-for="item in item_show(nav_item)">
+						<template v-if="item.type=='folder'">
+							<li class="dropdown">
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">{|{ item.display_name }|}<span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									<template v-for="folder_item in item.items">
+									<li><a :href="folder_item.url">{|{ folder_item.display_name }|}</a></li>
+									</template>
+								</ul>
+							</li>
+						</template>
+						<template v-if="item.type=='item'">
+							<li class="dropdown"><a :href="item.url">{|{ item.display_name }|}</a></li>
+						</template>
+					</template>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<template v-for="item in item_show(nav_item_right)">
+						<template v-if="item.type=='folder'">
+							<li class="dropdown">
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">{|{ item.display_name }|}<span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									<template v-for="folder_item in item.items">
+									<li><a :href="folder_item.url">{|{ folder_item.display_name }|}</a></li>
+									</template>
+								</ul>
+							</li>
+						</template>
+						<template v-if="item.type=='item'">
+							<li class="dropdown"><a :href="item.url">{|{ item.display_name }|}</a></li>
+						</template>
+					</template>
+				</ul>
+			</div>
+		</div>
+	</nav>
+</template>
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+
+	module.exports = {
+		components: {
+		},
+		data: function(){
+			return {
+				'nav_item': [
+					{
+						type: 'item',
+						'display_name': '網站導覽',
+						'permission': ['true'],
+						'url': '/sitemap/',
+					},
+					{
+						type: 'folder',
+						'display_name': '管理',
+						'permission': ['login'],
+						'items': [
+							{
+								type: 'item',
+								'display_name': '上傳文件審核',
+								'permission': ['true'],
+								'url': '/ebookSystem/generics/book_review_list/',
+							},
+							{
+								type: 'item',
+								'display_name': '校對文件審核',
+								'permission': ['true'],
+								'url': '/ebookSystem/generics/ebook_review_list/',
+							},
+							{
+								type: 'item',
+								'display_name': '書籍管理',
+								'permission': ['true'],
+								'url': '/ebookSystem/generics/book_manager/',
+							},
+							{
+								type: 'item',
+								'display_name': '使用者管理',
+								'permission': ['true'],
+								'url': '/genericUser/generics/user_manager/',
+							},
+							{
+								type: 'item',
+								'display_name': '身障手冊管理',
+								'permission': ['true'],
+								'url': '/genericUser/generics/disabilitycard_manager/',
+							},
+							{
+								type: 'item',
+								'display_name': '服務時數確認',
+								'permission': ['true'],
+								'url': '/genericUser/generics/serviceinfo_list_check/',
+							},
+							{
+								type: 'item',
+								'display_name': '校對順序',
+								'permission': ['true'],
+								'url': '/ebookSystem/generics/bookorder_list/',
+							},
+							{
+								type: 'item',
+								'display_name': '統計資訊',
+								'permission': ['true'],
+								'url': '/statistics_old/',
+							},
+							{
+								type: 'item',
+								'display_name': '統計書籍下載',
+								'permission': ['true'],
+								'url': '/generics/book_download/',
+							},
+							{
+								type: 'item',
+								'display_name': '統計使用者下載',
+								'permission': ['true'],
+								'url': '/generics/user_download/',
+							},
+							{
+								type: 'item',
+								'display_name': '統計使用者校對',
+								'permission': ['true'],
+								'url': '/generics/user_editrecord/',
+							},
+							{
+								type: 'item',
+								'display_name': '管理首頁 Banner',
+								'permission': ['true'],
+								'url': '/genericUser/generics/bannercontent_create/',
+							},
+							{
+								type: 'item',
+								'display_name': '訊息傳送',
+								'permission': ['true'],
+								'url': '/genericUser/generics/user_email/',
+							},
+							{
+								type: 'item',
+								'display_name': '公告發佈',
+								'permission': ['true'],
+								'url': '/genericUser/generics/announcement_create/',
+							},
+							{
+								type: 'item',
+								'display_name': '分段管理',
+								'permission': ['true'],
+								'url': '/ebookSystem/generics/ebook_manager/',
+							},
+						],
+					},
+					{
+						type: 'folder',
+						'display_name': '文件上傳',
+						'permission': ['login'],
+						'items': [
+							{
+								type: 'item',
+								'display_name': '掃描檔上傳',
+								'permission': ['true'],
+								'url': '/ebookSystem/generics/book_create/',
+							},
+							{
+								type: 'item',
+								'display_name': '電子檔上傳',
+								'permission': ['true'],
+								'url': '/ebookSystem/generics/book_upload/',
+							},
+						],
+					},
+					{
+						type: 'folder',
+						'display_name': '校對服務',
+						'permission': ['login'],
+						'items': [
+							{
+								type: 'item',
+								'display_name': '一般校對',
+								'permission': ['true'],
+								'url': '/ebookSystem/generics/service/',
+							},
+						],
+					},
+					{
+						type: 'item',
+						'display_name': '校對進度',
+						'permission': ['login'],
+						'url': '/ebookSystem/generics/book_person/',
+					},
+					{
+						type: 'item',
+						'display_name': '借閱書櫃',
+						'permission': ['login'],
+						'url': '/ebookSystem/generics/book_shelf/',
+					},
+					{
+						type: 'item',
+						'display_name': '平台書庫',
+						'permission': ['true'],
+						'url': '/ebookSystem/generics/book_repository/',
+					},
+					{
+						type: 'folder',
+						'display_name': '專案合作',
+						'permission': ['true'],
+						'items': [
+							{
+								type: 'item',
+								'display_name': '法鼓山(107年度)',
+								'permission': ['true'],
+								'url': '/generics/ddm/',
+							},
+						],
+					},
+				],
+				'nav_item_right': [
+					{
+						type: 'folder',
+						'display_name': '帳號',
+						'permission': ['login'],
+						'items': [
+							{
+								type: 'item',
+								'display_name': '服務紀錄',
+								'permission': ['true'],
+								'url': '/genericUser/generics/serviceinfo_record/',
+							},
+							{
+								type: 'item',
+								'display_name': '個人資料',
+								'permission': ['true'],
+								'url': '/genericUser/generics/user_person/',
+							},
+							{
+								type: 'item',
+								'display_name': '字體設定',
+								'permission': ['true'],
+								'url': '',
+							},
+							{
+								type: 'item',
+								'display_name': '登出',
+								'permission': ['true'],
+								'url': '/auth/logout/',
+							},
+						],
+					},
+					{
+						type: 'item',
+						'display_name': '登入',
+						'permission': 'anonymous',
+						'url': '/genericUser/generics/login/',
+					},
+					{
+						type: 'item',
+						'display_name': '註冊',
+						'permission': 'anonymous',
+						'url': '/genericUser/generics/register/',
+					},
+					{
+						type: 'folder',
+						'display_name': '關於',
+						'permission': ['true'],
+						'items': [
+							{
+								type: 'item',
+								'display_name': '教學內容',
+								'permission': ['true'],
+								'url': '/genericUser/generics/qanda_tutorial/',
+							},
+							{
+								type: 'item',
+								'display_name': '平台使用指南',
+								'permission': ['true'],
+								'url': '/about/user_guide/',
+							},
+							{
+								type: 'item',
+								'display_name': '平台Q&A',
+								'permission': ['true'],
+								'url': '/about/qanda/',
+							},
+							{
+								type: 'item',
+								'display_name': '聯絡資訊',
+								'permission': ['true'],
+								'url': '/about/contact/',
+							},
+							{
+								type: 'item',
+								'display_name': '服務條款',
+								'permission': ['true'],
+								'url': '/about/terms_of_service/',
+							},
+							{
+								type: 'item',
+								'display_name': '隱私與資訊安全',
+								'permission': ['true'],
+								'url': '/about/privacy_and_security/',
+							},
+							{
+								type: 'item',
+								'display_name': '平台濫觴',
+								'permission': ['true'],
+								'url': '/about/origin/',
+							},
+							{
+								type: 'item',
+								'display_name': '開發資訊',
+								'permission': ['true'],
+								'url': '/about/development/',
+							},
+							{
+								type: 'item',
+								'display_name': '營運組織',
+								'permission': ['true'],
+								'url': 'https://www.forblind.org.tw/',
+							},
+						],
+					},
+				],
+				user: {},
+			}
+		},
+		computed: {
+			'nav_item_show': function () {
+				items = []
+				_.each(this.nav_item, v => {
+					if(this.item_permission(this.user, v.permission)){
+						item = {
+							'type': v.type,
+							'display_name': v.display_name,
+						}
+						if(v.type==='folder'){
+							item.items = []
+							_.each(v.items, v_item => {
+								if(this.item_permission(this.user, v_item.permission)){
+									item.items.push({
+										'type': v_item.type,
+										'display_name': v_item.display_name,
+										'url': v_item.url,
+									})
+								}
+							})
+							if(item.items.length>0){
+								items.push(item)
+							}
+						}
+						if(v.type==='item'){
+							item.url = v.url
+							items.push(item)
+						}
+					}
+				})
+				return items
+			},
+			'nav_item_right_show': function () {
+				
+			},
+		},
+		created: function () {
+		},
+		mounted: function () {
+			this.user = user
+		},
+		methods: {
+			item_permission: function(u, p){
+				if(p.includes('true')){ return true }
+				if(p.includes('false')){ return false }
+				if(p.includes('anonymous')){
+					if(iser(u)){ return true}
+					else { return false}
+				}
+				if(p.includes('login')){
+					if(!iser(u)){ return true}
+					else { return false}
+				}
+			},
+			'item_show': function (nav_item) {
+				items = []
+				_.each(nav_item, v => {
+					if(this.item_permission(this.user, v.permission)){
+						item = {
+							'type': v.type,
+							'display_name': v.display_name,
+						}
+						if(v.type==='folder'){
+							item.items = []
+							_.each(v.items, v_item => {
+								if(v_item.type==='item' && this.item_permission(this.user, v_item.permission)){
+									item.items.push({
+										'type': v_item.type,
+										'display_name': v_item.display_name,
+										'url': v_item.url,
+									})
+								}
+							})
+							if(item.items.length>0){
+								items.push(item)
+							}
+						}
+						if(v.type==='item'){
+							item.url = v.url
+							items.push(item)
+						}
+					}
+				})
+				return items
+			},
+			'item_show2': function (nav_item) {
+				items = []
+				_.each(nav_item, v => {
+					if(this.item_permission(this.user, v.permission)){
+						item = {
+							'type': v.type,
+							'display_name': v.display_name,
+						}
+						if(v.type==='folder'){
+							item.items = this.item_show2(v.items)
+							if(item.items.length>0){
+								items.push(item)
+							}
+						}
+						if(v.type==='item'){
+							item.url = v.url
+							items.push(item)
+						}
+					}
+				})
+				return items
+			},
+		},
+	}
+
+</script>
