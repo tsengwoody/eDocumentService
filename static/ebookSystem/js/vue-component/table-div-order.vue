@@ -118,13 +118,51 @@ div.tbody .cell {
 					</div>
 				</div>
 			</div>
-			<div v-if="numpage>1" style="text-align:center;">
-				<ul class="pagination" style="margin:0px;">
-					<li class="prev" style="cursor:pointer;"><a href="#" @click="pagin_change(-1)">上一頁</a></li>
-					<li class=""><a>{|{ pagenow }|} / {|{ numpage }|}</a></li>
-					<li class="next" style="cursor:pointer;"><a href="#" @click="pagin_change(1)">下一頁</a></li>
+			<nav v-if="numpage>1" style="text-align:center;  cursor:pointer;">
+		        <ul class="pagination">
+					<li class="page-item">
+						<a class="page-link" tabindex="-1" @click="pagin_change('-1')">上一頁</a>
+					</li>
+					<!-- <li class="page-item"><a class="page-link">1</a></li> -->
+
+					<li
+						:class="{ active: pagenow === 1 }"
+						v-if="numpage > 0"
+						class="page-item"
+					>
+						<a class="page-link" tabindex="-1" @click="pagin_change(1)">1</a>
+					</li>
+
+					<li v-if="showPrevMore">
+						<a class="page-link" tabindex="-1" @click="pagin_change('quickprev')">...</a>
+					</li>
+
+					<li
+						v-for="pager in pagers"
+						:key="pager"
+						:class="{ active: pagenow === pager }"
+						class="page-item"
+					>
+						<a class="page-link" tabindex="-1" @click="pagin_change(pager)">{|{ pager }|}</a>
+					</li>
+
+					<li v-if="showNextMore">
+						<a class="page-link" tabindex="-1" @click="pagin_change('quicknext')">...</a>
+					</li>
+
+					<li
+						:class="{ active: pagenow === numpage }"
+						class="page-item"
+						v-if="numpage > 1"
+					>
+						<a class="page-link" tabindex="-1" @click="pagin_change(numpage)">{|{ numpage }|}</a>
+					</li>
+
+					<li class="page-item">
+						<a class="page-link" tabindex="-1" @click="pagin_change('+1')">下一頁</a>
+					</li>
 				</ul>
-			</div>
+			</nav>
 		</div>
 		<div v-else>
 			無資料
@@ -145,6 +183,9 @@ div.tbody .cell {
 				orderby: '',
 				numperpage: 10,
 				pagenow: 1,
+				showPrevMore: false,
+				showNextMore: false,
+				pagerCount: 7,
 			}
 		},
 		computed: {
@@ -160,6 +201,49 @@ div.tbody .cell {
 			end: function () {
 				return Math.min(this.numperpage *(this.pagenow), this.numrow)
 			},
+			pagers() {
+				const pagerCount = this.pagerCount;
+				const halfPagerCount = (this.pagerCount - 1) / 2;
+				const currentPage = Number(this.pagenow);
+				const pageCount = Number(this.numpage);
+				let showPrevMore = false;
+				let showNextMore = false;
+				if (pageCount > pagerCount) {
+					if (currentPage > pagerCount - halfPagerCount) {
+					  showPrevMore = true;
+					}
+					if (currentPage < pageCount - halfPagerCount) {
+					  showNextMore = true;
+					}
+				}
+				const array = [];
+				if (showPrevMore && !showNextMore) {
+					const startPage = pageCount - (pagerCount - 2);
+					for (let i = startPage; i < pageCount; i++) {
+					  array.push(i);
+					}
+				} 
+				else if (!showPrevMore && showNextMore) {
+					for (let i = 2; i < pagerCount; i++) {
+					  array.push(i);
+					}
+				} 
+				else if (showPrevMore && showNextMore) {
+					const offset = Math.floor(pagerCount / 2) - 1;
+					for (let i = currentPage - offset; i <= currentPage + offset; i++) {
+					  array.push(i);
+					}
+				} 
+				else {
+					for (let i = 2; i < pageCount; i++) {
+					  array.push(i);
+					}
+				}
+
+				this.showPrevMore = showPrevMore;
+				this.showNextMore = showNextMore;
+				return array;
+			},
 		},
 		watch: {
 			datas: function (val) {
@@ -167,24 +251,25 @@ div.tbody .cell {
 			},
 		},
 		methods: {
-			pagin_change: function(oper) {
-				//表格分頁切換
+			pagin_change(oper) {
+				const pagerCountOffset = this.pagerCount - 2;
 
-				let pagenow = this.pagenow
-				let numperpage = this.numperpage
-				let numpage = this.numpage
-
-				if (String(oper) === '1') {
+				if (String(oper) === '+1') {
 					this.pagenow += 1;
-				}
+				} 
 				else if (String(oper) === '-1') {
 					this.pagenow -= 1;
-				}
+				} 
+				else if (String(oper) === 'quickprev') {
+					this.pagenow = this.pagenow - pagerCountOffset;
+				} 
+				else if (String(oper) === 'quicknext') {
+					this.pagenow = this.pagenow + pagerCountOffset;
+				} 
 				else {
-					this.pagenow = cint(oper);
+					this.pagenow = parseInt(oper, 10);
 				}
 
-				//check
 				this.pagenow = Math.max(this.pagenow, 1);
 				this.pagenow = Math.min(this.pagenow, this.numpage);
 			},
