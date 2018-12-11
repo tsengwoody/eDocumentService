@@ -32,8 +32,9 @@ else:
 
 
 if socket.gethostname() == 'edspro':
-    ALLOWED_HOSTS = ['edocumentservice.org', 'www.edocumentservice.org', '104.155.204.241']
     SECURE_SSL_REDIRECT = True
+
+ALLOWED_HOSTS = ['*']
 
 ADMINS = [
     ('eDocumentService', 'edocumentservice@gmail.com'),

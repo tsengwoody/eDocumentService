@@ -5,12 +5,11 @@
 
 {% block content %}
 {% csrf_token %}
-{% include 'comp/table-div.vue' %}
-{% include 'comp/serviceinfo_record.vue' %}
 
 <div id="serviceinfo" class="container">
 	<serviceinfo_record
 		:bus="bus"
+		ref="srcom"
 	>
 	</serviceinfo_record>
 </div>
@@ -21,8 +20,7 @@
 	new Vue({
 		el: '#serviceinfo',
 		components: {
-			//'serviceinfo_record': httpVueLoader('/static/ebookSystem/js/vue-component/serviceinfo_record.vue'),
-			//'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+			'serviceinfo_record': httpVueLoader('/static/ebookSystem/js/vue-component/serviceinfo_record.vue'),
 		},
 		data: {
 			bus: new Vue(),
@@ -34,7 +32,11 @@
 			if(this.pk==='serviceinfo_record'){
 				this.pk = user.id
 			}
-			this.bus.$emit('instance-set', this.pk)
+			setTimeout(() => {
+				//this.bus.$emit('instance-set', this.pk)
+				//this.$refs.srcom.pk=this.pk
+				//this.$refs.srcom.refresh()
+			}, 1000)
 		},
 	})
 </script>

@@ -2,13 +2,23 @@
 {% block title %}
 電子檔上傳
 {% endblock %}
-
 {% block content %}
-<div category="epub"></div>
-{% include 'comp/book_vue.html' %}
-{% include 'comp/mx_find_book.html' %}
 {% include 'comp/upload_dialog.html' %}
-
 {% csrf_token %}
 
+<div id="book_create">
+	<h2>文件上傳</h2>
+	<book_upload category="epub"></book_upload>
+</div>
+
+<script>
+	new Vue({
+		el: '#book_create',
+		components: {
+			'book_upload': httpVueLoader('/static/ebookSystem/js/vue-component/book_upload.vue'),
+		},
+		data: {
+		},
+	})
+</script>
 {% endblock %}

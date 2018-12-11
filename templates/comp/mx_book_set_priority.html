@@ -24,15 +24,15 @@
 			let priority = $('#divmodal_BookSetPriority_priority').find('option:selected').val();
 
 			//aj_booksetpriority
-			aj_booksetpriority(password, ISBN, priority)
+			rest_aj_send('post', '/ebookSystem/api/books/' +ISBN +'/action/set_priority/', {'priority': priority})
 				.done(function (data) {
 					alertmessage('success', '成功設定權重')
 						.done(function () {
 							location.reload(); //重新載入網頁以更新資訊
 						});
 				})
-				.fail(function (data) {
-					alertmessage('error', xhr)
+				.fail(function(data){
+					alertmessage('error', o2j(data))
 				})
 
 			div.modal('hide');

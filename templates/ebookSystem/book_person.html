@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 校對進度
 {% endblock %}
@@ -12,7 +12,7 @@
 		<template slot="table" slot-scope="props">
 			<table-div :datas="props.item.datas" :header="props.item.header">
 				<template slot="inactive_book_action" slot-scope="props">
-					<a v-if="user.is_manager" class="btn btn-default" role="button" :href="'/ebookSystem/review_document/' +props.item.ISBN +'/'" target="_blank" title="審核(另開新視窗)">審核</a>
+					<a v-if="user.is_manager" class="btn btn-default" role="button" :href="'/ebookSystem/generics/book_review/' +props.item.ISBN +'/'" target="_blank" title="審核(另開新視窗)">審核</a>
 					<button class="btn btn-default" @click="book_del(props.item.ISBN)">刪除</button>
 				</template>
 				<template slot="active_book_action" slot-scope="props">

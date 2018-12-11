@@ -2,40 +2,52 @@
 
 from rest_framework import filters
 
-class BookStatusFilter(filters.BaseFilterBackend):
+class BaseFilter(filters.BaseFilterBackend):
+	key = ''
+	type = str
+	attr = ''
 	def filter_queryset(self, request, queryset, view):
-		status = request.query_params.get('status')
+		value = request.query_params.get(self.key)
+		if not value:
+			return queryset
 		try:
-			if status:
-				return queryset.filter(status=int(status))
-			else:
-				return queryset
+			self.value = self.type(value)
+			kwargs = {
+				self.attr: self.value,
+			}
+			return queryset.filter(**kwargs)
 		except:
 			return queryset
 
-class BookOwnerFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		owner_id = request.query_params.get('owner_id')
-		if owner_id:
-			owner = User.objects.get(id=owner_id)
-			return queryset.filter(owner=owner)
-		else:
-			return queryset
+# ['book_review_list', 'book_manager', 'book_person', 'ebook_review_list', 'service', ]
+class StatusFilter(BaseFilter):
+	key = 'status'
+	type = int
+	attr = 'status'
+
+# ['book_person', ]
+class BookOwnerFilter(BaseFilter):
+	key = 'owner_id'
+	type = str
+	attr = 'owner_id'
+
+# ['service', ]
+class EditorFilter(BaseFilter):
+	key = 'editor_id'
+	type = str
+	attr = 'editor_id'
+
+# ['book_person', ]
+class BookInfoOwnerFilter(BaseFilter):
+	key = 'owner_id'
+	type = str
+	attr = 'book__owner_id'
 
 class BookBooknameFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
 		bookname = request.query_params.get('bookname')
 		if bookname and not bookname=='':
 			return queryset.filter(book_info__bookname__contains=bookname)
-		else:
-			return queryset
-
-class BookInfoOwnerFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		value = request.query_params.get('owner_id')
-		if value:
-			obj = User.objects.get(id=value)
-			return queryset.filter(book__owner=obj)
 		else:
 			return queryset
 
@@ -80,26 +92,7 @@ class HottestFilter(filters.BaseFilterBackend):
 		else:
 			return queryset
 
-class EBookStatusFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		status = request.query_params.get('status')
-		try:
-			if status:
-				return queryset.filter(status=int(status))
-			else:
-				return queryset
-		except:
-			return queryset
-
 from genericUser.models import User
-class EBookEditorFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		user_id = request.query_params.get('editor_id')
-		if user_id:
-			user = User.objects.get(id=user_id)
-			return queryset.filter(editor=user)
-		else:
-			return queryset
 
 class EditRecordEditorFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):

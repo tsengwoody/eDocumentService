@@ -153,9 +153,21 @@
 			this.clientb.add('editrecords');
 			this.bus.$on('instance-set', this.instance_set)
 		},
+		mounted: function () {
+			pk = window.location.pathname.split('/')
+			pk = pk[pk.length-2]
+			if(pk==='serviceinfo_record'){
+				this.pk = user.id
+			}
+			else {
+				this.pk = pk
+			}
+			this.refresh()
+		},
 		methods: {
 			instance_set: function (event) {
 				this.pk = event
+				console.log('YAA')
 				this.refresh()
 			},
 			serviceinfo_datas: function(v){

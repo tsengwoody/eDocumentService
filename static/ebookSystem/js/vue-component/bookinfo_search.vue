@@ -1,5 +1,4 @@
-{% include 'comp/table-div.vue' %}
-<template id="bookinfo_search">
+<template>
 	<modal id_modal="bis">
 		<template slot="header">
 			<h4 class="modal-title">更多查詢方式</h4>
@@ -119,9 +118,12 @@
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
-	Vue.component('bookinfo_search', {
-		template: '#bookinfo_search',
+	module.exports = {
 		props: [],
+		components: {
+			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+			'modal': httpVueLoader('/static/ebookSystem/js/vue-component/modal.vue'),
+		},
 		data: function(){
 			return {
 				mode: 'request', //request, response
@@ -349,6 +351,6 @@
 				return ncl_df
 			},
 		},
-	})
+	}
 
 </script>

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 		<div class="container">
 			<div class="navbar-header">
@@ -72,91 +72,91 @@
 							{
 								type: 'item',
 								'display_name': '上傳文件審核',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/ebookSystem/generics/book_review_list/',
 							},
 							{
 								type: 'item',
 								'display_name': '校對文件審核',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/ebookSystem/generics/ebook_review_list/',
 							},
 							{
 								type: 'item',
 								'display_name': '書籍管理',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/ebookSystem/generics/book_manager/',
 							},
 							{
 								type: 'item',
 								'display_name': '使用者管理',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/genericUser/generics/user_manager/',
 							},
 							{
 								type: 'item',
 								'display_name': '身障手冊管理',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/genericUser/generics/disabilitycard_manager/',
 							},
 							{
 								type: 'item',
 								'display_name': '服務時數確認',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/genericUser/generics/serviceinfo_list_check/',
 							},
 							{
 								type: 'item',
 								'display_name': '校對順序',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/ebookSystem/generics/bookorder_list/',
 							},
 							{
 								type: 'item',
 								'display_name': '統計資訊',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/statistics_old/',
 							},
 							{
 								type: 'item',
 								'display_name': '統計書籍下載',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/generics/book_download/',
 							},
 							{
 								type: 'item',
 								'display_name': '統計使用者下載',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/generics/user_download/',
 							},
 							{
 								type: 'item',
 								'display_name': '統計使用者校對',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/generics/user_editrecord/',
 							},
 							{
 								type: 'item',
 								'display_name': '管理首頁 Banner',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/genericUser/generics/bannercontent_create/',
 							},
 							{
 								type: 'item',
 								'display_name': '訊息傳送',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/genericUser/generics/user_email/',
 							},
 							{
 								type: 'item',
 								'display_name': '公告發佈',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/genericUser/generics/announcement_create/',
 							},
 							{
 								type: 'item',
 								'display_name': '分段管理',
-								'permission': ['true'],
+								'permission': ['is_superuser'],
 								'url': '/ebookSystem/generics/ebook_manager/',
 							},
 						],
@@ -169,13 +169,13 @@
 							{
 								type: 'item',
 								'display_name': '掃描檔上傳',
-								'permission': ['true'],
+								'permission': ['auth_guest'],
 								'url': '/ebookSystem/generics/book_create/',
 							},
 							{
 								type: 'item',
 								'display_name': '電子檔上傳',
-								'permission': ['true'],
+								'permission': ['is_manager'],
 								'url': '/ebookSystem/generics/book_upload/',
 							},
 						],
@@ -188,7 +188,7 @@
 							{
 								type: 'item',
 								'display_name': '一般校對',
-								'permission': ['true'],
+								'permission': ['auth_editor'],
 								'url': '/ebookSystem/generics/service/',
 							},
 						],
@@ -196,13 +196,13 @@
 					{
 						type: 'item',
 						'display_name': '校對進度',
-						'permission': ['login'],
+						'permission': ['auth_guest'],
 						'url': '/ebookSystem/generics/book_person/',
 					},
 					{
 						type: 'item',
 						'display_name': '借閱書櫃',
-						'permission': ['login'],
+						'permission': ['auth_guest'],
 						'url': '/ebookSystem/generics/book_shelf/',
 					},
 					{
@@ -234,7 +234,7 @@
 							{
 								type: 'item',
 								'display_name': '服務紀錄',
-								'permission': ['true'],
+								'permission': ['auth_editor'],
 								'url': '/genericUser/generics/serviceinfo_record/',
 							},
 							{
@@ -242,12 +242,6 @@
 								'display_name': '個人資料',
 								'permission': ['true'],
 								'url': '/genericUser/generics/user_person/',
-							},
-							{
-								type: 'item',
-								'display_name': '字體設定',
-								'permission': ['true'],
-								'url': '',
 							},
 							{
 								type: 'item',
@@ -383,9 +377,20 @@
 					if(iser(u)){ return true}
 					else { return false}
 				}
-				if(p.includes('login')){
-					if(!iser(u)){ return true}
-					else { return false}
+				if(!iser(u)){
+					if(p.includes('login')){
+						return true
+					}
+					roles = ['is_editor', 'is_guest', 'auth_editor', 'auth_guest', 'is_manager', 'is_superuser']
+					for(var i=0; i<roles.length; i++){
+						role = roles[i]
+						if(p.includes(role)){
+							return u[role]
+						}
+					}
+				}
+				else {
+					return false
 				}
 			},
 			'item_show': function (nav_item) {
