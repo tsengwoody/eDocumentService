@@ -22,16 +22,15 @@
 		</template>
 	</tab>
 </div>
-<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	new Vue({
 		el: '#announcement_list',
 		components: {
-			'bookinfo_repository': httpVueLoader('/static/ebookSystem/js/vue-component/bookinfo_repository.vue'),
-			'tab': httpVueLoader('/static/ebookSystem/js/vue-component/tab.vue'),
-			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+			'bookinfo_repository': components['bookinfo_repository'],
+			'tab': components['tab'],
+			'table-div': components['table-div'],
 		},
 		data: {
 			announcement_columns: {

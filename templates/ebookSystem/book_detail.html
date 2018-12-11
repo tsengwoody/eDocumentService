@@ -110,10 +110,10 @@
 	new Vue({
 		el: '#book_detail',
 		components: {
-			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
-			'book_origin_download': httpVueLoader('/static/ebookSystem/js/vue-component/book_origin_download.vue'),
-			'ul-component': httpVueLoader('/static/ebookSystem/js/vue-component/list_vue_component.vue'),
-			'assign-component': httpVueLoader('/static/ebookSystem/js/vue-component/ebook_assign_component.vue'),
+			'table-div': components['table-div'],
+			'book_origin_download': components['book_origin_download'],
+			'ul-component': components['list_vue_component'],
+			'assign-component': components['ebook_assign_component'],
 		},
 		data: {
 			pk: '',

@@ -46,17 +46,15 @@
 		</template>
 	</modal>
 </div>
-
-<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	new Vue({
 		el: '#disabilitycard_manager',
 		components: {
-			'disabilitycard': httpVueLoader('/static/ebookSystem/js/vue-component/disabilitycard.vue'),
-			'modal': httpVueLoader('/static/ebookSystem/js/vue-component/modal.vue'),
-			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+			'disabilitycard': components['disabilitycard'],
+			'modal': components['modal'],
+			'table-div': components['table-div'],
 		},
 		data: {
 			dm_bus: new Vue(),

@@ -91,14 +91,13 @@
 	</div>
 </div>
 
-<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 	new Vue({
 		el: '#id_announcement',
 		components: {
 			'editor': Editor,
-			'file_manager': httpVueLoader('/static/ebookSystem/js/vue-component/file_manager.vue'),
+			'file_manager': components['file_manager'],
 		},
 		data: {
 			announcement: {},

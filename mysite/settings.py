@@ -115,7 +115,7 @@ else:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'eDocumentService',
             'USER': 'root',
-            'PASSWORD': 'eds@2018',
+            'PASSWORD': 'tseng790125',
             'HOST': '127.0.0.1',
             'PORT': '3306',
         }

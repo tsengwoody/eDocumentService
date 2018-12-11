@@ -104,15 +104,13 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 		</div>
 	</div>
 </div>
-
-<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	vo_genericUser_register = new Vue({
 		el: '#genericUser_register',
 		components: {
-			'form-drf': httpVueLoader('/static/ebookSystem/js/vue-component/form.vue'),
+			'form-drf': components['form'],
 		},
 		data: {
 			// bus: new Vue(),

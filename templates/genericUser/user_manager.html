@@ -111,18 +111,17 @@
 
 </div>
 
-<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	new Vue({
 		el: '#user_manager',
 		components: {
-			'disabilitycard': httpVueLoader('/static/ebookSystem/js/vue-component/disabilitycard.vue'),
-			'modal': httpVueLoader('/static/ebookSystem/js/vue-component/modal.vue'),
-			'serviceinfo_record': httpVueLoader('/static/ebookSystem/js/vue-component/serviceinfo_record.vue'),
-			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
-			'user_permission': httpVueLoader('/static/ebookSystem/js/vue-component/user_permission.vue'),
+			'disabilitycard': components['disabilitycard'],
+			'modal': components['modal'],
+			'serviceinfo_record': components['serviceinfo_record'],
+			'table-div': components['table-div'],
+			'user_permission': components['user_permission'],
 		},
 		data: {
 			dm_bus: new Vue(),

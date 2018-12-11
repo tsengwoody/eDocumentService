@@ -1,0 +1,37 @@
+<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
+<script type="text/javascript">
+	function set_components(components) {
+		let timestamp = '?' + Date.now();
+		let components_array = [
+			'book_download',
+			'book_origin_download',
+			'book_upload',
+			'bookinfo_repository',
+			'bookinfo_search',
+			'disabilitycard',
+			'drf',
+			'ebook_assign_component',
+			'eds-nav',
+			'file_manager',
+			'file_upload',
+			'form',
+			'list_vue_component',
+			'modal',
+			'serviceinfo_record',
+			'set_password',
+			'tab',
+			'table-div',
+			'table-div-filter',
+			'table-div-order',
+			'table-div-row',
+			'user_permission',
+		]
+		_.each(components_array, function(v){
+			url = '/static/ebookSystem/js/vue-component/' +v +'.vue' +timestamp
+			url = '/static/ebookSystem/js/vue-component/' +v +'.vue'
+			components[v] = httpVueLoader(url)
+		})
+		return components
+	}
+	let components = set_components({})
+</script>

@@ -1,4 +1,4 @@
-﻿{% extends "base_nav.html" %}
+{% extends "base_nav.html" %}
 {% block title %}
 取回帳密
 {% endblock %}
@@ -65,14 +65,12 @@
 		</div>
 	</div>
 </div>
-
-<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 
 	new Vue({
 		el: '#retrieve',
 		components: {
-			'form-drf': httpVueLoader('/static/ebookSystem/js/vue-component/form.vue'),
+			'form-drf': components['form'],
 		},
 		data: {
 			username: '',

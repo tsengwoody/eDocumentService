@@ -58,7 +58,6 @@
 		</template>
 	</modal>
 </div>
-<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
@@ -73,7 +72,7 @@
 		el: '#qanda_tutorial',
 		components: {
 			'editor': Editor,
-			'table-div-row': httpVueLoader('/static/ebookSystem/js/vue-component/table-div-row.vue'),
+			'table-div-row': components['table-div-row'],
 		},
 		data: {
 			qanda_tutorial_header: {

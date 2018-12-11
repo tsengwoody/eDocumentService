@@ -117,14 +117,13 @@
 	</modal>
 </div>
 
-<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 
 	new Vue({
 		el: '#user_person',
 		components: {
-			'disabilitycard': httpVueLoader('/static/ebookSystem/js/vue-component/disabilitycard.vue'),
-			'set_password': httpVueLoader('/static/ebookSystem/js/vue-component/set_password.vue'),
+			'disabilitycard': components['disabilitycard'],
+			'set_password': components['set_password'],
 		},
 		data: {
 			dm_bus: new Vue(),

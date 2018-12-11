@@ -47,13 +47,12 @@
 	</modal>
 </div>
 
-<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 
 	new Vue({
 		el: '#serviceinfo_check',
 		components: {
-			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+			'table-div': components['table-div'],
 		},
 		data: {
 			serviceinfo_header: {
