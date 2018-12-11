@@ -31,7 +31,7 @@ class BookOwnerFilter(BaseFilter):
 	type = str
 	attr = 'owner_id'
 
-# ['service', ]
+# ['service', 'serviceinfo_record', ]
 class EditorFilter(BaseFilter):
 	key = 'editor_id'
 	type = str
@@ -93,15 +93,6 @@ class HottestFilter(filters.BaseFilterBackend):
 			return queryset
 
 from genericUser.models import User
-
-class EditRecordEditorFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		editor_id = request.query_params.get('editor_id')
-		if editor_id:
-			editor = User.objects.get(id=editor_id)
-			return queryset.filter(editor=editor)
-		else:
-			return queryset
 
 class EditRecordServiceInfoFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):

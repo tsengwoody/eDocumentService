@@ -14,7 +14,7 @@ lxml==4.1.1
 mysqlclient==1.3.12
 oauthlib==2.0.6
 PyJWT==1.5.3
-pyminizip==0.2.3
+pyminizip==0.2.1
 python-Levenshtein==0.12.0
 python-memcached==1.59
 python-openid==2.2.5

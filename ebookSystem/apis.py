@@ -551,7 +551,7 @@ class BookOrderViewSet(viewsets.ModelViewSet):
 class EditRecordViewSet(viewsets.ModelViewSet):
 	queryset = EditRecord.objects.all().order_by('-get_date')
 	serializer_class = EditRecordSerializer
-	filter_backends = (filters.OrderingFilter, EditRecordEditorFilter, EditRecordServiceInfoFilter,)
+	filter_backends = (filters.OrderingFilter, EditorFilter, EditRecordServiceInfoFilter,)
 	ordering_fields = ('username',)
 	permission_classes = (permissions.IsAuthenticated,)
 
