@@ -1,4 +1,4 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
 登錄
 {% endblock %}
@@ -81,7 +81,7 @@
 					})
 				})
 				.fail(function(xhr, result, statusText){
-					alertmessage('error', '登錄平台失敗，請確認帳號或密碼是否正確。')
+					alertmessage('error', '登錄平台失敗，請確認帳號或密碼是否正確。'+xhr.message)
 				})
 
 			},

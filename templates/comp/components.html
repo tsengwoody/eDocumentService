@@ -28,7 +28,7 @@
 		]
 		_.each(components_array, function(v){
 			url = '/static/ebookSystem/js/vue-component/' +v +'.vue' +timestamp
-			url = '/static/ebookSystem/js/vue-component/' +v +'.vue'
+			//url = '/static/ebookSystem/js/vue-component/' +v +'.vue'
 			components[v] = httpVueLoader(url)
 		})
 		return components

@@ -9,14 +9,13 @@
 	<eds-nav ref="eds_nav_instance"></eds-nav>
 </div>
 
-<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	vo_eds_nav = new Vue({
 		el: '#edsnav',
 		components: {
-			'eds-nav': httpVueLoader('/static/ebookSystem/js/vue-component/eds-nav.vue')
+			'eds-nav': components['eds-nav'],
 		},
 		data: {
 		},

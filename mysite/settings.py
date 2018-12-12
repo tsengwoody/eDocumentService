@@ -49,10 +49,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'social_django',
     'ebookSystem',
     'genericUser',
     'rest_framework',
+    'rules',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -115,7 +115,7 @@ else:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'eDocumentService',
             'USER': 'root',
-            'PASSWORD': 'tseng790125',
+            'PASSWORD': 'eds@2018',
             'HOST': '127.0.0.1',
             'PORT': '3306',
         }
@@ -216,11 +216,8 @@ SERVICE = 'edocumentservice@gmail.com'
 TIME_ZONE = 'Asia/Taipei'
 
 AUTHENTICATION_BACKENDS = (
+    'rules.permissions.ObjectPermissionBackend',
     'django.contrib.auth.backends.ModelBackend',
-    'social_core.backends.facebook.FacebookOAuth2',
-    'social_core.backends.github.GithubOAuth2',
-    'social_core.backends.google.GoogleOAuth2',
-    'social_core.backends.twitter.TwitterOAuth',
 )
 
 from .account_info import *

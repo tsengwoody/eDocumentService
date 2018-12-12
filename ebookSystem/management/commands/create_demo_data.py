@@ -12,7 +12,6 @@ from ebookSystem.models import *
 from genericUser.models import *
 from ebookSystem.views import *
 from genericUser.views import *
-from mysite.views import register
 from mysite.settings import BASE_DIR
 import shutil
 import datetime
@@ -73,14 +72,14 @@ class Command(BaseCommand):
 		dc = DisabilityCard.objects.get(identity_card_number=pk)
 		dirname = os.path.dirname(dc.front)
 		if not os.path.exists(dirname):
-			os.makedirs(dirname, 0755)
+			os.makedirs(dirname, 755)
 		shutil.copy2('temp/dcf.jpg', dc.front,)
 		shutil.copy2('temp/dcb.jpg', dc.back,)
 
 
 		client = Client()
 		response = client.post(
-			reverse('register'),
+			'/genericUser/api/users/',
 			{
 				'username':'demo-editor',
 				'password':'demo-editor',
@@ -91,14 +90,12 @@ class Command(BaseCommand):
 				'phone':'1234567890',
 				'birthday':'2016-01-01',
 				'education':u'碩士',
-				'role':'Editor',
+				'is_editor': 'true',
 				'is_book':'on',
 				'org':u'1',
-				'professional_field':u'資訊工程學',
-				'is_privacy':True
 			}
 		)
-
+		print(response.content)
 		editor = User.objects.get(username='demo-editor')
 		editor.auth_email = True
 		editor.auth_phone = True
@@ -109,7 +106,7 @@ class Command(BaseCommand):
 
 		with open('temp/dcf.jpg') as dcf_file, open('temp/dcb.jpg') as dcb_file:
 			response = client.post(
-				reverse('register'),
+			'/genericUser/api/users/',
 				{
 					'username':'demo-guest',
 					'password':'demo-guest',
@@ -121,11 +118,8 @@ class Command(BaseCommand):
 					'birthday':'2016-01-01',
 					'education':u'碩士',
 					'is_book':'on',
-					'role':'Guest',
+					'is_guest':'true',
 					'org':u'1',
-					'disability_card_front':dcf_file,
-					'disability_card_back':dcb_file,
-					'is_privacy':True,
 				}
 			)
 
@@ -135,7 +129,7 @@ class Command(BaseCommand):
 		guest.save()
 
 		response = client.post(
-			reverse('register'),
+			'/genericUser/api/users/',
 			{
 				'username':'demo-manager',
 				'password':'demo-manager',
@@ -148,9 +142,7 @@ class Command(BaseCommand):
 				'education':u'碩士',
 				'is_book':'on',
 				'org':u'1',
-				'role':'Editor',
-				'professional_field':u'資訊工程學',
-				'is_privacy':True,
+				'is_editor':'true',
 			},
 		)
 
@@ -160,7 +152,7 @@ class Command(BaseCommand):
 		manager.save()
 
 		src = BASE_DIR +u'/temp/藍色駭客.zip'
-		with open(src) as book_file:
+		with open(src, 'rb') as book_file:
 			client = Client()
 			client.login(username='root', password='eds@2018')
 			response = client.post(
@@ -179,7 +171,7 @@ class Command(BaseCommand):
 #				HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 			)
 
-		assert response.status_code == 202, 'status_code' +str(response.status_code) +response.content
+		assert response.status_code == 202, 'status_code' +str(response.status_code) +str(response.content)
 		assert len(Book.objects.all())==1, 'create book fail'
 		assert len(EBook.objects.all()) == 10, 'create part fail'
 
@@ -234,7 +226,7 @@ class Command(BaseCommand):
 		assert ebook.change_status(1, 'review'), 'change status error'
 
 		src = BASE_DIR +u'/temp/山羊島的藍色奇蹟.zip'
-		with open(src) as book_file:
+		with open(src, 'rb') as book_file:
 			client = Client()
 			client.login(username='root', password='eds@2018')
 			response = client.post(
@@ -259,7 +251,7 @@ class Command(BaseCommand):
 		assert len(EBook.objects.all()) == 16, 'create part fail'
 		assert len(book.ebook_set.all())==6, 'create part fail'
 
-		book_file = open(BASE_DIR +u'/temp/自創思維.epub')
+		book_file = open(BASE_DIR +u'/temp/自創思維.epub', 'rb')
 		client = Client()
 		client.login(username='root', password='eds@2018')
 		response = client.post(
@@ -279,6 +271,7 @@ class Command(BaseCommand):
 #			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
 		book_file.close()
+
 		assert len(Book.objects.all())==3, 'create book fail'
 
 		client = Client()
@@ -337,7 +330,7 @@ class Command(BaseCommand):
 
 		client = Client()
 		client.login(username='root', password='eds@2018')
-		with open('temp/cover1.jpg') as file:
+		with open('temp/cover1.jpg', 'rb') as file:
 			response = client.post(
 				'/genericUser/api/bannercontents/1/resource/cover/image/',
 				{
@@ -346,7 +339,7 @@ class Command(BaseCommand):
 				HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 			)
 
-		with open('temp/cover2.jpg') as file:
+		with open('temp/cover2.jpg', 'rb') as file:
 			response = client.post(
 				'/genericUser/api/bannercontents/2/resource/cover/image/',
 				{

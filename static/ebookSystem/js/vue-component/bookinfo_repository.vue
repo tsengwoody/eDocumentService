@@ -17,7 +17,7 @@
 	module.exports = {
 		props: ['header', 'datas',],
 		components: {
-			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+			'table-div': components['table-div'],
 		},
 		data: function(){
 			return {

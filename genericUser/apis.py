@@ -20,6 +20,9 @@ from django.template import Context
 
 from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWORD
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
 class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
@@ -67,6 +70,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 	@list_route(
 		methods=['post'],
+		permission_classes=[AllowAny,],
 		url_name='authenticate',
 		url_path='action/authenticate',
 	)
@@ -83,6 +87,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 	@list_route(
 		methods=['post', 'get'],
+		permission_classes=[AllowAny,],
 		url_name='login',
 		url_path='action/login',
 	)
@@ -108,6 +113,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 	@list_route(
 		methods=['post'],
+		permission_classes=[AllowAny,],
 		url_name='retrieve_up',
 		url_path='action/retrieve_up',
 	)
@@ -183,7 +189,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				vcode = cache.get(obj.email)['vcode']
 			subject = u'[驗證] {0} 信箱驗證碼'.format(obj.username)
 			t = get_template('email/email_validate.txt')
-			body = t.render(Context(locals()))
+			body = t.render(locals())
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[obj.email])
 			email.send(fail_silently=False)
 			res['detail'] = u'已寄送到您的電子信箱'

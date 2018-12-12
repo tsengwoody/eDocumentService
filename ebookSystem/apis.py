@@ -246,6 +246,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 					epub.write_epub(final_file, book, {})
 				except BaseException as e:
 					shutil.rmtree(uploadPath)
+					raise(e)
 					res['detail'] = u'建立文件失敗' +str(e)
 					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 

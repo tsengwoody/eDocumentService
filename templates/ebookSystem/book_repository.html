@@ -82,8 +82,8 @@
 	new Vue({
 		el: '#book_repository_recommend',
 		components: {
-			'tab': httpVueLoader('/static/ebookSystem/js/vue-component/tab.vue'),
-			'bookinfo_repository': httpVueLoader('/static/ebookSystem/js/vue-component/bookinfo_repository.vue'),
+			'tab': components['tab'],
+			'bookinfo_repository': components['bookinfo_repository'],
 		},
 		data: {
 			bookinfo_columns: bookinfo_columns,
@@ -142,8 +142,8 @@
 	new Vue({
 		el: '#book_repository_index',
 		components: {
-			'tab': httpVueLoader('/static/ebookSystem/js/vue-component/tab.vue'),
-			'bookinfo_repository': httpVueLoader('/static/ebookSystem/js/vue-component/bookinfo_repository.vue'),
+			'tab': components['tab'],
+			'bookinfo_repository': components['bookinfo_repository'],
 		},
 		data: {
 			bookinfo_columns: bookinfo_columns,
@@ -251,8 +251,8 @@
 	new Vue({
 		el: '#book_repository_search',
 		components: {
-			'tab': httpVueLoader('/static/ebookSystem/js/vue-component/tab.vue'),
-			'bookinfo_repository': httpVueLoader('/static/ebookSystem/js/vue-component/bookinfo_repository.vue'),
+			'tab': components['tab'],
+			'bookinfo_repository': components['bookinfo_repository'],
 		},
 		data: {
 			search_value: '',

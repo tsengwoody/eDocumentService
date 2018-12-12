@@ -57,60 +57,6 @@ def home(request, template_name='home.html'):
 def sitemap(request, template_name='sitemap.html'):
 	return locals()
 
-@http_response
-def register(request, template_name='registration/register.html'):
-	if request.method == 'POST':
-#		print request.POST
-		registerUserForm = RegisterUserForm(request.POST)
-		if not registerUserForm.is_valid():
-			status = 'error'
-			message = u'表單驗證失敗' +str(registerUserForm.errors)
-			return locals()
-		if 'is_privacy' not in request.POST:
-			status = 'error'
-			message = u'請勾選隱私權條款'
-			return locals()
-		newUser = registerUserForm.save(commit=False)
-		newUser.set_password(request.POST.get('password'))
-		newUser.is_active = True
-		newUser.is_license = True
-		newUser.save()
-
-		if request.POST['role'] == 'Editor':
-			try:
-				newUser.is_editor = True
-			except:
-				newUser.delete()
-				status = 'error'
-				message = u'editor申請失敗'
-				return locals()
-		elif request.POST['role'] == 'Guest':
-			try:
-				DCDir = BASE_DIR +'/static/ebookSystem/disability_card/{0}'.format(newUser.username)
-				handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_front.jpg'), request.FILES['disability_card_front'])
-				handle_uploaded_file(os.path.join(DCDir, request.POST['username'] + '_back.jpg'), request.FILES['disability_card_back'])
-			except:
-				newUser.delete()
-				status = 'error'
-				message = u'guest申請失敗'
-				return locals()
-		newUser.save()
-		Event.objects.create(creater=newUser, action=newUser)
-		username = request.POST['username']
-		password = request.POST['password']
-		user = authenticate(username=username, password=password)
-		if user is not None:
-			auth_login(request, user)
-		else:
-			pass
-		status = 'success'
-		message = u'資料填寫成功，需完成電子信箱與聯絡電話驗證才算完成註冊'
-		redirect_to = '/'
-		return locals()
-	if request.method == 'GET':
-		registerUserForm = RegisterUserForm()
-		return locals()
-
 from utils.decorator import *
 @http_response
 def login(request, template_name='registration/login.html', authentication_form=AuthenticationForm):
@@ -147,29 +93,6 @@ def login(request, template_name='registration/login.html', authentication_form=
 def logout_user(request, template_name='registration/logged_out.html'):
 	auth_logout(request)
 	return render(request, template_name, locals())
-
-@http_response
-def password_change(request, template_name='registration/password_change_form.html', password_change_form=PasswordChangeForm):
-	if request.method == "POST":
-		form = password_change_form(user=request.user, data=request.POST)
-		if not form.is_valid():
-			status = 'error'
-			message = u'舊密碼或新密碼輸入錯誤'
-#			message = u'表單驗證失敗' +str(form.errors)
-			return locals()
-		form.save()
-		# Updating the password logs out all other sessions for the user
-		# except the current one if
-		# django.contrib.auth.middleware.SessionAuthenticationMiddleware
-		# is enabled.
-		update_session_auth_hash(request, form.user)
-		status = 'success'
-		message = u'成功修改密碼'
-		redirect_to = reverse('genericUser:info')
-		return locals()
-	if request.method == "GET":
-		form = password_change_form(user=request.user)
-		return locals()
 
 @http_response
 def statistics(request, template_name='mysite/statistics.html'):

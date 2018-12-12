@@ -17,7 +17,7 @@ def validate_folder(OCR, source, page_per_part):
 	for scanPage in sourceFileList:
 		if scanPage.split('.')[-1].lower() == 'jpg':
 			page_count = page_count + 1
-	part_count = (page_count-1)/page_per_part+1
+	part_count = int((page_count-1)/page_per_part) +1
 	for i in range(part_count):
 		if u'part{0}.txt'.format(i+1) not in OCRFileList:
 			raise OSError('invalid folder')

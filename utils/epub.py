@@ -16,9 +16,13 @@ def through(src, dst):
 
 def add_bookinfo(epubBook, **kwargs):
 
+	remove_key = []
 	for k in epubBook.metadata[epub.NAMESPACES['DC']].keys():
 		if k in kwargs.keys():
-			del epubBook.metadata[epub.NAMESPACES['DC']][k]
+			remove_key.append(k)
+
+	for k in remove_key:
+		del epubBook.metadata[epub.NAMESPACES['DC']][k]
 
 	epubBook.set_title(kwargs['bookname'])
 	epubBook.set_language(kwargs['language'])

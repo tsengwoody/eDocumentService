@@ -86,7 +86,7 @@ class Book(models.Model):
 		if page_list == []:
 			if not len(self.ebook_set.all()) == 0:
 				raise ValueError('part not 0')
-			part_count = (self.page_count-1)/self.page_per_part+1
+			part_count = int((self.page_count-1)/self.page_per_part) +1
 			for i in range(part_count):
 				begin_page = i*self.page_per_part
 				end_page = (i+1)*self.page_per_part-1
