@@ -1426,10 +1426,9 @@ function rest_aj_upload(url, transferData) {
 			//reject
 			let res = {
 				'status': xhr.status,
-				'message': '伺服器錯誤回應: ' +xhr.status +' - ' +xhr.responseText,
+				'message': '上傳檔案時，伺服器錯誤回應: ' +xhr.status +' - ' +xhr.responseText,
 				'data': '',
 			};
-
 			df.reject(res);
 
 		},

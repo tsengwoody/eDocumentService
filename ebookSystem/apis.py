@@ -12,6 +12,7 @@ from .filters import *
 from .premissions import *
 from .serializers import *
 from utils.resource import *
+import sys
 
 class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = Book.objects.all()
@@ -452,7 +453,11 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
-from utils.crawler import *
+if (sys.version_info > (2, 0) and sys.version_info < (3, 0)):
+	from utils.crawler2 import *
+elif (sys.version_info > (3, 0)):
+	from utils.crawler3 import *
+
 class BookInfoViewSet(viewsets.ModelViewSet):
 	queryset = BookInfo.objects.filter(book__status__gte=Book.STATUS['finish']).order_by('-date')
 	serializer_class = BookInfoSerializer

@@ -5,16 +5,12 @@ db.sqlite3
 file/
 log/
 static/ebookSystem/document/
-static/ebookSystem/disability_card/
-static/readium/
 temp/
-templates/old/
 venv/
 venvpy3/
 auto.sh
 .idea
 ebookSystem/fixtures
-social_django/
-mysite/account_info.py
+mysite/env.py
 ghostdriver.log
 eds.sql

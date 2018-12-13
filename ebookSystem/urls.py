@@ -24,7 +24,6 @@ urlpatterns = [
 	url(r'^edit_ajax/(?P<ISBN_part>[0-9\-]+)/$', views.edit_ajax, name='edit_ajax'),
 	url(r'^library_view$', views.library_view, name='library_view'),
 	url(r'^library_origin_view$', views.library_origin_view, name='library_origin_view'),
-	url(r'^book_action/$', views.book_action, name='book_action'),
 	url(r'^api/', include(api_urlpatterns, namespace='api')),
 	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),
 ]

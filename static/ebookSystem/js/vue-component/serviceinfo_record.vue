@@ -170,16 +170,6 @@
 				console.log('YAA')
 				this.refresh()
 			},
-			serviceinfo_datas: function(v){
-				temp_data = {
-					date: v['date'],
-					service_hours: v['service_hours'],
-					'org': v['orginfo'].name,
-					editrecord_set: v.editrecordinfo_set,
-				};
-
-				filter_data.push(temp_data);
-			},
 			refresh: function(){
 				let self = this
 
@@ -204,17 +194,27 @@
 				query = {'user_id': self.pk, 'is_exchange': 'false',}
 				self.clientg.serviceinfos.read(query)
 				.done(function(data) {
-					filter_data = [];
-					_.each(data, self.serviceinfo_datas)
-					self.exchange_false_serviceinfos = filter_data;
+					_.each(data, function(v){
+						self.exchange_false_serviceinfos.push({
+							date: v['date'],
+							service_hours: v['service_hours'],
+							'org': v['orginfo'].name,
+							editrecord_set: v.editrecordinfo_set,
+						})
+					})
 				})
 
 				query = {'user_id': self.pk, 'is_exchange': 'true',}
 				self.clientg.serviceinfos.read(query)
 				.done(function(data) {
-					filter_data = [];
-					_.each(data, self.serviceinfos_datas)
-					self.exchange_true_serviceinfos = filter_data;
+					_.each(data, function(v){
+						self.exchange_true_serviceinfos.push({
+							date: v['date'],
+							service_hours: v['service_hours'],
+							'org': v['orginfo'].name,
+							editrecord_set: v.editrecordinfo_set,
+						})
+					})
 				})
 
 				self.clientg.organizations.read()

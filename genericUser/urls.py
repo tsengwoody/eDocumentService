@@ -21,7 +21,6 @@ import rest_framework
 urlpatterns = [
 	url(r'^org_info$', views.org_info, name='org_info'),
 	url(r'^upload_progress/$', views.upload_progress, name='upload_progress'),
-	url(r'^retrieve_password/$', views.retrieve_password, name='retrieve_password'),
 	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),
 	url(r'^api/', include(api_urlpatterns, namespace='api')),
 	url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),

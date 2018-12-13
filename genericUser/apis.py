@@ -26,7 +26,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
-	#permission_classes = (permissions.IsAuthenticated,)
+	#permission_classes = (UserDataPermission,)
 	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, UserOrganizationFilter, UserRoleFilter, UserAuthFilter)
 	ordering_fields = ('username',)
 	search_fields = ('username', 'email', 'first_name', 'last_name',)
@@ -108,6 +108,20 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 					session.delete()
 			except:
 				pass
+		res['detail'] = u'成功登錄平台'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	@list_route(
+		methods=['post', 'get'],
+		permission_classes=[AllowAny,],
+		url_name='logout',
+		url_path='action/logout',
+	)
+	def logout(self, request, pk=None):
+		res = {}
+
+		from django.contrib.auth import (login as auth_login, logout as auth_logout, update_session_auth_hash, authenticate,)
+		auth_logout(request)
 		res['detail'] = u'成功登錄平台'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 

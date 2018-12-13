@@ -16,12 +16,14 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+import mysite.env
+mysite.env.set()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'e_#e-byj7#a+$v7#wmocwd8wp)+&wajk0axt70dl@)nsx!*glq'
+SECRET_KEY = os.environ["eDocumentService_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 import socket
@@ -52,7 +54,8 @@ INSTALLED_APPS = (
     'ebookSystem',
     'genericUser',
     'rest_framework',
-    'rules',
+    #'rules',
+    'rules.apps.AutodiscoverRulesConfig',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -90,34 +93,23 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-database = os.environ.get('DATABASE')
-if socket.gethostname() == 'edspro':
+DB_BACKEND = os.environ.get('eDocumentService_DB_BACKEND')
+if DB_BACKEND == 'mysql':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'eDocumentService',
-            'USER': 'root',
-            'PASSWORD': 'eds@2018',
-            'HOST': '127.0.0.1',
-            'PORT': '3306',
+            'NAME': os.environ.get('eDocumentService_DATABASE'),
+            'USER': os.environ.get('eDocumentService_DB_USER'),
+            'PASSWORD': os.environ.get('eDocumentService_DB_PASS'),
+            'HOST': os.environ.get('eDocumentService_DB_HOST'),
+            'PORT': os.environ.get('eDocumentService_DB_PORT'),
         }
     }
-elif database == 'sqlite3':
+elif DB_BACKEND == 'sqlite3':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'eDocumentService',
-            'USER': 'root',
-            'PASSWORD': 'eds@2018',
-            'HOST': '127.0.0.1',
-            'PORT': '3306',
         }
     }
 
@@ -145,12 +137,12 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 FILE_CHARSET='utf-8'
 AUTH_USER_MODEL = 'genericUser.User'
 
-#CACHES = {
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-#        'LOCATION': 'my_cache_table',
-#    }
-#}
+'''CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'my_cache_table',
+    }
+}'''
 
 CACHES = {
     'default': {
@@ -158,6 +150,13 @@ CACHES = {
         'LOCATION': '127.0.0.1:11211',
     }
 }
+
+'''CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/django_cache',
+    }
+}'''
 
 from django.conf import global_settings
 FILE_UPLOAD_HANDLERS = ['utils.cache.UploadProgressCachedHandler', ] + global_settings.FILE_UPLOAD_HANDLERS
@@ -220,16 +219,24 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-from .account_info import *
-
-'''REST_FRAMEWORK = {
+REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
     )
-}'''
+}
 
 BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+OTP_ACCOUNT = os.environ["eDocumentService_OTP_ACCOUNT"]
+OTP_PASSWORD = os.environ["eDocumentService_OTP_PASSWORD"]
+
+EMAIL_HOST = os.environ["eDocumentService_EMAIL_HOST"]
+EMAIL_PORT = os.environ["eDocumentService_EMAIL_PORT"]
+EMAIL_HOST_USER = os.environ["eDocumentService_EMAIL_HOST_USER"]
+EMAIL_HOST_PASSWORD = os.environ["eDocumentService_EMAIL_HOST_PASSWORD"]
+EMAIL_USE_TLS = True
+SERVICE = EMAIL_HOST_USER

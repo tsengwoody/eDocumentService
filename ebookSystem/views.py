@@ -77,32 +77,6 @@ def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args
 
 #==========
 
-
-from django.contrib.auth import authenticate
-
-@http_response
-def book_action(request):
-	if request.method == 'POST' and request.is_ajax():
-		getBook = Book.objects.get(ISBN=request.POST['ISBN'])
-		try:
-			user = authenticate(username=request.user.username, password=request.POST['password'])
-			if user is None:
-				raise SystemError(u'使用者驗證失敗')
-
-			if request.POST['action'] == 'set_priority':
-				if not (int(request.POST['priority']) > 0 and int(request.POST['priority']) < 10):
-					raise SystemError(u'權重數值錯誤，請輸入0-9之數值')
-				getBook.priority = int(request.POST['priority'])
-				getBook.save()
-
-		except BaseException as e:
-			status = 'error'
-			message = u'book {0}: error'.format(request.POST['action'])
-			return locals()
-		status = 'success'
-		message = u'book {0}: success'.format(request.POST['action'])
-		return locals()
-
 @http_response
 def library_view(request, template_name='ebookSystem/library_view.html'):
 	if request.method == 'GET':

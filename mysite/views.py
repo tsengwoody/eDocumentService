@@ -1,11 +1,9 @@
 ﻿# coding: utf-8
 from django.contrib.auth import (login as auth_login, logout as auth_logout, update_session_auth_hash, authenticate,)
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import timezone
-from .forms import *
 from ebookSystem.models import *
 from genericUser.models import *
 from utils.uploadFile import *
@@ -53,46 +51,11 @@ def home(request, template_name='home.html'):
 	announcement_list = Announcement.objects.filter(datetime__gt=deadline).order_by('-datetime')
 	return locals()
 
-@http_response
-def sitemap(request, template_name='sitemap.html'):
-	return locals()
-
-from utils.decorator import *
-@http_response
-def login(request, template_name='registration/login.html', authentication_form=AuthenticationForm):
-	"""
-	Displays the login form and handles the login action.
-	"""
-	if request.method == 'GET':
-		form = authentication_form(request)
-		return locals()
-	if request.method == 'POST':
-		form = authentication_form(request, data=request.POST)
-		if not form.is_valid():
-			status = 'error'
-			message = u'帳號或密碼錯誤，請重新輸入'
-			message = u'表單驗證失敗，' + str(form.errors)
-			return locals()
-
-		auth_login(request, form.get_user())
-		if not request.user.is_license:
-			redirect_to='/genericUser/generics/license/'
-		else:
-			redirect_to = '/'
-		from django.contrib.sessions.models import Session
-		for session in Session.objects.all():
-			try:
-				if int(session.get_decoded()['_auth_user_id']) == request.user.id and request.user.username != 'root':
-					session.delete()
-			except:
-				pass
-		status = 'success'
-		message = u'登錄成功'
-		return locals()
-
 def logout_user(request, template_name='registration/logged_out.html'):
 	auth_logout(request)
 	return render(request, template_name, locals())
+
+from utils.decorator import *
 
 @http_response
 def statistics(request, template_name='mysite/statistics.html'):

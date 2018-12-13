@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 		<div class="container">
 			<div class="navbar-header">
@@ -62,7 +62,7 @@
 						type: 'item',
 						'display_name': '網站導覽',
 						'permission': ['true'],
-						'url': '/sitemap/',
+						'url': '/generics/sitemap/',
 					},
 					{
 						type: 'folder',
