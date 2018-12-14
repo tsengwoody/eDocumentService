@@ -10,7 +10,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from utils.resource import *
 from .filters import *
-from .premissions import *
+from .permissions import *
 from .serializers import *
 
 from django.core.cache import cache
@@ -26,8 +26,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
-	#permission_classes = (UserDataPermission,)
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, UserOrganizationFilter, UserRoleFilter, UserAuthFilter)
+	#filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, UserOrganizationFilter, UserRoleFilter, UserAuthFilter)
 	ordering_fields = ('username',)
 	search_fields = ('username', 'email', 'first_name', 'last_name',)
 
@@ -273,7 +272,10 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 class DisabilityCardViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = DisabilityCard.objects.all()
 	serializer_class = DisabilityCardSerializer
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, DisabilityCardActiveFilter,)
+	'''permission_classes = (RuleORPermission([
+		('is_manager_object', ['__all__',]),
+	]),)'''
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, OwnerOrgManagerFilter, DisabilityCardActiveFilter,)
 	search_fields = ('identity_card_number', 'name',)
 
 	def get_fullpath(self, obj, dir, resource):

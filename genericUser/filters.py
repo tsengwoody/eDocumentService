@@ -4,6 +4,16 @@ from django.db.models import F,Q
 from rest_framework import filters
 from .models import *
 
+class OwnerOrgManagerFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		if request.user.has_perm('is_manager'):
+			return queryset.filter(
+				Q(owner_id__org=request.user.org.id)
+				| Q(owner_id=request.user.id)
+			)
+		else:
+			return queryset.filter(owner_id=request.user.id)
+
 class DisabilityCardActiveFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
 		is_active = request.query_params.get('is_active')
@@ -52,7 +62,7 @@ class AnnouncementNewestFilter(filters.BaseFilterBackend):
 
 class UserSelfOrManagerFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
-		if hasattr(request.user, 'is_manager') and request.user.is_manager:
+		if request.user.has_perm('is_manager'):
 			return queryset
 		else:
 			return queryset.filter(id=request.user.id)

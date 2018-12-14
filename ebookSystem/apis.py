@@ -9,7 +9,7 @@ from rest_framework import generics
 from rest_framework import filters
 from rest_framework import viewsets
 from .filters import *
-from .premissions import *
+from .permissions import *
 from .serializers import *
 from utils.resource import *
 import sys
