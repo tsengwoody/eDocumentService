@@ -220,16 +220,9 @@ AUTHENTICATION_BACKENDS = (
 )
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100,
-    'DEFAULT_PERMISSION_CLASSES': (
-        #'rest_framework.permissions.IsAuthenticated',
-    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ),
+    )
 }
 
 BROKER_URL = 'redis://localhost:6379'
@@ -247,7 +240,3 @@ EMAIL_HOST_USER = os.environ["eDocumentService_EMAIL_HOST_USER"]
 EMAIL_HOST_PASSWORD = os.environ["eDocumentService_EMAIL_HOST_PASSWORD"]
 EMAIL_USE_TLS = True
 SERVICE = EMAIL_HOST_USER
-
-JWT_AUTH = {
-	'JWT_ALLOW_REFRESH': True,
-}

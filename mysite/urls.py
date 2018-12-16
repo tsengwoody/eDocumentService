@@ -90,8 +90,8 @@ urlpatterns = [
 	url(r'^api/ddm/(?P<action>[\d\w]+)/(?P<dir>[\d\w]+)/(?P<resource>.+)/$', apis.Ddm.as_view()),
 ]
 
-from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
+'''from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 urlpatterns = urlpatterns +[
 	url(r'^api-token-auth/', obtain_jwt_token),
 	url(r'^api-token-refresh/', refresh_jwt_token),
-]
+]'''
