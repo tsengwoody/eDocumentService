@@ -191,7 +191,7 @@
 					})
 				})
 
-				query = {'user_id': self.pk, 'is_exchange': 'false',}
+				query = {'owner_id': self.pk, 'is_exchange': 'false',}
 				self.clientg.serviceinfos.read(query)
 				.done(function(data) {
 					_.each(data, function(v){
@@ -204,7 +204,7 @@
 					})
 				})
 
-				query = {'user_id': self.pk, 'is_exchange': 'true',}
+				query = {'owner_id': self.pk, 'is_exchange': 'true',}
 				self.clientg.serviceinfos.read(query)
 				.done(function(data) {
 					_.each(data, function(v){

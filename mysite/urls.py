@@ -15,7 +15,6 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
 from . import views
 from .settings import BASE_DIR
 
@@ -89,5 +88,10 @@ urlpatterns = [
 	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),
 	url(r'^api/ddm/(?P<action>[\d\w]+)/(?P<dir>[\d\w]+)/$', apis.Ddm.as_view()),
 	url(r'^api/ddm/(?P<action>[\d\w]+)/(?P<dir>[\d\w]+)/(?P<resource>.+)/$', apis.Ddm.as_view()),
-	#url(r'^auth/', include('django.contrib.auth.urls',)),
+]
+
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
+urlpatterns = urlpatterns +[
+	url(r'^api-token-auth/', obtain_jwt_token),
+	url(r'^api-token-refresh/', refresh_jwt_token),
 ]

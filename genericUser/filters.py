@@ -1,55 +1,28 @@
 ﻿# coding: utf-8
 
-from django.db.models import F,Q
 from rest_framework import filters
+from utils.filters import KeyMapAttrFilterFactory, convert_bool, convert_unicode
 from .models import *
 
-class OwnerOrgManagerFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		if request.user.has_perm('is_manager'):
-			return queryset.filter(
-				Q(owner_id__org=request.user.org.id)
-				| Q(owner_id=request.user.id)
-			)
-		else:
-			return queryset.filter(owner_id=request.user.id)
+# ['disabilitycard_manager', ]
+DisabilityCardActiveFilter = KeyMapAttrFilterFactory(key='is_active', type=convert_bool, attr='is_active')
 
-class DisabilityCardActiveFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		is_active = request.query_params.get('is_active')
-		if is_active and is_active in ['true', 'True']:
-			return queryset.filter(is_active=True)
-		elif is_active and is_active in ['false', 'False']:
-			return queryset.filter(is_active=False)
-		else:
-			return queryset
+# ['', ]
+ServiceInfoExchangeFilter = KeyMapAttrFilterFactory(key='is_exchange', type=convert_bool, attr='is_exchange')
 
-class ServiceInfoExchangeFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		is_exchange = request.query_params.get('is_exchange')
-		if is_exchange and is_exchange in ['true', 'True']:
-			return queryset.filter(is_exchange=True)
-		elif is_exchange and is_exchange in ['false', 'False']:
-			return queryset.filter(is_exchange=False)
-		else:
-			return queryset
+# ['', ]
+OwnerFilter = KeyMapAttrFilterFactory(key = 'owner_id', type = str, attr = 'owner_id')
 
-class ServiceInfoUserFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		user_id = request.query_params.get('user_id')
-		if user_id:
-			user = User.objects.get(id=user_id)
-			return queryset.filter(owner=user)
-		else:
-			return queryset
+AnnouncementCategoryFilter = KeyMapAttrFilterFactory(key='category', type=convert_unicode, attr='category')
+QAndACategoryFilter = KeyMapAttrFilterFactory(key='category', type=str, attr='category')
 
-class AnnouncementCategoryFilter(filters.BaseFilterBackend):
+'''class AnnouncementCategoryFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
 		category = request.query_params.get('category')
 		if category:
 			return queryset.filter(category=category)
 		else:
-			return queryset
+			return queryset'''
 
 class AnnouncementNewestFilter(filters.BaseFilterBackend):
 
@@ -104,13 +77,5 @@ class UserRoleFilter(filters.BaseFilterBackend):
 				return queryset.filter(is_editor=True)
 			elif role == 'all':
 				return queryset
-		else:
-			return queryset
-
-class QAndACategoryFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		category = request.query_params.get('category')
-		if category:
-			return queryset.filter(category=category)
 		else:
 			return queryset

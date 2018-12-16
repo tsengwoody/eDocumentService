@@ -3,30 +3,32 @@
 import json
 import requests
 import urllib
+
+from django.core.cache import cache
+from django.core.mail import EmailMessage
+from django.template.loader import get_template
+
 from rest_framework import filters
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
-from utils.resource import *
-from .filters import *
-from .permissions import *
-from .serializers import *
-
-from django.core.cache import cache
-from django.core.mail import EmailMessage
-from django.template.loader import get_template
-from django.template import Context
-
-from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWORD
-
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
+
+from utils.resource import *
+from utils.apis import MixedPermissionModelViewSet
+from utils.filters import OwnerOrgManagerFilter
+from utils.permissions import RuleORPermissionFactory
+from .filters import *
+from .serializers import *
+
+from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWORD
 
 class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
-	#filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, UserOrganizationFilter, UserRoleFilter, UserAuthFilter)
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, UserOrganizationFilter, UserRoleFilter, UserAuthFilter)
 	ordering_fields = ('username',)
 	search_fields = ('username', 'email', 'first_name', 'last_name',)
 
@@ -269,13 +271,14 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			return Response(data={'detail': u'變更密碼成功'}, status=status.HTTP_202_ACCEPTED)
 		return Response(data={'detail': u'變更密碼失敗'}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-class DisabilityCardViewSet(viewsets.ModelViewSet, ResourceViewSet):
+class DisabilityCardViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet, ResourceViewSet):
 	queryset = DisabilityCard.objects.all()
 	serializer_class = DisabilityCardSerializer
-	'''permission_classes = (RuleORPermission([
-		('is_manager_object', ['__all__',]),
-	]),)'''
+	permission_classes_by_action = {
+		'create': [AllowAny],
+	}
 	filter_backends = (filters.OrderingFilter, filters.SearchFilter, OwnerOrgManagerFilter, DisabilityCardActiveFilter,)
+	#filter_backends = (filters.OrderingFilter, filters.SearchFilter, DisabilityCardActiveFilter,)
 	search_fields = ('identity_card_number', 'name',)
 
 	def get_fullpath(self, obj, dir, resource):
@@ -290,7 +293,7 @@ class DisabilityCardViewSet(viewsets.ModelViewSet, ResourceViewSet):
 class ServiceInfoViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = ServiceInfo.objects.all().order_by('-date')
 	serializer_class = ServiceInfoSerializer
-	filter_backends = (filters.OrderingFilter, ServiceInfoUserFilter, ServiceInfoExchangeFilter,)
+	filter_backends = (filters.OrderingFilter, OwnerOrgManagerFilter, OwnerFilter, ServiceInfoExchangeFilter,)
 	ordering_fields = ('owner',)
 	permission_classes = (permissions.IsAuthenticated,)
 
@@ -309,7 +312,12 @@ class AnnouncementViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	filter_backends = (filters.OrderingFilter, filters.SearchFilter, AnnouncementCategoryFilter, AnnouncementNewestFilter, )
 	ordering_fields = ('datetime',)
 	search_fields = ('category',)
-	permission_classes = (IsManagerOrReadOnly, )
+	permission_classes = (
+		RuleORPermissionFactory('list', [
+			'is_manager',
+			'__read__',
+		]),
+	)
 
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = os.path.join(obj.path, dir, resource)
@@ -319,7 +327,12 @@ class QAndAViewSet(viewsets.ModelViewSet):
 	queryset = QAndA.objects.all()
 	serializer_class = QAndASerializer
 	filter_backends = (QAndACategoryFilter,)
-	permission_classes = (IsManagerOrReadOnly, )
+	permission_classes = (
+		RuleORPermissionFactory('list', [
+			'is_manager',
+			'__read__',
+		]),
+	)
 
 	def perform_create(self, serializer):
 		instance = serializer.save(
@@ -330,16 +343,32 @@ class QAndAViewSet(viewsets.ModelViewSet):
 class OrganizationViewSet(viewsets.ModelViewSet):
 	queryset = Organization.objects.all()
 	serializer_class = OrganizationSerializer
-	permission_classes = (IsManagerOrReadOnly, )
+	permission_classes = (
+		RuleORPermissionFactory('list', [
+			'is_manager',
+			'__read__',
+		]),
+	)
 
 class BusinessContentViewSet(viewsets.ModelViewSet):
 	queryset = BusinessContent.objects.all()
 	serializer_class = BusinessContentSerializer
+	permission_classes = (
+		RuleORPermissionFactory('list', [
+			'is_manager',
+			'__read__',
+		]),
+	)
 
 class BannerContentViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = BannerContent.objects.all()
 	serializer_class = BannerContentSerializer
-	permission_classes = (IsManagerOrReadOnly, )
+	permission_classes = (
+		RuleORPermissionFactory('list', [
+			'is_manager',
+			'__read__',
+		]),
+	)
 
 	def perform_create(self, serializer):
 		instance = serializer.save(

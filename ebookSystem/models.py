@@ -651,9 +651,12 @@ class EditRecord(models.Model):
 		if import_source == 0:
 			from utils import tag
 			source = self.part.get_path()
-			with io.open(source, 'r', encoding='utf-8') as sourceFile:
-				content = sourceFile.read()
-			return tag.add_tag(content)
+			try:
+				with io.open(source, 'r', encoding='utf-8') as sourceFile:
+					content = sourceFile.read()
+				return tag.add_tag(content)
+			except IOError:
+				return ''
 		else:
 			source = EditRecord.objects.get(part=self.part, number_of_times=import_source)
 			return source.finish

@@ -4,42 +4,48 @@ import rules
 
 @rules.predicate
 def is_manager(user):
-	return user.is_manager
+	return getattr(user, 'is_manager', False)
 
 @rules.predicate
 def is_superuser(user):
-	return user.is_superuser
+	return getattr(user, 'is_superuser', False)
 
 @rules.predicate
 def is_editor(user):
-	return user.is_editor
+	return getattr(user, 'is_editor', False)
 
 @rules.predicate
 def is_guest(user):
-	return user.is_guest
+	return getattr(user, 'is_guest', False)
 
 @rules.predicate
 def is_self(user, obj):
 	if obj:
 		return user == obj
 	else:
-		return True
+		return False
 
 # 判斷物件是否為該人員
 @rules.predicate
 def is_owner_object(user, obj):
 	if obj:
-		return user == obj.owner
+		if hasattr(obj, 'owner'):
+			return user == obj.owner
+		else:
+			return False
 	else:
-		return True
+		return False
 
 # 判斷物件是否為該單位人員可管理
 @rules.predicate
 def is_org_object(user, obj):
 	if obj:
-		return user.org == obj.owner.org
+		try:
+			return user.org == obj.owner.org
+		except:
+			return False
 	else:
-		return True
+		return False
 
 rules.add_perm('is_superuser', is_superuser)
 rules.add_perm('is_manager', is_manager)

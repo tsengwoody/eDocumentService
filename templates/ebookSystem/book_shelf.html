@@ -87,7 +87,7 @@
 		mounted: function () {
 			let self = this;
 
-			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'user_id': user.id, 'status': 'true'})
+			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'owner_id': user.id, 'status': 'true'})
 			.done(function(data) {
 				let filter_data = [];
 				_.each(data['data'], function(v){
@@ -107,7 +107,7 @@
 				self.checkout_list = filter_data
 			})
 
-			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'user_id': user.id, 'status': 'false'})
+			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'owner_id': user.id, 'status': 'false'})
 			.done(function(data) {
 				let filter_data = [];
 				_.each(data['data'], function(v){

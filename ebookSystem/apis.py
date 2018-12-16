@@ -11,16 +11,20 @@ from rest_framework import viewsets
 from .filters import *
 from .permissions import *
 from .serializers import *
+
 from utils.resource import *
+from utils.apis import MixedPermissionModelViewSet
+from utils.filters import OwnerOrgManagerFilter
+from utils.permissions import RuleORPermissionFactory
+
 import sys
 
 class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
-	filter_backends = (StatusFilter, BookOwnerFilter, BookBooknameFilter,)
+	filter_backends = (StatusFilter, OwnerFilter,)
 	ordering_fields = ('upload_date',)
 	permission_classes = (permissions.IsAuthenticated,)
-	#permission_classes = (BookDataPermission, )
 
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = None
@@ -141,7 +145,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				)
 			except BaseException as e:
 				shutil.rmtree(uploadPath)
-				res['detail'] = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面'
+				res['detail'] = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面' +unicode(e)
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 			#建立book object
@@ -554,12 +558,17 @@ class BookOrderViewSet(viewsets.ModelViewSet):
 	search_fields = ('order',)
 	permission_classes = (permissions.IsAuthenticated,)
 
-class EditRecordViewSet(viewsets.ModelViewSet):
+class EditRecordViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet):
 	queryset = EditRecord.objects.all().order_by('-get_date')
 	serializer_class = EditRecordSerializer
 	filter_backends = (filters.OrderingFilter, EditorFilter, EditRecordServiceInfoFilter,)
 	ordering_fields = ('username',)
-	permission_classes = (permissions.IsAuthenticated,)
+	permission_classes_by_action = {
+		#'retrieve': [RuleORPermissionFactory('detail', ['is_manager',]),],
+		'update': [RuleORPermissionFactory('detail', ['is_manager',]),],
+		'partial_update': [RuleORPermissionFactory('detail', ['is_manager',]),],
+		'destroy': [RuleORPermissionFactory('detail', ['is_manager',]),],
+	}
 
 	@detail_route(
 		methods=['get', ],
@@ -584,8 +593,8 @@ class BookRecommendViewSet(viewsets.ModelViewSet):
 class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = LibraryRecord.objects.all()
 	serializer_class = LibraryRecordSerializer
-	filter_backends = (LibraryRecordUserFilter, LibraryRecordStatusFilter,)
-	permission_classes = (permissions.IsAuthenticated, ManagerOrOwner,)
+	filter_backends = (OwnerFilter, BoolStatusFilter,)
+	permission_classes = (permissions.IsAuthenticated, )
 
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = None

@@ -1,55 +1,22 @@
 ﻿# coding: utf-8
 
 from rest_framework import filters
-
-class BaseFilter(filters.BaseFilterBackend):
-	key = ''
-	type = str
-	attr = ''
-	def filter_queryset(self, request, queryset, view):
-		value = request.query_params.get(self.key)
-		if not value:
-			return queryset
-		try:
-			self.value = self.type(value)
-			kwargs = {
-				self.attr: self.value,
-			}
-			return queryset.filter(**kwargs)
-		except:
-			return queryset
+from utils.filters import convert_bool, KeyMapAttrFilterFactory
 
 # ['book_review_list', 'book_manager', 'book_person', 'ebook_review_list', 'service', ]
-class StatusFilter(BaseFilter):
-	key = 'status'
-	type = int
-	attr = 'status'
+StatusFilter = KeyMapAttrFilterFactory(key = 'status', type = int, attr = 'status')
 
-# ['book_person', ]
-class BookOwnerFilter(BaseFilter):
-	key = 'owner_id'
-	type = str
-	attr = 'owner_id'
+# ['book_shelf']
+BoolStatusFilter = KeyMapAttrFilterFactory(key = 'status', type = convert_bool, attr = 'status')
+
+# ['book_person', book_shelf ,]
+OwnerFilter = KeyMapAttrFilterFactory(key = 'owner_id', type = str, attr = 'owner_id')
 
 # ['service', 'serviceinfo_record', ]
-class EditorFilter(BaseFilter):
-	key = 'editor_id'
-	type = str
-	attr = 'editor_id'
+EditorFilter = KeyMapAttrFilterFactory(key = 'editor_id', type = str, attr = 'editor_id')
 
 # ['book_person', ]
-class BookInfoOwnerFilter(BaseFilter):
-	key = 'owner_id'
-	type = str
-	attr = 'book__owner_id'
-
-class BookBooknameFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		bookname = request.query_params.get('bookname')
-		if bookname and not bookname=='':
-			return queryset.filter(book_info__bookname__contains=bookname)
-		else:
-			return queryset
+BookInfoOwnerFilter = KeyMapAttrFilterFactory(key = 'owner_id', type = str, attr = 'book__owner_id')
 
 class CBCFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
@@ -92,8 +59,6 @@ class HottestFilter(filters.BaseFilterBackend):
 		else:
 			return queryset
 
-from genericUser.models import User
-
 class EditRecordServiceInfoFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
 		exchange = request.query_params.get('exchange')
@@ -101,24 +66,5 @@ class EditRecordServiceInfoFilter(filters.BaseFilterBackend):
 			return queryset.exclude(serviceInfo=None)
 		elif exchange and exchange in ['false', 'False']:
 			return queryset.filter(serviceInfo=None)
-		else:
-			return queryset
-
-class LibraryRecordUserFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		user_id = request.query_params.get('user_id')
-		if user_id:
-			user = User.objects.get(id=user_id)
-			return queryset.filter(owner=user)
-		else:
-			return queryset
-
-class LibraryRecordStatusFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		status = request.query_params.get('status')
-		if status and status in ['true', 'True']:
-			return queryset.filter(status=True)
-		elif status and status in ['false', 'False']:
-			return queryset.filter(status=False)
 		else:
 			return queryset
