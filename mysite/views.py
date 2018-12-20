@@ -27,6 +27,14 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 @http_response
+def routing(request, name):
+	app = name.split('/')[0]
+	page = name.split('/')[1]
+	component_page = '<{0}></{0}>'.format(page)
+	template_name='routing.html'
+	return locals()
+
+@http_response
 def generics(request, name, pk=None):
 	template_name='mysite/{0}.html'.format(name.split('/')[0])
 	return locals()

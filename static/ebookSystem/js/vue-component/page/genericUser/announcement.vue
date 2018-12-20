@@ -1,0 +1,174 @@
+<template>
+	<div>
+		<h2>公告內容</h2>
+		<div class="form-group">
+			<label for="id_category" class="control-label col-sm-1"><font style="color:red">*</font>類別</label>
+			<div class="col-sm-11">
+				<div v-if="mode=='read'" class="panel panel-default" style="margin:0px; padding:5px 10px;">{|{ announcement.category }|}</div>
+				<template v-if="mode=='write'">
+					<select v-model="announcement.category" class="form-control">
+						<option value="">---------</option>
+						<option value="平台消息">平台消息</option>
+						<option value="新書推薦">新書推薦</option>
+						<option value="志工快訊">志工快訊</option>
+					</select>
+				</template>
+			</div>
+		</div>
+	
+		<div class="form-group">
+			<label for="id_title" class="control-label col-sm-1"><font style="color:red">*</font>標題</label>
+			<div class="col-sm-11">
+				<div v-if="mode=='read'" class="panel panel-default" style="margin:0px; padding:5px 10px;">{|{ announcement.title }|}</div>
+				<template v-if="mode=='write'">
+					<input v-model="announcement.title" class="form-control" type="text"/>
+				</template>
+			</div>
+		</div>
+	
+		<div class="form-group">
+			<label for="id_content" class="control-label col-sm-1"><font style="color:red">*</font>內容</label>
+			<div class="col-sm-11">
+				<div v-if="mode=='read'" v-html="announcement.content" class="panel panel-default" style="margin:0px; padding:5px 10px;"></div>
+				<div v-if="mode=='write'">
+					<editor
+						v-model="announcement.content"
+						:init="tinymce_init">
+					</editor>
+				</div>
+			</div>
+		</div>
+	
+		<h2>附件檔案</h2>
+		<file_manager
+			:url="url +'resource/attachment/'"
+			:permission="{
+				'create': {'is_manager': true,},
+				'read': {'is_all': true,},
+				'update': {'is_manager': true,},
+				'delete': {'is_manager': true,},
+			}"
+		></file_manager>
+		<div class="form-group">        
+			<div class="col-sm-offset-1 col-sm-11">
+	
+				<button
+					v-if="mode=='read'"
+					class="btn btn-primary"
+					onclick="window.location='/routing/genericUser/announcement_list/'"
+				>返回公告列表</button>
+				<template v-if="user.is_manager===true">
+					<button
+						v-if="mode=='read'"
+						@click="write_mode()"
+						class="btn btn-primary"
+					>進行修改</button>
+					<button
+						v-if="mode=='write'"
+						@click="update()"
+						class="btn btn-primary"
+					>儲存</button>
+					<button
+						v-if="mode=='write'"
+						@click="cancel()"
+						class="btn btn-primary"
+					>取消</button>
+					<button
+						v-if="mode=='write'"
+						@click="deletes()"
+						class="btn btn-danger"
+					>刪除</button>
+				</template>
+	
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+	module.exports = {
+		props: [],
+		components: {
+			'editor': Editor,
+			'file_manager': components['file_manager'],
+		},
+		data: function(){
+			return {
+				announcement: {},
+				url: '',
+				mode: 'read', //read or write
+				attachment_name: '',
+				tinymce_init: {
+					selector: "#id_content",
+					language:"zh_TW",
+					plugins: ['advlist autolink lists link image charmap print preview hr anchor pagebreak', 'searchreplace wordcount visualblocks visualchars code fullscreen', 'insertdatetime media nonbreaking save table contextmenu directionality', 'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'],
+					toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media | forecolor backcolor emoticons | codesample',
+				},
+			}
+		},
+		mounted: function(){
+			document.title = '公告內容'
+
+			let self = this
+
+			let pk = window.location.pathname.split('/')
+			pk = pk[pk.length-2]
+
+			self.url = '/genericUser/api/announcements/' +pk +'/'
+
+			rest_aj_send('get', self.url, {})
+			.done(function(data) {
+				self.announcement = data['data']
+			})
+		},
+		methods: {
+			read_mode: function(){
+				this.mode = 'read'
+			},
+			write_mode: function(){
+				this.mode = 'write'
+			},
+			update: function(){
+				let self = this
+
+				rest_aj_send('patch', self.url, self.announcement)
+				.done(function(data){
+					alertmessage('success', '成功修改公告')
+					.done(function(){
+						self.mode = 'read'
+					})
+				})
+				.fail(function(data){
+				    alertmessage('error', data['message']);
+				})
+			},
+			cancel: function(){
+				let self = this
+				rest_aj_send('get', self.url, {})
+				.done(function(data) {
+					self.announcement.category = data['data'].category
+					self.announcement.title = data['data'].title
+					self.announcement.content = data['data'].content
+				})
+				this.mode = 'read'
+			},
+			deletes: function(){
+				let self = this
+
+				alertconfirm('是否確定刪除公告?')
+				.done(function(){
+					rest_aj_send('delete', self.url, {})
+					.done(function(data){
+						alertmessage('success', '成功刪除公告')
+						.done(function(){
+							window.location='/genericUser/announcement_list';
+						})
+					})
+					.fail(function(data){
+					    alertmessage('error', data['message']);
+					})
+				})
+			},
+		},
+	}
+</script>

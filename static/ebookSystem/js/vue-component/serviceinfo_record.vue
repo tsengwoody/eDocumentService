@@ -175,6 +175,9 @@
 
 				self.editrecords = []
 				self.editrecord_checks = []
+				self.exchange_false_serviceinfos = []
+				self.exchange_true_serviceinfos = []
+
 				query = {'editor_id': self.pk, 'exchange': 'false',}
 				self.clientb.editrecords.read(query)
 				.done(function(data) {

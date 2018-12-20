@@ -1,0 +1,42 @@
+{% extends "base_nav.html" %}
+{% block title %}
+服務紀錄
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<div id="serviceinfo" class="container">
+	<serviceinfo_record
+		:bus="bus"
+		ref="srcom"
+	>
+	</serviceinfo_record>
+</div>
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+
+	new Vue({
+		el: '#serviceinfo',
+		components: {
+			'serviceinfo_record': components['serviceinfo_record'],
+		},
+		data: {
+			bus: new Vue(),
+			pk: '',
+		},
+		mounted: function () {
+			this.pk = window.location.pathname.split('/')
+			this.pk = this.pk[this.pk.length-2]
+			if(this.pk==='serviceinfo_record'){
+				this.pk = user.id
+			}
+			setTimeout(() => {
+				//this.bus.$emit('instance-set', this.pk)
+				//this.$refs.srcom.pk=this.pk
+				//this.$refs.srcom.refresh()
+			}, 1000)
+		},
+	})
+</script>
+{% endblock %}

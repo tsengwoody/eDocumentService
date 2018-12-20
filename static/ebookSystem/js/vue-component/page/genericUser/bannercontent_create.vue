@@ -1,0 +1,220 @@
+﻿<template>
+	<div id="id_bannercontent_create" class="container">
+		<h2>管理首頁 Banner</h2>
+		<div class="row">
+			<div class="col-sm-3 col-md-3">
+				<div class="panel-group">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<span class="glyphicon glyphicon-folder-close"></span>&nbsp;&nbsp;Banner
+							</h4>
+						</div>
+						<div class="panel-collapse">
+							<ul class="list-group">
+								<li class="list-group-item"><a
+									v-on:click="read(-1)"
+									href='#'
+									>新增</a></li>
+								<li class="list-group-item" v-for="(item, index) in items"><a 
+									v-on:click="read(index)"
+									href='#'
+								>{|{ index+1 }|}. {|{ item.title }|}</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-9 col-md-9">
+				<div v-if="index!=-1" style='float: right;'>
+					<button type="button" class="btn btn-default" v-if="mode=='read'" v-on:click="change_mode">編輯</button>
+					<button type="button" class="btn btn-default" v-if="mode=='write'" v-on:click="change_mode">檢視</button>
+				</div>
+				<div v-if="mode=='read'">
+					<p class="h5"><strong>摘要文字</strong></p>
+					<p>{|{ temp.title }|}</p>
+					<p class="h5"><strong>圖片內容</strong></p>
+					<img
+						v-if="index!=-1"
+						v-bind:alt="temp.title"
+						v-bind:src="url +`resource/cover/image/`"
+						style="height: 480px;width:940px"
+					>
+					<br>
+					<p class="h5"><strong>詳細說明</strong></p>
+					<p v-html="markdown2html(temp.content)"></p>
+				</div>
+				<div v-if="mode=='write'">
+					<form>
+						<div class="form-group">
+							<label for="id_title">摘要文字</label>
+							<input id="id_title" v-model="temp.title" class="form-control" placeholder="title">
+						</div>
+						<p class="h5"><strong>圖片內容</strong></p>
+						<img
+							v-if="index!=-1"
+							v-bind:alt="temp.title"
+							v-bind:src="url +`resource/cover/image/`"
+							style="height: 480px;width:940px"
+						>
+						<br><br>
+						<div class="form-group">
+								<label for="id_content">詳細說明</label>
+								<textarea class="form-control" id="id_content" v-model="temp.content" rows="3" placeholder="content"></textarea>
+							</div>
+						<div class="form-group">
+							<label for="id_cover">上傳圖檔</label>
+							<input type="file" class="form-control-file" id="id_cover" name="cover"/>
+						</div>
+					</form>
+					<div>
+						<button class="btn btn-primary" v-if="index==-1" v-on:click="create()">新增</button>
+						<button class="btn btn-primary" v-else v-on:click="update()">更新</button>
+						<button class="btn btn-danger" v-if="index!=-1" v-on:click="del()">刪除</button>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+	module.exports = {
+		data: function(){
+			return {
+				'mode': 'write', //read or write
+				'items': [],
+				'index': -1,
+				'temp': {
+					'id': '',
+					'title': '',
+					'content': '',
+					'order': '',
+				},
+			}
+		},
+		computed: {
+			url: function(){
+				u = '/genericUser/api/bannercontents/'
+				if(this.index!=-1){
+					u += this.temp.id +'/'
+				}
+				return u
+			},
+		},
+		mounted: function(){
+			document.title = '管理首頁 Banner'
+
+			this.client = new $.RestClient('/genericUser/api/');
+			this.client.add('bannercontents');
+
+			this.list()
+		},
+		methods: {
+			upload: function(){
+				let fileCover = document.getElementById('id_cover');
+				fileObject = fileCover.files[0]
+				if(iser(fileObject)){
+					alertmessage('error', '檔案尚未選擇')
+					return -1
+				}
+				let vo = this; //this 在.done內會被復蓋
+				let url_resource = '/genericUser/api/bannercontents/' +vo.id +'/resource/cover/image/'
+				rest_aj_upload(url_resource, {'object': fileCover.files[0]})
+				.done(function(data) {
+					alertmessage('success', '成功更新資料(檔案)' +data['message'])
+					vo.clear()
+				})
+				.fail(function(data){
+					alertmessage('error', '失敗更新資料(檔案)' +data['message'])
+				})
+			},
+			list: function () {
+				let vo = this
+				vo.client.bannercontents.read()
+					.done(function (data, textStatus, xhrObject) {
+						vo.items = data
+						vo.read(vo.index)
+					})
+			},
+			create: function () {
+				let vo = this
+				transferData = {
+					'title': this.temp.title,
+					'content': this.temp.content,
+				}
+				//create
+				rest_aj_send('post', this.url, this.temp)
+					.done(function(data) {
+						vo.id = data['data'].id
+						vo.upload()
+						vo.list()
+					})
+					.fail(function(data){
+						alertmessage('error', data['message'])
+					})
+			},
+			read: function (index) {
+				this.index = index
+				if(index==-1){
+					this.mode = 'write'
+					this.clear()
+				}
+				else{
+					this.mode = 'read'
+					this.temp = this.items[index]
+				}
+			},
+			update: function () {
+				let vo = this
+				rest_aj_send('patch', this.url, this.temp)
+					.done(function (data) {
+						let fileCover = document.getElementById('id_cover');
+						fileObject = fileCover.files[0]
+						if(!iser(fileObject)){
+							vo.id = data['data'].id
+							vo.upload()
+						}
+						else {
+							alertmessage('success', '成功更新資料' +data['message'])
+						}
+						vo.list()
+					})
+					.fail(function(data){
+						alertmessage('error', data['message'])
+					})
+			},
+			del: function(){
+				let vo=this
+				rest_aj_send('delete', this.url, {})
+					.done(function (data){
+						vo.clear()
+						vo.list()
+						alertmessage('success', '已刪除')
+					})
+					.fail(function(data){
+						alertmessage('error', data['message'])
+					})
+			},
+			clear: function () {
+				this.index = -1
+				this.temp = {
+					'id': -1,
+					'title': '',
+					'content': '',
+					'order': -1,
+				}
+			},
+			change_mode: function () {
+				if(this.mode=='read'){ this.mode = 'write' }
+				else if(this.mode=='write'){ this.mode = 'read' }
+			},
+			markdown2html: function (text) {
+				var converter = new showdown.Converter()
+				html = converter.makeHtml(text)
+				return html
+			},
+		},
+	}
+</script>

@@ -34,4 +34,32 @@
 		return components
 	}
 	let components = set_components({})
+
+	function set_pages(pages) {
+		let timestamp = '?' + Date.now();
+		let pages_array = [
+			'genericUser/announcement',
+			'genericUser/announcement_create',
+			'genericUser/announcement_list',
+			'genericUser/bannercontent_create',
+			'genericUser/disabilitycard_manager',
+			'genericUser/login',
+			'genericUser/qanda_tutorial',
+			'genericUser/register',
+			'genericUser/retrieve',
+			'genericUser/serviceinfo_list_check',
+			'genericUser/serviceinfo_record',
+			'genericUser/user_email',
+			'genericUser/user_manager',
+			'genericUser/user_person',
+		]
+		_.each(pages_array, function(v){
+			url = '/static/ebookSystem/js/vue-component/page/' +v +'.vue' +timestamp
+			//url = '/static/ebookSystem/js/vue-component/' +v +'.vue'
+			pages[v] = httpVueLoader(url)
+		})
+		return pages
+	}
+	let pages = set_pages({})
+
 </script>
