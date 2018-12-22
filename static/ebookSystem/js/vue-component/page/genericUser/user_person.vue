@@ -1,0 +1,163 @@
+<template>
+	<div id="user_person">
+		<h3>個人資料</h3>
+		<div class="form-horizontal">
+			<template v-for="(value, key) in filter_data">
+				<div class="form-group" v-if="key==='email'">
+					<label class="control-label col-sm-2" :for="key"><font style="color:red">*</font><span>{|{ data_header[key] }|}</span></label>
+					<div class="col-sm-4">
+						<div class="input-group">
+							<div class="likebtn">{|{ value }|}</div>
+							<span class="input-group-btn">
+								<button class="btn btn-success" disabled v-if="auth_email">已驗證</button>
+								<button class="btn btn-warning" v-else
+										@click="user_getOTP(userID, 'email')"
+								>未驗證</button>
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="form-group" v-else-if="key==='phone'">
+					<label class="control-label col-sm-2" :for="key"><font style="color:red">*</font><span>{|{ data_header[key] }|}</span></label>
+					<div class="col-sm-4">
+						<div class="input-group">
+							
+							<div class="likebtn">{|{ value }|}</div>
+							<span class="input-group-btn">
+								<button class="btn btn-success" disabled v-if="auth_phone">已驗證</button>
+								<button class="btn btn-warning" v-else
+										@click="user_getOTP(userID, 'phone')"
+								>未驗證</button>
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="form-group" v-else>
+					<label class="control-label col-sm-2" :for="key"><font style="color:red">*</font><span>{|{ data_header[key] }|}</span></label>
+					<div class="col-sm-4">
+						<div class="likebtn" :id="key">{|{ value }|}</div>
+					</div>
+				</div>
+			</template>
+			<div class="form-group">
+				<label class="control-label col-sm-2"></label>
+				<div class="col-sm-7">
+					<button class="btn btn-primary" @click="usermodel(userID)">變更使用者資訊</button>
+					<button
+						class="btn btn-primary"
+						@click="openDialog('spm', this);"
+					>修改密碼</button>
+						<button class="btn btn-primary"
+						v-if="user.is_guest"
+						@click="dm_bus.$emit('instance-set', user.disabilitycard_set[0]); openDialog('dm', this);"
+					>
+						<div v-if="user.disabilitycard_set[0]">手冊查閱編修</div>
+						<div v-else>手冊新建登錄</div>
+					</button>
+					<!--<a
+						v-bind:href="'/genericUser/generics/disabilitycard_register/' +user.disabilitycard_set[0] +'/'"
+						class="btn btn-primary"
+						role="button"
+									target="blank" title="(另開新視窗)"
+					>
+						<div v-if="user.disabilitycard_set[0]">手冊查閱編修</div>
+						<div v-else>手冊新建登錄</div>
+					</a>-->
+					<button
+						class="btn btn-primary"
+						@click="setFontSize()"
+					>字體設定</button>
+				</div>
+			</div>
+		</div>
+		<modal :id_modal="'spm'">
+			<template slot="header">
+				<h4 class="modal-title">修改密碼</h4>
+			</template>   
+			<template slot="body">
+				<div class="form-horizontal">
+					<set_password ref="spm"></set_password>
+				</div>
+			</template>
+			<template slot="footer">
+				<button class="btn btn-default"
+					@click="change_password"
+				>送出</button>
+			</template>
+		</modal>
+		<modal :id_modal="'dm'">
+			<template slot="header">
+				<h4 class="modal-title">身心障礙手冊登錄</h4>
+			</template>
+			<template slot="body">
+				<disabilitycard
+					:bus="dm_bus"
+				>
+				</disabilitycard>
+			</template>
+			<template slot="footer">
+				<button onclick="closeDialog(this)" class="btn btn-default" data-dismiss="modal">關閉</button>
+			</template>
+		</modal>
+	</div>
+</template>
+<script>
+	module.exports = {
+		components: {
+			'disabilitycard': components['disabilitycard'],
+			'set_password': components['set_password'],
+		},
+		data: function(){
+			return {
+				dm_bus: new Vue(),
+				user: user,
+				userID: user.id,
+				filter_data: {
+					username: user.username,
+					first_name: user.first_name,
+					last_name: user.last_name,
+					email: user.email,
+					phone: user.phone,
+					birthday: user.birthday,
+					education: user.education,
+					is_book: user.is_book,
+					org: user.org,
+				},
+				data_header: {
+					username: '使用者名稱',
+					first_name: '姓氏',
+					last_name: '名字',
+					email: '電子信箱',
+					phone: '聯絡電話',
+					birthday: '生日',
+					education: '教育程度',
+					is_book: '訂閱訊息',
+					org: '所屬單位',
+				},
+				auth_email: user.auth_email,
+				auth_phone: user.auth_phone,
+			}
+		},
+		mounted: function() {
+			document.title = '個人資料'
+			let self=this;
+			let client = new $.RestClient('/genericUser/api/');
+			client.add('organizations');
+			
+			client.organizations.read()
+			.done(function (org_data) {
+				_.each(org_data,function(v,k){
+					if(self.filter_data['org'] == v['id']) {
+						self.filter_data['org'] = v['name'];
+					}
+				})
+			})
+		},
+		methods: {
+			change_password: function() {
+				this.$refs.spm.set_password(user.id);
+				closeDialog(this.$refs.spm);
+			}
+		},
+	}
+</script>

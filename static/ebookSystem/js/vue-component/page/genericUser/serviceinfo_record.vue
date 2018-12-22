@@ -1,31 +1,25 @@
-{% extends "base_nav.html" %}
-{% block title %}
-服務紀錄
-{% endblock %}
-
-{% block content %}
-{% csrf_token %}
-
-<div id="serviceinfo" class="container">
-	<serviceinfo_record
-		:bus="bus"
-		ref="srcom"
-	>
-	</serviceinfo_record>
-</div>
+<template>
+	<div id="serviceinfo" class="container">
+		<serviceinfo_record
+			:bus="bus"
+			ref="srcom"
+		>
+		</serviceinfo_record>
+	</div>
+</template>
 <script>
-	Vue.options.delimiters = ['{|{', '}|}'];
-
-	new Vue({
-		el: '#serviceinfo',
+	module.exports = {
 		components: {
 			'serviceinfo_record': components['serviceinfo_record'],
 		},
-		data: {
-			bus: new Vue(),
-			pk: '',
+		data: function(){
+			return {
+				bus: new Vue(),
+				pk: '',
+			}
 		},
 		mounted: function () {
+			document.title = '服務紀錄'
 			this.pk = window.location.pathname.split('/')
 			this.pk = this.pk[this.pk.length-2]
 			if(this.pk==='serviceinfo_record'){
@@ -37,6 +31,5 @@
 				//this.$refs.srcom.refresh()
 			}, 1000)
 		},
-	})
+	}
 </script>
-{% endblock %}

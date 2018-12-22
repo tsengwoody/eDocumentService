@@ -73,7 +73,7 @@ from . import apis
 from django.views.static import serve
 
 urlpatterns = [
-	#url(r'^static/(?P<path>.*)$', serve, {'document_root': BASE_DIR +'/static/'}),
+	url(r'^file/(?P<path>.*)$', serve, {'document_root': BASE_DIR +'/file/'}),
 	url(r'^$', views.home, name='home'),
 	url(r'^dev/(?P<name>[\w\d/_\-]+)/$', views.dev, name='dev'),
 	url(r'^about/(?P<name>[\w]+)/$', views.about, name='about'),
@@ -87,12 +87,13 @@ urlpatterns = [
 	url(r'^statistics_old/$', views.statistics, name='statistics'),
 	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),
 	url(r'^routing/(?P<name>[\w\d/_\-]+)/$', views.routing, name='routing'),
+	url(r'^epub_view/(?P<path>.+)/$', views.epub_view, name='epub_view'),
 	url(r'^api/ddm/(?P<action>[\d\w]+)/(?P<dir>[\d\w]+)/$', apis.Ddm.as_view()),
 	url(r'^api/ddm/(?P<action>[\d\w]+)/(?P<dir>[\d\w]+)/(?P<resource>.+)/$', apis.Ddm.as_view()),
 ]
 
-'''from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 urlpatterns = urlpatterns +[
 	url(r'^api-token-auth/', obtain_jwt_token),
 	url(r'^api-token-refresh/', refresh_jwt_token),
-]'''
+]

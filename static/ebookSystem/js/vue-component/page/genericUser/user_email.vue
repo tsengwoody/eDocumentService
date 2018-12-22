@@ -1,0 +1,105 @@
+<template>
+	<div id="user_email">
+		<h2>訊息傳送</h2>
+		<div class="form-horizontal">
+			<form-drf
+				:keys="'category'"
+				:model_info="model_info.category"
+				:label-class="'col-sm-1'"
+				:input-class="'col-sm-11'"
+				mode="write"
+				v-model="category"
+			></form-drf>
+			<form-drf
+				:keys="'subject'"
+				:model_info="model_info.subject"
+				:label-class="'col-sm-1'"
+				:input-class="'col-sm-11'"
+				mode="write"
+				v-model="subject"
+			></form-drf>
+			<form-drf
+				:keys="'body'"
+				:model_info="model_info.body"
+				:label-class="'col-sm-1'"
+				:input-class="'col-sm-11'"
+				mode="write"
+				v-model="body"
+			></form-drf>
+			<div class="form-group">
+				<div class="col-sm-offset-1 col-sm-11">
+					<button class="btn btn-primary" @click="send_email()">傳送</button>
+				</div>	
+			</div>
+		</div>
+	</div>
+</template>
+<script>
+	module.exports = {
+		components: {
+			'form-drf': components['form'],
+		},
+		data: function(){
+			return {
+				category: 'editor',
+				subject: '',
+				body: '',
+				model_info: {
+					'category': {
+						'label': '類型',
+						'type': 'radio',
+						'choices' : [
+							{
+								'value': 'editor',
+								'display_name': '志工',
+							},
+							{
+								'value': 'guest',
+								'display_name': '視障者',
+							},
+						],
+					},
+					'subject': {
+						'label': '主旨',
+						'type': 'text',
+					},
+					'body': {
+						'label': '內容',
+						'type': 'textarea',
+					},
+				},
+			}
+		},
+		mounted: function () {
+			document.title = '訊息傳送'
+			this.client = new $.RestClient('/genericUser/api/');
+			this.client.add('users');
+		},
+		methods: {
+			send_email: function () {
+				let self = this
+
+				if(iser(self.category) | iser(self.subject) | iser(self.body)){
+					alertmessage('error', '尚有欄位未填寫')
+					return -1
+					}
+
+					post_data = {
+					'category': self.category,
+					'subject': self.subject,
+					'body': self.body,
+				}
+
+
+				rest_aj_send('post', '/genericUser/api/users/action/email/', post_data)
+				.done(function(data) {
+					alertmessage('success', '成功傳送訊息')
+				})
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', xhr)
+					console.log(xhr)
+				})
+			},
+		},
+	}
+</script>

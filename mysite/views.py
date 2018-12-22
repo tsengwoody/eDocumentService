@@ -9,6 +9,8 @@ from genericUser.models import *
 from utils.decorator import *
 from utils.other import *
 from mysite.settings import BASE_DIR
+
+import base64
 import datetime
 import json
 
@@ -38,6 +40,12 @@ def routing(request, name):
 def generics(request, name, pk=None):
 	template_name='mysite/{0}.html'.format(name.split('/')[0])
 	return locals()
+
+@http_response
+def epub_view(request, path, template_name='mysite/epub_view.html'):
+		path = '/file/' +path.encode('utf8')
+		base64_path = base64.b64encode(path)
+		return locals()
 
 @http_response
 def dev(request, name, pk=None):
