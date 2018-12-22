@@ -1,81 +1,74 @@
-{% extends "base_nav.html" %}
-{% block title %}
-服務時數確認
-{% endblock %}
-
-{% block content %}
-
-{% csrf_token %}
-
-<div id="serviceinfo_check">
-	<h2>服務時數確認</h2>
-	<h3 style="margin-top:30px;">Step1: 勾選志工所提送的兌換項目</h3>
-	<hr style="margin-top:5px;">
-	<div style="margin-bottom:60px;">
-		<button class="btn btn-default" @click="serviceinfo_select_all()">全選</button>
-		<button class="btn btn-default" @click="serviceinfo_checks=[]">全不選</button>
-		<button class="btn btn-default" @click="serviceinfo_select_inv()">反向選</button>
-		<button class="btn btn-default" onclick="window.location.replace('/genericUser/api/serviceinfos/action/exchange_false_export/')">匯出</button>
-		<table-div :datas="serviceinfo_datas" :header="serviceinfo_header">
-			<template slot="check" slot-scope="props">
-				<input type="checkbox" v-model="serviceinfo_checks" :value="props.item.id">
+﻿<template>
+	<div id="serviceinfo_check">
+		<h2>服務時數確認</h2>
+		<h3 style="margin-top:30px;">Step1: 勾選志工所提送的兌換項目</h3>
+		<hr style="margin-top:5px;">
+		<div style="margin-bottom:60px;">
+			<button class="btn btn-default" @click="serviceinfo_select_all()">全選</button>
+			<button class="btn btn-default" @click="serviceinfo_checks=[]">全不選</button>
+			<button class="btn btn-default" @click="serviceinfo_select_inv()">反向選</button>
+			<button class="btn btn-default" onclick="window.location.replace('/genericUser/api/serviceinfos/action/exchange_false_export/')">匯出</button>
+			<table-div :datas="serviceinfo_datas" :header="serviceinfo_header">
+				<template slot="check" slot-scope="props">
+					<input type="checkbox" v-model="serviceinfo_checks" :value="props.item.id">
+				</template>
+				<template slot="editrecord_set" slot-scope="props">
+					<button class="btn btn-default" @click="editrecords_detail(props.item); openDialog('editrecords_detail', this);">詳細服務紀錄</button>
+				</template>
+			</table-div>
+		</div>
+		<h3>Step2: 確認後進行兌換</h3>
+		<hr style="margin-top:5px;">
+		<div style="margin-bottom:60px;">
+			<button
+				@click="serviceinfo_cancel()"
+				class="btn btn-primary" style="margin-top:10px;"
+			>退回兌換</button>
+			<button
+				@click="serviceinfo_exchange()"
+				class="btn btn-primary" style="margin-top:10px;"
+			>同意兌換</button>
+		</div>
+		<modal :id_modal="'editrecords_detail'">
+			<template slot="header">
+				<h4 class="modal-title">詳細服務紀錄</h4>
 			</template>
-			<template slot="editrecord_set" slot-scope="props">
-				<button class="btn btn-default" @click="editrecords_detail(props.item); openDialog('editrecords_detail', this);">詳細服務紀錄</button>
+			<template slot="body">
+				<table-div :datas="detail_editrecord_datas" :header="detail_editrecord_header">
 			</template>
-		</table-div>
+		</modal>
 	</div>
-	<h3>Step2: 確認後進行兌換</h3>
-	<hr style="margin-top:5px;">
-	<div style="margin-bottom:60px;">
-		<button
-			@click="serviceinfo_cancel()"
-			class="btn btn-primary" style="margin-top:10px;"
-		>退回兌換</button>
-		<button
-			@click="serviceinfo_exchange()"
-			class="btn btn-primary" style="margin-top:10px;"
-		>同意兌換</button>
-	</div>
-	<modal :id_modal="'editrecords_detail'">
-		<template slot="header">
-			<h4 class="modal-title">詳細服務紀錄</h4>
-		</template>
-		<template slot="body">
-			<table-div :datas="detail_editrecord_datas" :header="detail_editrecord_header">
-		</template>
-	</modal>
-</div>
-
+</template>
 <script>
-
-	new Vue({
-		el: '#serviceinfo_check',
+	module.exports = {
 		components: {
 			'table-div': components['table-div'],
 		},
-		data: {
-			serviceinfo_header: {
-				'check': '核取',
-				'date': '兌換日期',
-				'service_hours': '服務時數',
-				'user': '服務者',
-				'org': '兌換單位',
-				editrecord_set: '服務紀錄',
-			},
-			serviceinfo_datas: [],
-			serviceinfo_checks: [],
-				detail_editrecord_datas: [],
-				detail_editrecord_header: {
-					part: '文件',
-					get_date: '服務時間',
-					service_hours: '服務時數',
-					stay_hours: '線上時數',
-					category: '類型',
+		data: function(){
+			return {
+				serviceinfo_header: {
+					'check': '核取',
+					'date': '兌換日期',
+					'service_hours': '服務時數',
+					'user': '服務者',
+					'org': '兌換單位',
+					editrecord_set: '服務紀錄',
 				},
-			detail_editrecord_datas: [],
+				serviceinfo_datas: [],
+				serviceinfo_checks: [],
+					detail_editrecord_datas: [],
+					detail_editrecord_header: {
+						part: '文件',
+						get_date: '服務時間',
+						service_hours: '服務時數',
+						stay_hours: '線上時數',
+						category: '類型',
+					},
+				detail_editrecord_datas: [],
+			}
 		},
-		created: function () {
+		mounted: function () {
+			document.title = '服務時數確認'
 			this.client = new $.RestClient('/genericUser/api/');
 			this.client.add('serviceinfos');
 			this.get_serviceinfo_data()
@@ -188,7 +181,5 @@
 				this.detail_editrecord_datas = editrecords
 			},
 		},
-	})
-
+	}
 </script>
-{% endblock %}
