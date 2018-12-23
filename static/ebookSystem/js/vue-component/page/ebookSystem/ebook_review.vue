@@ -1,0 +1,158 @@
+
+<template>
+	<div>
+		<h2>分段審核</h2>
+
+		<div id="ebook_review">
+			<h3><span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step1: 基本資料</h3>
+			<hr style="margin-top:5px;">
+
+			<ul-component :data="info"></ul-component>
+
+			<!-- step 2 -->
+			<h3><span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step2: 校對資訊</h3>
+			<hr style="margin-top:5px;">
+
+			<ul class="nav nav-tabs">
+				<li class="active"><a href="#ebook_review_analysis" name="ebook_review_tab_grp" data-toggle="tab" aria-expanded="true" onclick="pagetab_subtabfix(this);">差異分析</a></li>
+				<li><a href="#ebook_review_text" name="ebook_review_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">校對文字</a></li>
+			</ul>
+
+			<div class="tab-content" style="padding:20px 0px;">
+				<div id="ebook_review_analysis" class="tab-pane active">
+					<table class="table table-striped table-hover">
+						<tr>
+							<th>編輯距離</th>
+							<th>相同區數</th>
+							<th>相同字數</th>
+							<th>刪除字數</th>
+							<th>新增字數</th>
+							<th>原始字數</th>
+							<th>校後字數</th>
+							<th>增長字數</th>
+						</tr>
+						<tr>
+							<td>{|{ analysis.edit_distance }|}</td>
+							<td>{|{ analysis.len_block }|}</td>
+							<td>{|{ analysis.same_character }|}</td>
+							<td>{|{ analysis.delete_count }|}</td>
+							<td>{|{ analysis.insert_count }|}</td>
+							<td>{|{ analysis.src_count }|}</td>
+							<td>{|{ analysis.dst_count }|}</td>
+							<td>{|{ analysis.diff_count }|}</td>
+						</tr>
+					</table>
+				</div>
+				<div id="ebook_review_text" class="tab-pane">
+					<p class="y-scroll-box" v-html="finish_content"></p>
+				</div>
+			</div>
+			<!--step 3-->
+			<h3><span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step3: 審核結果</h3>
+			<hr style="margin-top:5px;">
+
+			<template v-if="ebook.status==3">
+				<div class="form-group">
+					<input type="radio" id="success" value="success" v-model="result">
+					<label for="success">成功</label>
+					<br>
+					<input type="radio" id="error" value="error" v-model="result">
+					<label for="error">退回</label>
+					<br>
+					<template v-if="result=='error'">
+						<label for="reason">原因</label>
+						<input type="text" id="reason" v-model="reason">
+					</template>
+				</div>
+				<button  class="btn btn-primary" @click="review()" type="submit" id="send_id" name="send">送出</button>
+			</template>
+
+		</div>
+	</div>
+</template>
+
+<script>
+	module.exports = {
+		components: {
+			'ul-component': components['list_vue_component'],
+		},
+		data: function() {
+			return {
+				pk: '',
+				ebook: {},
+				current_editrecord: {},
+				analysis: {},
+				finish_content: '',
+				reason: '',
+				result: 'success', //success or error
+			}
+		},
+		computed: {
+			info: function () {
+				return {
+					'服務時間': this.ebook.get_date,
+					'線上時數': this.ebook.service_hours,
+				}
+			},
+		},
+		mounted: function () {
+			document.title = '分段審核';
+
+			this.pk = window.location.pathname.split('/');
+			this.pk = this.pk[this.pk.length-2]
+			this.client = new $.RestClient('/ebookSystem/api/');
+			this.client.add('ebooks');
+			this.get_ebook_data()
+		},
+		methods: {
+			get_ebook_data: function(){
+				let self = this;
+
+				self.client.ebooks.read(self.pk)
+				.done(function(data) {
+					self.ebook = data;
+					self.current_editrecord = data.current_editrecord;
+
+					rest_aj_send('get', '/ebookSystem/api/editrecords/' +self.current_editrecord.id +'/action/analysis/', {})
+					.done(function(data) {
+						self.analysis = data['data']
+					})
+					.fail(function(xhr, result, statusText){
+						console.log(xhr)
+					})
+
+				})
+
+				rest_aj_send('get', '/ebookSystem/api/ebooks/' +self.pk +'/action/edit/', {})
+				.done(function(data) {
+					self.finish_content = data['data'].finish
+				})
+
+			},
+			review: function () {
+				let self = this;
+
+				let transferData = {
+					number_of_times: this.ebook.number_of_times,
+					result: this.result,
+					reason: this.reason,
+				}
+
+				rest_aj_send('post', '/ebookSystem/api/ebooks/' +self.pk +'/action/review/', transferData)
+				.done(function(data) {
+					alertmessage('success', '審核已完成' +data['message'])
+					.done(function() {
+						window.location.replace('/ebookSystem/generics/ebook_review_list/')
+					})
+				})
+				.fail(function(data){
+					alertmessage('error', '' +data['message'])
+					.done(function() {
+						window.location.replace('/ebookSystem/generics/ebook_review_list/')
+					})
+				})
+
+			},
+		}
+	}
+</script>

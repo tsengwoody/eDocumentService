@@ -50,7 +50,6 @@
 		},
 		data: function() {
 			return {
-				
 				user: user,	
 				recommend_data: [
 					{
@@ -162,7 +161,6 @@
 			get_recommend_table_data: function () {
 				// run ajax get data
 				let self = this;
-				console.log('get_recommend_table_data');
 
 				_.each(self.recommend_data, function(v){
 					let query = {};
@@ -192,10 +190,8 @@
 			get_index_table_data: function () {
 				// run ajax get data
 				let self = this;
-				console.log('get_index_table_data');
 
 				_.each(self.index_data, function(v) {
-
 					const query = {'chinese_book_category': v.value};
 					self.client.bookinfos.read(query)
 					.done(function(data) {
