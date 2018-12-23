@@ -3,7 +3,7 @@
 		<h2>平台書庫</h2>
 		<ul class="nav nav-tabs">
 			<li class="active"><a href="#book_repository_recommend" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="true" onclick="pagetab_subtabfix(this);">書籍推薦</a></li>
-			<li><a href="#book_repository_index" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">索引</a></li>
+			<li><a href="#book_repository_index" name="repository_books_tab_grp" data-toggle="tab" aria-expanded=s"false" onclick="pagetab_subtabfix(this);">索引</a></li>
 			<li><a href="#book_repository_search" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">查詢</a></li>
 		</ul>
 
@@ -50,7 +50,6 @@
 		},
 		data: function() {
 			return {
-				
 				user: user,	
 				recommend_data: [
 					{
@@ -162,7 +161,6 @@
 			get_recommend_table_data: function () {
 				// run ajax get data
 				let self = this;
-				console.log('get_recommend_table_data');
 
 				_.each(self.recommend_data, function(v){
 					let query = {};
@@ -192,10 +190,8 @@
 			get_index_table_data: function () {
 				// run ajax get data
 				let self = this;
-				console.log('get_index_table_data');
 
 				_.each(self.index_data, function(v) {
-
 					const query = {'chinese_book_category': v.value};
 					self.client.bookinfos.read(query)
 					.done(function(data) {
