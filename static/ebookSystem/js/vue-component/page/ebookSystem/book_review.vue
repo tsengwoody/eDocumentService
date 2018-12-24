@@ -58,26 +58,28 @@
 			return {
 				pk: '',
 				book: {},
+				info: {},
 				reason: '',
 				result: 'success', //success or error
 			}
 		},
-		computed: {
-			info: function () {
-				return {
+		watch: {
+			book: function() {
+				this.info = {
 					'ISBN': this.book.book_info.ISBN,
 					'書名': this.book.book_info.bookname,
 					'作者': this.book.book_info.author,
 					'出版社': this.book.book_info.house,
 					'出版日期': this.book.book_info.date,
 					'裝訂冊數': this.book.book_info.bookbinding,
-				}
-			},
+				};
+			}
 		},
 		mounted: function () {
 			document.title = '文件審核';
-			this.pk = window.location.pathname.split('/')
-			this.pk = this.pk[this.pk.length-2]
+			this.pk = window.location.pathname.split('/');
+			this.pk = this.pk[this.pk.length-2];
+			console.log(this.pk);
 			this.client = new $.RestClient('/ebookSystem/api/');
 			this.client.add('bookadds');
 			this.get_book_data()
@@ -88,8 +90,9 @@
 
 				self.client.bookadds.read(self.pk)
 				.done(function(data) {
-					self.book = data
+					self.book = data;
 				})
+				console.log(self.book);
 			},
 			review: function () {
 				let self = this
