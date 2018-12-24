@@ -48,7 +48,7 @@
 			this.client.add('bookadds');
 
 			let self = this
-			self.client.books.read({'status': '0',})
+			self.client.books.read({'status': '0', 'org_id': user.org})
 			.done(function(data) {
 				let filter_data = [];
 				_.each(data, function(v){

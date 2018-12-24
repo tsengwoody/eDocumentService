@@ -27,7 +27,7 @@
 		</div>
 		<div class="form-group">
 			<div class="col-sm-3 col-sm-offset-5">
-				<a href="/genericUser/generics/retrieve/">忘記帳密</a>
+				<a href="/routing/genericUser/retrieve/">忘記帳密</a>
 			</div>
 		</div>
 	</div>

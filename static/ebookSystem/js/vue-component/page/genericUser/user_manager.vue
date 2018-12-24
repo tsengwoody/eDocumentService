@@ -32,14 +32,6 @@
 					<div v-if="props.item.disabilitycard_set[0]">手冊查閱編修</div>
 					<div v-else>手冊新建登錄</div>
 				</button>
-				<!--<a
-					v-bind:href="'/genericUser/generics/disabilitycard_register/' +props.item.disabilitycard_set[0] +'/'"
-					class="btn btn-default"
-					role="button"
-								target="blank" title="(另開新視窗)"
-				>
-					手冊登錄
-				</a>-->
 				<!--data-toggle="modal" :data-target="'#'"-->
 				<button class="btn btn-default"
 					v-if="props.item.is_editor"
@@ -47,15 +39,6 @@
 				>
 					服務紀錄
 				</button>
-				<!--<a
-					v-if="props.item.is_editor"
-					v-bind:href="'/genericUser/generics/serviceinfo_record/' +props.item.id +'/'"
-					class="btn btn-default"
-					role="button"
-								target="blank" title="(另開新視窗)"
-				>
-					服務紀錄
-				</a>-->
 			</template>
 		</table-div>
 		<modal :id_modal="'dm'">

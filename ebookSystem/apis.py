@@ -22,7 +22,7 @@ import sys
 class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
-	filter_backends = (StatusFilter, OwnerFilter,)
+	filter_backends = (StatusFilter, OwnerFilter, OrgFilter, BooknameFilter,)
 	ordering_fields = ('upload_date',)
 	permission_classes = (permissions.IsAuthenticated,)
 
@@ -279,7 +279,7 @@ class BookAddViewSet(BookViewSet):
 class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = EBook.objects.all()
 	serializer_class = EBookSerializer
-	filter_backends = (StatusFilter, EditorFilter,)
+	filter_backends = (StatusFilter, EditorFilter, EbookOrgFilter,)
 	permission_classes = (permissions.IsAuthenticated,)
 
 	@list_route(

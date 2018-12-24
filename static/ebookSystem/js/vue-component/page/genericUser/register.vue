@@ -1,4 +1,4 @@
-﻿<script id="tmp_userterms" type="text">*使用者條款
+<script id="tmp_userterms" type="text">*使用者條款
 
 eDocumentService雲端千眼平台(以下簡稱「本站」)係依據本條款提供特定身心障礙者出版品重製服務。當您使用本服務時，即表示您已閱讀、瞭解並同意接受此條款之所有內容。本站有權於任何時間修改或變更此條款之內容，若您於任何修改或變更後繼續使用本服務，視為您已閱讀、瞭解並同意接受該等修改或變更。如果您不同意此條款的內容，您應立即停止使用本站之服務。
 
@@ -414,7 +414,7 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 					password: password,
 				})
 				.done(function(data) {
-					window.location.replace('/genericUser/generics/user_person/')
+					window.location.replace('/routing/genericUser/user_person/')
 				})
 				.fail(function(xhr, result, statusText){
 					alertmessage('error', xhr.responseText)

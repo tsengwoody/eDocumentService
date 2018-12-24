@@ -103,7 +103,7 @@
 				.done(function(data) {
 					alertmessage('success', '成功重設密碼，請至電子信箱中查閱。')
 					.done(function() {
-						window.location.replace('/genericUser/generics/login/')
+						window.location.replace('/routing/genericUser/login/')
 					})
 				})
 				.fail(function(xhr, result, statusText){

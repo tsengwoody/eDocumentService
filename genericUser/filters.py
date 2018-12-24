@@ -13,6 +13,8 @@ ServiceInfoExchangeFilter = KeyMapAttrFilterFactory(key='is_exchange', type=conv
 # ['', ]
 OwnerFilter = KeyMapAttrFilterFactory(key = 'owner_id', type = str, attr = 'owner_id')
 
+OrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'org_id')
+
 AnnouncementCategoryFilter = KeyMapAttrFilterFactory(key='category', type=convert_unicode, attr='category')
 QAndACategoryFilter = KeyMapAttrFilterFactory(key='category', type=str, attr='category')
 
@@ -39,14 +41,6 @@ class UserSelfOrManagerFilter(filters.BaseFilterBackend):
 			return queryset
 		else:
 			return queryset.filter(id=request.user.id)
-
-class UserOrganizationFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		org = request.query_params.get('org')
-		if org:
-			return queryset.filter(org=org)
-		else:
-			return queryset
 
 class UserAuthFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):

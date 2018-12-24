@@ -54,15 +54,6 @@
 						<div v-if="user.disabilitycard_set[0]">手冊查閱編修</div>
 						<div v-else>手冊新建登錄</div>
 					</button>
-					<!--<a
-						v-bind:href="'/genericUser/generics/disabilitycard_register/' +user.disabilitycard_set[0] +'/'"
-						class="btn btn-primary"
-						role="button"
-									target="blank" title="(另開新視窗)"
-					>
-						<div v-if="user.disabilitycard_set[0]">手冊查閱編修</div>
-						<div v-else>手冊新建登錄</div>
-					</a>-->
 					<button
 						class="btn btn-primary"
 						@click="setFontSize()"

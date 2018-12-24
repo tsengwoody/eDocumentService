@@ -7,7 +7,7 @@
 				<template slot="action" slot-scope="props">
 					<a
 						role="button" class="btn btn-default"
-						:href="'/ebookSystem/generics/ebook_review/' +props.item.ISBN_part +'/'"
+						:href="'/routing/ebookSystem/ebook_review/' +props.item.ISBN_part +'/'"
 						target="blank" title="(另開新視窗)"
 					>審核</a>
 				</template>

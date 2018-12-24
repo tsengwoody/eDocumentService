@@ -28,7 +28,7 @@ from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWOR
 class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, UserOrganizationFilter, UserRoleFilter, UserAuthFilter)
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, OrgFilter, UserRoleFilter, UserAuthFilter)
 	ordering_fields = ('username',)
 	search_fields = ('username', 'email', 'first_name', 'last_name',)
 
@@ -277,7 +277,7 @@ class DisabilityCardViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet, 
 	permission_classes_by_action = {
 		'create': [AllowAny],
 	}
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, OwnerOrgManagerFilter, DisabilityCardActiveFilter,)
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, OwnerOrgManagerFilter, DisabilityCardActiveFilter, OrgFilter)
 	#filter_backends = (filters.OrderingFilter, filters.SearchFilter, DisabilityCardActiveFilter,)
 	search_fields = ('identity_card_number', 'name',)
 
@@ -293,7 +293,7 @@ class DisabilityCardViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet, 
 class ServiceInfoViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = ServiceInfo.objects.all().order_by('-date')
 	serializer_class = ServiceInfoSerializer
-	filter_backends = (filters.OrderingFilter, OwnerOrgManagerFilter, OwnerFilter, ServiceInfoExchangeFilter,)
+	filter_backends = (filters.OrderingFilter, OwnerOrgManagerFilter, OwnerFilter, OrgFilter, ServiceInfoExchangeFilter,)
 	ordering_fields = ('owner',)
 	permission_classes = (permissions.IsAuthenticated,)
 

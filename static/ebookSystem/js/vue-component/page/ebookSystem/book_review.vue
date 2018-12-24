@@ -103,13 +103,13 @@
 				.done(function(data) {
 					alertmessage('success', '審核已完成' + data['data']['message'])
 					.done(function() {
-						window.location.replace('/ebookSystem/generics/book_review_list/')
+						window.location.replace('/routing/ebookSystem/book_review_list/')
 					})
 				})
 				.fail(function(data){
 					alertmessage('error', o2j(data))
 					.done(function() {
-						window.location.replace('/ebookSystem/generics/book_review_list/')
+						window.location.replace('/routing/ebookSystem/book_review_list/')
 					})
 				})
 			},

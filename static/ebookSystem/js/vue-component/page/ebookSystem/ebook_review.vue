@@ -142,13 +142,13 @@
 				.done(function(data) {
 					alertmessage('success', '審核已完成' +data['message'])
 					.done(function() {
-						window.location.replace('/ebookSystem/generics/ebook_review_list/')
+						window.location.replace('/routing/ebookSystem/ebook_review_list/')
 					})
 				})
 				.fail(function(data){
 					alertmessage('error', '' +data['message'])
 					.done(function() {
-						window.location.replace('/ebookSystem/generics/ebook_review_list/')
+						window.location.replace('/routing/ebookSystem/ebook_review_list/')
 					})
 				})
 

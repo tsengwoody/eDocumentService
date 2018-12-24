@@ -5,12 +5,12 @@
 			<template slot="table" slot-scope="props">
 				<table-div :datas="props.item.datas" :header="props.item.header">
 					<template slot="inactive_book_action" slot-scope="props">
-						<a v-if="user.is_manager" class="btn btn-default" role="button" :href="'/ebookSystem/generics/book_review/' +props.item.ISBN +'/'" target="_blank" title="審核(另開新視窗)">審核</a>
+						<a v-if="user.is_manager" class="btn btn-default" role="button" :href="'/routing/ebookSystem/book_review/' +props.item.ISBN +'/'" target="_blank" title="審核(另開新視窗)">審核</a>
 						<button class="btn btn-default" @click="book_del(props.item.ISBN)">刪除</button>
 					</template>
 					<template slot="active_book_action" slot-scope="props">
 						<button class="btn btn-default send_button" @click="BookSetPriority(props.item.ISBN)">設定權重</button>
-						<a class="btn btn-default" :href="'/ebookSystem/generics/book_detail/' +props.item.ISBN +'/'" target="_blank" title="分段資訊(另開新視窗)">分段資訊</a>
+						<a class="btn btn-default" :href="'/routing/ebookSystem/book_detail/' +props.item.ISBN +'/'" target="_blank" title="分段資訊(另開新視窗)">分段資訊</a>
 					</template>
 				</table-div>
 			</template>

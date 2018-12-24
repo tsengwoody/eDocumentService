@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="tab-content" style="padding:20px 0px;">
 		<h2>書籍管理</h2>
 		<div id="book_manager_search">
@@ -24,12 +24,12 @@
 				<template slot="action" slot-scope="props">
 					<a
 						role="button" class="btn btn-default"
-						:href="'/ebookSystem/generics/book_review/' +props.item.ISBN +'/'"
+						:href="'/routing/ebookSystem/book_review/' +props.item.ISBN +'/'"
 						target="blank" title="(另開新視窗)"
 					>審核</a>
 					<a
 						role="button" class="btn btn-default"
-						:href="'/ebookSystem/generics/book_detail/' +props.item.ISBN +'/'"
+						:href="'/routing/ebookSystem/book_detail/' +props.item.ISBN +'/'"
 						target="blank" title="(另開新視窗)"
 					>分段資訊</a>
 				</template>

@@ -1,7 +1,7 @@
 ﻿# coding: utf-8
 
 from rest_framework import filters
-from utils.filters import convert_bool, KeyMapAttrFilterFactory
+from utils.filters import convert_bool, convert_unicode, KeyMapAttrFilterFactory
 
 # ['book_review_list', 'book_manager', 'book_person', 'ebook_review_list', 'service', ]
 StatusFilter = KeyMapAttrFilterFactory(key = 'status', type = int, attr = 'status')
@@ -12,11 +12,20 @@ BoolStatusFilter = KeyMapAttrFilterFactory(key = 'status', type = convert_bool, 
 # ['book_person', book_shelf ,]
 OwnerFilter = KeyMapAttrFilterFactory(key = 'owner_id', type = str, attr = 'owner_id')
 
+# ['school',]
+OrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'org_id')
+
+# 
+EbookOrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'book__org_id')
+
 # ['service', 'serviceinfo_record', ]
 EditorFilter = KeyMapAttrFilterFactory(key = 'editor_id', type = str, attr = 'editor_id')
 
 # ['book_person', ]
 BookInfoOwnerFilter = KeyMapAttrFilterFactory(key = 'owner_id', type = str, attr = 'book__owner_id')
+
+#['book_manager']
+BooknameFilter = KeyMapAttrFilterFactory(key = 'bookname', type = convert_unicode, attr = 'book_info__bookname')
 
 class CBCFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
