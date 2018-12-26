@@ -20,6 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 			'is_editor',
 			'is_guest',
 			'is_manager',
+			'is_supermanager',
 			'is_superuser',
 			'auth_email',
 			'auth_phone',

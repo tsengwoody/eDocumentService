@@ -50,8 +50,6 @@
 	</nav>
 </template>
 <script>
-	Vue.options.delimiters = ['{|{', '}|}'];
-
 	module.exports = {
 		components: {
 		},
@@ -72,85 +70,85 @@
 							{
 								type: 'item',
 								'display_name': '上傳文件審核',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/ebookSystem/book_review_list/',
 							},
 							{
 								type: 'item',
 								'display_name': '校對文件審核',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/ebookSystem/ebook_review_list/',
 							},
 							{
 								type: 'item',
 								'display_name': '書籍管理',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/ebookSystem/book_manager/',
 							},
 							{
 								type: 'item',
 								'display_name': '使用者管理',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/genericUser/user_manager/',
 							},
 							{
 								type: 'item',
 								'display_name': '身障手冊管理',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/genericUser/disabilitycard_manager/',
 							},
 							{
 								type: 'item',
 								'display_name': '服務時數確認',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/genericUser/serviceinfo_list_check/',
 							},
 							{
 								type: 'item',
 								'display_name': '校對順序',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/ebookSystem/bookorder_list/',
 							},
 							{
 								type: 'item',
 								'display_name': '統計資訊',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/statistics_old/',
 							},
 							{
 								type: 'item',
 								'display_name': '統計書籍下載',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/mysite/statistics/book_download/',
 							},
 							{
 								type: 'item',
 								'display_name': '統計使用者下載',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/mysite/statistics/user_download/',
 							},
 							{
 								type: 'item',
 								'display_name': '統計使用者校對',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/mysite/statistics/user_editrecord/',
 							},
 							{
 								type: 'item',
 								'display_name': '管理首頁 Banner',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/genericUser/bannercontent_create/',
 							},
 							{
 								type: 'item',
 								'display_name': '訊息傳送',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/genericUser/user_email/',
 							},
 							{
 								type: 'item',
 								'display_name': '公告發佈',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/genericUser/announcement_create/',
 							},
 							{
@@ -175,7 +173,7 @@
 							{
 								type: 'item',
 								'display_name': '電子檔上傳',
-								'permission': ['is_manager'],
+								'permission': ['is_supermanager'],
 								'url': '/routing/ebookSystem/book_upload/',
 							},
 						],
@@ -381,7 +379,7 @@
 					if(p.includes('login')){
 						return true
 					}
-					roles = ['is_editor', 'is_guest', 'auth_editor', 'auth_guest', 'is_manager', 'is_superuser']
+					roles = ['is_editor', 'is_guest', 'auth_editor', 'auth_guest', 'is_manager', 'is_supermanager', 'is_superuser']
 					for(var i=0; i<roles.length; i++){
 						role = roles[i]
 						if(p.includes(role)){

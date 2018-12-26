@@ -152,13 +152,14 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], page_per_part=50)
 			try:
 				newBook.set_page_count()
-			except:
+			except BaseException as e:
 				shutil.rmtree(uploadPath)
-				res['detail'] = u'set_page_count error'
+				res['detail'] = u'set_page_count error' +unicode(e)
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 			newBook.scaner = request.user
 			newBook.owner = request.user
+			newBook.org = request.user.org
 			newBook.source = 'self'
 			newBook.save()
 			try:
@@ -263,6 +264,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 			newBook.scaner = request.user
 			newBook.owner = request.user
+			newBook.org = request.user.org
 			newBook.source = request.POST['category']
 			newBook.finish_date = timezone.now()
 			newBook.save()

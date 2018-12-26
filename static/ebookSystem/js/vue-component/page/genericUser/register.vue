@@ -1,5 +1,19 @@
-<script id="tmp_userterms" type="text">*使用者條款
-
+<template>
+	<div id="genericUser_register">
+		<div class="form-group text-center">
+			<h2 class="">註冊</h2>
+		</div>
+		<div class="form-horizontal">
+			<form-drf v-for="(model_info, key) in model_infos"
+				:model_info="model_info"
+				:field="key"
+				:offset-class="'col-sm-offset-2'"
+				v-model="infos[key]"
+			></form-drf>
+			<div class="form-group">
+				<label class="control-label col-sm-2 col-sm-offset-2" for="userterms"><font style="color:red">*</font><span>使用者條款隱私權政策</span></label>
+				<div class="col-sm-7">
+					<textarea id="userterms" class="form-control" readonly style="width:100%;height: 300px; resize: none;">
 eDocumentService雲端千眼平台(以下簡稱「本站」)係依據本條款提供特定身心障礙者出版品重製服務。當您使用本服務時，即表示您已閱讀、瞭解並同意接受此條款之所有內容。本站有權於任何時間修改或變更此條款之內容，若您於任何修改或變更後繼續使用本服務，視為您已閱讀、瞭解並同意接受該等修改或變更。如果您不同意此條款的內容，您應立即停止使用本站之服務。
 
 一、本站委託方（人）須遵守之義務
@@ -59,25 +73,6 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 六、《隱私權政策》適用範圍及效力：本站的《隱私權政策》不適用於由其他網站連結或個人提供的服務，諸如由本站所連結到的其他網站皆不在此《隱私權政策》適用範圍之內。我們的《隱私權政策》不涵括其他為本站服務宣傳之公司或機構所採用的資訊做法。
 
 本同意書所定之任何會員條款之全部或一部無效時，不影響其他條款之效力。關於本條款之解釋或適用，均以中華民國之法律為基準。使用者因使用本站而生之爭議，同意本誠信原則解決之，如有訴訟之必要時，同意以台灣台北地方法院為第一審管轄法院。
-</script>
-
-<template>
-	<div id="genericUser_register">
-		<div class="form-group text-center">
-			<h2 class="">註冊</h2>
-		</div>
-		<div class="form-horizontal">
-			<form-drf v-for="(model_info, key) in model_infos"
-				:model_info="model_info"
-				:field="key"
-				:offset-class="'col-sm-offset-2'"
-				v-model="infos[key]"
-			></form-drf>
-			<div class="form-group">
-				<label class="control-label col-sm-2 col-sm-offset-2" for="userterms"><font style="color:red">*</font><span>使用者條款隱私權政策</span></label>
-				<div class="col-sm-7">
-					<textarea id="userterms" class="form-control" readonly style="width:100%;height: 300px; resize: none;">
-						{|{ usertermsContent }|}
 					</textarea>
 					<label>
 						<input type="checkbox" v-model="isPrivacyAgree">
@@ -201,10 +196,6 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 						'type': 'select',
 						'remark': '請選擇所屬單位',
 						'choices': [
-							{
-								'value': '',
-								'display_name': '其它',
-							},
 						],
 					},
 					'role': {
@@ -231,14 +222,13 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 			document.title = '註冊'
 
 			let vo = this;
-			vo.usertermsContent = document.getElementById('tmp_userterms').innerHTML;
-
 			let client = new $.RestClient('/genericUser/api/');
 			client.add('organizations');
 			
 			client.organizations.read()
 			.done(function (org_data) {
-				_.each(org_data, function(v,k){
+				console.log(org_data)
+				_.each(org_data, function(v){
 					vo.model_infos.org.choices.push({
 						'value': v.id,
 						'display_name': v.name,

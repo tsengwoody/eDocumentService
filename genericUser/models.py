@@ -27,13 +27,6 @@ def generic_serialized(self):
 		serialize.update({field.name: value})
 	return serialize
 
-class PublicFile(object):
-	from mysite.settings import BASE_DIR
-	def __init__(self, path):
-		self.name = os.path.basename(path)
-		self.path = path
-		self.url = path.replace(BASE_DIR +'/static/', '')
-
 class User(AbstractUser):
 	phone = models.CharField(max_length=30)
 	birthday = models.DateField()
@@ -46,7 +39,7 @@ class User(AbstractUser):
 	)
 	education = models.CharField(max_length=30, choices=EDU)
 	online = models.DateTimeField(default = timezone.now)
-	org = models.ForeignKey('Organization',blank=True, null=True, on_delete=models.SET_NULL, related_name='user_set', )
+	org = models.ForeignKey('Organization', related_name='user_set', )
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'review':2}
 	is_book = models.BooleanField(default=False)
@@ -54,7 +47,7 @@ class User(AbstractUser):
 	is_editor = models.BooleanField(default=False)
 	is_guest = models.BooleanField(default=False)
 	is_manager = models.BooleanField(default=False)
-	is_advanced_editor = models.BooleanField(default=False)
+	is_supermanager = models.BooleanField(default=False)
 	auth_email = models.BooleanField(default=False)
 	auth_phone = models.BooleanField(default=False)
 
@@ -231,7 +224,6 @@ class Organization(models.Model):
 	address = models.CharField(max_length=100)
 	email = models.EmailField()
 	phone = models.CharField(max_length=30)
-	manager = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='manage_org_set')
 	is_service_center = models.BooleanField(default=False)
 
 	def __unicode__(self):
@@ -239,7 +231,7 @@ class Organization(models.Model):
 
 class ServiceInfo(models.Model):
 	owner = models.ForeignKey(User, related_name='serviceinfo_set')
-	org = models.ForeignKey(Organization, blank=True, null=True, related_name='serviceinfo_set')
+	org = models.ForeignKey(Organization, related_name='serviceinfo_set')
 	date = models.DateField()
 	service_hours = models.IntegerField(default=0)
 	is_exchange = models.BooleanField(default=False)

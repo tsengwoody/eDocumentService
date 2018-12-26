@@ -35,7 +35,6 @@ class Command(BaseCommand):
 			is_editor=True,
 			is_guest=True,
 			is_manager=True,
-			is_advanced_editor=True,
 			is_license = True,
 			is_book = True,
 			auth_email=True,
@@ -44,8 +43,7 @@ class Command(BaseCommand):
 		)
 		root.set_password('eds@2018')
 		root.status = root.STATUS['active']
-		root.save()
-		org = Organization.objects.create(name=u'eDocumentService', address=u'台北市大同區1段149號7樓', email=u'edocumentservice@gmail.com', phone='0917823098', manager=root, is_service_center=True)
+		org = Organization.objects.create(name=u'eDocumentService', address=u'台北市大同區1段149號7樓', email=u'edocumentservice@gmail.com', phone='0917823098', is_service_center=True)
 		root.org=org
 		root.save()
 

@@ -35,7 +35,7 @@ class Book(models.Model):
 	finish_date = models.DateField(blank=True, null=True)
 	priority = models.IntegerField(default=9)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
-	org = models.ForeignKey(Organization,blank=True, null=True, on_delete=models.SET_NULL, related_name='book_set', )
+	org = models.ForeignKey(Organization, related_name='book_set', )
 	owner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='own_book_set')
 	upload_date = models.DateField(default = timezone.now)
 	is_private = models.BooleanField(default=False)
@@ -118,7 +118,6 @@ class Book(models.Model):
 			if scanPage.split('.')[-1].lower() == 'jpg':
 				page_count = page_count + 1
 		self.page_count = page_count
-		self.save()
 		return self.page_count
 
 	def validate_folder(self):
