@@ -43,7 +43,8 @@ def generics(request, name, pk=None):
 
 @http_response
 def epub_view(request, path, template_name='mysite/epub_view.html'):
-		path = '/file/' +path.encode('utf8')
+		#path = '/file/' +path.encode('utf8')
+		path = '/api/ddm/resource/107/' +path.encode('utf8')
 		base64_path = base64.b64encode(path)
 		return locals()
 

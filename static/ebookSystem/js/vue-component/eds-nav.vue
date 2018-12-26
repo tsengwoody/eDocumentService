@@ -62,7 +62,7 @@
 						type: 'item',
 						'display_name': '網站導覽',
 						'permission': ['true'],
-						'url': '/generics/sitemap/',
+						'url': '/routing/mysite/sitemap/',
 					},
 					{
 						type: 'folder',
@@ -121,19 +121,19 @@
 								type: 'item',
 								'display_name': '統計書籍下載',
 								'permission': ['is_manager'],
-								'url': '/generics/book_download/',
+								'url': '/routing/mysite/statistics/book_download/',
 							},
 							{
 								type: 'item',
 								'display_name': '統計使用者下載',
 								'permission': ['is_manager'],
-								'url': '/generics/user_download/',
+								'url': '/routing/mysite/statistics/user_download/',
 							},
 							{
 								type: 'item',
 								'display_name': '統計使用者校對',
 								'permission': ['is_manager'],
-								'url': '/generics/user_editrecord/',
+								'url': '/routing/mysite/statistics/user_editrecord/',
 							},
 							{
 								type: 'item',

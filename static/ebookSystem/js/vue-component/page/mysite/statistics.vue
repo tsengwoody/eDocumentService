@@ -1,36 +1,45 @@
-{% extends "base_nav.html" %}
-{% block title %}
-使用者下載
-{% endblock %}
-{% block content %}
-
-{% csrf_token %}
-
-<div id="user_download">
-	<h2>使用者下載</h2>
-	<table-div
-		:header="statistics_header"
-		:datas="statistics_datas"
-	></table-div>
-</div>
-
+<template>
+	<div>
+		<h2>{|{ title }|}</h2>
+		<table-div
+			:header="statistics_header"
+			:datas="statistics_datas"
+		></table-div>
+	</div>
+</template>
 <script>
-	new Vue({
-		el: '#user_download',
+	module.exports = {
 		components: {
-			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div-order.vue'),
+			'table-div': components['table-div-order'],
 		},
-		data: {
-			statistics_header: {
-				'groupfield': '使用者名稱',
-				'all': '全部期間',
-			},
-			statistics_datas: [],
-			temp: {},
-		},
-		created: function () {
+		data: function(){
+			return {
+				statistics_header: {
+					'groupfield': '項目',
+					'all': '全部期間',
+				},
+				statistics_datas: [],
+				temp: {},
+				title: '',
+				url: '',
+			}
 		},
 		mounted: function () {
+			let self = this
+			let page = window.location.pathname.split('/')
+			page = page[page.length-2]
+			if(page==='book_download'){
+				self.title = '統計書籍下載'
+			}
+			else if(page==='user_download'){
+				self.title = '統計使用者下載'
+			}
+			else if(page==='user_editrecord'){
+				self.title = '統計使用者校對'
+			}
+
+			document.title = self.title
+			self.url = '/api/statistics/' +page +'/'
 			this.statistics()
 		},
 		methods: {
@@ -40,7 +49,7 @@
 				let querys = []
 				let keys = []
 
-				let all_query = rest_aj_send_memory('get', '/api/statistics/user_download/', {}, {'key': 'all'})
+				let all_query = rest_aj_send_memory('get', self.url, {}, {'key': 'all'})
 				querys.push(all_query)
 
 				all_query
@@ -65,7 +74,7 @@
 					end_time = time['end_time']
 
 					key = 'month' +v
-					let month_query = rest_aj_send_memory('get', '/api/statistics/user_download/', {'begin_time': begin_time, 'end_time': end_time,}, {'key': key})
+					let month_query = rest_aj_send_memory('get', self.url, {'begin_time': begin_time, 'end_time': end_time,}, {'key': key})
 					querys.push(month_query)
 					keys.push(key)
 						self.statistics_header[key] = begin_time.split('-')[0] +'年' +begin_time.split('-')[1] +'月'
@@ -100,7 +109,5 @@
 				})
 			},
 		},
-	})
-
+	}
 </script>
-{% endblock %}

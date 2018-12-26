@@ -78,7 +78,7 @@ urlpatterns = [
 	url(r'^dev/(?P<name>[\w\d/_\-]+)/$', views.dev, name='dev'),
 	url(r'^about/(?P<name>[\w]+)/$', views.about, name='about'),
 	url(r'^library_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{32,32})/$', library_epub),
-	url(r'^library_origin_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{32,32})/$', library_origin_epub),
+	url(r'^library_origin_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{0,32})/$', library_origin_epub),
 	url(r'^admin/', include(admin.site.urls)),
 	url(r'^ebookSystem/', include('ebookSystem.urls', namespace="ebookSystem")),
 	url(r'^genericUser/', include('genericUser.urls', namespace="genericUser")),
