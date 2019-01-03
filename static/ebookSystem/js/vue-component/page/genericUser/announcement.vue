@@ -43,10 +43,10 @@
 		<file_manager
 			:url="url +'resource/attachment/'"
 			:permission="{
-				'create': {'is_manager': true,},
+				'create': {'is_supermanager': true,},
 				'read': {'is_all': true,},
-				'update': {'is_manager': true,},
-				'delete': {'is_manager': true,},
+				'update': {'is_supermanager': true,},
+				'delete': {'is_supermanager': true,},
 			}"
 		></file_manager>
 		<div class="form-group">        

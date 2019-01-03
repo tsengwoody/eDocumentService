@@ -1,103 +1,47 @@
 <template>
-<div id="disabilitycard_manager">
-	<h2>身心障礙手冊管理</h2>
-	<div class="form-inline">
-		<div class="form-group">
-			<select
-				class="form-control"
-				v-model="search_filter"
-				required
-			>
-				<option value="all" selected="selected">全部</option>
-				<option v-for="(value, key) in search_choices" :value="key">{|{ value }|}</option>
-			</select>
-		</div>
-		<div class="form-group">
-			<input v-model="search_value" id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊" maxlength="15">
-		</div>
-		<div class="form-group">
-			<button type="button" class="btn btn-primary" @click="search()">搜尋</button>
-		</div>
+	<div>
+		<h2>身障手冊管理</h2>
+		<tab :data="tab_data">
+			<template slot="disabilitycard_manager_org" slot-scope="props">
+				<disabilitycard_manager_org :org_id="props.item">
+				</disabilitycard_manager_org>
+			</template>
+		</tab>
 	</div>
-	<table-div :datas="search_disabilitycard_datas" :header="disabilitycard_header">
-		<template slot="action" slot-scope="props">
-			<button class="btn btn-primary"
-				@click="dm_bus.$emit('instance-set', props.item); openDialog('dm', this);"
-			>
-				查閱編修
-			</button>
-		</template>
-	</table-div>
-	<modal :id_modal="'dm'">
-		<template slot="header">
-			<h4 class="modal-title">身心障礙手冊登錄</h4>
-		</template>
-		<template slot="body">
-			<disabilitycard
-				:bus="dm_bus"
-			>
-			</disabilitycard>
-		</template>
-	</modal>
-</div>
 </template>
+
 <script>
 	module.exports = {
 		components: {
-			'disabilitycard': components['disabilitycard'],
-			'modal': components['modal'],
-			'table-div': components['table-div'],
+			'disabilitycard_manager_org': components['disabilitycard_manager_org'],
+			'tab': components['tab'],
 		},
-		data: function(){
+		data: function() {
 			return {
-				dm_bus: new Vue(),
-				search_choices: {
-					'false': '未啟用',
-					'true': '已啟用',
-				},
-				search_filter: 'all',
-				search_value: '',
-				disabilitycard_header: {
-					"identity_card_number": "身份證字號",
-					"name": "姓名",
-					"action": "動作",
-				},
-				search_disabilitycard_datas: [],
+				tab_data: [],
 			}
 		},
 		mounted: function () {
-			document.title = '身心障礙手冊管理'
+			document.title = '身障手冊管理';
+			let self = this
 
-			this.client = new $.RestClient('/genericUser/api/');
-			this.client.add('disabilitycards');
-		},
-		methods: {
-			disabilitycard_datas: function(v){
-				temp_data = {
-					"identity_card_number": v.identity_card_number,
-					"name": v.name,
-					"action": v.identity_card_number,
-				}
-
-				filter_data.push(temp_data)
-			},
-			search: function () {
-				let self = this;
-				self.data = []
-
-				query = {'search': self.search_value, 'is_active': self.search_filter,}
-				self.client.disabilitycards.read(query)
-				.done(function(data) {
-					filter_data = []
-					_.each(data, self.disabilitycard_datas)
-					self.search_disabilitycard_datas = filter_data
-					alertmessage('success', '查詢完成，共取得 ' +self.search_disabilitycard_datas.length +' 筆資料')
+			this.clientg = new $.RestClient('/genericUser/api/');
+			this.clientg.add('organizations');
+			this.clientg.organizations.read()
+			.done(function(data) {
+				_.each(data, function(v){
+					self.tab_data.push({
+						'order': v.id,
+						'display_name': v.name,
+						'value': v.id,
+						'type': 'disabilitycard_manager_org',
+						'data': v.id,
+					})
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
-				})
-
-			},
+			})
+			.fail(function(xhr, result, statusText){
+				alertmessage('error', xhr.responseText)
+			})
 		},
 	}
 </script>

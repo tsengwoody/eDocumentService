@@ -58,6 +58,7 @@
 	module.exports = {
 		components: {
 			'editor': Editor,
+			'modal': components['modal'],
 			'table-div-row': components['table-div-row'],
 		},
 		data: function(){

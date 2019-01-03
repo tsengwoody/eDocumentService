@@ -105,6 +105,7 @@
 			'book_origin_download': components['book_origin_download'],
 			'ul-component': components['list_vue_component'],
 			'assign-component': components['ebook_assign_component'],
+			'modal': components['modal'],
 		},
 		data: function() {
 			return {

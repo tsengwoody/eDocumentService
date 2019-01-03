@@ -47,7 +47,7 @@ class Resource(APIView):
 		content_type, encoding = mimetypes.guess_type(fullpath)
 		content_type = content_type or 'application/octet-stream'
 		response = FileResponse(open(fullpath, 'rb'), content_type='application/octet-stream')
-		#response['Content-Disposition'] = u'attachment; filename="{0}"'.format(os.path.basename(fullpath)).encode('utf-8')
+		response['Content-Disposition'] = u'attachment; filename="{0}"'.format(os.path.basename(fullpath)).encode('utf-8')
 		#response["Last-Modified"] = http_date(statobj.st_mtime)
 		#if stat.S_ISREG(statobj.st_mode):
 			#response["Content-Length"] = statobj.st_size

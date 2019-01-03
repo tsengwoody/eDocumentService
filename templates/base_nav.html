@@ -6,7 +6,13 @@
 <script language="javascript" src="{% static 'ebookSystem/js/nav.js' %}"></script>
 
 <div id="edsnav">
-	<eds-nav ref="eds_nav_instance"></eds-nav>
+	<eds_nav
+		v-if="1==1"
+		ref="eds_nav_instance"></eds_nav
+	><eds_nav_org
+		v-else
+		ref="eds_nav_org_instance"
+	></eds_nav_org>
 </div>
 
 <script>
@@ -15,7 +21,8 @@
 	vo_eds_nav = new Vue({
 		el: '#edsnav',
 		components: {
-			'eds-nav': components['eds-nav'],
+			'eds_nav': components['eds_nav'],
+			'eds_nav_org': components['eds_nav_org'],
 		},
 		data: {
 		},

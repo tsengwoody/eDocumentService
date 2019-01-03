@@ -88,7 +88,8 @@
 	module.exports = {
 		props: ['bus',],
 		components: {
-			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
+			'modal': components['modal'],
+			'table-div': components['table-div'],
 		},
 		data: function(){
 			return {
@@ -145,29 +146,27 @@
 				return service_hour
 			},
 		},
-		created: function () {
+		mounted: function () {
 			this.clientg = new $.RestClient('/genericUser/api/');
 			this.clientg.add('serviceinfos');
 			this.clientg.add('organizations');
 			this.clientb = new $.RestClient('/ebookSystem/api/');
 			this.clientb.add('editrecords');
 			this.bus.$on('instance-set', this.instance_set)
-		},
-		mounted: function () {
+
 			pk = window.location.pathname.split('/')
 			pk = pk[pk.length-2]
 			if(pk==='serviceinfo_record'){
 				this.pk = user.id
+				this.refresh()
 			}
 			else {
 				this.pk = pk
 			}
-			this.refresh()
 		},
 		methods: {
 			instance_set: function (event) {
 				this.pk = event
-				console.log('YAA')
 				this.refresh()
 			},
 			refresh: function(){

@@ -1,4 +1,4 @@
-﻿
+
 <template>
 	<div id="book_shelf" class="container">
 		<h2>借閱書櫃</h3>
@@ -58,6 +58,7 @@
 	module.exports = {
 		components: {
 			'book_download': components['book_download'],
+			'modal': components['modal'],
 			'table-div': components['table-div'],
 		},
 		data: function() {

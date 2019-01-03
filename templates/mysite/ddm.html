@@ -12,10 +12,10 @@
 		<file_manager
 			url="/api/ddm/resource/107/"
 			:permission="{
-				'create': {'is_manager': true,},
-				'read': {'is_guest': true,},
-				'update': {'is_manager': true,},
-				'delete': {'is_manager': true,},
+				'create': {'is_supermanager': true,},
+				'read': {'is_guest': true, 'org2': true,},
+				'update': {'is_supermanager': true,},
+				'delete': {'is_supermanager': true,},
 			}"
 		></file_manager>
 	</div>

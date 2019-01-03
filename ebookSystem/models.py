@@ -497,23 +497,33 @@ class BookOrder(models.Model):
 	@classmethod
 	def refresh(cls):
 		BookOrder.objects.all().delete()
-		book_list = [ book for book in Book.objects.filter(Q(status=Book.STATUS['active'])|Q(status=Book.STATUS['edit'])).order_by('priority', 'upload_date') ]
 
-		user_order = []
-		for book in book_list:
-			if book.owner not in user_order:
-				user_order.append(book.owner)
+		# 針對每個單位各自產生領書的 queue
+		for org in Organization.objects.all():
 
-		book_order = []
-		while book_list:
-			for user in user_order:
-				for book in book_list:
-					if book.owner == user:
-						book_list.remove(book)
-						book_order.append(book)
-						break
-		for index, book in enumerate(book_order):
-			BookOrder.objects.create(book=book, order=index)
+			# 書籍是未領取(active)或校對中(edit)且是該單位的書
+			book_list = [ book for book in Book.objects.filter(
+				(Q(status=Book.STATUS['active'])|Q(status=Book.STATUS['edit']))
+				&Q(org=org)
+			).order_by('priority', 'upload_date') ]
+
+			# 取得的書籍中以 user group by 並且有 user 排序
+			user_order = []
+			for book in book_list:
+				if book.owner not in user_order:
+					user_order.append(book.owner)
+
+			book_order = []
+			while book_list:
+				for user in user_order:
+					for book in book_list:
+						if book.owner == user:
+							book_list.remove(book)
+							book_order.append(book)
+							break
+
+			for index, book in enumerate(book_order):
+				BookOrder.objects.create(book=book, order=index)
 
 class GetBookRecord(models.Model):
 	user = models.ForeignKey(User, related_name='getbookrecord_set')

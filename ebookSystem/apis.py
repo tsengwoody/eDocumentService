@@ -285,41 +285,36 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	permission_classes = (permissions.IsAuthenticated,)
 
 	@list_route(
-		methods=['get', 'post'],
+		methods=['post'],
 		url_name='service',
 		url_path='action/service',
 	)
 	def service(self, request, pk=None):
 		res = {}
 
-		if request.method == 'POST':
-			editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
-			GET_MAX_EBOOK = 6
-			if len(editingPartList) >= GET_MAX_EBOOK:
-				res['detail'] = u'您已有超過{0}段文件，請先校對完成再領取'.format(GET_MAX_EBOOK)
-				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-			try:
+		editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
+		GET_MAX_EBOOK = 3
+		if len(editingPartList) >= GET_MAX_EBOOK:
+			res['detail'] = u'您已有超過{0}段文件，請先校對完成再領取'.format(GET_MAX_EBOOK)
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		try:
+			if not request.data['org_id']=='0':
+				partialBook = BookOrder.objects.filter(book__status=Book.STATUS['active'], book__org_id=request.data['org_id']).order_by('order')[0].book
+			else:
 				partialBook = BookOrder.objects.filter(book__status=Book.STATUS['active']).order_by('order')[0].book
-			except BaseException as e:
-				res['detail'] = u'無文件：{0}'.format(unicode(e))
-				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
-			getPart.change_status(1, 'edit', user=request.user, deadline=datetime.date.today() +datetime.timedelta(days=5))
-			serializer = EBookSerializer(getPart)
-			res['data'] = serializer.data
-			res['detail'] = u'成功取得文件'
-			return Response(data=res, status=status.HTTP_202_ACCEPTED)
-		if request.method == 'GET':
-			try:
-				partialBook = BookOrder.objects.filter(book__status=Book.STATUS['active']).order_by('order')[0].book
-			except BaseException as e:
-				res['detail'] = u'無文件：{0}'.format(unicode(e))
-				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-			getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
-			serializer = EBookSerializer(getPart)
-			res['data'] = serializer.data
-			res['detail'] = u'成功取得文件'
-			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+		except IndexError as e:
+			res['detail'] = u'無文件可校對，請聯絡管理者'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		except BaseException as e:
+			res['detail'] = u'伺服器錯誤：{0}'.format(unicode(e))
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+		getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
+		getPart.change_status(1, 'edit', user=request.user, deadline=datetime.date.today() +datetime.timedelta(days=5))
+		serializer = EBookSerializer(getPart)
+		res['data'] = serializer.data
+		res['detail'] = u'成功取得文件'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	@detail_route(
 		methods=['post'],

@@ -231,7 +231,7 @@ class Organization(models.Model):
 
 class ServiceInfo(models.Model):
 	owner = models.ForeignKey(User, related_name='serviceinfo_set')
-	org = models.ForeignKey(Organization, related_name='serviceinfo_set')
+	org = models.ForeignKey(Organization, blank=True, null=True, related_name='serviceinfo_set')
 	date = models.DateField()
 	service_hours = models.IntegerField(default=0)
 	is_exchange = models.BooleanField(default=False)

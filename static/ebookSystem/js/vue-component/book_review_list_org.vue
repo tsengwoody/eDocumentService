@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2>上傳文件審核</h2>
+		<h3>{|{ org.name }|}</h3>
 		<div class="tab-content" style="padding:20px 0px;">
 			<div id="book_unreview_list">
 				<table-div :header="book_header" :datas="book_datas">
@@ -25,11 +25,13 @@
 <script>
 
 	module.exports = {
+		props: ['org_id',],
 		components: {
 			'table-div': components['table-div'],
 		},
 		data: function() {
 			return {
+				org: {},
 				book_header: {
 					'ISBN': 'ISBN',
 					'bookname': '書名',
@@ -42,13 +44,23 @@
 			}
 		},
 		mounted: function () {
-			document.title = '上傳文件審核';
-			this.client = new $.RestClient('/ebookSystem/api/');
-			this.client.add('books');
-			this.client.add('bookadds');
-
 			let self = this
-			self.client.books.read({'status': '0', 'org_id': user.org})
+
+			this.clientg = new $.RestClient('/genericUser/api/');
+			this.clientg.add('organizations');
+			this.clientg.organizations.read(this.org_id)
+			.done(function(data) {
+				self.org = data
+			})
+			.fail(function(xhr, result, statusText){
+				alertmessage('error', xhr.responseText)
+			})
+
+			this.clientb = new $.RestClient('/ebookSystem/api/');
+			this.clientb.add('books');
+			this.clientb.add('bookadds');
+
+			self.clientb.books.read({'status': '0', 'org_id': self.org_id})
 			.done(function(data) {
 				let filter_data = [];
 				_.each(data, function(v){

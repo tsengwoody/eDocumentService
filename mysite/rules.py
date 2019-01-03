@@ -52,7 +52,7 @@ def is_org_object(user, obj):
 		return False
 
 rules.add_perm('is_superuser', is_superuser)
-rules.add_perm('is_supermanager', is_manager)
+rules.add_perm('is_supermanager', is_supermanager)
 rules.add_perm('is_manager', is_manager)
 rules.add_perm('is_editor', is_editor)
 rules.add_perm('is_guest', is_guest)

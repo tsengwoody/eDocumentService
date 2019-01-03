@@ -14,6 +14,8 @@ ServiceInfoExchangeFilter = KeyMapAttrFilterFactory(key='is_exchange', type=conv
 OwnerFilter = KeyMapAttrFilterFactory(key = 'owner_id', type = str, attr = 'owner_id')
 
 OrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'org_id')
+DisabilityCardOrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'owner__org_id')
+
 
 AnnouncementCategoryFilter = KeyMapAttrFilterFactory(key='category', type=convert_unicode, attr='category')
 QAndACategoryFilter = KeyMapAttrFilterFactory(key='category', type=str, attr='category')

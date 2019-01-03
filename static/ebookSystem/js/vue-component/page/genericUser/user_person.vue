@@ -96,6 +96,7 @@
 	module.exports = {
 		components: {
 			'disabilitycard': components['disabilitycard'],
+			'modal': components['modal'],
 			'set_password': components['set_password'],
 		},
 		data: function(){

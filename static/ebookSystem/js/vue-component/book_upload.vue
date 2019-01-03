@@ -81,8 +81,6 @@
 	</div>
 </template>
 <script>
-	Vue.options.delimiters = ['{|{', '}|}'];
-
 	module.exports = {
 		props: ['category',],
 		components: {

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h2>平台書庫</h2>
 		<ul class="nav nav-tabs">
@@ -10,16 +10,16 @@
 		<div class="tab-content" style="padding:20px 0px;">
 			<div id="book_repository_recommend" class="tab-pane active">
 				<h3 class="textfornvda">書籍推薦</h3>
-				<tab :data="recommend_data">
-					<template slot="table" slot-scope="props">
+				<tab :headinglevel="4" :data="recommend_data">
+					<template slot="bookinfo_repository" slot-scope="props">
 						<bookinfo_repository :datas="props.item.datas" :header="props.item.header"></bookinfo_repository>
 					</template>
 				</tab>
 			</div>
 			<div id="book_repository_index" class="tab-pane">
 				<h3 class="textfornvda">索引</h3>
-				<tab :data="index_data">
-					<template slot="table" slot-scope="props">
+				<tab :headinglevel="4" :data="index_data">
+					<template slot="bookinfo_repository" slot-scope="props">
 						<bookinfo_repository :datas="props.item.datas" :header="props.item.header"></bookinfo_repository>
 					</template>
 				</tab>
@@ -56,21 +56,21 @@
 						order: 0,
 						display_name: '最新上架',
 						value: 'newest',
-						type: 'table',
+						type: 'bookinfo_repository',
 						data: '',
 					},
 					{
 						order: 1,
 						display_name: '平台推薦',
 						value: 'recommend',
-						type: 'table',
+						type: 'bookinfo_repository',
 						data: '',
 					},
 					{
 						order: 2,
 						display_name: '借閱排行',
 						value: 'hottest',
-						type: 'table',
+						type: 'bookinfo_repository',
 						data: '',
 					},
 				],
@@ -79,70 +79,70 @@
 						'order': 0,
 						'display_name': '總類',
 						'value': '0',
-						'type': 'table',
+						'type': 'bookinfo_repository',
 						'data': '',
 					},
 					{
 						'order': 1,
 						'display_name': '哲學',
 						'value': '1',
-						'type': 'table',
+						'type': 'bookinfo_repository',
 						'data': '',
 					},
 					{
 						'order': 2,
 						'display_name': '宗教',
 						'value': '2',
-						'type': 'table',
+						'type': 'bookinfo_repository',
 						'data': '',
 					},
 					{
 						'order': 3,
 						'display_name': '科學',
 						'value': '3',
-						'type': 'table',
+						'type': 'bookinfo_repository',
 						'data': '',
 					},
 					{
 						'order': 4,
 						'display_name': '應用科學',
 						'value': '4',
-						'type': 'table',
+						'type': 'bookinfo_repository',
 						'data': '',
 					},
 					{
 						'order': 5,
 						'display_name': '社會科學',
 						'value': '5',
-						'type': 'table',
+						'type': 'bookinfo_repository',
 						'data': '',
 					},
 					{
 						'order': 6,
 						'display_name': '史地類',
 						'value': '6',
-						'type': 'table',
+						'type': 'bookinfo_repository',
 						'data': '',
 					},
 					{
 						'order': 7,
 						'display_name': '世界史地',
 						'value': '7',
-						'type': 'table',
+						'type': 'bookinfo_repository',
 						'data': '',
 					},
 					{
 						'order': 8,
 						'display_name': '語言文學',
 						'value': '8',
-						'type': 'table',
+						'type': 'bookinfo_repository',
 						'data': '',
 					},
 					{
 						'order': 9,
 						'display_name': '藝術',
 						'value': '9',
-						'type': 'table',
+						'type': 'bookinfo_repository',
 						'data': '',
 					},
 				],

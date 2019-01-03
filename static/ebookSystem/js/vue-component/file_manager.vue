@@ -57,8 +57,8 @@
 	module.exports = {
 		props: ['url', 'permission',],
 		components: {
-			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
-			'file_upload': httpVueLoader('/static/ebookSystem/js/vue-component/file_upload.vue'),
+			'table-div': components['table-div'],
+			'file_upload': components['file_upload'],
 		},
 		data: function(){
 			return {
@@ -84,6 +84,8 @@
 				if(u.is_editor&&p[crud].is_editor){ return true }
 				else if(u.is_guest&&p[crud].is_guest){ return true }
 				else if(u.is_manager&&p[crud].is_manager){ return true }
+				else if(u.is_supermanager&&p[crud].is_supermanager){ return true }
+				else if(u.is_manager&&p[crud]['org' +u.org]){ return true }
 				else if(p[crud].is_all){ return true }
 				else {return false}
 			},

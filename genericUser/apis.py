@@ -43,22 +43,26 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		instance.save()
 
 	def perform_update(self, serializer):
+
+		# 要分開先判斷是否與原始資料相同，再一併存檔
 		if self.request.data.has_key('email'):
 			match_email = serializer.validated_data['email'] == serializer.instance.email
+			auth_email = match_email & serializer.instance.auth_email
 		if self.request.data.has_key('phone'):
 			match_phone = serializer.validated_data['phone'] == serializer.instance.phone
+			auth_phone = match_phone & serializer.instance.auth_phone
+		if self.request.data.has_key('org'):
+			match_org = serializer.validated_data['org'] == serializer.instance.org
+			is_manager = match_org & serializer.instance.is_manager
 
 		if self.request.data.has_key('email'):
-			auth_email = match_email & serializer.instance.auth_email
 			serializer.save(auth_email=auth_email)
-		else:
-			serializer.save()
-
 		if self.request.data.has_key('phone'):
-			auth_phone = match_phone & serializer.instance.auth_phone
 			serializer.save(auth_phone=auth_phone)
-		else:
-			serializer.save()
+		if self.request.data.has_key('org'):
+			serializer.save(is_manager=is_manager)
+
+		serializer.save()
 
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = None
@@ -277,8 +281,7 @@ class DisabilityCardViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet, 
 	permission_classes_by_action = {
 		'create': [AllowAny],
 	}
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, OwnerOrgManagerFilter, DisabilityCardActiveFilter, OrgFilter)
-	#filter_backends = (filters.OrderingFilter, filters.SearchFilter, DisabilityCardActiveFilter,)
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, DisabilityCardActiveFilter, DisabilityCardOrgFilter,)
 	search_fields = ('identity_card_number', 'name',)
 
 	def get_fullpath(self, obj, dir, resource):
@@ -343,6 +346,7 @@ class QAndAViewSet(viewsets.ModelViewSet):
 class OrganizationViewSet(viewsets.ModelViewSet):
 	queryset = Organization.objects.all()
 	serializer_class = OrganizationSerializer
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter,)
 	permission_classes = (
 		RuleORPermissionFactory('list', [
 			'is_manager',

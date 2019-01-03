@@ -28,5 +28,10 @@
 		props: {
 			id_modal: String,	// define type
 		},
+		methods: {
+			open: function(focusAfterClosed){
+				openDialog(this.id_modal, focusAfterClosed)
+			},
+		},
 	}
 </script>

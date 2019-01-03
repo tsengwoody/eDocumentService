@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<modal id_modal="fum">
 		<template slot="header">
 			<h4 class="modal-title">檔案上傳</h4>
@@ -67,6 +67,9 @@
 
 	module.exports = {
 		props: ['url', 'resource_name',],
+		components: {
+			'modal': components['modal'],
+		},
 		data: function(){
 			return {
 				mode: '', //create / update / delete

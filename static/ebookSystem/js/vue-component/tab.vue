@@ -11,7 +11,13 @@
 				:id="'index_tab_' +entry.value"
 				:class="{'tab-pane':true, 'active':(index===0)}"
 			>
-				<h4 class="sr-only">{|{ entry.display_name }|}</h4>
+
+				<h2 v-if="headinglevel===2" class="sr-only">{|{ entry.display_name }|}</h2>
+				<h3 v-if="headinglevel===3" class="sr-only">{|{ entry.display_name }|}</h3>
+				<h4 v-if="headinglevel===4" class="sr-only">{|{ entry.display_name }|}</h4>
+				<h5 v-if="headinglevel===5" class="sr-only">{|{ entry.display_name }|}</h5>
+				<h6 v-if="headinglevel===6" class="sr-only">{|{ entry.display_name }|}</h6>
+
 				<div v-if="$scopedSlots[entry.type]">
 					<slot :name="entry.type" :item="entry.data"></slot>
 				</div>
@@ -27,6 +33,7 @@
 	module.exports = {
 		props: {
 			data: Array,  // define type
+			headinglevel: Number,
 		},
 	}
 </script>

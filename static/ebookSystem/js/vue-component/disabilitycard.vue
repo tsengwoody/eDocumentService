@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 <div id="disabilitycard_register" class="container">
 	<div class="row">
 		<div class="col-sm-4 col-md-4">
@@ -223,15 +223,16 @@
 		},
 		methods: {
 			instance_set: function (event) {
+				let self = this
 				this.pk = event
 
 				if(iser(this.pk)){
 					this.mode = 'create'
 					_.each(this.disabilitycard, function(v, k){
-						this.disabilitycard[k] = ''
+						self.disabilitycard[k] = ''
 					})
 					_.each(this.disabilitycard_temp, function(v, k){
-						this.disabilitycard_temp[k] = ''
+						self.disabilitycard_temp[k] = ''
 					})
 				}
 				else {

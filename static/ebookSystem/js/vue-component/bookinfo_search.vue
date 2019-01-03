@@ -121,8 +121,8 @@
 	module.exports = {
 		props: [],
 		components: {
-			'table-div': httpVueLoader('/static/ebookSystem/js/vue-component/table-div.vue'),
-			'modal': httpVueLoader('/static/ebookSystem/js/vue-component/modal.vue'),
+			'table-div': components['table-div'],
+			'modal': components['modal'],
 		},
 		data: function(){
 			return {

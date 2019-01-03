@@ -1,6 +1,6 @@
-﻿<template>
+<template>
 	<div class="tab-content" style="padding:20px 0px;">
-		<h2>書籍管理</h2>
+		<h3>{|{ org.name }|}</h3>
 		<div id="book_manager_search">
 			<div class="form-inline" style="margin-bottom:20px;">
 				<div class="form-group">
@@ -40,11 +40,13 @@
 
 <script>
 	module.exports = {
+		props: ['org_id',],
 		components: {
 			'table-div': components['table-div'],
 		},
 		data: function() {
 			return {
+				org: {},
 				search_choices: {
 					'0': '未審核',
 					'1': '未校對',
@@ -66,17 +68,29 @@
 			}
 		},
 		mounted: function () {
-			document.title = '書籍管理';
-			this.client = new $.RestClient('/ebookSystem/api/');
-			this.client.add('books');
-			this.client.add('bookadds');
+			let self = this
+
+			this.clientg = new $.RestClient('/genericUser/api/');
+			this.clientg.add('organizations');
+			this.clientg.organizations.read(this.org_id)
+			.done(function(data) {
+				self.org = data
+			})
+			.fail(function(xhr, result, statusText){
+				alertmessage('error', xhr.responseText)
+			})
+
+			this.clientb = new $.RestClient('/ebookSystem/api/');
+			this.clientb.add('books');
+			this.clientb.add('bookadds');
+
 		},
 		methods: {
 			search: function () {
 				let self = this;
 				self.book_datas = []
 
-				self.client.books.read({'bookname': self.search_value, 'status': this.search_filter, 'org_id': user.org,})
+				self.clientb.books.read({'bookname': self.search_value, 'status': this.search_filter, 'org_id': self.org_id})
 				.done(function(data) {
 					filter_data = []
 					_.each(data, function(v){

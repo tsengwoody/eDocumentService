@@ -22,6 +22,7 @@
 				'username': '',
 				user_permission: {
 					'is_active': '',
+					'is_manager': '',
 					'is_editor': '',
 					'is_guest': '',
 					'auth_email': '',
@@ -29,6 +30,7 @@
 				},
 				permission_label: {
 					'is_active': '登錄權限',
+					'is_manager': '單位管理員權限',
 					'is_editor': '志工權限',
 					'is_guest': '視障者權限',
 					'auth_email': '信箱驗證',

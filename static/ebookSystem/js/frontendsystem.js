@@ -1579,7 +1579,7 @@ function genMonth(v){
 	}
 	else {
 		begin_time = year.toString() +'-' +month.toString() +'-01'
-		end_time = year.toString() +'-' +month.toString() +'-' +(date+1).toString()
+		end_time = year.toString() +'-' +month.toString() +'-' +(date).toString()
 	}
 
 	return {

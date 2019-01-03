@@ -1,7 +1,7 @@
-<template>
+﻿<template>
 	<div>
 		<h2>公告列表</h2>
-		<tab :data="data">
+		<tab :headinglevel="3" :data="data">
 			<template slot="table" slot-scope="props">
 				<table-div :datas="props.item" :header="announcement_columns">
 					<template slot="action" slot-scope="props">

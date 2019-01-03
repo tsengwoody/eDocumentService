@@ -10,8 +10,9 @@ def PermissionFilterFactory(attr):
 			owner_id = attr +'_id'
 			owner_kwargs = {owner_id: request.user.id}
 			org_kwargs = {owner_id +'__org': request.user.org.id}
-			if request.user.has_perm('is_manager'):
+			if request.user.has_perm('is_supermanager'):
 				return queryset
+			elif request.user.has_perm('is_manager'):
 				return queryset.filter(
 					Q(**org_kwargs)
 					| Q(**owner_kwargs)
