@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="sitemap">
 		<h2>網站導覽 <span id="span_more" class="label label-warning" style="display:none; font-size:12pt;">登入後有更多使用者功能!</span></h2>
 		<ul>
@@ -35,7 +35,7 @@
 				let enc = vo_eds_nav.$refs.eds_nav_instance
 				this.items.push(...enc.item_show(enc.nav_item))
 				this.items.push(...enc.item_show(enc.nav_item_right))
-			}, 1000)
+			}, 0)
 		},
 		methods: {
 			test: function(){

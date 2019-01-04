@@ -7,10 +7,12 @@
 
 <div id="edsnav">
 	<eds_nav
-		v-if="1==1"
-		ref="eds_nav_instance"></eds_nav
-	><eds_nav_org
-		v-else
+		v-if="mode==='all'"
+		v-on:mode-change="mode_change('self')"
+		ref="eds_nav_instance"></eds_nav>
+		<eds_nav_org
+		v-if="mode==='self'"
+		v-on:mode-change="mode_change('all')"
 		ref="eds_nav_org_instance"
 	></eds_nav_org>
 </div>
@@ -25,15 +27,29 @@
 			'eds_nav_org': components['eds_nav_org'],
 		},
 		data: {
+			'mode': 'all', //all, self
 		},
 		created: function () {
 		},
 		mounted: function () {
+			//get Cookies
+			mode = Cookies.get('nav_mode');
+
+			if (iser(mode)) {
+				this.mode = 'all'
+			}
+			else {
+				this.mode = mode
+			}
 		},
 		methods: {
-			test: function(){
-				c = this.$refs.eds_nav_instance.nav_item
-				console.log(c)
+			mode_change: function(mode){
+				this.mode = mode
+
+				//set Cookies
+				Cookies.set('nav_mode', mode);
+
+				window.location.replace('/')
 			},
 		},
 	})

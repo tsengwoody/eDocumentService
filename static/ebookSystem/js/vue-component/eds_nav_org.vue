@@ -44,6 +44,7 @@
 							<li class="dropdown"><a :href="item.url">{|{ item.display_name }|}</a></li>
 						</template>
 					</template>
+					<li class="dropdown"><a href="#" @click="mode_change()">一般版</a></li>
 				</ul>
 			</div>
 		</div>
@@ -154,19 +155,6 @@
 						'display_name': '平台書庫',
 						'permission': ['true'],
 						'url': '/routing/ebookSystem/book_repository/',
-					},
-					{
-						type: 'folder',
-						'display_name': '專案合作',
-						'permission': ['true'],
-						'items': [
-							{
-								type: 'item',
-								'display_name': '法鼓山(107年度)',
-								'permission': ['true'],
-								'url': '/generics/ddm/',
-							},
-						],
 					},
 				],
 				'nav_item_right': [
@@ -389,6 +377,10 @@
 					}
 				})
 				return items
+			},
+			mode_change: function(){
+				let self = this
+				self.$emit('mode-change')
 			},
 		},
 	}

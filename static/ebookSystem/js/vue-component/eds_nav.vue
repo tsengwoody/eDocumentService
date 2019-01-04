@@ -44,6 +44,7 @@
 							<li class="dropdown"><a :href="item.url">{|{ item.display_name }|}</a></li>
 						</template>
 					</template>
+					<li class="dropdown"><a href="#" @click="mode_change()">校園版</a></li>
 				</ul>
 			</div>
 		</div>
@@ -486,6 +487,10 @@
 					}
 				})
 				return items
+			},
+			mode_change: function(){
+				let self = this
+				self.$emit('mode-change')
 			},
 		},
 	}
