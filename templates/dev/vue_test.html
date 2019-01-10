@@ -1,0 +1,85 @@
+﻿{% extends "base_nav.html" %}
+{% block title %}
+測試
+{% endblock %}
+{% block content %}
+
+{% csrf_token %} 
+
+<div id="app">
+	<h1>123</h1>
+	<button
+		@click="send_with_jwt()"
+	>測試jwt</button>
+	<button
+		@click="send()"
+	>測試</button>
+	{|{ users }|}
+	{|{ token }|}
+</div>
+
+<script>
+function foo(a) {
+    console.log( a + b );
+    b = a;
+    var b=1
+}
+
+foo( 2 );
+
+
+	Vue.options.delimiters = ['{|{', '}|}'];
+
+	new Vue({
+		el: '#app',
+		components: {
+		},
+		data: {
+			users: ['123'],
+			token: '',
+		},
+		mounted: function(){
+			let self = this
+
+			rest_aj_send('post', '/api-token-auth/', {'username': 'root', 'password': 'eds@2018',})
+			.done(function(data) {
+				self.token = data['data']['token']
+				Cookies.set('token', data['data']['token']);
+			})
+			.fail(function(xhr, result, statusText){
+				alertmessage('error', o2j(xhr))
+			})
+		},
+		methods: {
+			send: function () {
+				let self = this
+
+				rest_aj_send('get', '/genericUser/api/users/', {})
+				.done(function(data) {
+					self.users = data['data']
+				})
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', o2j(xhr))
+				})
+
+
+			},
+			send_with_jwt: function () {
+				let self = this
+
+				rest_aj_send_with_jwt('get', '/genericUser/api/users/', {}, self.token)
+				.done(function(data) {
+					self.users = data['data']
+				})
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', o2j(xhr))
+				})
+
+
+			},
+		},
+	});
+
+</script>
+
+{% endblock %}

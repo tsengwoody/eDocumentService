@@ -1,5 +1,5 @@
-﻿<template>
-	<div class="modal fade" :id="id_modal" role="dialog" aria-modal="true">
+<template>
+	<div class="modal fade" :id="id_modal" :ref="id_modal +'_instance'" role="dialog" aria-modal="true">
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content alert-info" style="background-color: #f5f5f5;">
 				<div class="modal-header">
@@ -31,6 +31,9 @@
 		methods: {
 			open: function(focusAfterClosed){
 				openDialog(this.id_modal, focusAfterClosed)
+			},
+			close: function(){
+				closeDialog(this.$refs[this.id_modal +'_instance'])
 			},
 		},
 	}

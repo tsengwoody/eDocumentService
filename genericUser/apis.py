@@ -281,7 +281,7 @@ class DisabilityCardViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet, 
 	permission_classes_by_action = {
 		'create': [AllowAny],
 	}
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, DisabilityCardActiveFilter, DisabilityCardOrgFilter,)
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, OwnerOrgManagerFilter, DisabilityCardActiveFilter, DisabilityCardOrgFilter,)
 	search_fields = ('identity_card_number', 'name',)
 
 	def get_fullpath(self, obj, dir, resource):

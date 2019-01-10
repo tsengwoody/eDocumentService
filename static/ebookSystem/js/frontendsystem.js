@@ -729,131 +729,6 @@ function lm_minu() {
 
 }
 
-function dict2grid(ar, tabid) {
-	//字典陣列轉出基本table
-
-	//head
-
-	let head = ar[0];
-	head = _.keys(head);
-
-	//c
-	let c = '';
-	c += '<table id="' + tabid + '">';
-	c += '<thead>';
-	_.each(head, function (key) {
-		c += '<th>' + key + '</th>';
-	})
-	c += '</thead>';
-	c += '<tbody>';
-	_.each(ar, function (v, k) {
-		c += '<tr>';
-		_.each(head, function (key) {
-			c += '<td>' + v[key] + '</td>';
-		})
-		c += '</tr>';
-	})
-	c += '</tbody>';
-	c += '</table>';
-
-	return c;
-}
-
-function grid2bstable(tabid) {
-	//基本table賦予class與sytle
-
-	//tab
-	let tab = $('#' + tabid);
-
-	//table
-	tab.addClass('table table-hover table-rwd').css({
-		'margin': '10px 0px',
-	});
-
-	//thead
-	let thead = tab.find('thead');
-	thead.css({
-		'background-color': '#eee',
-	});
-
-	//thead tr
-	thead.find('tr').addClass('tr-only-hide');
-
-	//tr border
-	tab.find('tr').css({
-		'border': '0px', //清除bs預設tr的border
-		'border-bottom': '1px solid #ddd',
-	});
-
-	//ths
-	let ths = tab.find('th');
-	ths.css({
-		'text-align': 'center',
-		'vertical-align': 'top',
-		'padding': '10px 0px',
-		'border': '0px', //清除bs預設th的border
-		'border-top': '1px solid #ddd',
-	});
-
-	//tds
-	let tds = tab.find('td');
-	tds.css({
-		'vertical-align': 'top',
-		'padding': '5px',
-	});
-
-	//vths
-	let vths = [];
-	ths.each(function () {
-		let th = $(this);
-		vths.push(th.text());
-	})
-
-	//tbody trs
-	let trs = tab.find('tbody').find('tr');
-
-	//td add data-th
-	trs.each(function () {
-		let tr = $(this);
-		let tds = tr.find('td');
-		_.each(vths, function (v, k) {
-			tds.eq(k).attr('data-th', v);
-		})
-	})
-
-}
-
-function pagetab(data) {
-	//產生分頁頁籤
-
-	let c = '';
-	c += '<ul class="nav nav-tabs">';
-
-	//each li
-	let li_active = 'active';
-	let li_expanded = 'true';
-	_.each(data, function (v, k) {
-		c += '<li class="' + li_active + '"><a onkeydown="keyspace2enter(event,this);" href="#' + v['id'] + '" name="' + v['name'] + '" prop="' + v['prop'] + '" data-toggle="tab" aria-expanded="' + li_expanded + '">' + v['title'] + '</a></li>';
-		li_active = '';
-		li_expanded = 'false';
-	})
-
-	c += '</ul>';
-
-	c += '<div class="tab-content">';
-
-	//each div
-	let div_active = 'active';
-	_.each(data, function (v, k) {
-		c += '<div id="' + v['id'] + '" class="tab-pane ' + div_active + '" style="margin-top:20px;"></div>';
-		div_active = '';
-	})
-
-	c += '</div>';
-
-	return c;
-}
-
 function pagetab_subtabfix(me) {
 	//修正多層分頁會於上層切換分頁時，導致次分頁aria-expanded都被改為ture，使nvda無法順利讀取
 
@@ -1203,98 +1078,6 @@ function aj_binary(url, transferData) {
 	return df;
 }
 
-function aj_booklist_dict(key2head, k) {
-	//書籍中英鍵值轉換
-
-	let o = {
-		'ISBN': 'ISBN',
-		'bookname': '書名',
-		'bookbinding': '裝訂冊數',
-		'order': '版次',
-		'author': '作者',
-		'house': '出版社',
-		'date': '出版日期',
-		'chinese_book_category': '中文圖書分類號',
-		'source': '來源',
-	};
-	let p = {
-		'ISBN': 'ISBN',
-		'書名': 'bookname',
-		'裝訂冊數': 'bookbinding',
-		'版次': 'order',
-		'作者': 'author',
-		'出版社': 'house',
-		'出版日期': 'date',
-		'中文圖書分類號': 'chinese_book_category',
-		'來源': 'source',
-	};
-
-	let q;
-	if (key2head) {
-		q = o;
-	}
-	else {
-		q = p;
-	}
-
-	if (haskey(q, k)) {
-		return q[k];
-	}
-	else {
-		return k
-	}
-
-}
-
-function aj_booklist_dict_array(ar, key2head) {
-	//書籍中英鍵值物件轉換
-
-	function forobj(o) {
-		let r = {};
-		_.each(o, function (vv, kk) {
-			let knew = aj_booklist_dict(key2head, kk);
-			r[knew] = vv;
-		})
-		return r;
-	}
-
-	let r = [];
-	_.each(ar, function (vv, kk) {
-		r.push(forobj(vv));
-	})
-
-	return r;
-}
-
-function aj_booksetpriority(password, ISBN, priority) {
-	//使用API book_action
-
-	//df
-	let df = GenDF();
-
-	//url
-	let url = '/ebookSystem/book_action/';
-
-	//transferData
-	let transferData = {
-		'action': 'set_priority',
-		'ISBN': ISBN,
-		'password': password,
-		'priority': priority,
-	};
-
-	//aj_post
-	rest_aj_send('post', url, transferData)
-		.done(function (data) {
-			df.resolve(data);
-		})
-		.fail(function (data) {
-			df.reject(data);
-		})
-
-	return df;
-}
-
 function rest_aj_send(type, url, transferData) {
 	//ajax傳送訊息
 
@@ -1471,6 +1254,72 @@ function rest_aj_upload(url, transferData) {
 	refreshIntervalId=setInterval(function() {
 		showProgress(uuid);
 	},1000);
+
+	return df;
+
+}
+
+function rest_aj_send_with_jwt(type, url, transferData, jwt_token) {
+	//ajax傳送訊息
+
+	//df
+	let df = GenDF();
+
+	//ajax
+	$.ajax({
+		url: url,
+		type: type,
+		data: transferData,
+		//ata: JSON.stringify(transferData),
+		//contentType: 'application/json', //default: 'application/x-www-form-urlencoded; charset=UTF-8'
+		beforeSend: function (jqXHR, settings) {
+			jqXHR.setRequestHeader('Authorization', 'JWT ' +jwt_token);
+			if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+				let g = aj_getcsrf();
+				jqXHR.setRequestHeader('X-CSRFToken', g['X-CSRFToken']);
+				jqXHR.setRequestHeader('X-Requested-With', g.XMLHttpRequest)
+			}
+		},
+		'error': function (xhr) {
+
+			//reject
+			let res = {
+				'status': xhr.status,
+				'message': '伺服器錯誤回應: ' +xhr.status +' - ' +xhr.responseText,
+			};
+
+			df.reject(res);
+
+		},
+		success: function(data, textStatus, xhr) {
+			if (xhr.status >= 200 && xhr.status < 300) {
+				let res = {
+					'status': xhr.status,
+					'data': data,
+					'message': '',
+				};
+				if(!iser(data)){
+					if (data.hasOwnProperty('detail')){
+						res['message'] = '伺服器成功操作: ' +xhr.status +' - ' +data['detail']
+					}
+				}
+				else {
+					res['message'] = '伺服器成功操作: ' +xhr.status +' - '
+				}
+
+				df.resolve(res);
+			}
+			else {
+				//reject
+				let res = {
+					'status': 'error',
+					'message': o2j(data),
+				};
+
+				df.reject(res);
+			}
+		}
+	})
 
 	return df;
 

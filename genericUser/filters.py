@@ -37,12 +37,20 @@ class AnnouncementNewestFilter(filters.BaseFilterBackend):
 		else:
 			return queryset
 
+from django.db.models import F,Q
 class UserSelfOrManagerFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
-		if request.user.has_perm('is_manager'):
+		owner_kwargs = {'id': request.user.id}
+		org_kwargs = {'org': request.user.org.id}
+		if request.user.has_perm('is_supermanager'):
 			return queryset
+		elif request.user.has_perm('is_manager'):
+			return queryset.filter(
+				Q(**org_kwargs)
+				| Q(**owner_kwargs)
+			)
 		else:
-			return queryset.filter(id=request.user.id)
+			return queryset.filter(**owner_kwargs)
 
 class UserAuthFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):

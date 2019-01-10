@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="book_detail" class="container">
 		<h3>書籍詳細</h3>
 
@@ -134,9 +134,6 @@
 			
 		},
 		computed: {
-			url: function () {
-				return '/ebookSystem/api/bookadds/' +this.pk +'/'
-			},
 			ebook: function () {
 				if (!iser(this.book.ebook_set)) {
 					return this.book.ebook_set[this.ebook_index];
@@ -211,10 +208,7 @@
 					rest_aj_send('post', url, {})
 					.done(function(data) {
 						alertmessage('success', data['message'])
-						rest_aj_send('get', self.url, {})
-						.done(function(data) {
-							self.book = data['data']
-						})
+						self.get_overall_datas()
 					})
 					.fail(function(xhr, result, statusText){
 						alertmessage('error', xhr.responseText)

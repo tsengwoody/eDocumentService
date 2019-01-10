@@ -1,7 +1,5 @@
-<!-- {% include 'comp/upload_dialog.html' %} -->
-
 <template>
-	<div id="book_create">
+	<div>
 		<h2>文件上傳</h2>
 		<book_upload category="self"></book_upload>
 	</div>

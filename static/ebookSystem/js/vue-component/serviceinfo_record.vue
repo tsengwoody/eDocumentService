@@ -49,9 +49,12 @@
 
 		<div id="serviceinfo_record_redeeming" class="tab-pane">
 			<h4>兌換中</h4>
-			<table-div :datas="exchange_false_serviceinfos" :header="exchange_serviceinfos_columns">
+			<table-div :datas="exchange_false_serviceinfos" :header="exchange_false_serviceinfos_columns">
 				<template slot="editrecord_set" slot-scope="props">
 					<button class="btn btn-default" @click="editrecords_detail(props.item); openDialog('editrecords_detail', this);">詳細服務紀錄</button>
+				</template>
+				<template slot="serviceinfo_delete" slot-scope="props">
+					<button class="btn btn-default" @click="serviceinfo_delete(props.item);">取消申請</button>
 				</template>
 			</table-div>
 
@@ -59,7 +62,7 @@
 
 		<div id="serviceinfo_record_redeemed" class="tab-pane">
 			<h4>已兌換</h4>
-			<table-div :datas="exchange_true_serviceinfos" :header="exchange_serviceinfos_columns">
+			<table-div :datas="exchange_true_serviceinfos" :header="exchange_true_serviceinfos_columns">
 				<template slot="editrecord_set" slot-scope="props">
 					<button class="btn btn-default" @click="editrecords_detail(props.item); openDialog('editrecords_detail', this);">詳細服務紀錄</button>
 				</template>
@@ -103,8 +106,15 @@
 					category: '類型',
 				},
 				exchange_false_serviceinfos: [],
+				exchange_false_serviceinfos_columns: {
+					date: '兌換日期',
+					service_hours: '服務時數',
+					org: '兌換單位',
+					editrecord_set: '服務紀錄',
+					serviceinfo_delete: '動作',
+				},
 				exchange_true_serviceinfos: [],
-				exchange_serviceinfos_columns: {
+				exchange_true_serviceinfos_columns: {
 					date: '兌換日期',
 					service_hours: '服務時數',
 					org: '兌換單位',
@@ -202,6 +212,7 @@
 							service_hours: v['service_hours'],
 							'org': v['orginfo'].name,
 							editrecord_set: v.editrecordinfo_set,
+							serviceinfo_delete: v.id,
 						})
 					})
 				})
@@ -268,6 +279,22 @@
 				})
 				.fail(function(data){
 					alertmessage('error', data['message'])
+				})
+
+			},
+			serviceinfo_delete: function(id){
+				let self = this
+
+				alertconfirm('是否確認取消申請該服務時數(id:' +id +')？')
+				.done(function(){
+					self.clientg.serviceinfos.del(id)
+					.done(function(data) {
+						alertmessage('success', '已取消申請兌換時數(id:' +id +')，請重新選擇服務紀錄。')
+						self.refresh()
+					})
+					.fail(function(xhr, result, statusText){
+						alertmessage('error', xhr.responseText)
+					})
 				})
 
 			},

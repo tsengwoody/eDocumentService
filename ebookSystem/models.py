@@ -580,6 +580,11 @@ class LibraryRecord(Library):
 	owner = models.ForeignKey(User, related_name='libraryrecord_set')
 	object = models.ForeignKey(Book, related_name='libraryrecord_set')
 
+	def __init__(self, *args, **kwargs):
+		super(Library, self).__init__(*args, **kwargs)
+		self.epub = BASE_DIR +u'/file/ebookSystem/library/{0}{1}.epub'.format(self.id, self.object.book_info.bookname)
+		self.txt = BASE_DIR +u'/file/ebookSystem/library/{0}{1}.txt'.format(self.id, self.object.book_info.bookname)
+
 class Recommend(models.Model):
 	content = models.TextField()
 	date = models.DateField(default = timezone.now)

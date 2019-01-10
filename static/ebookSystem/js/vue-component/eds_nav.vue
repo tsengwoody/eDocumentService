@@ -371,40 +371,6 @@
 			}
 		},
 		computed: {
-			'nav_item_show': function () {
-				items = []
-				_.each(this.nav_item, v => {
-					if(this.item_permission(this.user, v.permission)){
-						item = {
-							'type': v.type,
-							'display_name': v.display_name,
-						}
-						if(v.type==='folder'){
-							item.items = []
-							_.each(v.items, v_item => {
-								if(this.item_permission(this.user, v_item.permission)){
-									item.items.push({
-										'type': v_item.type,
-										'display_name': v_item.display_name,
-										'url': v_item.url,
-									})
-								}
-							})
-							if(item.items.length>0){
-								items.push(item)
-							}
-						}
-						if(v.type==='item'){
-							item.url = v.url
-							items.push(item)
-						}
-					}
-				})
-				return items
-			},
-			'nav_item_right_show': function () {
-				
-			},
 		},
 		created: function () {
 		},
@@ -435,47 +401,16 @@
 					return false
 				}
 			},
-			'item_show': function (nav_item) {
-				items = []
+			'item_show': function item_show(nav_item) {
+				let items = []
 				_.each(nav_item, v => {
 					if(this.item_permission(this.user, v.permission)){
-						item = {
+						let item = {
 							'type': v.type,
 							'display_name': v.display_name,
 						}
 						if(v.type==='folder'){
-							item.items = []
-							_.each(v.items, v_item => {
-								if(v_item.type==='item' && this.item_permission(this.user, v_item.permission)){
-									item.items.push({
-										'type': v_item.type,
-										'display_name': v_item.display_name,
-										'url': v_item.url,
-									})
-								}
-							})
-							if(item.items.length>0){
-								items.push(item)
-							}
-						}
-						if(v.type==='item'){
-							item.url = v.url
-							items.push(item)
-						}
-					}
-				})
-				return items
-			},
-			'item_show2': function (nav_item) {
-				items = []
-				_.each(nav_item, v => {
-					if(this.item_permission(this.user, v.permission)){
-						item = {
-							'type': v.type,
-							'display_name': v.display_name,
-						}
-						if(v.type==='folder'){
-							item.items = this.item_show2(v.items)
+							item.items = this.item_show(v.items)
 							if(item.items.length>0){
 								items.push(item)
 							}

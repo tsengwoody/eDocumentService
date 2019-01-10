@@ -78,20 +78,26 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	@detail_route(
-		methods=['post'],
+		methods=['get', 'post'],
 		url_name='set_priority',
 		url_path='action/set_priority',
 	)
 	def set_priority(self, request, pk=None):
 		res = {}
-		obj = self.get_object()
-		try:
-			res['priority'] = priority = int(request.POST['priority'])
-			obj.priority = priority
-			obj.save()
-		except BaseException as e:
-			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+		if request.method == 'GET':
+			obj = self.get_object()
+			res['priority'] = obj.priority
+			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+		if request.method == 'POST':
+			obj = self.get_object()
+			try:
+				res['priority'] = priority = int(request.POST['priority'])
+				obj.priority = priority
+				obj.save()
+				res['priority'] = obj.priority
+			except BaseException as e:
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+			return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	@list_route(
 		methods=['post'],

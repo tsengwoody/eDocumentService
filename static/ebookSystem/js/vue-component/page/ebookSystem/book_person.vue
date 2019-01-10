@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="book_person">
 		<h2>校對進度</h2>
 		<tab :data="data">
@@ -9,7 +9,12 @@
 						<button class="btn btn-default" @click="book_del(props.item.ISBN)">刪除</button>
 					</template>
 					<template slot="active_book_action" slot-scope="props">
-						<button class="btn btn-default send_button" @click="BookSetPriority(props.item.ISBN)">設定權重</button>
+						<button
+							class="btn btn-default send_button"
+							@click="
+							$refs['sp_instance'].instance_set(props.item.ISBN);
+							$refs['spm_instance'].open('book_person');
+						">設定權重</button>
 						<a class="btn btn-default" :href="'/routing/ebookSystem/book_detail/' +props.item.ISBN +'/'" target="_blank" title="分段資訊(另開新視窗)">分段資訊</a>
 					</template>
 				</table-div>
@@ -18,6 +23,26 @@
 				<bookinfo_repository :datas="props.item.datas" :header="props.item.header"></bookinfo_repository>
 			</template>
 		</tab>
+		<modal :id_modal="'spm'" ref="spm_instance">
+			<template slot="header">
+				<h4 class="modal-title">權重設定</h4>
+			</template>   
+			<template slot="body">
+				<div class="form-horizontal">
+					<set_priority
+						ref="sp_instance"
+						v-on:update="
+							get_table_data();
+							$refs['spm_instance'].close();
+					"></set_priority>
+				</div>
+			</template>
+			<template slot="footer">
+				<button class="btn btn-default"
+					@click="$refs.sp_instance.set_priority()"
+				>送出</button>
+			</template>
+		</modal>
 	</div>
 </template>
 
@@ -26,7 +51,9 @@
 		components: {
 			'table-div': components['table-div'],
 			'tab': components['tab'],
+			'modal': components['modal'],
 			'bookinfo_repository': components['bookinfo_repository'],
+			'set_priority': components['set_priority'],
 		},
 		data: function() {
 			return {

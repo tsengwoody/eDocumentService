@@ -2,7 +2,13 @@
 	<div>
 		<ul class="nav nav-tabs">
 			<template v-for="(entry, index) in data">
-				<li role="tab" :class="{'active':(index===0)}"><a :href="'#index_tab_' +entry.value" name="index_tab_grp" data-toggle="tab" :aria-expanded="!!(index===0)" @click="pagetab_subtabfix(this);">{|{ entry.display_name }|}</a></li>
+				<template v-if="index===0">
+					<li role="tab" class="active"><a :href="'#index_tab_' +entry.value" name="index_tab_grp" data-toggle="tab" aria-expanded="true" @click="pagetab_subtabfix(this);">{|{ entry.display_name }|}</a></li>
+				</template>
+				<template v-else>
+					<li role="tab"><a :href="'#index_tab_' +entry.value" name="index_tab_grp" data-toggle="tab" aria-expanded="false" @click="pagetab_subtabfix(this);">{|{ entry.display_name }|}</a></li>
+				</template>
+
 			</template>
 		</ul>
 		<div class="tab-content" style="padding:20px 0px;">

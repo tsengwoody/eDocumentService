@@ -23,8 +23,8 @@
 				<button
 					style="margin: 0.5em;"
 					class="btn btn-default"
-					@click="ScanBookEditor('掃描內容瀏覽', item.ISBN_part)"
-				>分段{|{ item.part }|}</button>
+					@click="ScanBookEditor('掃描內容瀏覽', item)"
+				>分段{|{ item.split('-')[1] }|}</button>
 			</template>
 
 			<!--step 3-->
@@ -79,20 +79,18 @@
 			document.title = '文件審核';
 			this.pk = window.location.pathname.split('/');
 			this.pk = this.pk[this.pk.length-2];
-			console.log(this.pk);
 			this.client = new $.RestClient('/ebookSystem/api/');
-			this.client.add('bookadds');
+			this.client.add('books');
 			this.get_book_data()
 		},
 		methods: {
 			get_book_data: function(){
 				let self = this;
 
-				self.client.bookadds.read(self.pk)
+				self.client.books.read(self.pk)
 				.done(function(data) {
 					self.book = data;
 				})
-				console.log(self.book);
 			},
 			review: function () {
 				let self = this

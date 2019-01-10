@@ -82,8 +82,6 @@
 
 			this.clientb = new $.RestClient('/ebookSystem/api/');
 			this.clientb.add('books');
-			this.clientb.add('bookadds');
-
 		},
 		methods: {
 			search: function () {

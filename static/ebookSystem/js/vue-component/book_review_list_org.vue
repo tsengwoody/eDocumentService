@@ -58,7 +58,6 @@
 
 			this.clientb = new $.RestClient('/ebookSystem/api/');
 			this.clientb.add('books');
-			this.clientb.add('bookadds');
 
 			self.clientb.books.read({'status': '0', 'org_id': self.org_id})
 			.done(function(data) {
