@@ -1,22 +1,25 @@
 ﻿<template>
 	<div id="service">
-		<div id="buttonGroup" style="text-align: center;">
-			<div>
-				<div>領取</div>
-				<select
-					v-if="choice_org"
-					class="form-control"
-					v-model="org_id"
-				>
-							<option value="0" selected="selected">全部</option>
-							<option v-for="(value, key) in orgs" :value="value.id">{|{ value.name }|}</option>
-				</select>
-				<div
-					v-if="!choice_org"
-				>{|{ org.name }|}</div>
-				<div>的文件</div>
+		<div style="text-align: center;">
+			<form class="form-inline">
+				<span style="margin-right:1em;">
+					領取
+					<select
+						v-if="choice_org"
+						class="form-control"
+						v-model="org_id"
+					>
+						<option value="0" selected="selected">全部</option>
+						<option v-for="(value, key) in orgs" :value="value.id">{|{ value.name }|}</option>
+					</select>
+					<template
+						v-if="!choice_org"
+					>{|{ org.name }|}</template>
+					的文件
+				</span>
 				<button class="btn btn-lg btn-default" type="button" @click="get_ebook()">領文件</button>
-			</div>
+			</form>
+			
 			<div style="padding:10px; color:#ff2200; font-size:12pt;">注意：未於期限內完成校對動作將自動歸還文件，將無法計入當月服務時數</div>
 		</div>
 
@@ -24,7 +27,7 @@
 			<h4 class="page-header">正校對文件</h4>
 			<table-div :datas="edit_ebook" :header="edit_ebook_header">
 				<template slot="action" slot-scope="props">
-					<a class="btn btn-default" role="button" :href="'/ebookSystem/edit/' +props.item.ISBN_part +'/'">編輯</a>
+					<a class="btn btn-default" role="button" :href="'/routing/ebookSystem/edit/' +props.item.ISBN_part +'/'">編輯</a>
 					<button class="btn btn-default" @click="reback_ebook(props.item.ISBN_part)">還文件</button>
 				</template>
 			</table-div>

@@ -1,5 +1,5 @@
 <template>
-	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<nav class="navbar navigation-clean-button navbar-fixed-top" role="navigation">
 		<div class="container">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -385,3 +385,39 @@
 		},
 	}
 </script>
+
+<style>
+nav.navigation-clean-button {
+	background: #badc58;
+}
+
+nav.navigation-clean-button a:hover {
+	background: #b8e994;
+}
+
+.nav .open>a, .nav .open>a:hover, .nav .open>a:focus {
+	background-color: #b8e994;
+	background: #b8e994;
+}
+
+nav.navigation-clean-button li.open a:hover {
+	background-color: #b8e994;
+}
+
+nav.navigation-clean-button li.open a:active {
+	background: #b8e994;
+}
+
+
+
+nav.navigation-clean-button * {
+	color: #333;
+}
+
+div.navbar-header {
+	font-weight: bold;
+    color: inherit;
+}
+
+
+</style>
