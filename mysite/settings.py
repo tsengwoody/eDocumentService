@@ -226,6 +226,11 @@ REST_FRAMEWORK = {
     )
 }
 
+import datetime
+JWT_AUTH = {
+	'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=30),
+	'JWT_ALLOW_REFRESH': True,
+}
 BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']

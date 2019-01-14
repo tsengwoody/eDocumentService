@@ -173,106 +173,14 @@ div.tbody .cell {
 <script>
 
 	module.exports = {
-		props: {
-			datas: Array,  // define type
-			header: Object,
-		},
+		mixins: [base_table],
 		data: function () {
 			return {
 				key: '',
 				orderby: '',
-				numperpage: 10,
-				pagenow: 1,
-				showPrevMore: false,
-				showNextMore: false,
-				pagerCount: 7,
 			}
 		},
-		computed: {
-			numpage: function () {
-				return Math.ceil(this.datas.length / this.numperpage);
-			},
-			numrow: function () {
-				return this.datas.length
-			},
-			start: function () {
-				return this.numperpage *(this.pagenow -1)
-			},
-			end: function () {
-				return Math.min(this.numperpage *(this.pagenow), this.numrow)
-			},
-			pagers() {
-				const pagerCount = this.pagerCount;
-				const halfPagerCount = (this.pagerCount - 1) / 2;
-				const currentPage = Number(this.pagenow);
-				const pageCount = Number(this.numpage);
-				let showPrevMore = false;
-				let showNextMore = false;
-				if (pageCount > pagerCount) {
-					if (currentPage > pagerCount - halfPagerCount) {
-					  showPrevMore = true;
-					}
-					if (currentPage < pageCount - halfPagerCount) {
-					  showNextMore = true;
-					}
-				}
-				const array = [];
-				if (showPrevMore && !showNextMore) {
-					const startPage = pageCount - (pagerCount - 2);
-					for (let i = startPage; i < pageCount; i++) {
-					  array.push(i);
-					}
-				} 
-				else if (!showPrevMore && showNextMore) {
-					for (let i = 2; i < pagerCount; i++) {
-					  array.push(i);
-					}
-				} 
-				else if (showPrevMore && showNextMore) {
-					const offset = Math.floor(pagerCount / 2) - 1;
-					for (let i = currentPage - offset; i <= currentPage + offset; i++) {
-					  array.push(i);
-					}
-				} 
-				else {
-					for (let i = 2; i < pageCount; i++) {
-					  array.push(i);
-					}
-				}
-
-				this.showPrevMore = showPrevMore;
-				this.showNextMore = showNextMore;
-				return array;
-			},
-		},
-		watch: {
-			datas: function (val) {
-				this.pagenow = 1
-			},
-		},
 		methods: {
-			pagin_change(oper) {
-				const pagerCountOffset = this.pagerCount - 2;
-
-				if (String(oper) === '+1') {
-					this.pagenow += 1;
-				} 
-				else if (String(oper) === '-1') {
-					this.pagenow -= 1;
-				} 
-				else if (String(oper) === 'quickprev') {
-					this.pagenow = this.pagenow - pagerCountOffset;
-				} 
-				else if (String(oper) === 'quicknext') {
-					this.pagenow = this.pagenow + pagerCountOffset;
-				} 
-				else {
-					this.pagenow = parseInt(oper, 10);
-				}
-
-				this.pagenow = Math.max(this.pagenow, 1);
-				this.pagenow = Math.min(this.pagenow, this.numpage);
-			},
 			order: function(key, orderby) {
 				if(this.key === key){
 					if(this.orderby==='asc'){

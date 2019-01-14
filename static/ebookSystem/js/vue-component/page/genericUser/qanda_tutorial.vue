@@ -2,7 +2,7 @@
 	<div id="qanda_tutorial">
 		<h2>教學內容</h2>
 		<button
-			v-if="user.is_manager"
+			v-if="user.is_supermanager"
 			class="btn btn-primary"
 			@click="qanda_create()"
 		>新建</button>
@@ -18,20 +18,20 @@
 			</template>
 			<template slot="action" slot-scope="props">
 				<button
-					v-if="user.is_manager"
+					v-if="user.is_supermanager"
 					class="btn btn-primary"
 					@click="qanda_update(props.item.id)"
 				>編輯</button>
 				<!--data-toggle="modal" :data-target="'#qm'"-->
 				<button
-					v-if="user.is_manager"
+					v-if="user.is_supermanager"
 					class="btn btn-primary"
 					@click="qanda_del(props.item.id)"
 				>刪除</button>
 			</template>
 		</table-div-row>
 	
-		<modal id_modal="qm">
+		<modal id_modal="qm" ref="qm_instance">
 			<template slot="header">
 				<h4 class="modal-title">Q&A 編修</h4>
 			</template>

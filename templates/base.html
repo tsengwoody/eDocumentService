@@ -21,7 +21,7 @@
 	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-tmpl-1.4.2.min.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-binarytransport.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-pp.js' %}"></script>
-	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-rest-1.0.4.js' %}"></script>
+	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-rest-1.0.5.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-mousewheel-3.1.13.min.js' %}"></script>
 
 	<script language="javascript" src="{% static 'ebookSystem/js/lodash-4.17.4.js' %}"></script>
@@ -30,6 +30,7 @@
 	<script language="javascript" src="{% static 'ebookSystem/js/base64js.min.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/md5-2.10.0.min.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/js-cookie-2.2.0.min.js' %}"></script>
+	<script language="javascript" src="{% static 'ebookSystem/js/jwt-decode-2.2.js' %}"></script>
 
 	<!-- vue -->
 	<script language="javascript" src="/static/ebookSystem/js/vue-2.5.16.min.js"></script>
@@ -115,6 +116,7 @@
 			//ltjs
 			let ltjs = [];
 			ltjs.push('/static/ebookSystem/js/frontendsystem.js');
+			ltjs.push('/static/ebookSystem/js/token.js');
 
 			function comadd_css(href) {
 				return '<link rel="stylesheet" href="' + href + '"\>';

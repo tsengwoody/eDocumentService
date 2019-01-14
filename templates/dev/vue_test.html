@@ -8,6 +8,21 @@
 
 <div id="app">
 	<h1>123</h1>
+	<div>{|{ now }|}</div>
+	<button
+		@click="decode()"
+	>測試jwt decode</button>
+	<div>{|{ jwt_decoded }|}</div>
+	<div>{|{ human_exp }|}</div>
+
+	<button
+		@click="refresh()"
+	>測試jwt refresh</button>
+
+	<button
+		@click="check()"
+	>測試jwt過期</button>
+
 	<button
 		@click="send_with_jwt()"
 	>測試jwt</button>
@@ -19,14 +34,19 @@
 </div>
 
 <script>
-function foo(a) {
-    console.log( a + b );
-    b = a;
-    var b=1
+function Foo() { 
+    // ...
 }
 
-foo( 2 );
+Foo.prototype.test = 1
 
+var a = new Foo();
+var b = new Foo();
+console.log(Object.getPrototypeOf(a) === Object.getPrototypeOf(b))
+console.log(a.test)
+//console.log(Object.getPrototypeOf( a ) === Foo.prototype)
+
+	console.log($.RestClient.prototype.ajax)
 
 	Vue.options.delimiters = ['{|{', '}|}'];
 
@@ -37,20 +57,46 @@ foo( 2 );
 		data: {
 			users: ['123'],
 			token: '',
+			jwt_decoded: '',
+		human_exp: '',
+		now: '',
 		},
 		mounted: function(){
 			let self = this
 
-			rest_aj_send('post', '/api-token-auth/', {'username': 'root', 'password': 'eds@2018',})
+			get_token('root', '1234QWER')
 			.done(function(data) {
-				self.token = data['data']['token']
-				Cookies.set('token', data['data']['token']);
+				self.token = data['token']
+				self.now = new Date()
+				Cookies.set('jwt-token', data['token']);
 			})
 			.fail(function(xhr, result, statusText){
 				alertmessage('error', o2j(xhr))
 			})
 		},
 		methods: {
+			check: function () {
+				console.log(check_token_exp(this.token))
+			},
+			refresh: function () {
+				let self = this;
+
+				rest_aj_send('post', '/api-token-refresh/', {'token': this.token,})
+				.done(function(data) {
+					self.token = data['data']['token']
+					self.now = new Date()
+					Cookies.set('jwt-token', data['data']['token']);
+				})
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', o2j(xhr))
+				})
+
+			},
+			decode: function () {
+				this.jwt_decoded = jwt_decode(this.token);
+			this.human_exp = new Date(this.jwt_decoded.exp*1000)
+			console.log(this.human_exp -this.now)
+			},
 			send: function () {
 				let self = this
 

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div>
 		<h2>平台書庫</h2>
 		<ul class="nav nav-tabs">
@@ -164,7 +164,7 @@
 
 				_.each(self.recommend_data, function(v){
 					let query = {};
-					query[v.value] = 8;
+					query[v.value] = 30;
 					self.client.bookinfos.read(query)
 					.done(function(data) {
 
