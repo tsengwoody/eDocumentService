@@ -1,7 +1,7 @@
 <template>
 	<div id="serviceinfo" class="container">
 		<serviceinfo_record
-			:bus="bus"
+			:user_id="4"
 			ref="srcom"
 		>
 		</serviceinfo_record>

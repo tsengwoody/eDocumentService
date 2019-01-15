@@ -1,27 +1,38 @@
 ﻿{% extends "base_nav.html" %}
 {% block title %}
-測試
+JWT 測試
 {% endblock %}
 {% block content %}
 
 {% csrf_token %} 
 
 <div id="app">
-	<h1>123</h1>
+	<h2>JWT 測試</h2>
 	<div>{|{ now }|}</div>
-	<button
-		@click="decode()"
-	>測試jwt decode</button>
-	<div>{|{ jwt_decoded }|}</div>
-	<div>{|{ human_exp }|}</div>
+	<div>取得時間：{|{ token.get_orig_iat_date() }|}</div>
+	<div>到期時間：{|{ token.get_exp_date() }|}</div>
 
-	<button
-		@click="refresh()"
-	>測試jwt refresh</button>
+	<div>
+		<button
+			@click="renew()"
+		>刷新 jwt 內容</button>
+	</div>
 
-	<button
-		@click="check()"
-	>測試jwt過期</button>
+	<div>
+		<div>username:</div>
+		<div><input v-model="username"/></div>
+		<div>password:</div>
+		<div><input v-model="password"/></div>
+		<button
+			@click="obtain()"
+		>測試jwt obtain</button>
+	</div>
+
+	<div>
+		<button
+			@click="refresh()"
+		>測試jwt refresh</button>
+	</div>
 
 	<button
 		@click="send_with_jwt()"
@@ -30,7 +41,6 @@
 		@click="send()"
 	>測試</button>
 	{|{ users }|}
-	{|{ token }|}
 </div>
 
 <script>
@@ -42,11 +52,9 @@ Foo.prototype.test = 1
 
 var a = new Foo();
 var b = new Foo();
-console.log(Object.getPrototypeOf(a) === Object.getPrototypeOf(b))
-console.log(a.test)
+//console.log(Object.getPrototypeOf(a) === Object.getPrototypeOf(b))
+//console.log(a.test)
 //console.log(Object.getPrototypeOf( a ) === Foo.prototype)
-
-	console.log($.RestClient.prototype.ajax)
 
 	Vue.options.delimiters = ['{|{', '}|}'];
 
@@ -55,47 +63,71 @@ console.log(a.test)
 		components: {
 		},
 		data: {
+			username: '',
+			password: '',
 			users: ['123'],
 			token: '',
-			jwt_decoded: '',
-		human_exp: '',
-		now: '',
+			now: '',
 		},
 		mounted: function(){
 			let self = this
 
-			get_token('root', '1234QWER')
-			.done(function(data) {
-				self.token = data['token']
-				self.now = new Date()
-				Cookies.set('jwt-token', data['token']);
-			})
-			.fail(function(xhr, result, statusText){
-				alertmessage('error', o2j(xhr))
-			})
+			self.token = Object.create(Token);
+			self.token.set('token');
+			self.token.load();
+			self.now = new Date();
+
+			{
+				let period_second = 20;
+				let period_time = period_second * 1000;
+
+				if(self.token.check_exp_come_soon(period_second +30)){
+					self.token.refresh();
+						self.token.save();
+				}
+				setInterval(function () {
+					if(self.token.check_exp_come_soon(period_second +30)){
+						self.token.refresh();
+						self.token.save();
+					}
+				}, period_time);
+			}
+
 		},
 		methods: {
-			check: function () {
-				console.log(check_token_exp(this.token))
+			renew: function () {
+				let self = this;
+				alertmessage('success', '成功 renew token')
+				self.token.save();
+				self.now = new Date()
 			},
-			refresh: function () {
+			obtain: function () {
 				let self = this;
 
-				rest_aj_send('post', '/api-token-refresh/', {'token': this.token,})
+				self.token.obtain(self.username, self.password)
 				.done(function(data) {
-					self.token = data['data']['token']
+					alertmessage('success', '成功 obtain token')
+					self.token.save();
 					self.now = new Date()
-					Cookies.set('jwt-token', data['data']['token']);
 				})
 				.fail(function(xhr, result, statusText){
 					alertmessage('error', o2j(xhr))
 				})
 
 			},
-			decode: function () {
-				this.jwt_decoded = jwt_decode(this.token);
-			this.human_exp = new Date(this.jwt_decoded.exp*1000)
-			console.log(this.human_exp -this.now)
+			refresh: function () {
+				let self = this;
+
+				self.token.refresh()
+				.done(function(data) {
+					alertmessage('success', '成功 refresh token')
+					self.token.save();
+					self.now = new Date()
+				})
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', o2j(xhr))
+				})
+
 			},
 			send: function () {
 				let self = this
@@ -113,14 +145,13 @@ console.log(a.test)
 			send_with_jwt: function () {
 				let self = this
 
-				rest_aj_send_with_jwt('get', '/genericUser/api/users/', {}, self.token)
+				rest_aj_send_with_jwt('get', '/genericUser/api/users/1/', {}, self.token.token)
 				.done(function(data) {
 					self.users = data['data']
 				})
 				.fail(function(xhr, result, statusText){
 					alertmessage('error', o2j(xhr))
 				})
-
 
 			},
 		},

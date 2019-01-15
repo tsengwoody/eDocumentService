@@ -33,107 +33,174 @@ function j2o(v) {
 	return c;
 }
 
-function get_token_exp_time(token){
-	let token_obj = jwt_decode(token);
-	token_obj['exp_date'] = new Date(token_obj.exp*1000)
-	return token_obj['exp_date'] - Date.now();
-}
-
-function check_token_exp(token){
-	let exp_second = get_token_exp_time(token)/1000;
-	if(exp_second > 0){
-		return false;
-	}
-	else {
-		return true;
-	}
-}
-
-function check_token_exp_come soon(token, period_second){
-	let exp_second = get_token_exp_time(token)/1000;
-	if(exp_second > 0 && exp_second - period_second < 0){
-		return true;
-	}
-	else {
-		return false;
-	}
-}
-
-function get_user_id_from_token(token){
-	let token_obj = jwt_decode(token);
-	return token_obj.user_id;
-}
-
-function get_refresh_token(token) {
-	//df
-	let df = $.Deferred();
-
-	//ajax
-	$.ajax({
-		url: '/api-token-refresh/',
-		type: 'post',
-		data: {'token': token},
-		//contentType: 'application/json', //default: 'application/x-www-form-urlencoded; charset=UTF-8'
-		'error': function (xhr) {
-			let res = {
-				'status': xhr.status,
-				'responseText': xhr.responseText,
-			};
-
-			df.reject(res);
-
-		},
-		success: function(data, textStatus, xhr) {
-			let res = data;
-
-			df.resolve(res);
-
+var Token = {
+	set: function set(name, token){
+		this.name = name;
+		this.token = token;
+	},
+	get: function get(){
+		return this.token;
+	},
+	load: function load(){
+		this.token = Cookies.get(this.name);
+	},
+	save: function save(){
+		Cookies.set(this.name, this.token);
+	},
+	get_exp_countdown: function get_exp_countdown(){
+		try {
+			let token_obj = jwt_decode(this.token);
+			token_obj['exp_date'] = new Date(token_obj.exp*1000)
+			return token_obj['exp_date'] - Date.now();
 		}
-	})
-
-	return df;
-
-}
-
-function get_token(username, password) {
-	//df
-	let df = $.Deferred();
-
-	//ajax
-	$.ajax({
-		url: '/api-token-auth/',
-		type: 'post',
-		data: {
-			'username': username,
-			'password': password,
-		},
-		//contentType: 'application/json', //default: 'application/x-www-form-urlencoded; charset=UTF-8'
-		'error': function (xhr) {
-			let res = {
-				'status': xhr.status,
-				'responseText': xhr.responseText,
-			};
-
-			df.reject(res);
-
-		},
-		success: function(data, textStatus, xhr) {
-			let res = data;
-
-			df.resolve(res);
-
+		catch (err) {
+			return null;
 		}
-	})
+	},
+	check_exp: function check_exp(){
+		try {
+			let exp_second = this.get_exp_countdown()/1000;
+			if(exp_second > 0){
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+		catch (err) {
+			return true;
+		}
+	},
+	check_exp_come_soon: function check_exp_come_soon(period_second){
+		try {
+			let exp_second = this.get_exp_countdown()/1000;
+			if(exp_second > 0 && exp_second - period_second < 0){
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		catch (err) {
+			return false;
+		}
+	},
+	get_user_id: function get_user_id(){
+		try {
+			return jwt_decode(this.token).user_id;
+		}
+		catch (err) {
+			return null;
+		}
+	},
+	get_username: function get_user_id(){
+		try {
+			return jwt_decode(this.token).username;
+		}
+		catch (err) {
+			return null;
+		}
+	},
+	get_exp_date: function get_user_id(){
+		try {
+			return new Date(jwt_decode(this.token).exp*1000);
+		}
+		catch (err) {
+			return null;
+		}
+	},
+	get_orig_iat_date: function get_user_id(){
+		try {
+			return new Date(jwt_decode(this.token).orig_iat*1000);
+		}
+		catch (err) {
+			return null;
+		}
+	},
+	refresh: function refresh() {
+		//df
+		let df = $.Deferred();
 
-	return df;
+		//ajax
+		$.ajax({
+			url: '/api-token-refresh/',
+			type: 'post',
+			data: {'token': this.token},
+			//contentType: 'application/json', //default: 'application/x-www-form-urlencoded; charset=UTF-8'
+			'error': function (xhr) {
+				let res = {
+					'status': xhr.status,
+					'responseText': xhr.responseText,
+				};
 
+				df.reject(res);
+
+			},
+			success: (data, textStatus, xhr) => {
+				let res = data;
+				this.set('token', data['token']);
+				df.resolve(res);
+
+			}
+		})
+
+		return df;
+
+	},
+	obtain: function obtain(username, password) {
+		//df
+		let df = $.Deferred();
+
+		//ajax
+		$.ajax({
+			url: '/api-token-auth/',
+			type: 'post',
+			data: {
+				'username': username,
+				'password': password,
+			},
+			//contentType: 'application/json', //default: 'application/x-www-form-urlencoded; charset=UTF-8'
+			'error': function (xhr) {
+				let res = {
+					'status': xhr.status,
+					'responseText': xhr.responseText,
+				};
+
+				df.reject(res);
+
+			},
+			success: (data, textStatus, xhr) => {
+				let res = data;
+				this.set('token', data['token']);
+				df.resolve(res);
+
+			}
+		})
+
+		return df;
+
+	},
 }
 
-$(document).ready(function () {
-	let period_second = 3600;
+var token = Object.create(Token);
+token.set('token-g');
+
+token.load();
+
+{
+	let period_second = 20;
 	let period_time = period_second * 1000;
-	setInterval(function () {
 
+	if(token.check_exp_come_soon(period_second +30)){
+		token.refresh();
+			token.save();
+	}
+	setInterval(function () {
+		//console.log(token.check_exp_come_soon(period_second +30));
+		if(token.check_exp_come_soon(period_second +30)){
+			token.refresh();
+			token.save();
+		}
 	}, period_time);
 
-});
+}

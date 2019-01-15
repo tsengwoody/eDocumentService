@@ -2,20 +2,19 @@
 	<div>
 		<ul class="nav nav-tabs">
 			<template v-for="(entry, index) in data">
-				<template v-if="index===0">
-					<li role="tab" class="active"><a :href="'#index_tab_' +entry.value" name="index_tab_grp" data-toggle="tab" aria-expanded="true" @click="pagetab_subtabfix(this);">{|{ entry.display_name }|}</a></li>
+				<template v-if="index===tab_index">
+					<li role="tab" class="active"><a href="#" aria-expanded="true" @click="tab_index=index">{|{ entry.display_name }|}</a></li>
 				</template>
 				<template v-else>
-					<li role="tab"><a :href="'#index_tab_' +entry.value" name="index_tab_grp" data-toggle="tab" aria-expanded="false" @click="pagetab_subtabfix(this);">{|{ entry.display_name }|}</a></li>
+					<li role="tab"><a href="#" aria-expanded="false" @click="tab_index=index">{|{ entry.display_name }|}</a></li>
 				</template>
-
 			</template>
 		</ul>
 		<div class="tab-content" style="padding:20px 0px;">
 			<div
 				v-for="(entry, index) in data"
-				:id="'index_tab_' +entry.value"
-				:class="{'tab-pane':true, 'active':(index===0)}"
+				v-if="index==tab_index"
+				:class="{'tab-pane':true, 'active':(index==tab_index)}"
 			>
 
 				<h2 v-if="headinglevel===2" class="sr-only">{|{ entry.display_name }|}</h2>
@@ -40,6 +39,11 @@
 		props: {
 			data: Array,  // define type
 			headinglevel: Number,
+		},
+		data: function() {
+			return {
+				tab_index: 0,
+			}
 		},
 	}
 </script>

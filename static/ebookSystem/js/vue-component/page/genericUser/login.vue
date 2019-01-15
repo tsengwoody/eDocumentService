@@ -67,18 +67,27 @@
 		methods: {
 			login: function () {
 				let self = this
-				rest_aj_send('post', '/genericUser/api/users/action/login/', {
+				let session_login = rest_aj_send('post', '/genericUser/api/users/action/login/', {
 					username: self.username,
 					password: self.password,
 				})
+
+				let token_login = token.obtain(self.username, self.password)
+
+				token_login
 				.done(function(data) {
-					alertmessage('success', data.data.detail)
+					token.save();
+				})
+
+				Promise.all([session_login, token_login,])
+				.then(function (s, t) {
+					alertmessage('success', '成功登入平台')
 					.done(function() {
 						window.location.replace('/')
 					})
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', '登錄平台失敗，請確認帳號或密碼是否正確。'+xhr.message)
+				.catch(function (s, t) {
+					alertmessage('error', '登錄平台失敗，請確認帳號或密碼是否正確。'+o2j(s) +o2j(t))
 				})
 
 			},

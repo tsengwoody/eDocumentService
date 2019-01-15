@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div :id="'user_manager' +org_id">
 		<h3>{|{ org.name }|}</h3>
 		<div>
@@ -38,8 +38,10 @@
 					</button>
 					<button class="btn btn-default"
 						v-if="props.item.is_editor"
-						@click="sr_bus.$emit('instance-set', props.item.id); $refs['sr' +org_id].open('user_manager' +org_id)"
-					>
+						@click="
+							$refs['sr' +org_id].instance_set(props.item.id);
+							$refs['srm' +org_id].open('user_manager' +org_id)
+					">
 						服務紀錄
 					</button>
 				</template>
@@ -56,13 +58,14 @@
 				</template>
 			</modal>
 
-			<modal :id_modal="'sr' +org_id" :ref="'sr' +org_id">
+			<modal :id_modal="'sr' +org_id" :ref="'srm' +org_id">
 				<template slot="header">
 					<h4 class="modal-title">服務紀錄</h4>
 				</template>
 				<template slot="body">
 					<serviceinfo_record
-						v-bind:bus="sr_bus"
+						user_id="0"
+						:ref="'sr' +org_id"
 					>
 					</serviceinfo_record>
 				</template>
@@ -97,7 +100,6 @@
 			return {
 				org: {},
 				dm_bus: new Vue(),
-				sr_bus: new Vue(),
 				user_header: {
 					"username": "使用者名稱",
 					"name": "姓名",

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h2>平台書庫</h2>
 		<ul class="nav nav-tabs">
@@ -167,7 +167,6 @@
 					query[v.value] = 30;
 					self.client.bookinfos.read(query)
 					.done(function(data) {
-
 						let filter_data = [];
 						_.each(data, function(o) {
 							filter_data.push({
@@ -185,6 +184,11 @@
 						v.data['header'] = self.bookinfo_columns;
 						v.data['datas'] = filter_data;
 					})
+					.fail(function(xhr, result, statusText){
+						alertmessage('error', xhr.responseText)
+					})
+
+
 				})
 			},
 			get_index_table_data: function () {

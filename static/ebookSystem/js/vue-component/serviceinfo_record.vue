@@ -2,14 +2,8 @@
 <div>
 	<h3>服務紀錄</h3>
 
-	<ul class="nav nav-tabs">
-		<li class="active"><a href="#serviceinfo_record_notyetredeem" name="serviceinfo_record_tab_grp" data-toggle="tab" aria-expanded="true">未兌換</a></li>
-		<li><a href="#serviceinfo_record_redeeming" name="serviceinfo_record_tab_grp" data-toggle="tab" aria-expanded="false">兌換中</a></li>
-		<li><a href="#serviceinfo_record_redeemed" name="serviceinfo_record_tab_grp" data-toggle="tab" aria-expanded="false">已兌換</a></li>
-	</ul>
-	<div class="tab-content" style="padding:20px 0px;">
-		<div id="serviceinfo_record_notyetredeem" class="tab-pane active">
-			<h4>未兌換</h4>
+	<tab :headinglevel="4" :data="tab_data">
+		<template slot="notyetredeem"  slot-scope="props">
 			<h4 style="margin-top:30px;">Step1: 勾選欲兌換之服務紀錄</h4>
 			<hr style="margin-top:5px;">
 			<div style="margin-bottom:60px;">
@@ -45,10 +39,9 @@
 					class="btn btn-primary" style="margin-top:10px;"
 				>兌換</button>
 			</div>
-		</div>
+		</template>
 
-		<div id="serviceinfo_record_redeeming" class="tab-pane">
-			<h4>兌換中</h4>
+		<template slot="redeeming" slot-scope="props">
 			<table-div :datas="exchange_false_serviceinfos" :header="exchange_false_serviceinfos_columns">
 				<template slot="editrecord_set" slot-scope="props">
 					<button class="btn btn-default" @click="editrecords_detail(props.item); openDialog('editrecords_detail', this);">詳細服務紀錄</button>
@@ -58,45 +51,68 @@
 				</template>
 			</table-div>
 
-		</div>
+		</template>
 
-		<div id="serviceinfo_record_redeemed" class="tab-pane">
-			<h4>已兌換</h4>
+		<template slot="redeemed" slot-scope="props">
 			<table-div :datas="exchange_true_serviceinfos" :header="exchange_true_serviceinfos_columns">
 				<template slot="editrecord_set" slot-scope="props">
 					<button class="btn btn-default" @click="editrecords_detail(props.item); openDialog('editrecords_detail', this);">詳細服務紀錄</button>
 				</template>
 			</table-div>
-		</div>
+		</template>
+	</tab>
 
-		<div>
-			<modal :id_modal="'editrecords_detail'">
-				<template slot="header">
-					<h4 class="modal-title">詳細服務紀錄</h4>
-				</template>
+	<div>
+		<modal :id_modal="'editrecords_detail'">
+			<template slot="header">
+				<h4 class="modal-title">詳細服務紀錄</h4>
+			</template>
 
-				<template slot="body">
-					<table-div :datas="detail_editrecords" :header="detail_editrecords_columns">
-				</template>
+			<template slot="body">
+				<table-div :datas="detail_editrecords" :header="detail_editrecords_columns">
+			</template>
 
-			</modal>
-		</div>
-
+		</modal>
 	</div>
+
 </div>
 </template>
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	module.exports = {
-		props: ['bus',],
+		props: ['user_id',],
 		components: {
 			'modal': components['modal'],
+			'tab': components['tab'],
 			'table-div': components['table-div'],
 		},
 		data: function(){
 			return {
 				pk: '',
+				tab_data: [
+					{
+						order: 0,
+						display_name: '未兌換',
+						value: 'notyetredeem',
+						type: 'notyetredeem',
+						data: '',
+					},
+					{
+						order: 1,
+						display_name: '審核中',
+						value: 'redeeming',
+						type: 'redeeming',
+						data: '',
+					},
+					{
+						order: 2,
+						display_name: '已兌換',
+						value: 'redeemed',
+						type: 'redeemed',
+						data: '',
+					},
+				],
 				editrecords: [],
 				editrecords_columns: {
 					id: '核取',
@@ -156,23 +172,20 @@
 				return service_hour
 			},
 		},
+		watch: {
+			user_id: function() {
+				this.pk = this.user_id
+				this.refresh()
+			},
+		},
 		mounted: function () {
 			this.clientg = new $.RestClient('/genericUser/api/');
 			this.clientg.add('serviceinfos');
 			this.clientg.add('organizations');
 			this.clientb = new $.RestClient('/ebookSystem/api/');
 			this.clientb.add('editrecords');
-			this.bus.$on('instance-set', this.instance_set)
-
-			pk = window.location.pathname.split('/')
-			pk = pk[pk.length-2]
-			if(pk==='serviceinfo_record'){
-				this.pk = user.id
-				this.refresh()
-			}
-			else {
-				this.pk = pk
-			}
+			this.pk = this.user_id
+		this.refresh()
 		},
 		methods: {
 			instance_set: function (event) {

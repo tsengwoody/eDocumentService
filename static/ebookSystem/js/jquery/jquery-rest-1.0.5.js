@@ -76,6 +76,7 @@ defaultOpts = {
     'create': 'POST',
     'read': 'GET',
     'update': 'PUT',
+    'updatepart': 'PATCH',
     'destroy': 'DELETE'
   },
   ajax: {
@@ -410,6 +411,9 @@ $.RestClient = Resource;
     if (true) { //change to inherent csrf
       headers['X-CSRFToken'] = aj_getcsrf().csrf;
       headers['X-Requested-With'] = 'XMLHttpRequest';
+    }
+    if(!token.check_exp()){
+      headers['Authorization'] = 'JWT ' +token.token;
     }
     ajaxOpts = {
       url: url,
