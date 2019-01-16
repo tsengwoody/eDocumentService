@@ -76,6 +76,33 @@ defaultOpts = {
     'create': 'POST',
     'read': 'GET',
     'update': 'PUT',
+    'destroy': 'DELETE'
+  },
+  ajax: {
+    dataType: 'json'
+  }
+};
+
+// start custom
+defaultOpts = {
+  url: '',
+  cache: 0,
+  csrf: '',
+  request: function (resource, options) {
+    return $.ajax(options);
+  },
+  isSingle: false,
+  autoClearCache: true,
+  cachableMethods: ['GET'],
+  methodOverride: false,
+  stringifyData: true, //change to contentType: 'application/json'
+  stripTrailingSlash: false,
+  password: null,
+  username: null,
+  verbs: {
+    'create': 'POST',
+    'read': 'GET',
+    'update': 'PUT',
     'updatepart': 'PATCH',
     'destroy': 'DELETE'
   },
@@ -83,6 +110,7 @@ defaultOpts = {
     dataType: 'json'
   }
 };
+// end custom
 
 Cache = (function() {
   function Cache(parent) {
@@ -337,10 +365,14 @@ Resource = (function() {
       encoded = encode64(this.opts.username + ":" + this.opts.password);
       headers.Authorization = "Basic " + encoded;
     }
-    if (data && this.opts.stringifyData) {
+
+    // start custom comment
+    /*if (data && this.opts.stringifyData) {
       data = stringify(data);
       headers['Content-Type'] = "application/json";
-    }
+    }*/
+    // end custom comment
+
     if (this.opts.methodOverride && (method !== 'GET' && method !== 'HEAD' && method !== 'POST')) {
       headers['X-HTTP-Method-Override'] = method;
       method = 'POST';
@@ -348,6 +380,18 @@ Resource = (function() {
     if (this.opts.stripTrailingSlash) {
       url = url.replace(/\/$/, "");
     }
+
+    // start custom
+    if (data && this.opts.stringifyData && (method !== 'GET' && method !== 'HEAD')) {
+      data = stringify(data);
+      headers['Content-Type'] = "application/json";
+    }
+    if (true) { //change to inherent csrf
+      headers['X-CSRFToken'] = aj_getcsrf().csrf;
+      headers['X-Requested-With'] = 'XMLHttpRequest';
+    }
+    // end custom
+
     ajaxOpts = {
       url: url,
       type: method,
@@ -382,61 +426,3 @@ Resource.defaults = defaultOpts;
 
 $.RestClient = Resource;
 }(window,document,jQuery));
-
-  $.RestClient.prototype.ajax = function(method, url, data) {
-    var ajaxOpts, encoded, headers, key, req, useCache,
-      _this = this;
-    if (!method) {
-      error("method missing");
-    }
-    if (!url) {
-      error("url missing");
-    }
-    headers = {};
-    if (this.opts.username && this.opts.password) {
-      encoded = encode64(this.opts.username + ":" + this.opts.password);
-      headers.Authorization = "Basic " + encoded;
-    }
-    if (data && this.opts.stringifyData) {
-      data = stringify(data);
-      headers['Content-Type'] = "application/json";
-    }
-    if (this.opts.methodOverride && (method !== 'GET' && method !== 'HEAD' && method !== 'POST')) {
-      headers['X-HTTP-Method-Override'] = method;
-      method = 'POST';
-    }
-    if (this.opts.stripTrailingSlash) {
-      url = url.replace(/\/$/, "");
-    }
-    if (true) { //change to inherent csrf
-      headers['X-CSRFToken'] = aj_getcsrf().csrf;
-      headers['X-Requested-With'] = 'XMLHttpRequest';
-    }
-    if(!token.check_exp()){
-      headers['Authorization'] = 'JWT ' +token.token;
-    }
-    ajaxOpts = {
-      url: url,
-      type: method,
-      headers: headers
-    };
-    if (data) {
-      ajaxOpts.data = data;
-    }
-    ajaxOpts = $.extend(true, {}, this.opts.ajax, ajaxOpts);
-    useCache = this.opts.cache && $.inArray(method, this.opts.cachableMethods) >= 0;
-    if (useCache) {
-      key = this.root.cache.key(ajaxOpts);
-      req = this.root.cache.get(key);
-      if (req) {
-        return req;
-      }
-    }
-    req = this.opts.request(this.parent, ajaxOpts);
-    if (useCache) {
-      req.done(function() {
-        return _this.root.cache.put(key, req);
-      });
-    }
-    return req;
-  };

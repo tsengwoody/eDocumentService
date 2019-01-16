@@ -11,6 +11,7 @@ JWT 測試
 	<div>{|{ now }|}</div>
 	<div>取得時間：{|{ token.get_orig_iat_date() }|}</div>
 	<div>到期時間：{|{ token.get_exp_date() }|}</div>
+	<div style="display: none;">{|{ count }|}</div>
 
 	<div>
 		<button
@@ -68,6 +69,7 @@ var b = new Foo();
 			users: ['123'],
 			token: '',
 			now: '',
+			count: 0,
 		},
 		mounted: function(){
 			let self = this
@@ -90,6 +92,8 @@ var b = new Foo();
 						self.token.refresh();
 						self.token.save();
 					}
+					console.log('YAA')
+					self.count = self.count +1;
 				}, period_time);
 			}
 

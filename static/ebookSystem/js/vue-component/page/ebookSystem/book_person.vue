@@ -1,7 +1,7 @@
-﻿<template>
+<template>
 	<div id="book_person">
 		<h2>校對進度</h2>
-		<tab :data="data">
+		<tab :headinglevel="3" :data="data">
 			<template slot="table" slot-scope="props">
 				<table-div :datas="props.item.datas" :header="props.item.header">
 					<template slot="inactive_book_action" slot-scope="props">

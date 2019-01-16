@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div id="service">
 		<div style="text-align: center;">
 			<form class="form-inline">
@@ -8,8 +8,9 @@
 						v-if="choice_org"
 						class="form-control"
 						v-model="org_id"
+						@change="refresh()"
 					>
-						<option value="0" selected="selected">全部</option>
+						<option :value="0" selected="selected">全部</option>
 						<option v-for="(value, key) in orgs" :value="value.id">{|{ value.name }|}</option>
 					</select>
 					<template
@@ -24,7 +25,7 @@
 		</div>
 
 		<div>
-			<h4 class="page-header">正校對文件</h4>
+			<h3 class="page-header">正校對文件</h3>
 			<table-div :datas="edit_ebook" :header="edit_ebook_header">
 				<template slot="action" slot-scope="props">
 					<a class="btn btn-default" role="button" :href="'/routing/ebookSystem/edit/' +props.item.ISBN_part +'/'">編輯</a>
@@ -34,7 +35,7 @@
 		</div>
 
 		<div>
-			<h4 class="page-header">審核中的文件</h4>
+			<h3 class="page-header">審核中的文件</h3>
 			<table-div :datas="finish_ebook" :header="finish_ebook_header">
 				<template slot="action" slot-scope="props">
 					<button class="btn btn-default" @click="reedit_ebook(props.item.ISBN_part)">再編輯</button>
@@ -85,6 +86,11 @@
 				})
 				return org
 			},
+		},
+		watch: {
+			/*org_id: function() {
+				this.refresh()
+			},*/
 		},
 		created: function () {
 			this.clientg = new $.RestClient('/genericUser/api/');

@@ -300,6 +300,11 @@ class ServiceInfoViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	ordering_fields = ('owner',)
 	permission_classes = (permissions.IsAuthenticated,)
 
+	def perform_create(self, serializer):
+		instance = serializer.save()
+		instance.service_hours = instance.get_service_hours()
+		instance.save()
+
 	@list_route(
 		methods=['get'],
 		url_name='exchange_false_export',

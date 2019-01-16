@@ -13,7 +13,6 @@
 		<div class="tab-content" style="padding:20px 0px;">
 			<div
 				v-for="(entry, index) in data"
-				v-if="index==tab_index"
 				:class="{'tab-pane':true, 'active':(index==tab_index)}"
 			>
 

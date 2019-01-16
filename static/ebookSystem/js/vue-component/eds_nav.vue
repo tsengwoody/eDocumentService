@@ -162,49 +162,6 @@
 					},
 					{
 						type: 'folder',
-						'display_name': '單位管理',
-						'permission': ['login'],
-						'items': [
-							{
-								type: 'item',
-								'display_name': '上傳文件審核',
-								'permission': ['is_manager'],
-								'url': '/routing/ebookSystem/book_review_list_self/',
-							},
-							{
-								type: 'item',
-								'display_name': '校對文件審核',
-								'permission': ['is_manager'],
-								'url': '/routing/ebookSystem/ebook_review_list_self/',
-							},
-							{
-								type: 'item',
-								'display_name': '書籍管理',
-								'permission': ['is_manager'],
-								'url': '/routing/ebookSystem/book_manager_self/',
-							},
-							{
-								type: 'item',
-								'display_name': '使用者管理',
-								'permission': ['is_manager'],
-								'url': '/routing/genericUser/user_manager_self/',
-							},
-							{
-								type: 'item',
-								'display_name': '身障手冊管理',
-								'permission': ['is_manager'],
-								'url': '/routing/genericUser/disabilitycard_manager_self/',
-							},
-							{
-								type: 'item',
-								'display_name': '服務時數確認',
-								'permission': ['is_manager'],
-								'url': '/routing/genericUser/serviceinfo_list_check_self/',
-							},
-						],
-					},
-					{
-						type: 'folder',
 						'display_name': '文件上傳',
 						'permission': ['login'],
 						'items': [

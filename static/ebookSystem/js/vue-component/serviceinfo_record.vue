@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 <div>
 	<h3>服務紀錄</h3>
 
@@ -154,7 +154,7 @@
 				return {
 					"editrecord_set": this.editrecord_checks,
 					"date": moment().format('YYYY-MM-DD'),
-					"service_hours": this.service_hours,
+					"service_hours": 1000,
 					"is_exchange": false,
 					"owner": this.pk,
 					"org": this.org_select,
