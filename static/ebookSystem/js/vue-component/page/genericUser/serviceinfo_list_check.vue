@@ -1,12 +1,12 @@
 <template>
 	<div>
 		<h2>服務時數確認</h2>
-		<tab :data="tab_data">
+		<panel_group :data="tab_data" :title="'單位'">
 			<template slot="serviceinfo_list_check_org" slot-scope="props">
 				<serviceinfo_list_check_org :org_id="props.item">
 				</serviceinfo_list_check_org>
 			</template>
-		</tab>
+		</panel_group>
 	</div>
 </template>
 
@@ -14,7 +14,7 @@
 	module.exports = {
 		components: {
 			'serviceinfo_list_check_org': components['serviceinfo_list_check_org'],
-			'tab': components['tab'],
+			'panel_group': components['panel_group'],
 		},
 		data: function() {
 			return {
