@@ -34,18 +34,29 @@ function j2o(v) {
 }
 
 var Token = {
-	set: function set(name, token){
+	set: function set(name){
 		this.name = name;
-		this.token = token;
 	},
 	get: function get(){
 		return this.token;
 	},
 	load: function load(){
-		this.token = Cookies.get(this.name);
+		this.token = localStorage.getItem(this.name);
 	},
 	save: function save(){
-		Cookies.set(this.name, this.token);
+		localStorage.setItem(this.name, this.token);
+	},
+	remove: function remove(){
+		localStorage.removeItem(this.name);
+	},
+	check_token: function check_token(){
+		try {
+			let token_obj = jwt_decode(this.token);
+			return true;
+		}
+		catch (err) {
+			return false;
+		}
 	},
 	get_exp_countdown: function get_exp_countdown(){
 		try {
@@ -60,7 +71,7 @@ var Token = {
 	check_exp: function check_exp(){
 		try {
 			let exp_second = this.get_exp_countdown()/1000;
-			if(exp_second > 0){
+			if(exp_second >= 0){
 				return false;
 			}
 			else {
@@ -68,7 +79,7 @@ var Token = {
 			}
 		}
 		catch (err) {
-			return true;
+			return false;
 		}
 	},
 	check_exp_come_soon: function check_exp_come_soon(period_second){
@@ -78,6 +89,21 @@ var Token = {
 				return true;
 			}
 			else {
+				return false;
+			}
+		}
+		catch (err) {
+			return false;
+		}
+	},
+	check_active: function check_active(){
+		try {
+			let exp_second = this.get_exp_countdown()/1000;
+			if(exp_second > 1){
+				return true;
+			}
+			else {
+				console.log(this.get_exp_countdown())
 				return false;
 			}
 		}
@@ -138,7 +164,7 @@ var Token = {
 			},
 			success: (data, textStatus, xhr) => {
 				let res = data;
-				this.set('token', data['token']);
+				this.token = data['token'];
 				df.resolve(res);
 
 			}
@@ -171,7 +197,7 @@ var Token = {
 			},
 			success: (data, textStatus, xhr) => {
 				let res = data;
-				this.set('token', data['token']);
+				this.token = data['token'];
 				df.resolve(res);
 
 			}
@@ -183,24 +209,5 @@ var Token = {
 }
 
 var token = Object.create(Token);
-token.set('token-g');
-
+token.set('token');
 token.load();
-
-{
-	let period_second = 20;
-	let period_time = period_second * 1000;
-
-	if(token.check_exp_come_soon(period_second +30)){
-		token.refresh();
-			token.save();
-	}
-	setInterval(function () {
-		//console.log(token.check_exp_come_soon(period_second +30));
-		if(token.check_exp_come_soon(period_second +30)){
-			token.refresh();
-			token.save();
-		}
-	}, period_time);
-
-}

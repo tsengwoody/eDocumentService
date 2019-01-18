@@ -1,14 +1,14 @@
-﻿<template>
+<template>
 	<div>
 		<h2>平台書庫</h2>
 		<ul class="nav nav-tabs">
-			<li class="active"><a href="#book_repository_recommend" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="true" onclick="pagetab_subtabfix(this);">書籍推薦</a></li>
-			<li><a href="#book_repository_index" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">索引</a></li>
-			<li><a href="#book_repository_search" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="false" onclick="pagetab_subtabfix(this);">查詢</a></li>
+			<li class="active"><a href="#book_repository_recommend" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="true">書籍推薦</a></li>
+			<li><a href="#book_repository_index" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="false">索引</a></li>
+			<li><a href="#book_repository_search" name="repository_books_tab_grp" data-toggle="tab" aria-expanded="false">查詢</a></li>
 		</ul>
 
 		<div class="tab-content" style="padding:20px 0px;">
-			<div id="book_repository_recommend" class="tab-pane active">
+			<div id="book_repository_recommend" class="tab-pane fade active">
 				<h3 class="textfornvda">書籍推薦</h3>
 				<tab :headinglevel="4" :data="recommend_data">
 					<template slot="bookinfo_repository" slot-scope="props">
@@ -16,7 +16,7 @@
 					</template>
 				</tab>
 			</div>
-			<div id="book_repository_index" class="tab-pane">
+			<div id="book_repository_index" class="tab-pane fade">
 				<h3 class="textfornvda">索引</h3>
 				<tab :headinglevel="4" :data="index_data">
 					<template slot="bookinfo_repository" slot-scope="props">
@@ -24,7 +24,7 @@
 					</template>
 				</tab>
 			</div>
-			<div id="book_repository_search" class="tab-pane">
+			<div id="book_repository_search" class="tab-pane fade">
 				<h3 class="textfornvda">查詢</h3>
 				<div class="form-inline" style="margin-bottom:20px;">
 					<div class="form-group">

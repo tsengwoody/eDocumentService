@@ -2,7 +2,7 @@
 
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view
-from rest_framework.decorators import list_route, detail_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import mixins
 from rest_framework import generics
@@ -40,7 +40,8 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			pass
 		return fullpath
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['post'],
 		url_name='download',
 		url_path='action/download',
@@ -57,7 +58,8 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		return self.get_resource(file_path)
 
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['post'],
 		url_name='review',
 		url_path='action/review',
@@ -77,7 +79,8 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			res['message'] = u'審核退回文件'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['get', 'post'],
 		url_name='set_priority',
 		url_path='action/set_priority',
@@ -99,7 +102,8 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 			return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@list_route(
+	@action(
+		detail=False,
 		methods=['post'],
 		url_name='upload_self',
 		url_path='action/create',
@@ -178,7 +182,8 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			res['detail'] = u'成功建立並上傳文件'
 			return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@list_route(
+	@action(
+		detail=False,
 		methods=['post'],
 		url_name='upload',
 		url_path='action/upload',
@@ -290,7 +295,8 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	filter_backends = (StatusFilter, EditorFilter, EbookOrgFilter,)
 	permission_classes = (permissions.IsAuthenticated,)
 
-	@list_route(
+	@action(
+		detail=False,
 		methods=['post'],
 		url_name='service',
 		url_path='action/service',
@@ -322,7 +328,8 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res['detail'] = u'成功取得文件'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['post'],
 		url_name='onactive',
 		url_path='action/onactive',
@@ -340,7 +347,8 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res['detail'] = u'成功再校對'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['post'],
 		url_name='assign',
 		url_path='action/assign',
@@ -362,7 +370,8 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res['detail'] = u'指派已成功'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['post'],
 		url_name='change_status',
 		url_path='action/change_status',
@@ -379,7 +388,8 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res['detail'] = u'成功取得文件'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['get', 'post'],
 		url_name='edit',
 		url_path='action/edit',
@@ -424,7 +434,8 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			res['edited_page'] = obj.edited_page
 			return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['post'],
 		url_name='review',
 		url_path='action/review',
@@ -473,7 +484,8 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 	search_fields = ('ISBN', 'bookname', 'author', )
 
 	@method_decorator(ensure_csrf_cookie)
-	@list_route(
+	@action(
+		detail=False,
 		methods=['post'],
 		url_name='isbn2bookinfo',
 		url_path='action/isbn2bookinfo',
@@ -512,7 +524,8 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 		res['message'] = u'成功取得資料'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@list_route(
+	@action(
+		detail=False,
 		methods=['post'],
 		url_name='key2bookinfo',
 		url_path='action/key2bookinfo',
@@ -573,7 +586,8 @@ class EditRecordViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet):
 		'destroy': [RuleORPermissionFactory('detail', ['is_manager',]),],
 	}
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['get', ],
 		url_name='analysis',
 		url_path='action/analysis',
@@ -606,7 +620,8 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				fullpath = getattr(obj, resource, '')
 		return fullpath
 
-	@list_route(
+	@action(
+		detail=False,
 		methods=['post'],
 		url_name='check_create',
 		url_path='action/check_create',
@@ -626,7 +641,8 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res['id'] = lr.id
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['post'],
 		url_name='check_inout',
 		url_path='action/check_inout',
@@ -641,7 +657,8 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			obj.check_in()
 			return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['get', 'post'],
 		url_name='download',
 		url_path='action/download',
@@ -677,7 +694,8 @@ class ISSNBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	serializer_class = ISSNBookSerializer
 	filter_backends = (filters.OrderingFilter, filters.SearchFilter, )
 	ordering_fields = ('volume',)
-	@list_route(
+	@action(
+		detail=False,
 		methods=['post'],
 		url_name='upload',
 		url_path='action/upload',

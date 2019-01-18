@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="row" id="id_ebook_image">
 		<div id="imagePage" :class="imageClass" style="margin-bottom: 1em;">
 			<nav>
@@ -324,7 +324,7 @@
 									.done(function(data) {
 										alertmessage('success', data['message'])
 										.done(function() {
-											window.location.href = '/ebookSystem/service/';
+											window.location.href = '/routing/ebookSystem/service/';
 										})
 									})
 									.fail(function(data){
@@ -342,7 +342,7 @@
 							onclick: function () {
 								alertconfirm('是否確定離開?')
 								.done(function(){
-									window.location.href = '/ebookSystem/generics/service/';
+									window.location.href = '/routing/ebookSystem/service/';
 								})
 
 							}

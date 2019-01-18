@@ -5,7 +5,7 @@ celery==4.2.1
 certifi==2017.11.5
 chardet==3.0.4
 Django==1.11.17
-djangorestframework==3.7.7
+djangorestframework==3.9.1
 djangorestframework-jwt==1.11.0
 EbookLib==0.16
 html5lib==1.0.1

@@ -390,6 +390,12 @@ Resource = (function() {
       headers['X-CSRFToken'] = aj_getcsrf().csrf;
       headers['X-Requested-With'] = 'XMLHttpRequest';
     }
+    /*if(token.check_active()){
+      headers['Authorization'] = 'JWT ' +token.token;
+    }*/
+				else{
+					console.log(token.get_exp_date())
+				}
     // end custom
 
     ajaxOpts = {

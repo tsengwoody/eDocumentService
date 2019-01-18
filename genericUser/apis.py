@@ -14,6 +14,7 @@ from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from utils.resource import *
@@ -73,7 +74,8 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				fullpath = obj.disability_card_back
 		return fullpath
 
-	@list_route(
+	@action(
+		detail=False,
 		methods=['post'],
 		permission_classes=[AllowAny,],
 		url_name='authenticate',
@@ -90,7 +92,8 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		else:
 			return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@list_route(
+	@action(
+		detail=False,
 		methods=['post', 'get'],
 		permission_classes=[AllowAny,],
 		url_name='login',
@@ -116,7 +119,8 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res['detail'] = u'成功登錄平台'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@list_route(
+	@action(
+		detail=False,
 		methods=['post', 'get'],
 		permission_classes=[AllowAny,],
 		url_name='logout',
@@ -130,7 +134,8 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res['detail'] = u'成功登錄平台'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@list_route(
+	@action(
+		detail=False,
 		methods=['post'],
 		permission_classes=[AllowAny,],
 		url_name='retrieve_up',
@@ -170,7 +175,8 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@list_route(
+	@action(
+		detail=False,
 		methods=['post'],
 		url_name='email',
 		url_path='action/email',
@@ -190,7 +196,8 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['get', 'post'],
 		url_name='verify',
 		url_path='action/verify',
@@ -259,7 +266,8 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['post'],
 		url_name='set-password',
 		url_path='action/set_password',
@@ -305,7 +313,8 @@ class ServiceInfoViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		instance.service_hours = instance.get_service_hours()
 		instance.save()
 
-	@list_route(
+	@action(
+		detail=False,
 		methods=['get'],
 		url_name='exchange_false_export',
 		url_path='action/exchange_false_export',
