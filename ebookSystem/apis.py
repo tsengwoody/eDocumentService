@@ -408,8 +408,7 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 					if finishContent == '' or editContent == '':
 						raise SystemError('save mark error')
 				except BaseException as e:
-					res['detail'] = u'標記位置錯誤或有多個標記'
-					res['detail'] = unicode(e)
+					res['detail'] = u'標記位置錯誤或有多個標記' +unicode(e)
 					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 				finishContent = origin_finish + finishContent
@@ -433,6 +432,39 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			res['finish'], res['edit'] = obj.get_content()
 			res['edited_page'] = obj.edited_page
 			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	@action(
+		detail=True,
+		methods=['post'],
+		url_name='editlog',
+		url_path='action/editlog',
+	)
+	def editlog(self, request, pk=None):
+		res = {}
+
+		obj = self.get_object()
+
+		try:
+			delta = timezone.now() - self.request.user.online
+			if delta.seconds < 50:
+				raise SystemError('duration error')
+		except BaseException as e:
+			res['detail'] = u'您有其他編輯正進行' +unicode(e)
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+		self.request.user.online = timezone.now()
+		self.request.user.save()
+
+		obj.service_hours = obj.service_hours+1
+		obj.save()
+
+		editRecord = obj.current_editrecord()
+
+		order = len(EditLog.objects.filter(edit_record=editRecord))
+		EditLog.objects.create(edit_record=editRecord, user=self.request.user, time=timezone.now(), order=order, edit_count=int(request.POST['online']))
+
+		res['service_hours'] = obj.service_hours
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	@action(
 		detail=True,

@@ -38,20 +38,16 @@ def generics(request, name, pk=None):
 def edit_ajax(request, ISBN_part, *args, **kwargs):
 	user = request.user
 	response = {}
-	if not getattr(request.user, 'is_editor', None):
-		response['status'] = u'error'
-		response['message'] = u'已登出'
-	if not request.POST.has_key('online'):
-		response['status'] = 'error'
-		response['message'] = ''
-		return HttpResponse(json.dumps(response), content_type="application/json")
+
 	delta = timezone.now() - user.online
 	if delta.seconds < 50:
 		response['status'] = u'error'
 		response['message'] = u'您有其他編輯正進行'
 		return HttpResponse(json.dumps(response), content_type="application/json")
+
 	user.online = timezone.now()
 	user.save()
+
 	part = EBook.objects.get(ISBN_part=ISBN_part)
 	part.service_hours = part.service_hours+1
 	part.save()

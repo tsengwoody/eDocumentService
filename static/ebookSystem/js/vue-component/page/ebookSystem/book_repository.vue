@@ -8,7 +8,7 @@
 		</ul>
 
 		<div class="tab-content" style="padding:20px 0px;">
-			<div id="book_repository_recommend" class="tab-pane fade active">
+			<div id="book_repository_recommend" class="tab-pane active">
 				<h3 class="textfornvda">書籍推薦</h3>
 				<tab :headinglevel="4" :data="recommend_data">
 					<template slot="bookinfo_repository" slot-scope="props">

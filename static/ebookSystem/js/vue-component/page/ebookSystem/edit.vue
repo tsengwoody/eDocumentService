@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="row" id="id_ebook_image">
 		<div id="imagePage" :class="imageClass" style="margin-bottom: 1em;">
 			<nav>
@@ -453,7 +453,7 @@
 			recordPerMins: function() {
 				// 每 60s 傳送 change count 給後端
 				const self = this;
-				const editlog_url = '/ebookSystem/edit_ajax/' + self.pk +'/';
+				const editlog_url = '/ebookSystem/api/ebooks/' +self.pk +'/action/editlog/';
 				const transferData = {
 					online: self.change_count,
 					page: self.edited_page,
@@ -461,8 +461,13 @@
 
 				rest_aj_send('post', editlog_url, transferData)
 				.done(function(data) {
+					console.log(data)
 					self.change_count = 0;
 				})
+				.fail(function(xhr, result, statusText){
+					console.log(xhr.message);
+				})
+
 			},
 			detectIdel: function() {
 				// 每 60s 計算使用者閒置時間
