@@ -1,12 +1,12 @@
 <template>
 	<div>
 		<h2>身障手冊管理</h2>
-		<tab :data="tab_data">
+		<panel_group :data="tab_data" :title="'單位'">
 			<template slot="disabilitycard_manager_org" slot-scope="props">
 				<disabilitycard_manager_org :org_id="props.item">
 				</disabilitycard_manager_org>
 			</template>
-		</tab>
+		</panel_group>
 	</div>
 </template>
 
@@ -14,7 +14,7 @@
 	module.exports = {
 		components: {
 			'disabilitycard_manager_org': components['disabilitycard_manager_org'],
-			'tab': components['tab'],
+			'panel_group': components['panel_group'],
 		},
 		data: function() {
 			return {

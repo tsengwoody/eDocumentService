@@ -1,12 +1,12 @@
 <template>
 	<div>
 		<h2>校對文件審核</h2>
-		<tab :data="tab_data">
+		<panel_group :data="tab_data" :title="'單位'">
 			<template slot="ebook_review_list_org" slot-scope="props">
 				<ebook_review_list_org :org_id="props.item">
 				</ebook_review_list_org>
 			</template>
-		</tab>
+		</panel_group>
 	</div>
 </template>
 
@@ -14,7 +14,7 @@
 	module.exports = {
 		components: {
 			'ebook_review_list_org': components['ebook_review_list_org'],
-			'tab': components['tab'],
+			'panel_group': components['panel_group'],
 		},
 		data: function() {
 			return {

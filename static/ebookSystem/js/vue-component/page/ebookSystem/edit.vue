@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="row" id="id_ebook_image">
 		<div id="imagePage" :class="imageClass" style="margin-bottom: 1em;">
 			<nav>
@@ -242,10 +242,7 @@
 							text: '載入全文',
 							icon: false,
 							onclick: function () {
-								// function_click = true;
-
 								const url = '/ebookSystem/api/ebooks/' + self.pk +'/action/edit/';
-
 								let transferData = {
 									type: 'load',
 									finish: '',
@@ -257,7 +254,7 @@
 								.done(function(data) {
 									alertmessage('success', data['message'])
 									.done(function() {
-										location.reload(); //重新載入網頁以更新資訊
+										self.reloadPage();
 									})
 								})
 								.fail(function(data){
@@ -275,11 +272,8 @@
 								if (editor.getContent().indexOf('<p>|----------|</p>') < 0)
 									alertmessage('error', '未存檔成功，您提交的內容未包含特殊標記，無法得知校對進度，若已全數完成請按下完成按紐');
 								else {
-									// function_click = true;
 									editor.save();
-
 									const url = '/ebookSystem/api/ebooks/' + self.pk +'/action/edit/'
-
 									let transferData = {
 										type: 'save',
 										finish: $('#id_finish').val(),
@@ -291,7 +285,7 @@
 									.done(function(data) {
 										alertmessage('success', data['message'])
 										.done(function() {
-											location.reload(); //重新載入網頁以更新資訊
+											self.reloadPage();
 										})
 									})
 									.fail(function(data){
@@ -309,9 +303,7 @@
 								if (editor.getContent().indexOf('<p>|----------|</p>') > 0)
 									alertmessage('error', '未存檔成功，您提交的內容包含特殊標記，若已完成請將內容中之特殊標記刪除，若未全數完成請按下存檔按紐');
 								else {
-									// function_click = true;
 									editor.save();
-
 									const url = '/ebookSystem/api/ebooks/' + self.pk +'/action/edit/';
 									let transferData = {
 										type: 'finish',
@@ -376,14 +368,11 @@
 								let s = sep(href, '/');
 								let isbnpart = s.pop();
 
-								//url
 								let url = '/ebookSystem/api/ebooks/' + isbnpart + '/resource/OCR/origin';
 
 								//aj_text
 								aj_text(url,{})
 								.done(function(){
-
-									//alert
 									alertmessage('success', '成功提交下載原始文字檔');
 								})
 							}
@@ -400,24 +389,7 @@
 			const urlList = url.split('/');
 			self.pk = urlList[urlList.length-2];
 
-			$.when(
-				rest_aj_send('get', '/ebookSystem/api/ebooks/' +self.pk +'/'),
-				rest_aj_send('get', '/ebookSystem/api/ebooks/' +self.pk +'/action/edit/')
-			)
-			.done(function(data1, data2) {
-				self.image = data1['data'].scan_image;
-				self.old_edited_page = data1['data'].edited_page;
-				self.edited_page = data1['data'].edited_page;
-
-				const bookName = data1.data.bookname;
-				const part = data1.data.ISBN_part.split('-')[1];
-				document.title = '編輯' + bookName + '-part' + part;
-
-				self.current_editrecord = {
-					finish: data2.data.finish,
-					edit: data2.data.edit,
-				};
-			})
+			self.reloadPage();
 
 			self.recordPerMins();
 			setInterval(function () {
@@ -425,23 +397,39 @@
 				self.detectIdel();
 			}, 60000);
 
-
-			// window.addEventListener("beforeunload", function (e) {
-			// 	return 'Are you sure you want to leave?';
-			// })
-
 			window.addEventListener("beforeunload", function (event) {
 			  	event.returnValue = 'Are you sure you want to leave?';
 			});
 
 		},
 		methods: {
-			adjZoom :function(value){
+			reloadPage: function() {
+				const self = this;
+				$.when(
+					rest_aj_send('get', '/ebookSystem/api/ebooks/' +self.pk +'/'),
+					rest_aj_send('get', '/ebookSystem/api/ebooks/' +self.pk +'/action/edit/')
+				)
+				.done(function(data1, data2) {
+					self.image = data1.data.scan_image;
+					self.old_edited_page = data1.data.edited_page;
+					self.edited_page = data1.data.edited_page;
+
+					const bookName = data1.data.bookname;
+					const part = data1.data.ISBN_part.split('-')[1];
+					document.title = '編輯' + bookName + '-part' + part;
+
+					self.current_editrecord = {
+						finish: data2.data.finish,
+						edit: data2.data.edit,
+					};
+				})
+			},
+			adjZoom: function(value) {
 				if (this.imgSize + value > 0) {
 					this.imgSize = this.imgSize + value;
 				}
 			},
-			changePage: function(value){
+			changePage: function(value) {
 				page = parseInt(this.edited_page) + value;
 				if(page>=0 && page<50) {
 					this.edited_page = page;
@@ -453,7 +441,7 @@
 			recordPerMins: function() {
 				// 每 60s 傳送 change count 給後端
 				const self = this;
-				const editlog_url = '/ebookSystem/api/ebooks/' +self.pk +'/action/editlog/';
+				const editlog_url = '/ebookSystem/edit_ajax/' + self.pk +'/';
 				const transferData = {
 					online: self.change_count,
 					page: self.edited_page,
@@ -461,13 +449,8 @@
 
 				rest_aj_send('post', editlog_url, transferData)
 				.done(function(data) {
-					console.log(data)
 					self.change_count = 0;
 				})
-				.fail(function(xhr, result, statusText){
-					console.log(xhr.message);
-				})
-
 			},
 			detectIdel: function() {
 				// 每 60s 計算使用者閒置時間

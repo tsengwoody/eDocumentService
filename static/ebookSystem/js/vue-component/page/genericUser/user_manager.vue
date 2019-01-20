@@ -1,12 +1,12 @@
 <template>
 	<div>
 		<h2>使用者管理</h2>
-		<tab :data="tab_data">
+		<panel_group :data="tab_data" :title="'單位'">
 			<template slot="user_manager_org" slot-scope="props">
 				<user_manager_org :org_id="props.item">
 				</user_manager_org>
 			</template>
-		</tab>
+		</panel_group>
 	</div>
 </template>
 
@@ -14,7 +14,7 @@
 	module.exports = {
 		components: {
 			'user_manager_org': components['user_manager_org'],
-			'tab': components['tab'],
+			'panel_group': components['panel_group'],
 		},
 		data: function() {
 			return {

@@ -1,5 +1,5 @@
 <template>
-	<div class="tab-content" style="padding:20px 0px;">
+	<div class="tab-content">
 		<h3>{|{ org.name }|}</h3>
 		<div id="book_manager_search">
 			<div class="form-inline" style="margin-bottom:20px;">
