@@ -14,7 +14,7 @@
 			<div
 				:id="index"
 				v-for="(entry, index) in data"
-				:class="{'tab-pane':true, 'fade':false, 'active':(index==tab_index)}"
+				:class="{'tab-pane':true, 'fade':!(index===tab_index), 'active':(index===tab_index)}"
 			>
 
 				<h2 v-if="headinglevel===2" class="sr-only">{|{ entry.display_name }|}</h2>
