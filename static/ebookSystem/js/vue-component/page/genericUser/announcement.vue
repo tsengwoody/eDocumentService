@@ -1,44 +1,46 @@
 <template>
 	<div>
 		<h2>公告內容</h2>
-		<div class="form-group">
-			<label for="id_category" class="control-label col-sm-1"><font style="color:red">*</font>類別</label>
-			<div class="col-sm-11">
-				<div v-if="mode=='read'" class="panel panel-default" style="margin:0px; padding:5px 10px;">{|{ announcement.category }|}</div>
-				<template v-if="mode=='write'">
-					<select v-model="announcement.category" class="form-control">
-						<option value="">---------</option>
-						<option value="平台消息">平台消息</option>
-						<option value="新書推薦">新書推薦</option>
-						<option value="志工快訊">志工快訊</option>
-					</select>
-				</template>
+		<div class="form-horizontal">
+			<div class="form-group">
+				<label for="id_category" class="control-label col-sm-1"><font style="color:red">*</font>類別</label>
+				<div class="col-sm-11">
+					<div v-if="mode=='read'" class="panel panel-default" style="margin:0px; padding:5px 10px;">{|{ announcement.category }|}</div>
+					<template v-if="mode=='write'">
+						<select v-model="announcement.category" class="form-control">
+							<option value="">---------</option>
+							<option value="平台消息">平台消息</option>
+							<option value="新書推薦">新書推薦</option>
+							<option value="志工快訊">志工快訊</option>
+						</select>
+					</template>
+				</div>
 			</div>
-		</div>
-	
-		<div class="form-group">
-			<label for="id_title" class="control-label col-sm-1"><font style="color:red">*</font>標題</label>
-			<div class="col-sm-11">
-				<div v-if="mode=='read'" class="panel panel-default" style="margin:0px; padding:5px 10px;">{|{ announcement.title }|}</div>
-				<template v-if="mode=='write'">
-					<input v-model="announcement.title" class="form-control" type="text"/>
-				</template>
+		
+			<div class="form-group">
+				<label for="id_title" class="control-label col-sm-1"><font style="color:red">*</font>標題</label>
+				<div class="col-sm-11">
+					<div v-if="mode=='read'" class="panel panel-default" style="margin:0px; padding:5px 10px;">{|{ announcement.title }|}</div>
+					<template v-if="mode=='write'">
+						<input v-model="announcement.title" class="form-control" type="text"/>
+					</template>
+				</div>
 			</div>
-		</div>
-	
-		<div class="form-group">
-			<label for="id_content" class="control-label col-sm-1"><font style="color:red">*</font>內容</label>
-			<div class="col-sm-11">
-				<div v-if="mode=='read'" v-html="announcement.content" class="panel panel-default" style="margin:0px; padding:5px 10px;"></div>
-				<div v-if="mode=='write'">
-					<editor
-						v-model="announcement.content"
-						:init="tinymce_init">
-					</editor>
+		
+			<div class="form-group">
+				<label for="id_content" class="control-label col-sm-1"><font style="color:red">*</font>內容</label>
+				<div class="col-sm-11">
+					<div v-if="mode=='read'" v-html="announcement.content" class="panel panel-default" style="margin:0px; padding:5px 10px;"></div>
+					<div v-if="mode=='write'">
+						<editor
+							v-model="announcement.content"
+							:init="tinymce_init">
+						</editor>
+					</div>
 				</div>
 			</div>
 		</div>
-	
+		
 		<h2>附件檔案</h2>
 		<file_manager
 			:url="url +'resource/attachment/'"
@@ -82,6 +84,7 @@
 	
 			</div>
 		</div>
+
 	</div>
 </template>
 
