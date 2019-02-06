@@ -36,15 +36,19 @@
 					</li>
 				</ul>
 			</nav>
-			<div style="height:425px; overflow-y:auto;">
-				<img :src="image_url" alt="文件掃描原檔" id="scanPage" name="scanPage" :width="imageWidth">
-			</div>
+<!-- 			<div style="height:425px; overflow: hidden;">
+				<div id="scanPage">
+					<img :src="image_url" alt="文件掃描原檔" name="scanPage" style="opacity:0;">
+				</div>
+			</div> -->
+			<viewer ref="viewer" :image_url="image_url"></viewer>
+
 			<div id="sizeControl" class="row">
 				<div class="col-md-4 pull-left">
 					<label for="id_page">頁數:</label>
 					<input id="id_page" name="page" type="text" size="4" readonly="true" :value="edited_page">
 				</div>
-				<div class="input-group col-md-3 pull-right">
+<!-- 				<div class="input-group col-md-3 pull-right">
 					<span class="input-group-btn">
 						<button @click="adjZoom(-10)" id="zoomIN" class="btn btn-default btn-sm" type="button">-</button>
 					</span>
@@ -52,7 +56,7 @@
 					<span class="input-group-btn">
 						<button @click="adjZoom(10)" id="zoomOUT" class="btn btn-default btn-sm" type="button">+</button>
 					</span>
-				</div>
+				</div> -->
 			</div>
 		</div>
 
@@ -162,6 +166,7 @@
 	module.exports = {
 		components: {
 			'editor': Editor,
+			'viewer': components['viewer'],
 		},
 		data: function() {
 			return {
@@ -175,15 +180,16 @@
 				current_editrecord: {},
 				textClass: 'col-md-6 col-sm-12',
 				imageClass: 'col-md-6 col-sm-12',
+				// viewerId: null,
 			}
 		},
 		computed: {
 			image_url: function() {
 				return '/ebookSystem/api/ebooks/' +this.pk +'/resource/source/' +this.edited_page +'/'
 			},
-			imageWidth: function() {
-				return this.imgSize + '%';
-			},
+			// imageWidth: function() {
+			// 	return this.imgSize + '%';
+			// },
 			tinymce_init: function() {
 				const self = this;
 				return {
@@ -354,6 +360,7 @@
 									self.imageClass = 'col-md-6 col-sm-12';
 									self.textClass = 'col-md-6 col-sm-12';
 								}
+								self.$refs.viewer.refreshViewer();
 							}
 						});
 
@@ -400,7 +407,6 @@
 			window.addEventListener("beforeunload", function (event) {
 			  	event.returnValue = 'Are you sure you want to leave?';
 			});
-
 		},
 		methods: {
 			reloadPage: function() {
@@ -424,11 +430,11 @@
 					};
 				})
 			},
-			adjZoom: function(value) {
-				if (this.imgSize + value > 0) {
-					this.imgSize = this.imgSize + value;
-				}
-			},
+			// adjZoom: function(value) {
+			// 	if (this.imgSize + value > 0) {
+			// 		this.imgSize = this.imgSize + value;
+			// 	}
+			// },
 			changePage: function(value) {
 				page = parseInt(this.edited_page) + value;
 				if(page>=0 && page<50) {
@@ -459,7 +465,7 @@
 					window.removeEventListener("beforeunload", function (event) {
 					  	event.returnValue = 'Are you sure you want to leave?';
 					});
-					window.location.href = "/auth/logout/";
+					// window.location.href = "/auth/logout/";
 				}
 				this.idel_min++;
 			},
@@ -490,10 +496,11 @@
 	    width: 750px;
 	}
 
-	#zoomIN, #zoomOUT {
-		font-size: 1rem;
-		font-weight:bold;
-	}
+	// #zoomIN, #zoomOUT {
+	// 	font-size: 1rem;
+	// 	font-weight:bold;
+	// }
+
 	input#id_page {
 		height: 34px;
     	padding: 6px 12px;
@@ -506,8 +513,13 @@
 		margin: 5px 0;
 	}
 
-	div#sizeControl .input-group {
-		width: 150px;
-	}
+	// div#sizeControl .input-group {
+	// 	width: 150px;
+	// }
+
+	// li.viewer-prev, li.viewer-play, li.viewer-next, li.viewer-flip-horizontal, 
+	// li.viewer-flip-vertical {
+	// 	display: none;
+	// }
 
 </style>
