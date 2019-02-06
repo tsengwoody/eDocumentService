@@ -36,11 +36,7 @@
 					</li>
 				</ul>
 			</nav>
-<!-- 			<div style="height:425px; overflow: hidden;">
-				<div id="scanPage">
-					<img :src="image_url" alt="文件掃描原檔" name="scanPage" style="opacity:0;">
-				</div>
-			</div> -->
+			
 			<viewer ref="viewer" :image_url="image_url"></viewer>
 
 			<div id="sizeControl" class="row">
@@ -48,15 +44,6 @@
 					<label for="id_page">頁數:</label>
 					<input id="id_page" name="page" type="text" size="4" readonly="true" :value="edited_page">
 				</div>
-<!-- 				<div class="input-group col-md-3 pull-right">
-					<span class="input-group-btn">
-						<button @click="adjZoom(-10)" id="zoomIN" class="btn btn-default btn-sm" type="button">-</button>
-					</span>
-					<input type="text" class="form-control" size="2" :value="imageWidth" readonly="true">
-					<span class="input-group-btn">
-						<button @click="adjZoom(10)" id="zoomOUT" class="btn btn-default btn-sm" type="button">+</button>
-					</span>
-				</div> -->
 			</div>
 		</div>
 
@@ -187,9 +174,6 @@
 			image_url: function() {
 				return '/ebookSystem/api/ebooks/' +this.pk +'/resource/source/' +this.edited_page +'/'
 			},
-			// imageWidth: function() {
-			// 	return this.imgSize + '%';
-			// },
 			tinymce_init: function() {
 				const self = this;
 				return {
@@ -430,11 +414,6 @@
 					};
 				})
 			},
-			// adjZoom: function(value) {
-			// 	if (this.imgSize + value > 0) {
-			// 		this.imgSize = this.imgSize + value;
-			// 	}
-			// },
 			changePage: function(value) {
 				page = parseInt(this.edited_page) + value;
 				if(page>=0 && page<50) {
@@ -465,7 +444,7 @@
 					window.removeEventListener("beforeunload", function (event) {
 					  	event.returnValue = 'Are you sure you want to leave?';
 					});
-					// window.location.href = "/auth/logout/";
+					window.location.href = "/auth/logout/";
 				}
 				this.idel_min++;
 			},
@@ -495,12 +474,6 @@
 	.container {
 	    width: 750px;
 	}
-
-	// #zoomIN, #zoomOUT {
-	// 	font-size: 1rem;
-	// 	font-weight:bold;
-	// }
-
 	input#id_page {
 		height: 34px;
     	padding: 6px 12px;
@@ -512,14 +485,4 @@
 	div#sizeControl {
 		margin: 5px 0;
 	}
-
-	// div#sizeControl .input-group {
-	// 	width: 150px;
-	// }
-
-	// li.viewer-prev, li.viewer-play, li.viewer-next, li.viewer-flip-horizontal, 
-	// li.viewer-flip-vertical {
-	// 	display: none;
-	// }
-
 </style>
