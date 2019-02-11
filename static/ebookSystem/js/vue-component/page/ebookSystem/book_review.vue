@@ -23,12 +23,16 @@
 				<button
 					style="margin: 0.5em;"
 					class="btn btn-default"
-					@click="ScanBookEditor('掃描內容瀏覽', item)"
-				>分段{|{ item.split('-')[1] }|}</button>
+					@click="
+						$refs.scan_book_editor.instance_set(item); 
+						openDialog('scan_book_modal', this);
+				">分段{|{ item.split('-')[1] }|}</button>
 			</template>
 
 			<!--step 3-->
-			<h3><span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step3: 審核結果</h3>
+			<h3>
+				<span class="glyphicon glyphicon-check" aria-hidden="true" style="margin-top:20px;"></span> Step3: 審核結果
+			</h3>
 			<hr style="margin-top:5px;">
 
 			<template v-if="book.status==0">
@@ -48,12 +52,29 @@
 			</template>
 
 		</div>
+
+		<modal :id_modal="'scan_book_modal'" >
+			<template slot="header">
+				<h4 class="modal-title">掃描內容瀏覽</h4>
+			</template>
+			<template slot="body">
+				<scan_book_editor
+					:pk="0"
+					ref="scan_book_editor"
+				>
+				</scan_book_editor>
+			</template>
+		</modal>
 	</div>
 </template>
 
 <script>
 
 	module.exports = {
+		components: {
+			'scan_book_editor': components['scan_book_editor'],
+			'modal': components['modal'],
+		},
 		data: function() {
 			return {
 				pk: '',
@@ -117,3 +138,9 @@
 		}
 	}
 </script>
+
+<style>
+div#scan_book_modal > div.modal-dialog {
+	width: 95%;
+}
+</style>

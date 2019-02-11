@@ -1,50 +1,14 @@
 ﻿<template>
 	<div class="row" id="id_ebook_image">
 		<div id="imagePage" :class="imageClass" style="margin-bottom: 1em;">
-			<nav>
-				<ul class="pager" style="margin:0px 0px 10px 0px;">
-					<li class="previous">
-						<a @click="changePage(-1)" id="prePage" href="#">
-							<span aria-hidden="true">&larr;</span> Older
-						</a>
-					</li>
-					<li>
-						<div class="col-xs-5 centered">
-							<select class="form-control" id="scanPageList" v-model="edited_page">
-								<template v-for="(value, key) in image">
-									<option 
-										v-if="old_edited_page==key"
-										:value="key"
-									>
-										{|{ value }|}-上次校對頁數
-									</option>
-									<option 
-										v-else
-										:value="key"
-									>
-										{|{ value }|}
-									</option>
-								</template>
-
-							</select>
-						</div>
-					</li>
-					<li class="next">
-						<a @click="changePage(1)" id="nextPage" href="#">Newer
-							<span aria-hidden="true">&rarr;</span>
-						</a>
-					</li>
-				</ul>
-			</nav>
 			
-			<viewer ref="viewer" :image_url="image_url"></viewer>
+			<viewer ref="viewer" 
+				:pk="pk" 
+				:images="image"
+				:edited_page="old_edited_page"
+				@changed="changePage"
+			></viewer>
 
-			<div id="sizeControl" class="row">
-				<div class="col-md-4 pull-left">
-					<label for="id_page">頁數:</label>
-					<input id="id_page" name="page" type="text" size="4" readonly="true" :value="edited_page">
-				</div>
-			</div>
 		</div>
 
 		<div id="textPage" :class="textClass">
@@ -66,7 +30,6 @@
 	</div>
 </template>
 
-<script language="javascript" src="/static/ebookSystem/js/edit.js?180510"></script>
 <script type="text/javascript"> 
 
 	function addMark(strValue, editor) {
@@ -158,7 +121,8 @@
 		data: function() {
 			return {
 				pk: null,
-				edited_page: '',
+				old_edited_page: 0,
+				edited_page: 0,
 				image: {},
 				imgSize: 100,
 
@@ -171,9 +135,9 @@
 			}
 		},
 		computed: {
-			image_url: function() {
-				return '/ebookSystem/api/ebooks/' +this.pk +'/resource/source/' +this.edited_page +'/'
-			},
+			// image_url: function() {
+			// 	return '/ebookSystem/api/ebooks/' +this.pk +'/resource/source/' +this.edited_page +'/'
+			// },
 			tinymce_init: function() {
 				const self = this;
 				return {
@@ -415,13 +379,7 @@
 				})
 			},
 			changePage: function(value) {
-				page = parseInt(this.edited_page) + value;
-				if(page>=0 && page<50) {
-					this.edited_page = page;
-				}
-				else {
-					alertmessage('error', '超過頁數範圍惹~');
-				}
+				this.edited_page = value;
 			},
 			recordPerMins: function() {
 				// 每 60s 傳送 change count 給後端
@@ -429,7 +387,7 @@
 				const editlog_url = '/ebookSystem/edit_ajax/' + self.pk +'/';
 				const transferData = {
 					online: self.change_count,
-					page: self.edited_page,
+					page: self.edited_page,	// 要改成 nowPage
 				};
 
 				rest_aj_send('post', editlog_url, transferData)
@@ -444,7 +402,7 @@
 					window.removeEventListener("beforeunload", function (event) {
 					  	event.returnValue = 'Are you sure you want to leave?';
 					});
-					window.location.href = "/auth/logout/";
+					// window.location.href = "/auth/logout/";
 				}
 				this.idel_min++;
 			},

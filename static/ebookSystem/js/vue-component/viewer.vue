@@ -1,7 +1,53 @@
 <template>
-	<div :style="{ height: height + 'px', overflow: 'hidden'}">
-		<div id="scanPage">
-			<img :src="image_url" alt="文件掃描原檔" name="scanPage" style="opacity:0;">
+	<div>
+		<nav>
+			<ul class="pager" style="margin:0px 0px 10px 0px;">
+				<li>
+					<a href="#" aria-label="至最初頁" @click="changePage('first')">最初頁</a>
+				</li>
+
+				<li>
+					<a href="#" aria-label="上一頁" @click="changePage(-1)">上一頁</a>
+				</li>
+				
+				<li>
+					<div style="display:inline-block; float:none; margin:0px 10px;">
+						<select class="form-control" id="scanPageList" v-model="nowPage">
+							<template v-for="(value, key) in images">
+								<option 
+									v-if="edited_page == key"
+									:value="key"
+								>
+									{|{ value }|}-上次校對頁數
+								</option>
+								<option 
+									v-else
+									:value="key"
+								>
+									{|{ value }|}
+								</option>
+							</template>
+
+						</select>
+					</div>
+				</li>
+
+				<li>
+					<a href="#" aria-label="下一頁" @click="changePage(1)">下一頁</a>
+				</li>
+
+				<li>
+					<a href="#" aria-label="至最後頁" @click="changePage('end')">最後頁</a>
+				</li>
+
+				<slot></slot>
+			</ul>
+		</nav>
+
+		<div :style="{ height: height + 'px', overflow: 'hidden'}">
+			<div id="scanPage">
+				<img :src="image_url" alt="文件掃描原檔" name="scanPage" style="opacity:0;">
+			</div>
 		</div>
 	</div>
 </template>
@@ -9,26 +55,38 @@
 <script>
 	module.exports = {
 		props: {
-			height: {
-				default: 425,
+			pk: String,
+			images: Object,
+			edited_page: {
+				default: null,
 				type: Number,
 			},
-			image_url: String,
+			height: {
+				default: 455,
+				type: Number,
+			},
 		},
 		data: function() {
 			return {
 				viewerId: null,
+				nowPage: null,
 			}
 		},
 		mounted: function() {
-			if (this.image_url) {
+			this.nowPage = this.edited_page || 0;
+			this.$nextTick(() => {
 				this.refreshViewer();
-			}
+			})
+		},
+		computed: {
+			image_url: function() {
+				return '/ebookSystem/api/ebooks/' +this.pk +'/resource/source/' +this.nowPage +'/'
+			},
 		},
 		methods: {
 			refreshViewer: function() {
 				// Destroy the viewer and remove the instance.
-				this.viewerId && this.viewerId.destroy();	
+				this.viewerId && this.viewerId.destroy();
 				this.viewerId = new Viewer(document.getElementById('scanPage'), {
 					inline: true,
 					button: false,
@@ -53,7 +111,20 @@
 						localStorage.setItem("imgview_ratio", ratio);
 					}
 				});
-			}
+			},
+			changePage: function(value) {
+				if (value === 'first') this.nowPage = 0;
+				else if (value === 'end') this.nowPage = 49;
+				else {
+					const page = parseInt(this.nowPage) + value;
+					if (page >= 0 && page < 50) {
+						this.nowPage = page;
+					}
+					else {
+						alertmessage('error', '超過頁數範圍惹~');
+					}
+				}
+			},
 		},
 		watch: {
 			image_url: function() {
@@ -61,6 +132,12 @@
 					this.refreshViewer();
 				})
 			},
+			edited_page: function(val) {
+				this.nowPage = val;
+			},
+			nowPage: function(val) {
+				this.$emit('changed', val);
+			}
 		},
 	}
 </script>
