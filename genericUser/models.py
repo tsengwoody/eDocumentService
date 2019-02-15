@@ -344,6 +344,7 @@ class BannerContent(models.Model):
 	title = models.CharField(max_length=100, )
 	content = models.TextField()
 	order = models.IntegerField()
+	url = models.CharField(max_length=255, blank=True, null=True)
 
 	def __init__(self, *args, **kwargs):
 		super(BannerContent, self).__init__(*args, **kwargs)

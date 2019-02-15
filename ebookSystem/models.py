@@ -223,9 +223,10 @@ class Book(models.Model):
 		custom_zip = self.path +'/temp/{0}_{1}.zip'.format(self.ISBN, user.username)
 		zip_list = [custom_path]
 		try:
-			pyminizip.compress_multiple(zip_list, custom_zip, password, 5)
+			pyminizip.compress_multiple(zip_list, [], custom_zip, password, 5)
 			return custom_zip
 		except BaseException as e:
+			raise SystemError('zip create fail:' +unicode(e))
 			try:
 				os.remove(custom_zip)
 			except BaseException as e:

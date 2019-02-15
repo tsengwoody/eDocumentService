@@ -76,7 +76,7 @@
 
 				token_login
 				.done(function(data) {
-					token.save();
+					//token.save();
 				})
 
 				Promise.all([session_login, token_login,])

@@ -25,7 +25,7 @@ EditorFilter = KeyMapAttrFilterFactory(key = 'editor_id', type = str, attr = 'ed
 BookInfoOwnerFilter = KeyMapAttrFilterFactory(key = 'owner_id', type = str, attr = 'book__owner_id')
 
 #['book_manager']
-BooknameFilter = KeyMapAttrFilterFactory(key = 'bookname', type = convert_unicode, attr = 'book_info__bookname')
+BooknameFilter = KeyMapAttrFilterFactory(key = 'bookname', type = convert_unicode, attr = 'book_info__bookname__contains')
 
 class CBCFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):

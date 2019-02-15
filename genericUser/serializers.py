@@ -70,9 +70,6 @@ class BusinessContentSerializer(serializers.ModelSerializer):
 		fields = ('__all__')
 
 class BannerContentSerializer(serializers.ModelSerializer):
-	id = serializers.ReadOnlyField()
-	order = serializers.ReadOnlyField()
-
 	class Meta:
 		model = BannerContent
 		fields = ('__all__')

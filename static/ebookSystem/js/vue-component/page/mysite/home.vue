@@ -1,63 +1,5 @@
-
 <template>
 	<div>
-<!-- 		<div id="id_bannercontent_list">
-			<div id="myCarousel" class="carousel slide" data-ride="carousel">
-				<ol class="carousel-indicators">
-					<template v-for="(item, index) in bannercontentlist">
-						<li data-target="#myCarousel"
-							v-if="index==0"
-							v-bind:data-slide-to="index"
-							class="active"
-						></li>
-						<li data-target="#myCarousel"
-							v-if="index!=0"
-							v-bind:data-slide-to="index"
-						></li>
-					</template>
-				</ol>
-
-				<div class="carousel-inner" role="listbox">
-					<template v-for="(item, index) in bannercontentlist">
-						<div class="item active" v-if="index==0">
-							<img
-								:src="`/genericUser/api/bannercontents/` +item.id +`/resource/cover/image`"
-								:alt="item.title"
-								:title="item.title"
-								style="height: 480px;width:940px" 
-							>
-						</div>
-						<div class="item" v-if="index!=0">
-							<img
-								:src="`/genericUser/api/bannercontents/` +item.id +`/resource/cover/image`"
-								:alt="item.title"
-								:title="item.title"
-								style="height: 480px;width:940px" 
-							>
-						</div>
-					</template>
-				</div>
-
-				<a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev" aria-label="上一頁">
-					<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-					<span class="sr-only">Previous</span>
-				</a>
-				<a class="right carousel-control" href="#myCarousel" role="button" data-slide="next" aria-label="下一頁">
-					<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-					<span class="sr-only">Next</span>
-				</a>
-			</div>
-
-			<div class="textfornvda">
-				<h4>首頁圖片說明</h4>
-				<ul>
-					<li v-for="(item, index) in bannercontentlist">
-						<div v-html="markdown2html(item.content)"></div>
-					</li>
-				</ul>
-			</div>
-		</div> -->
-
 		<div class="homeCarousel">
 			<template v-for="(item, index) in bannercontentlist">
 				<div class="slides active" v-if="index==0">
@@ -80,13 +22,15 @@
 			
 
 			<a role="button" class="left carousel-control" @click="plusDivs(-1)">
-				<span class="pointer-left">&#10094;</span>
+				<span class="pointer-left" aria-hidden="true">&#10094;</span>
+				<span class="sr-only">上一頁</span>
 			</a>
-  			<a role="button" class="right carousel-control" @click="plusDivs(1)">
-  				<span class="pointer-right">&#10095;</span>
-  			</a>
+			<a role="button" class="right carousel-control" @click="plusDivs(1)">
+				<span class="pointer-right" aria-hidden="true">&#10095;</span>
+				<span class="sr-only">下一頁</span>
+			</a>
 
-  			<div class="textfornvda">
+			<div class="textfornvda">
 				<h4>首頁圖片說明</h4>
 				<ul>
 					<li v-for="(item, index) in bannercontentlist">
@@ -99,7 +43,7 @@
 		<div class="row" style="padding-top: 20px;">
 			<div class="col-lg-4">
 				<div class="panel panel-success">
-					<div class="panel-heading">最新消息 {|{ slideIndex }|}</div>
+					<div class="panel-heading">最新消息</div>
 					<div class="panel-body">
 						<template v-for="announcement in showAnnouncements">
 							<p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">

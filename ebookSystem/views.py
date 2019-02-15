@@ -1,20 +1,14 @@
 ﻿# coding: utf-8
 import base64
-import codecs
-import datetime
 import json
 import os
 import uuid
 
 from django.core.cache import cache
-from django.core.urlresolvers import reverse, resolve
-from django.http import HttpResponseRedirect,HttpResponse, Http404
 from django.shortcuts import render
 from django.utils import timezone
 from .models import *
-from mysite.settings import BASE_DIR, SERVICE
 from utils.decorator import *
-from django.views.decorators.cache import cache_control
 
 #logging config
 import logging
@@ -34,42 +28,6 @@ logger.addHandler(fh)
 def generics(request, name, pk=None):
 	template_name='ebookSystem/{0}.html'.format(name.split('/')[0])
 	return locals()
-
-def edit_ajax(request, ISBN_part, *args, **kwargs):
-	user = request.user
-	response = {}
-
-	delta = timezone.now() - user.online
-	if delta.seconds < 50:
-		response['status'] = u'error'
-		response['message'] = u'您有其他編輯正進行'
-		return HttpResponse(json.dumps(response), content_type="application/json")
-
-	user.online = timezone.now()
-	user.save()
-
-	part = EBook.objects.get(ISBN_part=ISBN_part)
-	part.service_hours = part.service_hours+1
-	part.save()
-
-	editRecord = EditRecord.objects.get(part=part, number_of_times=part.number_of_times)
-
-	order = len(EditLog.objects.filter(edit_record=editRecord))
-	EditLog.objects.create(edit_record=editRecord, user=request.user, time=timezone.now(), order=order, edit_count=int(request.POST['online']))
-	response['status'] = u'success'
-	response['message'] = part.service_hours
-	return HttpResponse(json.dumps(response), content_type="application/json")
-
-@cache_control(no_store=True, no_cache=True, max_age=0)
-@http_response
-def edit(request, template_name='ebookSystem/edit.html', encoding='utf-8', *args, **kwargs):
-	try:
-		part = EBook.objects.get(ISBN_part=kwargs['ISBN_part'])
-	except: 
-		raise Http404("book or part does not exist")
-
-	if request.method == 'GET':
-		return locals()
 
 #==========
 

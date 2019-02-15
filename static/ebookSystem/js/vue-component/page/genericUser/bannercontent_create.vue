@@ -59,9 +59,13 @@
 						>
 						<br><br>
 						<div class="form-group">
-								<label for="id_content">詳細說明</label>
-								<textarea class="form-control" id="id_content" v-model="temp.content" rows="3" placeholder="content"></textarea>
-							</div>
+							<label for="id_content">詳細說明</label>
+							<textarea class="form-control" id="id_content" v-model="temp.content" rows="3" placeholder="content"></textarea>
+						</div>
+						<div class="form-group">
+							<label for="id_url">連結網址</label>
+							<input class="form-control" id="id_url" v-model="temp.url" rows="3" placeholder="url"></input>
+						</div>
 						<div class="form-group">
 							<label for="id_cover">上傳圖檔</label>
 							<input type="file" class="form-control-file" id="id_cover" name="cover"/>
@@ -91,6 +95,7 @@
 					'title': '',
 					'content': '',
 					'order': '',
+					'url': '',
 				},
 			}
 		},
