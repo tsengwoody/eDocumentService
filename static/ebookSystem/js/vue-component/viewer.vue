@@ -11,7 +11,7 @@
 				</li>
 				
 				<li>
-					<div style="display:inline-block; float:none; margin:0px 10px;">
+					<div style="display:inline-block; float:none;">
 						<select class="form-control" id="scanPageList" v-model="nowPage">
 							<template v-for="(value, key) in images">
 								<option 

@@ -232,7 +232,7 @@
 										type: 'save',
 										finish: $('#id_finish').val(),
 										edit: $('#id_edit').val(),
-										page: $('#id_page').val(),
+										page: self.edited_page,
 									};
 
 									rest_aj_send('post', url, transferData)
@@ -263,7 +263,7 @@
 										type: 'finish',
 										finish: $('#id_finish').val(),
 										edit: $('#id_edit').val(),
-										page: $('#id_page').val(),
+										page: self.edited_page,
 									};
 
 									rest_aj_send('post', url, transferData)
@@ -384,7 +384,7 @@
 			recordPerMins: function() {
 				// 每 60s 傳送 change count 給後端
 				const self = this;
-				const editlog_url = '/ebookSystem/api/ebook' + self.pk +'/action/editlog/';
+				const editlog_url = '/ebookSystem/api/ebooks/' + self.pk +'/action/editlog/';
 				const transferData = {
 					online: self.change_count,
 					page: self.edited_page,	// 要改成 nowPage
