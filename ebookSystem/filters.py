@@ -24,6 +24,8 @@ EditorFilter = KeyMapAttrFilterFactory(key = 'editor_id', type = str, attr = 'ed
 # ['book_person', ]
 BookInfoOwnerFilter = KeyMapAttrFilterFactory(key = 'owner_id', type = str, attr = 'book__owner_id')
 
+BookInfoOrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'book__org_id')
+
 #['book_manager']
 BooknameFilter = KeyMapAttrFilterFactory(key = 'bookname', type = convert_unicode, attr = 'book_info__bookname__contains')
 
