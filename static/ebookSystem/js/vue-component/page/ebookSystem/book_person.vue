@@ -193,7 +193,7 @@
 				.done(function(){
 					self.client.books.del(pk)
 					.done(function(data) {
-						alertmessage('success', '成功刪除 Q&A id:' +pk)
+						alertmessage('success', '成功刪除書籍 id:' +pk)
 						.done(function(){
 							self.get_table_data();
 						})

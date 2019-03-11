@@ -61,6 +61,7 @@ class BookSerializer(serializers.ModelSerializer):
 			'finish_page_count',
 			'finish_part_count',
 			'service_hours',
+			'category',
 		]
 
 class BookAddSerializer(BookSerializer):
@@ -82,6 +83,12 @@ class LibraryRecordSerializer(serializers.ModelSerializer):
 	object = BookSerializer(read_only=True,)
 	class Meta:
 		model = LibraryRecord
+		fields = ('__all__')
+
+class CategorySerializer(serializers.ModelSerializer):
+	book_set = BookSerializer(many=True, read_only=True)
+	class Meta:
+		model = Category
 		fields = ('__all__')
 
 #===== ISSN Book =====

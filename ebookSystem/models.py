@@ -36,6 +36,7 @@ class Book(models.Model):
 	priority = models.IntegerField(default=9)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
 	org = models.ForeignKey(Organization, related_name='book_set', )
+	category = models.ForeignKey('Category', related_name='book_set', blank=True, null=True, on_delete=models.SET_NULL,)
 	owner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='own_book_set')
 	upload_date = models.DateField(default = timezone.now)
 	is_private = models.BooleanField(default=False)
@@ -201,6 +202,9 @@ class Book(models.Model):
 				html2txt(part_list, custom_txt)
 			except BaseException as e:
 				raise SystemError('epub create fail (not final):' +unicode(e))
+
+		with io.open(custom_txt, 'a', encoding='utf-8') as f:
+			f.write(unicode(user.id))
 
 		return custom_txt
 
@@ -715,6 +719,13 @@ class EditLog(models.Model):
 
 	def __unicode__(self):
 		return self.edit_record.part.ISBN_part +'-{0}'.format(self.order)
+
+class Category(models.Model):
+	name = models.CharField(max_length=255)
+	org = models.ForeignKey(Organization, related_name='category_set', )
+
+	def __unicode__(self):
+		return self.name
 
 def add_watermark(self,text, fontname, fontsize, imagefile, output_dir):
 	img0 = Image.new("RGBA", (1,1))

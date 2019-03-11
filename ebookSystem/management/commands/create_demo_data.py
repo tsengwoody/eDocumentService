@@ -35,6 +35,7 @@ class Command(BaseCommand):
 			is_editor=True,
 			is_guest=True,
 			is_manager=True,
+			is_supermanager=True,
 			is_license = True,
 			is_book = True,
 			auth_email=True,
@@ -61,6 +62,7 @@ class Command(BaseCommand):
 				"level": "severe",
 				"category": "vi",
 				"owner": 1,
+				'is_active': 'true',
 			},
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
@@ -149,6 +151,11 @@ class Command(BaseCommand):
 		manager.auth_phone = True
 		manager.save()
 
+		category_instance = Category.objects.create(
+			name='資訊工程學',
+			org_id=org.id,
+		)
+
 		src = BASE_DIR +u'/temp/藍色駭客.zip'
 		with open(src, 'rb') as book_file:
 			client = Client()
@@ -164,9 +171,10 @@ class Command(BaseCommand):
 					u'bookbinding': '平裝',
 					u'chinese_book_category': '874',
 					u'order': '初版',
+					'category_id': category_instance.id,
 					'fileObject': book_file,
 				},
-#				HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+				#HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 			)
 
 		assert response.status_code == 202, 'status_code' +str(response.status_code) +str(response.content)
@@ -238,6 +246,7 @@ class Command(BaseCommand):
 					u'bookbinding': '平裝',
 					u'chinese_book_category': '861',
 					u'order': '初版',
+					'category_id': category_instance.id,
 					'fileObject': book_file,
 				},
 #				HTTP_X_REQUESTED_WITH='XMLHttpRequest',
@@ -263,6 +272,7 @@ class Command(BaseCommand):
 				u'bookbinding': '平裝',
 				u'chinese_book_category': '494',
 				u'order': '第二版',
+				'category_id': category_instance.id,
 				'fileObject': book_file,
 				'category': 'epub',
 			},

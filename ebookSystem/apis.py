@@ -171,6 +171,10 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			newBook.owner = request.user
 			newBook.org = request.user.org
 			newBook.source = 'self'
+			try:
+				newBook.category = Category.objects.get(id=request.POST['category_id'])
+			except:
+				pass
 			newBook.save()
 			try:
 				newBook.create_EBook()
@@ -712,6 +716,12 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			else:
 				res['detail'] = u'身份認證失敗'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+class CategoryViewSet(viewsets.ModelViewSet):
+	queryset = Category.objects.all()
+	serializer_class = CategorySerializer
+	filter_backends = (OrgFilter,)
+	permission_classes = (permissions.IsAuthenticated, )
 
 #===== ISSN Book =====
 

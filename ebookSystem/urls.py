@@ -14,6 +14,7 @@ router.register(r'issnbookinfos', apis.ISSNBookInfoViewSet)
 router.register(r'issnbooks', apis.ISSNBookViewSet)
 router.register(r'bookrecommends', apis.BookRecommendViewSet)
 router.register(r'libraryrecords', apis.LibraryRecordViewSet)
+router.register(r'categorys', apis.CategoryViewSet)
 router.register(r'bookorders', apis.BookOrderViewSet)
 
 import copy
