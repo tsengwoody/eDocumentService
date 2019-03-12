@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div :id="'category_manager' +org_id" class="container">
 		<h3>{|{ org.name }|}</h3>
 		<div class="row">
@@ -40,11 +40,11 @@
 				</div>
 			</div>
 			<div class="col-sm-9 col-md-9">
-				<h4>書籍列表</h4>
 				<div
 					v-for="(item, index) in items"
 					v-if="pointer.id===item.id"
 				>
+					<h4>{|{ item.name }|}書籍列表</h4>
 					<table-div :datas="item.book_list" :header="bookinfo_columns">
 						<template slot="action" slot-scope="props">
 							<button
