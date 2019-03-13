@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div id="book_repository_school" class="container">
 		<h2>平台書庫</h2>
 		<div class="row">
@@ -167,8 +167,24 @@
 				}
 
 				if(!self.pointer.hasOwnProperty("books")){
+					let param = {}
+
+					try {
+						if( self.pointer.id.endsWith('null') && (self.pointer.id.split('-').length===2) ){
+							let org_id = self.pointer.id.split('-')[0]
+							let category_id = self.pointer.id.split('-')[1]
+							param = {'org_id': org_id, 'category_id': category_id}
+						}
+						else{
+							param = {'category_id': self.pointer.id}
+						}
+					}
+					catch (err) {
+						param = {'category_id': self.pointer.id}
+					}
+
 					self.pointer.books = []
-					self.clientb.bookinfos.read({'category_id': self.pointer.id})
+					self.clientb.bookinfos.read(param)
 					.done(function(data) {
 						_.each(data, function(b){
 							b['action'] = b.ISBN
