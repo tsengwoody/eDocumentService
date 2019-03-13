@@ -14,6 +14,7 @@ OwnerFilter = KeyMapAttrFilterFactory(key = 'owner_id', type = str, attr = 'owne
 
 # ['school',]
 OrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'org_id')
+CategoryFilter = KeyMapAttrFilterFactory(key = 'category_id', type = str, attr = 'category_id')
 
 # 
 EbookOrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'book__org_id')
@@ -25,6 +26,7 @@ EditorFilter = KeyMapAttrFilterFactory(key = 'editor_id', type = str, attr = 'ed
 BookInfoOwnerFilter = KeyMapAttrFilterFactory(key = 'owner_id', type = str, attr = 'book__owner_id')
 
 BookInfoOrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'book__org_id')
+BookInfoCategoryFilter = KeyMapAttrFilterFactory(key = 'category_id', type = str, attr = 'book__category_id')
 
 #['book_manager']
 BooknameFilter = KeyMapAttrFilterFactory(key = 'bookname', type = convert_unicode, attr = 'book_info__bookname__contains')

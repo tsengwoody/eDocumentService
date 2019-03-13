@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div :id="'category_manager' +org_id" class="container">
 		<h3>{|{ org.name }|}</h3>
 		<div class="row">
@@ -40,11 +40,11 @@
 				</div>
 			</div>
 			<div class="col-sm-9 col-md-9">
-				<h4>書籍列表</h4>
 				<div
 					v-for="(item, index) in items"
 					v-if="pointer.id===item.id"
 				>
+					<h4>{|{ item.name }|}書籍列表</h4>
 					<table-div :datas="item.book_list" :header="bookinfo_columns">
 						<template slot="action" slot-scope="props">
 							<button
@@ -149,7 +149,7 @@
 						'type': 'select',
 						'choices' : [
 							{
-								'value': 0,
+								'value': null,
 								'display_name': '未分類',
 							},
 						],
@@ -186,9 +186,6 @@
 					}
 				}
 			},
-			url: function(){
-				return '/ebookSystem/api/categorys/';
-			},
 		},
 		mounted: function () {
 			let self = this
@@ -211,21 +208,15 @@
 		methods: {
 			refresh: function(){
 				let self = this;
-				self.items = [
-					{
-						'id': 0,
-						'name': '未分類',
-						'book_list': [],
-					},
-				],
-				self.pointer = self.items[0];
+				self.items = []
+				self.pointer = {};
 				self.model_info = {
 					book_category_id: {
 						'label': '類別',
 						'type': 'select',
 						'choices' : [
 							{
-								'value': 0,
+								'value': null,
 								'display_name': '未分類',
 							},
 						],
@@ -239,6 +230,24 @@
 				self.book_category_id = 0;
 				self.category_id = '';
 				self.category_name = '';
+
+				self.clientb.books.read({'org_id': self.org_id, 'category_id': 'null'})
+				.done(function(data) {
+					let bookinfos = [];
+					_.each(data, function(v){
+						v.book_info['action'] = v.book_info['ISBN'],
+						bookinfos.push(v.book_info);
+					})
+					self.items.push({
+						'id': 0,
+						'name': '未分類',
+						'book_list': bookinfos,
+					})
+					self.pointer = self.items[0]
+				})
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', xhr.responseText)
+				})
 
 				self.clientb.categorys.read({'org_id': self.org_id})
 				.done(function(data) {
@@ -267,7 +276,9 @@
 			},
 			book_category_update: function(){
 				let self = this
-				self.clientb.books.updatepart(self.book_ISBN, {'category': self.book_category_id})
+
+				param = {'category': self.book_category_id}
+				self.clientb.books.updatepart(self.book_ISBN, param)
 				.done(function(data) {
 					alertmessage('success', '書籍類別變更成功');
 					self.$refs['bcu' +self.org_id].close();

@@ -22,7 +22,7 @@ import sys
 class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
-	filter_backends = (StatusFilter, OwnerFilter, OrgFilter, BooknameFilter,)
+	filter_backends = (StatusFilter, OwnerFilter, OrgFilter, CategoryFilter, BooknameFilter,)
 	ordering_fields = ('upload_date',)
 	permission_classes = (permissions.IsAuthenticated,)
 
@@ -515,7 +515,7 @@ elif (sys.version_info > (3, 0)):
 class BookInfoViewSet(viewsets.ModelViewSet):
 	queryset = BookInfo.objects.filter(book__status__gte=Book.STATUS['finish']).order_by('-date')
 	serializer_class = BookInfoSerializer
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, CBCFilter, NewestFilter, HottestFilter, BookInfoOwnerFilter, BookInfoOrgFilter,)
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, CBCFilter, NewestFilter, HottestFilter, BookInfoOwnerFilter, BookInfoOrgFilter, BookInfoCategoryFilter,)
 	ordering_fields = ('date',)
 	search_fields = ('ISBN', 'bookname', 'author', )
 
