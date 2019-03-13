@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="book_repository_school" class="container">
 		<h2>平台書庫</h2>
 		<div class="row">
@@ -6,9 +6,9 @@
 				<div class="panel-group">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h4 class="panel-title">
+							<h3 class="panel-title">
 								<span class="glyphicon glyphicon-folder-close"></span>&nbsp;&nbsp;分類列表
-							</h4>
+							</h3>
 						</div>
 						<div class="panel-collapse">
 							<ul class="list-group">
@@ -31,7 +31,7 @@
 				</div>
 			</div>
 			<div class="col-sm-9 col-md-9">
-				<h4>{|{ pointer.name }|}書籍列表</h4>
+				<h3>{|{ pointer.name }|}書籍列表</h3>
 				<bookinfo_repository :datas="books" :header="bookinfo_header"></bookinfo_repository>
 			</div>
 		</div>
@@ -113,17 +113,24 @@
 							'name': o.name,
 							'categorys': [],
 						}
+
+						let temp = {
+							'id': o.id +'-null',
+							'name': '未分類',
+						}
+
+						org_category.categorys.push(temp)
+						self.categorys_books.push(temp)
+
 						self.clientb.categorys.read({'org_id': o.id})
 						.done(function(data) {
 							_.each(data, function(c){
-								org_category.categorys.push({
-									'id': c.id,
-									'name': c.name,
-								})
-								self.categorys_books.push({
-									'id': c.id,
-									'name': c.name,
-								})
+							let temp = {
+								'id': c.id,
+								'name': c.name,
+							}
+								org_category.categorys.push(temp)
+								self.categorys_books.push(temp)
 							})
 						})
 						.fail(function(xhr, result, statusText){
@@ -161,7 +168,7 @@
 
 				if(!self.pointer.hasOwnProperty("books")){
 					self.pointer.books = []
-					self.clientb.bookinfos.read({'org_id': self.pointer.id})
+					self.clientb.bookinfos.read({'category_id': self.pointer.id})
 					.done(function(data) {
 						_.each(data, function(b){
 							b['action'] = b.ISBN

@@ -43,7 +43,10 @@ def KeyMapAttrFilterFactory(key, type, attr):
 			if not value:
 				return queryset
 			try:
-				self.value = self.type(value)
+				if value=='null':
+					self.value = None
+				else:
+					self.value = self.type(value)
 				kwargs = {
 					self.attr: self.value,
 				}

@@ -14,6 +14,7 @@ OwnerFilter = KeyMapAttrFilterFactory(key = 'owner_id', type = str, attr = 'owne
 
 # ['school',]
 OrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'org_id')
+CategoryFilter = KeyMapAttrFilterFactory(key = 'category_id', type = str, attr = 'category_id')
 
 # 
 EbookOrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'book__org_id')
