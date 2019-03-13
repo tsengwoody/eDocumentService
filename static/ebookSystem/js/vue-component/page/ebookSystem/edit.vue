@@ -1,13 +1,21 @@
 ﻿<template>
 	<div class="row" id="id_ebook_image">
-		<div id="imagePage" :class="imageClass" style="margin-bottom: 1em;">
-			
+		<div id="imagePage" :class="imageClass" style="margin-bottom: 1em; padding-bottom: 1em;">
 			<viewer ref="viewer" 
 				:pk="pk" 
 				:images="image"
 				:edited_page="old_edited_page"
+				:height="viewerHeight"
 				@changed="changePage"
 			></viewer>
+			
+			<hr/>
+
+			<div style="position: absolute; bottom: 0; right: 50%; cursor: n-resize; display: block;"
+				@mousedown="startAdjustHeight($event)"
+			>
+				<i class="fa fa-angle-double-down" aria-hidden="true" style="font-size:1.5em;"></i>
+			</div>
 
 		</div>
 
@@ -24,7 +32,7 @@
 				@input="editorChange"
 				:init="tinymce_init"
 				v-model="current_editrecord.edit"
-				style="height:400px;"
+				:style="{height: editorHeight + 'px'}"
 			></editor>
 		</div>
 	</div>
@@ -113,6 +121,10 @@
 		return index;
 	}
 
+	function beforeunloadFun(event) {
+		event.returnValue = 'Are you sure you want to leave?';
+	}
+
 	module.exports = {
 		components: {
 			'editor': Editor,
@@ -131,13 +143,15 @@
 				current_editrecord: {},
 				textClass: 'col-md-6 col-sm-12',
 				imageClass: 'col-md-6 col-sm-12',
-				// viewerId: null,
+				old_position: {},
+				new_position: {},
+
+				isMousedown: false,
+				viewerHeight: 455,
+				editorHeight: 400,
 			}
 		},
 		computed: {
-			// image_url: function() {
-			// 	return '/ebookSystem/api/ebooks/' +this.pk +'/resource/source/' +this.edited_page +'/'
-			// },
 			tinymce_init: function() {
 				const self = this;
 				return {
@@ -149,9 +163,16 @@
 					toolbar2: 'undo redo | cut copy paste | bullist numlist | table | searchreplace | fontsizeselect ',
 					fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt',
 					menubar: false,
+
 					setup: function (editor) {
 						editor.on('init', function (e) {
 							editor.getBody().style.fontSize = '14pt';
+						});
+
+						editor.on('ResizeEditor', function(e) {
+							const iframeHeight = e.target.editorContainer.clientHeight;
+							const editorHeight = Math.round(iframeHeight - 100);
+							localStorage.setItem("book_editor_height", editorHeight);
 						});
 
 						// 圖片標記路徑目前無效，id 是圖片檔名 (目前沒有特別作用)
@@ -338,12 +359,22 @@
 				}
 			}
 		},
-		mounted: function() {
-			const self = this;
+		created: function() {
 			const url = window.location.pathname;
 			const urlList = url.split('/');
-			self.pk = urlList[urlList.length-2];
+			this.pk = urlList[urlList.length-2];
 
+			const preEditorHeight = localStorage.getItem("book_editor_height");
+			const preViewerHeight = localStorage.getItem("viewer_height");
+			if (preEditorHeight) {
+				this.editorHeight = Math.round(preEditorHeight);
+			}
+			if (preViewerHeight) {
+				this.viewerHeight = Math.round(preViewerHeight);
+			}
+		},
+		mounted: function() {
+			const self = this;
 			self.reloadPage();
 
 			self.recordPerMins();
@@ -352,16 +383,17 @@
 				self.detectIdel();
 			}, 60000);
 
-			window.addEventListener("beforeunload", function (event) {
-			  	event.returnValue = 'Are you sure you want to leave?';
-			});
+			window.addEventListener("beforeunload", beforeunloadFun);
+		},
+		beforeDestroy() {
+			window.removeEventListener("beforeunload", beforeunloadFun);
 		},
 		methods: {
 			reloadPage: function() {
 				const self = this;
 				$.when(
-					rest_aj_send('get', '/ebookSystem/api/ebooks/' +self.pk +'/'),
-					rest_aj_send('get', '/ebookSystem/api/ebooks/' +self.pk +'/action/edit/')
+					rest_aj_send('get', '/ebookSystem/api/ebooks/' + self.pk + '/'),
+					rest_aj_send('get', '/ebookSystem/api/ebooks/' + self.pk + '/action/edit/')
 				)
 				.done(function(data1, data2) {
 					self.image = data1.data.scan_image;
@@ -384,7 +416,7 @@
 			recordPerMins: function() {
 				// 每 60s 傳送 change count 給後端
 				const self = this;
-				const editlog_url = '/ebookSystem/api/ebooks/' + self.pk +'/action/editlog/';
+				const editlog_url = '/ebookSystem/api/ebooks/' + self.pk + '/action/editlog/';
 				const transferData = {
 					online: self.change_count,
 					page: self.edited_page,	// 要改成 nowPage
@@ -399,10 +431,8 @@
 				// 每 60s 計算使用者閒置時間
 				if (this.idel_min > 10) {
 					this.idel_min = 0;
-					window.removeEventListener("beforeunload", function (event) {
-					  	event.returnValue = 'Are you sure you want to leave?';
-					});
-					// window.location.href = "/auth/logout/";
+					window.removeEventListener("beforeunload", beforeunloadFun);
+					window.location.href = "/auth/logout/";
 				}
 				this.idel_min++;
 			},
@@ -410,37 +440,77 @@
 				this.idel_min = 0;
 				this.change_count++;
 			},
+			startAdjustHeight: function(e) {
+				e.preventDefault();
+
+				this.isMousedown = true;
+				this.old_position = {x: e.clientX, y: e.clientY};
+
+				document.addEventListener('mousemove', this.movingHeight)
+				document.addEventListener('mouseup', this.endAdjustHeight)
+			},
+			movingHeight: function(e) {
+				e.preventDefault();
+				this.new_postion = {x: e.clientX, y: e.clientY};
+
+				if (this.old_position && this.isMousedown) {
+					const diff_height = (this.new_postion.y - this.old_position.y);
+					this.viewerHeight = this.viewerHeight + diff_height;
+					this.old_position = {x: e.clientX, y: e.clientY};
+				}
+			},
+			endAdjustHeight: function() {
+				this.isMousedown = false;
+
+				this.$emit('updateHeight');
+				localStorage.setItem("viewer_height", Math.round(this.viewerHeight));
+				document.removeEventListener('mousemove', this.movingHeight)
+				document.removeEventListener('mouseup', this.endAdjustHeight)
+			},
 		},
 	}
 </script>
 
 <style>
-	nav[role=navigation], footer[role=footer] {
-		display: none;
-	}
+nav[role=navigation], footer[role=footer] {
+	display: none;
+}
 
-	.container {
-		width: 95%;
-	}
-	
-	@media (min-width: 992px)
-	.container {
-	    width: 970px;
-	}
+.container {
+	width: 95%;
+}
 
-	@media (min-width: 768px)
-	.container {
-	    width: 750px;
-	}
-	input#id_page {
-		height: 34px;
-    	padding: 6px 12px;
-    	color: #555;
-    	border: 1px solid #ccc;
-    	box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    	border-radius: 4px;
-	}
-	div#sizeControl {
-		margin: 5px 0;
-	}
+#textPage {
+	margin-bottom: 100px;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 0.5em 0 0 0;
+    padding: 0;
+}
+
+@media (min-width: 992px)
+.container {
+    width: 970px;
+}
+
+@media (min-width: 768px)
+.container {
+    width: 750px;
+}
+input#id_page {
+	height: 34px;
+	padding: 6px 12px;
+	color: #555;
+	border: 1px solid #ccc;
+	box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+	border-radius: 4px;
+}
+div#sizeControl {
+	margin: 5px 0;
+}
 </style>

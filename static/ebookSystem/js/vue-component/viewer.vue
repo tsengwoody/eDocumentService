@@ -12,7 +12,10 @@
 				
 				<li>
 					<div style="display:inline-block; float:none;">
-						<select class="form-control" id="scanPageList" v-model="nowPage">
+						<select class="form-control" id="scanPageList" 
+							v-model="nowPage" 
+							@change="$emit('changed', $event.target.value);"
+						>
 							<template v-for="(value, key) in images">
 								<option 
 									v-if="edited_page == key"
@@ -44,9 +47,9 @@
 			</ul>
 		</nav>
 
-		<div :style="{ height: height + 'px', overflow: 'hidden'}">
+		<div :style="{ height: (newHeight || height) + 'px'}">
 			<div id="scanPage">
-				<img :src="image_url" alt="文件掃描原檔" name="scanPage" style="opacity:0;">
+				<img :src="image_url" alt="文件掃描原檔" name="scanPage" style="opacity:0; height: 0px;">
 			</div>
 		</div>
 	</div>
@@ -61,16 +64,17 @@
 				default: null,
 				type: Number,
 			},
-			height: {
-				default: 455,
-				type: Number,
-			},
+			height: Number,
 		},
 		data: function() {
 			return {
 				viewerId: null,
 				nowPage: null,
+				newHeight: null,
 			}
+		},
+		created: function() {
+			this.$parent.$on('updateHeight', this.setHeight);
 		},
 		mounted: function() {
 			this.nowPage = this.edited_page || 0;
@@ -125,6 +129,9 @@
 					}
 				}
 			},
+			setHeight: function() {
+				this.refreshViewer();
+			},
 		},
 		watch: {
 			image_url: function() {
@@ -135,9 +142,6 @@
 			edited_page: function(val) {
 				this.nowPage = val;
 			},
-			nowPage: function(val) {
-				this.$emit('changed', val);
-			}
 		},
 	}
 </script>
@@ -147,6 +151,12 @@
 li.viewer-prev, li.viewer-play, li.viewer-next, li.viewer-flip-horizontal, 
 li.viewer-flip-vertical {
 	display: none;
+}
+
+div.viewer-container {
+	// resize: vertical;
+ 	// overflow-y: scroll;
+    margin-bottom: 100px;
 }
 
 </style>
