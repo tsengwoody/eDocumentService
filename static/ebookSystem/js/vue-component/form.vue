@@ -1,7 +1,7 @@
 <template>
 	<div class="form-group">
 		<label :class="['control-label', labelClass, offsetClass]" :for="field"><font style="color:red">*</font><span>{|{ model_info.label }|}</span></label>
-		<div :class="inputClass">
+		<div :class="[inputClass]">
 			<input
 				v-if="model_info.type === 'text' || model_info.type === 'email' || model_info.type === 'password'"
 				class="form-control" 
@@ -98,6 +98,9 @@
 		methods: {
 
 		},
+		mounted() {
+			console.log(this.inputClass);
+		}
 	};
 
 </script>

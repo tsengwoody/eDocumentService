@@ -1,6 +1,6 @@
 <template>
 	<div class="modal fade" :id="id_modal" :ref="id_modal +'_instance'" role="dialog" aria-modal="true">
-		<div class="modal-dialog modal-lg" role="document">
+		<div :class="[ 'modal-dialog', modalSize ]" role="document">
 			<div class="modal-content alert-info" style="background-color: #f5f5f5;">
 				<div class="modal-header">
 					<button onclick="closeDialog(this)" class="close" data-dismiss="modal" aria-label="Close"><span>&times;</span></button>
@@ -27,6 +27,25 @@
 	module.exports = {
 		props: {
 			id_modal: String,	// define type
+			size: {
+				type: String,
+				default: 'large',
+			},
+		},
+		data() {
+			return {
+				// modalSize: 'modal-lg'
+
+				modalSizeMap: {
+					large: 'modal-lg',
+					normal: '',
+					small: 'modal-sm',
+				},
+				modalSize: 'modal-lg',
+			}
+		},
+		mounted() {
+			this.modalSize = this.modalSizeMap[this.size];
 		},
 		methods: {
 			open: function(focusAfterClosed){

@@ -20,19 +20,28 @@
 							<ul class="list-group">
 								<li class="list-group-item" v-for="(item, index) in items">
 									<a 
-										v-on:click="pointer=item"
+										@click="pointer=item"
 										href='#'
 									>{|{ index+1 }|}. {|{ item.name }|}</a>
-									<button
-										@click="
-											category_id = item.id;
-											category_name = item.name;
-											$refs['cu' +org_id].open('category_manager' +org_id);
-										"
-									>更名</button>
-									<button
-										@click="category_delete(item)"
-									>刪除</button>
+
+									<span v-if="index > 0">
+										<i class="fa fa-pencil-square-o" aria-hidden="true"
+											role="button"
+											title="更名" 
+											@click="
+												category_id = item.id;
+												category_name = item.name;
+												$refs['cu' +org_id].open('category_manager' +org_id);
+											"
+										></i>
+
+										<i class="fa fa-times" aria-hidden="true"
+											role="button"
+											title="刪除" 
+											@click="category_delete(item)"
+											style="font-size: 1.2em;" 
+										></i>
+									</span>
 								</li>
 							</ul>
 						</div>
@@ -60,57 +69,71 @@
 				</div>
 			</div>
 		</div>
-		<modal :id_modal="'bcu' +org_id" :ref="'bcu' +org_id">
+		<modal :id_modal="'bcu' +org_id" :size="'normal'" :ref="'bcu' +org_id">
 			<template slot="header">
 				<h4 class="modal-title">書籍{|{ book_ISBN }|}類別變更</h4>
 			</template>
 			<template slot="body">
-
-				<form-drf 
-					:model_info="model_info.book_category_id"
-					:field="'book_category_id'"
-					v-model="book_category_id"
-					@keyup.enter.native="book_category_update()"
-				></form-drf>
+				<div class="form-horizontal">
+					<form-drf 
+						:model_info="model_info.book_category_id"
+						:input-class="'col-sm-6'"
+						:offset-class="'col-sm-offset-1'"
+						:field="'book_category_id'"
+						v-model="book_category_id"
+						@keyup.enter.native="book_category_update()"
+					></form-drf>
+				</div>
 			</template>
 			<template slot="footer">
 				<button
+					class="btn btn-default"
 					@click="book_category_update();"
 				>變更</button>
 			</template>
 		</modal>
-		<modal :id_modal="'cc' +org_id" :ref="'cc' +org_id">
+		<modal :id_modal="'cc' +org_id" :size="'normal'" :ref="'cc' +org_id">
 			<template slot="header">
 				<h4 class="modal-title">類別新增</h4>
 			</template>
 			<template slot="body">
-				<form-drf 
-					:model_info="model_info.category_name"
-					:field="'category_name'"
-					v-model="category_name"
-					@keyup.enter.native="category_create();"
-				></form-drf>
+				<div class="form-horizontal">
+					<form-drf 
+						:model_info="model_info.category_name"
+						:input-class="'col-sm-6'"
+						:offset-class="'col-sm-offset-1'"
+						:field="'category_name'"
+						v-model="category_name"
+						@keyup.enter.native="category_create();"
+					></form-drf>
+				</div>
 			</template>
 			<template slot="footer">
 				<button
+					class="btn btn-default"
 					@click="category_create();"
 				>新增</button>
 			</template>
 		</modal>
-		<modal :id_modal="'cu' +org_id" :ref="'cu' +org_id">
+		<modal :id_modal="'cu' +org_id" :size="'normal'" :ref="'cu' +org_id">
 			<template slot="header">
 				<h4 class="modal-title">類別{|{ category_id }|}更名</h4>
 			</template>
 			<template slot="body">
-				<form-drf 
-					:model_info="model_info.category_name"
-					:field="'category_name'"
-					v-model="category_name"
-					@keyup.enter.native="category_update();"
-				></form-drf>
+				<div class="form-horizontal">
+					<form-drf 
+						:model_info="model_info.category_name"
+						:input-class="'col-sm-6'"
+						:offset-class="'col-sm-offset-1'"
+						:field="'category_name'"
+						v-model="category_name"
+						@keyup.enter.native="category_update();"
+					></form-drf>
+				</div>
 			</template>
 			<template slot="footer">
 				<button
+					class="btn btn-default"
 					@click="category_update();"
 				>變更</button>
 			</template>
@@ -332,3 +355,16 @@
 		},
 	}
 </script>
+
+<style>
+div.panel-heading {
+	display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-group-item {
+	display: flex;
+    justify-content: space-between;
+}
+</style>

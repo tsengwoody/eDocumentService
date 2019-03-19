@@ -14,16 +14,24 @@
 							<ul class="list-group">
 								<li class="list-group-item" v-for="(org, index) in items">
 									<a 
-										v-on:click="org_read(org)"
+										@click="org_read(org)"
 										href='#'
-									>{|{ index+1 }|}. {|{ org.name }|}</a>
-									<ul>
-										<li v-for="(category, index) in org.categorys">
-											<a
-												@click="category_read(category)"
-											>{|{ category.name }|}</a>
-										</li>
-									</ul>
+									>
+										<i class="fa fa-chevron-down" aria-hidden="true" 
+											v-if="selected_org === org.id"
+										></i>
+										<i class="fa fa-chevron-right" aria-hidden="true" v-else></i>
+										&nbsp;{|{ org.name }|}
+									</a>
+									<transition name="fade">
+										<ol style="list-style-image:none;" v-if="selected_org === org.id">
+											<li style="margin-top: 0.5em; cursor: pointer;" v-for="(category, index) in org.categorys">
+												<a
+													@click="category_read(category)"
+												>{|{ category.name }|}</a>
+											</li>
+										</ol>
+									</transition>
 								</li>
 							</ul>
 						</div>
@@ -45,9 +53,10 @@
 			'bookinfo_repository': components['bookinfo_repository'],
 			'table-div': components['table-div'],
 		},
-		data: function(){
+		data: function() {
 			return {
 				user: user,
+				selected_org: null,
 				pointer: {},
 				items: [],
 				orgs_books: [],
@@ -80,12 +89,12 @@
 					}
 				}
 			},
-			url: function(){
+			url: function() {
 				return '/ebookSystem/api/categorys/';
 			},
 		},
-		mounted: function () {
-			let self = this
+		mounted: function() {
+			const self = this;
 			document.title = '平台書庫';
 
 			self.clientg = new $.RestClient('/genericUser/api/');
@@ -96,8 +105,8 @@
 			self.refresh();
 		},
 		methods: {
-			refresh: function(){
-				let self = this;
+			refresh: function() {
+				const self = this;
 
 				self.items = []
 				self.orgs_books = []
@@ -152,44 +161,44 @@
 
 			},
 			category_read: function(category){
-				let self = this
+				const self = this;
 
-				self.books = []
-				self.pointer = {}
+				self.books = [];
+				self.pointer = {};
 				_.each(self.categorys_books, function(c){
 					if(category.id===c.id){
-						self.pointer = c
+						self.pointer = c;
 					}
 				})
 
 				if(!self.pointer.hasOwnProperty("id")){
-					return -1
+					return -1;
 				}
 
 				if(!self.pointer.hasOwnProperty("books")){
-					let param = {}
+					let param = {};
 
 					try {
 						if( self.pointer.id.endsWith('null') && (self.pointer.id.split('-').length===2) ){
-							let org_id = self.pointer.id.split('-')[0]
-							let category_id = self.pointer.id.split('-')[1]
-							param = {'org_id': org_id, 'category_id': category_id}
+							let org_id = self.pointer.id.split('-')[0];
+							let category_id = self.pointer.id.split('-')[1];
+							param = {'org_id': org_id, 'category_id': category_id};
 						}
 						else{
-							param = {'category_id': self.pointer.id}
+							param = {'category_id': self.pointer.id};
 						}
 					}
 					catch (err) {
-						param = {'category_id': self.pointer.id}
+						param = {'category_id': self.pointer.id};
 					}
 
-					self.pointer.books = []
+					self.pointer.books = [];
 					self.clientb.bookinfos.read(param)
 					.done(function(data) {
 						_.each(data, function(b){
-							b['action'] = b.ISBN
-							self.books.push(b)
-							self.pointer.books.push(b)
+							b['action'] = b.ISBN;
+							self.books.push(b);
+							self.pointer.books.push(b);
 						})
 					})
 					.fail(function(xhr, result, statusText){
@@ -204,39 +213,45 @@
 				}
 
 			},
-			org_read: function(org){
-				let self = this
+			org_read: function(org) {
+				const self = this;
 
-				self.books = []
-				self.pointer = {}
+				if (self.selected_org === org.id) {
+					self.selected_org = null;
+				} else {
+					self.selected_org = org.id;
+				}
+
+				self.books = [];
+				self.pointer = {};
 				_.each(self.orgs_books, function(o){
 					if(org.id===o.id){
-						self.pointer = o
+						self.pointer = o;
 					}
 				})
 
 				if(!self.pointer.hasOwnProperty("id")){
-					return -1
+					return -1;
 				}
 
 				if(!self.pointer.hasOwnProperty("books")){
-					self.pointer.books = []
+					self.pointer.books = [];
 					self.clientb.bookinfos.read({'org_id': self.pointer.id})
 					.done(function(data) {
 						_.each(data, function(b){
-							b['action'] = b.ISBN
-							self.books.push(b)
-							self.pointer.books.push(b)
+							b['action'] = b.ISBN;
+							self.books.push(b);
+							self.pointer.books.push(b);
 						})
 					})
 					.fail(function(xhr, result, statusText){
-						alertmessage('error', xhr.responseText)
+						alertmessage('error', xhr.responseText);
 					})
 				}
 				else {
 					_.each(self.pointer.books, function(b){
-						b['action'] = b.ISBN
-						self.books.push(b)
+						b['action'] = b.ISBN;
+						self.books.push(b);
 					})
 				}
 
@@ -244,3 +259,12 @@
 		},
 	}
 </script>
+
+<style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+</style>
