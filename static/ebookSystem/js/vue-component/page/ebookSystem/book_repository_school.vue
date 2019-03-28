@@ -50,8 +50,7 @@
 	module.exports = {
 		props: ['org_id',],
 		components: {
-			'bookinfo_repository': components['bookinfo_repository'],
-			'table-div': components['table-div'],
+			'bookinfo_repository': components['bookinfo_repository_filter'],
 		},
 		data: function() {
 			return {

@@ -99,6 +99,7 @@ div.tbody .cell {
 					</select>	
 				</div>
 				<button class="btn btn-primary" @click.prevent="filterData">搜尋</button>
+				<button class="btn btn-primary" @click.prevent="filterClean">清除</button>
 			</form>
 		</div>
 		<div v-if="!iser(showData)">
@@ -186,6 +187,7 @@ div.tbody .cell {
 <script>
 
 	module.exports = {
+		mixins: [base_table],
 		props: {
 			datas: Array,  // define type
 			header: Object,
@@ -211,55 +213,6 @@ div.tbody .cell {
 			numrow: function () {
 				return this.showData.length
 			},
-			start: function () {
-				return this.numperpage *(this.pagenow -1)
-			},
-			end: function () {
-				return Math.min(this.numperpage *(this.pagenow), this.numrow)
-			},
-			pagers() {
-				const pagerCount = this.pagerCount;
-				const halfPagerCount = (this.pagerCount - 1) / 2;
-				const currentPage = Number(this.pagenow);
-				const pageCount = Number(this.numpage);
-				let showPrevMore = false;
-				let showNextMore = false;
-				if (pageCount > pagerCount) {
-					if (currentPage > pagerCount - halfPagerCount) {
-					  showPrevMore = true;
-					}
-					if (currentPage < pageCount - halfPagerCount) {
-					  showNextMore = true;
-					}
-				}
-				const array = [];
-				if (showPrevMore && !showNextMore) {
-					const startPage = pageCount - (pagerCount - 2);
-					for (let i = startPage; i < pageCount; i++) {
-					  array.push(i);
-					}
-				} 
-				else if (!showPrevMore && showNextMore) {
-					for (let i = 2; i < pagerCount; i++) {
-					  array.push(i);
-					}
-				} 
-				else if (showPrevMore && showNextMore) {
-					const offset = Math.floor(pagerCount / 2) - 1;
-					for (let i = currentPage - offset; i <= currentPage + offset; i++) {
-					  array.push(i);
-					}
-				} 
-				else {
-					for (let i = 2; i < pageCount; i++) {
-					  array.push(i);
-					}
-				}
-
-				this.showPrevMore = showPrevMore;
-				this.showNextMore = showNextMore;
-				return array;
-			},
 		},
 		watch: {
 			showData: function (val) {
@@ -270,29 +223,11 @@ div.tbody .cell {
 				this.showData = val;
 			},
 		},
+		mounted: function () {
+			let self = this;
+			self.showData = _.cloneDeep(this.datas)	// re-initialize data before filter
+		},
 		methods: {
-			pagin_change(oper) {
-				const pagerCountOffset = this.pagerCount - 2;
-
-				if (String(oper) === '+1') {
-					this.pagenow += 1;
-				} 
-				else if (String(oper) === '-1') {
-					this.pagenow -= 1;
-				} 
-				else if (String(oper) === 'quickprev') {
-					this.pagenow = this.pagenow - pagerCountOffset;
-				} 
-				else if (String(oper) === 'quicknext') {
-					this.pagenow = this.pagenow + pagerCountOffset;
-				} 
-				else {
-					this.pagenow = parseInt(oper, 10);
-				}
-
-				this.pagenow = Math.max(this.pagenow, 1);
-				this.pagenow = Math.min(this.pagenow, this.numpage);
-			},
 			order: function(key, orderby) {
 				if(this.key === key){
 					if(this.orderby==='asc'){
@@ -311,11 +246,17 @@ div.tbody .cell {
 				this.key = key
 				this.showData.sort(compare(this.key, this.orderby))
 			},
-			filterData: function() {
-				var self = this;
+			filterClean: function() {
+				let self = this;
 				self.showData = _.cloneDeep(this.datas)	// re-initialize data before filter
+				self.keyword = '';
+				self.selectHeader = '';
+			},
+			filterData: function() {
+				let self = this;
 
 				if(this.keyword && this.selectHeader) {
+					self.showData = _.cloneDeep(this.datas)	// re-initialize data before filter
 					var filterByKeyword = this.datas.filter(function(item) {
 						if(item[self.selectHeader]) {
 							return item[self.selectHeader].indexOf(self.keyword) > -1;
@@ -323,9 +264,10 @@ div.tbody .cell {
 					})
 					self.showData = filterByKeyword;
 					alertmessage('success', '成功完成搜尋!')
-				} else if(!this.selectHeader) {
+				} else {
 					alertmessage('error', '請填妥搜尋欄位')
 				}
+
 			}
 		},
 	}

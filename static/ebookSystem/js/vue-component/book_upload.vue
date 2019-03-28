@@ -21,7 +21,11 @@
 						@click="openDialog('bis', this);"
 					>更多查詢方式</button>
 					<a type="button" class="btn btn-default" href="http://isbn.ncl.edu.tw/NCL_ISBNNet/H30_SearchBooks.php?PHPSESSID=3ovphpac0m41ducm3iiak2sfe5&Pact=DisplayAll" target="_blank" id="to_ISBNNet" title="開啟新視窗">國家圖書館書目資料查詢</a>
-				<!-- <input type="button" class="btn btn-default" style="display: none;" value="是否人工輸入？" id="show_prop">-->
+					<button
+						style="display: none;"
+						class="btn btn-default"
+						@click=""
+					>手動輸入</button>
 			</div> 
 			<div v-for="(value, key) in temp">
 				<div class="form-group">
@@ -35,7 +39,7 @@
 							v-bind:id="'id_' +key"
 							v-bind:name="key"
 							v-bind:value="temp[key].value"
-							readonly="true"
+							v-bind:readonly="value.readonly"
 						>
 					</div>
 				</div>
@@ -94,38 +98,47 @@
 					'ISBN': {
 						'value': '',
 						'show': 'ISBN',
+						'readonly': true,
 					},
 					'bookname': {
 						'value': '',
 						'show': '書名',
+						'readonly': true,
 					},
 					'author': {
 						'value': '',
 						'show': '作者',
+						'readonly': true,
 					},
 					'house': {
 						'value': '',
 						'show': '出版社',
+						'readonly': true,
 					},
 					'date': {
 						'value': '',
 						'show': '出版日期',
+						'readonly': true,
 					},
 					'bookbinding': {
 						'value': '',
 						'show': '裝訂冊數',
+						'readonly': true,
 					},
 					'chinese_book_category': {
 						'value': '',
 						'show': '中文圖書分類',
+						'readonly': true,
 					},
 					'order': {
 						'value': '',
 						'show': '版次',
+						'readonly': true,
 					},
 					'source': {
 						'value': '',
 						'show': '來源',
+						'readonly': true,
 					},
 				},
 			}
@@ -154,39 +167,38 @@
 					alertmessage('error', 'ISBN長度錯誤')
 					return -1;
 				}
-				//assign vo
-				let vo = this
-				vo.mode = 'search';
-				//aj_isbnnetanddouban_ISBN
-				vo.aj_ncl_douban_ISBN(this.search_ISBN)
+
+				let self = this
+				self.mode = 'search';
+
+				self.aj_ncl_douban_ISBN(this.search_ISBN)
 				.done(function(data){
-					//alertmessage
 					alertmessage('success', '查詢成功');
-					//show
-					vo.search_ISBN = data['ISBN']; //若查詢ISBN10會自動轉ISBN13，故要重新更新
-					vo.temp['ISBN'].value = data['ISBN'];
-					vo.temp['bookname'].value = data['bookname'];
-					vo.temp['author'].value = data['author'];
-					vo.temp['date'].value = data['date'];
-					vo.temp['house'].value = data['house'];
-					vo.temp['bookbinding'].value = data['bookbinding'];
-					vo.temp['chinese_book_category'].value = data['chinese_book_category'];
-					vo.temp['order'].value = data['order'];
-					vo.temp['source'].value = data['source'];
+					self.search_ISBN = data['ISBN']; //若查詢ISBN10會自動轉ISBN13，故要重新更新
+					_.each(self.temp, function(v, k){
+						self.temp[k].value = data[k];
+					})
 				})
 				.fail(function(data){
-					//alertmessage
-					alertmessage('error', data);
-					//解開readonly屬性由使用者自行輸入
-					$('#show_prop')
-						.off()
-						.on('click',function(){
-							$('input[type="text"][grp="changemode"]').prop('readonly',false);
+					alertconfirm('查無書籍資料，是否手動輸入？')
+					.done(function(){
+						_.each(self.temp, function(v, k){
+							self.temp[k].value = '';
+							if(k==='ISBN'){
+								self.temp[k].value = self.search_ISBN;
+							}
+							else if(k==='source'){
+								self.temp[k].value = 'other';
+							}
+							else {
+								self.temp[k].readonly = false;
+							}
 						})
-						.show();
+						self.temp['source'].value = 'other';
+					})
 				})
 				.always(function(){
-					vo.mode = 'input';
+					self.mode = 'input';
 				})
 			},
 			aj_ncl_douban_ISBN: function(value){

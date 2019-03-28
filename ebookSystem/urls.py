@@ -5,6 +5,7 @@ from . import apis
 
 from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
+router.register(r'booksimples', apis.BookSimpleViewSet)
 router.register(r'books', apis.BookViewSet)
 router.register(r'bookadds', apis.BookAddViewSet)
 router.register(r'ebooks', apis.EBookViewSet)

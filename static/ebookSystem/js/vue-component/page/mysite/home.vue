@@ -3,12 +3,14 @@
 		<div class="homeCarousel">
 			<template v-for="(item, index) in bannercontentlist">
 				<div class="slides active" v-if="index==0">
-					<img
-						:src="`/genericUser/api/bannercontents/` +item.id +`/resource/cover/image`"
-						:alt="item.title"
-						:title="item.title"
-						style="height: 480px;width:940px" 
-					>
+					<a :href="item.url">
+						<img
+							:src="`/genericUser/api/bannercontents/` +item.id +`/resource/cover/image`"
+							:alt="item.title"
+							:title="item.title"
+							style="height: 480px;width:940px" 
+						>
+					</a>
 				</div>
 				<div class="slides" v-if="index!=0">
 					<img

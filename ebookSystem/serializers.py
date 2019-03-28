@@ -36,6 +36,24 @@ class EBookSerializer(serializers.ModelSerializer):
 			'service_hours',
 		]
 
+class BookSimpleSerializer(serializers.ModelSerializer):
+	book_info = BookInfoSerializer(read_only=True)
+
+	class Meta:
+		model = Book
+		fields = [
+			'ISBN',
+			'book_info',
+			'finish_date',
+			'upload_date',
+			'priority',
+			'scaner',
+			'owner',
+			'source',
+			'status',
+			'category',
+		]
+
 class BookSerializer(serializers.ModelSerializer):
 	#ebook_set = EBookSerializer(many=True, read_only=True)
 	book_info = BookInfoSerializer(read_only=True)

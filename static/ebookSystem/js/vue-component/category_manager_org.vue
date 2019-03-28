@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div :id="'category_manager' +org_id" class="container">
 		<h3>{|{ org.name }|}</h3>
 		<div class="row">
@@ -25,7 +25,7 @@
 									>{|{ index+1 }|}. {|{ item.name }|}</a>
 
 									<span v-if="index > 0">
-										<i class="fa fa-pencil-square-o" aria-hidden="true"
+										<i class="fa fa-pencil-square-o"
 											role="button"
 											title="更名" 
 											@click="
@@ -35,7 +35,7 @@
 											"
 										></i>
 
-										<i class="fa fa-times" aria-hidden="true"
+										<i class="fa fa-times"
 											role="button"
 											title="刪除" 
 											@click="category_delete(item)"
@@ -224,7 +224,7 @@
 			})
 
 			self.clientb = new $.RestClient('/ebookSystem/api/');
-			self.clientb.add('books');
+			self.clientb.add('booksimples');
 			self.clientb.add('categorys');
 			self.refresh();
 		},
@@ -254,7 +254,7 @@
 				self.category_id = '';
 				self.category_name = '';
 
-				self.clientb.books.read({'org_id': self.org_id, 'category_id': 'null'})
+				self.clientb.booksimples.read({'org_id': self.org_id, 'category_id': 'null'})
 				.done(function(data) {
 					let bookinfos = [];
 					_.each(data, function(v){
@@ -301,7 +301,7 @@
 				let self = this
 
 				param = {'category': self.book_category_id}
-				self.clientb.books.updatepart(self.book_ISBN, param)
+				self.clientb.booksimples.updatepart(self.book_ISBN, param)
 				.done(function(data) {
 					alertmessage('success', '書籍類別變更成功');
 					self.$refs['bcu' +self.org_id].close();

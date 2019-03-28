@@ -19,6 +19,13 @@ from utils.permissions import RuleORPermissionFactory
 
 import sys
 
+class BookSimpleViewSet(viewsets.ModelViewSet):
+	queryset = Book.objects.all()
+	serializer_class = BookSimpleSerializer
+	filter_backends = (StatusFilter, OwnerFilter, OrgFilter, CategoryFilter, BooknameFilter,)
+	ordering_fields = ('upload_date',)
+	permission_classes = (permissions.IsAuthenticated,)
+
 class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
@@ -402,7 +409,11 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res = {}
 
 		obj = self.get_object()
+
 		if request.method == 'POST':
+			if obj.status != 2:
+				res['detail'] = u'該段落非編輯狀態'
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 			content = request.POST['edit']
 			origin_finish = request.POST['finish']
 			page = request.POST['page']
@@ -447,6 +458,9 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res = {}
 
 		obj = self.get_object()
+		if obj.status != 2:
+			res['detail'] = u'該段落非編輯狀態'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 		try:
 			delta = timezone.now() - self.request.user.online

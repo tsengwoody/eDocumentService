@@ -222,6 +222,8 @@ class Book(models.Model):
 		elif format == 'txt':
 			custom_path = self.custom_txt_create(custom_path, user)
 
+		return custom_path
+
 		#加入壓縮檔內
 		import pyminizip
 		custom_zip = self.path +'/temp/{0}_{1}.zip'.format(self.ISBN, user.username)
