@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="user_person">
 		<h3>個人資料</h3>
 		<div class="form-horizontal">
@@ -56,7 +56,9 @@
 					</button>
 					<button
 						class="btn btn-primary"
-						@click="setFontSize()"
+						@click="
+							$refs['fs'].open('user_person');
+						"
 					>字體設定</button>
 				</div>
 			</div>
@@ -88,6 +90,20 @@
 			</template>
 			<template slot="footer">
 				<button onclick="closeDialog(this)" class="btn btn-default" data-dismiss="modal">關閉</button>
+			</template>
+		</modal>
+		<modal :id_modal="'fs'" :ref="'fs'">
+			<template slot="header">
+				<h4 class="modal-title">字體大小設定</h4>
+			</template>
+			<template slot="body">
+				<div style="padding:20px 20px; background-color:#fafafa;">
+					<span style="font-size: 1.2em;">設定文字大小:</span>
+					<button>預設</button>
+					<button>放大</button>
+					<button>縮小</button>
+					<span></span>
+				</div>
 			</template>
 		</modal>
 	</div>

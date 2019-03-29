@@ -3,13 +3,13 @@
 		<nav>
 			<ul class="pager" style="margin:0px 0px 10px 0px;">
 				<li>
-					<a href="#" aria-label="至最初頁" @click="changePage('first')">最初頁</a>
+					<a href="#" aria-label="上一頁" @click="changePage(-1)">上一頁</a>
 				</li>
 
 				<li>
-					<a href="#" aria-label="上一頁" @click="changePage(-1)">上一頁</a>
+					<a href="#" aria-label="至最初頁" @click="changePage('first')">最初頁</a>
 				</li>
-				
+
 				<li>
 					<div style="display:inline-block; float:none;">
 						<select class="form-control" id="scanPageList" 
@@ -36,11 +36,11 @@
 				</li>
 
 				<li>
-					<a href="#" aria-label="下一頁" @click="changePage(1)">下一頁</a>
+					<a href="#" aria-label="至最後頁" @click="changePage('end')">最後頁</a>
 				</li>
 
 				<li>
-					<a href="#" aria-label="至最後頁" @click="changePage('end')">最後頁</a>
+					<a href="#" aria-label="下一頁" @click="changePage(1)">下一頁</a>
 				</li>
 
 				<slot></slot>
@@ -128,6 +128,7 @@
 						alertmessage('error', '超過頁數範圍惹~');
 					}
 				}
+				this.$emit('changed', this.nowPage);
 			},
 			setHeight: function() {
 				this.refreshViewer();
