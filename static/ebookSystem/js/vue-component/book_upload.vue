@@ -38,12 +38,13 @@
 						<input type="text" grp="changemode" class="form-control"
 							v-bind:id="'id_' +key"
 							v-bind:name="key"
-							v-bind:value="temp[key].value"
+							v-model:value="temp[key].value"
 							v-bind:readonly="value.readonly"
 						>
 					</div>
 				</div>
 			</div>
+			{|{ temp }|}
 			<template v-if="category!='self'">
 				<div class="form-group">
 					<label class="control-label col-sm-2" for="id_category">類型：</label>
@@ -154,8 +155,13 @@
 				else if(this.category=='self') return '/ebookSystem/api/books/action/create/'
 			},
 		},
-		mounted: function(){
-			console.log(this.category)
+		mounted: function () {
+			let self = this
+			self.clientb = new $.RestClient('/ebookSystem/api/');
+			self.clientb.add('bookinfos');
+			self.clientb.addVerb('bookinfos_create_update', 'POST', {
+				url: 'bookinfos/action/create_update/',
+			});
 		},
 		methods: {
 			search_ISBN_info: function(){
@@ -260,6 +266,8 @@
 				self.temp['source'].value = data['source'];
 			},
 			create: function(){
+				let self = this;
+
 				// 確認有選擇類型
 				if(iser(this.category)){
 					alertmessage('error', '類型尚未選擇')
@@ -271,22 +279,33 @@
 					alertmessage('error', '檔案尚未選擇')
 					return -1
 				}
-				transferData = {
-					category: this.category,
-					'fileObject': fileObject,
-				}
-				_.each(this.temp, function(v, k){
-					transferData[k] = v.value
+
+				let transferData = {}
+				_.each(self.temp, function(v, k){
+					if(!(v.value==='')){
+						transferData[k] = v.value
+					}
 				})
-				let vo = this; //this 在.done內會被復蓋
-				rest_aj_upload(this.url, transferData)
-				.done(function(data) {
-					alertmessage('success', '成功更新資料(檔案)' +data['message'])
-					//vo.clear()
+
+				self.clientb.bookinfos_create_update(transferData)
+				.done(function(data){
+					let transferData = {
+						ISBN: self.temp['ISBN'].value,
+						category: self.category,
+						fileObject: fileObject,
+					}
+					rest_aj_upload(self.url, transferData)
+					.done(function(data) {
+						alertmessage('success', '成功更新資料(檔案)' +data['message'])
+					})
+					.fail(function(data){
+						alertmessage('error', '失敗更新資料(檔案)' +data['message'])
+					})
 				})
-				.fail(function(data){
-					alertmessage('error', '失敗更新資料(檔案)' +data['message'])
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', xhr.responseText)
 				})
+
 			},
 		},
 	}

@@ -219,7 +219,7 @@
 								type: 'item',
 								'display_name': '法鼓山(107年度)',
 								'permission': ['true'],
-								'url': '/generics/ddm/',
+								'url': '/routing/mysite/ddm/',
 							},
 						],
 					},

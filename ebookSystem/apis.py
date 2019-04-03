@@ -64,6 +64,30 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 		return self.get_resource(file_path)
 
+	@action(
+		detail=True,
+		methods=['post'],
+		url_name='feedback',
+		url_path='action/feedback',
+	)
+	def feedback(self, request, pk=None):
+		res = {}
+		obj = self.get_object()
+
+		from django.core.mail import EmailMessage
+		from mysite.settings import SERVICE
+
+		user_email_list = [ i.email for i in User.objects.filter(org=obj.org, is_manager=True) ]
+		subject = u'回報 - {0} {1}'.format(obj.ISBN, obj.book_info.bookname)
+
+		try:
+			body = request.POST['body']
+			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[SERVICE], bcc=user_email_list)
+			email.send(fail_silently=False)
+		except BaseException as e:
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	@action(
 		detail=True,
@@ -119,15 +143,11 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res = {}
 
 		if request.method == 'POST':
-			#book info 設定
 			try:
 				newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
 			except:
-				serializer = BookInfoSerializer(data=request.data)
-				if not serializer.is_valid():
-					res['detail'] = u'序列化驗證失敗' + unicode(serializer.errors)
-					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-				newBookInfo = serializer.save()
+				res['detail'] = u'書籍資訊不存在，請先行建立書籍資訊'
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 			try:
 				book = Book.objects.get(ISBN=request.POST['ISBN'])
@@ -203,15 +223,11 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res = {}
 
 		if request.method == 'POST':
-			#book info 設定
 			try:
 				newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
 			except:
-				serializer = BookInfoSerializer(data=request.data)
-				if not serializer.is_valid():
-					res['detail'] = u'序列化驗證失敗' + unicode(serializer.errors)
-					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-				newBookInfo = serializer.save()
+				res['detail'] = u'書籍資訊不存在，請先行建立書籍資訊'
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 			#判斷是否上傳
 			source_priority = {
@@ -532,6 +548,25 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 	filter_backends = (filters.OrderingFilter, filters.SearchFilter, CBCFilter, NewestFilter, HottestFilter, BookInfoOwnerFilter, BookInfoOrgFilter, BookInfoCategoryFilter,)
 	ordering_fields = ('date',)
 	search_fields = ('ISBN', 'bookname', 'author', )
+
+	@action(
+		detail=False,
+		methods=['post'],
+		url_name='create_update',
+		url_path='action/create_update',
+	)
+	def create_update(self, request, pk=None):
+		res = {}
+		try:
+			newBookInfo = BookInfo.objects.get(ISBN=request.data['ISBN'])
+			serializer = BookInfoSerializer(data=request.data, instance=newBookInfo)
+		except BaseException as e:
+			serializer = BookInfoSerializer(data=request.data)
+		if not serializer.is_valid():
+			res['detail'] = u'序列化驗證失敗' + unicode(serializer.errors)
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		newBookInfo = serializer.save()
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	@method_decorator(ensure_csrf_cookie)
 	@action(

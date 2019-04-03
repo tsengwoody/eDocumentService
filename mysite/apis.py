@@ -33,9 +33,21 @@ class Statistics(APIView):
 			temp_time = [int(i) for i in temp_time]
 			self.end_time = datetime.datetime(temp_time[0], temp_time[1], temp_time[2])
 
+	def filter_org(self, request):
+
+		org_id = request.GET.get('org_id', None)
+		if org_id:
+			print('YA')
+			try:
+				self.org = Organization.objects.get(id=org_id)
+			except:
+				self.org = None
+
 	def get(self, request, action=None):
 		res = {}
 		self.filter_time(request)
+		self.filter_org(request)
+
 		if action:
 			#try:
 			return getattr(self, action)(request)
@@ -64,13 +76,16 @@ class Statistics(APIView):
 			query = query.filter(get_time__gte=self.begin_time)
 		if self.end_time:
 			query = query.filter(get_time__lt=self.end_time)
+		if hasattr(self, 'org'):
+			query = query.filter(user__org=self.org)
+
 		download_count = query.count()
 
 		res['result'].append({
 			'groupfield': 'all',
 			'count': download_count,
 		})
-		r = query.values('book').annotate(count=Count('book')) 
+		r = query.values('book').annotate(count=Count('book'))
 		r = [{
 			'groupfield': BookInfo.objects.get(ISBN=i['book']).bookname,
 			'count': i['count'],
@@ -88,6 +103,8 @@ class Statistics(APIView):
 			query = query.filter(get_time__gte=self.begin_time)
 		if self.end_time:
 			query = query.filter(get_time__lt=self.end_time)
+		if self.org:
+			query = query.filter(user__org=self.org)
 		download_count = query.count()
 
 		res['result'].append({
@@ -112,6 +129,8 @@ class Statistics(APIView):
 			query = query.filter(get_date__gte=self.begin_time)
 		if self.end_time:
 			query = query.filter(get_date__lt=self.end_time)
+		if self.org:
+			query = query.filter(editor__org=self.org)
 		count = query.count()
 
 		res['result'].append({

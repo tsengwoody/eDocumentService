@@ -65,6 +65,16 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 		serializer.save()
 
+	@action(
+		detail=False,
+		methods=['post'],
+		permission_classes=[AllowAny,],
+		url_name='authenticate',
+		url_path='action/authenticate',
+	)
+	def authenticate(self, request, pk=None):
+		return 1
+
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = None
 		if dir == 'disability_card':

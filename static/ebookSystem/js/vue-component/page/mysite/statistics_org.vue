@@ -1,13 +1,6 @@
 <template>
 	<div>
 		<h2>{|{ title }|}</h2>
-		<select
-			class="form-control"
-			v-model="org_id"
-		>
-			<option :value="'all'" selected="selected">全部</option>
-			<option v-for="(value, key) in orgs" :value="value.id">{|{ value.name }|}</option>
-		</select>
 		<statistics
 			:org_id="org_id"
 			:url="url"
@@ -23,7 +16,7 @@
 		data: function(){
 			return {
 				orgs: [],
-				org_id: 'all',
+				org_id: user.org,
 				title: '',
 				url: '',
 			}
