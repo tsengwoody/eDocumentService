@@ -104,6 +104,24 @@
 								'permission': ['is_manager'],
 								'url': '/routing/genericUser/serviceinfo_list_check_self/',
 							},
+							{
+								type: 'item',
+								'display_name': '統計書籍下載',
+								'permission': ['is_manager'],
+								'url': '/routing/mysite/statistics_org/book_download/',
+							},
+							{
+								type: 'item',
+								'display_name': '統計使用者下載',
+								'permission': ['is_manager'],
+								'url': '/routing/mysite/statistics_org/user_download/',
+							},
+							{
+								type: 'item',
+								'display_name': '統計使用者校對',
+								'permission': ['is_manager'],
+								'url': '/routing/mysite/statistics_org/user_editrecord/',
+							},
 						],
 					},
 					{

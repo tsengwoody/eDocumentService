@@ -37,7 +37,6 @@ class Statistics(APIView):
 
 		org_id = request.GET.get('org_id', None)
 		if org_id:
-			print('YA')
 			try:
 				self.org = Organization.objects.get(id=org_id)
 			except:
