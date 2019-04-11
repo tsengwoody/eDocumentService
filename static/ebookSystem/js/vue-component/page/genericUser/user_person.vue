@@ -97,18 +97,32 @@
 				<h4 class="modal-title">字體大小設定</h4>
 			</template>
 			<template slot="body">
-				<div style="padding:20px 20px; background-color:#fafafa;">
+				<div class="font-size-area" style="padding:20px 20px;">
 					<span style="font-size: 1.2em;">設定文字大小:</span>
-					<button>預設</button>
-					<button>放大</button>
-					<button>縮小</button>
-					<span></span>
+					<button class="font-size-default" @click="defautlFontSize">預設</button>
+					<button class="font-size-up" @click="upFontSize">放大</button>
+					<button class="font-size-down" @click="downFontSize">縮小</button>
+					<span class="font-size-ratio">{|{ fontSizeRatio }|}</span>
 				</div>
 			</template>
 		</modal>
 	</div>
 </template>
 <script>
+
+	const defautlFontSize = "htmlFontSize90";
+	const percentage = [
+		"htmlFontSize70",
+	  	"htmlFontSize75",
+		"htmlFontSize80",
+		"htmlFontSize85",
+		"htmlFontSize90",
+		"htmlFontSize95",
+		"htmlFontSize100",
+		"htmlFontSize105",
+		"htmlFontSize110"
+	];
+
 	module.exports = {
 		components: {
 			'disabilitycard': components['disabilitycard'],
@@ -144,12 +158,14 @@
 				},
 				auth_email: user.auth_email,
 				auth_phone: user.auth_phone,
+				newRatio: '',
+				percentageIndex: 0,
 			}
 		},
 		mounted: function() {
-			document.title = '個人資料'
-			let self=this;
-			let client = new $.RestClient('/genericUser/api/');
+			document.title = '個人資料';
+			const self = this;
+			const client = new $.RestClient('/genericUser/api/');
 			client.add('organizations');
 			
 			client.organizations.read()
@@ -160,12 +176,75 @@
 					}
 				})
 			})
+
+			const fontClass = document.querySelector('body').className;
+			self.newRatio = fontClass;
+			self.percentageIndex = percentage.indexOf(fontClass);
 		},
 		methods: {
 			change_password: function() {
 				this.$refs.spm.set_password(user.id);
 				closeDialog(this.$refs.spm);
+			},
+			upFontSize() {
+				if (this.percentageIndex < percentage.length -1) {
+					this.percentageIndex += 1;
+					this.updateFontSize();
+				}
+			},
+			downFontSize() {
+				if (this.percentageIndex > 0) {
+					this.percentageIndex -= 1;
+					this.updateFontSize();
+				}
+			},
+			defautlFontSize() {
+				this.percentageIndex = percentage.indexOf(defautlFontSize);
+				this.updateFontSize();
+			},
+			updateFontSize() {
+				this.newRatio =  percentage[ this.percentageIndex ];
+				document.querySelector('body').className = this.newRatio;
+				localStorage.setItem('fontSize', this.newRatio);
 			}
 		},
+		computed: {
+			fontSizeRatio() {
+				console.log(typeof this.newRatio);
+				return this.newRatio.substr(12) - 90;
+			}
+		}
 	}
 </script>
+
+<style>
+.font-size-area > .font-size-default,
+.font-size-area > .font-size-up,
+.font-size-area > .font-size-down {
+	color: darkgray;
+	font-size: 1.2em;
+	margin-left: 0.3em;
+	padding: 0.1em 0.5em;
+	border: 1px solid lightgray;
+	border-radius: 0.3em;
+
+	background-color: white;
+}
+
+.font-size-area > .font-size-default:hover,
+.font-size-area > .font-size-up:hover,
+.font-size-area > .font-size-down:hover {
+	color: white;
+	background-color: darkgray;
+}
+
+.font-size-ratio {
+	display: inline-block; 
+	width: 2.5em; 
+	text-align: center; 
+	font-size: 3em; 
+	border-radius: 0.2em; 
+	border: 2px solid lightgray; 
+	margin-left: 1em;
+}
+</style>

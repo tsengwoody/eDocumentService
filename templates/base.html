@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh" class="htmlFontSize80">
+<html lang="zh">
 
 <head>
 	{% load staticfiles %}
@@ -40,7 +40,7 @@
 	<!-- element-ui -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.0.1/theme-chalk/index.css" />
 	<script language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.0.1/index.js"></script>
-	<script slanguage="javascript" rc="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.0.1/locale/zh-TW.min.js"></script>
+	<script language="javascript" rc="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.0.1/locale/zh-TW.min.js"></script>
 
 	<!--viewer-->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.3.2/viewer.min.css">
@@ -145,7 +145,7 @@
 	</script>
 </head>
 
-<body>
+<body class="htmlFontSize90">
 	<div id="divmodal_dialog_root"></div>
 	<div user_id="{{ request.user.id }}"></div>
 	{% block tawk %}
@@ -233,12 +233,11 @@
 <script>
 //-------------cookie 儲存字體大小設定-------------
 $(function(){
-	var _fontSize = $.cookie('font-size');
-	
-	if ( _fontSize != null ) {
-		$("html").removeClass().addClass(_fontSize);
-	};
-	
+	const localFontClass = localStorage.getItem('fontSize');
+
+	if (localFontClass) {
+		document.querySelector('body').className = localFontClass;
+	}
 });
 </script>
 

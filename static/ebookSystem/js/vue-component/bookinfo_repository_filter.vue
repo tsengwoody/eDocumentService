@@ -13,7 +13,6 @@
 
 						$refs[id].open('bookinfo_repository_filter');
 					">回報</button>
-					{|{ id }|}
 			</template>
 		</table-div>
 		<modal :id_modal="id" :size="'normal'" :ref="id">
@@ -21,7 +20,8 @@
 				<h4 class="modal-title">書籍 {|{ feedback_id }|} 回報</h4>
 			</template>
 			<template slot="body">
-				<textarea
+				<h5>回報內容:</h5>
+				<textarea class="feedback" 
 					v-model="feedback_content"
 				></textarea>
 			</template>
@@ -29,7 +29,7 @@
 				<button
 					class="btn btn-default"
 					@click="$refs[id].close()"
-				>取肖</button>
+				>取消</button>
 				<button
 					class="btn btn-default"
 					@click="feedback()"
@@ -95,3 +95,13 @@
 		},
 	}
 </script>
+
+<style>
+.feedback {
+	width: fill-available; 
+	width: -webkit-fill-available; 
+	height: 200px;
+	color:  #4d4d4d;
+	font-size: 1.2em;
+}
+</style>

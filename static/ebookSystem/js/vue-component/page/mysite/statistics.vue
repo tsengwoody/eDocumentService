@@ -1,13 +1,23 @@
 <template>
 	<div>
 		<h2>{|{ title }|}</h2>
-		<select
-			class="form-control"
-			v-model="org_id"
-		>
-			<option :value="'all'" selected="selected">全部</option>
-			<option v-for="(value, key) in orgs" :value="value.id">{|{ value.name }|}</option>
-		</select>
+		<div class="form-horizontal" style="margin: 1em 0;">
+			<div class="form-group">
+				<label class="control-label col-md-2 col-lg-1">
+					請選擇單位
+				</label>	
+				<div class="col-md-4 col-lg-4">
+					<select
+						class="form-control"
+						v-model="org_id"
+					>
+						<option :value="'all'" selected="selected">全部</option>
+						<option v-for="(value, key) in orgs" :value="value.id">{|{ value.name }|}</option>
+					</select>
+				</div>
+			</div>
+		</div>
+		
 		<statistics
 			:org_id="org_id"
 			:url="url"
