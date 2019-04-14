@@ -66,22 +66,30 @@
 			statistics: function () {
 				let self = this;
 
+				let pageURL = new URL(window.location.href)
+				let page_params = {}
+				for (let pair of pageURL.searchParams.entries()) {
+					page_params[pair[0]] = pair[1]
+				}
+
 				let querys = []
 				let keys = []
+				let params = {}
+				params = Object.assign(params, page_params)
 
 				let all_query
 
 				if(!(self.org_id==='all')){
-					all_query = rest_aj_send_memory('get', self.url, {'org_id': self.org_id}, {'key': 'all'})
-				} else {
-					all_query = rest_aj_send_memory('get', self.url, {}, {'key': 'all'})
+					params = Object.assign(params, {'org_id': self.org_id})
 				}
+
+				all_query = rest_aj_send('get', self.url, params)
 
 				querys.push(all_query)
 
 				all_query
 				.done(function(data) {
-					key = data['memory']['key']
+					let key = 'all'
 					self['temp'][key] = []
 					_.each(data['data'].result, function(item){
 						temp_obj = {}
@@ -91,37 +99,32 @@
 					})
 				})
 				.fail(function(xhr, result, statusText){
-					console.log(xhr)
+					console.log(self.url)
+					alertmessage('error', o2j(xhr))
 				})
 
 				_.each([0, 1, 2, 3, 4, 5, 6,], function(v){
 
-					time = genMonth(v)
-					begin_time = time['begin_time']
-					end_time = time['end_time']
+					let time = genMonth(v)
+					let begin_time = time['begin_time']
+					let end_time = time['end_time']
 
-					key = 'month' +v
-
-					let month_query
-					if(!(self.org_id==='all')){
-						month_query = rest_aj_send_memory('get', self.url, {'begin_time': begin_time, 'end_time': end_time, 'org_id': self.org_id}, {'key': key})
-					} else {
-						month_query = rest_aj_send_memory('get', self.url, {'begin_time': begin_time, 'end_time': end_time}, {'key': key})
-					}
-
+					let key = 'month' +v
+					params = Object.assign(params, {'begin_time': begin_time, 'end_time': end_time})
+					let month_query = rest_aj_send('get', self.url, params)
 					querys.push(month_query)
 					keys.push(key)
 						self.statistics_header[key] = begin_time.split('-')[0] +'年' +begin_time.split('-')[1] +'月'
 
 					month_query
 					.done(function(data) {
-						key = data['memory']['key']
-						self['temp'][key] = []
+						let k = key
+						self['temp'][k] = []
 						_.each(data['data'].result, function(item){
 							temp_obj = {}
 							temp_obj['groupfield'] = item.groupfield
-							temp_obj[key] = item.count
-							self['temp'][key].push(temp_obj)
+							temp_obj[k] = item.count
+							self['temp'][k].push(temp_obj)
 						})
 					})
 					.fail(function(xhr, result, statusText){

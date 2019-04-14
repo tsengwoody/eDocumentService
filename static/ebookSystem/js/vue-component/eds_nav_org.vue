@@ -112,6 +112,18 @@
 							},
 							{
 								type: 'item',
+								'display_name': '統計書籍下載(epub)',
+								'permission': ['is_manager'],
+								'url': '/routing/mysite/statistics_org/book_download/file_format=epub',
+							},
+							{
+								type: 'item',
+								'display_name': '統計書籍下載(txt)',
+								'permission': ['is_manager'],
+								'url': '/routing/mysite/statistics_org/book_download/file_format=txt',
+							},
+							{
+								type: 'item',
 								'display_name': '統計使用者下載',
 								'permission': ['is_manager'],
 								'url': '/routing/mysite/statistics_org/user_download/',

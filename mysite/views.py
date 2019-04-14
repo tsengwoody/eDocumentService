@@ -62,9 +62,10 @@ def about(request, name):
 
 @http_response
 def home(request, template_name='home.html'):
-#	logger.info('{}/home\t{}'.format(resolve(request.path).namespace, request.user))
-	deadline = timezone.now() -datetime.timedelta(days=60)
-	announcement_list = Announcement.objects.filter(datetime__gt=deadline).order_by('-datetime')
+	app = 'mysite'
+	page = 'home'
+	component_page = '<{0}></{0}>'.format(page)
+	template_name='routing.html'
 	return locals()
 
 def logout_user(request, template_name='registration/logged_out.html'):

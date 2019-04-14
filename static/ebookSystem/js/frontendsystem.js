@@ -1155,8 +1155,8 @@ function rest_aj_send_memory(type, url, data, memory) {
 		df.resolve(data)
 	})
 	.fail(function(xhr, result, statusText){
-		data['key'] = key
-		df.reject(data)
+		xhr['memory'] = memory
+		df.reject(xhr)
 	})
 	return df
 }

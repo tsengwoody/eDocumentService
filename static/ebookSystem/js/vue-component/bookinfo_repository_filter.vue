@@ -54,6 +54,15 @@
 				feedback_content: '',
 			}
 		},
+		created: function () {
+			let self = this
+			self.clientg = new $.RestClient('/genericUser/api/')
+			self.clientb = new $.RestClient('/ebookSystem/api/')
+			self.clientb.add('books');
+			self.clientb.books.addVerb('feedback', 'POST', {
+				url: 'action/feedback/',
+			});
+		},
 		methods: {
 			check_create: function (pk) {
 				let self = this
@@ -91,6 +100,18 @@
 
 			},
 			feedback: function () {
+				let self = this
+				let feedback_content = self.feedback_content
+				self.clientb.books.feedback(self.feedback_id, {
+					feedback_content: feedback_content,
+				})
+				.done(function(data) {
+					alertmessage('success', '成功回報資料')
+				})
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', xhr.responseText)
+				})
+
 			},
 		},
 	}

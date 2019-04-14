@@ -124,6 +124,18 @@
 							},
 							{
 								type: 'item',
+								'display_name': '統計書籍下載(epub)',
+								'permission': ['is_supermanager'],
+								'url': '/routing/mysite/statistics/book_download/?file_format=epub',
+							},
+							{
+								type: 'item',
+								'display_name': '統計書籍下載(txt)',
+								'permission': ['is_supermanager'],
+								'url': '/routing/mysite/statistics/book_download/?file_format=txt',
+							},
+							{
+								type: 'item',
 								'display_name': '統計使用者下載',
 								'permission': ['is_supermanager'],
 								'url': '/routing/mysite/statistics/user_download/',

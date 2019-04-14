@@ -53,19 +53,6 @@ class Statistics(APIView):
 			#except BaseException as e:
 				#return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-	def download(self, request):
-		res = {}
-
-		query = GetBookRecord.objects.all()
-		if self.begin_time:
-			query = query.filter(get_time__gte=self.begin_time)
-		if self.end_time:
-			query = query.filter(get_time__lt=self.end_time)
-		download_count = query.count()
-
-		res['download_count'] = download_count
-		return Response(data=res, status=status.HTTP_202_ACCEPTED)
-
 	def book_download(self, request):
 		res = {}
 		res['result'] = []
@@ -77,6 +64,10 @@ class Statistics(APIView):
 			query = query.filter(get_time__lt=self.end_time)
 		if hasattr(self, 'org'):
 			query = query.filter(user__org=self.org)
+
+		file_format = request.GET.get('file_format', None)
+		if file_format:
+			query = query.filter(format=file_format)
 
 		download_count = query.count()
 

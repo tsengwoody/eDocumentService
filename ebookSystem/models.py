@@ -537,6 +537,11 @@ class GetBookRecord(models.Model):
 	book = models.ForeignKey(Book, related_name='getbookrecord_set')
 	get_time = models.DateTimeField(default = timezone.now)
 	get_ip = models.GenericIPAddressField()
+	FORMAT = (
+		('epub' , 'epub'),
+		('txt' , 'txt'),
+	)
+	format = models.CharField(max_length=10, choices=FORMAT)
 
 	def __unicode__(self):
 		return u'{0}-{1}'.format(self.book, self.user)

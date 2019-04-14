@@ -79,9 +79,9 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 		user_email_list = [ i.email for i in User.objects.filter(org=obj.org, is_manager=True) ]
 		subject = u'回報 - {0} {1}'.format(obj.ISBN, obj.book_info.bookname)
-
+		print(subject)
 		try:
-			body = request.POST['body']
+			body = request.data['feedback_content']
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[SERVICE], bcc=user_email_list)
 			email.send(fail_silently=False)
 		except BaseException as e:
@@ -757,10 +757,11 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			if not user is None:
 				from utils.other import get_client_ip
 				get_ip = get_client_ip(request)
-				GetBookRecord.objects.create(book=obj.object, user=request.user, get_ip=get_ip)
-				if request.POST['fileformat'] == 'epub':
+				format = request.POST['fileformat']
+				GetBookRecord.objects.create(book=obj.object, user=request.user, get_ip=get_ip, format=format)
+				if format == 'epub':
 					return self.get_resource(obj.epub)
-				elif request.POST['fileformat'] == 'txt':
+				elif format == 'txt':
 					return self.get_resource(obj.txt)
 			else:
 				res['detail'] = u'身份認證失敗'

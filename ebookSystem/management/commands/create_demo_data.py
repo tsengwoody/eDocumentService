@@ -156,6 +156,23 @@ class Command(BaseCommand):
 			org_id=org.id,
 		)
 
+		client = Client()
+		client.login(username='root', password='eds@2018')
+		response = client.post(
+			'/ebookSystem/api/bookinfos/action/create_update/',
+			{
+				u'ISBN': u'9789573321569',
+				u'author': u'傑佛瑞.迪佛(Jeffery Deaver)著; 宋瑛堂譯',
+				u'house': u'皇冠',
+				u'bookname': u'藍色駭客',
+				u'date': u'2005-07-01',
+				u'bookbinding': '平裝',
+				u'chinese_book_category': '874',
+				u'order': '初版',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+
 		src = BASE_DIR +u'/temp/藍色駭客.zip'
 		with open(src, 'rb') as book_file:
 			client = Client()
@@ -164,13 +181,6 @@ class Command(BaseCommand):
 				'/ebookSystem/api/books/action/create/',
 				{
 					u'ISBN': u'9789573321569',
-					u'author': u'傑佛瑞.迪佛(Jeffery Deaver)著; 宋瑛堂譯',
-					u'house': u'皇冠',
-					u'bookname': u'藍色駭客',
-					u'date': u'2005-07-01',
-					u'bookbinding': '平裝',
-					u'chinese_book_category': '874',
-					u'order': '初版',
 					'category_id': category_instance.id,
 					'fileObject': book_file,
 				},
@@ -231,6 +241,23 @@ class Command(BaseCommand):
 			)
 		assert ebook.change_status(1, 'review'), 'change status error'
 
+		client = Client()
+		client.login(username='root', password='eds@2018')
+		response = client.post(
+			'/ebookSystem/api/bookinfos/action/create_update/',
+			{
+				u'ISBN': u'9789866104626',
+				u'author': u'多利安助川著; 卓惠娟譯',
+				u'house': u'博識圖書',
+				u'bookname': u'山羊島的藍色奇蹟',
+				u'date': u'2015-07-01',
+				u'bookbinding': '平裝',
+				u'chinese_book_category': '861',
+				u'order': '初版',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+
 		src = BASE_DIR +u'/temp/山羊島的藍色奇蹟.zip'
 		with open(src, 'rb') as book_file:
 			client = Client()
@@ -239,13 +266,6 @@ class Command(BaseCommand):
 				'/ebookSystem/api/books/action/create/',
 				{
 					u'ISBN': u'9789866104626',
-					u'author': u'多利安助川著; 卓惠娟譯',
-					u'house': u'博識圖書',
-					u'bookname': u'山羊島的藍色奇蹟',
-					u'date': u'2015-07-01',
-					u'bookbinding': '平裝',
-					u'chinese_book_category': '861',
-					u'order': '初版',
 					'category_id': category_instance.id,
 					'fileObject': book_file,
 				},
@@ -258,11 +278,10 @@ class Command(BaseCommand):
 		assert len(EBook.objects.all()) == 16, 'create part fail'
 		assert len(book.ebook_set.all())==6, 'create part fail'
 
-		book_file = open(BASE_DIR +u'/temp/自創思維.epub', 'rb')
 		client = Client()
 		client.login(username='root', password='eds@2018')
 		response = client.post(
-			'/ebookSystem/api/books/action/upload/',
+			'/ebookSystem/api/bookinfos/action/create_update/',
 			{
 				u'ISBN': u'9789863981459',
 				u'author': u'雷德.霍夫曼(Reid Hoffman), 班.卡斯諾查(Ben Casnocha)著; 洪慧芳譯',
@@ -272,6 +291,17 @@ class Command(BaseCommand):
 				u'bookbinding': '平裝',
 				u'chinese_book_category': '494',
 				u'order': '第二版',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+		)
+
+		book_file = open(BASE_DIR +u'/temp/自創思維.epub', 'rb')
+		client = Client()
+		client.login(username='root', password='eds@2018')
+		response = client.post(
+			'/ebookSystem/api/books/action/upload/',
+			{
+				u'ISBN': u'9789863981459',
 				'category_id': category_instance.id,
 				'fileObject': book_file,
 				'category': 'epub',
@@ -297,8 +327,8 @@ class Command(BaseCommand):
 			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
 		assert len(Announcement.objects.all()) == previous_count +1, 'create announcement fail'
-		GetBookRecord.objects.create(book=book, user=root, get_ip='192.168.1.0')
-		GetBookRecord.objects.create(book=book, user=root, get_ip='192.168.1.0')
+		GetBookRecord.objects.create(book=book, user=root, get_ip='192.168.1.0', format='epub')
+		GetBookRecord.objects.create(book=book, user=root, get_ip='192.168.1.0', format='txt')
 
 		QAndA.objects.create(question='<p>question 1</p>', answer='<p>answer 1</p>', order=0)
 		QAndA.objects.create(question='<p>question 2</p>', answer='<p>answer 2</p>', order=0)
