@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<div class="homeCarousel">
+			<h2 class="sr-only">首頁</h2>
 			<template v-for="(item, index) in bannercontentlist">
 				<div class="slides active" v-if="index==0">
 					<a :href="item.url">
@@ -13,16 +14,17 @@
 					</a>
 				</div>
 				<div class="slides" v-if="index!=0">
-					<img
-						:src="`/genericUser/api/bannercontents/` +item.id +`/resource/cover/image`"
-						:alt="item.title"
-						:title="item.title"
-						style="height: 480px;width:940px" 
-					>
+					<a :href="item.url">
+						<img
+							:src="`/genericUser/api/bannercontents/` +item.id +`/resource/cover/image`"
+							:alt="item.title"
+							:title="item.title"
+							style="height: 480px;width:940px" 
+						>
+					</a>
 				</div>
 			</template>
 			
-
 			<a role="button" class="left carousel-control" @click="plusDivs(-1)">
 				<span class="pointer-left" aria-hidden="true">&#10094;</span>
 				<span class="sr-only">上一頁</span>
@@ -33,7 +35,7 @@
 			</a>
 
 			<div class="textfornvda">
-				<h4>首頁圖片說明</h4>
+				<h3>輪播圖片說明</h3>
 				<ul>
 					<li v-for="(item, index) in bannercontentlist">
 						<div v-html="markdown2html(item.content)"></div>
@@ -228,7 +230,7 @@
 	animation: opac 0.8s;
 }
 
-.slides > img {
+.slides img {
 	margin: auto;
 	display: block;
     max-width: 100%;
