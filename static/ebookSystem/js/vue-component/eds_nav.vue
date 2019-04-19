@@ -8,7 +8,8 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="/">eDocumentService</a>
+				<a aria-hidden="true" class="navbar-brand" href="/">eDocumentService</a>
+				<a class="sr-only" href="/"><h1>eDocumentService</h1></a>
 			</div>
 			<div id="navbar" class="collapse navbar-collapse navbar-dark bg-inverse">
 				<ul class="nav navbar-nav">

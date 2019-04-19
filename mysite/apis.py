@@ -1,9 +1,10 @@
 ﻿# coding: utf-8
 
-import datetime
+#import datetime
 import os
 
 from django.db.models import Count
+from django.utils import timezone as datetime
 
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.views import APIView
@@ -21,17 +22,20 @@ class Statistics(APIView):
 
 	def filter_time(self, request):
 
+		import pytz
+		utc = pytz.timezone('UTC')
+
 		begin_time = request.GET.get('begin_time', None)
 		if begin_time:
 			temp_time = begin_time.split('-')
 			temp_time = [int(i) for i in temp_time]
-			self.begin_time = datetime.datetime(temp_time[0], temp_time[1], temp_time[2])
+			self.begin_time = datetime.datetime(temp_time[0], temp_time[1], temp_time[2], tzinfo=utc)
 
 		end_time = request.GET.get('end_time', None)
 		if end_time:
 			temp_time = end_time.split('-')
 			temp_time = [int(i) for i in temp_time]
-			self.end_time = datetime.datetime(temp_time[0], temp_time[1], temp_time[2])
+			self.end_time = datetime.datetime(temp_time[0], temp_time[1], temp_time[2], tzinfo=utc)
 
 	def filter_org(self, request):
 
@@ -93,7 +97,7 @@ class Statistics(APIView):
 			query = query.filter(get_time__gte=self.begin_time)
 		if self.end_time:
 			query = query.filter(get_time__lt=self.end_time)
-		if self.org:
+		if hasattr(self, 'org'):
 			query = query.filter(user__org=self.org)
 		download_count = query.count()
 
@@ -119,7 +123,7 @@ class Statistics(APIView):
 			query = query.filter(get_date__gte=self.begin_time)
 		if self.end_time:
 			query = query.filter(get_date__lt=self.end_time)
-		if self.org:
+		if hasattr(self, 'org'):
 			query = query.filter(editor__org=self.org)
 		count = query.count()
 

@@ -339,6 +339,10 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 				if(education===''){
 					err.push('教育程度尚未選擇');
 				}
+				let org = this.infos.org;
+				if(org===''){
+					err.push('所屬單位尚未選擇');
+				}
 
 				//role
 				let role = this.infos.role;

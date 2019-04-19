@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div class="row" id="id_ebook_image">
 		<div id="imagePage" :class="imageClass" style="margin-bottom: 1em; padding-bottom: 1em;">
 			<viewer ref="viewer" 
@@ -429,7 +429,7 @@
 			},
 			detectIdel: function() {
 				// 每 60s 計算使用者閒置時間
-				if (this.idel_min > 10) {
+				if (this.idel_min > 30) {
 					this.idel_min = 0;
 					window.removeEventListener("beforeunload", beforeunloadFun);
 					window.location.href = "/auth/logout/";

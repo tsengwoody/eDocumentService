@@ -8,7 +8,8 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="/">eDocumentService</a>
+				<a aria-hidden="true" class="navbar-brand" href="/">eDocumentService</a>
+				<a class="sr-only" href="/"><h1>eDocumentService</h1></a>
 			</div>
 			<div id="navbar" class="collapse navbar-collapse navbar-dark bg-inverse">
 				<ul class="nav navbar-nav">
@@ -114,13 +115,13 @@
 								type: 'item',
 								'display_name': '統計書籍下載(epub)',
 								'permission': ['is_manager'],
-								'url': '/routing/mysite/statistics_org/book_download/file_format=epub',
+								'url': '/routing/mysite/statistics_org/book_download/?file_format=epub',
 							},
 							{
 								type: 'item',
 								'display_name': '統計書籍下載(txt)',
 								'permission': ['is_manager'],
-								'url': '/routing/mysite/statistics_org/book_download/file_format=txt',
+								'url': '/routing/mysite/statistics_org/book_download/?file_format=txt',
 							},
 							{
 								type: 'item',
