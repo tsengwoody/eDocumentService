@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h2>文件上傳</h2>
-		<book_upload category="epub"></book_upload>
+		<book_upload format="epub"></book_upload>
 	</div>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h2>文件上傳</h2>
-		<book_upload category="self"></book_upload>
+		<book_upload format="self"></book_upload>
 	</div>
 </template>
 

@@ -1,6 +1,8 @@
 <template>
 	<div>
-		<h3 v-if="category!='self'"><legend>電子檔上傳</legend></h3>
+		{|{ org_id }|}
+		{|{ category_id }|}
+		<h3 v-if="format!='self'"><legend>電子檔上傳</legend></h3>
 		<h3 v-else><legend>掃描檔上傳</legend></h3>
 		<div class="form-horizontal">
 			<div class="form-group">
@@ -44,15 +46,14 @@
 					</div>
 				</div>
 			</div>
-			{|{ temp }|}
-			<template v-if="category!='self'">
+			<template v-if="format!='self'">
 				<div class="form-group">
-					<label class="control-label col-sm-2" for="id_category">類型：</label>
+					<label class="control-label col-sm-2" for="id_format">格式：</label>
 					<div class="col-sm-3">
 						<select
 							class="form-control"
-							v-model="category"
-							id="id_category" name="category" required
+							v-model="format"
+							id="id_format" name="format" required
 						>
 							<option value="" selected="selected">---------</option>
 							<option value="txt">txt</option>
@@ -61,15 +62,64 @@
 					</div>
 				</div> 
 			</template>
+
+			<div class="form-group">
+				<label class="control-label col-sm-2" for="id_org">單位：</label>
+				<template v-if="user.is_supermanager">
+					<div class="col-sm-3">
+						<select
+							class="form-control"
+							v-model="org_id"
+							id="id_org" name="org" required
+							@change="category_id=''"
+						>
+							<option
+								v-for="item in org_categorys"
+								:value="item.id"
+							>{|{ item.name }|}</option>
+						</select>
+					</div>
+				</template>
+				<template v-else>
+					<div class="col-sm-3">
+						<div
+							v-for="item in org_categorys"
+							v-if="org_id==item.id"
+						>{|{ item.name }|}</div>
+					</div>
+				</template>
+				<label class="control-label col-sm-2" for="id_category">類別：</label>
+				<div class="col-sm-3">
+
+					<template
+						v-for="item in org_categorys"
+						v-if="org_id==item.id"
+					>
+						<select
+							class="form-control"
+							v-model="category_id"
+							id="id_category" name="category"
+						>
+							<option value="">-----請選擇-----</option>
+							<option
+								v-for="category in item.categorys"
+								:value="category.id"
+							>{|{ category.name }|}</option>
+						</select>
+					</template>
+				</div>
+
+			</div> 
+
 			<div class="form-group">
 				<label class="control-label col-sm-2" for="id_fileObject">文件：</label>
 				<div class="col-sm-3">
 					<input class="form-control-file" id="id_fileObject" name="fileObject" type="file" required />		  
 				</div>
 			</div> 
+
 			<div class="form-group row">
 				<div class="col-sm-offset-2 col-sm-10">
-				   <!-- <button class="btn btn-default" type="submit" id="send_id" name="send">傳送</button>-->
 					<input v-on:click="create()" type="button" class="btn btn-primary upload" value="送出" id="send_id">
 					<input type="reset" class="btn btn-danger" value="重置">
 				</div>
@@ -87,7 +137,7 @@
 </template>
 <script>
 	module.exports = {
-		props: ['category',],
+		props: ['format',],
 		components: {
 			'bookinfo_search': httpVueLoader('/static/ebookSystem/js/vue-component/bookinfo_search.vue')
 		},
@@ -142,6 +192,9 @@
 						'readonly': true,
 					},
 				},
+				org_id: '',
+				category_id: '',
+				org_categorys: [],
 			}
 		},
 		computed: {
@@ -151,19 +204,56 @@
 				else return 'none';
 			},
 			url: function(){
-				if(this.category=='epub' || this.category=='txt') return '/ebookSystem/api/books/action/upload/'
-				else if(this.category=='self') return '/ebookSystem/api/books/action/create/'
+				if(this.format=='epub' || this.format=='txt') return '/ebookSystem/api/books/action/upload/'
+				else if(this.format=='self') return '/ebookSystem/api/books/action/create/'
 			},
 		},
 		mounted: function () {
 			let self = this
 			self.clientb = new $.RestClient('/ebookSystem/api/');
 			self.clientb.add('bookinfos');
+			self.clientb.add('categorys');
 			self.clientb.addVerb('bookinfos_create_update', 'POST', {
 				url: 'bookinfos/action/create_update/',
 			});
+			self.clientg = new $.RestClient('/genericUser/api/');
+			self.clientg.add('organizations');
+			self.get_org_category()
+			self.org_id=user.org
 		},
 		methods: {
+			get_org_category: function(){
+				let self = this
+				self.clientg.organizations.read()
+				.done(function(data) {
+					_.each(data, function(o){
+						let org_category = {
+							'id': o.id,
+							'name': o.name,
+							'categorys': [],
+						}
+
+						self.clientb.categorys.read({'org_id': o.id})
+						.done(function(data) {
+							_.each(data, function(c){
+								let temp = {
+									'id': c.id,
+									'name': c.name,
+								}
+								org_category.categorys.push(temp)
+							})
+						})
+						.fail(function(xhr, result, statusText){
+							alertmessage('error', xhr.responseText)
+						})
+						self.org_categorys.push(org_category)
+					})
+				})
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', xhr.responseText)
+				})
+
+			},
 			search_ISBN_info: function(){
 				if(binstr(this.search_ISBN, '-')){
 					alertmessage('error', 'ISBN格式不能含有「-」')
@@ -269,7 +359,7 @@
 				let self = this;
 
 				// 確認有選擇類型
-				if(iser(this.category)){
+				if(iser(this.format)){
 					alertmessage('error', '類型尚未選擇')
 					return -1
 				}
@@ -291,7 +381,9 @@
 				.done(function(data){
 					let transferData = {
 						ISBN: self.temp['ISBN'].value,
-						category: self.category,
+						org_id: self.org_id,
+						category_id: self.category_id,
+						format: self.format,
 						fileObject: fileObject,
 					}
 					rest_aj_upload(self.url, transferData)

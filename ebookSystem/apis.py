@@ -195,14 +195,16 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 			newBook.scaner = request.user
-			newBook.owner = request.user
-			newBook.org = request.user.org
 			newBook.source = 'self'
+
 			try:
+				newBook.org = Organization.objects.get(id=request.POST['org_id'])
 				newBook.category = Category.objects.get(id=request.POST['category_id'])
 			except:
-				pass
+				newBook.org = request.user.org
+
 			newBook.save()
+
 			try:
 				newBook.create_EBook()
 			except BaseException as e:
@@ -237,7 +239,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			}
 			try:
 				book = Book.objects.get(ISBN=request.POST['ISBN'])
-				if source_priority[request.POST['category']] <= source_priority[book.source]:
+				if source_priority[request.POST['format']] <= source_priority[book.source]:
 					res['detail'] = u'文件已存在'
 					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 			except:
@@ -245,13 +247,13 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 			#上傳文件設定
 			uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
-			uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.' +request.POST['category'])
+			uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.' +request.POST['format'])
 			self.post_resource(uploadFilePath, request.FILES['fileObject'])
 
 			#根據選擇上傳格式作業
 			final_file = os.path.join(uploadPath, 'OCR') + '/{0}.epub'.format(request.POST['ISBN'], )
 			#txt
-			if request.POST['category'] == 'txt':
+			if request.POST['format'] == 'txt':
 				from ebooklib import epub
 				from utils.epub import txt2epub
 				try:
@@ -271,7 +273,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 			#epub
-			if request.POST['category'] == 'epub':
+			if request.POST['format'] == 'epub':
 				from ebooklib import epub
 				from utils.epub import through, add_bookinfo
 				try:
@@ -301,10 +303,14 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				newBook = Book.objects.get(ISBN=request.POST['ISBN'])
 
 			newBook.scaner = request.user
-			newBook.owner = request.user
 			newBook.org = request.user.org
-			newBook.source = request.POST['category']
+			newBook.source = request.POST['format']
 			newBook.finish_date = timezone.now()
+			try:
+				newBook.org = Organization.objects.get(id=request.POST['org_id'])
+				newBook.category = Category.objects.get(id=request.POST['category_id'])
+			except:
+				newBook.org = request.user.org
 			newBook.save()
 
 			ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN'] + '-1', begin_page=-1, end_page=-1)
@@ -758,6 +764,15 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				from utils.other import get_client_ip
 				get_ip = get_client_ip(request)
 				format = request.POST['fileformat']
+
+				'''from django.db import connection
+					with connection.cursor() as cursor:
+						sql = "select count(*) from (select count(*) from ebookSystem_getbookrecord where user_id={} and datediff(now(), get_time)<=7 group by book_id) as g".format(request.user.id)
+						result=cursor.execute(sql).fetchall()
+				if result[0][0]>3:
+					res['detail'] = u'下載書籍數已到上線，每週僅能下載 3 本'
+					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)'''
+
 				GetBookRecord.objects.create(book=obj.object, user=request.user, get_ip=get_ip, format=format)
 				if format == 'epub':
 					return self.get_resource(obj.epub)

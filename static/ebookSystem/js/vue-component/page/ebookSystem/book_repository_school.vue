@@ -133,10 +133,10 @@
 						self.clientb.categorys.read({'org_id': o.id})
 						.done(function(data) {
 							_.each(data, function(c){
-							let temp = {
-								'id': c.id,
-								'name': c.name,
-							}
+								let temp = {
+									'id': c.id,
+									'name': c.name,
+								}
 								org_category.categorys.push(temp)
 								self.categorys_books.push(temp)
 							})
