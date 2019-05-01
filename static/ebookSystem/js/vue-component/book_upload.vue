@@ -1,7 +1,5 @@
 <template>
 	<div>
-		{|{ org_id }|}
-		{|{ category_id }|}
 		<h3 v-if="format!='self'"><legend>電子檔上傳</legend></h3>
 		<h3 v-else><legend>掃描檔上傳</legend></h3>
 		<div class="form-horizontal">
@@ -88,6 +86,9 @@
 						>{|{ item.name }|}</div>
 					</div>
 				</template>
+			</div> 
+
+			<div class="form-group">
 				<label class="control-label col-sm-2" for="id_category">類別：</label>
 				<div class="col-sm-3">
 
@@ -108,8 +109,7 @@
 						</select>
 					</template>
 				</div>
-
-			</div> 
+			</div>
 
 			<div class="form-group">
 				<label class="control-label col-sm-2" for="id_fileObject">文件：</label>
