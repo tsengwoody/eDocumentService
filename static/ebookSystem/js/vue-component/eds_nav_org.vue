@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<nav class="navbar navigation-clean-button navbar-fixed-top" role="navigation">
 		<div class="container">
 			<div class="navbar-header">
@@ -86,6 +86,12 @@
 								'display_name': '書籍管理',
 								'permission': ['is_manager'],
 								'url': '/routing/ebookSystem/book_manager_self/',
+							},
+							{
+								type: 'item',
+								'display_name': '書籍類型管理',
+								'permission': ['is_supermanager'],
+								'url': '/routing/ebookSystem/category_manager_self/',
 							},
 							{
 								type: 'item',
@@ -185,7 +191,7 @@
 						type: 'item',
 						'display_name': '平台書庫',
 						'permission': ['true'],
-						'url': '/routing/ebookSystem/book_repository/',
+						'url': '/routing/ebookSystem/book_repository_school/',
 					},
 				],
 				'nav_item_right': [

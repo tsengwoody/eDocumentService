@@ -25,6 +25,11 @@ except:
 	unicode = str
 	from urllib.parse import urlencode
 
+def kill_firefox():
+	import subprocess
+	p=subprocess.Popen("killall firefox", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	(stdoutput,erroutput) = p.communicate()
+
 def worker_get_bookinfo_detail(function, urls, result, mutex, session):
 	while True:
 		try:
@@ -55,30 +60,14 @@ def get_douban_bookinfo(ISBN):
 
 	soup = BeautifulSoup(browser.page_source, 'html5lib')
 	browser.quit()
+	kill_firefox()
 
 	session = requests.Session()
 	url_list = [i['href'] for i in soup.find_all("a", class_="title-text")]
 
 	bookinfo_list = []
-	result = Queue()
-	urls = Queue()
 	for url in url_list:
-		urls.put(url)
-
-	threads = []
-	mutex = Lock()
-	for t in range(8):
-		t = Thread(target=worker_get_bookinfo_detail, kwargs={'function':get_douban_bookinfo_detail, 'urls': urls, 'result': result, 'mutex':mutex, 'session': session})
-		t.start()
-		threads.append(t)
-	for t in threads:
-		t.join()
-
-	while True:
-		try:
-			item = result.get(block=False)
-		except:
-			break
+		item = get_douban_bookinfo_detail(url, session)
 		bookinfo_list.extend(item)
 
 	return bookinfo_list[0]
@@ -96,30 +85,14 @@ def get_douban_bookinfo_list(query_text):
 
 	soup = BeautifulSoup(browser.page_source, 'html5lib')
 	browser.quit()
+	kill_firefox()
 
 	session = requests.Session()
 	url_list = [i['href'] for i in soup.find_all("a", class_="title-text")]
 
 	bookinfo_list = []
-	result = Queue()
-	urls = Queue()
 	for url in url_list:
-		urls.put(url)
-
-	threads = []
-	mutex = Lock()
-	for t in range(8):
-		t = Thread(target=worker_get_bookinfo_detail, kwargs={'function':get_douban_bookinfo_detail, 'urls': urls, 'result': result, 'mutex':mutex, 'session': session})
-		t.start()
-		threads.append(t)
-	for t in threads:
-		t.join()
-
-	while True:
-		try:
-			item = result.get(block=False)
-		except:
-			break
+		item = get_douban_bookinfo_detail(url, session)
 		bookinfo_list.extend(item)
 
 	return bookinfo_list
@@ -244,6 +217,7 @@ def get_ncl_bookinfo(ISBN):
 		browser.back()
 
 	browser.quit()
+	kill_firefox()
 
 	return bookinfo_list[0]
 
@@ -291,6 +265,7 @@ def get_ncl_bookinfo_list(query_dict):
 		browser.back()
 
 	browser.quit()
+	kill_firefox()
 
 	return bookinfo_list
 

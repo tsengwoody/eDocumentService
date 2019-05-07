@@ -1,5 +1,5 @@
 <template>
-	<div class="tab-content">
+	<div :id="'book_manager' +org_id" class="tab-content">
 		<h3>{|{ org.name }|}</h3>
 		<div id="book_manager_search">
 			<div class="form-inline" style="margin-bottom:20px;">
@@ -32,9 +32,45 @@
 						:href="'/routing/ebookSystem/book_detail/' +props.item.ISBN +'/'"
 						target="blank" title="(另開新視窗)"
 					>分段資訊</a>
+				<button class="btn btn-default"
+					@click="
+						book_update = props.item;
+						$refs[id].open('book_manager' +org_id);
+					">資料編輯</button>
 				</template>
 			</table-div>
 		</div>
+		<modal :id_modal="id" :size="'normal'" :ref="id">
+			<template slot="header">
+				<h4 v-if="book_update.book_info" class="modal-title">書籍 {|{ book_update.book_info.bookname }|} 資料編輯更新</h4>
+			</template>
+			<template slot="body">
+				<div>權重：</div>
+				<select v-model="book_update.priority">
+					<option
+						v-for="item in '0123456789'"
+						:value="item"
+					>{|{ item }|}</option>
+				</select>
+				<div>擁有者：</div>
+				<select v-model="book_update.owner">
+					<option
+						v-for="item in user_list"
+						:value="item.id"
+					>{|{ item.username }|}</option>
+				</select>
+			</template>
+			<template slot="footer">
+				<button
+					class="btn btn-default"
+					@click="$refs[id].close()"
+				>取消</button>
+				<button
+					class="btn btn-default"
+					@click="updates()"
+				>更新</button>
+			</template>
+		</modal>
 	</div>
 </template>
 
@@ -42,10 +78,14 @@
 	module.exports = {
 		props: ['org_id',],
 		components: {
+			'modal': components['modal'],
 			'table-div': components['table-div'],
 		},
 		data: function() {
 			return {
+				id: Math.floor(Math.random() * 100000000).toString(),
+				book_update: {},
+				user_list: [],
 				org: {},
 				search_choices: {
 					'0': '未審核',
@@ -72,9 +112,17 @@
 
 			this.clientg = new $.RestClient('/genericUser/api/');
 			this.clientg.add('organizations');
+			this.clientg.add('users');
 			this.clientg.organizations.read(this.org_id)
 			.done(function(data) {
 				self.org = data
+			})
+			.fail(function(xhr, result, statusText){
+				alertmessage('error', xhr.responseText)
+			})
+			this.clientg.users.read({role: 'guest'})
+			.done(function(data) {
+				self.user_list = data;
 			})
 			.fail(function(xhr, result, statusText){
 				alertmessage('error', xhr.responseText)
@@ -108,6 +156,21 @@
 				.fail(function(xhr, result, statusText){
 					alertmessage('error', xhr.responseText)
 				})
+			},
+			updates: function () {
+				let self = this
+				let feedback_content = self.feedback_content
+				self.clientb.books.updatepart(self.book_update.ISBN, {
+					priority: self.book_update.priority,
+					owner: self.book_update.owner,
+				})
+				.done(function(data) {
+					alertmessage('success', '成功更新資料')
+				})
+				.fail(function(xhr, result, statusText){
+					alertmessage('error', xhr.responseText)
+				})
+
 			},
 		},
 	}

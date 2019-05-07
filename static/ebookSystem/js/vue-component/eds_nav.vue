@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 		<div class="container">
 			<div class="navbar-header">
@@ -86,6 +86,12 @@
 								'display_name': '書籍管理',
 								'permission': ['is_supermanager'],
 								'url': '/routing/ebookSystem/book_manager/',
+							},
+							{
+								type: 'item',
+								'display_name': '書籍類型管理',
+								'permission': ['is_supermanager'],
+								'url': '/routing/ebookSystem/category_manager_self/',
 							},
 							{
 								type: 'item',

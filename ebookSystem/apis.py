@@ -19,6 +19,11 @@ from utils.permissions import RuleORPermissionFactory
 
 import sys
 
+def kill_firefox():
+	import subprocess
+	p=subprocess.Popen("killall firefox", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	(stdoutput,erroutput) = p.communicate()
+
 class BookSimpleViewSet(viewsets.ModelViewSet):
 	queryset = Book.objects.all()
 	serializer_class = BookSimpleSerializer
@@ -342,11 +347,13 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		if len(editingPartList) >= GET_MAX_EBOOK:
 			res['detail'] = u'您已有超過{0}段文件，請先校對完成再領取'.format(GET_MAX_EBOOK)
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		partialBook = BookOrder.objects.filter(book__status=Book.STATUS['active'])
 		try:
-			if not request.data['org_id']=='0':
-				partialBook = BookOrder.objects.filter(book__status=Book.STATUS['active'], book__org_id=request.data['org_id']).order_by('order')[0].book
-			else:
-				partialBook = BookOrder.objects.filter(book__status=Book.STATUS['active']).order_by('order')[0].book
+			if not request.data['org_id']==0:
+				partialBook = partialBook.filter(book__org_id=request.data['org_id'])
+			if not request.data['category_id']=='all':
+				partialBook = partialBook.filter(book__category_id=request.data['category_id'])
+			partialBook = partialBook.order_by('order')[0].book
 		except IndexError as e:
 			res['detail'] = u'無文件可校對，請聯絡管理者'
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -594,12 +601,15 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 		if len(ISBN) == 10:
 			ISBN = ISBN10_to_ISBN13(ISBN)
 
+		kill_firefox()
+
 		if request.POST['source'] == 'NCL':
 			#=====NCL=====
 			try:
 				res['bookinfo'] = get_ncl_bookinfo(ISBN)
 				res['bookinfo']['source'] = 'NCL'
 			except BaseException as e:
+				kill_firefox()
 				res['detail'] = u'NCL 無資料'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
@@ -609,6 +619,7 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 				res['bookinfo'] = get_douban_bookinfo(ISBN)
 				res['bookinfo']['source'] = 'douban'
 			except BaseException as e:
+				kill_firefox()
 				res['detail'] = u'douban 無資料'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 

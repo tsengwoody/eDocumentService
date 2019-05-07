@@ -267,7 +267,7 @@
 			clear: function () {
 				this.edit_ebook = [];
 				this.finish_ebook = [];
-				this.category='all'
+				this.category_id='all'
 			},
 		},
 	}
