@@ -45,20 +45,31 @@
 				<h4 v-if="book_update.book_info" class="modal-title">書籍 {|{ book_update.book_info.bookname }|} 資料編輯更新</h4>
 			</template>
 			<template slot="body">
-				<div>權重：</div>
-				<select v-model="book_update.priority">
-					<option
-						v-for="item in '0123456789'"
-						:value="item"
-					>{|{ item }|}</option>
-				</select>
-				<div>擁有者：</div>
-				<select v-model="book_update.owner">
-					<option
-						v-for="item in user_list"
-						:value="item.id"
-					>{|{ item.username }|}</option>
-				</select>
+				<div class="form-group col-md-6">
+					<label for="priority">權重：</label>
+					<select class="form-control" id="priority"
+						 v-model="book_update.priority"
+					>
+					    <option
+							v-for="item in '0123456789'"
+							:value="item"
+						>{|{ item }|}</option>
+				    </select>
+				</div>
+
+				<div class="form-group col-md-6">
+					<label for="owner">擁有者：</label>
+					<select class="form-control" id="owner"
+						 v-model="book_update.owner"
+					>
+				      	<option
+							v-for="item in user_list"
+							:value="item.id"
+						>{|{ item.username }|}</option>
+				    </select>
+				</div>
+
+				<div style="clear: both;"></div>
 			</template>
 			<template slot="footer">
 				<button
