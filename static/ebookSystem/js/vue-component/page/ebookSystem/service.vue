@@ -1,7 +1,7 @@
-<template>
+﻿<template>
 	<div>
 		<h2>一般校對</h2>
-		<service_org :org_id="user.org" :choice_org="true">
+		<service_org org_id="1" :choice_org="false">
 		</service_org>
 	</div>
 </template>

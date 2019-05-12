@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="service">
 		<div style="text-align: center;">
 			<form class="form-inline">
@@ -123,6 +123,9 @@
 		mounted: function () {
 			document.title = '一般校對';
 			let self = this
+			if(self.org_id==1&&self.choice_org){
+				self.org_id = 0;
+			}
 			self.get_org_category()
 			self.refresh()
 		},
@@ -132,6 +135,10 @@
 				self.clientg.organizations.read()
 				.done(function(data) {
 					_.each(data, function(o){
+						// org 為 1 屬特殊情形，是一般版使用，故在選擇列表內不顯示
+						if(o.id==1){
+							return -1;
+						}
 						let org_category = {
 							'id': o.id,
 							'name': o.name,
