@@ -1,54 +1,55 @@
 <template>
-	<div class="home_school">
-		<div class="row">
-		    <div class="row space-16">&nbsp;</div>
-		    <div class="row">
-		      <div class="col-sm-3">
-		        <div class="thumbnail">
-		          <div class="caption text-center" onclick="location.href='#'">
-		            <div class="position-relative">
-		              <img src="/genericUser/api/bannercontents/1/resource/cover/image" />
-		            </div>
-		            <h4 id="thumbnail-label"><a href="#" target="_blank">校園版服務介紹</a></h4>
-		          </div>
-		        </div>
-		      </div>
+	<div>
+		<div class="homeCarousel">
+			<h2 class="sr-only">首頁</h2>
+			<template v-for="(item, index) in bannercontentlist">
+				<div class="slides active" v-if="index==0">
+					<a :href="item.url">
+						<img
+							:src="`/genericUser/api/bannercontents/` +item.id +`/resource/cover/image`"
+							:alt="item.title"
+							:title="item.title"
+							style="height: 480px;width:940px" 
+						>
+					</a>
+				</div>
+				<div class="slides" v-if="index!=0">
+					<a :href="item.url">
+						<img
+							:src="`/genericUser/api/bannercontents/` +item.id +`/resource/cover/image`"
+							:alt="item.title"
+							:title="item.title"
+							style="height: 480px;width:940px" 
+						>
+					</a>
+				</div>
+			</template>
+			
+			<a role="button" class="left carousel-control" @click="plusDivs(-1)">
+				<span class="pointer-left" aria-hidden="true">&#10094;</span>
+				<span class="sr-only">上一頁</span>
+			</a>
+			<a role="button" class="right carousel-control" @click="plusDivs(1)">
+				<span class="pointer-right" aria-hidden="true">&#10095;</span>
+				<span class="sr-only">下一頁</span>
+			</a>
 
-		      <div class="col-sm-3">
-		        <div class="thumbnail">
-		          <div class="caption text-center" onclick="location.href='#'">
-		            <div class="position-relative">
-		              <img src="https://az818438.vo.msecnd.net/icons/slack.png" style="width:72px;height:72px;" />
-		            </div>
-		            <h4 id="thumbnail-label"><a href="#" target="_blank">平台系統公告</a></h4>
-		          </div>
-		        </div>
-		      </div>
-
-		      <div class="col-sm-3">
-		        <div class="thumbnail">
-		          <div class="caption text-center" onclick="location.href='#'">
-		            <div class="position-relative">
-		              <img src="https://az818438.vo.msecnd.net/icons/slack.png" style="width:72px;height:72px;" />
-		            </div>
-		            <h4 id="thumbnail-label"><a href="#" target="_blank">協會簡介</a></h4>
-		          </div>
-		        </div>
-		      </div>
-
-		      <div class="col-sm-3">
-		        <div class="thumbnail">
-		          <div class="caption text-center" onclick="location.href='#'">
-		            <div class="position-relative">
-		              <img src="https://az818438.vo.msecnd.net/icons/slack.png" style="width:72px;height:72px;" />
-		            </div>
-		            <h4 id="thumbnail-label"><a href="#" target="_blank">著作權說明</a></h4>
-		          </div>
-		        </div>
-		      </div>
-		    </div>
+			<div class="textfornvda">
+				<h3>輪播圖片說明</h3>
+				<ul>
+					<li v-for="(item, index) in bannercontentlist">
+						<div v-html="markdown2html(item.content)"></div>
+					</li>
+				</ul>
+			</div>
 		</div>
 
+		<div class="row introduction-area">
+			<button type="button" class="btn btn-secondary btn-lg">校園版服務介紹</button>
+			<button type="button" class="btn btn-secondary btn-lg">平台系統公告</button>
+			<button type="button" class="btn btn-secondary btn-lg">協會簡介</button>
+			<button type="button" class="btn btn-secondary btn-lg">著作權說明</button>
+		</div>
 
 		<div class="row" style="padding-top: 20px;">
 			<div class="col-lg-4">
@@ -134,37 +135,167 @@
 </template>
 
 <script>
+
+	function Timer(fn, t) {
+	    var timerObj = setInterval(fn, t);
+
+	    this.stop = function() {
+	        if (timerObj) {
+	            clearInterval(timerObj);
+	            timerObj = null;
+	        }
+	        return this;
+	    }
+
+	    // start timer using current settings (if it's not already running)
+	    this.start = function() {
+	        if (!timerObj) {
+	            this.stop();
+	            timerObj = setInterval(fn, t);
+	        }
+	        return this;
+	    }
+
+	    // start with new interval, stop current interval
+	    this.reset = function(newT) {
+	        t = newT;
+	        return this.stop().start();
+	    }
+	}
+
 	module.exports = {
 		data: function() {
 			return {
-
+				bannercontentlist: null,
+				announcementlist: null,
+				slideIndex: 1,
+				timer: null,
 			}
 		},
 		mounted: function() {
 			document.title = '首頁';
 
+			const self = this;
+			let client = new $.RestClient('/genericUser/api/');
+			client.add('bannercontents');
+			client.add('announcements');
+
+			$.when(
+				client.bannercontents.read(), 
+				client.announcements.read()
+			).done(function(res1, res2) {
+				self.bannercontentlist = res1[0];
+				self.announcementlist = res2[0];
+				
+				setTimeout(() => {
+					self.showDivs(self.slideIndex);
+				}, 100);
+
+				self.timer = new Timer(function() {
+				    self.plusDivs(1);
+				}, 4000);
+			})
+		},
+		computed: {
+			showAnnouncements: function() {
+				let target_announcements = [];
+				if (this.announcementlist) {
+					if(this.announcementlist.length < 3) {
+						target_announcements = this.announcementlist;
+					} else {
+						target_announcements = this.announcementlist.slice(0, 2);
+					}
+				}
+				
+				return target_announcements.map(function(announcement) {
+					let year, month, day;
+					[year, month, day] = announcement.datetime.split('-');
+					return {
+						id: announcement.id,
+						title: announcement.title,
+						year,
+						month,
+						day,
+					}
+				});
+			}
 		},
 		methods: {
+			markdown2html: function (text) {
+				const converter = new showdown.Converter();
+				const html = converter.makeHtml(text);
+				return html;
+			},
+			plusDivs(n) {
+			  	this.showDivs(
+			  		this.slideIndex += n
+			  	);
+			  	this.timer.reset(4000);
+			},
+			showDivs(n) {
+				const slides = document.getElementsByClassName("slides");
+				if (n > slides.length) {
+					this.slideIndex = 1
+				}
+				if (n < 1) {
+					this.slideIndex = slides.length
+				}
+				for (let i = 0; i < slides.length; i++) {
+					slides[i].style.display = "none";  
+				}
 
+				if (slides.length > 0) {
+					slides[ this.slideIndex - 1 ].style.display = "block";
+				}
+			}
 		},
 	}
 </script>
 
 <style>
-.thumbnail {
-	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-	transition: 0.3s;
-	min-width: 40%;
-	border-radius: 5px;
+.carousel-inner > .item > img,
+.carousel-inner > .item > a > img {
+  margin: auto;
 }
 
-.thumbnail:hover {
-	cursor: pointer;
-	box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.5);
-}
-
-.thumbnail img {
+.homeCarousel {
+	position: relative;
 	width: 100%;
+	overflow: hidden;
+}
+
+@keyframes opac{
+	from{opacity:0} 
+	to{opacity:1}
+}
+
+.slides {
+	display:none; 
+	animation: opac 0.8s;
+}
+
+.slides img {
+	margin: auto;
+	display: block;
+    max-width: 100%;
+}
+
+.pointer-left, .pointer-right {
+	position: absolute;
+    top: 50%;
+    z-index: 5;
+    display: inline-block;
+    font-size: 1.2em;
+}
+
+.pointer-right {
+	right: 50%;
+    margin-right: -10px;
+}
+
+.pointer-left {
+	left: 50%;
+    margin-left: -10px;
 }
 
 ul.navigation {
@@ -173,5 +304,11 @@ ul.navigation {
 }
 ul.navigation li {
   display: inline;
+}
+
+div.introduction-area {
+	display: flex;
+    justify-content: space-between;
+	padding-top: 20px;
 }
 </style>
