@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 function urlparam() {
 	//解析網址參數

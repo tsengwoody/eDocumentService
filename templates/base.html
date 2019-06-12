@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh">
 
 <head>
@@ -18,13 +18,7 @@
 
 	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-1.12.4.min.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-ui-1.12.1.min.js' %}"></script>
-	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-tmpl-1.4.2.min.js' %}"></script>
-	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-binarytransport.js' %}"></script>
-	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-pp.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-rest-1.0.5.js' %}"></script>
-	<script language="javascript" src="{% static 'ebookSystem/js/jquery/jquery-mousewheel-3.1.13.min.js' %}"></script>
-
-	<script language="javascript" src="{% static 'ebookSystem/js/lodash-4.17.4.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/bluebird-3.5.0.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/Math.uuid.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/base64js.min.js' %}"></script>
@@ -32,15 +26,27 @@
 	<script language="javascript" src="{% static 'ebookSystem/js/js-cookie-2.2.0.min.js' %}"></script>
 	<script language="javascript" src="{% static 'ebookSystem/js/jwt-decode-2.2.js' %}"></script>
 
+	<!-- main -->
+	<script src="/static/ebookSystem/js/main.js" type="module"></script>
+
+	<!-- axios -->
+	<script language="javascript" src="/static/ebookSystem/js/modules/axios-0.19.0.min.js"></script>
+
+	<!-- FileSaver -->
+	<script language="javascript" src="/static/ebookSystem/js/modules/FileSaver-2.0.2.min.js"></script>
+
+	<!-- lodash -->
+	<script language="javascript" src="/static/ebookSystem/js/modules/lodash-4.17.11.js"></script>
+
 	<!-- vue -->
-	<script language="javascript" src="/static/ebookSystem/js/vue-2.5.16.min.js"></script>
+	<script language="javascript" src="/static/ebookSystem/js/modules/vue-2.6.10.min.js"></script>
 	<!-- vuex -->
 	<!--<script language="javascript" src="/static/ebookSystem/js/vuex-3.1.0.js"></script>-->
 
 	<!-- element-ui -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.0.1/theme-chalk/index.css" />
 	<script language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.0.1/index.js"></script>
-	<script language="javascript" rc="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.0.1/locale/zh-TW.min.js"></script>
+	<script language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.0.1/locale/zh-TW.min.js"></script>
 
 	<!--viewer-->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.3.2/viewer.min.css">
@@ -57,11 +63,11 @@
 	<!-- font size px -> em to adjust font-size % -->
 	<link rel="stylesheet" href="{% static 'ebookSystem/framework/bootstrap-3.3.4/css/fontSize.css' %}">
 
-	<link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+	<link href="/static/ebookSystem/css/font-awesome.css" rel="stylesheet">
 
 	<!-- bootstrap-docs -->
 	<link rel="stylesheet" href="{% static 'ebookSystem/framework/bootstrap-additional/docs.min.css' %}">
-	
+
 	<!-- bootstrap-datepicker -->
 	<link rel="stylesheet" href="{% static 'ebookSystem/framework/bootstrap-datepicker-1.6.4-dist/css/bootstrap-datepicker3.min.css' %}">
 	<script type="text/javascript" src="{% static 'ebookSystem/framework/bootstrap-datepicker-1.6.4-dist/js/bootstrap-datepicker.min.js' %}"></script>
@@ -79,12 +85,12 @@
 	<!-- wiriseditor -->
 	<!--<script type="text/javascript" src="https://www.wiris.net/demo/editor/editor"></script>-->
 
-	<!-- MathJax, 可選 TeX-AMS-MML_SVG TeX-MML-AM_CHTML -->
+	<!-- MathJax, 可選 TeX-AMS-MML_SVG TeX-MML-AM_CHTML
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
 		MathJax.Hub.Config({
 			skipStartupTypeset: true, //不初始化啟動
 		});
-	</script>
+	</script>-->
 
 	<!--markdown to html-->
 	<script language="javascript" src="/static/ebookSystem/js/showdown.min.js"></script>
@@ -98,10 +104,6 @@
 	<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 
 	<title>{% block title %}{% endblock %} | 雲端千眼平台</title>
-	{% block resource%} 
-	{% endblock%} 
-	{% block style %}
-	{% endblock %}
 
 	<script type="text/javascript">
 
@@ -172,7 +174,6 @@
 {% include 'comp/mx_user_getOTP.html' %}
 	{% include 'comp/mx_qanda.html' %}
 	{% include 'comp/mx_doc_editor.html' %}
-	{% include 'comp/mx_serviceinfo_editrecord.html' %}
 
 	<div class="textfornvda"><a href="#id_main">移至主內容</a></div>
 	{% block nav %}
@@ -181,7 +182,7 @@
 	<div class="container">
 		<div role="main" id="id_main">{% block content %}{% endblock %}</div>
 	</div>
-	{% block footer %}
+
 	<footer class="footer" role="footer">
 		<div class="container">
 			<div class="pull-left">
@@ -225,7 +226,6 @@
 			<a href="https://www.forblind.org.tw/" target="blank" title="(另開新視窗)"><img id=logo src="/static/ebookSystem/img/logo1.png" alt="社團法人台北市視障者家長協會"></a>
 		</div>
 	</footer>
-	{% endblock %}
 
 <script>
 //-------------cookie 儲存字體大小設定-------------
@@ -237,7 +237,5 @@ $(function(){
 	}
 });
 </script>
-
 </body>
-
 </html>
