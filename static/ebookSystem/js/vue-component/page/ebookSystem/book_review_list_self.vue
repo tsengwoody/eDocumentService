@@ -11,12 +11,8 @@
 		components: {
 			'book_review_list_org': components['book_review_list_org'],
 		},
-		data: function() {
-			return {
-			}
-		},
-		mounted: function () {
-			document.title = '上傳文件審核';
+		metaInfo: {
+			title: '上傳文件審核',
 		},
 	}
 </script>

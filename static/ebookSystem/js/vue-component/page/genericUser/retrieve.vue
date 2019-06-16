@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="retrieve">
 		<div class="form-group text-center">
 			<h2>取回帳密</h2>
@@ -61,7 +61,7 @@
 		components: {
 			'form-drf': components['form'],
 		},
-		data: function(){
+		data(){
 			return {
 				username: '',
 				email: '',
@@ -89,40 +89,42 @@
 		},
 		computed: {
 		},
-		mounted: function () {
-			document.title = '取回帳密'
+		metaInfo: {
+			title: '取回帳密',
+		},
+		mounted(){
 		},
 		methods: {
-			reset_password: function () {
-				let self = this
-				rest_aj_send('post', '/genericUser/api/users/action/retrieve_up/', {
+			reset_password(){
+				genericUserAPI.userAction.resetPassword({
 					action: 'reset_password',
-					username: self.username,
-					birthday: self.birthday_p,
+					username: this.username,
+					birthday: this.birthday_p,
 				})
-				.done(function(data) {
+				.then(res => {
 					alertmessage('success', '成功重設密碼，請至電子信箱中查閱。')
 					.done(function() {
 						window.location.replace('/routing/genericUser/login/')
 					})
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', '失敗重設密碼')
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
-			get_user: function () {
-				let self = this
-				rest_aj_send('post', '/genericUser/api/users/action/retrieve_up/', {
+			get_user(){
+				genericUserAPI.userAction.getUser({
 					action: 'get_user',
-					email: self.email,
-					birthday: self.birthday_u,
+					email: this.email,
+					birthday: this.birthday_u,
 				})
-				.done(function(data) {
+				.then(res => {
 					alertmessage('success', '成功取得帳號，請至電子信箱中查閱。')
+					.done(function() {
+						window.location.replace('/routing/genericUser/login/')
+					})
 				})
-				.fail(function(xhr, result, statusText){
-					console.log(o2j(xhr))
-					alertmessage('error', o2j(xhr))
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
 		},

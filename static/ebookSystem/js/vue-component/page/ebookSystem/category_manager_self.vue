@@ -11,12 +11,8 @@
 		components: {
 			'category_manager_org': components['category_manager_org'],
 		},
-		data: function() {
-			return {
-			}
-		},
-		mounted: function () {
-			document.title = '管理書籍類型';
+		metaInfo: {
+			title: '管理書籍類型',
 		},
 	}
 </script>

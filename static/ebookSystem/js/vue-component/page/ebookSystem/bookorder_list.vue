@@ -7,12 +7,11 @@
 </template>
 
 <script>
-
 	module.exports = {
 		components: {
 			'table-div': components['table-div'],
 		},
-		data: function() {
+		data(){
 			return {
 				bookorder_header: {
 					order: '順序',
@@ -22,28 +21,26 @@
 				bookorder_datas: [],
 			}
 		},
+		metaInfo: {
+			title: '校對順序',
+		},
 		mounted: function () {
-			document.title = '校對順序';
-
-			this.client = new $.RestClient('/ebookSystem/api/');
-			this.client.add('bookorders');
-
-			let self = this
-			self.client.bookorders.read()
-			.done(function(data) {
+			ebookSystemAPI.bookOrderRest.list()
+			.then(res => {
 				let filter_data = [];
-				_.each(data, function(v){
+				_.each(res.data, (v) => {
 					filter_data.push({
 						order: v.order,
 						bookname: v.bookname,
 						status: v.status,
 					})
 				})
-				self.bookorder_datas = filter_data;
+				this.bookorder_datas = filter_data;
 			})
-			.fail(function(xhr, result, statusText){
-				alertmessage('error', xhr.responseText)
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
 			})
+
 		},
 	}
 </script>

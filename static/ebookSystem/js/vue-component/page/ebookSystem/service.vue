@@ -11,5 +11,8 @@
 		components: {
 			'service_org': components['service_org'],
 		},
+		metaInfo: {
+			title: '一般校對',
+		},
 	}
 </script>

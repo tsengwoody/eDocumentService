@@ -1,4 +1,3 @@
-
 <template>
 	<div id="book_shelf" class="container">
 		<h2>借閱書櫃</h3>
@@ -54,14 +53,13 @@
 </template>
 
 <script>
-
 	module.exports = {
 		components: {
 			'book_download': components['book_download'],
 			'modal': components['modal'],
 			'table-div': components['table-div'],
 		},
-		data: function() {
+		data(){
 			return {
 				checkout_header: {
 					bookname: '書名',
@@ -78,16 +76,17 @@
 				checkin_list: [],
 			}
 		},
-		computed: {},
-		mounted: function () {
-			document.title = '借閱書櫃';
-			
+		metaInfo: {
+			title: '借閱書櫃',
+		},
+		mounted(){
 			let self = this;
-			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'owner_id': user.id, 'status': 'true'})
-			.done(function(data) {
+			let query = {};
+			query = {'owner_id': user.id, 'status': 'true'};
+			ebookSystemAPI.libraryRecordRest.filter(query)
+			.then(res => {
 				let filter_data = [];
-				_.each(data['data'], function(v){
-
+				_.each(res.data, (v) => {
 					try {
 						filter_data.push({
 							bookname: v.object.book_info.bookname,
@@ -100,14 +99,18 @@
 					}
 
 				})
-				self.checkout_list = filter_data
+				this.checkout_list = filter_data
+			})
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
 			})
 
-			rest_aj_send('get', '/ebookSystem/api/libraryrecords/', {'owner_id': user.id, 'status': 'false'})
-			.done(function(data) {
-				let filter_data = [];
-				_.each(data['data'], function(v){
 
+			query = {'owner_id': user.id, 'status': 'false'};
+			ebookSystemAPI.libraryRecordRest.filter(query)
+			.then(res => {
+				let filter_data = [];
+				_.each(res.data, (v) => {
 					try {
 						filter_data.push({
 							bookname: v.object.book_info.bookname,
@@ -117,22 +120,21 @@
 					} catch (exception) {
 						console.log(`${exception.name}: ${exception.message}`)
 					}
-
 				})
-				self.checkin_list = filter_data;
+				this.checkin_list = filter_data;
 			})
 		},
 		methods: {
-			check_inout: function (pk, action) {
+			check_inout(pk, action) {
 				let self = this;
 
-				rest_aj_send('post', '/ebookSystem/api/libraryrecords/' +pk +'/action/check_inout/', {'action': action,})
-				.done(function(data) {
+				ebookSystemAPI.libraryRecordAction.checkInout({pk, action,})
+				.then(res => {
 					let message = ''
 					if(action==='check_in'){
 						message = '成功歸還書籍'
 						alertmessage('success', message)
-						.done(function() {
+						.done(() => {
 							window.location.reload();
 						})
 					}
@@ -141,9 +143,10 @@
 						alertmessage('success', message)
 					}
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.message)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
+
 
 			},
 		},

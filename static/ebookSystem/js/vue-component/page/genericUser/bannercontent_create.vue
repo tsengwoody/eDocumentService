@@ -85,7 +85,7 @@
 
 <script>
 	module.exports = {
-		data: function(){
+		data(){
 			return {
 				'mode': 'write', //read or write
 				'items': [],
@@ -100,110 +100,33 @@
 			}
 		},
 		computed: {
-			url: function(){
-				u = '/genericUser/api/bannercontents/'
-				if(this.index!=-1){
-					u += this.temp.id +'/'
-				}
-				return u
-			},
 		},
-		mounted: function(){
-			document.title = '管理首頁 Banner'
-
-			this.client = new $.RestClient('/genericUser/api/');
-			this.client.add('bannercontents');
-
+		metaInfo: {
+			title: '管理首頁 Banner',
+		},
+		mounted(){
 			this.list()
 		},
 		methods: {
-			upload: function(){
+			upload(){
 				let fileCover = document.getElementById('id_cover');
 				fileObject = fileCover.files[0]
 				if(iser(fileObject)){
 					alertmessage('error', '檔案尚未選擇')
 					return -1
 				}
-				let vo = this; //this 在.done內會被復蓋
-				let url_resource = '/genericUser/api/bannercontents/' +vo.id +'/resource/cover/image/'
+				let url_resource = '/genericUser/api/bannercontents/' +this.id +'/resource/cover/image/'
 				rest_aj_upload(url_resource, {'object': fileCover.files[0]})
-				.done(function(data) {
+				.done((data) => {
 					alertmessage('success', '成功更新資料(檔案)' +data['message'])
-					vo.clear()
+					this.clear()
 				})
-				.fail(function(data){
+				.fail((data) => {
 					alertmessage('error', '失敗更新資料(檔案)' +data['message'])
 				})
 			},
-			list: function () {
-				let vo = this
-				vo.client.bannercontents.read()
-					.done(function (data, textStatus, xhrObject) {
-						vo.items = data
-						vo.read(vo.index)
-					})
-			},
-			create: function () {
-				let vo = this
-				transferData = {
-					'title': this.temp.title,
-					'content': this.temp.content,
-				}
-				//create
-				rest_aj_send('post', this.url, this.temp)
-					.done(function(data) {
-						vo.id = data['data'].id
-						vo.upload()
-						vo.list()
-					})
-					.fail(function(data){
-						alertmessage('error', data['message'])
-					})
-			},
-			read: function (index) {
-				this.index = index
-				if(index==-1){
-					this.mode = 'write'
-					this.clear()
-				}
-				else{
-					this.mode = 'read'
-					this.temp = this.items[index]
-				}
-			},
-			update: function () {
-				let vo = this
-				rest_aj_send('patch', this.url, this.temp)
-					.done(function (data) {
-						let fileCover = document.getElementById('id_cover');
-						fileObject = fileCover.files[0]
-						if(!iser(fileObject)){
-							vo.id = data['data'].id
-							vo.upload()
-						}
-						else {
-							alertmessage('success', '成功更新資料' +data['message'])
-						}
-						vo.list()
-					})
-					.fail(function(data){
-						alertmessage('error', data['message'])
-					})
-			},
-			del: function(){
-				let vo=this
-				rest_aj_send('delete', this.url, {})
-					.done(function (data){
-						vo.clear()
-						vo.list()
-						alertmessage('success', '已刪除')
-					})
-					.fail(function(data){
-						alertmessage('error', data['message'])
-					})
-			},
-			clear: function () {
-				this.index = -1
+			clear(){
+				this.index = -1;
 				this.temp = {
 					'id': -1,
 					'title': '',
@@ -211,12 +134,75 @@
 					'order': -1,
 				}
 			},
-			change_mode: function () {
+			list(){
+				genericUserAPI.bannerContentRest.list()
+				.then(res => {
+					this.items = res.data;
+					this.read(this.index);
+				})
+			},
+			create(){
+				genericUserAPI.bannerContentRest.create(this.temp)
+				.then(res => {
+						let fileCover = document.getElementById('id_cover');
+						fileObject = fileCover.files[0]
+						if(!iser(fileObject)){
+							this.upload()
+						}
+						else {
+							alertmessage('success', '成功建立資料')
+						}
+					this.list();
+				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
+			},
+			read(index) {
+				this.index = index;
+				if(index==-1){
+					this.mode = 'write';
+					this.clear();
+				}
+				else{
+					this.mode = 'read';
+					this.temp = this.items[index];
+				}
+			},
+			update(){
+				genericUserAPI.bannerContentRest.update(this.temp.id, this.temp)
+				.then(res => {
+						let fileCover = document.getElementById('id_cover');
+						fileObject = fileCover.files[0]
+						if(!iser(fileObject)){
+							this.upload()
+						}
+						else {
+							alertmessage('success', '成功更新資料')
+						}
+					this.list();
+				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
+			},
+			del(){
+				genericUserAPI.bannerContentRest.delete(this.temp.id)
+				.then(res => {
+					this.index = -1;
+					this.list();
+					alertmessage('success', '已刪除');
+				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
+			},
+			change_mode(){
 				if(this.mode=='read'){ this.mode = 'write' }
 				else if(this.mode=='write'){ this.mode = 'read' }
 			},
-			markdown2html: function (text) {
-				var converter = new showdown.Converter()
+			markdown2html(text){
+				let converter = new showdown.Converter()
 				html = converter.makeHtml(text)
 				return html
 			},

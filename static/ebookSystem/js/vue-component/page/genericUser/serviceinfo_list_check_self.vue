@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h2>服務時數確認</h2>
 		<serviceinfo_list_check_org :org_id="user.org">
@@ -11,12 +11,14 @@
 		components: {
 			'serviceinfo_list_check_org': components['serviceinfo_list_check_org'],
 		},
-		data: function() {
+		data(){
 			return {
 			}
 		},
-		mounted: function () {
-			document.title = '服務時數確認(各單位)';
+		metaInfo: {
+			title: '服務時數確認(各單位)',
+		},
+		mounted(){
 		},
 	}
 </script>

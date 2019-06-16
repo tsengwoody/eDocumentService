@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="book_repository_school" class="container">
 		<h2>平台書庫</h2>
 		<div class="row">
@@ -52,7 +52,7 @@
 		components: {
 			'bookinfo_repository': components['bookinfo_repository_filter'],
 		},
-		data: function() {
+		data(){
 			return {
 				user: user,
 				selected_org: null,
@@ -64,7 +64,7 @@
 			}
 		},
 		computed: {
-			bookinfo_header: function() {
+			bookinfo_header(){
 				if(this.user.auth_guest){
 					return {
 						ISBN: "ISBN",
@@ -88,34 +88,24 @@
 					}
 				}
 			},
-			url: function() {
-				return '/ebookSystem/api/categorys/';
-			},
 		},
-		mounted: function() {
-			const self = this;
-			document.title = '平台書庫';
-
-			self.clientg = new $.RestClient('/genericUser/api/');
-			self.clientg.add('organizations');
-			self.clientb = new $.RestClient('/ebookSystem/api/');
-			self.clientb.add('bookinfos');
-			self.clientb.add('categorys');
-			self.refresh();
+		metaInfo: {
+			title: '平台書庫',
+		},
+		mounted(){
+			this.refresh();
 		},
 		methods: {
 			refresh: function() {
-				const self = this;
+				this.items = []
+				this.orgs_books = []
+				this.categorys_books = []
+				this.pointer = {}
 
-				self.items = []
-				self.orgs_books = []
-				self.categorys_books = []
-				self.pointer = {}
-
-				self.clientg.organizations.read()
-				.done(function(data) {
+				genericUserAPI.organizationRest.list()
+				.then(res => {
 					// org get category
-					_.each(data, function(o){
+					_.each(res.data, (o) => {
 						let org_category = {
 							'id': o.id,
 							'name': o.name,
@@ -128,24 +118,24 @@
 						}
 
 						org_category.categorys.push(temp)
-						self.categorys_books.push(temp)
+						this.categorys_books.push(temp)
 
-						self.clientb.categorys.read({'org_id': o.id})
-						.done(function(data) {
-							_.each(data, function(c){
+						ebookSystemAPI.categoryRest.filter({'org_id': o.id})
+						.then(res => {
+							_.each(res.data, (c) => {
 								let temp = {
 									'id': c.id,
 									'name': c.name,
 								}
 								org_category.categorys.push(temp)
-								self.categorys_books.push(temp)
+								this.categorys_books.push(temp)
 							})
 						})
-						.fail(function(xhr, result, statusText){
-							alertmessage('error', xhr.responseText)
+						.catch(res => {
+							alertmessage('error', o2j(res.response.data));
 						})
-						self.items.push(org_category)
-						self.orgs_books.push({
+						this.items.push(org_category)
+						this.orgs_books.push({
 							'id': o.id,
 							'name': o.name,
 						})
@@ -154,103 +144,99 @@
 					// org get book
 
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 
 			},
-			category_read: function(category){
-				const self = this;
-
-				self.books = [];
-				self.pointer = {};
-				_.each(self.categorys_books, function(c){
+			category_read(category){
+				this.books = [];
+				this.pointer = {};
+				_.each(this.categorys_books, (c) => {
 					if(category.id===c.id){
-						self.pointer = c;
+						this.pointer = c;
 					}
 				})
 
-				if(!self.pointer.hasOwnProperty("id")){
+				if(!this.pointer.hasOwnProperty("id")){
 					return -1;
 				}
 
-				if(!self.pointer.hasOwnProperty("books")){
+				if(!this.pointer.hasOwnProperty("books")){
 					let param = {};
 
 					try {
-						if( self.pointer.id.endsWith('null') && (self.pointer.id.split('-').length===2) ){
-							let org_id = self.pointer.id.split('-')[0];
-							let category_id = self.pointer.id.split('-')[1];
+						if( this.pointer.id.endsWith('null') && (this.pointer.id.split('-').length===2) ){
+							let org_id = this.pointer.id.split('-')[0];
+							let category_id = this.pointer.id.split('-')[1];
 							param = {'org_id': org_id, 'category_id': category_id};
 						}
 						else{
-							param = {'category_id': self.pointer.id};
+							param = {'category_id': this.pointer.id};
 						}
 					}
 					catch (err) {
-						param = {'category_id': self.pointer.id};
+						param = {'category_id': this.pointer.id};
 					}
 
-					self.pointer.books = [];
-					self.clientb.bookinfos.read(param)
-					.done(function(data) {
-						_.each(data, function(b){
+					this.pointer.books = [];
+					ebookSystemAPI.bookInfoRest.filter(param)
+					.then(res => {
+						_.each(res.data, (b) => {
 							b['action'] = b.ISBN;
-							self.books.push(b);
-							self.pointer.books.push(b);
+							this.books.push(b);
+							this.pointer.books.push(b);
 						})
 					})
-					.fail(function(xhr, result, statusText){
-						alertmessage('error', xhr.responseText)
+					.catch(res => {
+						alertmessage('error', o2j(res.response.data));
 					})
 				}
 				else {
-					_.each(self.pointer.books, function(b){
+					_.each(this.pointer.books, (b) => {
 						b['action'] = b.ISBN
-						self.books.push(b)
+						this.books.push(b)
 					})
 				}
 
 			},
-			org_read: function(org) {
-				const self = this;
-
-				if (self.selected_org === org.id) {
-					self.selected_org = null;
+			org_read(org) {
+				if (this.selected_org === org.id) {
+					this.selected_org = null;
 				} else {
-					self.selected_org = org.id;
+					this.selected_org = org.id;
 				}
 
-				self.books = [];
-				self.pointer = {};
-				_.each(self.orgs_books, function(o){
+				this.books = [];
+				this.pointer = {};
+				_.each(this.orgs_books, (o) => {
 					if(org.id===o.id){
-						self.pointer = o;
+						this.pointer = o;
 					}
 				})
 
-				if(!self.pointer.hasOwnProperty("id")){
+				if(!this.pointer.hasOwnProperty("id")){
 					return -1;
 				}
 
-				if(!self.pointer.hasOwnProperty("books")){
-					self.pointer.books = [];
-					self.clientb.bookinfos.read({'org_id': self.pointer.id})
-					.done(function(data) {
-						_.each(data, function(b){
+				if(!this.pointer.hasOwnProperty("books")){
+					this.pointer.books = [];
+					ebookSystemAPI.bookInfoRest.filter({'org_id': this.pointer.id})
+					.then(res => {
+						_.each(res.data, (b) => {
 							b['action'] = b.ISBN;
-							self.books.push(b);
-							self.pointer.books.push(b);
+							this.books.push(b);
+							this.pointer.books.push(b);
 						})
 					})
-					.fail(function(xhr, result, statusText){
-						alertmessage('error', xhr.responseText);
+					.catch(res => {
+						alertmessage('error', o2j(res.response.data));
 					})
 				}
 				else {
-					_.each(self.pointer.books, function(b){
+					_.each(this.pointer.books, (b) => {
 						b['action'] = b.ISBN;
-						self.books.push(b);
+						this.books.push(b);
 					})
 				}
 

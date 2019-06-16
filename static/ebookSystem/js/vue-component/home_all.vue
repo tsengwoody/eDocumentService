@@ -129,8 +129,6 @@
 			}
 		},
 		mounted: function() {
-			document.title = '首頁';
-
 			const self = this;
 			let client = new $.RestClient('/genericUser/api/');
 			client.add('bannercontents');

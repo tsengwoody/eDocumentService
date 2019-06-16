@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="book_person">
 		<h2>校對進度</h2>
 		<tab :headinglevel="3" :data="data">
@@ -55,7 +55,7 @@
 			'bookinfo_repository': components['bookinfo_repository'],
 			'set_priority': components['set_priority'],
 		},
-		data: function() {
+		data(){
 			return {
 				bookinfo_header: {
 					"ISBN": "ISBN",
@@ -108,23 +108,20 @@
 				],
 			}
 		},
-		mounted: function () {
-			document.title = '校對進度';
-			this.client = new $.RestClient('/ebookSystem/api/');
-			this.client.add('books');
-			this.client.add('bookinfos');
+		metaInfo: {
+			title: '校對進度',
+		},
+		mounted(){
 			this.get_table_data();
 		},
 		methods: {
-			get_table_data: function () {
-				const self = this;
-
+			get_table_data(){
 				//finish book
 				let query = {'owner_id': user.id};
-				self.client.bookinfos.read(query)
-				.done(function(data) {
+				ebookSystemAPI.bookInfoRest.filter(query)
+				.then(res => {
 					let filter_data = []
-					_.each(data, function(v) {
+					_.each(res.data, (v) => {
 						filter_data.push({
 							"ISBN": v['ISBN'],
 							"bookname": v['bookname'],
@@ -136,21 +133,21 @@
 							"action": v['ISBN'],
 						})
 					})
-					self.data[0].data = {};
-					self.data[0].data['header'] = self.bookinfo_header;
-					self.data[0].data['datas'] = filter_data;
+					this.data[0].data = {};
+					this.data[0].data['header'] = this.bookinfo_header;
+					this.data[0].data['datas'] = filter_data;
 				})
 
 				//active book
-				const c1 = self.client.books.read({'status': 1, 'owner_id': user.id});
-				const c2 = self.client.books.read({'status': 2, 'owner_id': user.id});
-				$.when(c1, c2)
-				.done(function(data1, data2) {
+				const c1 = ebookSystemAPI.bookRest.filter({'status': 1, 'owner_id': user.id});
+				const c2 = ebookSystemAPI.bookRest.filter({'status': 2, 'owner_id': user.id});
+				Promise.all([c1, c2])
+				.then(res => {
 					let book_data = [];
-					book_data = book_data.concat(data1[0]);
-					book_data = book_data.concat(data2[0]);
+					book_data = book_data.concat(res[0].data);
+					book_data = book_data.concat(res[1].data);
 					let filter_data = [];
-					_.each(book_data, function(v) {
+					_.each(book_data, (v) => {
 						filter_data.push({
 							"ISBN": v.book_info.ISBN,
 							"bookname": v.book_info.bookname,
@@ -161,17 +158,17 @@
 							"active_book_action": v,
 						})
 					})
-					self.data[1].data = {};
-					self.data[1].data['header'] = self.active_book_header;
-					self.data[1].data['datas'] = filter_data;
+					this.data[1].data = {};
+					this.data[1].data['header'] = this.active_book_header;
+					this.data[1].data['datas'] = filter_data;
 				})
 
 				//inactive book
 				query = {'status': 0, 'owner_id': user.id};
-				self.client.books.read(query)
-				.done(function(data) {
+				ebookSystemAPI.bookRest.filter(query)
+				.then(res => {
 					let filter_data = [];
-					_.each(data, function(v){
+					_.each(res.data, (v) => {
 						filter_data.push({
 							"ISBN": v.book_info.ISBN,
 							"bookname": v.book_info.bookname,
@@ -180,26 +177,22 @@
 							"inactive_book_action": v,
 						})
 					});
-					self.data[2].data = {};
-					self.data[2].data['header'] = self.inactive_book_header;
-					self.data[2].data['datas'] = filter_data;
+					this.data[2].data = {};
+					this.data[2].data['header'] = this.inactive_book_header;
+					this.data[2].data['datas'] = filter_data;
 				})
 
 			},
-			book_del: function (pk) {
-				const self = this;
-
+			book_del(pk){
 				alertconfirm('確認刪除書籍 id:' +pk)
-				.done(function(){
-					self.client.books.del(pk)
-					.done(function(data) {
+				.done(() => {
+					ebookSystemAPI.bookRest.delete(pk)
+					.then(res => {
 						alertmessage('success', '成功刪除書籍 id:' +pk)
-						.done(function(){
-							self.get_table_data();
-						})
+						this.get_table_data();
 					})
-					.fail(function(xhr, result, statusText){
-						alertmessage('error', xhr.responseText)
+					.catch(res => {
+						alertmessage('error', o2j(res.response.data));
 					})
 				})
 			},

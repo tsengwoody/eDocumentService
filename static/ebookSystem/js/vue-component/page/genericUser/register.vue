@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="genericUser_register">
 		<div class="form-group text-center">
 			<h2 class="">註冊</h2>
@@ -109,10 +109,11 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 					'birthday': '',
 					'education': '',
 					'is_book': true,
-					'org': '',
+					'org': '1',
 					'password': '',
 					'confirm_password': '',
 					'role': 'editor',
+					'disabilitycard_set': [],
 				},
 				model_infos : {
 					'username': {
@@ -218,26 +219,26 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 		},
 		computed: {
 		},
-		mounted: function(){
-			document.title = '註冊'
-
-			let vo = this;
-			let client = new $.RestClient('/genericUser/api/');
-			client.add('organizations');
-			
-			client.organizations.read()
-			.done(function (org_data) {
-				console.log(org_data)
-				_.each(org_data, function(v){
-					vo.model_infos.org.choices.push({
+		metaInfo: {
+			title: '註冊',
+		},
+		mounted(){
+			genericUserAPI.organizationRest.list()
+			.then(res => {
+				_.each(res.data, (v)=> {
+					this.model_infos.org.choices.push({
 						'value': v.id,
 						'display_name': v.name,
 					})
 				})
 			})
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
+			})
+
 		},
 		methods: {
-			checkInput: function(){
+			checkInput(){
 				let err=[];
 				let username = this.infos.username;
 				if(username.length<5){
@@ -375,10 +376,10 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 					this.register()
 				}
 			},
-			clearInput: function(){
+			clearInput(){
 
 			},
-			register: function(){
+			register(){
 				if (this.infos.role==='editor') {
 					this.infos.is_editor = true;
 					this.infos.is_guest = false;
@@ -387,33 +388,33 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 					this.infos.is_editor = false;
 					this.infos.is_guest = true;
 				}
-				//delete this.infos.role;
 
-				let self = this;
-				rest_aj_send('post', '/genericUser/api/users/', this.infos)
-				.done(function(data, textStatus, xhr) {
+				genericUserAPI.userRest.create(this.infos)
+				.then(res => {
 					alertmessage('success', '成功註冊帳號，請至「帳號>個人資料」頁面驗證手機與電子信箱，視障者需額外登錄身障手冊，方可開始使用。')
-					.done(function() {
-						self.login(self.infos.username, self.infos.password)
+					.done(() => {
+						this.login(this.infos.username, this.infos.password)
 					})
 				})
-				.fail(function(data){
-					alertmessage('error', data['message'])
-				})
-			},
-			login: function (username, password) {
-				console.log(username)
-				rest_aj_send('post', '/genericUser/api/users/action/login/', {
-					username: username,
-					password: password,
-				})
-				.done(function(data) {
-					window.location.replace('/routing/genericUser/user_person/')
-				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 
+
+			},
+			login(username, password){
+				let session_login = genericUserAPI.userAction.login(username, password)
+				let token_login = token.obtain(username, password)
+				Promise.all([session_login, token_login,])
+				.then((s, t) => {
+					alertmessage('success', '成功登入平台')
+					.done(() => {
+						window.location.replace('/')
+					})
+				})
+				.catch((s, t) => {
+					alertmessage('error', '登錄平台失敗，請確認帳號或密碼是否正確。'+o2j(s.response.data))
+				})
 			},
 		},
 	}

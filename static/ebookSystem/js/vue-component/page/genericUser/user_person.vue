@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div id="user_person">
 		<h3>個人資料</h3>
 		<div class="form-horizontal">
@@ -109,7 +109,6 @@
 	</div>
 </template>
 <script>
-
 	const defautlFontSize = "htmlFontSize90";
 	const percentage = [
 		"htmlFontSize70",
@@ -129,7 +128,7 @@
 			'modal': components['modal'],
 			'set_password': components['set_password'],
 		},
-		data: function(){
+		data(){
 			return {
 				dm_bus: new Vue(),
 				user: user,
@@ -162,27 +161,25 @@
 				percentageIndex: 0,
 			}
 		},
-		mounted: function() {
-			document.title = '個人資料';
-			const self = this;
-			const client = new $.RestClient('/genericUser/api/');
-			client.add('organizations');
-			
-			client.organizations.read()
-			.done(function (org_data) {
-				_.each(org_data,function(v,k){
-					if(self.filter_data['org'] == v['id']) {
-						self.filter_data['org'] = v['name'];
+		metaInfo: {
+			title: '個人資料',
+		},
+		mounted(){
+			genericUserAPI.organizationRest.list()
+			.then(res => {
+				_.each(res.data, (v, k) => {
+					if(this.filter_data['org'] == v['id']) {
+						this.filter_data['org'] = v['name'];
 					}
 				})
 			})
 
 			const fontClass = document.querySelector('body').className;
-			self.newRatio = fontClass;
-			self.percentageIndex = percentage.indexOf(fontClass);
+			this.newRatio = fontClass;
+			this.percentageIndex = percentage.indexOf(fontClass);
 		},
 		methods: {
-			change_password: function() {
+			change_password(){
 				this.$refs.spm.set_password(user.id);
 				closeDialog(this.$refs.spm);
 			},

@@ -31,6 +31,7 @@ export const file_resolve = (resource) => {
 }
 
 export const create_rest = axiosapi => {
+	axiosapi.defaults.headers.common['X-CSRFToken'] = Cookies.get('csrftoken');
 	return {
 		options: () => axiosapi.options(''),
 		list: () => axiosapi.get(''),

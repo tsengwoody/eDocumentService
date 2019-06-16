@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h2>公告內容</h2>
 		<div class="form-horizontal">
@@ -90,13 +90,13 @@
 
 <script>
 	module.exports = {
-		props: [],
 		components: {
 			'editor': Editor,
 			'file_manager': components['file_manager'],
 		},
-		data: function(){
+		data(){
 			return {
+				pk: '',
 				announcement: {},
 				url: '',
 				mode: 'read', //read or write
@@ -109,66 +109,62 @@
 				},
 			}
 		},
-		mounted: function(){
-			document.title = '公告內容'
-
-			let self = this
-
+		metaInfo: {
+			title: '公告內容',
+		},
+		mounted(){
 			let pk = window.location.pathname.split('/')
-			pk = pk[pk.length-2]
+			this.pk = pk[pk.length-2]
 
-			self.url = '/genericUser/api/announcements/' +pk +'/'
-
-			rest_aj_send('get', self.url, {})
-			.done(function(data) {
-				self.announcement = data['data']
+			genericUserAPI.announcementRest.read(this.pk)
+			.then(res => {
+				this.announcement = res.data;
 			})
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
+			})
+
 		},
 		methods: {
-			read_mode: function(){
+			read_mode(){
 				this.mode = 'read'
 			},
-			write_mode: function(){
+			write_mode(){
 				this.mode = 'write'
 			},
-			update: function(){
-				let self = this
-
-				rest_aj_send('patch', self.url, self.announcement)
-				.done(function(data){
+			update(){
+				genericUserAPI.announcementRest.partialupdate(this.pk, this.announcement)
+				.then(res => {
 					alertmessage('success', '成功修改公告')
-					.done(function(){
-						self.mode = 'read'
+					.done(() => {
+						this.mode = 'read'
 					})
 				})
-				.fail(function(data){
-				    alertmessage('error', data['message']);
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
-			cancel: function(){
-				let self = this
-				rest_aj_send('get', self.url, {})
-				.done(function(data) {
-					self.announcement.category = data['data'].category
-					self.announcement.title = data['data'].title
-					self.announcement.content = data['data'].content
+			cancel(){
+				genericUserAPI.announcementRest.read(this.pk)
+				.then(res => {
+					this.announcement.category = res.data.category;
+					this.announcement.title = res.data.title;
+					this.announcement.content = res.data.content;
 				})
 				this.mode = 'read'
 			},
-			deletes: function(){
-				let self = this
-
+			deletes(){
 				alertconfirm('是否確定刪除公告?')
-				.done(function(){
-					rest_aj_send('delete', self.url, {})
-					.done(function(data){
+				.done(() => {
+					genericUserAPI.announcementRest.delete(this.pk)
+					.then(res => {
 						alertmessage('success', '成功刪除公告')
-						.done(function(){
-							window.location='/genericUser/announcement_list';
+						.done(() => {
+							window.location='/routing/genericUser/announcement_list/';
 						})
 					})
-					.fail(function(data){
-					    alertmessage('error', data['message']);
+					.catch(res => {
+						alertmessage('error', o2j(res.response.data));
 					})
 				})
 			},

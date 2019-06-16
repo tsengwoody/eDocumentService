@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="form-horizontal">
 		<div class="form-group">
 			<label class="control-label col-sm-4">搜尋</label>
@@ -95,7 +95,6 @@
 			let vo = this;
 			rest_aj_send('get', '/genericUser/api/users/', {})
 			.done(function(data) {
-				console.log(data.data);
 				_.each(data.data, function(v, k){
 					vo.users.push({
 						id: v['id'],

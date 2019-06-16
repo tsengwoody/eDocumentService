@@ -107,7 +107,7 @@
 			'assign-component': components['ebook_assign_component'],
 			'modal': components['modal'],
 		},
-		data: function() {
+		data(){
 			return {
 				pk: '',
 				book: {},
@@ -134,14 +134,17 @@
 			
 		},
 		computed: {
-			ebook: function () {
-				if (!iser(this.book.ebook_set)) {
+			ebook(){
+				if (this.book.ebook_set) {
 					return this.book.ebook_set[this.ebook_index];
 				}	
+				else {
+					return null;
+				}
 			},
-			editrecord_datas: function () {
+			editrecord_datas(){
 				let temp = [];
-				if (!iser(this.ebook)) {
+				if(this.ebook){
 					_.each(this.ebook.editrecord_set, function(v) {
 						temp.push({
 							'number_of_times': v.number_of_times,
@@ -154,9 +157,12 @@
 					})
 					return temp
 				}
+				else {
+					return null;
+				}
 			},
-			info: function () {
-				if (!iser(this.ebook)) {
+			info(){
+				if(this.ebook){
 					return {
 						'段數': this.ebook.part,
 						'狀態': this.ebook.status,
@@ -165,27 +171,31 @@
 						'預計完成日期': this.ebook.deadline,
 					}
 				}
+				else {
+					return null;
+				}
 			},
 		},
-		created: function () {
+		metaInfo: {
+			title: '書籍詳細',
+		},
+		mounted(){
 			this.pk = window.location.pathname.split('/')
 			this.pk = this.pk[this.pk.length-2]
-			this.client = new $.RestClient('/ebookSystem/api/');
-			this.client.add('books');
-			this.client.add('bookadds');
-		},
-		mounted: function () {
-			document.title = '書籍詳細';
 			this.get_overall_datas();
 		},
 		methods: {
 			get_overall_datas: function () {
-				let self = this;
-				self.client.bookadds.read(self.pk)
-				.done(function(data) {
-					self.book = data
-					_.each(data.ebook_set, function(v){
-						self.overall_datas.push({
+				ebookSystemAPI.bookRest.read(this.pk)
+				.then(res => {
+					this.book = res.data;
+					return ebookSystemAPI.ebookRest.reads(res.data.ebook_set);
+				})
+				.then(res => {
+					this.book.ebook_set = res.data;
+					this.overall_datas = [];
+					_.each(this.book.ebook_set, (v) => {
+						this.overall_datas.push({
 							'part': v.part,
 							'status': v.status,
 							'edited_page': v.edited_page+1,
@@ -195,23 +205,23 @@
 						})
 					})
 				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
 			},
-			read: function (index) {
+			read(index){
 				this.ebook_index = index
 			},
-			onactive: function (ISBN_part) {
-				let self = this
-
-				url = '/ebookSystem/api/ebooks/' +ISBN_part +'/action/onactive/';
+			onactive(ISBN_part) {
 				alertconfirm('是否確定再校對?')
 				.done(function(){
-					rest_aj_send('post', url, {})
-					.done(function(data) {
+					ebookAction.onactive(ISBN_part)
+					.then(res => {
 						alertmessage('success', data['message'])
-						self.get_overall_datas()
+						this.get_overall_datas()
 					})
-					.fail(function(xhr, result, statusText){
-						alertmessage('error', xhr.responseText)
+					.catch(res => {
+						alertmessage('error', o2j(res.response.data));
 					})
 				})
 			},

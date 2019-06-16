@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="user_email">
 		<h2>訊息傳送</h2>
 		<div class="form-horizontal">
@@ -34,12 +34,13 @@
 		</div>
 	</div>
 </template>
+
 <script>
 	module.exports = {
 		components: {
 			'form-drf': components['form'],
 		},
-		data: function(){
+		data(){
 			return {
 				category: 'editor',
 				subject: '',
@@ -70,34 +71,30 @@
 				},
 			}
 		},
-		mounted: function () {
-			document.title = '訊息傳送'
-			this.client = new $.RestClient('/genericUser/api/');
-			this.client.add('users');
+		metaInfo: {
+			title: '訊息傳送',
+		},
+		mounted(){
 		},
 		methods: {
-			send_email: function () {
-				let self = this
-
-				if(iser(self.category) | iser(self.subject) | iser(self.body)){
+			send_email(){
+				if(iser(this.category) | iser(this.subject) | iser(this.body)){
 					alertmessage('error', '尚有欄位未填寫')
 					return -1
-					}
-
-					post_data = {
-					'category': self.category,
-					'subject': self.subject,
-					'body': self.body,
 				}
 
+				let post_data = {
+					'category': this.category,
+					'subject': this.subject,
+					'body': this.body,
+				}
 
-				rest_aj_send('post', '/genericUser/api/users/action/email/', post_data)
-				.done(function(data) {
+				genericUserAPI.userAction.email(post_data)
+				.then(res => {
 					alertmessage('success', '成功傳送訊息')
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr)
-					console.log(xhr)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
 		},

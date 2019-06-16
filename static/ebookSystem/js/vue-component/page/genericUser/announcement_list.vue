@@ -24,7 +24,7 @@
 			'tab': components['tab'],
 			'table-div': components['table-div'],
 		},
-		data: function(){
+		data(){
 			return {
 				announcement_columns: {
 					'title': '標題',
@@ -63,33 +63,27 @@
 				],
 			}
 		},
-		mounted: function () {
-			document.title = '公告列表'
-
-			this.client = new $.RestClient('/genericUser/api/');
-			this.client.add('announcements');
-
+		metaInfo: {
+			title: '公告列表',
+		},
+		mounted(){
 			this.get_table_data()
 		},
 		methods: {
-			get_table_data: function () {
-				let self = this;
-
-				_.each(self.data, function(v){
+			get_table_data(){
+				_.each(this.data, (v) => {
 					query = {'category': v.value}
 
-					self.client.announcements.read(query)
-					.done(function(data) {
-
-						filter_data = []
-						_.each(data, function(v){
-							temp_data = {
+					genericUserAPI.announcementRest.filter(query)
+					.then(res => {
+						let filter_data = []
+						_.each(res.data, (v) => {
+							let temp_data = {
 								"id": v.id,
 								"title": v['title'],
 								"datetime": v['datetime'],
 								"action": v.id,
 							}
-
 							filter_data.push(temp_data)
 						})
 						v.data = filter_data

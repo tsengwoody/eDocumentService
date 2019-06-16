@@ -13,7 +13,7 @@ from .permissions import *
 from .serializers import *
 
 from utils.resource import *
-from utils.apis import MixedPermissionModelViewSet
+from utils.apis import MixedPermissionModelViewSet, ReadsModelViewSetMixin
 from utils.filters import OwnerOrgManagerFilter
 from utils.permissions import RuleORPermissionFactory
 
@@ -102,17 +102,16 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	)
 	def review(self, request, pk=None):
 		res = {}
-
 		obj = self.get_object()
 
-		if request.POST['result'] == 'success':
+		if request.data['result'] == 'success':
 			for part in obj.ebook_set.all():
 				part.change_status(1, 'active', category='based')
 			BookOrder.refresh()
-			res['message'] = u'審核通過文件'
-		elif request.POST['result'] == 'error':
+			res['detail'] = u'審核通過文件'
+		elif request.data['result'] == 'error':
 			obj.delete()
-			res['message'] = u'審核退回文件'
+			res['detail'] = u'審核退回文件'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	@action(
@@ -200,6 +199,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 			newBook.scaner = request.user
+			newBook.owner = request.user
 			newBook.source = 'self'
 
 			try:
@@ -308,7 +308,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				newBook = Book.objects.get(ISBN=request.POST['ISBN'])
 
 			newBook.scaner = request.user
-			newBook.org = request.user.org
+			newBook.owner = request.user
 			newBook.source = request.POST['format']
 			newBook.finish_date = timezone.now()
 			try:
@@ -327,7 +327,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 class BookAddViewSet(BookViewSet):
 	serializer_class = BookAddSerializer
 
-class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
+class EBookViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, ResourceViewSet):
 	queryset = EBook.objects.all()
 	serializer_class = EBookSerializer
 	filter_backends = (StatusFilter, EditorFilter, EbookOrgFilter,)
@@ -521,17 +521,16 @@ class EBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	)
 	def review(self, request, pk=None):
 		res = {}
-
 		obj = self.get_object()
-		if not int(request.POST['number_of_times']) == obj.number_of_times:
+		if not int(request.data['number_of_times']) == obj.number_of_times:
 			res['detail'] = u'校對次數資訊不符'
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-		if request.POST['result'] == 'success':
+		if request.data['result'] == 'success':
 			obj.change_status(1, 'finish')
-			res['message'] = u'審核通過文件'
-		if request.POST['result'] == 'error':
+			res['detail'] = u'審核通過文件'
+		if request.data['result'] == 'error':
 			obj.change_status(-1, 'edit')
-			res['message'] = u'審核退回文件'
+			res['detail'] = u'審核退回文件'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	def get_fullpath(self, ebook, dir, resource):
@@ -676,7 +675,7 @@ class BookOrderViewSet(viewsets.ModelViewSet):
 	search_fields = ('order',)
 	permission_classes = (permissions.IsAuthenticated,)
 
-class EditRecordViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet):
+class EditRecordViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, MixedPermissionModelViewSet):
 	queryset = EditRecord.objects.all().order_by('-get_date')
 	serializer_class = EditRecordSerializer
 	filter_backends = (filters.OrderingFilter, EditorFilter, EditRecordServiceInfoFilter,)
@@ -752,10 +751,10 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	def check_inout(self, request, pk=None):
 		res = {}
 		obj = self.get_object()
-		if request.POST['action'] == 'check_out':
+		if request.data['action'] == 'check_out':
 			obj.check_out()
 			return Response(data=res, status=status.HTTP_202_ACCEPTED)
-		elif request.POST['action'] == 'check_in':
+		elif request.data['action'] == 'check_in':
 			obj.check_in()
 			return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
@@ -793,11 +792,15 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				res['detail'] = u'身份認證失敗'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet):
 	queryset = Category.objects.all()
 	serializer_class = CategorySerializer
 	filter_backends = (OrgFilter,)
 	permission_classes = (permissions.IsAuthenticated, )
+	permission_classes_by_action = {
+		'list': [permissions.AllowAny,],
+		'retrieve': [permissions.AllowAny,],
+	}
 
 #===== ISSN Book =====
 

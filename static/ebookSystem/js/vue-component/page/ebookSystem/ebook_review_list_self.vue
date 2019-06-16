@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h2>校對文件審核</h2>
 		<ebook_review_list_org :org_id="user.org">
@@ -11,12 +11,12 @@
 		components: {
 			'ebook_review_list_org': components['ebook_review_list_org'],
 		},
-		data: function() {
+		data(){
 			return {
 			}
 		},
-		mounted: function () {
-			document.title = '校對文件審核';
+		metaInfo: {
+			title: '校對文件審核',
 		},
 	}
 </script>

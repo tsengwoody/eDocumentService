@@ -13,6 +13,7 @@
 					<option value="天橋說書">天橋說書</option>
 					<option value="新書推薦">新書推薦</option>
 					<option value="志工快訊">志工快訊</option>
+					<option value="校園公告">校園公告</option>
 				</select>
 			</div>
 		</div>
@@ -58,7 +59,7 @@
 	};
 
 	module.exports = {
-		data: function(){
+		data(){
 			return {
 				title: '',
 				category: '',
@@ -70,7 +71,7 @@
 			'editor': Editor
 		},
 		computed: {
-			transferData: function(){
+			transferData(){
 				return {
 					'title': this.title,
 					'category': this.category,
@@ -78,34 +79,33 @@
 				}
 			},
 		},
-		mounted: function(){
-			document.title = '公告發佈'
+		metaInfo: {
+			title: '公告發佈',
+		},
+		mounted(){
 		},
 		methods: {
-			cancel: function(){
+			cancel(){
 				if(!isobjvalueer(this.transferData)){
 					alertconfirm('已經填寫資料，是否確定取消?')
 					.done(function(){
-						//重新整理
 						window.location.reload();
 					})
 				}
 				else{
-					//重新整理
 					window.location.reload();
 				}
 			},
-			create: function(){
-				rest_aj_send('post', '/genericUser/api/announcements/', this.transferData)
-				.done(function(data){
+			create(){
+				genericUserAPI.announcementRest.create(this.transferData)
+				.then(res => {
 					alertmessage('success', '成功新建公告',)
-					.done(function(){
-						//重新整理
+					.done(() => {
 						window.location.replace('/routing/genericUser/announcement/' +data.data['id'] +'/')
 					})
 				})
-				.fail(function(data){
-				    alertmessage('error', data['message']);
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			}
 		},

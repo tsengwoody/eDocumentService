@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="qanda_tutorial">
 		<h2>教學內容</h2>
 		<button
@@ -61,7 +61,7 @@
 			'modal': components['modal'],
 			'table-div-row': components['table-div-row'],
 		},
-		data: function(){
+		data(){
 			return {
 				tinymce_init: {
 					selector: "editor",
@@ -84,24 +84,22 @@
 				},
 			}
 		},
-		mounted: function () {
-			document.title = '教學文件'
-
+		metaInfo: {
+			title: '教學文件',
+		},
+		mounted(){
 			this.client = new $.RestClient('/genericUser/api/');
 			this.client.add('qandas');
 			this.qanda_list_refresh()
 		},
 		methods: {
-			qanda_list_refresh: function () {
-				let self = this;
-				self.qanda_tutorial_datas = []
-
-				//self.client.qandas.read({'category': 'tutorial'})
-				self.client.qandas.read({'category': 'tutorial'})
-				.done(function(data){
-					filter_data = []
-					_.each(data,function(v){
-						temp_data = {
+			qanda_list_refresh(){
+				this.qanda_tutorial_datas = []
+				genericUserAPI.qAndARest.filter({category: 'tutorial'})
+				.then(res => {
+					let filter_data = []
+					_.each(res.data, (v) => {
+						let temp_data = {
 							'order': v,
 							'question': v.question,
 							'answer': v.answer,
@@ -109,75 +107,61 @@
 						}
 						filter_data.push(temp_data)
 					})
-					self.qanda_tutorial_datas = filter_data
+					this.qanda_tutorial_datas = filter_data
 				})
 			},
-			qanda_create: function () {
-				let self = this;
-
-				//AboutQAndA
+			qanda_create(){
 				AboutQAndA('', '', 'tutorial')
-				.done(function(nq,na, nc){
-					self.qanda_instance.question = nq
-					self.qanda_instance.answer = na
-					self.qanda_instance.category = nc
-					self.qanda_instance.order = 0
-					self.client.qandas.create(self.qanda_instance)
-					.done(function(data) {
+				.done((nq, na, nc) => {
+					this.qanda_instance.question = nq
+					this.qanda_instance.answer = na
+					this.qanda_instance.category = nc
+					this.qanda_instance.order = 0
+					genericUserAPI.qAndARest.create(this.qanda_instance)
+					.then(res => {
 						alertmessage('success', '成功新建教學內容。')
-						.done(function(data) {
-							self.qanda_list_refresh()
-						})
+						this.qanda_list_refresh()
 					})
-					.fail(function(xhr, result, statusText){
-						alertmessage('error', xhr.responseText)
+					.catch(res => {
+						alertmessage('error', o2j(res.response.data));
 					})
-
 				})
 			},
-			qanda_update: function (pk) {
-				let self = this;
-				self.client.qandas.read(pk)
-				.done(function(data) {
-					_.each(self.qanda_instance, function(v, k){
-						self.qanda_instance[k] = data[k]
+			qanda_update(pk){
+				genericUserAPI.qAndARest.read(pk)
+				.then(res => {
+					_.each(this.qanda_instance, (v, k) => {
+						this.qanda_instance[k] = res.data[k]
 					})
 				})
-				let qa = self.qanda_instance
+				let qa = this.qanda_instance
 
 				//AboutQAndA
 				AboutQAndA(qa.question,qa.answer, qa.category)
-				.done(function(nq,na, nc){
-					self.qanda_instance.question = nq
-					self.qanda_instance.answer = na
-					self.qanda_instance.category = nc
-					self.client.qandas.update(pk, self.qanda_instance)
-					.done(function(data) {
+				.done((nq, na, nc) => {
+					this.qanda_instance.question = nq
+					this.qanda_instance.answer = na
+					this.qanda_instance.category = nc
+					genericUserAPI.qAndARest.update(pk, this.qanda_instance)
+					.then(res => {
 						alertmessage('success', '成功更新教學內容。')
-						.done(function(data) {
-							self.qanda_list_refresh()
-						})
+						this.qanda_list_refresh()
 					})
-					.fail(function(xhr, result, statusText){
-						alertmessage('error', xhr.responseText)
+					.catch(res => {
+						alertmessage('error', o2j(res.response.data));
 					})
 				})
-
 			},
-			qanda_del: function (pk) {
-				let self = this
-
+			qanda_del(pk){
 				alertconfirm('確認刪除 Q&A id:' +pk)
-				.done(function(){
-					self.client.qandas.del(pk)
-					.done(function(data) {
+				.done(() => {
+					genericUserAPI.qAndARest.delete(pk)
+					.then(res => {
 						alertmessage('success', '成功刪除 Q&A id:' +pk)
-						.done(function(){
-							self.qanda_list_refresh()
-						})
+						this.qanda_list_refresh()
 					})
-					.fail(function(xhr, result, statusText){
-						alertmessage('error', xhr.responseText)
+					.catch(res => {
+						alertmessage('error', o2j(res.response.data));
 					})
 				})
 			},

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h2>書籍管理</h2>
 		<book_manager_org :org_id="user.org">
@@ -11,12 +11,14 @@
 		components: {
 			'book_manager_org': components['book_manager_org'],
 		},
-		data: function() {
+		data(){
 			return {
 			}
 		},
-		mounted: function () {
-			document.title = '書籍管理';
+		metaInfo: {
+			title: '書籍管理',
+		},
+		mounted(){
 		},
 	}
 </script>

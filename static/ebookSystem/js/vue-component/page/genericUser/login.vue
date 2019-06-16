@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 <div id="login">
 	<div class="form-group text-center">
 		<h2>登錄</h2>
@@ -33,13 +33,13 @@
 	</div>
 </div>
 </template>
-<script>
 
+<script>
 	module.exports = {
 		components: {
 			'form-drf': components['form'],
 		},
-		data: function(){
+		data(){
 			return {
 				username: '',
 				password: '',
@@ -55,39 +55,24 @@
 				},
 			}
 		},
-		mounted: function () {
-			document.title = '登入'
-
-			this.client = new $.RestClient('/genericUser/api/')
-			this.client.add('users');
-			this.client.users.addVerb('login', 'POST', {
-				url: 'action/login/',
-			});
+		metaInfo: {
+			title: '登入',
+		},
+		mounted(){
 		},
 		methods: {
-			login: function () {
-				let self = this
-				let session_login = rest_aj_send('post', '/genericUser/api/users/action/login/', {
-					username: self.username,
-					password: self.password,
-				})
-
-				let token_login = token.obtain(self.username, self.password)
-
-				token_login
-				.done(function(data) {
-					//token.save();
-				})
-
+			login(){
+				let session_login = genericUserAPI.userAction.login(this.username, this.password)
+				let token_login = token.obtain(this.username, this.password)
 				Promise.all([session_login, token_login,])
-				.then(function (s, t) {
+				.then((s, t) => {
 					alertmessage('success', '成功登入平台')
-					.done(function() {
+					.done(() => {
 						window.location.replace('/')
 					})
 				})
-				.catch(function (s, t) {
-					alertmessage('error', '登錄平台失敗，請確認帳號或密碼是否正確。'+o2j(s) +o2j(t))
+				.catch((s, t) => {
+					alertmessage('error', '登錄平台失敗，請確認帳號或密碼是否正確。'+o2j(s.response.data))
 				})
 
 			},

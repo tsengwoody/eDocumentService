@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import *
 
 class UserSerializer(serializers.ModelSerializer):
+	#disabilitycard_set = serializers.ReadOnlyField()
 	class Meta:
 		model = User
 		fields = [
@@ -26,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
 			'auth_phone',
 			'auth_editor',
 			'auth_guest',
-		'disabilitycard_set',
+			'disabilitycard_set',
 		]
 
 class DisabilityCardSerializer(serializers.ModelSerializer):

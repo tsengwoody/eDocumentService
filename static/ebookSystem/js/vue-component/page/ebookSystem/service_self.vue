@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h2>一般校對</h2>
 		<service_org :org_id="user.org" :choice_org="true">
@@ -10,6 +10,9 @@
 	module.exports = {
 		components: {
 			'service_org': components['service_org'],
+		},
+		metaInfo: {
+			title: '一般校對',
 		},
 	}
 </script>

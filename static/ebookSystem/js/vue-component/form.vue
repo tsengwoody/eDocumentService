@@ -99,7 +99,6 @@
 
 		},
 		mounted() {
-			console.log(this.inputClass);
 		}
 	};
 

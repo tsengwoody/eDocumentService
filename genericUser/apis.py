@@ -113,7 +113,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res = {}
 
 		from django.contrib.auth import (login as auth_login, logout as auth_logout, update_session_auth_hash, authenticate,)
-		user = authenticate(username=request.POST['username'], password=request.POST['password'])
+		user = authenticate(username=request.data['username'], password=request.data['password'])
 		if user is None:
 			res['detail'] = u'帳號或密碼錯誤，請確認輸入的帳號密碼'
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -153,12 +153,12 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	)
 	def retrieve_up(self, request, pk=None):
 		res = {}
-		if request.POST['action'] == 'reset_password':
+		if request.data['action'] == 'reset_password':
 			try:
-				birthday = request.POST['birthday'].split('-')
+				birthday = request.data['birthday'].split('-')
 				birthday = [ int(i) for i in birthday ]
 				birthday = datetime.date(birthday[0], birthday[1], birthday[2])
-				user = User.objects.get(username=request.POST['username'], birthday=birthday)
+				user = User.objects.get(username=request.data['username'], birthday=birthday)
 			except:
 				res['message'] = u'無法取得使用者資料，請確認填寫的資料是否無誤'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -170,14 +170,14 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			message = u'您的新密碼為：{0}'.format(reset_password)
 			user.email_user(subject=subject, message=message)
 			user.save()
-		elif request.POST['action'] == 'get_user':
+		elif request.data['action'] == 'get_user':
 			try:
-				birthday = request.POST['birthday'].split('-')
+				birthday = request.data['birthday'].split('-')
 				birthday = [ int(i) for i in birthday ]
 				birthday = datetime.date(birthday[0], birthday[1], birthday[2])
-				user = User.objects.get(email=request.POST['email'], birthday=birthday)
-			except:
-				res['message'] = u'無法取得使用者資料，請確認填寫的資料是否無誤'
+				user = User.objects.get(email=request.data['email'], birthday=birthday)
+			except BaseException as e:
+				res['message'] = u'無法取得使用者資料，請確認填寫的資料是否無誤' +unicode(e)
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 			subject = u'取得username郵件'
 			message = u'您的username為：{0}'.format(user.username)
@@ -195,12 +195,12 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res = {}
 
 		from django.core.mail import EmailMessage
-		if request.POST['category'] == 'editor':
+		if request.data['category'] == 'editor':
 			user_email_list = [ i.email for i in User.objects.filter(is_editor=True) if i.is_book and i.auth_email ]
-		if request.POST['category'] == 'guest':
+		if request.data['category'] == 'guest':
 			user_email_list = [ i.email for i in User.objects.filter(is_guest=True) if i.is_book and i.auth_email ]
-		subject = request.POST['subject']
-		body = request.POST['body']
+		subject = request.data['subject']
+		body = request.data['body']
 		email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[SERVICE], bcc=user_email_list)
 		email.send(fail_silently=False)
 

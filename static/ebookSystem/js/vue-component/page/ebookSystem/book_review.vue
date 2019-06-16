@@ -1,5 +1,4 @@
-
-<template>
+﻿<template>
 	<div>
 		<h2>文件審核</h2>
 
@@ -75,7 +74,7 @@
 			'scan_book_editor': components['scan_book_editor'],
 			'modal': components['modal'],
 		},
-		data: function() {
+		data(){
 			return {
 				pk: '',
 				book: {},
@@ -85,7 +84,7 @@
 			}
 		},
 		watch: {
-			book: function() {
+			book(){
 				this.info = {
 					'ISBN': this.book.book_info.ISBN,
 					'書名': this.book.book_info.bookname,
@@ -96,43 +95,40 @@
 				};
 			}
 		},
-		mounted: function () {
-			document.title = '文件審核';
+		metaInfo: {
+			title: '文件審核',
+		},
+		mounted(){
 			this.pk = window.location.pathname.split('/');
 			this.pk = this.pk[this.pk.length-2];
-			this.client = new $.RestClient('/ebookSystem/api/');
-			this.client.add('books');
 			this.get_book_data()
 		},
 		methods: {
-			get_book_data: function(){
-				let self = this;
-
-				self.client.books.read(self.pk)
-				.done(function(data) {
-					self.book = data;
+			get_book_data(){
+				ebookSystemAPI.bookRest.read(this.pk)
+				.then(res => {
+					this.book = res.data;
+				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
-			review: function () {
-				let self = this
-
-				const transferData = {
-					'result': this.result,
-					'reason': this.reason,
+			review(){
+				let transferData = {
+					pk: this.pk,
+					result: this.result,
+					reason: this.reason,
 				};
 
-				rest_aj_send('post', '/ebookSystem/api/books/' +self.pk +'/action/review/', transferData)
-				.done(function(data) {
-					alertmessage('success', '審核已完成' + data['data']['message'])
-					.done(function() {
+				ebookSystemAPI.bookAction.review(transferData)
+				.then(res => {
+					alertmessage('success', '審核已完成' + res.data['detail'])
+					.done(() => {
 						window.location.replace('/routing/ebookSystem/book_review_list/')
 					})
 				})
-				.fail(function(data){
-					alertmessage('error', o2j(data))
-					.done(function() {
-						window.location.replace('/routing/ebookSystem/book_review_list/')
-					})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
 		}

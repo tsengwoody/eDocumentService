@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h2>身障手冊管理</h2>
 		<disabilitycard_manager_org :org_id="user.org">
@@ -11,12 +11,14 @@
 		components: {
 			'disabilitycard_manager_org': components['disabilitycard_manager_org'],
 		},
-		data: function() {
+		data(){
 			return {
 			}
 		},
-		mounted: function () {
-			document.title = '身障手冊管理';
+		metaInfo: {
+			title: '身障手冊管理',
+		},
+		mounted(){
 		},
 	}
 </script>

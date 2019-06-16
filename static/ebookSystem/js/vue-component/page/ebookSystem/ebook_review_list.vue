@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h2>校對文件審核</h2>
 		<panel_group :data="tab_data" :title="'單位'">
@@ -21,16 +21,15 @@
 				tab_data: [],
 			}
 		},
+		metaInfo: {
+			title: '校對文件審核',
+		},
 		mounted: function () {
-			document.title = '校對文件審核';
-			let self = this
-
-			this.clientg = new $.RestClient('/genericUser/api/');
-			this.clientg.add('organizations');
-			this.clientg.organizations.read()
-			.done(function(data) {
-				_.each(data, function(v){
-					self.tab_data.push({
+			genericUserAPI.organizationRest.list()
+			.then(res => {
+				_.each(res.data, (v) => {
+					this.tab_data = []
+					this.tab_data.push({
 						'order': v.id,
 						'display_name': v.name,
 						'value': v.id,
@@ -39,8 +38,8 @@
 					})
 				})
 			})
-			.fail(function(xhr, result, statusText){
-				alertmessage('error', xhr.responseText)
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
 			})
 		},
 	}

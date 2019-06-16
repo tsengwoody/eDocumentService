@@ -48,7 +48,7 @@
 			'tab': components['tab'],
 			'bookinfo_repository': components['bookinfo_repository'],
 		},
-		data: function() {
+		data(){
 			return {
 				user: user,	
 				recommend_data: [
@@ -150,105 +150,8 @@
 				bookinfos: '',
 			}
 		},
-		mounted: function () {
-			document.title = '平台書庫';
-			this.client = new $.RestClient('/ebookSystem/api/');
-			this.client.add('bookinfos');
-			this.get_recommend_table_data();
-			this.get_index_table_data();
-		},
-		methods: {
-			get_recommend_table_data: function () {
-				// run ajax get data
-				let self = this;
-
-				_.each(self.recommend_data, function(v){
-					let query = {};
-					query[v.value] = 30;
-					self.client.bookinfos.read(query)
-					.done(function(data) {
-						let filter_data = [];
-						_.each(data, function(o) {
-							filter_data.push({
-								ISBN: o['ISBN'],
-								bookname: o['bookname'],
-								bookbinding: o['bookbinding'],
-								order: o['order'],
-								author: o['author'],
-								house: o['house'],
-								date: o['date'],
-								action: o['ISBN'],
-							})
-						})
-						v.data = {};
-						v.data['header'] = self.bookinfo_columns;
-						v.data['datas'] = filter_data;
-					})
-					.fail(function(xhr, result, statusText){
-						alertmessage('error', xhr.responseText)
-					})
-
-
-				})
-			},
-			get_index_table_data: function () {
-				// run ajax get data
-				let self = this;
-
-				_.each(self.index_data, function(v) {
-					const query = {'chinese_book_category': v.value};
-					self.client.bookinfos.read(query)
-					.done(function(data) {
-
-						let filter_data = [];
-						_.each(data, function(o) {
-							filter_data.push({
-								ISBN: o['ISBN'],
-								bookname: o['bookname'],
-								bookbinding: o['bookbinding'],
-								order: o['order'],
-								author: o['author'],
-								house: o['house'],
-								date: o['date'],
-								action: o['ISBN'],
-							})
-						})
-						v.data = {};
-						v.data['header'] = self.bookinfo_columns;
-						v.data['datas'] = filter_data;
-					})
-				})
-			},
-			search: function () {
-
-				let self = this;
-				const query = {'search': self.search_value};
-				self.client.bookinfos.read(query)
-				.done(function(data) {
-
-					let filter_data = [];
-					_.each(data, function(o) {
-						filter_data.push({
-							ISBN: o['ISBN'],
-							bookname: o['bookname'],
-							bookbinding: o['bookbinding'],
-							order: o['order'],
-							author: o['author'],
-							house: o['house'],
-							date: o['date'],
-							action: o['ISBN'],
-						})
-					})
-					self.bookinfos = {};
-					self.bookinfos['header'] = self.bookinfo_columns;
-					self.bookinfos['datas'] = filter_data;
-					alertmessage('success', '查詢完成，共取得 ' +self.bookinfos.datas.length +' 筆資料')
-				})
-
-			},
-		},
 		computed: {
-			bookinfo_columns: function() {
+			bookinfo_columns(){
 				if(this.user.auth_guest){
 					return {
 						ISBN: "ISBN",
@@ -271,6 +174,94 @@
 						date: "出版日期",
 					}
 				}
+			},
+		},
+		metaInfo: {
+			title: '平台書庫',
+		},
+		mounted: function () {
+			this.get_recommend_table_data();
+			this.get_index_table_data();
+		},
+		methods: {
+			get_recommend_table_data(){
+				_.each(this.recommend_data, (v) => {
+					let query = {};
+					query[v.value] = 30;
+					ebookSystemAPI.bookInfoRest.filter(query)
+					.then(res => {
+						let filter_data = [];
+						_.each(res.data, (o) => {
+							filter_data.push({
+								ISBN: o['ISBN'],
+								bookname: o['bookname'],
+								bookbinding: o['bookbinding'],
+								order: o['order'],
+								author: o['author'],
+								house: o['house'],
+								date: o['date'],
+								action: o['ISBN'],
+							})
+						})
+						v.data = {};
+						v.data['header'] = this.bookinfo_columns;
+						v.data['datas'] = filter_data;
+					})
+					.catch(res => {
+						alertmessage('error', o2j(res.response.data));
+					})
+				})
+			},
+			get_index_table_data(){
+				_.each(this.index_data, (v) => {
+					const query = {'chinese_book_category': v.value};
+					ebookSystemAPI.bookInfoRest.filter(query)
+					.then(res => {
+						let filter_data = [];
+						_.each(res.data, (o) => {
+							filter_data.push({
+								ISBN: o['ISBN'],
+								bookname: o['bookname'],
+								bookbinding: o['bookbinding'],
+								order: o['order'],
+								author: o['author'],
+								house: o['house'],
+								date: o['date'],
+								action: o['ISBN'],
+							})
+						})
+						v.data = {};
+						v.data['header'] = this.bookinfo_columns;
+						v.data['datas'] = filter_data;
+					})
+				})
+			},
+			search(){
+				const query = {'search': this.search_value};
+				ebookSystemAPI.bookInfoRest.filter(query)
+				.then(res => {
+					let filter_data = [];
+					_.each(res.data, function(o) {
+						filter_data.push({
+							ISBN: o['ISBN'],
+							bookname: o['bookname'],
+							bookbinding: o['bookbinding'],
+							order: o['order'],
+							author: o['author'],
+							house: o['house'],
+							date: o['date'],
+							action: o['ISBN'],
+						})
+					})
+					this.bookinfos = {};
+					this.bookinfos['header'] = this.bookinfo_columns;
+					this.bookinfos['datas'] = filter_data;
+					alertmessage('success', '查詢完成，共取得 ' +this.bookinfos.datas.length +' 筆資料')
+				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
+
 			},
 		},
 	}

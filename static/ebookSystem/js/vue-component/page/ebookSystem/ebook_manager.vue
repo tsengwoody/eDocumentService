@@ -1,5 +1,4 @@
-
-<template>
+﻿<template>
 	<div class="tab-content" style="padding:20px 0px;">
 		<h2>分段管理</h2>
 		<div id="ebook_manager_search">
@@ -40,7 +39,7 @@
 		components: {
 			'table-div': components['table-div'],
 		},
-		data: function() {
+		data(){
 			return {
 				search_choices: {
 					'0': '未審核',
@@ -59,31 +58,28 @@
 				ebook_datas: [],
 			}
 		},
-		mounted: function () {
-			document.title = '分段管理';
-			this.client = new $.RestClient('/ebookSystem/api/');
-			this.client.add('ebooks');
+		metaInfo: {
+			title: '分段管理',
 		},
 		methods: {
-			search: function () {
-				let self = this;
-				self.ebook_datas = [];
+			search(){
+				this.ebook_datas = [];
 
-				self.client.ebooks.read({'search': self.search_value, 'status': this.search_filter,})
-				.done(function(data) {
+				ebookSystemAPI.ebookRest.filter({'search': this.search_value, 'status': this.search_filter,})
+				.then(res => {
 					let filter_data = [];
-					_.each(data, function(v){
+					_.each(res.data, (v) => {
 						filter_data.push({
 							bookname: v.bookname,
 							part: v.part,
 							action: v,
 						})
 					})
-					self.ebook_datas = filter_data;
-					alertmessage('success', '查詢完成，共取得 ' +self.ebook_datas.length +' 筆資料')
+					this.ebook_datas = filter_data;
+					alertmessage('success', '查詢完成，共取得 ' +this.ebook_datas.length +' 筆資料')
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
 		},

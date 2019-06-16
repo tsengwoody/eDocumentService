@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="serviceinfo" class="container">
 		<serviceinfo_record
 			:user_id="user.id"
@@ -12,24 +12,21 @@
 		components: {
 			'serviceinfo_record': components['serviceinfo_record'],
 		},
-		data: function(){
+		data(){
 			return {
 				bus: new Vue(),
 				pk: '',
 			}
 		},
-		mounted: function () {
-			document.title = '服務紀錄'
+		metaInfo: {
+			title: '服務紀錄',
+		},
+		mounted(){
 			this.pk = window.location.pathname.split('/')
 			this.pk = this.pk[this.pk.length-2]
 			if(this.pk==='serviceinfo_record'){
 				this.pk = user.id
 			}
-			setTimeout(() => {
-				//this.bus.$emit('instance-set', this.pk)
-				//this.$refs.srcom.pk=this.pk
-				//this.$refs.srcom.refresh()
-			}, 1000)
 		},
 	}
 </script>

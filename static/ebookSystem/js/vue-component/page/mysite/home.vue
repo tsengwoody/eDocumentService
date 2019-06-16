@@ -20,8 +20,10 @@
 				mode: '',
 			}
 		},
+		metaInfo: {
+			title: '首頁',
+		},
 		mounted(){
-
 			mode = localStorage.getItem('nav_mode');
 			if (!mode) {
 				this.mode = 'all'

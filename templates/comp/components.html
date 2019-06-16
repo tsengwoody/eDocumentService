@@ -1,4 +1,3 @@
-<script src="/static/ebookSystem/js/httpVueLoader.js"></script>
 <script type="text/javascript">
 
 	base_table = {
@@ -153,7 +152,8 @@
 		})
 		return components
 	}
-	let components = set_components({})
+
+	var components = set_components({})
 
 	function set_pages(pages) {
 		let timestamp = '?' + Date.now();
@@ -161,6 +161,7 @@
 			'genericUser/announcement',
 			'genericUser/announcement_create',
 			'genericUser/announcement_list',
+			'genericUser/announcement_school_list',
 			'genericUser/bannercontent_create',
 			'genericUser/disabilitycard_manager',
 			'genericUser/disabilitycard_manager_self',
@@ -213,6 +214,7 @@
 		})
 		return pages
 	}
-	let pages = set_pages({})
+
+	var pages = set_pages({})
 
 </script>

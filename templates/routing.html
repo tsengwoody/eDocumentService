@@ -1,32 +1,33 @@
-{% extends "base_nav.html" %}
+﻿{% extends "base_nav.html" %}
 {% block title %}
-{{ title }}
 {% endblock %}
 {% block content %}
-
 {% csrf_token %} 
 
 <div id="app">
-	{% autoescape off %}
-	{{ component_page }}
-	{% endautoescape %}
+	<routerview></routerview>
 </div>
 
 <script>
+	Vue.use(VueMeta)
 	Vue.options.delimiters = ['{|{', '}|}'];
 
+$(()=>{
 	new Vue({
 		el: '#app',
 		components: {
-			"{{ page }}": pages['{{ app }}/{{ page }}'],
+			routerview: pages['{{ app }}/{{ page }}'],
 		},
 		data: {
+			user: null,
 		},
-		mounted: function(){
-
+		/*metaInfo: {
+			titleTemplate: '%s | 雲端千眼平台',
+		},*/
+		mounted(){
 		},
 	});
-
+})
 </script>
 
 {% endblock %}

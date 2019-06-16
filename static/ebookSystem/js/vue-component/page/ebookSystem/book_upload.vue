@@ -10,11 +10,8 @@
 		components: {
 			'book_upload': components['book_upload'],
 		},
-		data: function() {
-			return{}
+		metaInfo: {
+			title: '電子檔上傳',
 		},
-		mounted: function() {
-			document.title = '電子檔上傳';
-		}
 	}
 </script>

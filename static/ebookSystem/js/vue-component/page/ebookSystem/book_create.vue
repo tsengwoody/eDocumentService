@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h2>文件上傳</h2>
 		<book_upload format="self"></book_upload>
@@ -10,9 +10,11 @@
 		components: {
 			'book_upload': components['book_upload'],
 		},
-		data: function() {},
-		mounted: function() {
-			document.title = '掃描檔上傳';
+		metaInfo: {
+			title: '掃描檔上傳',
+		},
+		mounted(){
+			//document.title = '掃描檔上傳';
 		},
 	}
 </script>

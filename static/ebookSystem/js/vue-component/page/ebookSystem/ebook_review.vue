@@ -1,4 +1,4 @@
-
+﻿
 <template>
 	<div>
 		<h2>分段審核</h2>
@@ -76,7 +76,7 @@
 		components: {
 			'ul-component': components['list_vue_component'],
 		},
-		data: function() {
+		data(){
 			return {
 				pk: '',
 				ebook: {},
@@ -95,37 +95,36 @@
 				}
 			},
 		},
-		mounted: function () {
-			document.title = '分段審核';
-
+		metaInfo: {
+			title: '分段審核',
+		},
+		mounted(){
 			this.pk = window.location.pathname.split('/');
 			this.pk = this.pk[this.pk.length-2]
-			this.client = new $.RestClient('/ebookSystem/api/');
-			this.client.add('ebooks');
 			this.get_ebook_data()
 		},
 		methods: {
 			get_ebook_data: function(){
-				let self = this;
 
-				self.client.ebooks.read(self.pk)
-				.done(function(data) {
-					self.ebook = data;
-					self.current_editrecord = data.current_editrecord;
-
-					rest_aj_send('get', '/ebookSystem/api/editrecords/' +self.current_editrecord.id +'/action/analysis/', {})
-					.done(function(data) {
-						self.analysis = data['data']
-					})
-					.fail(function(xhr, result, statusText){
-						console.log(xhr)
-					})
-
+				ebookSystemAPI.ebookRest.read(this.pk)
+				.then(res => {
+					this.ebook = res.data;
+					this.current_editrecord = res.data.current_editrecord;
+					return ebookSystemAPI.editRecordAction.analysis(this.current_editrecord.id)
+				})
+				.then(res => {
+					this.analysis = res.data;
+				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 
-				rest_aj_send('get', '/ebookSystem/api/ebooks/' +self.pk +'/action/edit/', {})
-				.done(function(data) {
-					self.finish_content = data['data'].finish
+				ebookSystemAPI.ebookAction.readEdit({pk: this.pk})
+				.then(res => {
+					this.finish_content = res.data.finish;
+				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 
 			},
@@ -133,23 +132,21 @@
 				let self = this;
 
 				let transferData = {
+					pk: this.pk,
 					number_of_times: this.ebook.number_of_times,
 					result: this.result,
 					reason: this.reason,
 				}
 
-				rest_aj_send('post', '/ebookSystem/api/ebooks/' +self.pk +'/action/review/', transferData)
-				.done(function(data) {
-					alertmessage('success', '審核已完成' +data['message'])
-					.done(function() {
+				ebookSystemAPI.ebookAction.review(transferData)
+				.then(res => {
+					alertmessage('success', '審核已完成' + res.data['detail'])
+					.done(() => {
 						window.location.replace('/routing/ebookSystem/ebook_review_list/')
 					})
 				})
-				.fail(function(data){
-					alertmessage('error', '' +data['message'])
-					.done(function() {
-						window.location.replace('/routing/ebookSystem/ebook_review_list/')
-					})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 
 			},

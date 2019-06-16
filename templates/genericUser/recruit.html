@@ -1,8 +1,10 @@
-﻿{% extends "base_nav.html" %} {% load staticfiles %} {% block title %}招募志工{% endblock %} {% block style %}
-<link href="{% static " ebookSystem/css/bootstrap/assets/docs.min.css " %}" rel="stylesheet">
-<link href="{% static " ebookSystem/css/bootstrap/assets/src/docs.css " %}" rel="stylesheet"> {% endblock %} {% block content %}
-
-
+﻿{% extends "base_nav.html" %}
+{% block title %}招募志工{% endblock %}
+{% block style %}
+<link href="/static/ebookSystem/css/bootstrap/assets/docs.min.css" rel="stylesheet">
+<link href="/static/ebookSystem/css/bootstrap/assets/src/docs.css" rel="stylesheet">
+{% endblock%}
+{% block content %}
 <h3>招募志工</h3>
 <div class="bs-callout bs-callout-danger">
     <p class="text-danger">雲端千眼招募志工影片：讓我們一起Eye在雲端</p>
@@ -70,11 +72,10 @@
 <div class="bs-callout bs-callout-danger">
     <h4>聯絡我們</h4>
     <div style="padding-left:1em;">
-        <div>※<a href="http://www.edocumentservice.org/">雲端千眼平台</a></div>
-        <div>※<a href="https://www.facebook.com/groups/1740566082878636/">FB社群志工</a></div>
+        <div>※<a href="https://www.edocumentservice.org/">雲端千眼平台</a></div>
+        <!--<div>※<a href="https://www.facebook.com/groups/1740566082878636/">FB社群志工</a></div>-->
         <div>※平台提供志工時數證明，詳情請電洽(02)2717-7722 分機20 周組長</div>
     </div>
 </div>
-
 
 {% endblock%}
