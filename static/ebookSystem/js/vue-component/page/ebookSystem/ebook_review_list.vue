@@ -25,10 +25,10 @@
 			title: '校對文件審核',
 		},
 		mounted: function () {
+			this.tab_data = []
 			genericUserAPI.organizationRest.list()
 			.then(res => {
 				_.each(res.data, (v) => {
-					this.tab_data = []
 					this.tab_data.push({
 						'order': v.id,
 						'display_name': v.name,

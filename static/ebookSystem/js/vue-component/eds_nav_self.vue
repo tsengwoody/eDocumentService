@@ -53,9 +53,7 @@
 </template>
 <script>
 	module.exports = {
-		components: {
-		},
-		data: function(){
+		data(){
 			return {
 				'nav_item': [
 					{
@@ -251,9 +249,9 @@
 							},
 							{
 								type: 'item',
-								'display_name': '平台Q&A',
+								'display_name': '平台問與答',
 								'permission': ['true'],
-								'url': '/about/qanda/',
+								'url': '/routing/genericUser/qanda_all/',
 							},
 							{
 								type: 'item',
@@ -333,10 +331,11 @@
 				
 			},
 		},
-		created: function () {
+		created(){
+			this.$root.edsnavself = this;
 		},
-		mounted: function () {
-			this.user = user
+		mounted(){
+			this.user = this.$store.state.user;
 		},
 		methods: {
 			item_permission: function(u, p){

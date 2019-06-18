@@ -68,7 +68,7 @@ def home(request, template_name='home.html'):
 	template_name='routing.html'
 	return locals()
 
-def logout_user(request, template_name='registration/logged_out.html'):
+def logout_user(request, template_name='genericUser/logged_out.html'):
 	auth_logout(request)
 	return render(request, template_name, locals())
 

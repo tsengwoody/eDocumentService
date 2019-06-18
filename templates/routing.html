@@ -1,33 +1,53 @@
-﻿{% extends "base_nav.html" %}
-{% block title %}
-{% endblock %}
+{% extends "base.html" %}
+{% block title %}{% endblock %}
 {% block content %}
 {% csrf_token %} 
 
-<div id="app">
-	<routerview></routerview>
+<div class="container">
+	<div id="app">
+		<eds_nav></eds_nav>
+		<div role="main" id="id_main">
+			<routerview></routerview>
+		</div>
+		<eds_footer></eds_footer>
+	</div>
 </div>
 
 <script>
 	Vue.use(VueMeta)
 	Vue.options.delimiters = ['{|{', '}|}'];
 
-$(()=>{
+	let mapState = Vuex.mapState;
+
+//$(()=>{
 	new Vue({
+		store,
 		el: '#app',
 		components: {
+			eds_nav: components['eds_nav'],
 			routerview: pages['{{ app }}/{{ page }}'],
+			eds_footer: components['eds_footer'],
 		},
 		data: {
-			user: null,
+		},
+		computed: {
+			...mapState({
+				user: 'user',
+			}),
 		},
 		/*metaInfo: {
 			titleTemplate: '%s | 雲端千眼平台',
 		},*/
-		mounted(){
+		created(){
+			{% if user.is_authenticated %}
+			this.$store.dispatch('getUser',
+			{
+				id: {{ request.user.id }},
+			});
+			{% endif %}
 		},
 	});
-})
+//})
 </script>
 
 {% endblock %}

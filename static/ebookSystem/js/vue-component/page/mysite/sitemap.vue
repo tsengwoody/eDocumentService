@@ -21,27 +21,35 @@
 </template>
 <script>
 	module.exports = {
-		components: {
-			'eds-nav': components['eds-nav'],
-		},
-		data: function(){
+		data(){
 			return {
 				'items': [],
 			}
 		},
-		mounted: function () {
+		mounted(){
 			document.title = '網站導覽'
+
+			mode = localStorage.getItem('nav_mode');
+
+			if(!mode) {
+				this.mode = 'all'
+			}
+			else {
+				this.mode = mode
+			}
+
 			setTimeout(() => {
-				let enc = vo_eds_nav.$refs.eds_nav_instance
+				let enc;
+				if(mode==='all'){
+					enc = this.$root.edsnavall
+				}
+				if(mode==='self'){
+					enc = this.$root.edsnavself
+				}
+
 				this.items.push(...enc.item_show(enc.nav_item))
 				this.items.push(...enc.item_show(enc.nav_item_right))
-			}, 0)
-		},
-		methods: {
-			test: function(){
-				c = vo_eds_nav.$refs.eds_nav_instance.nav_item
-				console.log(c)
-			},
+			}, 100)
 		},
 	}
 </script>

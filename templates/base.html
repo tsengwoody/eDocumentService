@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh">
 
 <head>
@@ -111,6 +111,7 @@
 		MathJax.Hub.Config({
 			skipStartupTypeset: true, //不初始化啟動
 		});
+
 	</script>-->
 
 	<!--modal w3c-->
@@ -118,8 +119,10 @@
 	<script src="/static/ebookSystem/framework/modal_w3c/dialog.js" type="text/javascript"></script>
 	<script src="/static/ebookSystem/framework/modal_w3c/utils.js" type="text/javascript"></script>
 
+	<!-- jquery.quickpaginate -->
+	<script language="javascript" src="/static/ebookSystem/js/jquery.quickpaginate.js"></script>
+
 	<title>{% block title %}{% endblock %} | 雲端千眼平台</title>
-	{% block style %}{% endblock %}
 
 	<script type="text/javascript">
 
@@ -174,50 +177,12 @@
 	{% include 'comp/mx_alert_confirm.html' %}
 	{% include 'comp/mx_user_getOTP.html' %}
 	{% include 'comp/mx_qanda.html' %}
-	{% include 'comp/mx_doc_editor.html' %}
 
 	<div class="textfornvda"><a href="#id_main">移至主內容</a></div>
+
 	{% block nav %}{% endblock %}
-	<div class="container">
-		<div role="main" id="id_main">{% block content %}{% endblock %}</div>
-	</div>
+	{% block content %}{% endblock %}
 
-	<footer class="footer" role="footer">
-		<div class="container">
-			<div class="pull-left">
-				<ul class="list-inline">
-					<li>
-						<a href="/genericUser/generics/func_desc/">關於雲端千眼</a>
-					</li>
-					<li>
-						<a href="{% url 'genericUser:org_info' %}">服務中心資訊</a>
-					</li>
-					<li>
-						<div title="建議使用Firefox或Chrome等支援HTML5瀏覽器">
-							建議瀏覽器
-							<div class="textfornvda">
-								建議使用Firefox或Chrome等支援HTML5瀏覽器
-							</div>
-						</div>
-					</li>
-					<li>
-						<div title="建議解析度使用1366x768以上">
-							建議解析度
-							<div class="textfornvda">
-								建議解析度使用1366x768以上
-							</div>
-						</div>
-					</li>
-					<li>
-						<p>© eDocumentService 2019</p>
-					</li>
-				</ul>
-			</div>
-			<a href="https://www.forblind.org.tw/" target="blank" title="(另開新視窗)"><img id=logo src="/static/ebookSystem/img/logo1.png" alt="社團法人台北市視障者家長協會"></a>
-		</div>
-	</footer>
-
-	{% block tawk %}
 	<!--Start of Tawk.to Script-->
 	<script type="text/javascript">
 		var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
@@ -231,7 +196,6 @@
 		})();
 	</script>
 	<!--End of Tawk.to Script-->
-	{% endblock %}
 
 	<script>
 		//-------------cookie 儲存字體大小設定-------------

@@ -1,52 +1,25 @@
 {% extends "base.html" %}
 {% block nav %}
-{% load staticfiles %}
-<link href="{% static "ebookSystem/css/footer-navbar.css" %}" rel="stylesheet" >
-<script language="javascript" src="{% static 'ebookSystem/js/jquery.quickpaginate.js' %}"></script>
-
 <div id="edsnav">
-	<eds_nav
-		v-if="mode==='all'"
-		v-on:mode-change="mode_change('self')"
-		ref="eds_nav_instance"></eds_nav>
-		<eds_nav_org
-		v-if="mode==='self'"
-		v-on:mode-change="mode_change('all')"
-		ref="eds_nav_org_instance"
-	></eds_nav_org>
+	<eds_nav></eds_nav>
 </div>
 
 <script>
 	Vue.options.delimiters = ['{|{', '}|}'];
 
-	vo_eds_nav = new Vue({
+	new Vue({
+		store,
 		el: '#edsnav',
 		components: {
 			'eds_nav': components['eds_nav'],
-			'eds_nav_org': components['eds_nav_org'],
 		},
-		data: {
-			'mode': 'all', //all, self
-		},
-		created: function () {
-		},
-		mounted: function () {
-			mode = localStorage.getItem('nav_mode');
-
-			if (iser(mode)) {
-				this.mode = 'all'
-			}
-			else {
-				this.mode = mode
-			}
-		},
-		methods: {
-			mode_change: function(mode){
-				//this.mode = mode
-
-				localStorage.setItem('nav_mode', mode);
-				window.location.replace('/')
-			},
+		created(){
+			{% if user.is_authenticated %}
+			this.$store.dispatch('getUser',
+			{
+				id: {{ request.user.id }},
+			});
+			{% endif %}
 		},
 	})
 

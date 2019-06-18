@@ -42,3 +42,23 @@
 	user = get_user('session')
 
 </script>
+
+<script type="text/javascript">
+Vue.use(Vuex)
+
+store = new Vuex.Store({
+	state: {
+		user: {},
+	},
+	mutations: {
+		updateUser (state, payload) {
+				state.user = payload;
+		},
+	},
+	actions: {
+		getUser({commit}, payload){
+			genericUserAPI.userRest.read(payload.id).then(response => commit('updateUser', response.data))
+		},
+	},
+});
+</script>
