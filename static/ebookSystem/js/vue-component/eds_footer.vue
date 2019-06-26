@@ -2,7 +2,7 @@
 	<footer class="footer" role="footer">
 		<div class="container">
 			<div class="pull-left">
-				<ul class="list-inline">
+				<ul class="list-inline" style="display: flex;">
 					<li>
 						<a href="/genericUser/generics/func_desc/">關於雲端千眼</a>
 					</li>
@@ -38,3 +38,7 @@
 <script>
 	module.exports = {}
 </script>
+
+<style>
+
+</style>
