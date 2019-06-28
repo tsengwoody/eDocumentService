@@ -208,8 +208,8 @@
 					this.showDivs(this.slideIndex);
 				}, 100);
 
-				this.timer = new Timer(function() {
-				    this.plusDivs(1);
+				this.timer = new Timer(() => {
+					this.plusDivs(1);
 				}, 4000);
 
 			})
