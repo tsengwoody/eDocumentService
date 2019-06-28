@@ -20,6 +20,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from utils.resource import *
 from utils.apis import MixedPermissionModelViewSet
 from utils.filters import OwnerOrgManagerFilter
+from utils.filters import KeyMapAttrFilterFactory, convert_bool, convert_unicode
 from utils.permissions import RuleORPermissionFactory
 from .filters import *
 from .serializers import *
@@ -391,6 +392,7 @@ class BusinessContentViewSet(viewsets.ModelViewSet):
 class BannerContentViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = BannerContent.objects.all()
 	serializer_class = BannerContentSerializer
+	filter_backends = (KeyMapAttrFilterFactory(key='category', type=str, attr='category'), )
 	permission_classes = (
 		RuleORPermissionFactory('list', [
 			'is_manager',

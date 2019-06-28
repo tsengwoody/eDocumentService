@@ -1,6 +1,6 @@
-<template>
+﻿<template>
 	<div id="user_person">
-		<h3>個人資料</h3>
+		<h2>個人資料</h2>
 		<div class="form-horizontal">
 			<template v-for="(value, key) in filter_data">
 				<div class="form-group" v-if="key==='email'">

@@ -58,7 +58,7 @@ class Resource(APIView):
 	def post_resource(self, fullpath, file):
 		dirname = os.path.dirname(fullpath)
 		if not os.path.exists(dirname):
-			os.makedirs(dirname, 755)
+			os.makedirs(dirname, 0o755)
 		with open(fullpath, 'wb+') as destination:
 			for chunk in file.chunks():
 				destination.write(chunk)

@@ -244,7 +244,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			}
 			try:
 				book = Book.objects.get(ISBN=request.POST['ISBN'])
-				if source_priority[request.POST['format']] <= source_priority[book.source]:
+				if source_priority[request.POST['format']] < source_priority[book.source]:
 					res['detail'] = u'文件已存在'
 					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 			except:
@@ -257,12 +257,14 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 			#根據選擇上傳格式作業
 			final_file = os.path.join(uploadPath, 'OCR') + '/{0}.epub'.format(request.POST['ISBN'], )
+			if not os.path.exists(os.path.dirname(final_file)):
+				os.makedirs(os.path.dirname(final_file), 0o755)
+
 			#txt
 			if request.POST['format'] == 'txt':
 				from ebooklib import epub
 				from utils.epub import txt2epub
 				try:
-					os.makedirs(os.path.dirname(final_file))
 					info = {
 						'ISBN': newBookInfo.ISBN,
 						'bookname': newBookInfo.bookname,
@@ -282,7 +284,6 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				from ebooklib import epub
 				from utils.epub import through, add_bookinfo
 				try:
-					os.makedirs(os.path.dirname(final_file))
 					through(uploadFilePath, final_file)
 					book = epub.read_epub(final_file)
 					book = add_bookinfo(
@@ -317,6 +318,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				newBook.org = request.user.org
 			newBook.save()
 
+			newBook.ebook_set.all().delete()
 			ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN'] + '-1', begin_page=-1, end_page=-1)
 			ebook.change_status(5, 'final')
 
@@ -775,9 +777,9 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				format = request.POST['fileformat']
 
 				'''from django.db import connection
-					with connection.cursor() as cursor:
-						sql = "select count(*) from (select count(*) from ebookSystem_getbookrecord where user_id={} and datediff(now(), get_time)<=7 group by book_id) as g".format(request.user.id)
-						result=cursor.execute(sql).fetchall()
+				with connection.cursor() as cursor:
+					sql = "select count(*) from (select count(*) from ebookSystem_getbookrecord where user_id={} and datediff(now(), get_time)<=7 group by book_id) as g".format(request.user.id)
+					result=cursor.execute(sql).fetchall()
 				if result[0][0]>3:
 					res['detail'] = u'下載書籍數已到上線，每週僅能下載 3 本'
 					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)'''

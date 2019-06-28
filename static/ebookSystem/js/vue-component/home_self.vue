@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<div class="homeCarousel">
 			<h2 class="sr-only">首頁</h2>
@@ -172,30 +172,8 @@
 				timer: null,
 			}
 		},
-		mounted: function() {
-			const self = this;
-			let client = new $.RestClient('/genericUser/api/');
-			client.add('bannercontents');
-			client.add('announcements');
-
-			$.when(
-				client.bannercontents.read(), 
-				client.announcements.read()
-			).done(function(res1, res2) {
-				self.bannercontentlist = res1[0];
-				self.announcementlist = res2[0];
-				
-				setTimeout(() => {
-					self.showDivs(self.slideIndex);
-				}, 100);
-
-				self.timer = new Timer(function() {
-				    self.plusDivs(1);
-				}, 4000);
-			})
-		},
 		computed: {
-			showAnnouncements: function() {
+			showAnnouncements(){
 				let target_announcements = [];
 				if (this.announcementlist) {
 					if(this.announcementlist.length < 3) {
@@ -204,7 +182,6 @@
 						target_announcements = this.announcementlist.slice(0, 2);
 					}
 				}
-				
 				return target_announcements.map(function(announcement) {
 					let year, month, day;
 					[year, month, day] = announcement.datetime.split('-');
@@ -218,8 +195,28 @@
 				});
 			}
 		},
+		mounted(){
+			Promise.all([
+				genericUserAPI.bannerContentRest.filter({category: 'self'}),
+				genericUserAPI.announcementRest.list(),
+			])
+			.then(res => {
+				this.bannercontentlist = res[0].data;
+				this.announcementlist = res[1].data;
+
+				setTimeout(() => {
+					this.showDivs(this.slideIndex);
+				}, 100);
+
+				this.timer = new Timer(function() {
+				    this.plusDivs(1);
+				}, 4000);
+
+			})
+
+		},
 		methods: {
-			markdown2html: function (text) {
+			markdown2html(text){
 				const converter = new showdown.Converter();
 				const html = converter.makeHtml(text);
 				return html;

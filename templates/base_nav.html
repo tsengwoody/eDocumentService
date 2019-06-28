@@ -25,3 +25,19 @@
 
 </script>
 {% endblock %}
+{% block footer %}
+<div id="edsfooter">
+		<eds_footer></eds_footer>
+</div>
+
+<script>
+	Vue.options.delimiters = ['{|{', '}|}'];
+
+	new Vue({
+		el: '#edsfooter',
+		components: {
+			eds_footer: components['eds_footer'],
+		},
+	})
+</script>
+{% endblock %}

@@ -1,17 +1,11 @@
 ﻿{% extends "base_nav.html" %}
-{% block resource %}
-	{% load staticfiles %}
-	<link href="{% static "ebookSystem/css/signin.css" %}" rel="stylesheet" >
-	<script language="javascript" src="{% static 'ebookSystem/js/ajaxSubmit.js' %}"></script>
-	<script src="https://www.google.com/recaptcha/api.js" async defer></script> 
-{% endblock%}
-
+{% load staticfiles %}
 {% block title %}
 統計資料
 {% endblock %}
-
 {% block content %}
-{{ status }}
+<link href="{% static "ebookSystem/css/signin.css" %}" rel="stylesheet" >
+<script src="https://www.google.com/recaptcha/api.js" async defer></script> 
 <h3>統計資料</h3>
 <form action="" method="post" role="form">
 {% csrf_token %}

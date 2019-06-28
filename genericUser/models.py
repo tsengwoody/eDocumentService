@@ -28,6 +28,7 @@ def generic_serialized(self):
 	return serialize
 
 class User(AbstractUser):
+	password_md5 = models.CharField(max_length=32)
 	phone = models.CharField(max_length=30)
 	birthday = models.DateField()
 	EDU = (
@@ -56,6 +57,14 @@ class User(AbstractUser):
 		self.disability_card_front = BASE_DIR +'/static/ebookSystem/disability_card/{0}/{0}_front.jpg'.format(self.username)
 		self.disability_card_back = BASE_DIR +'/static/ebookSystem/disability_card/{0}/{0}_back.jpg'.format(self.username)
 		self.has_disability_card = os.path.exists(BASE_DIR +'/static/ebookSystem/disability_card/{0}/'.format(self.username))
+
+	def set_password(self, password, *args, **kwargs):
+		super(User, self).set_password(password, *args, **kwargs)
+		from hashlib import md5
+		h=md5()
+		data = password.encode("utf-8")
+		h.update(data)
+		self.password_md5 = h.hexdigest()
 
 	def auth_base(self):
 		return self.is_license & self.auth_email & self.auth_phone
@@ -346,6 +355,11 @@ class BannerContent(models.Model):
 	content = models.TextField()
 	order = models.IntegerField()
 	url = models.CharField(max_length=255, blank=True, null=True)
+	CATEGORY = (
+		('all', 'all'),
+		('self', 'self'),
+	)
+	category = models.CharField(max_length=10, choices=CATEGORY)
 
 	def __init__(self, *args, **kwargs):
 		super(BannerContent, self).__init__(*args, **kwargs)

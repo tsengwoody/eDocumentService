@@ -7,7 +7,7 @@
 						<a href="/genericUser/generics/func_desc/">關於雲端千眼</a>
 					</li>
 					<li>
-						<a href="{% url 'genericUser:org_info' %}">服務中心資訊</a>
+						<a href="/genericUser/generics/recruit/">招募志工</a>
 					</li>
 					<li>
 						<div title="建議使用Firefox或Chrome等支援HTML5瀏覽器">

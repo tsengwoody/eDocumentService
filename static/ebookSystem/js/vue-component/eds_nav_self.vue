@@ -139,6 +139,12 @@
 								'permission': ['is_manager'],
 								'url': '/routing/mysite/statistics_org/user_editrecord/',
 							},
+							{
+								type: 'item',
+								'display_name': '管理首頁 Banner',
+								'permission': ['is_supermanager'],
+								'url': '/routing/genericUser/bannercontent_create/',
+							},
 						],
 					},
 					{

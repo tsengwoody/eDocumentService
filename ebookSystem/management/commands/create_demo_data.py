@@ -304,7 +304,7 @@ class Command(BaseCommand):
 				u'ISBN': u'9789863981459',
 				'category_id': category_instance.id,
 				'fileObject': book_file,
-				'category': 'epub',
+				'format': 'epub',
 			},
 #			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
 		)
@@ -342,6 +342,7 @@ class Command(BaseCommand):
 	*	群眾參與，積砂成塔，邀請志工，期待你的加入。'''
 			,
 			order=0,
+			category='all',
 		)
 		BannerContent.objects.create(
 			title='我們可能無法做偉大的事，但可以用偉大的愛做小事 - 招募志工',
@@ -351,9 +352,10 @@ class Command(BaseCommand):
 	*	We Want You, Apply Now.'''
 			,
 			order=1,
+			category='all',
 		)
 
-		instance = ISSNBookInfo.objects.create(
+		'''instance = ISSNBookInfo.objects.create(
 			ISSN='16822811',
 			title='科學人[中文版]',
 			house='遠流出版事業股份有限公司',
@@ -364,7 +366,7 @@ class Command(BaseCommand):
 			volume='3',
 			date='2018-01-01',
 			owner=root,
-		)
+		)'''
 
 		client = Client()
 		client.login(username='root', password='eds@2018')

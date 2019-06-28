@@ -36,8 +36,8 @@
 					<p class="h5"><strong>圖片內容</strong></p>
 					<img
 						v-if="index!=-1"
-						v-bind:alt="temp.title"
-						v-bind:src="url +`resource/cover/image/`"
+						:alt="temp.title"
+						:src="'/genericUser/api/bannercontents/' +temp.id +'/resource/cover/image/'"
 						style="height: 480px;width:940px"
 					>
 					<br>
@@ -87,6 +87,7 @@
 	module.exports = {
 		data(){
 			return {
+				website: 'all',
 				'mode': 'write', //read or write
 				'items': [],
 				'index': -1,
@@ -105,17 +106,21 @@
 			title: '管理首頁 Banner',
 		},
 		mounted(){
+			website = localStorage.getItem('nav_mode');
+			if (website){
+				this.website = website;
+			}
 			this.list()
 		},
 		methods: {
-			upload(){
+			upload(id){
 				let fileCover = document.getElementById('id_cover');
 				fileObject = fileCover.files[0]
 				if(iser(fileObject)){
 					alertmessage('error', '檔案尚未選擇')
 					return -1
 				}
-				let url_resource = '/genericUser/api/bannercontents/' +this.id +'/resource/cover/image/'
+				let url_resource = '/genericUser/api/bannercontents/' +id +'/resource/cover/image/'
 				rest_aj_upload(url_resource, {'object': fileCover.files[0]})
 				.done((data) => {
 					alertmessage('success', '成功更新資料(檔案)' +data['message'])
@@ -132,10 +137,11 @@
 					'title': '',
 					'content': '',
 					'order': -1,
+					category: this.website,
 				}
 			},
 			list(){
-				genericUserAPI.bannerContentRest.list()
+				genericUserAPI.bannerContentRest.filter({category: this.website})
 				.then(res => {
 					this.items = res.data;
 					this.read(this.index);
@@ -147,7 +153,7 @@
 						let fileCover = document.getElementById('id_cover');
 						fileObject = fileCover.files[0]
 						if(!iser(fileObject)){
-							this.upload()
+							this.upload(res.data.id)
 						}
 						else {
 							alertmessage('success', '成功建立資料')
@@ -175,7 +181,7 @@
 						let fileCover = document.getElementById('id_cover');
 						fileObject = fileCover.files[0]
 						if(!iser(fileObject)){
-							this.upload()
+							this.upload(res.data.id)
 						}
 						else {
 							alertmessage('success', '成功更新資料')
