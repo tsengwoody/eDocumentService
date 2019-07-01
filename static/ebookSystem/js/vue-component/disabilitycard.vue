@@ -132,14 +132,13 @@
 </div>
 </template>
 <script>
-	Vue.options.delimiters = ['{|{', '}|}'];
 
 	module.exports = {
 		props: ['bus',],
 		components: {
-			'drf-model': httpVueLoader('/static/ebookSystem/js/vue-component/drf.vue'),
+			'drf-model': components['drf'],
 		},
-		data: function(){
+		data(){
 			return {
 				mode: 'read',
 				pk: '',
@@ -172,7 +171,7 @@
 			}
 		},
 		computed: {
-			url: function(){
+			url(){
 				if(this.pk===-1){
 					return '/genericUser/api/disabilitycards/'
 				}
@@ -183,192 +182,170 @@
 		},
 		created: function () {
 			this.bus.$on('instance-set', this.instance_set)
-			let self = this
-			self.client = new $.RestClient('/genericUser/api/')
-			self.client.add('users');
-			self.client.add('disabilitycards');
-			self.client.addVerb('disabilitycardsoption', 'OPTIONS', {
-				url: 'disabilitycards',
-			});
+		},
+		mounted(){
 
-			self.client.users.read()
-			.done(function(data) {
-				_.each(data, function(v){
-					self.user_list.push({
+			genericUserAPI.userRest.list()
+			.then(res => {
+				_.each(res.data, (v) => {
+					this.user_list.push({
 						'display_name': v.username,
 						'value': v.id,
 					})
 				})
 			})
 
-		},
-		mounted: function () {
-			let self = this
-
-			self.client.disabilitycardsoption()
-			.done(function(data) {
-				self.model_info = _.clone(data.actions.POST)
-				self.model_info.owner.choices = self.user_list
-				self.model_info.identity_card_number.label = '身份證字號'
-				self.model_info.owner.label = '擁有者'
-				self.model_info.owner.label = '擁有者'
-				self.model_info.name.label = '姓名'
-				self.model_info.address.label = '地址'
-				self.model_info.category.label = '類別'
-				self.model_info.identification_date.label = '鑑定日期'
-				self.model_info.renew_date.label = '重新鑑定日期'
-				self.model_info.level.label = '程度'
-
+			genericUserAPI.disabilityCardRest.options()
+			.then(res => {
+				this.model_info = _.clone(res.data.actions.POST);
+				this.model_info.owner.choices = this.user_list
+				this.model_info.identity_card_number.label = '身份證字號'
+				this.model_info.owner.label = '擁有者'
+				this.model_info.owner.label = '擁有者'
+				this.model_info.name.label = '姓名'
+				this.model_info.address.label = '地址'
+				this.model_info.category.label = '類別'
+				this.model_info.identification_date.label = '鑑定日期'
+				this.model_info.renew_date.label = '重新鑑定日期'
+				this.model_info.level.label = '程度'
 			})
+
 		},
 		methods: {
-			instance_set: function (event) {
-				let self = this
+			instance_set(event){
 				this.pk = event
-
-				if(iser(this.pk)){
+				if(!this.pk){
 					this.mode = 'create'
-					_.each(this.disabilitycard, function(v, k){
-						self.disabilitycard[k] = ''
+					_.each(this.disabilitycard, (v, k) => {
+						this.disabilitycard[k] = ''
 					})
-					_.each(this.disabilitycard_temp, function(v, k){
-						self.disabilitycard_temp[k] = ''
+					_.each(this.disabilitycard_temp, (v, k) => {
+						this.disabilitycard_temp[k] = ''
 					})
 				}
 				else {
 					this.refresh()
 				}
 			},
-			refresh: function () {
+			refresh(){
 				this.mode = 'read'
-				let self = this
-					self.client.disabilitycards.read(self.pk)
-					.done(function(data) {
-						_.each(self.disabilitycard, function(v,k){
-							self.disabilitycard[k] = data[k]
-							self.disabilitycard_temp[k] = data[k]
-						})
-						self.img_base64_front = null
-						self.img_base64_back = null
-					})
-					.fail(function(xhr, result, statusText){
-						self.mode = 'create'
-					})
 
+				genericUserAPI.disabilityCardRest.read(this.pk)
+				.then(res => {
+					_.each(this.disabilitycard, (v,k) => {
+						this.disabilitycard[k] = res.data[k]
+						this.disabilitycard_temp[k] = res.data[k]
+					})
+					this.img_base64_front = null
+					this.img_base64_back = null
+				})
+				.catch(res => {
+					this.mode = 'create'
+					alertmessage('error', o2j(res.response.data));
+				})
 			},
-			active: function (status) {
-				let self = this
-				self.disabilitycard.is_active = self.disabilitycard_temp.is_active = status
-				self.client.disabilitycards.updatepart(self.pk, {'is_active' :status})
-				.done(function(data) {
+			active(status){
+				this.disabilitycard.is_active = this.disabilitycard_temp.is_active = status
+				genericUserAPI.disabilityCardRest.partialupdate(this.pk, {'is_active' :status})
+				.then(res => {
 					if(status){ alertmessage('success', '成功啟用手冊') }
 					else if(!status){ alertmessage('success', '成功停用手冊') }
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
-			create: function () {
-				let self = this
-
-				self.disabilitycard_temp.is_active = 'false'
-				self.client.disabilitycards.create(self.disabilitycard_temp)
-				.done(function(data) {
+			create(){
+				this.disabilitycard_temp.is_active = 'false'
+				genericUserAPI.disabilityCardRest.create(this.disabilitycard_temp)
+				.then(res => {
 					alertmessage('success', '成功新建手冊')
-					self.pk = data.identity_card_number
-					self.upload(self.pk)
-					self.refresh()
-					self.bus.$emit('instance-refresh', 'refresh')
+					this.pk = res.data.identity_card_number
+					this.upload(this.pk)
+					this.refresh()
+					this.bus.$emit('instance-refresh', 'refresh')
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
-
 			},
-			cancel: function () {
-				let self = this
-				self.disabilitycard_temp = _.clone(self.disabilitycard)
-				self.mode_change('read');
-				self.img_base64_front = '';
-				self.img_base64_back = '';
-			},
-			update: function () {
-				let self = this
-
-				self.disabilitycard = _.clone(self.disabilitycard_temp)
-				self.client.disabilitycards.update(self.pk, self.disabilitycard)
-				.done(function(data) {
+			update(){
+				this.disabilitycard = _.clone(this.disabilitycard_temp)
+				genericUserAPI.disabilityCardRest.update(this.pk, this.disabilitycard)
+				.then(res => {
 					alertmessage('success', '成功修改手冊資料')
-					self.mode_change('read')
-					self.upload(self.pk)
+					this.mode_change('read')
+					this.upload(this.pk)
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
-
 			},
-			mode_change: function (mode) {
+			cancel(){
+				this.disabilitycard_temp = _.clone(this.disabilitycard)
+				this.mode_change('read');
+				this.img_base64_front = '';
+				this.img_base64_back = '';
+			},
+			mode_change(mode){
 				this.mode = mode
 			},
-			ch_img: function(me, kind){
+			ch_img(me, kind){
 				let self = this;
 
 				readfile(me)
-				.done(function (bs) {
+				.done((bs) => {
 					let v = bin2base64(bs2barr(bs));
-					if(kind==='front') self.img_base64_front = v;
-					else self.img_base64_back = v;
-					// cv_img_set(kind, v)
+					if(kind==='front') this.img_base64_front = v;
+					else this.img_base64_back = v;
 				})
 			},
-			upload: function(pk){
-				let self = this
+			upload(pk){
 				let resource_url = '/genericUser/api/disabilitycards/' +pk +'/resource/source/'
 
 				let fileFront = document.getElementById('id_front');
 				let aj_front = null
 				fileFrontObject = fileFront.files[0]
-				if(!iser(fileFrontObject)){
+				if(fileFrontObject){
 					aj_front = rest_aj_upload(resource_url +'front/', {'object': fileFrontObject})
 				}
 
 				let fileBack = document.getElementById('id_back');
 				let aj_back = null
 				fileBackObject = fileBack.files[0]
-				if(!iser(fileBackObject)){
+				if(fileBackObject){
 					aj_back = rest_aj_upload(resource_url +'back/', {'object': fileBackObject})
 				}
 
-				if(!iser(aj_front) && !iser(aj_back)){
+				if(aj_front && aj_back){
 					$.when(aj_front, aj_back)
-					.done(function(front_data, back_data) {
+					.done((front_data, back_data) => {
 						alertmessage('success', '成功上傳手冊')
 					})
-					.fail(function(data){
+					.fail((data) => {
 						alertmessage('error', '失敗上傳手冊')
 					})
 				}
-				else if(!iser(aj_front)){
+				else if(aj_front){
 					aj_front
-					.done(function(data) {
+					.done((data) => {
 						alertmessage('success', '成功上傳手冊正面')
 					})
-					.fail(function(data){
+					.fail((data) => {
 						alertmessage('error', '失敗上傳手冊正面')
 					})
 				}
-				else if(!iser(aj_back)){
+				else if(aj_back){
 					aj_back
-					.done(function(data) {
+					.done((data) => {
 						alertmessage('success', '成功上傳手冊反面')
 					})
-					.fail(function(data){
+					.fail((data) => {
 						alertmessage('error', '失敗上傳手冊反面')
 					})
 				}
 			},
 		},
-
 	}
 
 </script>

@@ -181,6 +181,7 @@ class DisabilityCard(models.Model):
 	level = models.CharField(max_length=10, choices=LEVEL)
 	CATEGORY = (
 		(u'vi' , u'視障'),
+		(u'ld' , u'學障'),
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
 	is_active = models.BooleanField(default=False)
