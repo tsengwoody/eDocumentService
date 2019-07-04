@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="container">
 	    <h3>平台濫觴</h3>
 
@@ -107,18 +107,8 @@
 </template>
 <script>
 	module.exports = {
-		components: {
-		},
-		data: function(){
-			return {
-			}
-		},
-		created: function () {
-		},
-		mounted: function () {
-			document.title = '平台濫觴';
-		},
-		methods: {
+		metaInfo: {
+			title: '平台濫觴',
 		},
 	}
 </script>

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="container">
 	    <h3>服務條款</h3>
 	    <p>　　eDocumentService雲端千眼平台(以下簡稱「本站」)係依據本條款提供特定身心障礙者出版品重製服務。當您使用本服務時，即表示您已閱讀、瞭解並同意接受此條款之所有內容。本站有權於任何時間修改或變更此條款之內容，若您於任何修改或變更後繼續使用本服務，視為您已閱讀、瞭解並同意接受該等修改或變更。如果您不同意此條款的內容，您應立即停止使用本站之服務。</p>
@@ -122,18 +122,8 @@
 </template>
 <script>
 	module.exports = {
-		components: {
-		},
-		data: function(){
-			return {
-			}
-		},
-		created: function () {
-		},
-		mounted: function () {
-			document.title = '服務條款';
-		},
-		methods: {
+		metaInfo: {
+			title: '服務條款',
 		},
 	}
 </script>

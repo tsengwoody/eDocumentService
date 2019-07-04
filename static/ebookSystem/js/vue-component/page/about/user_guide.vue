@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="container">
 		<h3>平台使用指南</h3>
 		<div class="bs-callout bs-callout-danger">
@@ -9,18 +9,8 @@
 </template>
 <script>
 	module.exports = {
-		components: {
-		},
-		data: function(){
-			return {
-			}
-		},
-		created: function () {
-		},
-		mounted: function () {
-			document.title = '平台使用指南';
-		},
-		methods: {
+		metaInfo: {
+			title: '平台使用指南',
 		},
 	}
 </script>

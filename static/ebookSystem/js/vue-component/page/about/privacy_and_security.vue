@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="container">
 	    <h3>隱私權及資訊安全政策</h3>
 	    <p>　　當您開始使用eDocumentService網站，即表示您信賴我們對您個人資訊的處理方式。本《隱私權及資訊安全政策》旨在協助您瞭解本站如何蒐集、應用及保護您所提供的個人資訊，以下的隱私權政策，適用於您在本站活動時，所涉及的個人資料蒐集、運用與保護，當您註冊或是登入時，即視為您已閱讀本同意書，並同意遵守以下所有同意書之規範。</p>
@@ -68,18 +68,8 @@
 </template>
 <script>
 	module.exports = {
-		components: {
-		},
-		data: function(){
-			return {
-			}
-		},
-		created: function () {
-		},
-		mounted: function () {
-			document.title = '隱私權及資訊安全政策';
-		},
-		methods: {
+		metaInfo: {
+			title: '隱私權及資訊安全政策',
 		},
 	}
 </script>

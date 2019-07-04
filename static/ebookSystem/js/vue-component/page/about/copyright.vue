@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="container">
 		<h3>著作權法</h3>
 		<div class="bs-callout bs-callout-default"> 
@@ -44,18 +44,8 @@
 
 <script>
 	module.exports = {
-		components: {
-		},
-		data: function(){
-			return {
-			}
-		},
-		created: function () {
-		},
-		mounted: function () {
-			document.title = '著作權法';
-		},
-		methods: {
+		metaInfo: {
+			title: '著作權法',
 		},
 	}
 </script>

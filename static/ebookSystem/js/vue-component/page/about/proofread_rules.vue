@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="container">
 		<h3>校對規則說明內容</h3>
 		<p>雲端千眼校園版線上校對注意事項：</p>
@@ -31,18 +31,8 @@
 
 <script>
 	module.exports = {
-		components: {
-		},
-		data: function(){
-			return {
-			}
-		},
-		created: function () {
-		},
-		mounted: function () {
-			document.title = '校園版校對規則';
-		},
-		methods: {
+		metaInfo: {
+			title: '校園版校對規則',
 		},
 	}
 </script>

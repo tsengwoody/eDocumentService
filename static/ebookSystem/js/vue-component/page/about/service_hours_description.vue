@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="container">
 		<h3>服務計算說明內容</h3>
 		<p>有關平台上服務時數的計算方式，請參照下列說明：</p>
@@ -21,18 +21,8 @@
 
 <script>
 	module.exports = {
-		components: {
-		},
-		data: function(){
-			return {
-			}
-		},
-		created: function () {
-		},
-		mounted: function () {
-			document.title = '服務計算說明';
-		},
-		methods: {
+		metaInfo: {
+			title: '服務計算說明',
 		},
 	}
 </script>

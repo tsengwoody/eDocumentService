@@ -46,9 +46,9 @@
 
 		<div class="row introduction-area">
 			<button type="button" class="btn btn-secondary btn-lg">校園版服務介紹</button>
-			<button type="button" class="btn btn-secondary btn-lg">平台系統公告</button>
+			<button type="button" class="btn btn-secondary btn-lg" @click="window.location.replace('/routing/genericUser/announcement_school_list/')">平台系統公告</button>
 			<button type="button" class="btn btn-secondary btn-lg">協會簡介</button>
-			<button type="button" class="btn btn-secondary btn-lg">著作權說明</button>
+			<button type="button" class="btn btn-secondary btn-lg" @click="window.location.replace('/routing/about/copyright/')">著作權說明</button>
 		</div>
 
 		<div class="row" style="padding-top: 20px;">
@@ -57,17 +57,14 @@
 					<div class="panel-heading">校園管理</div>
 					<div class="panel-body">
 						<ul class="navigation">
-						    <li><a class="btn btn-link" 
-								href="#"
-							>
-								校對進度查詢
-							</a></li>
-
-						    <li><a class="btn btn-link" 
-								href="#"
-							>
-								志工時數查詢
-							</a></li>
+							<li><a class="btn btn-link" 
+								tabindex="0"
+								@click="window.location.replace('/routing/ebookSystem/book_manager/')"
+							>校對進度查詢</a></li>
+							<li><a class="btn btn-link" 
+								tabindex="0"
+								@click="window.location.replace('/routing/genericUser/user_manager/')"
+							>志工時數查詢</a></li>
 						</ul> 
 					</div>
 				</div>
@@ -77,17 +74,13 @@
 					<div class="panel-heading" itemprop="name">服務使用者</div>
 					<div class="panel-body" itemprop="description">
 						<ul class="navigation">
-						    <li><a class="btn btn-link" 
+							<li><a class="btn btn-link" 
+								tabindex="0"
+								@click="window.location.replace('/routing/ebookSystem/book_repository_school/')"
+							>書籍快速下載</a></li>
+							<li><a class="btn btn-link" 
 								href="#"
-							>
-								書籍快速下載
-							</a></li>
-
-						    <li><a class="btn btn-link" 
-								href="#"
-							>
-								應用工具下載
-							</a></li>
+							>應用工具下載</a></li>
 						</ul>
 					</div>
 				</div>
@@ -97,35 +90,26 @@
 					<div class="panel-heading" itemprop="name">志工專區</div>
 					<div class="panel-body" itemprop="description">
 						<ul class="navigation">
-						    <li><a class="btn btn-link" 
-								href="#"
-							>
-								快速領書
-							</a></li>
-
-						    <li><a class="btn btn-link" 
-								href="#"
-							>
-								校對規則說明
-							</a></li>
-
 							<li><a class="btn btn-link" 
-								href="#"
-							>
-								服務時數說明
-							</a></li>
-
+								tabindex="0"
+								@click="window.location.replace('/routing/ebookSystem/service/')"
+							>快速領書</a></li>
 							<li><a class="btn btn-link" 
-								href="#"
-							>
-								帳號管理
-							</a></li>
-
+								tabindex="0"
+								@click="window.location.replace('/routing/about/proofread_rules/')"
+							>校對規則說明</a></li>
 							<li><a class="btn btn-link" 
-								href="#"
-							>
-								服務時數
-							</a></li>
+								tabindex="0"
+								@click="window.location.replace('/routing/about/service_hours_description/')"
+							>服務時數說明</a></li>
+							<li><a class="btn btn-link" 
+								tabindex="0"
+								@click="window.location.replace('/routing/genericUser/user_person/')"
+							>帳號管理</a></li>
+							<li><a class="btn btn-link" 
+								tabindex="0"
+								@click="window.location.replace('/routing/genericUser/serviceinfo_record/')"
+							>服務時數</a></li>
 						</ul>
 					</div>
 				</div>
