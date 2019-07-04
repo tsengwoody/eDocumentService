@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="ddm" class="tab-content" style="padding:20px 0px;">
 		<h2>法鼓山</h2>
 		<div id="ddm">
@@ -20,8 +20,8 @@
 		components: {
 			'file_manager': components['file_manager'],
 		},
-		mounted: function() {
-			document.title = '法鼓山';
+		metaInfo: {
+			title: '法鼓山',
 		},
 	}
 </script>

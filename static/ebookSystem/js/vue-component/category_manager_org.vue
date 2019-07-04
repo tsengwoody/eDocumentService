@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div :id="'category_manager' +org_id" class="container">
 		<h3>{|{ org.name }|}</h3>
 		<div class="row">
@@ -150,7 +150,7 @@
 			'tab': components['tab'],
 			'table-div': components['table-div'],
 		},
-		data: function(){
+		data(){
 			return {
 				user: user,
 				org: {},
@@ -185,7 +185,7 @@
 			}
 		},
 		computed: {
-			bookinfo_columns: function() {
+			bookinfo_columns(){
 				if(this.user.auth_guest){
 					return {
 						ISBN: "ISBN",
@@ -210,30 +210,24 @@
 				}
 			},
 		},
-		mounted: function () {
-			let self = this
-
-			self.clientg = new $.RestClient('/genericUser/api/');
-			self.clientg.add('organizations');
-			self.clientg.organizations.read(self.org_id)
-			.done(function(data) {
-				self.org = data
+		mounted(){
+			genericUserAPI.organizationRest.read(this.org_id)
+			.then(res => {
+				this.org = res.data;
 			})
-			.fail(function(xhr, result, statusText){
-				alertmessage('error', xhr.responseText)
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
 			})
-
-			self.clientb = new $.RestClient('/ebookSystem/api/');
-			self.clientb.add('booksimples');
-			self.clientb.add('categorys');
-			self.refresh();
+			this.clientb = new $.RestClient('/ebookSystem/api/');
+			this.clientb.add('booksimples');
+			this.clientb.add('categorys');
+			this.refresh();
 		},
 		methods: {
 			refresh: function(){
-				let self = this;
-				self.items = []
-				self.pointer = {};
-				self.model_info = {
+				this.items = []
+				this.pointer = {};
+				this.model_info = {
 					book_category_id: {
 						'label': '類別',
 						'type': 'select',
@@ -249,106 +243,101 @@
 						'type': 'text',
 					},
 				}
-				self.book_ISBN = '';
-				self.book_category_id = 0;
-				self.category_id = '';
-				self.category_name = '';
+				this.book_ISBN = '';
+				this.book_category_id = 0;
+				this.category_id = '';
+				this.category_name = '';
 
-				self.clientb.booksimples.read({'org_id': self.org_id, 'category_id': 'null'})
-				.done(function(data) {
+				ebookSystemAPI.bookSimpleRest.filter({'org_id': this.org_id, 'category_id': 'null'})
+				.then(res => {
 					let bookinfos = [];
-					_.each(data, function(v){
+					_.each(res.data, (v) => {
 						v.book_info['action'] = v.book_info['ISBN'],
 						bookinfos.push(v.book_info);
 					})
-					self.items.push({
+					this.items.push({
 						'id': 0,
 						'name': '未分類',
 						'book_list': bookinfos,
 					})
-					self.pointer = self.items[0]
+					this.pointer = this.items[0]
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 
-				self.clientb.categorys.read({'org_id': self.org_id})
-				.done(function(data) {
-					_.each(data, function(v){
+				ebookSystemAPI.categoryRest.filter({'org_id': this.org_id})
+				.then(res => {
+					_.each(res.data, (v) => {
 						let bookinfos = [];
-						_.each(v.book_set, function(v){
+						_.each(v.book_set, (v) => {
 							v.book_info['action'] = v.book_info['ISBN'],
 							bookinfos.push(v.book_info);
 						})
-						self.items.push({
+						this.items.push({
 							'id': v.id,
 							'name': v.name,
 							'book_list': bookinfos,
 						})
 
-						self.model_info['book_category_id'].choices.push({
+						this.model_info['book_category_id'].choices.push({
 							'value': v.id,
 							'display_name': v.name,
 						})
 
 					})
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
-			book_category_update: function(){
-				let self = this
-
-				param = {'category': self.book_category_id}
-				self.clientb.booksimples.updatepart(self.book_ISBN, param)
-				.done(function(data) {
+			book_category_update(){
+				param = {'category': this.book_category_id}
+				ebookSystemAPI.bookSimpleRest.partialupdate(this.book_ISBN, param)
+				.then(res => {
 					alertmessage('success', '書籍類別變更成功');
-					self.$refs['bcu' +self.org_id].close();
-					self.refresh();
+					this.$refs['bcu' +this.org_id].close();
+					this.refresh();
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
-			category_create: function () {
-				let self = this;
-				self.clientb.categorys.create({
-					'org': self.org_id,
-					'name': self.category_name,
+			category_create(){
+				ebookSystemAPI.categoryRest.create({
+					'org': this.org_id,
+					'name': this.category_name,
 				})
-				.done(function(data) {
+				.then(res => {
 					alertmessage('success', '類別新增成功');
-					self.$refs['cc' +self.org_id].close();
-					self.refresh();
+					this.$refs['cc' +this.org_id].close();
+					this.refresh();
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
-			category_update: function () {
-				let self = this;
-				self.clientb.categorys.updatepart(self.category_id, {'name': self.category_name})
-				.done(function(data) {
+			category_update(){
+				ebookSystemAPI.categoryRest.partialupdate(this.category_id, {'name': this.category_name})
+				.then(res => {
 					alertmessage('success', '類別名稱變更成功');
-					self.$refs['cu' +self.org_id].close();
-					self.refresh();
+					this.$refs['cu' +this.org_id].close();
+					this.refresh();
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
-			category_delete: function(item){
-				let self = this
+			category_delete(item){
 				alertconfirm('確認刪除類別:' +item.name)
-				.done(function(){
-					self.clientb.categorys.del(item.id)
-					.done(function(data) {
+				.done(() => {
+					ebookSystemAPI.categoryRest.delete(item.id)
+					.then(res => {
 						alertmessage('success', '成功刪除類別:' +item.name)
-						self.refresh()
+						this.refresh()
 					})
-					.fail(function(xhr, result, statusText){
-						alertmessage('error', xhr.responseText)
+					.catch(res => {
+						alertmessage('error', o2j(res.response.data));
 					})
 				})
 			},

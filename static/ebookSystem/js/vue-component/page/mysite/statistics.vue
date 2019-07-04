@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h2>{|{ title }|}</h2>
 		<div class="form-horizontal" style="margin: 1em 0;">
@@ -30,7 +30,7 @@
 		components: {
 			'statistics': components['statistics'],
 		},
-		data: function(){
+		data(){
 			return {
 				orgs: [],
 				org_id: 'all',
@@ -38,41 +38,34 @@
 				url: '',
 			}
 		},
-		created: function () {
-			this.clientg = new $.RestClient('/genericUser/api/');
-			this.clientg.add('organizations');
-		},
-		mounted: function () {
-			let self = this
-
-			self.clientg.organizations.read()
-			.done(function(data) {
-				_.each(data, function(v){
-					self.orgs.push({
+		mounted(){
+			genericUserAPI.organizationRest.list()
+			.then(res => {
+				this.orgs = [],
+				_.each(res.data, (v) => {
+					this.orgs.push({
 						'id': v.id,
 						'name': v.name,
 					})
 				})
 			})
-			.fail(function(xhr, result, statusText){
-				alertmessage('error', xhr.responseText)
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
 			})
 
-			let page = window.location.pathname.split('/')
-			page = page[page.length-2]
+			let page = window.location.pathname.split('/');
+			page = page[page.length-2];
 			if(page==='book_download'){
-				self.title = '統計書籍下載'
+				this.title = '統計書籍下載';
 			}
 			else if(page==='user_download'){
-				self.title = '統計使用者下載'
+				this.title = '統計使用者下載';
 			}
 			else if(page==='user_editrecord'){
-				self.title = '統計使用者校對'
+				this.title = '統計使用者校對';
 			}
-			document.title = self.title
-			self.url = '/api/statistics/' +page +'/'
-		},
-		methods: {
+			this.url = '/api/statistics/' +page +'/';
+			document.title = this.title;
 		},
 	}
 </script>

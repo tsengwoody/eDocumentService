@@ -68,7 +68,7 @@
 		components: {
 			'table-div': components['table-div'],
 		},
-		data: function() {
+		data(){
 			return {
 				edit_ebook_header: {
 					document: '文件',
@@ -92,15 +92,14 @@
 			}
 		},
 		computed: {
-			org: function () {
+			org(){
 				let org = {}
-				console.log('YAA')
-				this.clientg.organizations.read(this.org_id)
-				.done(function(data) {
-					org = data
+				genericUserAPI.organizationRest.read(this.org_id)
+				.then(res => {
+					org = res.data;
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 				return org
 			},
@@ -110,31 +109,18 @@
 				this.refresh()
 			},*/
 		},
-		created: function () {
-			this.clientg = new $.RestClient('/genericUser/api/');
-			this.clientg.add('organizations');
-			this.clientb = new $.RestClient('/ebookSystem/api/');
-			this.clientb.add('ebooks');
-			this.clientb.add('categorys');
-			this.clientb.ebooks.addVerb('service', 'POST', {
-				'url': 'action/service/',
-			})
-		},
-		mounted: function () {
-			document.title = '一般校對';
-			let self = this
-			if(self.org_id==1&&self.choice_org){
-				self.org_id = 0;
+		mounted(){
+			if(this.org_id==1&&this.choice_org){
+				this.org_id = 0;
 			}
-			self.get_org_category()
-			self.refresh()
+			this.get_org_category()
+			this.refresh()
 		},
 		methods: {
-			get_org_category: function(){
-				let self = this
-				self.clientg.organizations.read()
-				.done(function(data) {
-					_.each(data, function(o){
+			get_org_category(){
+				genericUserAPI.organizationRest.list()
+				.then(res => {
+					_.each(res.data, (o) => {
 						// org 為 1 屬特殊情形，是一般版使用，故在選擇列表內不顯示
 						if(o.id==1){
 							return -1;
@@ -145,9 +131,9 @@
 							'categorys': [],
 						}
 
-						self.clientb.categorys.read({'org_id': o.id})
-						.done(function(data) {
-							_.each(data, function(c){
+						ebookSystemAPI.categoryRest.filter({'org_id': o.id})
+						.then(res => {
+							_.each(res.data, (c) => {
 								let temp = {
 									'id': c.id,
 									'name': c.name,
@@ -155,34 +141,30 @@
 								org_category.categorys.push(temp)
 							})
 						})
-						.fail(function(xhr, result, statusText){
-							alertmessage('error', xhr.responseText)
+						.catch(res => {
+							alertmessage('error', o2j(res.response.data));
 						})
-						self.org_categorys.push(org_category)
+						this.org_categorys.push(org_category)
 					})
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 
 			},
-			refresh: function () {
-				// run ajax get data
-				let self = this;
-				self.clear();
-
-				if(self.org_id===0){
+			refresh(){
+				if(this.org_id===0){
 					query = {'editor_id': user.id, 'status': '2'}
 				}
 				else {
-					query = {'editor_id': user.id, 'status': '2', 'org_id': self.org_id}
+					query = {'editor_id': user.id, 'status': '2', 'org_id': this.org_id}
 				}
 
-				self.clientb.ebooks.read(query)
-				.done(function(data) {
-					_.each(data,function(v){
-
-						self.edit_ebook.push({
+				ebookSystemAPI.ebookRest.filter(query)
+				.then(res => {
+					this.edit_ebook = [];
+					_.each(res.data, (v) => {
+						this.edit_ebook.push({
 							document: v['bookname'] +v['part'],
 							page: v.edited_page+1 +'/50',
 							get_date: v.get_date,
@@ -193,17 +175,18 @@
 					})
 				})
 
-				if(self.org_id===0){
+				if(this.org_id===0){
 					query = {'editor_id': user.id, 'status': '3'}
 				}
 				else {
-					query = {'editor_id': user.id, 'status': '3', 'org_id': self.org_id}
+					query = {'editor_id': user.id, 'status': '3', 'org_id': this.org_id}
 				}
 
-				self.clientb.ebooks.read(query)
-				.done(function(data) {
-					_.each(data,function(v){
-						self.finish_ebook.push({
+				ebookSystemAPI.ebookRest.filter(query)
+				.then(res => {
+					this.finish_ebook = [];
+					_.each(res.data, (v) => {
+						this.finish_ebook.push({
 							document: v['bookname'] +v['part'],
 							service_hours: v.service_hours,
 							get_date: v.get_date,
@@ -213,68 +196,57 @@
 					})
 				})
 			},
-			get_ebook: function () {
-				let self = this;
-
-				self.clientb.ebooks.service({
-					'org_id': self.org_id,
-					'category_id': self.category_id,
+			get_ebook(){
+				ebookSystemAPI.ebookAction.service({
+					'org_id': this.org_id,
+					'category_id': this.category_id,
 				})
-				.done(function(data) {
-					const ebook = data.data;
-					alertmessage('success', '成功取得文件：' +ebook.bookname +ebook.part)
-					.done(function () {
-						self.refresh();
+				.then(res => {
+					alertmessage('success', '成功取得文件：' +res.data.data.bookname +res.data.data.part)
+					.done(() => {
+						this.refresh();
 					})
 				})
-				.fail(function(xhr, result, statusText){
-					data = j2o(xhr.responseText)
-					if (data.hasOwnProperty('detail')){
-						alertmessage('error', data['detail'])
-					}
-					else {
-						alertmessage('error', xhr.responseText)
-					}
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
-
 			},
-			reback_ebook: function (ISBN_part) {
-				let self = this;
-
+			reback_ebook(pk){
 				alertconfirm('還文件後該文件將提供其他校對者領取，且無法獲得校對時數，是否確定還文件?')
-				.done(function(){
-					rest_aj_send('post', '/ebookSystem/api/ebooks/' +ISBN_part +'/action/change_status/', {'direction': '-1', 'status': 'active'})
-					.done(function(data) {
-						const ebook = data['data'].data;
-						alertmessage('success', '成功歸還文件：' +ebook.bookname +ebook.part)
-						.done(function () {
-							self.refresh();
+				.done(() => {
+					ebookSystemAPI.ebookAction.changeStatus({
+						pk: pk,
+						direction: '-1',
+						status: 'active'
+					})
+					.then(res => {
+						alertmessage('success', '成功歸還文件：' +res.data.data.bookname +res.data.data.part)
+						.done(() => {
+							this.refresh();
 						})
 					})
-					.fail(function(data){
-						alertmessage('error', data['message'])
+					.catch(res => {
+						alertmessage('error', o2j(res.response.data));
 					})
-				})
-			},
-			reedit_ebook: function (ISBN_part) {
-				let self = this;
 
-				rest_aj_send('post', '/ebookSystem/api/ebooks/' +ISBN_part +'/action/change_status/', {'direction': '-1', 'status': 'edit'})
-				.done(function(data) {
-					const ebook = data['data'].data;
-					alertmessage('success', '成功再編輯文件：' +ebook.bookname +ebook.part)
-					.done(function () {
-						self.refresh();
-					})
-				})
-				.fail(function(data){
-					alertmessage('error', data['message'])
 				})
 			},
-			clear: function () {
-				this.edit_ebook = [];
-				this.finish_ebook = [];
-				this.category_id='all'
+			reedit_ebook(pk){
+				ebookSystemAPI.ebookAction.changeStatus({
+					pk: pk,
+					direction: '-1',
+					status: 'edit'
+				})
+				.then(res => {
+					alertmessage('success', '成功再編輯文件：' +res.data.data.bookname +res.data.data.part)
+					.done(() => {
+						this.refresh();
+					})
+				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
+
 			},
 		},
 	}

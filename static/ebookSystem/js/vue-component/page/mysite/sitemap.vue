@@ -26,8 +26,10 @@
 				'items': [],
 			}
 		},
+		metaInfo: {
+			title: '網站導覽',
+		},
 		mounted(){
-			document.title = '網站導覽'
 
 			mode = localStorage.getItem('nav_mode');
 

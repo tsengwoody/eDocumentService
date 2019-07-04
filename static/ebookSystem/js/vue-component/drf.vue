@@ -78,21 +78,15 @@
 	module.exports = {
 		props: ['model_info', 'keys', 'value', 'mode',],
 		methods: {
-			value2display_name: function (value, choices) {
+			value2display_name(value, choices) {
 				display_name = value
-				_.each(choices, function(v){
+				_.each(choices, (v) => {
 					if(v['value'] === value){
 						display_name = v['display_name']
 					}
 				})
 				return display_name
 			},
-		},
-		created() {
-
-		},
-		mounted () {
-
 		},
 	}
 </script>
