@@ -6,9 +6,7 @@ import uuid
 
 from django.core.cache import cache
 from django.shortcuts import render
-from django.utils import timezone
 from .models import *
-from utils.decorator import *
 
 #logging config
 import logging
@@ -24,14 +22,10 @@ fh.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(fh)
 
-@http_response
 def generics(request, name, pk=None):
 	template_name='ebookSystem/{0}.html'.format(name.split('/')[0])
-	return locals()
+	return render(request, template_name, {})
 
-#==========
-
-@http_response
 def library_view(request, template_name='ebookSystem/library_view.html'):
 	if request.method == 'GET':
 		if not request.user.is_guest:
@@ -45,9 +39,8 @@ def library_view(request, template_name='ebookSystem/library_view.html'):
 		path = '/library_epub/' +str(lr.id) +'/' +token
 		#path = '/ebookSystem/api/libraryrecords/{0}/resource/source/epub'.format(str(lr.id))
 		base64_path = base64.b64encode(path)
-		return locals()
+	return render(request, template_name, locals())
 
-@http_response
 def library_origin_view(request, template_name='ebookSystem/library_origin_view.html'):
 	if request.method == 'GET':
 		if not request.user.is_guest:
@@ -76,4 +69,4 @@ def library_origin_view(request, template_name='ebookSystem/library_origin_view.
 		cache.set('token.' +str(request.user.id), token, 10)
 		path = '/library_origin_epub/' +book.ISBN +'/' +token
 		base64_path = base64.b64encode(path)
-		return locals()
+	return render(request, template_name, locals())
