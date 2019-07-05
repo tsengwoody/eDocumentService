@@ -66,16 +66,6 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 		serializer.save()
 
-	@action(
-		detail=False,
-		methods=['post'],
-		permission_classes=[AllowAny,],
-		url_name='authenticate',
-		url_path='action/authenticate',
-	)
-	def authenticate(self, request, pk=None):
-		return 1
-
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = None
 		if dir == 'disability_card':
@@ -96,7 +86,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res = {}
 
 		from django.contrib.auth import authenticate as auth
-		user = auth(username=request.POST['username'], password=request.POST['password'])
+		user = auth(username=request.data['username'], password=request.data['password'])
 		if user is None:
 			res['detail'] = u'失敗使用者驗證'
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
