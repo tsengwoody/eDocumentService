@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="row" id="id_ebook_image">
 		<div id="imagePage" :class="imageClass" style="margin-bottom: 1em; padding-bottom: 1em;">
 			<viewer ref="viewer" 
@@ -130,14 +130,13 @@
 			'editor': Editor,
 			'viewer': components['viewer'],
 		},
-		data: function() {
+		data(){
 			return {
 				pk: null,
 				old_edited_page: 0,
 				edited_page: 0,
 				image: {},
 				imgSize: 100,
-
 				idel_min: 0,
 				change_count: 0,
 				current_editrecord: {},
@@ -145,21 +144,20 @@
 				imageClass: 'col-md-6 col-sm-12',
 				old_position: {},
 				new_position: {},
-
 				isMousedown: false,
 				viewerHeight: 455,
 				editorHeight: 400,
 			}
 		},
 		computed: {
-			tinymce_init: function() {
+			tinymce_init(){
 				const self = this;
 				return {
 					forced_root_block: "",
 					force_br_newlines: false,
 					force_p_newlines: false,
 					selector: 'editor',  // change this value according to your HTML
-					toolbar1: '標記 | 載入全文  | 存檔 | 完成 | 關閉 | 切換版型 | 下載原始文字檔',
+					toolbar1: '標記 | 載入全文  | 存檔 | 完成 | 關閉 | 切換版型 | 還原校對內容',
 					toolbar2: 'undo redo | cut copy paste | bullist numlist | table | searchreplace | fontsizeselect ',
 					fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt',
 					menubar: false,
@@ -308,10 +306,9 @@
 							icon: false,
 							onclick: function () {
 								alertconfirm('是否確定離開?')
-								.done(function(){
+								.done(() => {
 									window.location.href = '/routing/ebookSystem/service/';
 								})
-
 							}
 						});
 
@@ -333,37 +330,38 @@
 							}
 						});
 
-						editor.addButton('下載原始文字檔', {
-							text: '下載原始文字檔',
-							name: 'downloadrawtext',
+						editor.addButton('還原校對內容', {
+							text: '還原校對內容',
+							name: 'recover_content',
 							icon: false,
 							onclick: function () {
-
-								//isbnpart
 								let href = window.location.href;
 								let s = sep(href, '/');
-								let isbnpart = s.pop();
+								let pk = s.pop();
 
-								let url = '/ebookSystem/api/ebooks/' + isbnpart + '/resource/OCR/origin';
+								alertconfirm('是否確定還原校對內容，執行後現有的校對資料將被還原?')
+								.done(() => {
+									ebookSystemAPI.ebookAction.recoverContent({pk,})
+									.then(res => {
+										alertmessage('success', res.data['detail'])
+										self.reloadPage()
+									})
+									.catch(res => {
+										alertmessage('error', o2j(res.response.data));
+									})
 
-								//aj_text
-								aj_text(url,{})
-								.done(function(){
-									alertmessage('success', '成功提交下載原始文字檔');
+
 								})
+
 							}
 						});
 
 					},
 					plugins: ['save table searchreplace'],
 				}
-			}
+			},
 		},
-		created: function() {
-			const url = window.location.pathname;
-			const urlList = url.split('/');
-			this.pk = urlList[urlList.length-2];
-
+		created(){
 			const preEditorHeight = localStorage.getItem("book_editor_height");
 			const preViewerHeight = localStorage.getItem("viewer_height");
 			if (preEditorHeight) {
@@ -373,14 +371,14 @@
 				this.viewerHeight = Math.round(preViewerHeight);
 			}
 		},
-		mounted: function() {
-			const self = this;
-			self.reloadPage();
-
-			self.recordPerMins();
-			setInterval(function () {
-				self.recordPerMins();
-				self.detectIdel();
+		mounted(){
+			const urlList = window.location.pathname.split('/');
+			this.pk = urlList[urlList.length-2];
+			this.reloadPage();
+			this.recordPerMins();
+			setInterval(() => {
+				this.recordPerMins();
+				this.detectIdel();
 			}, 60000);
 
 			window.addEventListener("beforeunload", beforeunloadFun);
@@ -389,28 +387,26 @@
 			window.removeEventListener("beforeunload", beforeunloadFun);
 		},
 		methods: {
-			reloadPage: function() {
-				const self = this;
-				$.when(
-					rest_aj_send('get', '/ebookSystem/api/ebooks/' + self.pk + '/'),
-					rest_aj_send('get', '/ebookSystem/api/ebooks/' + self.pk + '/action/edit/')
-				)
-				.done(function(data1, data2) {
-					self.image = data1.data.scan_image;
-					self.old_edited_page = data1.data.edited_page;
-					self.edited_page = data1.data.edited_page;
-
-					const bookName = data1.data.bookname;
-					const part = data1.data.ISBN_part.split('-')[1];
+			reloadPage(){
+				Promise.all([
+					ebookSystemAPI.ebookRest.read(this.pk),
+					ebookSystemAPI.ebookAction.readEdit({pk: this.pk}),
+				])
+				.then(res => {
+					this.image = res[0].data.scan_image;
+					this.old_edited_page = res[0].data.edited_page;
+					this.edited_page = res[0].data.edited_page;
+					const bookName = res[0].data.bookname;
+					const part = res[0].data.ISBN_part.split('-')[1];
 					document.title = '編輯' + bookName + '-part' + part;
 
-					self.current_editrecord = {
-						finish: data2.data.finish,
-						edit: data2.data.edit,
+					this.current_editrecord = {
+						finish: res[1].data.finish,
+						edit: res[1].data.edit,
 					};
 				})
 			},
-			changePage: function(value) {
+			changePage(value){
 				this.edited_page = value;
 			},
 			recordPerMins: function() {
@@ -427,7 +423,7 @@
 					self.change_count = 0;
 				})
 			},
-			detectIdel: function() {
+			detectIdel(){
 				// 每 60s 計算使用者閒置時間
 				if (this.idel_min > 30) {
 					this.idel_min = 0;
@@ -436,11 +432,11 @@
 				}
 				this.idel_min++;
 			},
-			editorChange: function() {
+			editorChange(){
 				this.idel_min = 0;
 				this.change_count++;
 			},
-			startAdjustHeight: function(e) {
+			startAdjustHeight(e){
 				e.preventDefault();
 
 				this.isMousedown = true;
@@ -449,7 +445,7 @@
 				document.addEventListener('mousemove', this.movingHeight)
 				document.addEventListener('mouseup', this.endAdjustHeight)
 			},
-			movingHeight: function(e) {
+			movingHeight(e){
 				e.preventDefault();
 				this.new_postion = {x: e.clientX, y: e.clientY};
 
@@ -459,7 +455,7 @@
 					this.old_position = {x: e.clientX, y: e.clientY};
 				}
 			},
-			endAdjustHeight: function() {
+			endAdjustHeight(){
 				this.isMousedown = false;
 
 				this.$emit('updateHeight');

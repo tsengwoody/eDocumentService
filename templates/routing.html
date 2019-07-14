@@ -29,6 +29,7 @@
 			eds_footer: components['eds_footer'],
 		},
 		data: {
+			mode: 'all',
 		},
 		computed: {
 			...mapState({
@@ -45,6 +46,15 @@
 				id: {{ request.user.id }},
 			});
 			{% endif %}
+
+			mode = localStorage.getItem('nav_mode');
+			if(!mode) {
+				this.mode = 'all'
+			}
+			else {
+				this.mode = mode
+			}
+
 		},
 	});
 //})

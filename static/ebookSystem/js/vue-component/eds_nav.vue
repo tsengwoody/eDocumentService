@@ -1,11 +1,11 @@
 <template>
 	<div>
 		<eds_nav_all
-			v-if="mode==='all'"
+			v-if="$root.mode==='all'"
 			v-on:mode-change="mode_change('self')"
 		></eds_nav_all>
 		<eds_nav_self
-			v-if="mode==='self'"
+			v-if="$root.mode==='self'"
 			v-on:mode-change="mode_change('all')"
 		></eds_nav_self>
 	</div>
@@ -19,19 +19,9 @@
 		},
 		data(){
 			return {
-				'mode': 'all', //all, self
 			}
 		},
 		mounted(){
-			mode = localStorage.getItem('nav_mode');
-
-			if(!mode) {
-				this.mode = 'all'
-			}
-			else {
-				this.mode = mode
-			}
-
 		},
 		methods: {
 			mode_change(mode){

@@ -29,9 +29,7 @@ def generics(request, name, pk=None):
 def library_view(request, template_name='ebookSystem/library_view.html'):
 	if request.method == 'GET':
 		if not request.user.is_guest:
-			status = 'error'
-			message = ''
-			return locals()
+			return render(request, template_name, locals())
 		lr = LibraryRecord.objects.get(id=request.GET['ISBN'])
 
 		token = uuid.uuid4().hex
@@ -46,7 +44,7 @@ def library_origin_view(request, template_name='ebookSystem/library_origin_view.
 		if not request.user.is_guest:
 			status = 'error'
 			message = ''
-			return locals()
+			return render(request, template_name, locals())
 		book = Book.objects.get(ISBN=request.GET['ISBN'])
 		if not book.status == book.STATUS['final']:
 			final_epub = book.path +'/OCR/{0}.epub'.format(book.ISBN)

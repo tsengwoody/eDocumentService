@@ -1,18 +1,11 @@
 ﻿# coding: utf-8
-from django.contrib.auth import (login as auth_login, logout as auth_logout, update_session_auth_hash, authenticate,)
-from django.core.urlresolvers import reverse, resolve
-from django.http import HttpResponse,HttpResponseRedirect
+from django.contrib.auth import (login as auth_login, logout as auth_logout)
 from django.shortcuts import render
-from django.utils import timezone
-from ebookSystem.models import *
-from genericUser.models import *
-from utils.decorator import *
-from utils.other import *
-from mysite.settings import BASE_DIR
 
 import base64
 import datetime
 import json
+import os
 
 #logging config
 import logging
@@ -28,58 +21,54 @@ fh.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(fh)
 
-@http_response
 def routing(request, name):
 	app = name.split('/')[0]
 	page = name.split('/')[1]
 	component_page = '<{0}></{0}>'.format(page)
 	template_name='routing.html'
-	return locals()
+	return render(request, template_name, locals())
 
-@http_response
 def generics(request, name, pk=None):
 	template_name='mysite/{0}.html'.format(name.split('/')[0])
-	return locals()
+	return render(request, template_name, locals())
 
-@http_response
 def epub_view(request, path, template_name='mysite/epub_view.html'):
-		#path = '/file/' +path.encode('utf8')
-		path = '/api/ddm/resource/107/' +path.encode('utf8')
-		base64_path = base64.b64encode(path)
-		return locals()
+	#path = '/file/' +path.encode('utf8')
+	path = '/api/ddm/resource/107/' +path.encode('utf8')
+	base64_path = base64.b64encode(path)
+	return render(request, template_name, locals())
 
-@http_response
 def dev(request, name, pk=None):
 	template_name='dev/{0}.html'.format(name.split('/')[0])
-	status = 'success'
-	message = ''
-	return locals()
+	return render(request, template_name, locals())
 
-@http_response
-def about(request, name):
-	template_name='about/{0}.html'.format(name)
-	return locals()
-
-@http_response
-def home(request, template_name='home.html'):
+def home(request, template_name='routing.html'):
 	app = 'mysite'
 	page = 'home'
-	component_page = '<{0}></{0}>'.format(page)
-	template_name='routing.html'
-	return locals()
+	return render(request, template_name, locals())
+
+def generic(request, template_name='routing.html'):
+	app = 'mysite'
+	page = 'generic'
+	return render(request, template_name, locals())
+
+def school(request, template_name='routing.html'):
+	app = 'mysite'
+	page = 'school'
+	return render(request, template_name, locals())
 
 def logout_user(request, template_name='genericUser/logged_out.html'):
 	auth_logout(request)
 	return render(request, template_name, locals())
 
-from utils.decorator import *
-
-@http_response
 def statistics(request, template_name='mysite/statistics.html'):
 	if request.method == 'POST':
-		return locals()
+		return render(request, template_name, locals())
 	if request.method == 'GET':
 		from utils.other import month_gen
+		from ebookSystem.models import Book
+		from genericUser.models import User
+
 		month_list = month_gen(count=5)
 		month_list.insert(0, datetime.datetime.today())
 		result = []
@@ -105,4 +94,4 @@ def statistics(request, template_name='mysite/statistics.html'):
 			))
 		month = datetime.date.today() -datetime.timedelta(days=30)
 		active_editor_list = User.objects.filter(is_editor=True, last_login__gt=month)
-		return locals()
+		return render(request, template_name, locals())

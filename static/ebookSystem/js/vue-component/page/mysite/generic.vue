@@ -1,10 +1,10 @@
 ﻿<template>
 	<div>
 		<home_all
-			v-if="mode==='all'"
+			v-if="$root.mode==='all'"
 		></home_all>
 		<home_self
-			v-if="mode==='self'"
+			v-if="$root.mode==='self'"
 		></home_self>
 	</div>
 </template>
@@ -23,17 +23,8 @@
 			title: '首頁',
 		},
 		mounted(){
-			mode = localStorage.getItem('nav_mode');
-			if (!mode) {
-				this.mode = 'all'
-			}
-			else {
-				this.mode = mode
-			}
-		},
-		computed: {
-		},
-		methods: {
+			this.$root.mode = 'all';
+			localStorage.setItem('nav_mode', this.$root.mode);
 		},
 	}
 </script>
