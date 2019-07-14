@@ -2,6 +2,7 @@
 	<div>
 			<form-drf 
 				:model_info="model_info.old_password"
+				:input-class="'col-sm-5'"
 				:field="'old_password'"
 				:offset-class="'col-sm-offset-3'"
 				v-model="old_password"
@@ -10,6 +11,7 @@
 
 			<form-drf 
 				:model_info="model_info.new_password1"
+				:input-class="'col-sm-5'"
 				:field="'new_password1'"
 				:offset-class="'col-sm-offset-3'"
 				v-model="new_password1"
@@ -18,6 +20,7 @@
 
 			<form-drf 
 				:model_info="model_info.new_password2"
+				:input-class="'col-sm-5'"
 				:field="'new_password2'"
 				:offset-class="'col-sm-offset-3'"
 				v-model="new_password2"
@@ -67,9 +70,6 @@
 				})
 				.done(function(data) {
 					alertmessage('success', '成功修改密碼')
-					//.done(function() {
-						//window.location.replace('/genericUser/generics/login/')
-					//})
 				})
 				.fail(function(xhr, result, statusText){
 					alertmessage('error', '失敗修改密碼')

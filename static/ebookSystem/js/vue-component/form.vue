@@ -82,6 +82,7 @@
 			model_info: Object,
 			field: String,
 			value: [String, Boolean],
+			
 			offsetClass: {
 				type: String,
 				default: '',

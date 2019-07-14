@@ -1,4 +1,4 @@
-﻿<template>
+<template>
 	<div id="user_person">
 		<h2>個人資料</h2>
 		<div class="form-horizontal">
@@ -10,8 +10,10 @@
 							<div class="likebtn">{|{ value }|}</div>
 							<span class="input-group-btn">
 								<button class="btn btn-success" disabled v-if="auth_email">已驗證</button>
-								<button class="btn btn-warning" v-else
-										@click="user_getOTP(userID, 'email')"
+								<button 
+									v-else
+									class="btn btn-warning"
+									@click="openDialog('emailOTP', this)"
 								>未驗證</button>
 							</span>
 						</div>
@@ -25,8 +27,10 @@
 							<div class="likebtn">{|{ value }|}</div>
 							<span class="input-group-btn">
 								<button class="btn btn-success" disabled v-if="auth_phone">已驗證</button>
-								<button class="btn btn-warning" v-else
-										@click="user_getOTP(userID, 'phone')"
+								<button 
+									v-else
+									class="btn btn-warning"
+									@click="openDialog('phoneOTP', this)"
 								>未驗證</button>
 							</span>
 						</div>
@@ -42,7 +46,9 @@
 			<div class="form-group">
 				<label class="control-label col-sm-2"></label>
 				<div class="col-sm-7">
-					<button class="btn btn-primary" @click="usermodel(userID)">變更使用者資訊</button>
+					<button class="btn btn-primary" @click="usermodel(userID)">變更使用者資訊old</button>
+					<button class="btn btn-primary" @click="openDialog('userModal', this)">變更使用者資訊new</button>
+
 					<button
 						class="btn btn-primary"
 						@click="openDialog('spm', this);"
@@ -63,7 +69,25 @@
 				</div>
 			</div>
 		</div>
-		<modal :id_modal="'spm'">
+
+		<modal :id_modal="'userModal'" ref="userModal">
+			<template slot="header">
+				<h4 class="modal-title">變更使用者資訊</h4>
+			</template>   
+			<template slot="body">
+				<div class="form-horizontal">
+					<set_usermodel :userdata="filter_data" ref="usermodel"></set_usermodel>
+				</div>
+			</template>
+			<template slot="footer">
+				<button class="btn btn-default"
+					onclick="closeDialog(this)"
+					@click="change_usermodel"
+				>送出</button>
+			</template>
+		</modal>
+
+		<modal :id_modal="'spm'" :size="'normal'">
 			<template slot="header">
 				<h4 class="modal-title">修改密碼</h4>
 			</template>   
@@ -92,7 +116,7 @@
 				<button onclick="closeDialog(this)" class="btn btn-default" data-dismiss="modal">關閉</button>
 			</template>
 		</modal>
-		<modal :id_modal="'fs'" :ref="'fs'">
+		<modal :id_modal="'fs'" :ref="'fs'" :size="'normal'">
 			<template slot="header">
 				<h4 class="modal-title">字體大小設定</h4>
 			</template>
@@ -104,6 +128,81 @@
 					<button class="font-size-down" @click="downFontSize">縮小</button>
 					<span class="font-size-ratio">{|{ fontSizeRatio }|}</span>
 				</div>
+			</template>
+		</modal>
+
+		<modal :id_modal="'phoneOTP'" :ref="'phoneOTP'" :size="'normal'">
+			<template slot="header">
+				<h4 class="modal-title">手機驗證碼</h4>
+			</template>
+			<template slot="body">
+				<div class="form-horizontal" style="margin-top: 1rem;">			
+					<div class="form-group">				
+						<label class="control-label col-sm-2" for="phone_OTP_verification"><font style="color:red">*</font><span>驗證碼</span></label>			
+						<div class="col-sm-4">				
+							<input id="phone_OTP_verification" name="verification_code" class="form-control" type="text" v-model="verification_code">				
+						</div>				
+						<button
+							class="btn btn-primary" 
+							@click="verifyOTP('phone')"
+						>送出驗證碼
+						</button>				
+						<button 
+							class="btn btn-primary" 
+							:disabled="!isAllowedGetOTP" 
+							@click="getOTP('phone')"
+						>取得驗證碼
+							<template v-if="!isAllowedGetOTP">
+								<span class="badge">{|{ finalCounts }|}</span>
+							</template>
+						</button>				
+						<span v-if="!isAllowedGetOTP">已傳送</span>
+					</div>
+				</div>
+			</template>
+			<template slot="footer">
+				<button class="btn btn-default"
+					onclick="closeDialog(this)" 
+					@click="resetOTP"
+				>關閉</button>
+			</template>
+		</modal>
+
+		<modal :id_modal="'emailOTP'" :ref="'emailOTP'" :size="'normal'">
+			<template slot="header">
+				<h4 class="modal-title">信箱驗證碼</h4>
+			</template>
+			<template slot="body">
+				<div class="form-horizontal" style="margin-top: 1rem;">			
+					<div class="form-group">				
+						<label class="control-label col-sm-2" for="email_OTP_verification"><font style="color:red">*</font><span>驗證碼</span></label>				
+						<div class="col-sm-4">				
+							<input id="email_OTP_verification" name="verification_code" class="form-control" type="text" v-model="verification_code">				
+						</div>				
+						<button 
+							class="btn btn-primary" 
+							@click="verifyOTP('email')"
+						>送出驗證碼
+						</button>				
+						<button 
+							class="btn btn-primary" 
+							:disabled="!isAllowedGetOTP" 
+							@click="getOTP('email')"
+						>取得驗證碼
+							<template v-if="!isAllowedGetOTP">
+								<span class="badge">{|{ finalCounts }|}</span>
+							</template>
+						</button>				
+						<span v-if="!isAllowedGetOTP">已傳送</span>
+					</div>
+				</div>
+			</template>
+			<template slot="footer">
+				<button 
+					class="btn btn-default"
+					onclick="closeDialog(this)" 
+					@click="resetOTP"
+				>關閉</button>
 			</template>
 		</modal>
 	</div>
@@ -127,6 +226,7 @@
 			'disabilitycard': components['disabilitycard'],
 			'modal': components['modal'],
 			'set_password': components['set_password'],
+			'set_usermodel': components['set_usermodel'],
 		},
 		data(){
 			return {
@@ -159,6 +259,9 @@
 				auth_phone: user.auth_phone,
 				newRatio: '',
 				percentageIndex: 0,
+				isAllowedGetOTP: true,
+				verification_code: '',
+				finalCounts : 600,
 			}
 		},
 		metaInfo: {
@@ -179,9 +282,12 @@
 			this.percentageIndex = percentage.indexOf(fontClass);
 		},
 		methods: {
-			change_password(){
+			change_password() {
 				this.$refs.spm.set_password(user.id);
 				closeDialog(this.$refs.spm);
+			},
+			change_usermodel() {
+				this.$refs.usermodel.updateUserInfo(user.id);
 			},
 			upFontSize() {
 				if (this.percentageIndex < percentage.length -1) {
@@ -203,11 +309,49 @@
 				this.newRatio =  percentage[ this.percentageIndex ];
 				document.querySelector('body').className = this.newRatio;
 				localStorage.setItem('fontSize', this.newRatio);
+			},
+			getOTP(type) {
+				const url = '/genericUser/api/users/' + this.userID +'/action/verify/';
+				rest_aj_send('post', url, {'generate': type})
+				.done((data, textStatus, xhr) => {
+					alertmessage('success', data['message']);
+					this.isAllowedGetOTP = false;
+
+					let timer = setInterval(() => {
+	                    if (this.finalCounts === 0) {
+	                    	this.isAllowedGetOTP = true;
+	                    	this.finalCounts = 600;
+	                    	clearInterval(timer);	// stop setInterval
+	                    }
+	                    this.finalCounts -= 1;
+	                }, 1000);
+				})
+				.fail((data) => {
+					alertmessage('error', data['message']);
+				})
+			},
+			verifyOTP(type) {
+				console.log({ verification_code: this.verification_code, type });
+				const url = '/genericUser/api/users/' + this.userID +'/action/verify/';
+				rest_aj_send('post', url, { verification_code: this.verification_code, type } )
+				.done((data, textStatus, xhr) => {
+					// alertmessage('success', '已驗證完成');
+					alertmessage('success', data['message'])
+						.done(function () {
+							location.reload(); //重新載入網頁以更新資訊
+						});
+				})
+				.fail((data) => {
+					// alertmessage('error', '請重新確認驗證碼');
+					alertmessage('error', data['message']);
+				})
+			},
+			resetOTP() {
+	            this.verification_code = '';
 			}
 		},
 		computed: {
 			fontSizeRatio() {
-				console.log(typeof this.newRatio);
 				return this.newRatio.substr(12) - 90;
 			}
 		}
