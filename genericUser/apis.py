@@ -206,7 +206,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	def verify(self, request, pk=None):
 		res = {}
 		obj = self.get_object()
-		if request.POST.has_key('generate') and request.POST['generate'] == 'email':
+		if request.data['type'] == 'email' and request.data['action'] == 'generate':
 			if not cache.has_key(obj.email):
 				import random
 				import string
@@ -220,7 +220,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[obj.email])
 			email.send(fail_silently=False)
 			res['detail'] = u'已寄送到您的電子信箱'
-		elif request.POST.has_key('generate') and request.POST['generate'] == 'phone':
+		elif request.data['type'] == 'phone' and request.data['action'] == 'generate':
 			if not cache.has_key(request.user.phone):
 				import random
 				import string
@@ -239,11 +239,11 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			else:
 				res['detail'] = u'請確認手機號碼是否正確或聯絡系統管理員'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-		elif request.POST.has_key('verification_code') and request.POST.has_key('type') and request.POST['type'] == 'email':
+		elif request.data['type'] == 'email' and request.data['action'] == 'verify':
 			if not cache.has_key(obj.email):
 				res['detail'] = u'驗證碼已過期，請重新產生驗證碼'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-			input_vcode = request.POST['verification_code']
+			input_vcode = request.data['code']
 			vcode = cache.get(obj.email)['vcode']
 			if input_vcode == vcode:
 				res['detail'] = u'信箱驗證通過'
@@ -252,11 +252,11 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			else:
 				res['detail'] = u'信箱驗證碼不符'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-		elif request.POST.has_key('verification_code') and request.POST.has_key('type') and request.POST['type'] == 'phone':
+		elif request.data['type'] == 'phone' and request.data['action'] == 'verify':
 			if not cache.has_key(obj.phone):
 				res['detail'] = u'驗證碼已過期，請重新產生驗證碼'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-			input_vcode = request.POST['verification_code']
+			input_vcode = request.data['code']
 			vcode = cache.get(obj.phone)['vcode']
 			if input_vcode == vcode:
 				res['detail'] = u'手機驗證通過'
