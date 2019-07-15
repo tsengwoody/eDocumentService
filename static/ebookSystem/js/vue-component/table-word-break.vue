@@ -1,201 +1,5 @@
-<template>
-	<div>
-		<div style="text-align:center;">
-			<form class="form-inline">
-				<div class="form-group">
-					<input class="form-control" type="text" v-model="keyword">
-				</div>
-				<div class="form-group">
-					<select class="form-control" v-model="selectHeader">
-						<option v-for="(v, k) in header" :value="k">{|{ v }|}</option>
-					</select>	
-				</div>
-				<button class="btn btn-primary" @click.prevent="filterData">搜尋</button>
-				<button class="btn btn-primary" @click.prevent="filterClean">清除</button>
-			</form>
-		</div>
-		<div v-if="!iser(showData)">
-			<div role="table" class="table">
-				<div role="rowgroup" class="thead">
-					<div role="row" class="tr">
-						<div 
-							v-for="(v, k, index) in header" 
-							role="columnheader" 
-							class="cell" 
-							:key="v"
-							:style="{ 'width': tdwidths[index] + '%' }"
-						>
-							<a role="button"
-								@click="order(k)"
-							>
-								{|{ v }|}
-								<template v-if="k===key">
-									<template v-if="orderby==='asc'">▲</template>
-									<template v-if="orderby==='desc'">▼</template>
-								</template>
-							</a>
-						</div>
-					</div>
-				</div>
-				<div role="rowgroup" class=tbody>
-					<div role="row" v-for="entry, index in showData" v-if="index>=start&&index<end" class=tr>
-						<template v-for="(value, key) in header" >
-							<div v-if="$scopedSlots[key]" :data-title="value" role="cell" class="cell">
-								<slot :name="key" :item="entry[key]"></slot>
-							</div>
-							<div v-else :data-title="value" role="cell" class="cell">
-								{|{ entry[key] }|}
-							</div>
-						</template>
-					</div>
-				</div>
-			</div>
-			<nav v-if="numpage>1" style="text-align:center;  cursor:pointer;">
-		        <ul class="pagination">
-					<li class="page-item">
-						<a class="page-link" tabindex="-1" @click="pagin_change('-1')">上一頁</a>
-					</li>
-					<!-- <li class="page-item"><a class="page-link">1</a></li> -->
-
-					<li
-						:class="{ active: pagenow === 1 }"
-						v-if="numpage > 0"
-						class="page-item"
-					>
-						<a class="page-link" tabindex="-1" @click="pagin_change(1)">1</a>
-					</li>
-
-					<li v-if="showPrevMore">
-						<a class="page-link" tabindex="-1" @click="pagin_change('quickprev')">...</a>
-					</li>
-
-					<li
-						v-for="pager in pagers"
-						:key="pager"
-						:class="{ active: pagenow === pager }"
-						class="page-item"
-					>
-						<a class="page-link" tabindex="-1" @click="pagin_change(pager)">{|{ pager }|}</a>
-					</li>
-
-					<li v-if="showNextMore">
-						<a class="page-link" tabindex="-1" @click="pagin_change('quicknext')">...</a>
-					</li>
-
-					<li
-						:class="{ active: pagenow === numpage }"
-						class="page-item"
-						v-if="numpage > 1"
-					>
-						<a class="page-link" tabindex="-1" @click="pagin_change(numpage)">{|{ numpage }|}</a>
-					</li>
-
-					<li class="page-item">
-						<a class="page-link" tabindex="-1" @click="pagin_change('+1')">下一頁</a>
-					</li>
-				</ul>
-			</nav>
-		</div>
-		<div v-else>
-			無資料
-		</div>
-	</div>
-</template>
-
-<script>
-
-	module.exports = {
-		mixins: [base_table],
-		props: {
-			datas: Array,  // define type
-			header: Object,
-			tdwidths: Array,  // array of percentage
-		},
-		data: function () {
-			return {
-				key: '',
-				orderby: '',
-				numperpage: 10,
-				pagenow: 1,
-				showPrevMore: false,
-				showNextMore: false,
-				pagerCount: 7,
-				keyword: '',
-				selectHeader: '',
-				showData: [],
-			}
-		},
-		computed: {
-			numpage: function () {
-				return Math.ceil(this.showData.length / this.numperpage);
-			},
-			numrow: function () {
-				return this.showData.length
-			},
-		},
-		watch: {
-			showData: function (val) {
-				this.pagenow = 1
-			},
-			datas: function (val) {
-				// initial showData from async datas
-				this.showData = val;
-			},
-		},
-		mounted: function () {
-			let self = this;
-			self.showData = _.cloneDeep(this.datas)	// re-initialize data before filter
-		},
-		methods: {
-			order: function(key, orderby) {
-				if(this.key === key){
-					if(this.orderby==='asc'){
-						this.orderby = 'desc'
-					}
-					else if(this.orderby==='desc'){
-						this.orderby = 'asc'
-					}
-					else {
-						this.orderby = 'desc'
-					}
-				}
-				else {
-					this.orderby = 'desc'
-				}
-				this.key = key
-				this.showData.sort(compare(this.key, this.orderby))
-			},
-			filterClean: function() {
-				let self = this;
-				self.showData = _.cloneDeep(this.datas)	// re-initialize data before filter
-				self.keyword = '';
-				self.selectHeader = '';
-			},
-			filterData: function() {
-				let self = this;
-
-				if(this.keyword && this.selectHeader) {
-					self.showData = _.cloneDeep(this.datas)	// re-initialize data before filter
-					var filterByKeyword = this.datas.filter(function(item) {
-						if(item[self.selectHeader]) {
-							return item[self.selectHeader].indexOf(self.keyword) > -1;
-						}
-					})
-					self.showData = filterByKeyword;
-					alertmessage('success', '成功完成搜尋!')
-				} else {
-					alertmessage('error', '請填妥搜尋欄位')
-				}
-
-			}
-		},
-	}
-
-</script>
-
 <!--  scoped CSS -->
-<style scoped>
-
+<style>
 div.table {
 	width: 100%;
     max-width: 100%;
@@ -283,3 +87,106 @@ div.tbody .cell {
 	}
 }
 </style>
+
+<template>
+	<div>
+		<div v-if="!iser(datas)">
+			<div role="table" class="table">
+				<div role="rowgroup" class=thead>
+					<div role="row" class=tr>
+						<div 
+							v-for="(value, key, idx) in header" 
+							role="columnheader" 
+							class="cell" 
+							:key="value"
+							:style="tdStyles(idx)"
+						>
+							{|{ value }|}
+						</div>
+					</div>
+				</div>
+				<div role="rowgroup" class=tbody>
+					<div role="row" v-for="(entry, index) in datas" v-if="index>=start&&index<end" class=tr>
+						<template v-for="(value, key) in header" >
+							<div v-if="$scopedSlots[key]" :data-title="value" role="cell" class=cell>
+								<slot :name="key" :item="entry[key]"></slot>
+							</div>
+							<div v-else :data-title="value" role="cell" class=cell>
+								{|{ entry[key] }|}
+							</div>
+						</template>
+					</div>
+				</div>
+			</div>
+			<nav v-if="numpage>1" style="text-align:center;  cursor:pointer;">
+		        <ul class="pagination">
+					<li class="page-item">
+						<a class="page-link" tabindex="-1" @click="pagin_change('-1')">上一頁</a>
+					</li>
+					<!-- <li class="page-item"><a class="page-link">1</a></li> -->
+
+					<li
+						:class="{ active: pagenow === 1 }"
+						v-if="numpage > 0"
+						class="page-item"
+					>
+						<a class="page-link" tabindex="-1" @click="pagin_change(1)">1</a>
+					</li>
+
+					<li v-if="showPrevMore">
+						<a class="page-link" tabindex="-1" @click="pagin_change('quickprev')">...</a>
+					</li>
+
+					<li
+						v-for="pager in pagers"
+						:key="pager"
+						:class="{ active: pagenow === pager }"
+						class="page-item"
+					>
+						<a class="page-link" tabindex="-1" @click="pagin_change(pager)">{|{ pager }|}</a>
+					</li>
+
+					<li v-if="showNextMore">
+						<a class="page-link" tabindex="-1" @click="pagin_change('quicknext')">...</a>
+					</li>
+
+					<li
+						:class="{ active: pagenow === numpage }"
+						class="page-item"
+						v-if="numpage > 1"
+					>
+						<a class="page-link" tabindex="-1" @click="pagin_change(numpage)">{|{ numpage }|}</a>
+					</li>
+
+					<li class="page-item">
+						<a class="page-link" tabindex="-1" @click="pagin_change('+1')">下一頁</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+		<div v-else>
+			無資料
+		</div>
+	</div>`
+
+</template>
+
+<script>
+
+	module.exports = {
+		mixins: [base_table],
+		props: {
+			tdwidths: Array,  // array of percentage
+		},
+		methods: {
+			tdStyles (index) {
+				if (
+					this.tdwidths.reduce((prev, next) => parseInt(prev) + parseInt(next)) !== 100 
+				) {
+					return null;
+				}
+				return { width: this.tdwidths[index] + '%' };
+			},
+		},
+	}
+</script>

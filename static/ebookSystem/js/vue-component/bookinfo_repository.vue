@@ -1,6 +1,6 @@
 <template>
 	<div id="bookinfo_repository_filter">
-		<table-div :datas="datas" :header="header">
+		<table-div :datas="datas" :header="header" :tdwidths="tdwidths">
 			<template slot="action" slot-scope="props">
 				<button class="btn btn-default" @click="check_create(props.item)">借閱</button>
 				<a class="btn btn-default" role="button"
@@ -45,13 +45,15 @@
 		props: ['header', 'datas',],
 		components: {
 			'modal': components['modal'],
-			'table-div': components['table-div'],
+			// 'table-div': components['table-div'],
+			'table-div': components['table-word-break'],
 		},
 		data: function(){
 			return {
 				id: Math.floor(Math.random() * 100000000).toString(),
 				feedback_id: '',
 				feedback_content: '',
+				tdwidths: [10, 50, 5, 5, 10, 10, 10]
 			}
 		},
 		created: function () {
