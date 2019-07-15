@@ -1,14 +1,12 @@
 ﻿# coding: utf-8
-from django.core.cache import cache
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
 from genericUser.models import *
-from utils.decorator import *
 import json
 
-@http_response
 def generics(request, name, pk=None):
 	template_name='genericUser/{0}.html'.format(name.split('/')[0])
-	return locals()
+	return render(request, template_name, {})
 
 def upload_progress(request):
 	"""
@@ -27,11 +25,3 @@ def upload_progress(request):
 		return HttpResponse(json.dumps(data), content_type="application/json")
 	else:
 		return HttpResponseServerError('Server Error: You must provide X-Progress-ID header or query param.')
-
-@http_response
-def org_info(request, template_name='genericUser/org_info.html'):
-	org_list = Organization.objects.filter(is_service_center=True)
-	if request.method == 'POST':
-		return locals()
-	if request.method == 'GET':
-		return locals()

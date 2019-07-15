@@ -346,7 +346,7 @@ class EBookViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, ResourceViewSe
 		editingPartList = request.user.edit_ebook_set.all().filter(status=EBook.STATUS['edit'])
 		GET_MAX_EBOOK = 3
 		if len(editingPartList) >= GET_MAX_EBOOK:
-			res['detail'] = u'您已有超過{0}段文件，請先校對完成再領取'.format(GET_MAX_EBOOK)
+			res['detail'] = u'您在一般版與校園版合計已有超過{0}段文件，請先校對完成再領取'.format(GET_MAX_EBOOK)
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		partialBook = BookOrder.objects.filter(book__status=Book.STATUS['active'])
 		try:
@@ -431,6 +431,42 @@ class EBookViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, ResourceViewSe
 
 	@action(
 		detail=True,
+		methods=['post'],
+		url_name='load_full_content',
+		url_path='action/load_full_content',
+	)
+	def load_full_content(self, request, pk=None):
+		res = {}
+
+		obj = self.get_object()
+		try:
+			obj.load_full_content()
+		except BaseException as e:
+			res['detail'] = u'載入全文校對內容失敗' +str(e)
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		res['detail'] = u'載入全文校對內容成功'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	@action(
+		detail=True,
+		methods=['post'],
+		url_name='recover_content',
+		url_path='action/recover_content',
+	)
+	def recover_content(self, request, pk=None):
+		res = {}
+
+		obj = self.get_object()
+		try:
+			obj.recover_content()
+		except BaseException as e:
+			res['detail'] = u'還原校對內容失敗' +str(e)
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		res['detail'] = u'還原校對內容成功'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	@action(
+		detail=True,
 		methods=['get', 'post'],
 		url_name='edit',
 		url_path='action/edit',
@@ -470,6 +506,7 @@ class EBookViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, ResourceViewSe
 			elif request.POST['type'] == 'load':
 				obj.load_full_content()
 				res['detail'] = u'成功載入全部文件內容'
+
 			res['finish'], res['edit'] = obj.get_content()
 			res['edited_page'] = obj.edited_page
 			return Response(data=res, status=status.HTTP_202_ACCEPTED)

@@ -295,42 +295,6 @@
 				user: {},
 			}
 		},
-		computed: {
-			'nav_item_show': function () {
-				items = []
-				_.each(this.nav_item, v => {
-					if(this.item_permission(this.user, v.permission)){
-						item = {
-							'type': v.type,
-							'display_name': v.display_name,
-						}
-						if(v.type==='folder'){
-							item.items = []
-							_.each(v.items, v_item => {
-								if(this.item_permission(this.user, v_item.permission)){
-									item.items.push({
-										'type': v_item.type,
-										'display_name': v_item.display_name,
-										'url': v_item.url,
-									})
-								}
-							})
-							if(item.items.length>0){
-								items.push(item)
-							}
-						}
-						if(v.type==='item'){
-							item.url = v.url
-							items.push(item)
-						}
-					}
-				})
-				return items
-			},
-			'nav_item_right_show': function () {
-				
-			},
-		},
 		created(){
 			this.$root.edsnavself = this;
 		},
@@ -415,8 +379,7 @@
 				return items
 			},
 			mode_change: function(){
-				let self = this
-				self.$emit('mode-change')
+				this.$emit('mode-change')
 			},
 		},
 	}

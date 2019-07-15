@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="user_person">
 		<h2>個人資料</h2>
 		<div class="form-horizontal">
@@ -46,8 +46,8 @@
 			<div class="form-group">
 				<label class="control-label col-sm-2"></label>
 				<div class="col-sm-7">
-					<button class="btn btn-primary" @click="usermodel(userID)">變更使用者資訊old</button>
-					<button class="btn btn-primary" @click="openDialog('userModal', this)">變更使用者資訊new</button>
+					<button class="btn btn-primary" @click="usermodel(userID)">變更使用者資訊</button>
+					<!--<button class="btn btn-primary" @click="openDialog('userModal', this)">變更使用者資訊new</button>-->
 
 					<button
 						class="btn btn-primary"
@@ -311,12 +311,13 @@
 				localStorage.setItem('fontSize', this.newRatio);
 			},
 			getOTP(type) {
-				const url = '/genericUser/api/users/' + this.userID +'/action/verify/';
-				rest_aj_send('post', url, {'generate': type})
-				.done((data, textStatus, xhr) => {
-					alertmessage('success', data['message']);
+				genericUserAPI.userAction.verify(this.userID, {
+					type: type,
+					action: 'generate',
+				})
+				.then(res => {
+					alertmessage('success', res.data['detail']);
 					this.isAllowedGetOTP = false;
-
 					let timer = setInterval(() => {
 	                    if (this.finalCounts === 0) {
 	                    	this.isAllowedGetOTP = true;
@@ -326,24 +327,24 @@
 	                    this.finalCounts -= 1;
 	                }, 1000);
 				})
-				.fail((data) => {
-					alertmessage('error', data['message']);
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
 			verifyOTP(type) {
-				console.log({ verification_code: this.verification_code, type });
-				const url = '/genericUser/api/users/' + this.userID +'/action/verify/';
-				rest_aj_send('post', url, { verification_code: this.verification_code, type } )
-				.done((data, textStatus, xhr) => {
-					// alertmessage('success', '已驗證完成');
-					alertmessage('success', data['message'])
-						.done(function () {
+				genericUserAPI.userAction.verify(this.userID, {
+					type: type,
+					action: 'verify',
+					code: this.verification_code,
+				})
+				.then(res => {
+					alertmessage('success', res.data['detail'])
+						.done(() => {
 							location.reload(); //重新載入網頁以更新資訊
 						});
 				})
-				.fail((data) => {
-					// alertmessage('error', '請重新確認驗證碼');
-					alertmessage('error', data['message']);
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
 			resetOTP() {

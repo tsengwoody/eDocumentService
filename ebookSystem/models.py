@@ -408,6 +408,12 @@ class EBook(models.Model):
 		editRecord.save()
 		return editRecord.edit
 
+	def recover_content(self):
+		editRecord = EditRecord.objects.get(part=self, number_of_times=self.number_of_times)
+		editRecord.edit = editRecord.source_text()
+		editRecord.finish = ''
+		editRecord.save()
+
 	def create_watermark_image(self, user):
 		water_path = BASE_DIR +u'/static/ebookSystem/document/{0}/source/{1}/'.format(self.book.book_info.ISBN, user.username)
 		source_path = self.book.path +u'/source'
@@ -557,11 +563,6 @@ class Library(models.Model):
 	def __unicode__(self):
 		return u'{0}-{1}'.format(self.object, self.owner)
 
-	def __init__(self, *args, **kwargs):
-		super(Library, self).__init__(*args, **kwargs)
-		self.epub = BASE_DIR +'/file/ebookSystem/library/{0}.epub'.format(self.id)
-		self.txt = BASE_DIR +'/file/ebookSystem/library/{0}.txt'.format(self.id)
-
 	def check_out(self):
 		if not os.path.exists(os.path.dirname(self.epub)):
 			os.mkdir(os.path.dirname(self.epub))
@@ -594,8 +595,8 @@ class LibraryRecord(Library):
 
 	def __init__(self, *args, **kwargs):
 		super(Library, self).__init__(*args, **kwargs)
-		self.epub = BASE_DIR +u'/file/ebookSystem/library/{0}{1}.epub'.format(self.id, self.object.book_info.bookname)
-		self.txt = BASE_DIR +u'/file/ebookSystem/library/{0}{1}.txt'.format(self.id, self.object.book_info.bookname)
+		self.epub = BASE_DIR +u'/file/ebookSystem/library/{0}/{1}{2}.epub'.format(self.owner.username, self.id, self.object.book_info.bookname)
+		self.txt = BASE_DIR +u'/file/ebookSystem/library/{0}/{1}{2}.txt'.format(self.owner.username, self.id, self.object.book_info.bookname)
 
 class Recommend(models.Model):
 	content = models.TextField()
@@ -634,6 +635,7 @@ class EditRecord(models.Model):
 
 	def textimport(self):
 		self.edit = self.source_text()
+		self.finish = ''
 		self.save()
 
 	def textexport(self):

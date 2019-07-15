@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h2>平台書庫</h2>
 		<ul class="nav nav-tabs">
@@ -32,6 +32,9 @@
 					</div>
 					<div class="form-group">
 						<button type="button" class="btn btn-primary" @click="search()">搜尋</button>
+					</div>
+					<div>
+						共查到 {|{ bookinfos.datas.length }|} 筆資料
 					</div>
 				</div>
 				<bookinfo_repository :datas="bookinfos.datas" :header="bookinfos.header"></bookinfo_repository>
@@ -147,7 +150,10 @@
 					},
 				],
 				search_value: '',
-				bookinfos: '',
+				bookinfos: {
+					header: {},
+					datas: [],
+				},
 			}
 		},
 		computed: {
@@ -179,7 +185,9 @@
 		metaInfo: {
 			title: '平台書庫',
 		},
-		mounted: function () {
+		mounted(){
+			this.bookinfos['header'] = this.bookinfo_columns;
+			this.bookinfos['datas'] = [];
 			this.get_recommend_table_data();
 			this.get_index_table_data();
 		},
@@ -253,8 +261,6 @@
 							action: o['ISBN'],
 						})
 					})
-					this.bookinfos = {};
-					this.bookinfos['header'] = this.bookinfo_columns;
 					this.bookinfos['datas'] = filter_data;
 					alertmessage('success', '查詢完成，共取得 ' +this.bookinfos.datas.length +' 筆資料')
 				})

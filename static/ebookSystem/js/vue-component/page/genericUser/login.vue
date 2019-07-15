@@ -65,14 +65,14 @@
 				let session_login = genericUserAPI.userAction.login(this.username, this.password)
 				let token_login = token.obtain(this.username, this.password)
 				Promise.all([session_login, token_login,])
-				.then((s, t) => {
+				.then(res => {
 					alertmessage('success', '成功登入平台')
 					.done(() => {
 						window.location.replace('/')
 					})
 				})
-				.catch((s, t) => {
-					alertmessage('error', '登錄平台失敗，請確認帳號或密碼是否正確。'+o2j(s.response.data))
+				.catch(res => {
+					alertmessage('error', '登錄平台失敗，請確認帳號或密碼是否正確。')
 				})
 
 			},

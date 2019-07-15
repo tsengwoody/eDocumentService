@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="form-horizontal">
 		<form-drf 
 			:model_info="model_info.fileformat"
@@ -43,9 +43,9 @@ function post(path, params, method) {
 	module.exports = {
 		props: ['pk',],
 		components: {
-			'form-drf': httpVueLoader('/static/ebookSystem/js/vue-component/form.vue'),
+			'form-drf': components['form'],
 		},
-		data: function(){
+		data(){
 			return {
 				fileformat: 'epub',
 				password: '',
@@ -71,33 +71,30 @@ function post(path, params, method) {
 				},
 			}
 		},
-		created: function () {
-			let self = this
-		},
-		mounted: function () {
+		mounted(){
 			this.refresh()
 		},
 		methods: {
-			instance_set: function (event) {
+			instance_set(event){
 				this.pk = event
 				this.refresh()
 			},
-			refresh: function () {
+			refresh(){
 				this.fileformat = 'epub'
 				this.password = ''
 			},
-			object_get: function () {
+			object_get(){
 				let self = this
 
 				let authenticate_url = '/genericUser/api/users/action/authenticate/'
-				rest_aj_send('post', authenticate_url, {'username': user.username, 'password': this.password,})
-				.done(function(data) {
-					let url = '/ebookSystem/api/libraryrecords/' +self.pk +'/action/download/'
+				genericUserAPI.userAction.authenticate(user.username, this.password)
+				.then(res => {
+					let url = '/ebookSystem/api/libraryrecords/' +this.pk +'/action/download/'
 					let csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-					post(url, {'fileformat': self.fileformat, 'password': self.password, 'csrfmiddlewaretoken': csrf}, 'post')
+					post(url, {'fileformat': this.fileformat, 'password': this.password, 'csrfmiddlewaretoken': csrf}, 'post')
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', '失敗使用者驗證')
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 
 			},

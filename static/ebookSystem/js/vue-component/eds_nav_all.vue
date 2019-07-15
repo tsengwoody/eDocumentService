@@ -340,8 +340,6 @@
 				user: {},
 			}
 		},
-		computed: {
-		},
 		created(){
 			this.$root.edsnavall = this;
 		},
@@ -395,8 +393,7 @@
 				return items
 			},
 			mode_change: function(){
-				let self = this
-				self.$emit('mode-change')
+				this.$emit('mode-change')
 			},
 		},
 	}
