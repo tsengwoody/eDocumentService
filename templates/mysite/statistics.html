@@ -1,14 +1,17 @@
-﻿{% extends "base_nav.html" %}
-{% load staticfiles %}
+{% extends "base.html" %}
 {% block title %}
 統計資料
 {% endblock %}
 {% block content %}
-<link href="{% static "ebookSystem/css/signin.css" %}" rel="stylesheet" >
+<link href="/static/ebookSystem/css/signin.css" rel="stylesheet">
 <script src="https://www.google.com/recaptcha/api.js" async defer></script> 
+{% csrf_token %} 
+
+<div class="container">
+	<div id="app">
+		<eds_nav></eds_nav>
 <h3>統計資料</h3>
 <form action="" method="post" role="form">
-{% csrf_token %}
 <table class='table table-striped'>
 	<tr>
 		<th>時間</th>
@@ -36,4 +39,55 @@
 	{% endfor %}
 </table>
 </form>
+		<eds_footer></eds_footer>
+	</div>
+</div>
+
+<script>
+	Vue.use(VueMeta)
+	Vue.options.delimiters = ['{|{', '}|}'];
+
+	let mapState = Vuex.mapState;
+
+//$(()=>{
+	new Vue({
+		store,
+		el: '#app',
+		components: {
+			eds_nav: components['eds_nav'],
+			routerview: pages['{{ app }}/{{ page }}'],
+			eds_footer: components['eds_footer'],
+		},
+		data: {
+			mode: 'all',
+		},
+		computed: {
+			...mapState({
+				user: 'user',
+			}),
+		},
+		/*metaInfo: {
+			titleTemplate: '%s | 雲端千眼平台',
+		},*/
+		created(){
+			{% if user.is_authenticated %}
+			this.$store.dispatch('getUser',
+			{
+				id: {{ request.user.id }},
+			});
+			{% endif %}
+
+			mode = localStorage.getItem('nav_mode');
+			if(!mode) {
+				this.mode = 'all'
+			}
+			else {
+				this.mode = mode
+			}
+
+		},
+	});
+//})
+</script>
+
 {% endblock %}

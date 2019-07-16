@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="bookinfo_repository_filter">
 		<table-div :datas="datas" :header="header" :tdwidths="tdwidths">
 			<template slot="action" slot-scope="props">
@@ -45,8 +45,7 @@
 		props: ['header', 'datas',],
 		components: {
 			'modal': components['modal'],
-			// 'table-div': components['table-div'],
-			'table-div': components['table-word-break'],
+			'table-div': components['table-div'],
 		},
 		data: function(){
 			return {

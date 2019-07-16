@@ -1,4 +1,4 @@
-<!--  scoped CSS -->
+﻿<!--  scoped CSS -->
 <style>
 div.table {
 	width: 100%;
@@ -8,6 +8,8 @@ div.table {
 	border-spacing: 0px;
 	margin: 10px 0px;
 	border-color: grey;
+
+	word-break: break-all;
 }
 
 div.table .tbody .tr:hover {
@@ -92,13 +94,19 @@ div.tbody .cell {
 			<div role="table" class="table">
 				<div role="rowgroup" class=thead>
 					<div role="row" class=tr>
-						<div v-for="(value, key) in header" role="columnheader" class=cell>
+						<div 
+							v-for="(value, key, idx) in header" 
+							role="columnheader" 
+							class="cell" 
+							:key="value"
+							:style="tdStyles(idx)"
+						>
 							{|{ value }|}
 						</div>
 					</div>
 				</div>
 				<div role="rowgroup" class=tbody>
-					<div role="row" v-for="entry, index in datas" v-if="index>=start&&index<end" class=tr>
+					<div role="row" v-for="(entry, index) in datas" v-if="index>=start&&index<end" class=tr>
 						<template v-for="(value, key) in header" >
 							<div v-if="$scopedSlots[key]" :data-title="value" role="cell" class=cell>
 								<slot :name="key" :item="entry[key]"></slot>
@@ -167,5 +175,20 @@ div.tbody .cell {
 
 	module.exports = {
 		mixins: [base_table],
+		props: {
+			tdwidths: {
+				default: [],
+			},
+		},
+		methods: {
+			tdStyles (index) {
+				if (
+					this.tdwidths.reduce((prev, next) => parseInt(prev) + parseInt(next), 0) !== 100 
+				) {
+					return null;
+				}
+				return { width: this.tdwidths[index] + '%' };
+			},
+		},
 	}
 </script>

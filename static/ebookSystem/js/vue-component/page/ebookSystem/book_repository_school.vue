@@ -50,7 +50,7 @@
 	module.exports = {
 		props: ['org_id',],
 		components: {
-			'bookinfo_repository': components['bookinfo_repository_filter'],
+			'bookinfo_repository': components['bookinfo_repository'],
 		},
 		data(){
 			return {
@@ -107,7 +107,7 @@
 					// org get category
 					_.each(res.data, (o) => {
 						// org 為 1 屬特殊情形，是一般版使用，故在選擇列表內不顯示
-						if(o.id==1){
+						if(0 && o.id==1){
 							return -1;
 						}
 						let org_category = {
