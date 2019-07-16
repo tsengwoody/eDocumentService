@@ -8,6 +8,8 @@ div.table {
 	border-spacing: 0px;
 	margin: 10px 0px;
 	border-color: grey;
+
+	word-break: break-all;
 }
 
 div.table .tbody .tr:hover {
@@ -92,7 +94,7 @@ div.tbody .cell {
 			<div role="table" class="table">
 				<div role="rowgroup" class=thead>
 					<div role="row" class=tr>
-						<div v-for="(v, k) in header" role="columnheader" class=cell>
+<!-- 						<div v-for="(v, k) in header" role="columnheader" class=cell>
 							<a role="button"
 								@click="order(k)"
 							>
@@ -102,7 +104,26 @@ div.tbody .cell {
 									<template v-if="orderby==='desc'">▼</template>
 								</template>
 							</a>
+						</div> -->
+
+						<div 
+							v-for="(v, k, idx) in header" 
+							role="columnheader" 
+							class="cell" 
+							:key="value"
+							:style="tdStyles(idx)"
+						>
+							<a role="button"
+								@click="order(k)"
+							>
+								{|{ v }|}
+								<template v-if="k === key">
+									<template v-if="orderby === 'asc'">▲</template>
+									<template v-if="orderby === 'desc'">▼</template>
+								</template>
+							</a>
 						</div>
+
 					</div>
 				</div>
 				<div role="rowgroup" class=tbody>

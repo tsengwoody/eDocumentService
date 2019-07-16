@@ -4,6 +4,9 @@
 		props: {
 			datas: Array,  // define type
 			header: Object,
+			tdwidths: {
+				default: [],
+			},
 		},
 		data: function () {
 			return {
@@ -98,6 +101,14 @@
 
 				this.pagenow = Math.max(this.pagenow, 1);
 				this.pagenow = Math.min(this.pagenow, this.numpage);
+			},
+			tdStyles (index) {
+				if (
+					this.tdwidths.reduce((prev, next) => parseInt(prev) + parseInt(next), 0) !== 100 
+				) {
+					return null;
+				}
+				return { width: this.tdwidths[index] + '%' };
 			},
 		},
 	}

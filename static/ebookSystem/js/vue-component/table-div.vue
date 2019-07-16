@@ -176,19 +176,19 @@ div.tbody .cell {
 	module.exports = {
 		mixins: [base_table],
 		props: {
-			tdwidths: {
-				default: [],
-			},
+			// tdwidths: {
+			// 	default: [],
+			// },
 		},
 		methods: {
-			tdStyles (index) {
-				if (
-					this.tdwidths.reduce((prev, next) => parseInt(prev) + parseInt(next), 0) !== 100 
-				) {
-					return null;
-				}
-				return { width: this.tdwidths[index] + '%' };
-			},
+			// tdStyles (index) {
+			// 	if (
+			// 		this.tdwidths.reduce((prev, next) => parseInt(prev) + parseInt(next), 0) !== 100 
+			// 	) {
+			// 		return null;
+			// 	}
+			// 	return { width: this.tdwidths[index] + '%' };
+			// },
 		},
 	}
 </script>
