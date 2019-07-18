@@ -1,7 +1,12 @@
 ﻿<template>
 	<div id="book_repository_school" class="container">
-		<h2>平台書庫</h2>
-		<div class="row">
+		<h2>平台書庫
+			<span class="heading-btns">
+				<button class="btn btn-default" v-if="!isSearch" @click="isSearch = true">搜尋</button>
+				<button class="btn btn-default" v-if="isSearch" @click="isSearch = false">返回書籍索引</button>
+			</span>
+		</h2>
+		<div class="row" v-if="!isSearch">
 			<div class="col-sm-3 col-md-3">
 				<div class="panel-group">
 					<div class="panel panel-default">
@@ -43,6 +48,10 @@
 				<bookinfo_repository :datas="books" :header="bookinfo_header"></bookinfo_repository>
 			</div>
 		</div>
+
+		<template v-else>
+			<book_repository_school_filter :organizations="items"></book_repository_school_filter>
+		</template>
 	</div>
 </template>
 
@@ -51,6 +60,7 @@
 		props: ['org_id',],
 		components: {
 			'bookinfo_repository': components['bookinfo_repository'],
+			'book_repository_school_filter': components['book_repository_school_filter'],
 		},
 		data(){
 			return {
@@ -61,6 +71,7 @@
 				orgs_books: [],
 				categorys_books: [],
 				books: [],
+				isSearch: false,
 			}
 		},
 		computed: {
@@ -257,5 +268,9 @@
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;
+}
+
+.heading-btns {
+	margin-left: 1.5rem;
 }
 </style>

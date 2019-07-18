@@ -32,9 +32,7 @@
 					</div>
 					<div class="form-group">
 						<button type="button" class="btn btn-primary" @click="search()">搜尋</button>
-					</div>
-					<div>
-						共查到 {|{ bookinfos.datas.length }|} 筆資料
+						<span class="book_search_result">共查到 {|{ bookinfos.datas.length }|} 筆資料</span>
 					</div>
 				</div>
 				<bookinfo_repository :datas="bookinfos.datas" :header="bookinfos.header"></bookinfo_repository>
@@ -272,3 +270,10 @@
 		},
 	}
 </script>
+
+<style>
+.book_search_result {
+	margin-left: 1rem;
+}
+
+</style>
