@@ -53,12 +53,12 @@
 			<div class="form-group">
 				<div class="col-sm-3 col-sm-offset-2">
 					<button type="button" class="btn btn-primary" @click="search">搜尋</button>
-					<span class="book_search_result">共查到 {|{ bookinfos.datas.length }|} 筆資料</span>
+					<span class="book_search_result">共查到 {|{ bookinfosData.length }|} 筆資料</span>
 				</div>
 			</div>
 		</div>
 
-		<bookinfo_repository :datas="bookinfos.datas" :header="bookinfo_header"></bookinfo_repository>
+		<bookinfo_repository :datas="bookinfosData" :header="bookinfo_header"></bookinfo_repository>
 	</div>
 </template>
 
@@ -72,10 +72,7 @@
 			return {
 				user: user,
 				search_value: '',
-				bookinfos: {
-					header: {},
-					datas: [],
-				},
+				bookinfosData: [],
 				organizations: [],
 				search_category_id: 'all',
 				search_org_Id: 0,
@@ -113,9 +110,6 @@
 				return null;
 			}
 		},
-		mounted(){
-			console.log()
-		},
 		methods: {
 			search() {
 				// 待確認
@@ -125,14 +119,11 @@
 					'search': this.search_value
 				}).then(res => {
 					console.log(res)
-					this.bookinfos.datas = res.data;
+					this.bookinfosData = res.data;
 
 				}).catch(err => {
 					console.log(err)
 				})
-			},
-			refreshCategories() {
-
 			},
 		},
 	}
