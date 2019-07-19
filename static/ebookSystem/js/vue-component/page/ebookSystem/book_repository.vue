@@ -247,7 +247,7 @@
 				ebookSystemAPI.bookInfoRest.filter(query)
 				.then(res => {
 					let filter_data = [];
-					_.each(res.data, function(o) {
+					_.each(res.data, (o) => {
 						filter_data.push({
 							ISBN: o['ISBN'],
 							bookname: o['bookname'],

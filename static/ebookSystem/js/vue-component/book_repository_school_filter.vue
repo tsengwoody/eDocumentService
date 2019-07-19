@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="book_repository_school_filter">
 		<h3 class="textfornvda">查詢</h3>
 		<div class="form-horizontal">
@@ -7,7 +7,7 @@
 				<div class="col-sm-3">
 					<select
 						class="form-control"
-						v-model="search_org_Id"
+						v-model="search_org_id"
 						placeholder="請選擇單位"
 					>
 						<option value="0" selected>全部</option>
@@ -75,7 +75,7 @@
 				bookinfosData: [],
 				organizations: [],
 				search_category_id: 'all',
-				search_org_Id: 0,
+				search_org_id: '0',
 			}
 		},
 		computed: {
@@ -104,26 +104,46 @@
 				}
 			},
 			selected_org() {
-				if (this.search_org_Id) {
-					return this.organizations.find(org => org.id === this.search_org_Id);
+				if (this.search_org_id) {
+					return this.organizations.find(org => org.id === this.search_org_id);
 				}
 				return null;
 			}
 		},
 		methods: {
 			search() {
-				// 待確認
-				ebookSystemAPI.bookInfoRest.filter({
-					'org_id': this.search_org_Id, 
-					'search_category_id': this.search_category_id, 
-					'search': this.search_value
-				}).then(res => {
-					console.log(res)
-					this.bookinfosData = res.data;
-
-				}).catch(err => {
-					console.log(err)
+				let query = {search: this.search_value};
+				if(!(this.search_org_id=='0')){
+					query['org_id'] = this.search_org_id;
+				}
+				if(!(this.search_category_id=='all')){
+					query['category_id'] = this.search_category_id;
+				}
+				if(String(this.search_category_id).endsWith('null')){
+					query['category_id'] = 'null';
+				}
+				console.log(query)
+				ebookSystemAPI.bookInfoRest.filter(query)
+				.then(res => {
+					this.bookinfosData = [];
+					_.each(res.data, (o) => {
+						this.bookinfosData.push({
+							ISBN: o['ISBN'],
+							bookname: o['bookname'],
+							bookbinding: o['bookbinding'],
+							order: o['order'],
+							author: o['author'],
+							house: o['house'],
+							date: o['date'],
+							action: o['ISBN'],
+						})
+					})
+					alertmessage('success', '查詢完成，共取得 ' +this.bookinfosData.length +' 筆資料')
 				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
+
 			},
 		},
 	}

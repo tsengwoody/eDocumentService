@@ -224,7 +224,7 @@
 			this.refresh();
 		},
 		methods: {
-			refresh: function(){
+			refresh(){
 				this.items = []
 				this.pointer = {};
 				this.model_info = {

@@ -45,7 +45,7 @@
 		props: ['header', 'datas',],
 		components: {
 			'modal': components['modal'],
-			'table-div': components['table-div'],
+			'table-div': components['table-div-order'],
 		},
 		data: function(){
 			return {

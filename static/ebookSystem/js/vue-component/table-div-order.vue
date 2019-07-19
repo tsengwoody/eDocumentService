@@ -1,4 +1,4 @@
-<!--  scoped CSS -->
+﻿<!--  scoped CSS -->
 <style scoped>
 div.table {
 	width: 100%;
@@ -98,7 +98,7 @@ div.tbody .cell {
 							v-for="(v, k, idx) in header" 
 							role="columnheader" 
 							class="cell" 
-							:key="value"
+							:key="v"
 							:style="tdStyles(idx)"
 						>
 							<a role="button"

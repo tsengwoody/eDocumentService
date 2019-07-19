@@ -2,8 +2,8 @@
 	<div id="book_repository_school" class="container">
 		<h2>平台書庫
 			<span class="heading-btns">
-				<button class="btn btn-default" v-if="!isSearch" @click="isSearch = true">搜尋</button>
-				<button class="btn btn-default" v-if="isSearch" @click="isSearch = false">返回書籍索引</button>
+				<button class="btn btn-default" v-if="!isSearch" @click="isSearch = true">進入書籍查尋</button>
+				<button class="btn btn-default" v-if="isSearch" @click="isSearch = false">進入書籍索引</button>
 			</span>
 		</h2>
 		<div class="row" v-if="!isSearch">
