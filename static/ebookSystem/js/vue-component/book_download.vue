@@ -84,8 +84,6 @@ function post(path, params, method) {
 				this.password = ''
 			},
 			object_get(){
-				let self = this
-
 				let authenticate_url = '/genericUser/api/users/action/authenticate/'
 				genericUserAPI.userAction.authenticate(user.username, this.password)
 				.then(res => {
@@ -96,7 +94,6 @@ function post(path, params, method) {
 				.catch(res => {
 					alertmessage('error', o2j(res.response.data));
 				})
-
 			},
 		},
 	};

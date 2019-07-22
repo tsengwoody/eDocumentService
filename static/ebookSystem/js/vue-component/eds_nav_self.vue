@@ -299,7 +299,8 @@
 			this.$root.edsnavself = this;
 		},
 		mounted(){
-			this.user = this.$store.state.user;
+			this.user = user;
+			//this.user = this.$store.state.user;
 		},
 		methods: {
 			item_permission: function(u, p){

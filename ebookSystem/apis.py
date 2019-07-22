@@ -84,9 +84,8 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 		user_email_list = [ i.email for i in User.objects.filter(org=obj.org, is_manager=True) ]
 		subject = u'回報 - {0} {1}'.format(obj.ISBN, obj.book_info.bookname)
-		print(subject)
 		try:
-			body = request.data['feedback_content']
+			body = request.data['content']
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[SERVICE], bcc=user_email_list)
 			email.send(fail_silently=False)
 		except BaseException as e:
@@ -767,13 +766,13 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	)
 	def check_create(self, request, pk=None):
 		res = {}
-		book = Book.objects.get(ISBN=request.POST['ISBN'])
+		book = Book.objects.get(ISBN=request.data['ISBN'])
 		lr_user = request.user.libraryrecord_set.filter(status=True)
 		if len(lr_user) >5:
-			res['message'] = u'已到達借閱上限，同時可借閱書量為5本，請先歸還書籍再借閱'
+			res['detail'] = u'已到達借閱上限，同時可借閱書量為5本，請先歸還書籍再借閱'
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		if len(lr_user.filter(object=book)) >0:
-			res['message'] = u'已在借閱書櫃無需再借閱'
+			res['detail'] = u'已在借閱書櫃無需再借閱'
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 		lr = LibraryRecord.objects.create(owner=request.user, object=book)

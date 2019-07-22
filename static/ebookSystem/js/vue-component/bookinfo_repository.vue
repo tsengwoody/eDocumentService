@@ -47,7 +47,7 @@
 			'modal': components['modal'],
 			'table-div': components['table-div-order'],
 		},
-		data: function(){
+		data(){
 			return {
 				id: Math.floor(Math.random() * 100000000).toString(),
 				feedback_id: '',
@@ -55,64 +55,33 @@
 				tdwidths: [10, 50, 5, 5, 10, 10, 10]
 			}
 		},
-		created: function () {
-			let self = this
-			self.clientg = new $.RestClient('/genericUser/api/')
-			self.clientb = new $.RestClient('/ebookSystem/api/')
-			self.clientb.add('books');
-			self.clientb.books.addVerb('feedback', 'POST', {
-				url: 'action/feedback/',
-			});
-		},
 		methods: {
-			check_create: function (pk) {
-				let self = this
-
-				rest_aj_send('post', '/ebookSystem/api/libraryrecords/action/check_create/', {'ISBN': pk,})
-				.done(function(data) {
-					self.check_inout(data['data'].id, 'check_out')
+			check_create(ISBN) {
+				ebookSystemAPI.libraryRecordAction.checkCreate({ISBN})
+				.then(res => {
+					return ebookSystemAPI.libraryRecordAction.checkInout({
+						pk: res.data.id,
+						action: 'check_out',
+					})
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.message)
+				.then(res => {
+					alertmessage('success', '成功借閱書籍')
 				})
-
-			},
-			check_inout: function (pk, action) {
-				let self = this
-
-				rest_aj_send('post', '/ebookSystem/api/libraryrecords/' +pk +'/action/check_inout/', {'action': action,})
-				.done(function(data) {
-					let message = ''
-					if(action==='check_in'){
-						message = '成功歸還書籍'
-						alertmessage('success', message)
-						.done(function() {
-							window.location.reload()
-						})
-					}
-					if(action==='check_out'){
-						message = '成功借閱書籍'
-						alertmessage('success', message)
-					}
-				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.message)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 
 			},
-			feedback: function () {
-				let self = this
-				let feedback_content = self.feedback_content
-				self.clientb.books.feedback(self.feedback_id, {
-					feedback_content: feedback_content,
+			feedback(){
+				ebookSystemAPI.bookAction.feedback(this.feedback_id, {
+					content: this.feedback_content,
 				})
-				.done(function(data) {
+				.then(res => {
 					alertmessage('success', '成功回報資料')
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
-
 			},
 		},
 	}

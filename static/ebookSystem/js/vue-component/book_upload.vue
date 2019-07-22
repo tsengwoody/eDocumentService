@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h3 v-if="format!='self'"><legend>電子檔上傳</legend></h3>
 		<h3 v-else><legend>掃描檔上傳</legend></h3>
@@ -139,9 +139,9 @@
 	module.exports = {
 		props: ['format',],
 		components: {
-			'bookinfo_search': httpVueLoader('/static/ebookSystem/js/vue-component/bookinfo_search.vue')
+			'bookinfo_search': components['bookinfo_search'],
 		},
-		data: function(){
+		data(){
 			return {
 				mode:'input', //input or search
 				search_ISBN: '',
@@ -198,7 +198,7 @@
 			}
 		},
 		computed: {
-			loading: function(){
+			loading(){
 				if(this.mode=='search') return 'inline-block'
 				else if(this.mode=='input') return 'none'
 				else return 'none';
@@ -208,7 +208,7 @@
 				else if(this.format=='self') return '/ebookSystem/api/books/action/create/'
 			},
 		},
-		mounted: function () {
+		mounted(){
 			let self = this
 			self.clientb = new $.RestClient('/ebookSystem/api/');
 			self.clientb.add('bookinfos');

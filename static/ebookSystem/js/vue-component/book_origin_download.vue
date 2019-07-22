@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="form-horizontal">
 		<form-drf 
 			:model_info="model_info.fileformat"
@@ -13,6 +13,7 @@
 		></form-drf>
 	</div>
 </template>
+
 <script>
 
 function post(path, params, method) {
@@ -42,63 +43,57 @@ function post(path, params, method) {
 	module.exports = {
 		props: ['pk',],
 		components: {
-			'form-drf': httpVueLoader('/static/ebookSystem/js/vue-component/form.vue'),
+			'form-drf': components['form'],
 		},
-		data: function(){
+		data(){
 			return {
 				fileformat: 'epub',
 				password: '',
 				model_info: {
-					fileformat: {
-						label: '類型',
-						type: 'select',
-						choices: [
+					'fileformat': {
+						'label': '類型',
+						'type': 'select',
+						'choices': [
 							{
-								display_name: '電子書(epub)',
-								value: 'epub',
+								'display_name': '電子書(epub)',
+								'value': 'epub',
 							},
 							{
-								display_name: '純文字(txt)',
-								value: 'txt',
+								'display_name': '純文字(txt)',
+								'value': 'txt',
 							},
 						],
 					},
 					password: {
-						label: '密碼',
-						type: 'password',
+						'label': '密碼',
+						'type': 'password',
 					},
 				},
 			}
 		},
-		created: function () {
-			let self = this;
-		},
-		mounted: function () {
-			this.refresh();
+		mounted(){
+			this.refresh()
 		},
 		methods: {
-			instance_set: function (event) {
-				this.pk = event;
-				this.refresh();
+			instance_set(event){
+				this.pk = event
+				this.refresh()
 			},
-			refresh: function () {
-				this.fileformat = 'epub';
-				this.password = '';
+			refresh(){
+				this.fileformat = 'epub'
+				this.password = ''
 			},
-			object_get: function () {
-				let self = this;
-
-				let authenticate_url = '/genericUser/api/users/action/authenticate/';
-				rest_aj_send('post', authenticate_url, {'username': user.username, 'password': this.password,})
-				.done(function(data) {
+			object_get(){
+				let authenticate_url = '/genericUser/api/users/action/authenticate/'
+				genericUserAPI.userAction.authenticate(user.username, this.password)
+				.then(res => {
 					let url = '/ebookSystem/api/books/' +self.pk +'/action/download/';
 					let csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-					post(url, {fileformat: self.fileformat, password: self.password, csrfmiddlewaretoken: csrf}, 'post')
+					post(url, {'fileformat': this.fileformat, 'password': this.password, 'csrfmiddlewaretoken': csrf}, 'post')
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', '失敗使用者驗證')
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
-
 			},
 		},
 	};

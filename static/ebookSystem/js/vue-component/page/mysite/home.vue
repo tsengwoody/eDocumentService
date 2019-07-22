@@ -24,11 +24,8 @@
 		},
 		mounted(){
 			mode = localStorage.getItem('nav_mode');
-			if (!mode) {
-				this.mode = 'all'
-			}
-			else {
-				this.mode = mode
+			if (!(mode=='all') && !(mode=='self')) {
+				this.mode = 'all';
 			}
 		},
 		computed: {

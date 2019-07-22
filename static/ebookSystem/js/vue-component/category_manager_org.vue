@@ -218,9 +218,6 @@
 			.catch(res => {
 				alertmessage('error', o2j(res.response.data));
 			})
-			this.clientb = new $.RestClient('/ebookSystem/api/');
-			this.clientb.add('booksimples');
-			this.clientb.add('categorys');
 			this.refresh();
 		},
 		methods: {

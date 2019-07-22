@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div class="tab-content">
 		<h3>{|{ org.name }|}</h3>
 		<div id="ebook_review_list">
@@ -32,42 +32,30 @@
 			}
 		},
 		mounted: function () {
-			let self = this
-
-			this.clientg = new $.RestClient('/genericUser/api/');
-			this.clientg.add('organizations');
-			this.clientg.organizations.read(this.org_id)
-			.done(function(data) {
-				self.org = data
+			genericUserAPI.organizationRest.read(this.org_id)
+			.then(res => {
+				this.org = res.data
 			})
-			.fail(function(xhr, result, statusText){
-				alertmessage('error', xhr.responseText)
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
 			})
-
-			this.clientb = new $.RestClient('/ebookSystem/api/');
-			this.clientb.add('ebooks');
 			this.review_list()
 		},
 		methods: {
-			review_list: function () {
-				let self = this;
-				self.ebook_datas = [];
-
-				self.clientb.ebooks.read({'status': '3', 'org_id': self.org_id,})
-				.done(function(data) {
-					let filter_data = [];
-					_.each(data, function(v){
-						filter_data.push({
+			review_list(){
+				ebookSystemAPI.ebookRest.filter({'status': '3', 'org_id': self.org_id,})
+				.then(res => {
+					this.ebook_datas = [];
+					_.each(res.data, function(v){
+						this.ebook_datas.push({
 							bookname: v.bookname,
 							part: v.part,
 							action: v,
 						})
 					})
-					self.ebook_datas = filter_data;
-
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
 		},

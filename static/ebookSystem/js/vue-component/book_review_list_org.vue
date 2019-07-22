@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 		<h3>{|{ org.name }|}</h3>
 		<div class="tab-content">
@@ -29,7 +29,7 @@
 		components: {
 			'table-div': components['table-div'],
 		},
-		data: function() {
+		data(){
 			return {
 				org: {},
 				book_header: {
@@ -43,27 +43,20 @@
 				book_datas: [],
 			}
 		},
-		mounted: function () {
-			let self = this
-
-			this.clientg = new $.RestClient('/genericUser/api/');
-			this.clientg.add('organizations');
-			this.clientg.organizations.read(this.org_id)
-			.done(function(data) {
-				self.org = data
+		mounted(){
+			genericUserAPI.organizationRest.read(this.org_id)
+			.then(res => {
+				this.org = res.data
 			})
-			.fail(function(xhr, result, statusText){
-				alertmessage('error', xhr.responseText)
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
 			})
 
-			this.clientb = new $.RestClient('/ebookSystem/api/');
-			this.clientb.add('books');
-
-			self.clientb.books.read({'status': '0', 'org_id': self.org_id})
-			.done(function(data) {
-				let filter_data = [];
-				_.each(data, function(v){
-					filter_data.push({
+			ebookSystemAPI.bookRest.filter({'status': '0', 'org_id': self.org_id})
+			.then(res => {
+				this.book_datas = [];
+				_.each(res.data, (v) => {
+					this.book_datas.push({
 						'ISBN': v.ISBN,
 						'bookname': v.book_info.bookname,
 						'page': v.finish_page_count +'/' +v.page_count,
@@ -72,10 +65,9 @@
 						'action': v,
 					})
 				})
-				self.book_datas = filter_data
 			})
-			.fail(function(xhr, result, statusText){
-				alertmessage('error', xhr.responseText)
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
 			})
 		},
 	}

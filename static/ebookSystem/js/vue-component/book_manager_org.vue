@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div :id="'book_manager' +org_id" class="tab-content">
 		<h3>{|{ org.name }|}</h3>
 		<div id="book_manager_search">
@@ -92,7 +92,7 @@
 			'modal': components['modal'],
 			'table-div': components['table-div'],
 		},
-		data: function() {
+		data(){
 			return {
 				id: Math.floor(Math.random() * 100000000).toString(),
 				book_update: {},
@@ -118,40 +118,30 @@
 				book_datas: [],
 			}
 		},
-		mounted: function () {
-			let self = this
-
-			this.clientg = new $.RestClient('/genericUser/api/');
-			this.clientg.add('organizations');
-			this.clientg.add('users');
-			this.clientg.organizations.read(this.org_id)
-			.done(function(data) {
-				self.org = data
+		mounted(){
+			genericUserAPI.organizationRest.read(this.org_id)
+			.then(res => {
+				this.org = res.data
 			})
-			.fail(function(xhr, result, statusText){
-				alertmessage('error', xhr.responseText)
-			})
-			this.clientg.users.read({role: 'guest'})
-			.done(function(data) {
-				self.user_list = data;
-			})
-			.fail(function(xhr, result, statusText){
-				alertmessage('error', xhr.responseText)
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
 			})
 
-			this.clientb = new $.RestClient('/ebookSystem/api/');
-			this.clientb.add('books');
+			genericUserAPI.userRest.filter({role: 'guest'})
+			.then(res => {
+				this.user_list = res.data;
+			})
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
+			})
 		},
 		methods: {
-			search: function () {
-				let self = this;
-				self.book_datas = []
-
-				self.clientb.books.read({'bookname': self.search_value, 'status': this.search_filter, 'org_id': self.org_id})
-				.done(function(data) {
-					filter_data = []
-					_.each(data, function(v){
-						filter_data.push({
+			search(){
+				ebookSystemAPI.bookRest.filter({'bookname': this.search_value, 'status': this.search_filter, 'org_id': this.org_id})
+				.then(res => {
+					this.book_datas = [];
+					_.each(res.data, (v) => {
+						this.book_datas.push({
 							'ISBN': v.ISBN,
 							'bookname': v.book_info.bookname,
 							'page': v.finish_page_count +'/' +v.page_count,
@@ -160,28 +150,24 @@
 							'action': v,
 						})
 					})
-					self.book_datas = filter_data,
-
-					alertmessage('success', '查詢完成，共取得 ' +self.book_datas.length +' 筆資料')
+					alertmessage('success', '查詢完成，共取得 ' +this.book_datas.length +' 筆資料')
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
-			updates: function () {
-				let self = this
-				let feedback_content = self.feedback_content
-				self.clientb.books.updatepart(self.book_update.ISBN, {
-					priority: self.book_update.priority,
-					owner: self.book_update.owner,
+			updates(){
+				let feedback_content = this.feedback_content
+				ebookSystemAPI.bookSimpleRest.partialupdate(this.book_update.ISBN, {
+					priority: this.book_update.priority,
+					owner: this.book_update.owner,
 				})
-				.done(function(data) {
+				.then(res => {
 					alertmessage('success', '成功更新資料')
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
-
 			},
 		},
 	}
