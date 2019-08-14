@@ -78,7 +78,6 @@
 </div>
 </template>
 <script>
-	Vue.options.delimiters = ['{|{', '}|}'];
 
 	module.exports = {
 		props: ['user_id',],
@@ -87,7 +86,7 @@
 			'tab': components['tab'],
 			'table-div': components['table-div'],
 		},
-		data: function(){
+		data(){
 			return {
 				pk: '',
 				tab_data: [
@@ -150,7 +149,7 @@
 			}
 		},
 		computed: {
-			transferData: function(){
+			transferData(){
 				return {
 					"editrecord_set": this.editrecord_checks,
 					"date": moment().format('YYYY-MM-DD'),
@@ -160,7 +159,7 @@
 					"org": this.org_select,
 				}
 			},
-			service_hours: function(){
+			service_hours(){
 				let self = this
 
 				service_hour = 0
@@ -173,54 +172,49 @@
 			},
 		},
 		watch: {
-			user_id: function() {
+			user_id(){
 				this.pk = this.user_id
 				this.refresh()
 			},
 		},
-		mounted: function () {
-			this.clientg = new $.RestClient('/genericUser/api/');
-			this.clientg.add('serviceinfos');
-			this.clientg.add('organizations');
-			this.clientb = new $.RestClient('/ebookSystem/api/');
-			this.clientb.add('editrecords');
+		mounted(){
 			this.pk = this.user_id
-		this.refresh()
+			this.refresh()
 		},
 		methods: {
-			instance_set: function (event) {
-				this.pk = event
-				this.refresh()
+			instance_set(event){
+				this.pk = event;
+				this.refresh();
 			},
-			refresh: function(){
-				let self = this
+			refresh(){
+				this.editrecords = []
+				this.editrecord_checks = []
+				this.exchange_false_serviceinfos = []
+				this.exchange_true_serviceinfos = []
 
-				self.editrecords = []
-				self.editrecord_checks = []
-				self.exchange_false_serviceinfos = []
-				self.exchange_true_serviceinfos = []
-
-				query = {'editor_id': self.pk, 'exchange': 'false',}
-				self.clientb.editrecords.read(query)
-				.done(function(data) {
-					_.each(data, function(v){
-						temp_data = {
+				query = {'editor_id': this.pk, 'exchange': 'false',}
+				ebookSystemAPI.editRecordRest.filter(query)
+				.then(res => {
+					_.each(res.data, (v) => {
+						this.editrecords.push({
 							id: v['id'],
 							get_date: v['get_date'],
 							service_hours: v['service_hours'],
 							stay_hours: v['stay_hours'],
 							category: v['category'],
-						};
-						self.editrecords.push(temp_data);
-						self.editrecord_checks.push(v.id)
+						});
+						this.editrecord_checks.push(v.id)
 					})
 				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
 
-				query = {'owner_id': self.pk, 'is_exchange': 'false',}
-				self.clientg.serviceinfos.read(query)
-				.done(function(data) {
-					_.each(data, function(v){
-						self.exchange_false_serviceinfos.push({
+				query = {'owner_id': this.pk, 'is_exchange': 'false',}
+				genericUserAPI.serviceInfoRest.filter(query)
+				.then(res => {
+					_.each(res.data, (v) => {
+						this.exchange_false_serviceinfos.push({
 							date: v['date'],
 							service_hours: v['service_hours'],
 							'org': v['orginfo'].name,
@@ -229,12 +223,15 @@
 						})
 					})
 				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
 
-				query = {'owner_id': self.pk, 'is_exchange': 'true',}
-				self.clientg.serviceinfos.read(query)
-				.done(function(data) {
-					_.each(data, function(v){
-						self.exchange_true_serviceinfos.push({
+				query = {'owner_id': this.pk, 'is_exchange': 'true',}
+				genericUserAPI.serviceInfoRest.filter(query)
+				.then(res => {
+					_.each(res.data, (v) => {
+						this.exchange_true_serviceinfos.push({
 							date: v['date'],
 							service_hours: v['service_hours'],
 							'org': v['orginfo'].name,
@@ -242,77 +239,70 @@
 						})
 					})
 				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
 
-				self.clientg.organizations.read()
-				.done(function(data) {
-					self.org_list = data
+				genericUserAPI.organizationRest.list()
+				.then(res => {
+					this.org_list = res.data;
 				})
 			},
-			editrecord_select_all: function(){
-				let self = this
-
-				_.each(self.editrecords, function(v){
-					self.editrecord_checks.push(v.id)
+			editrecord_select_all(){
+				_.each(this.editrecords, (v) => {
+					this.editrecord_checks.push(v.id)
 				})
 			},
-			editrecord_select_inv: function(){
-				let self = this
-
-				temp = []
-				_.each(self.editrecords, function(v){
-					if(!_.includes(self.editrecord_checks, v.id)){
+			editrecord_select_inv(){
+				let temp = [];
+				_.each(this.editrecords, (v) => {
+					if(!_.includes(this.editrecord_checks, v.id)){
 					temp.push(v.id)
 					}
 				})
-				self.editrecord_checks = temp
+				this.editrecord_checks = temp;
 			},
-			serviceinfo_create: function(){
-				let self = this
-
-				if(iser(self.editrecord_checks)){
+			serviceinfo_create(){
+				if(iser(this.editrecord_checks)){
 					alertmessage('error', '請至少選擇一筆服務紀錄。')
 					return -1
 				}
 
-				if(iser(self.org_select)){
+				if(iser(this.org_select)){
 					alertmessage('error', '請選擇兌換中心。')
 					return -1
 				}
 
-				if(self.service_hours<60){
+				if(this.service_hours<60){
 					alertmessage('error', '單筆申請服務時數需超過1小時。')
 					return -1
 				}
 
-				self.clientg.serviceinfos.create(self.transferData)
-				.done(function(data) {
-					alertmessage('success', '申請兌換時數' +o2j(data['service_hours']) +'，請等待核發。')
-					self.refresh()
-
+				genericUserAPI.serviceInfoRest.create(this.transferData)
+				.then(res => {
+					alertmessage('success', '申請兌換時數' +o2j(res.data.service_hours) +'，請等待核發。');
+					this.refresh();
 				})
-				.fail(function(data){
-					alertmessage('error', data['message'])
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 
 			},
-			serviceinfo_delete: function(id){
-				let self = this
-
+			serviceinfo_delete(id){
 				alertconfirm('是否確認取消申請該服務時數(id:' +id +')？')
-				.done(function(){
-					self.clientg.serviceinfos.del(id)
-					.done(function(data) {
-						alertmessage('success', '已取消申請兌換時數(id:' +id +')，請重新選擇服務紀錄。')
-						self.refresh()
+				.done(() => {
+					genericUserAPI.serviceInfoRest.delete(id)
+					.then(res => {
+						alertmessage('success', '已取消申請兌換時數(id:' +id +')，請重新選擇服務紀錄。');
+						this.refresh();
 					})
-					.fail(function(xhr, result, statusText){
-						alertmessage('error', xhr.responseText)
+					.catch(res => {
+						alertmessage('error', o2j(res.response.data));
 					})
 				})
-
 			},
-			editrecords_detail: function(editrecords){
-				this.detail_editrecords = editrecords
+			editrecords_detail(editrecords){
+				this.detail_editrecords = editrecords;
 			},
 		},
 	}

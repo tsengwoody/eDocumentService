@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div style="padding:20px 20px; background-color:#fafafa;">
 
 		<div class="row">
@@ -33,40 +33,36 @@
 		components: {
 			'viewer': components['viewer'],
 		},
-		data: function(){
+		data(){
 			return {
 				image: {},
 				content: '',
 				fontSize: 140,
 			}
 		},
-		mounted: function () {
+		mounted(){
 			if (this.pk) {
 				this.refresh();
 			}
 		},
 		methods: {
-			instance_set: function (event) {
-				this.pk = event
+			instance_set(event){
+				this.pk = event;
 				this.refresh();
 			},
-			refresh: function () {
-				//ebooks
-				const self = this;
-				let client = new $.RestClient('/ebookSystem/api/');
-				client.add('ebooks');
-
+			refresh(){
 				//read text data
 				let tu = '/ebookSystem/api/ebooks/' + this.pk  + '/resource/OCR/origin';
-
-				//when
-				$.when(client.ebooks.read(this.pk), $.get(tu))
-					.done(function(data_pic, data_text){
-						self.image = data_pic[0].scan_image;
-						self.content =  _.escape(data_text[0]);
-					})
+				Promise.all([
+					ebookSystemAPI.ebookRest.read(this.pk),
+					axios.get(tu),
+				])
+				.then(res => {
+					this.image = res[0].data.scan_image;
+					this.content = _.escape(res[1].data);
+				})
 			},
-			changeFontSize: function() {
+			changeFontSize(){
 				if (this.fontSize < 200) {
 					this.fontSize = this.fontSize + 20;
 				} else {
@@ -74,7 +70,6 @@
 				}
 			}
 		},
-		computed: {}
 	}
 
 </script>

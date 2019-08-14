@@ -17,12 +17,15 @@
 					<option value="">---</option>
 					<template v-if="!iser(users)" v-for="(user, index) in users">
 						<option
-							:value="user.id"
+							:value="user.username"
 						>
 							{|{ user.username }|}
 						</option>
 					</template>
 				</select>
+			</div>
+			<div class="col-sm-4">
+				<input class="form-control" v-model="assign_user"/>
 			</div>
 		</div>
 		<div class="form-group">
@@ -43,7 +46,7 @@
 
 	module.exports = {
 		props: ['isbn_part'],
-		data: function(){
+		data(){
 			return {
 				// assign data
 				assign_user: '',
@@ -53,35 +56,27 @@
 				filter_word: '',
 			}
 		},
-		computed: {
-			url: function () {
-				return '/ebookSystem/api/ebooks/' +this.isbn_part +'/'
-			},
-		},
 		methods: {
-			instance_set: function(pk){
+			instance_set(pk){
 				this.isbn_part = pk;
 			},
-			save_assign: function(){
-				let self = this;
-				// post to assign
-				rest_aj_send(
-					'post',
-					this.url +'action/assign/',
-					{
-						id: self.assign_user,
-						deadline: self.deadline,
-					},
-				)
-				.done(function(data) {
-					alertmessage('success', data['message'])
-					.done(function(data) {
+			save_assign(){
+				ebookSystemAPI.ebookAction.assign(this.isbn_part, {
+					username: this.assign_user,
+					deadline: this.deadline,
+				})
+				.then(res => {
+					alertmessage('success', res.data['detail'])
+					.done(() => {
 						location.reload()
 					})
 				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
 
 			},
-			filter_user: function(){
+			filter_user(){
 				let vo = this;
 				vo.filter_word = vo.filter_word.trim();
 				let filtered_users = vo.orig_users.filter(function(item, index, array){

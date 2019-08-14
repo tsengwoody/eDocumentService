@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id="permissionDiv" class="row">
 		<h4>使用者名稱：{|{ username }|}</h4>
 		<div style="margin:20px;">
@@ -13,11 +13,9 @@
 	</div>
 </template>
 <script>
-	Vue.options.delimiters = ['{|{', '}|}'];
-
 	module.exports = {
 		props: ['pk',],
-		data: function(){
+		data(){
 			return {
 				'username': '',
 				user_permission: {
@@ -38,37 +36,30 @@
 				},
 			}
 		},
-		created: function () {
-			let self = this
-			self.client = new $.RestClient('/genericUser/api/')
-			self.client.add('users');
-		},
-		mounted: function () {
+		mounted(){
 			this.refresh()
 		},
 		methods: {
-			instance_set: function (event) {
+			instance_set(event){
 				this.pk = event
 				this.refresh()
 			},
-			refresh: function () {
-				let self = this
-				self.client.users.read(self.pk)
-				.done(function(data) {
-					self.username = data.username
-					_.each(self.user_permission, function(v,k){
-						self.user_permission[k] = data[k]
+			refresh(){
+				genericUserAPI.userRest.read(this.pk)
+				.then(res => {
+					this.username = res.data.username
+					_.each(this.user_permission, (v,k) => {
+						this.user_permission[k] = res.data[k];
 					})
 				})
 			},
-			permission_update: function () {
-				let self = this
-				self.client.users.updatepart(self.pk, self.user_permission)
-				.done(function(data) {
+			permission_update(){
+				genericUserAPI.userRest.partialupdate(this.pk, this.user_permission)
+				.then(res => {
 					alertmessage('success', '完成權限變更')
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
 		},

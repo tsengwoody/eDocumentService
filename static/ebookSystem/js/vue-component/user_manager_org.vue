@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div :id="'user_manager' +org_id">
 		<h3>{|{ org.name }|}</h3>
 		<div>
@@ -96,7 +96,7 @@
 			'table-div': components['table-div'],
 			'user_permission': components['user_permission'],
 		},
-		data: function(){
+		data(){
 			return {
 				org: {},
 				dm_bus: new Vue(),
@@ -113,54 +113,42 @@
 				temp_dcpk: '',
 			}
 		},
-		mounted: function () {
-			let self = this
-
+		mounted(){
 			//this.dm_bus.$on('instance-refresh', this.user_refresh)
-			this.clientg = new $.RestClient('/genericUser/api/');
-			this.clientg.add('users');
-			this.clientg.add('organizations');
-			this.clientg.organizations.read(this.org_id)
-			.done(function(data) {
-				self.org = data
+			genericUserAPI.organizationRest.read(this.org_id)
+			.then(res => {
+				this.org = res.data
 			})
-			.fail(function(xhr, result, statusText){
-				alertmessage('error', xhr.responseText)
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
 			})
 		},
 		methods: {
-			user_refresh: function (reason) {
-				let self = this;
-
-				if(self.search_role==='unauth'){
-					query = {'search': self.search_value, 'auth': 'false'}
+			user_refresh(reason){
+				if(this.search_role==='unauth'){
+					query = {'search': this.search_value, 'auth': 'false'}
 				}
 				else {
-					query = {'search': self.search_value, 'role': self.search_role}
+					query = {'search': this.search_value, 'role': this.search_role}
 				}
-				query['org_id'] = self.org_id
+				query['org_id'] = this.org_id
 
-				self.clientg.users.read(query)
-				.done(function(data){
-					filter_data = []
-					_.each(data,function(v){
-						temp_data = {
+				genericUserAPI.userRest.filter(query)
+				.then(res => {
+					_.each(res.data, (v) => {
+						this.datas.push({
 							"username": v.username,
 							"name": v.first_name +v.last_name,
 							"email": v.email,
 							"phone": v.phone,
 							"action": v,
-						}
-						filter_data.push(temp_data)
+						})
 					})
-					self.datas = filter_data
-					if(reason==='search'){ alertmessage('success', '查詢完成，共取得 ' +self.datas.length +' 筆資料'); }
+					if(reason==='search'){ alertmessage('success', '查詢完成，共取得 ' +this.datas.length +' 筆資料'); }
 				})
-				.fail(function(xhr, result, statusText){
-					console.log(xhr)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
-
-
 			},
 		},
 	}

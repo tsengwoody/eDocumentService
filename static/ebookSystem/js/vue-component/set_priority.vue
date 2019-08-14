@@ -40,31 +40,28 @@
 			})
 		},
 		methods: {
-			instance_set: function(pk){
+			instance_set(pk){
 				this.pk = pk
 				this.get_priority()
 			},
-			get_priority: function(){
-				let self = this
-				rest_aj_send('get', '/ebookSystem/api/books/' +self.pk +'/action/set_priority/', {})
-				.done(function (data) {
-					self.priority = data['data'].priority
+			get_priority(){
+				ebookSystemAPI.bookRest.read(this.pk)
+				.then(res => {
+					this.priority = res.data.priority;
 				})
-				.fail(function(data){
-					alertmessage('error', o2j(data))
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
-			set_priority: function(){
-				let self = this
-				rest_aj_send('post', '/ebookSystem/api/books/' +self.pk +'/action/set_priority/', {'priority': self.priority})
-				.done(function (data) {
+			set_priority(){
+				ebookSystemAPI.bookRest.partialupdate(this.pk, {priority: this.priority,})
+				.then(res => {
+					this.$emit('update')
+					this.priority = res.data.priority;
 					alertmessage('success', '成功設定權重')
-						.done(function () {
-							self.$emit('update')
-						});
 				})
-				.fail(function(data){
-					alertmessage('error', o2j(data))
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
 		},

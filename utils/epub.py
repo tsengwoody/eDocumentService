@@ -41,7 +41,8 @@ def html2epub(part_list, dst, **kwargs):
 	c_list = []
 	toc = []
 	for i in range(len(part_list)):
-		c_soup = BeautifulSoup(open(part_list[i]), 'html5lib')
+		with io.open(part_list[i], 'r', encoding='utf-8') as f:
+			c_soup = BeautifulSoup(f.read(), 'html5lib')
 		c = epub.EpubHtml(
 			title=u'{0}-part{1}'.format(kwargs['bookname'], i+1),
 			file_name='Text/part{0}.xhtml'.format(i+1),

@@ -51,7 +51,7 @@
 			'modal': components['modal'],
 			'table-div': components['table-div'],
 		},
-		data: function(){
+		data(){
 			return {
 				org: [],
 				serviceinfo_header: {
@@ -75,31 +75,23 @@
 				detail_editrecord_datas: [],
 			}
 		},
-		mounted: function () {
-			let self = this
-
-			this.clientg = new $.RestClient('/genericUser/api/');
-			this.clientg.add('serviceinfos');
-			this.clientg.add('organizations');
-			this.clientg.organizations.read(this.org_id)
-			.done(function(data) {
-				self.org = data
+		mounted(){
+			genericUserAPI.organizationRest.read(this.org_id)
+			.then(res => {
+				this.org = res.data
 			})
-			.fail(function(xhr, result, statusText){
-				alertmessage('error', xhr.responseText)
+			.catch(res => {
+				alertmessage('error', o2j(res.response.data));
 			})
-			this.get_serviceinfo_data()
+			this.get_serviceinfo_data();
 		},
 		methods: {
-			get_serviceinfo_data: function () {
-				let self = this;
-				self.serviceinfo_datas = []
-
-				self.clientg.serviceinfos.read({'is_exchange': 'false', 'org_id': self.org_id})
-				.done(function(data) {
-					filter_data = []
-					_.each(data, function(v){
-						filter_data.push({
+			get_serviceinfo_data(){
+				this.serviceinfo_datas = [];
+				genericUserAPI.serviceInfoRest.filter({'is_exchange': 'false', 'org_id': this.org_id})
+				.then(res => {
+					_.each(res.data, (v) => {
+						this.serviceinfo_datas.push({
 							'check': v,
 							'date': v.date,
 							'service_hours': v.service_hours,
@@ -108,94 +100,71 @@
 							editrecord_set: v.editrecordinfo_set,
 						})
 					})
-					self.serviceinfo_datas = filter_data
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
-			serviceinfo_exchange: function(){
-				let self = this
-
-				if(iser(self.serviceinfo_checks)){
+			serviceinfo_exchange(){
+				if(iser(this.serviceinfo_checks)){
 					alertmessage('error', '請至少選擇一筆兌換紀錄。')
 					return -1
 				}
 
-				//PATCH
 				let dfs = [];
-				_.each(self.serviceinfo_checks, function (v) {
-
-					//updatepart
-					let df = self.clientg.serviceinfos.updatepart(v, { 'is_exchange': true });
-
-					//push
-					dfs.push(df);
+				_.each(this.serviceinfo_checks, (v) => {
+					dfs.push(genericUserAPI.serviceInfoRest.partialupdate(v, { 'is_exchange': true }));
 				})
 
-				//Promise.all
 				Promise.all(dfs)
-				.then(function () {
+				.then(res => {
 					alertmessage('success', '同意兌換成功')
-					.done(function () {
-						self.get_serviceinfo_data()
+					.done(() => {
+						this.get_serviceinfo_data();
 					})
 				})
-				.catch(function (msg) {
-					alertmessage('error', '非預期同意兌換失敗: ' + msg);
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
-			serviceinfo_cancel: function(){
-				let self = this
-
-				if(iser(self.serviceinfo_checks)){
+			serviceinfo_cancel(){
+				if(iser(this.serviceinfo_checks)){
 					alertmessage('error', '請至少選擇一筆兌換紀錄。')
 					return -1
 				}
 
-				//PATCH
 				let dfs = [];
-				_.each(self.serviceinfo_checks, function (v) {
-
-					//updatepart
-					let df = self.clientg.serviceinfos.del(v);
-
-					//push
-					dfs.push(df);
+				_.each(this.serviceinfo_checks, (v) => {
+					dfs.push(genericUserAPI.serviceInfoRest.delete(v));
 				})
 
-				//Promise.all
 				Promise.all(dfs)
-				.then(function () {
+				.then(res => {
 					alertmessage('success', '退回兌換申請')
-					.done(function () {
-						self.get_serviceinfo_data()
+					.done(() => {
+						this.get_serviceinfo_data();
 					})
 				})
-				.catch(function (msg) {
-					alertmessage('error', '非預期同意兌換失敗: ' + msg);
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
-			serviceinfo_select_all: function(){
-				let self = this
-
-				_.each(self.serviceinfo_datas, function(v){
-					self.serviceinfo_checks.push(v.check.id)
+			serviceinfo_select_all(){
+				_.each(this.serviceinfo_datas, (v) => {
+					this.serviceinfo_checks.push(v.check.id);
 				})
 			},
-			serviceinfo_select_inv: function(){
-				let self = this
-
-				temp = []
-				_.each(self.serviceinfo_datas, function(v){
-					if(!_.includes(self.serviceinfo_checks, v.check.id)){
-					temp.push(v.check.id)
+			serviceinfo_select_inv(){
+				let temp = [];
+				_.each(this.serviceinfo_datas, (v) => {
+					if(!_.includes(this.serviceinfo_checks, v.check.id)){
+					temp.push(v.check.id);
 					}
 				})
-				self.serviceinfo_checks = temp
+				this.serviceinfo_checks = temp
 			},
-			editrecords_detail: function(editrecords){
-				this.detail_editrecord_datas = editrecords
+			editrecords_detail(editrecords){
+				this.detail_editrecord_datas = editrecords;
 			},
 		},
 	}

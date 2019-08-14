@@ -5,25 +5,25 @@
 			<div class="school-slide">
 				<img
 					src="static/ebookSystem/img/school/banner.png"
-					alt=""
+					alt="校園版 banner"
 					title=""
 					style="width: 100%" 
 				>
 				<div class="slide-icons">
 					<a href="https://line.me/R/ti/g/eYf_3Ast89" target="_blank">
-						<img src="static/ebookSystem/img/school/line.png" alt="link to Line account">
+						<img src="static/ebookSystem/img/school/line.png" alt="連至 Line 帳號(開啟新視窗)">
 					</a>
 					<a href="https://www.facebook.com/forblind/" target="_blank">
-						<img src="static/ebookSystem/img/school/fb-icon.png" alt="link to Facebook page">
+						<img src="static/ebookSystem/img/school/fb-icon.png" alt="連至 Facebook 頁面(開啟新視窗)">
 					</a>
 					<a href="https://www.youtube.com/channel/UC8TV4EKxbSQPzx8nmTzfIag" target="_blank">
-						<img src="static/ebookSystem/img/school/youtube.png" alt="link to Youtube page">
+						<img src="static/ebookSystem/img/school/youtube.png" alt="連至 Youtube 頁面(開啟新視窗)">
 					</a>
 				</div>
 			</div>
 		</div>
 
-		<form class="form-inline form-row">
+		<!--<form class="form-inline form-row">
 			<div class="form-group">
 				列表排序：依
 				<label>
@@ -57,65 +57,71 @@
 
 				<button class="btn btn-default u-margin-left-sm">搜尋</button>
 			</div>
-		</form>
+		</form>-->
 
 		<h3>校園公佈欄列表</h3>
 		<div class="row">
-			
 			<div style="float: left;width: 65%;margin: 0px 1rem;">
-				<table-div :datas="datas" :header="header">
+				<table-div :datas="announcement_datas" :header="announcement_header">
+					<template slot="action" slot-scope="props">
+						<a
+							class="btn btn-link"
+							role="button"
+							:href="'/routing/genericUser/announcement/' +props.item +'/'"
+						>閱讀全文</a>
+					</template>
 				</table-div>
 			</div>
 			
 
 			<div style="width: 30%; float: left;">
 				<div class="col-sm-4">
-					<a href="#" class="tool-box">
+					<a href="/genericUser/generics/recruit/" class="tool-box">
 						<div class="tool-box__img">
-							<img src="static/ebookSystem/img/school/sun.png" alt="" style="height:100%;">
+							<img src="static/ebookSystem/img/school/sun.png" alt="志工招募" style="height:100%;">
 						</div>
-						<div class="tool-box__text">志工招募</div>
+						<div class="tool-box__text" aria-hidden="true">志工招募</div>
 					</a>
 				</div>
 			
 				<div class="col-sm-4">
-					<a href="#" class="tool-box">
+					<a href="/genericUser/generics/func_desc/" class="tool-box">
 						<div class="tool-box__img">
-							<img src="static/ebookSystem/img/school/wifi.png" alt="" style="height:100%;">
+							<img src="static/ebookSystem/img/school/wifi.png" alt="關於我們" style="height:100%;">
 						</div>
-						<div class="tool-box__text">關於我們</div>
+						<div class="tool-box__text" aria-hidden="true">關於我們</div>
+					</a>
+				</div>
+				<div class="col-sm-4">
+					<a href="/routing/about/contact/" class="tool-box">
+						<div class="tool-box__img">
+							<img src="static/ebookSystem/img/school/pen.png" alt="聯絡我們" style="height:100%;">
+						</div>
+						<div class="tool-box__text" aria-hidden="true">聯絡我們</div>
+					</a>
+				</div>
+				<div class="col-sm-4">
+					<a href="/routing/genericUser/manager_school/" class="tool-box">
+						<div class="tool-box__img">
+							<img src="static/ebookSystem/img/school/tool.png" alt="校園管理" style="height:100%;">
+						</div>
+						<div class="tool-box__text" aria-hidden="true">校園管理</div>
+					</a>
+				</div>
+				<div class="col-sm-4">
+					<a href="/routing/ebookSystem/book_repository_school/" class="tool-box">
+						<div class="tool-box__img">
+							<img src="static/ebookSystem/img/school/boy.png" alt="讀者專區" style="height:100%;">
+						</div>
+						<div class="tool-box__text" aria-hidden="true">讀者專區</div>
 					</a>
 				</div>
 				<div class="col-sm-4">
 					<a href="#" class="tool-box">
 						<div class="tool-box__img">
-							<img src="static/ebookSystem/img/school/pen.png" alt="" style="height:100%;">
+							<img src="static/ebookSystem/img/school/bird.png" alt="捐書捐款" style="height:100%;">
 						</div>
-						<div class="tool-box__text">聯絡我們</div>
-					</a>
-				</div>
-				<div class="col-sm-4">
-					<a href="#" class="tool-box">
-						<div class="tool-box__img">
-							<img src="static/ebookSystem/img/school/tool.png" alt="" style="height:100%;">
-						</div>
-						<div class="tool-box__text">校園管理</div>
-					</a>
-				</div>
-				<div class="col-sm-4">
-					<a href="#" class="tool-box">
-						<div class="tool-box__img">
-							<img src="static/ebookSystem/img/school/boy.png" alt="" style="height:100%;">
-						</div>
-						<div class="tool-box__text">讀者專區</div>
-					</a>
-				</div>
-				<div class="col-sm-4">
-					<a href="#" class="tool-box">
-						<div class="tool-box__img">
-							<img src="static/ebookSystem/img/school/bird.png" alt="" style="height:100%;">
-						</div>
-						<div class="tool-box__text">捐書捐款</div>
+						<div class="tool-box__text" aria-hidden="true">捐書捐款</div>
 					</a>
 				</div>
 			</div>
@@ -129,35 +135,42 @@
 		components: {
 			'table-div': components['table-div-order'],
 		},
-		data: function() {
+		data(){
 			return {
-				header: {
+				announcement_header: {
 					title: '標題',
-					publishDate: '發佈日期',
-					org: '發佈單位',
-					readCount: '點閱次數',
+					datetime: '發佈日期',
+					action: '動作',
 				},
-				datas: [
-					{
-						title: 'aaa',
-						publishDate: '2019/06/24',
-						org: 'org 1',
-						readCount: '12',
-					},
-					{
-						title: 'bbb',
-						publishDate: '2019/06/24',
-						org: 'org 2',
-						readCount: '13',
-					},
-				]
+				announcement_datas: [],
 			}
 		},
 		computed: {
 		},
 		mounted(){
+			this.get_school_announcement()
 		},
 		methods: {
+			get_school_announcement(){
+
+				query = {'category': '校園公告'}
+
+				genericUserAPI.announcementRest.filter(query)
+				.then((response) => {
+					let filter_data = []
+					_.each(response.data, (v) => {
+						let temp_data = {
+							"id": v.id,
+							"title": v['title'],
+							"datetime": v['datetime'],
+							"action": v.id,
+						}
+						filter_data.push(temp_data)
+					})
+					this.announcement_datas = filter_data
+				})
+
+			},
 		},
 	}
 </script>

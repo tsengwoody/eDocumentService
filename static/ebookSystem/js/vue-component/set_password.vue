@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div>
 			<form-drf 
 				:model_info="model_info.old_password"
@@ -6,7 +6,7 @@
 				:field="'old_password'"
 				:offset-class="'col-sm-offset-3'"
 				v-model="old_password"
-				@keyup.enter.native="set_password()"
+				@keyup.enter.native="set_password(user.id)"
 			></form-drf>
 
 			<form-drf 
@@ -15,7 +15,7 @@
 				:field="'new_password1'"
 				:offset-class="'col-sm-offset-3'"
 				v-model="new_password1"
-				@keyup.enter.native="set_password()"
+				@keyup.enter.native="set_password(user.id)"
 			></form-drf>
 
 			<form-drf 
@@ -24,7 +24,7 @@
 				:field="'new_password2'"
 				:offset-class="'col-sm-offset-3'"
 				v-model="new_password2"
-				@keyup.enter.native="set_password()"
+				@keyup.enter.native="set_password(user.id)"
 			></form-drf>
 	</div>
 </template>
@@ -33,9 +33,9 @@
 
 	module.exports = {
 		components: {
-			'form-drf': httpVueLoader('/static/ebookSystem/js/vue-component/form.vue'),
+			'form-drf': components['form'],
 		},
-		data: function(){
+		data(){
 			return {
 				old_password: '',
 				new_password1: '',
@@ -56,23 +56,18 @@
 				},
 			}
 		},
-		computed: {
-		},
-		mounted: function(){
-		},
 		methods: {
-			set_password: function(){
-				let self = this
-				rest_aj_send('post', '/genericUser/api/users/' +user.id +'/action/set_password/', {
-					old_password: self.old_password,
-					new_password1: self.new_password1,
-					new_password2: self.new_password2,
+			set_password(pk){
+				genericUserAPI.userAction.setPassword(pk, {
+					old_password: this.old_password,
+					new_password1: this.new_password1,
+					new_password2: this.new_password2,
 				})
-				.done(function(data) {
+				.then(res => {
 					alertmessage('success', '成功修改密碼')
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', '失敗修改密碼')
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 			},
 		},

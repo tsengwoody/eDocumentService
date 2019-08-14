@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<modal id_modal="bis">
 		<template slot="header">
 			<h4 class="modal-title">更多查詢方式</h4>
@@ -109,7 +109,7 @@
 			<button
 				v-if="mode==='response'"
 				ref="cb"
-				@click="bookinfo_out(bookinfo_check); closeDialog($refs.cb);"
+				@click="bookinfo_out(); closeDialog($refs.cb);"
 				class="btn btn-primary"
 			>確定</button>
 		</template>
@@ -177,39 +177,27 @@
 				bookinfo_check: 0,
 			}
 		},
-		computed: {
-		},
-		created: function () {
-		},
-		mounted: function () {
-		},
 		methods: {
-			FindBook: function () {
-				let self = this
+			intergrate(){
+				let value = this.intergrate_value;
 
-				//loading
-				self.mode = 'loading'
+				// ncl
+				let ncl_query = _.clone(this.default_ncl_query);
+				ncl_query['FO_SearchValue0'] = value;
+				ncl_query['FO_SearchValue1'] = value;
+				// douban
+				let douban_query = _.clone(this.default_douban_query);
+				douban_query['search_query'] = value;
 
-				//df
-				let df;
-				let bdone = false;
-				if (self.source=== 'intergrate') {
-					df = self.aj_ncl_douban(self.intergrate_value)
-				}
-				else if (self.source === 'ncl') {
-					df = self.aj_ncl(self.ncl_query)
-				}
-
-				df
-				.done(function (data) {
-					//bdone
-					if (bdone === true) {
-						return;
-					}
-
-					index = 0
-					_.each(data, function (v) {
-						self.result.push({
+				this.mode = 'loading';
+				Promise.all([
+					ebookSystemAPI.bookInfoAction.key2bookinfo(ncl_query),
+					ebookSystemAPI.bookInfoAction.key2bookinfo(douban_query),
+				])
+				.then(res => {
+					let index = 0;
+					_.each(res[0].data['bookinfo_list'], (v) => {
+						this.result.push({
 							"check": index,
 							"ISBN": v['ISBN'],
 							"bookname": v['bookname'],
@@ -221,134 +209,88 @@
 							"chinese_book_category": v['chinese_book_category'],
 							"source": v['source'],
 						})
-						index = index +1
+						index = index +1;
 					})
-
-					//切換顯示
-					self.mode = 'response'
-				})
-				.fail(function(xhr, result, statusText){
-					console.log(xhr)
-					alertmessage('error', xhr.responseText)
-					self.mode = 'request'
-				})
-				.always(function () {
-					bdone = true;
-				})
-
-				//等待時間限制
-				_.delay(function () {
-					if (bdone === false) {
-
-						//bdone
-						bdone = true;
-
-						//alert
-						alert('等待時間過長，可能是網路問題或符合結果過多，請重新輸入更多書籍資訊。');
-						self.mode = 'request'
-					}
-				}, 1000 * 60);
-
-			},
-			bookinfo_out: function (index) {
-				let self = this
-				self.$emit('bookinfo-out', self.result[index])
-			},
-			reset: function () {
-				let self = this
-				self.mode = 'request'
-				self.source = 'intergrate'
-				self.intergrate_value = ''
-				_.each(self.default_ncl_query, function(v, k){
-					self.ncl_query[k] = self.default_ncl_query[k]
-				})
-				_.each(self.default_douban_query, function(v, k){
-					self.douban_query[k] = self.default_douban_query[k]
-				})
-				self.result = []
-				self.bookinfo_check = 0
-			},
-			aj_ncl_douban: function(value){
-				//用value查找[全國新書資訊網]與[豆瓣]書籍資訊
-				let self = this
-
-				//df
-				let df = GenDF();
-
-				let ncl_query = _.clone(self.default_ncl_query)
-				ncl_query['FO_SearchValue0'] = value
-				ncl_query['FO_SearchValue1'] = value
-				let ncl_data = [];
-				let ncl_df = GenDF()
-
-				rest_aj_send('post', '/ebookSystem/api/bookinfos/action/key2bookinfo/', ncl_query)
-				.done(function (data) {
-					ncl_data = data['data'].bookinfo_list
-				})
-				.fail(function(xhr, result, statusText){
-					console.log(xhr)
-				})
-				.always(function () {
-					ncl_df.resolve(ncl_data);
-				})
-
-				let douban_query = _.clone(self.default_douban_query)
-				douban_query['search_query'] = value
-				let douban_data = [];
-				let douban_df = GenDF()
-
-				rest_aj_send('post', '/ebookSystem/api/bookinfos/action/key2bookinfo/', douban_query)
-				.done(function (data) {
-					douban_data = data['data'].bookinfo_list
-				})
-				.fail(function(xhr, result, statusText){
-					console.log(xhr)
-				})
-				.always(function () {
-					douban_df.resolve(douban_data);
-				})
-
-				//when
-				$.when(ncl_df, douban_df)
-				.done(function (data1, data2) {
-
-					let r = [];
-					_.each(data1, function (v) {
-						r.push(v);
+					_.each(res[1].data['bookinfo_list'], (v) => {
+						this.result.push({
+							"check": index,
+							"ISBN": v['ISBN'],
+							"bookname": v['bookname'],
+							"bookbinding": v['bookbinding'],
+							"order": v['order'],
+							"author": v['author'],
+							"house": v['house'],
+							"date": v['date'],
+							"chinese_book_category": v['chinese_book_category'],
+							"source": v['source'],
+						})
+						index = index +1;
 					})
-					_.each(data2, function (v) {
-						r.push(v);
-					})
-
-					//no date
-					if (r.length === 0) {
-						df.resolve(r);
-						//df.reject(r);
-					}
-					else {
-						df.resolve(r);
+					this.mode = 'response';
+					if (this.result.length === 0) {
+						this.mode = 'request';
+						alertmessage('error', '查無書籍資料');
 					}
 				})
-				return df;
+				.catch(res => {
+					this.mode = 'request';
+					alertmessage('error', o2j(res));
+				})
 			},
-			aj_ncl: function(ncl_query){
-				//用value查找[全國新書資訊網]與[豆瓣]書籍資訊
-				let self = this
-
-				let ncl_data = [];
-				let ncl_df = GenDF()
-
-				rest_aj_send('post', '/ebookSystem/api/bookinfos/action/key2bookinfo/', ncl_query)
-				.done(function (data) {
-					ncl_data = data['data'].bookinfo_list
+			ncl(){
+				this.mode = 'loading';
+				ebookSystemAPI.bookInfoAction.key2bookinfo(this.ncl_query)
+				.then(res => {
+					let index = 0;
+					_.each(res.data['bookinfo_list'], (v) => {
+						this.result.push({
+							"check": index,
+							"ISBN": v['ISBN'],
+							"bookname": v['bookname'],
+							"bookbinding": v['bookbinding'],
+							"order": v['order'],
+							"author": v['author'],
+							"house": v['house'],
+							"date": v['date'],
+							"chinese_book_category": v['chinese_book_category'],
+							"source": v['source'],
+						})
+						index = index +1;
+					})
+					this.mode = 'response';
+					if (this.result.length === 0) {
+						this.mode = 'request';
+						alertmessage('error', '查無書籍資料');
+					}
 				})
-				.fail(function(xhr, result, statusText){
-					console.log(xhr)
+				.catch(res => {
+					this.mode = 'request';
+					alertmessage('error', o2j(res.response.data));
 				})
-				.always(function () {
-					ncl_df.resolve(ncl_data);
+			},
+			FindBook(){
+				if (this.source=== 'intergrate') {
+					this.intergrate();
+				}
+				else if (this.source === 'ncl') {
+					this.ncl();
+				}
+			},
+			bookinfo_out() {
+				this.$emit('bookinfo-out', this.result[this.bookinfo_check]);
+			},
+			reset(){
+				this.mode = 'request'
+				this.source = 'intergrate'
+				this.intergrate_value = ''
+				_.each(this.default_ncl_query, function(v, k){
+					this.ncl_query[k] = this.default_ncl_query[k]
 				})
-				return ncl_df
+				_.each(this.default_douban_query, function(v, k){
+					this.douban_query[k] = this.default_douban_query[k]
+				})
+				this.result = []
+				this.bookinfo_check = 0
 			},
 		},
 	}

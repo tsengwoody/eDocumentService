@@ -31,7 +31,7 @@
 				ebook_datas: [],
 			}
 		},
-		mounted: function () {
+		mounted(){
 			genericUserAPI.organizationRest.read(this.org_id)
 			.then(res => {
 				this.org = res.data
@@ -43,10 +43,10 @@
 		},
 		methods: {
 			review_list(){
-				ebookSystemAPI.ebookRest.filter({'status': '3', 'org_id': self.org_id,})
+				ebookSystemAPI.ebookRest.filter({'status': '3', 'org_id': this.org_id,})
 				.then(res => {
 					this.ebook_datas = [];
-					_.each(res.data, function(v){
+					_.each(res.data, (v)=> {
 						this.ebook_datas.push({
 							bookname: v.bookname,
 							part: v.part,

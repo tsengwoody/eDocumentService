@@ -203,39 +203,29 @@
 				else if(this.mode=='input') return 'none'
 				else return 'none';
 			},
-			url: function(){
+			url(){
 				if(this.format=='epub' || this.format=='txt') return '/ebookSystem/api/books/action/upload/'
 				else if(this.format=='self') return '/ebookSystem/api/books/action/create/'
 			},
 		},
 		mounted(){
-			let self = this
-			self.clientb = new $.RestClient('/ebookSystem/api/');
-			self.clientb.add('bookinfos');
-			self.clientb.add('categorys');
-			self.clientb.addVerb('bookinfos_create_update', 'POST', {
-				url: 'bookinfos/action/create_update/',
-			});
-			self.clientg = new $.RestClient('/genericUser/api/');
-			self.clientg.add('organizations');
-			self.get_org_category()
-			self.org_id=user.org
+			this.get_org_category();
+			this.org_id=user.org;
 		},
 		methods: {
-			get_org_category: function(){
-				let self = this
-				self.clientg.organizations.read()
-				.done(function(data) {
-					_.each(data, function(o){
+			get_org_category(){
+				genericUserAPI.organizationRest.list()
+				.then(res => {
+					_.each(res.data, (o) => {
 						let org_category = {
 							'id': o.id,
 							'name': o.name,
 							'categorys': [],
 						}
 
-						self.clientb.categorys.read({'org_id': o.id})
-						.done(function(data) {
-							_.each(data, function(c){
+						ebookSystemAPI.categoryRest.filter({'org_id': o.id})
+						.then(res => {
+							_.each(res.data, (c) => {
 								let temp = {
 									'id': c.id,
 									'name': c.name,
@@ -243,18 +233,18 @@
 								org_category.categorys.push(temp)
 							})
 						})
-						.fail(function(xhr, result, statusText){
-							alertmessage('error', xhr.responseText)
+						.catch(res => {
+							alertmessage('error', o2j(res.response.data));
 						})
-						self.org_categorys.push(org_category)
+						this.org_categorys.push(org_category)
 					})
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 
 			},
-			search_ISBN_info: function(){
+			search_ISBN_info(){
 				if(binstr(this.search_ISBN, '-')){
 					alertmessage('error', 'ISBN格式不能含有「-」')
 					return -1;
@@ -264,100 +254,57 @@
 					return -1;
 				}
 
-				let self = this
-				self.mode = 'search';
+				this.mode = 'search';
 
-				self.aj_ncl_douban_ISBN(this.search_ISBN)
-				.done(function(data){
+				Promise.all([
+					ebookSystemAPI.bookInfoAction.isbn2bookinfo({ISBN: this.search_ISBN, source: 'NCL'}),
+					//ebookSystemAPI.bookInfoAction.isbn2bookinfo({ISBN: this.search_ISBN, source: 'douban'}),
+				])
+				.then(res => {
 					alertmessage('success', '查詢成功');
-					self.search_ISBN = data['ISBN']; //若查詢ISBN10會自動轉ISBN13，故要重新更新
-					_.each(self.temp, function(v, k){
-						self.temp[k].value = data[k];
+					let result = null;
+					if(res[0].data.bookinfo.ISBN){
+						result = res[0].data.bookinfo;
+					}
+					/*else if(res[1].data.bookinfo.ISBN){
+						result = res[1].data.bookinfo;
+					}*/
+					console.log(result)
+					this.search_ISBN = result['ISBN']; //若查詢ISBN10會自動轉ISBN13，故要重新更新
+					_.each(this.temp, (v, k) => {
+						this.temp[k].value = result[k];
 					})
 				})
-				.fail(function(data){
+				.catch(res => {
 					alertconfirm('查無書籍資料，是否手動輸入？')
-					.done(function(){
-						_.each(self.temp, function(v, k){
-							self.temp[k].value = '';
+					.done(() => {
+						_.each(this.temp, (v, k) => {
+							this.temp[k].value = '';
 							if(k==='ISBN'){
-								self.temp[k].value = self.search_ISBN;
+								this.temp[k].value = this.search_ISBN;
 							}
 							else if(k==='source'){
-								self.temp[k].value = 'other';
+								this.temp[k].value = 'other';
 							}
 							else {
-								self.temp[k].readonly = false;
+								this.temp[k].readonly = false;
 							}
 						})
-						self.temp['source'].value = 'other';
+						this.temp['source'].value = 'other';
 					})
 				})
-				.always(function(){
-					self.mode = 'input';
+				.finally(() => {
+					this.mode = 'input';
 				})
 			},
-			aj_ncl_douban_ISBN: function(value){
-				//用ISBN查找[全國新書資訊網]與[豆瓣]書籍資訊，並以[全國新書資訊網]優先
-				let self = this
-				//df
-				let df = GenDF();
-				let ncl_data = [];
-				let ncl_df = GenDF()
-				let douban_data = [];
-				let douban_df = GenDF()
-				rest_aj_send('post', '/ebookSystem/api/bookinfos/action/isbn2bookinfo/', {'ISBN': value, 'source':'NCL',})
-				.done(function (data) {
-					ncl_data = data['data'].bookinfo
-					douban_df.resolve(douban_data);
+			search_ISBN_info_more(data){
+					this.search_ISBN = data['ISBN']; //若查詢ISBN10會自動轉ISBN13，故要重新更新
+				_.each(data, (v, k) => {
+					this.temp[k].value = data[k];
 				})
-				.fail(function(xhr, result, statusText){
-					console.log(xhr)
-				})
-				.always(function () {
-					ncl_df.resolve(ncl_data);
-				})
-				rest_aj_send('post', '/ebookSystem/api/bookinfos/action/isbn2bookinfo/', {'ISBN': value, 'source':'douban',})
-				.done(function (data) {
-					douban_data = data['data'].bookinfo
-				})
-				.fail(function(xhr, result, statusText){
-					console.log(xhr)
-				})
-				.always(function () {
-					douban_df.resolve(douban_data);
-				})
-				//when
-				$.when(ncl_df, douban_df)
-				.done(function (data1, data2) {
-					if(!iser(data1.ISBN)){
-						df.resolve(data1);
-					}
-					else if(!iser(data2.ISBN)){
-						df.resolve(data2);
-					}
-					else {
-						df.reject('無書籍資料');
-					}
-				})
-				return df;
-			},
-			search_ISBN_info_more: function(data){
-				let self = this
-				self.search_ISBN = data['ISBN']; //若查詢ISBN10會自動轉ISBN13，故要重新更新
-				self.temp['ISBN'].value = data['ISBN'];
-				self.temp['bookname'].value = data['bookname'];
-				self.temp['author'].value = data['author'];
-				self.temp['date'].value = data['date'];
-				self.temp['house'].value = data['house'];
-				self.temp['bookbinding'].value = data['bookbinding'];
-				self.temp['chinese_book_category'].value = data['chinese_book_category'];
-				self.temp['order'].value = data['order'];
-				self.temp['source'].value = data['source'];
-			},
-			create: function(){
-				let self = this;
 
+			},
+			create(){
 				// 確認有選擇類型
 				if(iser(this.format)){
 					alertmessage('error', '類型尚未選擇')
@@ -371,31 +318,31 @@
 				}
 
 				let transferData = {}
-				_.each(self.temp, function(v, k){
+				_.each(this.temp, (v, k) => {
 					if(!(v.value==='')){
 						transferData[k] = v.value
 					}
 				})
 
-				self.clientb.bookinfos_create_update(transferData)
-				.done(function(data){
+				ebookSystemAPI.bookInfoAction.createUpdate(transferData)
+				.then(res => {
 					let transferData = {
-						ISBN: self.temp['ISBN'].value,
-						org_id: self.org_id,
-						category_id: self.category_id,
-						format: self.format,
+						ISBN: this.temp['ISBN'].value,
+						org_id: this.org_id,
+						category_id: this.category_id,
+						format: this.format,
 						fileObject: fileObject,
 					}
-					rest_aj_upload(self.url, transferData)
-					.done(function(data) {
+					rest_aj_upload(this.url, transferData)
+					.done((data) => {
 						alertmessage('success', '成功更新資料(檔案)' +data['message'])
 					})
-					.fail(function(data){
+					.fail((data) => {
 						alertmessage('error', '失敗更新資料(檔案)' +data['message'])
 					})
 				})
-				.fail(function(xhr, result, statusText){
-					alertmessage('error', xhr.responseText)
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
 				})
 
 			},

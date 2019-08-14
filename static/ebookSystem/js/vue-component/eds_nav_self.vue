@@ -88,7 +88,7 @@
 							{
 								type: 'item',
 								'display_name': '書籍類型管理',
-								'permission': ['is_supermanager'],
+								'permission': ['is_manager'],
 								'url': '/routing/ebookSystem/category_manager_self/',
 							},
 							{

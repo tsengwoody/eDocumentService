@@ -182,8 +182,7 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'log') +'/djangoOS.log',
         },
-        'rotating_file':
-        {
+        'rotating_file': {
             'level' : 'DEBUG',
             'formatter' : 'verbose',
             'class' : 'logging.handlers.TimedRotatingFileHandler',
