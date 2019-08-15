@@ -145,7 +145,7 @@
 			editrecord_datas(){
 				let temp = [];
 				if(this.ebook){
-					_.each(this.ebook.editrecord_set, function(v) {
+					_.each(this.ebook.editrecord_set, (v) => {
 						temp.push({
 							'number_of_times': v.number_of_times,
 							'get_date': v.get_date,
@@ -185,7 +185,7 @@
 			this.get_overall_datas();
 		},
 		methods: {
-			get_overall_datas: function () {
+			get_overall_datas(){
 				ebookSystemAPI.bookRest.read(this.pk)
 				.then(res => {
 					this.book = res.data;
@@ -214,10 +214,10 @@
 			},
 			onactive(ISBN_part) {
 				alertconfirm('是否確定再校對?')
-				.done(function(){
-					ebookAction.onactive(ISBN_part)
+				.done(() => {
+					ebookSystemAPI.ebookAction.onactive(ISBN_part)
 					.then(res => {
-						alertmessage('success', data['message'])
+						alertmessage('success', '成功將分段再校對')
 						this.get_overall_datas()
 					})
 					.catch(res => {

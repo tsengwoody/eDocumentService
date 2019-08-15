@@ -96,8 +96,10 @@
 					let end_time = time['end_time']
 
 					let key = 'month' +v
-					params = Object.assign(params, {'begin_time': begin_time, 'end_time': end_time})
-					let month_query = axios.get(this.url, params)
+					let month_query = axios.get(this.url, {params: {
+						...params,
+						...{begin_time, end_time,},
+					}})
 					querys.push(month_query)
 					keys.push(key)
 						this.statistics_header[key] = begin_time.split('-')[0] +'年' +begin_time.split('-')[1] +'月'

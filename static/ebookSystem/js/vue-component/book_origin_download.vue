@@ -87,7 +87,7 @@ function post(path, params, method) {
 				let authenticate_url = '/genericUser/api/users/action/authenticate/'
 				genericUserAPI.userAction.authenticate(user.username, this.password)
 				.then(res => {
-					let url = '/ebookSystem/api/books/' +self.pk +'/action/download/';
+					let url = '/ebookSystem/api/books/' +this.pk +'/action/download/';
 					let csrf = document.getElementsByName('csrfmiddlewaretoken')[0].value;
 					post(url, {'fileformat': this.fileformat, 'password': this.password, 'csrfmiddlewaretoken': csrf}, 'post')
 				})

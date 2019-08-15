@@ -25,13 +25,13 @@ class Statistics(APIView):
 		import pytz
 		utc = pytz.timezone('UTC')
 
-		begin_time = request.GET.get('begin_time', None)
+		begin_time = request.query_params.get('begin_time')
 		if begin_time:
 			temp_time = begin_time.split('-')
 			temp_time = [int(i) for i in temp_time]
 			self.begin_time = datetime.datetime(temp_time[0], temp_time[1], temp_time[2], tzinfo=utc)
 
-		end_time = request.GET.get('end_time', None)
+		end_time = request.query_params.get('end_time')
 		if end_time:
 			temp_time = end_time.split('-')
 			temp_time = [int(i) for i in temp_time]
