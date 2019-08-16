@@ -261,21 +261,24 @@
 					//ebookSystemAPI.bookInfoAction.isbn2bookinfo({ISBN: this.search_ISBN, source: 'douban'}),
 				])
 				.then(res => {
-					alertmessage('success', '查詢成功');
-					let result = null;
+					let result = [];
+					console.log(res[0].data.bookinfo.ISBN);
 					if(res[0].data.bookinfo.ISBN){
 						result = res[0].data.bookinfo;
+						alertmessage('success', '查詢成功');
 					}
-					/*else if(res[1].data.bookinfo.ISBN){
-						result = res[1].data.bookinfo;
-					}*/
-					console.log(result)
+					else {
+						console.log('success search but not found')
+						throw('not found');
+					}
+
 					this.search_ISBN = result['ISBN']; //若查詢ISBN10會自動轉ISBN13，故要重新更新
 					_.each(this.temp, (v, k) => {
 						this.temp[k].value = result[k];
 					})
 				})
 				.catch(res => {
+					console.log('error')
 					alertconfirm('查無書籍資料，是否手動輸入？')
 					.done(() => {
 						_.each(this.temp, (v, k) => {

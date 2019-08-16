@@ -207,14 +207,16 @@ def get_ncl_bookinfo(ISBN):
 	record_count = int(record_count)
 
 	bookinfo_list = []
+	detail_urls = []
 	for i in range(1):
 		result_table = browser.find_element_by_class_name('table-searchbooks')
 		books_link = result_table.find_elements_by_tag_name('a')
-		books_link[i].click()
+		detail_urls.append(books_link[i].get_attribute('href'))
+	for detail_url in detail_urls:
+		browser.get(detail_url)
 		book_page = browser.page_source
 		item = get_ncl_bookinfo_detail(book_page)
 		bookinfo_list.extend(item)
-		browser.back()
 
 	browser.quit()
 	kill_firefox()
@@ -255,14 +257,16 @@ def get_ncl_bookinfo_list(query_dict):
 	record_count = int(record_count)
 
 	bookinfo_list = []
-	for i in range(record_count):
+	detail_urls = []
+	for i in range(1):
 		result_table = browser.find_element_by_class_name('table-searchbooks')
 		books_link = result_table.find_elements_by_tag_name('a')
-		books_link[i].click()
+		detail_urls.append(books_link[i].get_attribute('href'))
+	for detail_url in detail_urls:
+		browser.get(detail_url)
 		book_page = browser.page_source
 		item = get_ncl_bookinfo_detail(book_page)
 		bookinfo_list.extend(item)
-		browser.back()
 
 	browser.quit()
 	kill_firefox()
@@ -361,6 +365,12 @@ if __name__ == '__main__':
 	r = get_ncl_bookinfo_list({
 		'FO_SearchValue0' :u'零之使魔',
 		'FO_SearchField0': 'Title',
+		'FO_SchRe1ation1': 'OR',
+		'FO_SearchValue1' : u'',
+		'FO_SearchField1': 'Author',
+		'FO_SchRe1ation2': 'OR',
+		'FO_SearchValue2' : u'',
+		'FO_SearchField2': 'ISBN',
 	})
 	e = time.time()
 	print(e-s)
