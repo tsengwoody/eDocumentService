@@ -208,8 +208,8 @@ def get_ncl_bookinfo(ISBN):
 
 	bookinfo_list = []
 	detail_urls = []
+	result_table = browser.find_element_by_class_name('table-searchbooks')
 	for i in range(1):
-		result_table = browser.find_element_by_class_name('table-searchbooks')
 		books_link = result_table.find_elements_by_tag_name('a')
 		detail_urls.append(books_link[i].get_attribute('href'))
 	for detail_url in detail_urls:
@@ -255,11 +255,13 @@ def get_ncl_bookinfo_list(query_dict):
 	pattern = re.compile(ur'找到 (\d{1,}) 筆')
 	record_count = pattern.search(result_page).group(1)
 	record_count = int(record_count)
+	record_count = 10 if record_count>10 else record_count
 
 	bookinfo_list = []
 	detail_urls = []
-	for i in range(1):
-		result_table = browser.find_element_by_class_name('table-searchbooks')
+	result_table = browser.find_element_by_class_name('table-searchbooks')
+	for i in range(record_count):
+		#detail_urls.append('http://isbn.ncl.edu.tw/NEW_ISBNNet/main_DisplayRecord.php?&Pact=init&Pstart={}'.format(i+1))
 		books_link = result_table.find_elements_by_tag_name('a')
 		detail_urls.append(books_link[i].get_attribute('href'))
 	for detail_url in detail_urls:
@@ -355,11 +357,11 @@ def ISBN10_to_ISBN13(ISBN):
 import sys
 if __name__ == '__main__':
 	import time
-	s = time.time()
+	'''s = time.time()
 	r = get_ncl_bookinfo(u'9789573321569')
 	e = time.time()
 	print(r['bookname'])
-	print(e-s)
+	print(e-s)'''
 
 	s = time.time()
 	r = get_ncl_bookinfo_list({

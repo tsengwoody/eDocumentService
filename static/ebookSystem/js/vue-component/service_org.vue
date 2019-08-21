@@ -110,9 +110,6 @@
 			},*/
 		},
 		mounted(){
-			if(this.org_id==1&&this.choice_org){
-				this.org_id = 0;
-			}
 			this.get_org_category()
 			this.refresh()
 		},
@@ -122,9 +119,9 @@
 				.then(res => {
 					_.each(res.data, (o) => {
 						// org 為 1 屬特殊情形，是一般版使用，故在選擇列表內不顯示
-						if(o.id==1){
+						/*if(o.id==1){
 							return -1;
-						}
+						}*/
 						let org_category = {
 							'id': o.id,
 							'name': o.name,

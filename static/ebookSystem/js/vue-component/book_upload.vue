@@ -262,7 +262,6 @@
 				])
 				.then(res => {
 					let result = [];
-					console.log(res[0].data.bookinfo.ISBN);
 					if(res[0].data.bookinfo.ISBN){
 						result = res[0].data.bookinfo;
 						alertmessage('success', '查詢成功');
@@ -278,7 +277,7 @@
 					})
 				})
 				.catch(res => {
-					console.log('error')
+					console.log(JSON.stringify(res))
 					alertconfirm('查無書籍資料，是否手動輸入？')
 					.done(() => {
 						_.each(this.temp, (v, k) => {
@@ -301,11 +300,11 @@
 				})
 			},
 			search_ISBN_info_more(data){
-					this.search_ISBN = data['ISBN']; //若查詢ISBN10會自動轉ISBN13，故要重新更新
-				_.each(data, (v, k) => {
-					this.temp[k].value = data[k];
+				let result = data;
+				this.search_ISBN = result['ISBN']; //若查詢ISBN10會自動轉ISBN13，故要重新更新
+				_.each(this.temp, (v, k) => {
+					this.temp[k].value = result[k];
 				})
-
 			},
 			create(){
 				// 確認有選擇類型

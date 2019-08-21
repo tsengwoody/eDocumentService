@@ -124,7 +124,7 @@
 			'table-div': components['table-div'],
 			'modal': components['modal'],
 		},
-		data: function(){
+		data(){
 			return {
 				mode: 'request', //request, response
 				source: 'intergrate', //intergrate, ncl, douban
@@ -283,10 +283,10 @@
 				this.mode = 'request'
 				this.source = 'intergrate'
 				this.intergrate_value = ''
-				_.each(this.default_ncl_query, function(v, k){
+				_.each(this.default_ncl_query, (v, k) => {
 					this.ncl_query[k] = this.default_ncl_query[k]
 				})
-				_.each(this.default_douban_query, function(v, k){
+				_.each(this.default_douban_query, (v, k) => {
 					this.douban_query[k] = this.default_douban_query[k]
 				})
 				this.result = []
