@@ -28,7 +28,11 @@
 				<h3 class="textfornvda">查詢</h3>
 				<div class="form-inline" style="margin-bottom:20px;">
 					<div class="form-group">
-						<input v-model="search_value" id="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊" maxlength="15">
+						<input
+							@keyup.enter="search()"
+							v-model="search_value"
+							class="form-control" type="text" placeholder="輸入欲查詢資訊"
+						>
 					</div>
 					<div class="form-group">
 						<button type="button" class="btn btn-primary" @click="search()">搜尋</button>
