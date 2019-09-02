@@ -1,6 +1,6 @@
-<template>
+﻿<template>
 	<div id="book_shelf" class="container">
-		<h2>借閱書櫃</h3>
+		<h2>我的書櫃</h3>
 		<ul class="nav nav-tabs">
 			<li class="active"><a href="#book_shelf_checkout" name="book_shelf_tab_grp" data-toggle="tab" aria-expanded="true">正借閱書籍</a></li>
 			<li><a href="#book_shelf_checkin" name="book_shelf_tab_grp" data-toggle="tab" aria-expanded="false">借閱歷史紀錄</a></li>
@@ -72,7 +72,7 @@
 				checkin_header: {
 					bookname: '書名',
 					check_out_time: '借出日期',
-					check_in_time: '到期日期',
+					check_in_time: '歸還日期',
 				},
 				checkin_list: [],
 			}

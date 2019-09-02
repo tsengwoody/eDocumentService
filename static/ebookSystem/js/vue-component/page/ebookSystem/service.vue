@@ -1,6 +1,6 @@
 ﻿<template>
 	<div>
-		<h2>一般校對</h2>
+		<h2>校對服務</h2>
 		<service_org org_id="1" :choice_org="false">
 		</service_org>
 	</div>

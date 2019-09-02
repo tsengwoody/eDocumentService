@@ -10,8 +10,17 @@
 					<option value="guest">視障者</option>
 					<option value="unauth">視障者(未驗證)</option>
 				</select>
-				<input v-model="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊" @keyup.enter="user_refresh('search')">
-				<button class="btn btn-default" @click="user_refresh('search')">搜尋</button>
+				<input
+					@keyup.enter="user_refresh('search');"
+					v-model="search_value"
+					class="form-control"
+					type="text"
+					placeholder="輸入欲查詢資訊"
+				/>
+				<button
+					class="btn btn-default"
+					@click="user_refresh('search');"
+				>搜尋</button>
 			</div>
 			<table-div
 				:header="user_header"
@@ -135,6 +144,7 @@
 
 				this.datas = [];
 
+				this.datas = [];
 				genericUserAPI.userRest.filter(query)
 				.then(res => {
 					_.each(res.data, (v) => {

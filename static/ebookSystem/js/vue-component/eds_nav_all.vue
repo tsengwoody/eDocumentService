@@ -181,7 +181,7 @@
 					},
 					{
 						type: 'folder',
-						'display_name': '文件上傳',
+						'display_name': '書籍上傳',
 						'permission': ['login'],
 						'items': [
 							{
@@ -199,17 +199,10 @@
 						],
 					},
 					{
-						type: 'folder',
+						type: 'item',
 						'display_name': '校對服務',
-						'permission': ['login'],
-						'items': [
-							{
-								type: 'item',
-								'display_name': '一般校對',
-								'permission': ['auth_editor'],
-								'url': '/routing/ebookSystem/service/',
-							},
-						],
+						'permission': ['auth_editor'],
+						'url': '/routing/ebookSystem/service/',
 					},
 					{
 						type: 'item',
@@ -219,7 +212,7 @@
 					},
 					{
 						type: 'item',
-						'display_name': '借閱書櫃',
+						'display_name': '我的書櫃',
 						'permission': ['auth_guest'],
 						'url': '/routing/ebookSystem/book_shelf/',
 					},
