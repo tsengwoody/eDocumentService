@@ -10,8 +10,8 @@
 					<option value="guest">視障者</option>
 					<option value="unauth">視障者(未驗證)</option>
 				</select>
-				<input v-model="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊">
-				<button class="btn btn-default" @click="user_refresh('search');">搜尋</button>
+				<input v-model="search_value" class="form-control" type="text" placeholder="輸入欲查詢資訊" @keyup.enter="user_refresh('search')">
+				<button class="btn btn-default" @click="user_refresh('search')">搜尋</button>
 			</div>
 			<table-div
 				:header="user_header"
@@ -131,7 +131,9 @@
 				else {
 					query = {'search': this.search_value, 'role': this.search_role}
 				}
-				query['org_id'] = this.org_id
+				query['org_id'] = this.org_id;
+
+				this.datas = [];
 
 				genericUserAPI.userRest.filter(query)
 				.then(res => {
@@ -144,7 +146,9 @@
 							"action": v,
 						})
 					})
-					if(reason==='search'){ alertmessage('success', '查詢完成，共取得 ' +this.datas.length +' 筆資料'); }
+					if(reason==='search'){ 
+						alertmessage('success', '查詢完成，共取得 ' +this.datas.length +' 筆資料'); 
+					}
 				})
 				.catch(res => {
 					alertmessage('error', o2j(res.response.data));

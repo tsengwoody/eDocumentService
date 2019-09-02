@@ -1,7 +1,7 @@
 ﻿<template>
 	<div>
 		<h2>校園管理</h2>
-		<ul>
+		<ul class="manager_school">
 			<template v-for="item in itemsShow">
 				<li><a :href="item.url" title="(開啟新視窗)" target="blank">{|{ item.display_name }|}</a></li>
 			</template>
@@ -131,3 +131,9 @@
 		},
 	}
 </script>
+
+<style >
+ul.manager_school  {
+	line-height: 1.7em;
+}
+</style>

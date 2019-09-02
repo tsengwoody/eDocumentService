@@ -1,3 +1,28 @@
+
+<div id="divmodal_alertmessage" class="modal fade" style="z-index:10000;" tabindex="-1" role="dialog" aria-labelledby="divmodal_alertmessage_title" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content alert-info" style="background-color: #f5f5f5;">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 id="divmodal_alertmessage_title" class="modal-title">系統訊息</h4>
+			</div>
+			<div style="padding:40px 20px; background-color:#fafafa;">
+				<table>
+					<tr>
+						<td id="divmodal_alertmessage_icon" style="font-size:30pt; padding-right:15px;"></td>
+						<td id="divmodal_alertmessage_msg" style="font-size:12pt;" tabindex="0"></td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button id="divmodal_alertmessage_ok" type="button" class="btn btn-primary">確定</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script>
 
 
@@ -40,6 +65,7 @@
 			//show
 			div.modal('hide');
 
+			$('#divmodal_alertmessage').off('keypress');
 		});
 
 		//hidden
@@ -55,34 +81,16 @@
 		//autofocus
 		_.delay(function () {
 			$('#divmodal_alertmessage_msg').focus();
+
+			$('#divmodal_alertmessage').on('keypress', function(e) {
+			    const keycode = (e.keyCode ? e.keyCode : e.which);
+			    if (keycode == '13') {
+			      div.modal('hide');
+			    }
+			});
 		}, 500)
 
 		return df;
 	}
 
 </script>
-
-
-<div id="divmodal_alertmessage" class="modal fade" style="z-index:10000;" tabindex="-1" role="dialog" aria-labelledby="divmodal_alertmessage_title" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content alert-info" style="background-color: #f5f5f5;">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 id="divmodal_alertmessage_title" class="modal-title">系統訊息</h4>
-			</div>
-			<div style="padding:40px 20px; background-color:#fafafa;">
-				<table>
-					<tr>
-						<td id="divmodal_alertmessage_icon" style="font-size:30pt; padding-right:15px;"></td>
-						<td id="divmodal_alertmessage_msg" style="font-size:12pt;" tabindex="0"></td>
-					</tr>
-				</table>
-			</div>
-			<div class="modal-footer">
-				<button id="divmodal_alertmessage_ok" type="button" class="btn btn-primary">確定</button>
-			</div>
-		</div>
-	</div>
-</div>

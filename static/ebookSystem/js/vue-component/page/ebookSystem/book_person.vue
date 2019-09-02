@@ -28,6 +28,7 @@
 				<h4 class="modal-title">權重設定</h4>
 			</template>   
 			<template slot="body">
+				<div class="text-center">*權重設定，最高: 1，最低: 9</div>
 				<div class="form-horizontal">
 					<set_priority
 						ref="sp_instance"
