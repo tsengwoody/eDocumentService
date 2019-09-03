@@ -1,5 +1,4 @@
 ﻿{% extends "base.html" %}
-{% block title %}{% endblock %}
 {% block content %}
 {% csrf_token %} 
 
@@ -19,8 +18,14 @@
 
 	let mapState = Vuex.mapState;
 
+	var title = '';
+	window.addEventListener('focus', () => {
+		console.log(title)
+		document.title = title;
+	});
+
 //$(()=>{
-	new Vue({
+	appVue = new Vue({
 		store,
 		el: '#app',
 		components: {
@@ -36,9 +41,21 @@
 				user: 'user',
 			}),
 		},
-		/*metaInfo: {
-			titleTemplate: '%s | 雲端千眼平台',
-		},*/
+		metaInfo: {
+			titleTemplate: (subTitle) => {
+				if(subTitle){
+					title = `${subTitle} | 雲端千眼平台`;
+					setInterval(() => document.title = title, 1000);
+					setTimeout(() => document.title = title, 1000);
+					return title;
+				}
+				else {
+					title = `雲端千眼平台`;
+					return title;
+				}
+				//appVue.$forceUpdate();
+			},
+		},
 		created(){
 			{% if user.is_authenticated %}
 			this.$store.dispatch('getUser',
@@ -55,6 +72,8 @@
 				this.mode = mode
 			}
 
+		},
+		mounted(){
 		},
 	});
 //})

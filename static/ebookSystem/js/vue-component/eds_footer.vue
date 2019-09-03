@@ -4,10 +4,10 @@
 			<div class="pull-left">
 				<ul class="list-inline" style="display: flex;">
 					<li>
-						<a href="/genericUser/generics/func_desc/">關於雲端千眼</a>
+						<a href="/routing/about/about/">關於雲端千眼</a>
 					</li>
 					<li>
-						<a href="/genericUser/generics/recruit/">招募志工</a>
+						<a href="/routing/about/recruit/">招募志工</a>
 					</li>
 					<li>
 						<div title="建議使用Firefox或Chrome等支援HTML5瀏覽器">

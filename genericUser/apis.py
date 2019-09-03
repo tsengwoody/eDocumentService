@@ -132,7 +132,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 
 		from django.contrib.auth import (login as auth_login, logout as auth_logout, update_session_auth_hash, authenticate,)
 		auth_logout(request)
-		res['detail'] = u'成功登錄平台'
+		res['detail'] = u'成功登出平台'
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	@action(
