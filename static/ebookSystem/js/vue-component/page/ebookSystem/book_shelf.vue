@@ -78,7 +78,7 @@
 			}
 		},
 		metaInfo: {
-			title: '借閱書櫃',
+			title: '我的書櫃',
 		},
 		mounted(){
 			let self = this;

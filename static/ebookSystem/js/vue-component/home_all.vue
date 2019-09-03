@@ -81,7 +81,7 @@
 					<div class="panel-body" itemprop="description">
 						<p>「eDocumentService雲端千眼平台」招募大量志工於線上進行重製書籍服務，不如一般志工型態需固定排班或前往特定地點，只要您有時間、有網路，無論何時何地皆能進行志工服務，讓您的愛不再受到限制！</p>
 						<div class="pull-right">
-							<p><a class="btn btn-default center" href="/genericUser/generics/recruit/" role="button" itemprop="url">閱讀更多 »</a></p>
+							<p><a class="btn btn-default center" href="/routing/about/recruit/" role="button" itemprop="url">閱讀更多 »</a></p>
 						</div>
 					</div>
 				</div>

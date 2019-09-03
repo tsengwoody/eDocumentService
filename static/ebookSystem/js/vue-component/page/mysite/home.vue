@@ -19,10 +19,13 @@
 			return {
 			}
 		},
-		metaInfo: {
-			title: '首頁',
+		metaInfo(){
+			return {
+				title: '首頁',
+			}
 		},
 		mounted(){
+			console.log('COMPONENT')
 		},
 	}
 </script>
