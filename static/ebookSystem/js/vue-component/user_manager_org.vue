@@ -21,6 +21,13 @@
 					class="btn btn-default"
 					@click="user_refresh('search');"
 				>搜尋</button>
+
+				<div v-if="search_counts && search_counts > 0" 
+					class="alert alert-info" 
+					role="alert"
+				>
+				  共取得 {|{ search_counts }|} 筆資料
+				</div>
 			</div>
 			<table-div
 				:header="user_header"
@@ -120,6 +127,7 @@
 				search_role: 'all', //all/editor/guest
 				search_value: '',
 				temp_dcpk: '',
+				search_counts: null,
 			}
 		},
 		mounted(){
@@ -143,8 +151,6 @@
 				query['org_id'] = this.org_id;
 
 				this.datas = [];
-
-				this.datas = [];
 				genericUserAPI.userRest.filter(query)
 				.then(res => {
 					_.each(res.data, (v) => {
@@ -156,7 +162,8 @@
 							"action": v,
 						})
 					})
-					if(reason==='search'){ 
+					if(reason === 'search'){ 
+						this.search_counts = this.datas.length;
 						alertmessage('success', '查詢完成，共取得 ' +this.datas.length +' 筆資料'); 
 					}
 				})
@@ -167,3 +174,9 @@
 		},
 	}
 </script>
+
+<style>
+.alert {
+	margin-top: 1rem;
+}
+</style>
