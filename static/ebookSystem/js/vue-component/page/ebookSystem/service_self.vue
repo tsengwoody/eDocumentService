@@ -12,7 +12,7 @@
 			'service_org': components['service_org'],
 		},
 		metaInfo: {
-			title: '一般校對',
+			title: '校對服務',
 		},
 	}
 </script>

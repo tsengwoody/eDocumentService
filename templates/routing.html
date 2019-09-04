@@ -13,21 +13,21 @@
 </div>
 
 <script>
-	Vue.use(VueMeta)
+	Vue.use(VueMeta);
+	Vue.use(Vuex);
 	Vue.options.delimiters = ['{|{', '}|}'];
 
 	let mapState = Vuex.mapState;
 
 	var title = '';
 	window.addEventListener('focus', () => {
-		console.log(title)
-		document.title = title;
+		setTimeout(() => document.title = title, 1000);
 	});
 
 //$(()=>{
 	appVue = new Vue({
-		store,
 		el: '#app',
+		store,
 		components: {
 			eds_nav: components['eds_nav'],
 			routerview: pages['{{ app }}/{{ page }}'],
@@ -45,7 +45,7 @@
 			titleTemplate: (subTitle) => {
 				if(subTitle){
 					title = `${subTitle} | 雲端千眼平台`;
-					setInterval(() => document.title = title, 1000);
+					//setInterval(() => document.title = title, 1000);
 					setTimeout(() => document.title = title, 1000);
 					return title;
 				}

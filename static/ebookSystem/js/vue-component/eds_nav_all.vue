@@ -18,14 +18,22 @@
 							<li class="dropdown">
 								<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">{|{ item.display_name }|}<span class="caret"></span></a>
 								<ul class="dropdown-menu">
-									<template v-for="folder_item in item.items">
-									<li><a :href="folder_item.url">{|{ folder_item.display_name }|}</a></li>
+									<template v-for="item in item.items">
+										<template v-if="item.type=='item'">
+											<li><a :href="item.url">{|{ item.display_name }|}</a></li>
+										</template>
+										<template v-if="item.type=='action'">
+											<li class="dropdown"><a href="#" @click="item.action()">{|{ item.display_name }|}</a></li>
+										</template>
 									</template>
 								</ul>
 							</li>
 						</template>
 						<template v-if="item.type=='item'">
 							<li class="dropdown"><a :href="item.url">{|{ item.display_name }|}</a></li>
+						</template>
+						<template v-if="item.type=='action'">
+							<li class="dropdown"><a href="#" @click="item.action()">{|{ item.display_name }|}</a></li>
 						</template>
 					</template>
 				</ul>
@@ -35,14 +43,22 @@
 							<li class="dropdown">
 								<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">{|{ item.display_name }|}<span class="caret"></span></a>
 								<ul class="dropdown-menu">
-									<template v-for="folder_item in item.items">
-									<li><a :href="folder_item.url">{|{ folder_item.display_name }|}</a></li>
+									<template v-for="item in item.items">
+										<template v-if="item.type=='item'">
+											<li><a :href="item.url">{|{ item.display_name }|}</a></li>
+										</template>
+										<template v-if="item.type=='action'">
+											<li class="dropdown"><a href="#" @click="item.action()">{|{ item.display_name }|}</a></li>
+										</template>
 									</template>
 								</ul>
 							</li>
 						</template>
 						<template v-if="item.type=='item'">
 							<li class="dropdown"><a :href="item.url">{|{ item.display_name }|}</a></li>
+						</template>
+						<template v-if="item.type=='action'">
+							<li class="dropdown"><a href="#" @click="item.action()">{|{ item.display_name }|}</a></li>
 						</template>
 					</template>
 					<li class="dropdown"><a href="#" @click="mode_change()">校園版</a></li>
@@ -255,10 +271,23 @@
 								'url': '/routing/genericUser/user_person/',
 							},
 							{
-								type: 'item',
+								type: 'action',
 								'display_name': '登出',
 								'permission': ['true'],
-								'url': '/auth/logout/',
+								'action': () => {
+									let session_logout = genericUserAPI.userAction.logout()
+									let token_logout = token.remove()
+									Promise.all([session_logout, token_logout,])
+									.then(res => {
+										alertmessage('success', '成功登出平台')
+										.done(() => {
+											window.location.replace('/')
+										})
+									})
+									.catch(res => {
+										alertmessage('error', '登錄平台失敗，請確認帳號或密碼是否正確。')
+									})
+								},
 							},
 						],
 					},
@@ -341,7 +370,7 @@
 			//this.user = this.$store.state.user;
 		},
 		methods: {
-			item_permission: function(u, p){
+			item_permission(u, p){
 				if(p.includes('true')){ return true }
 				if(p.includes('false')){ return false }
 				if(p.includes('anonymous')){
@@ -364,7 +393,7 @@
 					return false
 				}
 			},
-			'item_show': function item_show(nav_item) {
+			item_show(nav_item) {
 				let items = []
 				_.each(nav_item, v => {
 					if(this.item_permission(this.user, v.permission)){
@@ -382,11 +411,15 @@
 							item.url = v.url
 							items.push(item)
 						}
+						if(v.type==='action'){
+							item.action = v.action
+							items.push(item)
+						}
 					}
 				})
 				return items
 			},
-			mode_change: function(){
+			mode_change(){
 				this.$emit('mode-change')
 			},
 		},
