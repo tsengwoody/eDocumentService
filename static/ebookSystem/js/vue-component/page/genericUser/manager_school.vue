@@ -9,7 +9,6 @@
 	</div>
 </template>
 <script>
-
 	module.exports = {
 		components: {
 		},
@@ -90,9 +89,9 @@
 					},
 					{
 						type: 'item',
-						'display_name': '管理首頁 Banner',
-						'permission': ['is_supermanager'],
-						'url': '/routing/genericUser/bannercontent_create/',
+						'display_name': '公告發佈',
+						'permission': ['is_manager'],
+						'url': '/routing/genericUser/announcement_create/',
 					},
 				],
 			}

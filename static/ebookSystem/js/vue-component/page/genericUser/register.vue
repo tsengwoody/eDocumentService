@@ -4,12 +4,29 @@
 			<h2 class="">註冊</h2>
 		</div>
 		<div class="form-horizontal">
-			<form-drf v-for="(model_info, key) in model_infos"
-				:model_info="model_info"
-				:field="key"
-				:offset-class="'col-sm-offset-2'"
-				v-model="infos[key]"
-			></form-drf>
+			<template
+				v-for="(v) in [
+					'username',
+					'password',
+					'confirm_password',
+					'first_name',
+					'last_name',
+					'email',
+					'phone',
+					'birthday',
+					'education',
+					'is_book',
+					'org',
+					'role',
+				]"
+			>
+				<form-drf
+					:model_info="model_infos[v]"
+					:field="v"
+					:offset-class="'col-sm-offset-2'"
+					v-model="infos[v]"
+				></form-drf>
+			</template>
 			<div class="form-group">
 				<label class="control-label col-sm-2 col-sm-offset-2" for="userterms"><font style="color:red">*</font><span>使用者條款隱私權政策</span></label>
 				<div class="col-sm-7">
@@ -96,7 +113,7 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 		components: {
 			'form-drf': components['form'],
 		},
-		data: function(){
+		data(){
 			return {
 				usertermsContent: '',
 				isPrivacyAgree: true,

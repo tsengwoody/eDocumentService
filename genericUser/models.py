@@ -235,6 +235,12 @@ class Organization(models.Model):
 	email = models.EmailField()
 	phone = models.CharField(max_length=30)
 	is_service_center = models.BooleanField(default=False)
+	CATEGORY = (
+		(u'一般' , u'一般'),
+		(u'企業' , u'企業'),
+		(u'校園' , u'校園'),
+	)
+	category = models.CharField(max_length=10, choices=CATEGORY)
 
 	def __unicode__(self):
 		return self.name
@@ -306,6 +312,7 @@ class ServiceInfo(models.Model):
 		return character_count
 
 class Announcement(models.Model):
+	org = models.ForeignKey('Organization', related_name='announcement_set')
 	title = models.CharField(max_length=100)
 	content = models.TextField()
 	datetime = models.DateField(default = timezone.now)

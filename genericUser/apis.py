@@ -327,7 +327,13 @@ class ServiceInfoViewSet(viewsets.ModelViewSet, ResourceViewSet):
 class AnnouncementViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = Announcement.objects.all().order_by('-datetime')
 	serializer_class = AnnouncementSerializer
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, AnnouncementCategoryFilter, AnnouncementNewestFilter, )
+	filter_backends = (
+		filters.OrderingFilter,
+		filters.SearchFilter,
+		AnnouncementNewestFilter, 
+		KeyMapAttrFilterFactory(key='category', type=convert_unicode, attr='category'),
+		KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'org_id')
+	)
 	ordering_fields = ('datetime',)
 	search_fields = ('category',)
 	permission_classes = (

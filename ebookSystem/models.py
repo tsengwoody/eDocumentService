@@ -546,6 +546,7 @@ class GetBookRecord(models.Model):
 	FORMAT = (
 		('epub' , 'epub'),
 		('txt' , 'txt'),
+		('online' , 'online'),
 	)
 	format = models.CharField(max_length=10, choices=FORMAT)
 

@@ -16,17 +16,7 @@ OwnerFilter = KeyMapAttrFilterFactory(key = 'owner_id', type = str, attr = 'owne
 OrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'org_id')
 DisabilityCardOrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'owner__org_id')
 
-
-AnnouncementCategoryFilter = KeyMapAttrFilterFactory(key='category', type=convert_unicode, attr='category')
 QAndACategoryFilter = KeyMapAttrFilterFactory(key='category', type=str, attr='category')
-
-'''class AnnouncementCategoryFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		category = request.query_params.get('category')
-		if category:
-			return queryset.filter(category=category)
-		else:
-			return queryset'''
 
 class AnnouncementNewestFilter(filters.BaseFilterBackend):
 

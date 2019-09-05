@@ -27,24 +27,15 @@
 		<div style="width: 100%;">
 			<div class="tool-box-area">
 				<div class="tool-box">
-					<a href="/genericUser/generics/recruit/" class="tool-box__link">
+					<a href="/routing/about/recruit_school/" class="tool-box__link">
 						<div class="tool-box__img">
 							<img src="static/ebookSystem/img/school/sun.png" alt="志工招募" style="height:100%;">
 						</div>
 						<div class="tool-box__text" aria-hidden="true">志工招募</div>
 					</a>
 				</div>
-			
 				<div class="tool-box">
-					<a href="/genericUser/generics/func_desc/" class="tool-box__link">
-						<div class="tool-box__img">
-							<img src="static/ebookSystem/img/school/wifi.png" alt="關於我們" style="height:100%;">
-						</div>
-						<div class="tool-box__text" aria-hidden="true">關於我們</div>
-					</a>
-				</div>
-				<div class="tool-box">
-					<a href="/routing/about/contact/" class="tool-box__link">
+					<a href="/routing/about/contact_school/" class="tool-box__link">
 						<div class="tool-box__img">
 							<img src="static/ebookSystem/img/school/pen.png" alt="聯絡我們" style="height:100%;">
 						</div>
@@ -52,15 +43,23 @@
 					</a>
 				</div>
 				<div class="tool-box">
-					<a href="/routing/genericUser/manager_school/" class="tool-box__link">
+					<a href="/routing/about/about_school/" class="tool-box__link">
 						<div class="tool-box__img">
-							<img src="static/ebookSystem/img/school/tool.png" alt="校園管理" style="height:100%;">
+							<img src="static/ebookSystem/img/school/wifi.png" alt="關於校園版" style="height:100%;">
 						</div>
-						<div class="tool-box__text" aria-hidden="true">校園管理</div>
+						<div class="tool-box__text" aria-hidden="true">關於校園版</div>
 					</a>
 				</div>
 				<div class="tool-box">
-					<a href="/routing/ebookSystem/book_repository_school/" class="tool-box__link">
+					<a href="/routing/genericUser/editor_zone_school/" class="tool-box__link">
+						<div class="tool-box__img">
+							<img src="static/ebookSystem/img/school/tool.png" alt="志工專區" style="height:100%;">
+						</div>
+						<div class="tool-box__text" aria-hidden="true">志工專區</div>
+					</a>
+				</div>
+				<div class="tool-box">
+					<a href="/routing/genericUser/guest_zone_school/" class="tool-box__link">
 						<div class="tool-box__img">
 							<img src="static/ebookSystem/img/school/boy.png" alt="讀者專區" style="height:100%;">
 						</div>
@@ -68,7 +67,7 @@
 					</a>
 				</div>
 				<div class="tool-box">
-					<a href="#" class="tool-box__link">
+					<a href="/routing/about/donation_school/" class="tool-box__link">
 						<div class="tool-box__img">
 							<img src="static/ebookSystem/img/school/bird.png" alt="捐書捐款" style="height:100%;">
 						</div>
@@ -117,7 +116,7 @@
 		methods: {
 			get_school_announcement(){
 
-				query = {'category': '校園公告'}
+				query = {'category': '校園公告', 'org_id': user.org,}
 
 				genericUserAPI.announcementRest.filter(query)
 				.then((response) => {

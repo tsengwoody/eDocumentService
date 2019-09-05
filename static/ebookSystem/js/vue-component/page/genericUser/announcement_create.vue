@@ -1,7 +1,10 @@
 ﻿<template>
 	<div class="form-horizontal">
 		<h3>公告發佈</h3>
-		<div class="form-group">
+		<div
+			v-if="user.org=='1'"
+			class="form-group"
+		>
 			<label for="id_category" class="control-label col-sm-1"><font style="color:red">*</font>類別</label>
 			<div class="col-sm-11">
 				<select
@@ -61,6 +64,7 @@
 	module.exports = {
 		data(){
 			return {
+				org: user.org,
 				title: '',
 				category: '',
 				content: '',
@@ -72,9 +76,11 @@
 		},
 		computed: {
 			transferData(){
+				let category = (user.org=='1') ? this.category : '校園公告';
 				return {
+					'org': this.org,
 					'title': this.title,
-					'category': this.category,
+					'category': category,
 					'content': this.content,
 				}
 			},

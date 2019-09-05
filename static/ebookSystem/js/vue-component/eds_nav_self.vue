@@ -80,91 +80,6 @@
 					},
 					{
 						type: 'folder',
-						'display_name': '單位管理',
-						'permission': ['login'],
-						'items': [
-							{
-								type: 'item',
-								'display_name': '上傳文件審核',
-								'permission': ['is_manager'],
-								'url': '/routing/ebookSystem/book_review_list_self/',
-							},
-							{
-								type: 'item',
-								'display_name': '校對文件審核',
-								'permission': ['is_manager'],
-								'url': '/routing/ebookSystem/ebook_review_list_self/',
-							},
-							{
-								type: 'item',
-								'display_name': '書籍管理',
-								'permission': ['is_manager'],
-								'url': '/routing/ebookSystem/book_manager_self/',
-							},
-							{
-								type: 'item',
-								'display_name': '書籍類型管理',
-								'permission': ['is_manager'],
-								'url': '/routing/ebookSystem/category_manager_self/',
-							},
-							{
-								type: 'item',
-								'display_name': '使用者管理',
-								'permission': ['is_manager'],
-								'url': '/routing/genericUser/user_manager_self/',
-							},
-							{
-								type: 'item',
-								'display_name': '身障手冊管理',
-								'permission': ['is_manager'],
-								'url': '/routing/genericUser/disabilitycard_manager_self/',
-							},
-							{
-								type: 'item',
-								'display_name': '服務時數確認',
-								'permission': ['is_manager'],
-								'url': '/routing/genericUser/serviceinfo_list_check_self/',
-							},
-							{
-								type: 'item',
-								'display_name': '統計書籍下載',
-								'permission': ['is_manager'],
-								'url': '/routing/mysite/statistics_org/book_download/',
-							},
-							{
-								type: 'item',
-								'display_name': '統計書籍下載(epub)',
-								'permission': ['is_manager'],
-								'url': '/routing/mysite/statistics_org/book_download/?file_format=epub',
-							},
-							{
-								type: 'item',
-								'display_name': '統計書籍下載(txt)',
-								'permission': ['is_manager'],
-								'url': '/routing/mysite/statistics_org/book_download/?file_format=txt',
-							},
-							{
-								type: 'item',
-								'display_name': '統計使用者下載',
-								'permission': ['is_manager'],
-								'url': '/routing/mysite/statistics_org/user_download/',
-							},
-							{
-								type: 'item',
-								'display_name': '統計使用者校對',
-								'permission': ['is_manager'],
-								'url': '/routing/mysite/statistics_org/user_editrecord/',
-							},
-							{
-								type: 'item',
-								'display_name': '管理首頁 Banner',
-								'permission': ['is_supermanager'],
-								'url': '/routing/genericUser/bannercontent_create/',
-							},
-						],
-					},
-					{
-						type: 'folder',
 						'display_name': '書籍上傳',
 						'permission': ['login'],
 						'items': [
@@ -215,15 +130,21 @@
 						'items': [
 							{
 								type: 'item',
+								'display_name': '個人資料',
+								'permission': ['true'],
+								'url': '/routing/genericUser/user_person/',
+							},
+							{
+								type: 'item',
 								'display_name': '服務紀錄',
 								'permission': ['auth_editor'],
 								'url': '/routing/genericUser/serviceinfo_record/',
 							},
 							{
 								type: 'item',
-								'display_name': '個人資料',
-								'permission': ['true'],
-								'url': '/routing/genericUser/user_person/',
+								'display_name': '校園管理',
+								'permission': ['is_manager'],
+								'url': '/routing/genericUser/manager_school/',
 							},
 							{
 								type: 'action',
