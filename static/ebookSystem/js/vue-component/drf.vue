@@ -3,16 +3,16 @@
 		<label
 			:for="'id_' +keys"
 			class="col-sm-3"
-		>{|{ model_info.label }|}</label>
+		>{{ model_info.label }}</label>
 		<template v-if="mode==='read'">
 			<div
 				v-if="model_info.type==='choice' || model_info.type==='field'"
 				class="col-sm-6"
-			>{|{ value2display_name(value, model_info.choices) }|}</div>
+			>{{ value2display_name(value, model_info.choices) }}</div>
 			<div
 				v-else
 				class="col-sm-6"
-			>{|{ value }|}</div>
+			>{{ value }}</div>
 		</template>
 		<template v-if="mode==='write'">
 		<div class="col-sm-6">
@@ -34,7 +34,7 @@
 					v-for="item in model_info.choices"
 					:value="item.value"
 				>
-					{|{ item.display_name }|}
+					{{ item.display_name }}
 				</option>
 			</select>
 			<el-date-picker
@@ -67,7 +67,7 @@
 					@input="$emit('input', $event.target.value)"
 					:checked="el.value == value"
 				> 
-					{|{ el.display_name }|}
+					{{ el.display_name }}
 				</label>
 			</template>
 		</div>

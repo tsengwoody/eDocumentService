@@ -1,6 +1,6 @@
 ﻿<template>
 	<div :id="'book_manager' +org_id" class="tab-content">
-		<h3>{|{ org.name }|}</h3>
+		<h3>{{ org.name }}</h3>
 		<div id="book_manager_search">
 			<div class="form-inline" style="margin-bottom:20px;">
 				<div class="form-group">
@@ -10,7 +10,7 @@
 						id="id_search_choices" required
 					>
 						<option value="all" selected="selected">全部</option>
-						<option v-for="(value, key) in search_choices" :value="key">{|{ value }|}</option>
+						<option v-for="(value, key) in search_choices" :value="key">{{ value }}</option>
 					</select>
 				</div>
 				<div class="form-group">
@@ -42,7 +42,7 @@
 		</div>
 		<modal :id_modal="id" :size="'normal'" :ref="id">
 			<template slot="header">
-				<h4 v-if="book_update.book_info" class="modal-title">書籍 {|{ book_update.book_info.bookname }|} 資料編輯更新</h4>
+				<h4 v-if="book_update.book_info" class="modal-title">書籍 {{ book_update.book_info.bookname }} 資料編輯更新</h4>
 			</template>
 			<template slot="body">
 				<div class="form-group col-md-6">
@@ -53,7 +53,7 @@
 					    <option
 							v-for="item in '0123456789'"
 							:value="item"
-						>{|{ item }|}</option>
+						>{{ item }}</option>
 				    </select>
 				</div>
 
@@ -65,7 +65,7 @@
 				      	<option
 							v-for="item in user_list"
 							:value="item.id"
-						>{|{ item.username }|}</option>
+						>{{ item.username }}</option>
 				    </select>
 				</div>
 

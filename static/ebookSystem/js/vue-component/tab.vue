@@ -3,10 +3,10 @@
 		<ul class="nav nav-tabs">
 			<template v-for="(entry, index) in data">
 				<template v-if="index===tab_index">
-					<li role="tab" class="active"><a :href="'#' +index" aria-expanded="true" @click="tab_index=index">{|{ entry.display_name }|}</a></li>
+					<li role="tab" class="active"><a :href="'#' +index" aria-expanded="true" @click="tab_index=index">{{ entry.display_name }}</a></li>
 				</template>
 				<template v-else>
-					<li role="tab"><a :href="'#' +index" aria-expanded="false" @click="tab_index=index">{|{ entry.display_name }|}</a></li>
+					<li role="tab"><a :href="'#' +index" aria-expanded="false" @click="tab_index=index">{{ entry.display_name }}</a></li>
 				</template>
 			</template>
 		</ul>
@@ -17,17 +17,17 @@
 				:class="{'tab-pane':true, 'fade':!(index===tab_index), 'active':(index===tab_index)}"
 			>
 
-				<h2 v-if="headinglevel===2" class="sr-only">{|{ entry.display_name }|}</h2>
-				<h3 v-if="headinglevel===3" class="sr-only">{|{ entry.display_name }|}</h3>
-				<h4 v-if="headinglevel===4" class="sr-only">{|{ entry.display_name }|}</h4>
-				<h5 v-if="headinglevel===5" class="sr-only">{|{ entry.display_name }|}</h5>
-				<h6 v-if="headinglevel===6" class="sr-only">{|{ entry.display_name }|}</h6>
+				<h2 v-if="headinglevel===2" class="sr-only">{{ entry.display_name }}</h2>
+				<h3 v-if="headinglevel===3" class="sr-only">{{ entry.display_name }}</h3>
+				<h4 v-if="headinglevel===4" class="sr-only">{{ entry.display_name }}</h4>
+				<h5 v-if="headinglevel===5" class="sr-only">{{ entry.display_name }}</h5>
+				<h6 v-if="headinglevel===6" class="sr-only">{{ entry.display_name }}</h6>
 
 				<div v-if="$scopedSlots[entry.type]">
 					<slot :name="entry.type" :item="entry.data"></slot>
 				</div>
 				<div v-else>
-					{|{ entry.data }|}
+					{{ entry.data }}
 				</div>
 			</div>
 		</div>

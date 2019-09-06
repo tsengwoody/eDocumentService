@@ -116,7 +116,7 @@
 	</modal>
 </template>
 <script>
-	Vue.options.delimiters = ['{|{', '}|}'];
+	Vue.options.delimiters = ['{{', '}}'];
 
 	module.exports = {
 		props: [],

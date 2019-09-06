@@ -11,11 +11,11 @@
 						@change="refresh()"
 					>
 						<option :value="0" selected="selected">全部</option>
-						<option v-for="item in org_categorys" :value="item.id">{|{ item.name }|}</option>
+						<option v-for="item in org_categorys" :value="item.id">{{ item.name }}</option>
 					</select>
 					<template
 						v-if="!choice_org"
-					>{|{ org.name }|}</template>
+					>{{ org.name }}</template>
 					<template
 						v-for="item in org_categorys"
 						v-if="org_id==item.id"
@@ -29,7 +29,7 @@
 							<option
 								v-for="category in item.categorys"
 								:value="category.id"
-							>{|{ category.name }|}</option>
+							>{{ category.name }}</option>
 						</select>
 						類別
 					</template>

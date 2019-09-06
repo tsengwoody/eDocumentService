@@ -1,6 +1,6 @@
 ﻿<template>
 	<div :id="'serviceinfo_check' +org_id">
-		<h3>{|{ org.name }|}</h3>
+		<h3>{{ org.name }}</h3>
 		<h3 style="margin-top:30px;">Step1: 勾選志工所提送的兌換項目</h3>
 		<hr style="margin-top:5px;">
 		<div style="margin-bottom:60px;">

@@ -1,6 +1,6 @@
 <template>
 	<div class="form-group">
-		<label :class="['control-label', labelClass, offsetClass]" :for="field"><font style="color:red">*</font><span>{|{ model_info.label }|}</span></label>
+		<label :class="['control-label', labelClass, offsetClass]" :for="field"><span>{{ model_info.label }}</span></label>
 		<div :class="[inputClass]">
 			<input
 				v-if="model_info.type === 'text' || model_info.type === 'email' || model_info.type === 'password'"
@@ -9,6 +9,7 @@
 				:id="field"
 				:value="value"
 				@input="$emit('input', $event.target.value)"
+				:required="model_info.required"
 			>
 
 			<input
@@ -19,6 +20,7 @@
 				@change="$emit('input', $event.target.checked)"
 				:checked="value == true"
 				style="height: 30px; line-height: 30px;"
+				:required="model_info.required"
 			>
 
 			<el-date-picker v-if="model_info.type === 'date'"
@@ -41,7 +43,7 @@
 					v-for="el in model_info.choices"
 					:value="el.value"
 				>
-					{|{ el.display_name }|}
+					{{ el.display_name }}
 				</option>
 			</select>
 
@@ -58,7 +60,7 @@
 					@input="$emit('input', $event.target.value)"
 					:checked="el.value == value"
 				> 
-					{|{ el.display_name }|}
+					{{ el.display_name }}
 				</label>
 			</template>
 
@@ -72,7 +74,7 @@
 				
 			</textarea>
 		</div>
-		<label v-if="!iser(model_info.remark)" class="control-label col-sm-4" :for="field" style="text-align:left;"><font style="color:red">{|{ model_info.remark }|}</font></label>
+		<label v-if="!iser(model_info.remark)" class="control-label col-sm-4" :for="field" style="text-align:left;"><font style="color:red">{{ model_info.remark }}</font></label>
 	</div>
 </template>
 

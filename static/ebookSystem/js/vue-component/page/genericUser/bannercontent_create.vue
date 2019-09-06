@@ -19,7 +19,7 @@
 								<li class="list-group-item" v-for="(item, index) in items"><a 
 									v-on:click="read(index)"
 									href='#'
-								>{|{ index+1 }|}. {|{ item.title }|}</a></li>
+								>{{ index+1 }}. {{ item.title }}</a></li>
 							</ul>
 						</div>
 					</div>
@@ -32,7 +32,7 @@
 				</div>
 				<div v-if="mode=='read'">
 					<p class="h5"><strong>摘要文字</strong></p>
-					<p>{|{ temp.title }|}</p>
+					<p>{{ temp.title }}</p>
 					<p class="h5"><strong>圖片內容</strong></p>
 					<img
 						v-if="index!=-1"

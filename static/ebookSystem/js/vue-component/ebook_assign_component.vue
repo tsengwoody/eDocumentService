@@ -19,7 +19,7 @@
 						<option
 							:value="user.username"
 						>
-							{|{ user.username }|}
+							{{ user.username }}
 						</option>
 					</template>
 				</select>

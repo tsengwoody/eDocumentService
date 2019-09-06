@@ -5,7 +5,7 @@
 			<div class="form-group">
 				<label for="id_category" class="control-label col-sm-1"><font style="color:red">*</font>類別</label>
 				<div class="col-sm-11">
-					<div v-if="mode=='read'" class="panel panel-default" style="margin:0px; padding:5px 10px;">{|{ announcement.category }|}</div>
+					<div v-if="mode=='read'" class="panel panel-default" style="margin:0px; padding:5px 10px;">{{ announcement.category }}</div>
 					<template v-if="mode=='write'">
 						<select v-model="announcement.category" class="form-control">
 							<option value="">---------</option>
@@ -20,7 +20,7 @@
 			<div class="form-group">
 				<label for="id_title" class="control-label col-sm-1"><font style="color:red">*</font>標題</label>
 				<div class="col-sm-11">
-					<div v-if="mode=='read'" class="panel panel-default" style="margin:0px; padding:5px 10px;">{|{ announcement.title }|}</div>
+					<div v-if="mode=='read'" class="panel panel-default" style="margin:0px; padding:5px 10px;">{{ announcement.title }}</div>
 					<template v-if="mode=='write'">
 						<input v-model="announcement.title" class="form-control" type="text"/>
 					</template>

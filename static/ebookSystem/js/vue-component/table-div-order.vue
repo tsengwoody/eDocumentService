@@ -104,7 +104,7 @@ div.tbody .cell {
 							<a role="button"
 								@click="order(k)"
 							>
-								{|{ v }|}
+								{{ v }}
 								<template v-if="k === key">
 									<template v-if="orderby === 'asc'">▲</template>
 									<template v-if="orderby === 'desc'">▼</template>
@@ -121,7 +121,7 @@ div.tbody .cell {
 								<slot :name="key" :item="entry[key]"></slot>
 							</div>
 							<div v-else :data-title="value" role="cell" class=cell>
-								{|{ entry[key] }|}
+								{{ entry[key] }}
 							</div>
 						</template>
 					</div>
@@ -152,7 +152,7 @@ div.tbody .cell {
 						:class="{ active: pagenow === pager }"
 						class="page-item"
 					>
-						<a class="page-link" tabindex="-1" @click="pagin_change(pager)">{|{ pager }|}</a>
+						<a class="page-link" tabindex="-1" @click="pagin_change(pager)">{{ pager }}</a>
 					</li>
 
 					<li v-if="showNextMore">
@@ -164,7 +164,7 @@ div.tbody .cell {
 						class="page-item"
 						v-if="numpage > 1"
 					>
-						<a class="page-link" tabindex="-1" @click="pagin_change(numpage)">{|{ numpage }|}</a>
+						<a class="page-link" tabindex="-1" @click="pagin_change(numpage)">{{ numpage }}</a>
 					</li>
 
 					<li class="page-item">

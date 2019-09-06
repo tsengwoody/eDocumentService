@@ -1,6 +1,6 @@
 ﻿<template>
 	<div :id="'disabilitycard_manager' +org_id">
-		<h3>{|{ org.name }|}</h3>
+		<h3>{{ org.name }}</h3>
 		<div class="form-inline">
 			<div class="form-group">
 				<select
@@ -9,7 +9,7 @@
 					required
 				>
 					<option value="all" selected="selected">全部</option>
-					<option v-for="(value, key) in search_choices" :value="key">{|{ value }|}</option>
+					<option v-for="(value, key) in search_choices" :value="key">{{ value }}</option>
 				</select>
 			</div>
 			<div class="form-group">

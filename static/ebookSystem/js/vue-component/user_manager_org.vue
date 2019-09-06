@@ -1,6 +1,6 @@
 ﻿<template>
 	<div :id="'user_manager' +org_id">
-		<h3>{|{ org.name }|}</h3>
+		<h3>{{ org.name }}</h3>
 		<div>
 			<div class="form-inline" style="margin-bottom:20px;">
 				<span>關鍵字查詢：</span>
@@ -26,7 +26,7 @@
 					class="alert alert-info" 
 					role="alert"
 				>
-				  共取得 {|{ search_counts }|} 筆資料
+				  共取得 {{ search_counts }} 筆資料
 				</div>
 			</div>
 			<table-div

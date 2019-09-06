@@ -16,24 +16,24 @@
 					<template v-for="item in item_show(nav_item)">
 						<template v-if="item.type=='folder'">
 							<li class="dropdown">
-								<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">{|{ item.display_name }|}<span class="caret"></span></a>
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">{{ item.display_name }}<span class="caret"></span></a>
 								<ul class="dropdown-menu">
 									<template v-for="item in item.items">
 										<template v-if="item.type=='item'">
-											<li><a :href="item.url">{|{ item.display_name }|}</a></li>
+											<li><a :href="item.url">{{ item.display_name }}</a></li>
 										</template>
 										<template v-if="item.type=='action'">
-											<li class="dropdown"><a href="#" @click="item.action()">{|{ item.display_name }|}</a></li>
+											<li class="dropdown"><a href="#" @click="item.action()">{{ item.display_name }}</a></li>
 										</template>
 									</template>
 								</ul>
 							</li>
 						</template>
 						<template v-if="item.type=='item'">
-							<li class="dropdown"><a :href="item.url">{|{ item.display_name }|}</a></li>
+							<li class="dropdown"><a :href="item.url">{{ item.display_name }}</a></li>
 						</template>
 						<template v-if="item.type=='action'">
-							<li class="dropdown"><a href="#" @click="item.action()">{|{ item.display_name }|}</a></li>
+							<li class="dropdown"><a href="#" @click="item.action()">{{ item.display_name }}</a></li>
 						</template>
 					</template>
 				</ul>
@@ -41,24 +41,24 @@
 					<template v-for="item in item_show(nav_item_right)">
 						<template v-if="item.type=='folder'">
 							<li class="dropdown">
-								<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">{|{ item.display_name }|}<span class="caret"></span></a>
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">{{ item.display_name }}<span class="caret"></span></a>
 								<ul class="dropdown-menu">
 									<template v-for="item in item.items">
 										<template v-if="item.type=='item'">
-											<li><a :href="item.url">{|{ item.display_name }|}</a></li>
+											<li><a :href="item.url">{{ item.display_name }}</a></li>
 										</template>
 										<template v-if="item.type=='action'">
-											<li class="dropdown"><a href="#" @click="item.action()">{|{ item.display_name }|}</a></li>
+											<li class="dropdown"><a href="#" @click="item.action()">{{ item.display_name }}</a></li>
 										</template>
 									</template>
 								</ul>
 							</li>
 						</template>
 						<template v-if="item.type=='item'">
-							<li class="dropdown"><a :href="item.url">{|{ item.display_name }|}</a></li>
+							<li class="dropdown"><a :href="item.url">{{ item.display_name }}</a></li>
 						</template>
 						<template v-if="item.type=='action'">
-							<li class="dropdown"><a href="#" @click="item.action()">{|{ item.display_name }|}</a></li>
+							<li class="dropdown"><a href="#" @click="item.action()">{{ item.display_name }}</a></li>
 						</template>
 					</template>
 					<li class="dropdown"><a href="#" @click="mode_change()">校園版</a></li>
@@ -132,6 +132,24 @@
 								'display_name': '校對順序',
 								'permission': ['is_supermanager'],
 								'url': '/routing/ebookSystem/bookorder_list/',
+							},
+							{
+								type: 'item',
+								'display_name': '書籍閱讀統計',
+								'permission': ['is_manager'],
+								'url': '/routing/mysite/statistics_book_read/',
+							},
+							{
+								type: 'item',
+								'display_name': '志工服務時數統計',
+								'permission': ['is_manager'],
+								'url': '/routing/mysite/statistics_serviceinfo/',
+							},
+							{
+								type: 'item',
+								'display_name': '視障者閱讀統計',
+								'permission': ['is_manager'],
+								'url': '/routing/mysite/statistics_read/',
 							},
 							{
 								type: 'item',

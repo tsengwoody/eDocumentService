@@ -21,13 +21,13 @@
 									v-if="edited_page == key"
 									:value="key"
 								>
-									{|{ value }|}-上次校對頁數
+									{{ value }}-上次校對頁數
 								</option>
 								<option 
 									v-else
 									:value="key"
 								>
-									{|{ value }|}
+									{{ value }}
 								</option>
 							</template>
 

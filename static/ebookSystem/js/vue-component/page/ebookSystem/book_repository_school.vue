@@ -26,14 +26,14 @@
 											v-if="selected_org === org.id"
 										></i>
 										<i class="fa fa-chevron-right" aria-hidden="true" v-else></i>
-										&nbsp;{|{ org.name }|}
+										&nbsp;{{ org.name }}
 									</a>
 									<transition name="fade">
 										<ol style="list-style-image:none;" v-if="selected_org === org.id">
 											<li style="margin-top: 0.5em; cursor: pointer;" v-for="(category, index) in org.categorys">
 												<a
 													@click="category_read(category)"
-												>{|{ category.name }|}</a>
+												>{{ category.name }}</a>
 											</li>
 										</ol>
 									</transition>
@@ -44,7 +44,7 @@
 				</div>
 			</div>
 			<div class="col-sm-9 col-md-9">
-				<h3>{|{ pointer.name }|}書籍列表</h3>
+				<h3>{{ pointer.name }}書籍列表</h3>
 				<bookinfo_repository :datas="books" :header="bookinfo_header"></bookinfo_repository>
 			</div>
 		</div>

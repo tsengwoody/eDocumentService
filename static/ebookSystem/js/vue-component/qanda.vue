@@ -7,7 +7,7 @@
 		>新建</button>
 		<table-div-row :header="qanda_tutorial_header" :datas="qanda_tutorial_datas">
 			<template slot="order" slot-scope="props">
-				{|{ props.item.order +1 }|}
+				{{ props.item.order +1 }}
 			</template>
 			<template slot="question" slot-scope="props">
 				<div v-html="props.item"></div>
@@ -37,14 +37,14 @@
 				<div class="form-group">
 					<label for="id_question" class="control-label"><font style="color:red">*</font>問題</label>
 					<editor id="id_question" v-model="qanda_instance.question" :init="tinymce_init"></editor>
-					{|{ qanda_instance.question }|}
+					{{ qanda_instance.question }}
 				</div>
 				
 				<hr>
 				<div class="form-group">
 					<label for="id_answer" class="control-label"><font style="color:red">*</font>回答</label>
 					<editor id="id_answer" v-model="qanda_instance.answer" :init="tinymce_init"></editor>
-					{|{ qanda_instance.answer }|}
+					{{ qanda_instance.answer }}
 				</div>
 				
 			</template>

@@ -1,6 +1,6 @@
 ﻿<template>
 	<div class="tab-content">
-		<h3>{|{ org.name }|}</h3>
+		<h3>{{ org.name }}</h3>
 		<div id="ebook_review_list">
 			<table-div :header="ebook_header" :datas="ebook_datas">
 				<template slot="action" slot-scope="props">

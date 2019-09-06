@@ -1,6 +1,6 @@
 ﻿<template>
 	<div>
-		<h3>{|{ org.name }|}資料</h3>
+		<h3>{{ org.name }}資料</h3>
 		<table-div
 			:header="statistics_header"
 			:datas="statistics_datas"

@@ -54,7 +54,7 @@
 								<a class="btn btn-link" role="button" 
 									:href="'/routing/genericUser/announcement/' + announcement.id"
 								>
-									{|{ announcement.year }|}年{|{ announcement.month }|}月{|{ announcement.day }|}日 {|{ announcement.title }|}
+									{{ announcement.year }}年{{ announcement.month }}月{{ announcement.day }}日 {{ announcement.title }}
 								</a>
 							</p>
 						</template>

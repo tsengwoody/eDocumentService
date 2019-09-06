@@ -16,24 +16,24 @@
 					<template v-for="item in item_show(nav_item)">
 						<template v-if="item.type=='folder'">
 							<li class="dropdown">
-								<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">{|{ item.display_name }|}<span class="caret"></span></a>
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">{{ item.display_name }}<span class="caret"></span></a>
 								<ul class="dropdown-menu">
 									<template v-for="item in item.items">
 										<template v-if="item.type=='item'">
-											<li><a :href="item.url">{|{ item.display_name }|}</a></li>
+											<li><a :href="item.url">{{ item.display_name }}</a></li>
 										</template>
 										<template v-if="item.type=='action'">
-											<li class="dropdown"><a href="#" @click="item.action()">{|{ item.display_name }|}</a></li>
+											<li class="dropdown"><a href="#" @click="item.action()">{{ item.display_name }}</a></li>
 										</template>
 									</template>
 								</ul>
 							</li>
 						</template>
 						<template v-if="item.type=='item'">
-							<li class="dropdown"><a :href="item.url">{|{ item.display_name }|}</a></li>
+							<li class="dropdown"><a :href="item.url">{{ item.display_name }}</a></li>
 						</template>
 						<template v-if="item.type=='action'">
-							<li class="dropdown"><a href="#" @click="item.action()">{|{ item.display_name }|}</a></li>
+							<li class="dropdown"><a href="#" @click="item.action()">{{ item.display_name }}</a></li>
 						</template>
 					</template>
 				</ul>
@@ -41,24 +41,24 @@
 					<template v-for="item in item_show(nav_item_right)">
 						<template v-if="item.type=='folder'">
 							<li class="dropdown">
-								<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">{|{ item.display_name }|}<span class="caret"></span></a>
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">{{ item.display_name }}<span class="caret"></span></a>
 								<ul class="dropdown-menu">
 									<template v-for="item in item.items">
 										<template v-if="item.type=='item'">
-											<li><a :href="item.url">{|{ item.display_name }|}</a></li>
+											<li><a :href="item.url">{{ item.display_name }}</a></li>
 										</template>
 										<template v-if="item.type=='action'">
-											<li class="dropdown"><a href="#" @click="item.action()">{|{ item.display_name }|}</a></li>
+											<li class="dropdown"><a href="#" @click="item.action()">{{ item.display_name }}</a></li>
 										</template>
 									</template>
 								</ul>
 							</li>
 						</template>
 						<template v-if="item.type=='item'">
-							<li class="dropdown"><a :href="item.url">{|{ item.display_name }|}</a></li>
+							<li class="dropdown"><a :href="item.url">{{ item.display_name }}</a></li>
 						</template>
 						<template v-if="item.type=='action'">
-							<li class="dropdown"><a href="#" @click="item.action()">{|{ item.display_name }|}</a></li>
+							<li class="dropdown"><a href="#" @click="item.action()">{{ item.display_name }}</a></li>
 						</template>
 					</template>
 					<li class="dropdown"><a href="#" @click="mode_change()">一般版</a></li>

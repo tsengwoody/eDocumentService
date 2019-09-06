@@ -1,6 +1,6 @@
 ﻿<template>
 	<div>
-		<h2>{|{ title }|}</h2>
+		<h2>{{ title }}</h2>
 		<div class="form-horizontal" style="margin: 1em 0;">
 			<div class="form-group">
 				<label class="control-label col-md-2 col-lg-1">
@@ -12,7 +12,7 @@
 						v-model="org_id"
 					>
 						<option :value="'all'" selected="selected">全部</option>
-						<option v-for="(value, key) in orgs" :value="value.id">{|{ value.name }|}</option>
+						<option v-for="(value, key) in orgs" :value="value.id">{{ value.name }}</option>
 					</select>
 				</div>
 			</div>

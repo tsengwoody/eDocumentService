@@ -17,7 +17,7 @@
 							>
 						</div>
 						<div v-if="mode==='update'" class="col-sm-3 likebtn">
-							{|{ resource_name }|}
+							{{ resource_name }}
 						</div>
 					</div>
 					<div class="form-group">
@@ -56,7 +56,7 @@
 	</modal>
 </template>
 <script>
-	Vue.options.delimiters = ['{|{', '}|}'];
+	Vue.options.delimiters = ['{{', '}}'];
 
 	function getExt(filename){
 		// 依照名稱找副檔名

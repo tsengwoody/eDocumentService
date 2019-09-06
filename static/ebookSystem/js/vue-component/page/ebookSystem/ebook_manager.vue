@@ -10,7 +10,7 @@
 						id="id_search_choices" required
 					>
 						<option value="all" selected="selected">全部</option>
-						<option v-for="(value, key) in search_choices" :value="key">{|{ value }|}</option>
+						<option v-for="(value, key) in search_choices" :value="key">{{ value }}</option>
 					</select>
 				</div>
 				<div class="form-group">

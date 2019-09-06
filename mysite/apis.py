@@ -3,7 +3,7 @@
 #import datetime
 import os
 
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.utils import timezone as datetime
 
 from rest_framework.decorators import list_route, detail_route
@@ -136,6 +136,32 @@ class Statistics(APIView):
 			'groupfield': User.objects.get(id=i['editor']).username,
 			'count': i['count'],
 		} for i in r if i['editor'] ]
+		res['result'].extend(r)
+
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	def serviceinfo(self, request):
+		res = {}
+		res['result'] = []
+
+		query = EditRecord.objects.all()
+		query = query.filter(editor__org=request.GET['org'])
+		if self.begin_time:
+			query = query.filter(get_time__gte=self.begin_time)
+		if self.end_time:
+			query = query.filter(get_time__lt=self.end_time)
+
+		download_count = query.count()
+
+		res['result'].append({
+			'groupfield': 'all',
+			'count': download_count,
+		})
+		r = query.values('editor').annotate(count=Sum('service_hours'))
+		r = [{
+			'username': User.objects.get(id=i['editor']).username,
+			'count': i['count'],
+		} for i in r if i['editor']]
 		res['result'].extend(r)
 
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)

@@ -4,16 +4,16 @@
 		<ul>
 			<template v-for="item, index in items">
 				<template v-if="item.type=='folder'">
-					<li><a href="#">{|{ index+1 }|}. {|{ item.display_name }|}</a>
+					<li><a href="#">{{ index+1 }}. {{ item.display_name }}</a>
 						<ul>
 							<template v-for="folder_item, index_in in item.items">
-								<li><a :href="folder_item.url">{|{ index+1 }|}.{|{ index_in+1 }|} {|{ folder_item.display_name }|}</a></li>
+								<li><a :href="folder_item.url">{{ index+1 }}.{{ index_in+1 }} {{ folder_item.display_name }}</a></li>
 							</template>
 						</ul>
 					</li>
 				</template>
 				<template v-if="item.type=='item'">
-					<li><a :href="item.url">{|{ index+1 }|}. {|{ item.display_name }|}</a></li>
+					<li><a :href="item.url">{{ index+1 }}. {{ item.display_name }}</a></li>
 				</template>
 			</template>
 		</ul>

@@ -4,10 +4,10 @@
 		<div class="form-horizontal">
 			<template v-for="(value, key) in filter_data">
 				<div class="form-group" v-if="key==='email'">
-					<label class="control-label col-sm-2" :for="key"><font style="color:red">*</font><span>{|{ data_header[key] }|}</span></label>
+					<label class="control-label col-sm-2" :for="key"><font style="color:red">*</font><span>{{ data_header[key] }}</span></label>
 					<div class="col-sm-4">
 						<div class="input-group">
-							<div class="likebtn">{|{ value }|}</div>
+							<div class="likebtn">{{ value }}</div>
 							<span class="input-group-btn">
 								<button class="btn btn-success" disabled v-if="auth_email">已驗證</button>
 								<button 
@@ -20,11 +20,11 @@
 					</div>
 				</div>
 				<div class="form-group" v-else-if="key==='phone'">
-					<label class="control-label col-sm-2" :for="key"><font style="color:red">*</font><span>{|{ data_header[key] }|}</span></label>
+					<label class="control-label col-sm-2" :for="key"><font style="color:red">*</font><span>{{ data_header[key] }}</span></label>
 					<div class="col-sm-4">
 						<div class="input-group">
 							
-							<div class="likebtn">{|{ value }|}</div>
+							<div class="likebtn">{{ value }}</div>
 							<span class="input-group-btn">
 								<button class="btn btn-success" disabled v-if="auth_phone">已驗證</button>
 								<button 
@@ -37,9 +37,9 @@
 					</div>
 				</div>
 				<div class="form-group" v-else>
-					<label class="control-label col-sm-2" :for="key"><font style="color:red">*</font><span>{|{ data_header[key] }|}</span></label>
+					<label class="control-label col-sm-2" :for="key"><font style="color:red">*</font><span>{{ data_header[key] }}</span></label>
 					<div class="col-sm-4">
-						<div class="likebtn" :id="key">{|{ value }|}</div>
+						<div class="likebtn" :id="key">{{ value }}</div>
 					</div>
 				</div>
 			</template>
@@ -126,7 +126,7 @@
 					<button class="font-size-default" @click="defautlFontSize">預設</button>
 					<button class="font-size-up" @click="upFontSize">放大</button>
 					<button class="font-size-down" @click="downFontSize">縮小</button>
-					<span class="font-size-ratio">{|{ fontSizeRatio }|}</span>
+					<span class="font-size-ratio">{{ fontSizeRatio }}</span>
 				</div>
 			</template>
 		</modal>
@@ -153,7 +153,7 @@
 							@click="getOTP('phone')"
 						>取得驗證碼
 							<template v-if="!isAllowedGetOTP">
-								<span class="badge">{|{ finalCounts }|}</span>
+								<span class="badge">{{ finalCounts }}</span>
 							</template>
 						</button>				
 						<span v-if="!isAllowedGetOTP">已傳送</span>
@@ -190,7 +190,7 @@
 							@click="getOTP('email')"
 						>取得驗證碼
 							<template v-if="!isAllowedGetOTP">
-								<span class="badge">{|{ finalCounts }|}</span>
+								<span class="badge">{{ finalCounts }}</span>
 							</template>
 						</button>				
 						<span v-if="!isAllowedGetOTP">已傳送</span>

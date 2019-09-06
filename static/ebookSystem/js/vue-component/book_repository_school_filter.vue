@@ -11,7 +11,7 @@
 						placeholder="請選擇單位"
 					>
 						<option value="0" selected>全部</option>
-						<option v-for="org in organizations" :key="org.id" :value="org.id">{|{ org.name }|}</option>
+						<option v-for="org in organizations" :key="org.id" :value="org.id">{{ org.name }}</option>
 					</select>
 				</div>
 			</div>
@@ -31,7 +31,7 @@
 							v-for="category in selected_org.categorys"
 							:key="category.id"
 							:value="category.id"
-						>{|{ category.name }|}</option>
+						>{{ category.name }}</option>
 					</select>
 					<select
 						v-else
@@ -53,7 +53,7 @@
 			<div class="form-group">
 				<div class="col-sm-3 col-sm-offset-2">
 					<button type="button" class="btn btn-primary" @click="search">搜尋</button>
-					<span class="book_search_result">共查到 {|{ bookinfosData.length }|} 筆資料</span>
+					<span class="book_search_result">共查到 {{ bookinfosData.length }} 筆資料</span>
 				</div>
 			</div>
 		</div>

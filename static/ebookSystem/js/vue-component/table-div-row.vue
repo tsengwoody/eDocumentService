@@ -58,7 +58,7 @@ div.table > .tbody{
 				<div role="rowgroup" class=thead>
 					<div role="row" class=tr>
 						<div v-for="(value, key) in header" role="columnheader" class=cell>
-							{|{ value }|}
+							{{ value }}
 						</div>
 					</div>
 				</div>
@@ -69,7 +69,7 @@ div.table > .tbody{
 								<slot :name="key" :item="entry[key]"></slot>
 							</div>
 							<div v-else :data-title="value" role="cell" class=cell>
-								{|{ entry[key] }|}
+								{{ entry[key] }}
 							</div>
 						</template>
 					</div>
@@ -99,7 +99,7 @@ div.table > .tbody{
 							:class="{ active: pagenow === pager }"
 							class="page-item"
 						>
-							<a class="page-link" tabindex="-1" @click="pagin_change(pager)">{|{ pager }|}</a>
+							<a class="page-link" tabindex="-1" @click="pagin_change(pager)">{{ pager }}</a>
 						</li>
 
 						<li v-if="showNextMore">
@@ -111,7 +111,7 @@ div.table > .tbody{
 							class="page-item"
 							v-if="numpage > 1"
 						>
-							<a class="page-link" tabindex="-1" @click="pagin_change(numpage)">{|{ numpage }|}</a>
+							<a class="page-link" tabindex="-1" @click="pagin_change(numpage)">{{ numpage }}</a>
 						</li>
 
 						<li class="page-item">

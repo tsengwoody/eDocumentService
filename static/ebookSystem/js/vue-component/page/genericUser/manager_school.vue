@@ -3,7 +3,7 @@
 		<h2>校園管理</h2>
 		<ul class="manager_school">
 			<template v-for="item in itemsShow">
-				<li><a :href="item.url" title="(開啟新視窗)" target="blank">{|{ item.display_name }|}</a></li>
+				<li><a :href="item.url" title="(開啟新視窗)" target="blank">{{ item.display_name }}</a></li>
 			</template>
 		</ul>
 	</div>
@@ -56,6 +56,24 @@
 						'display_name': '服務時數確認',
 						'permission': ['is_manager'],
 						'url': '/routing/genericUser/serviceinfo_list_check_self/',
+					},
+					{
+						type: 'item',
+						'display_name': '書籍閱讀統計',
+						'permission': ['is_manager'],
+						'url': '/routing/mysite/statistics_book_read_self/',
+					},
+					{
+						type: 'item',
+						'display_name': '志工服務時數統計',
+						'permission': ['is_manager'],
+						'url': '/routing/mysite/statistics_serviceinfo_self/',
+					},
+					{
+						type: 'item',
+						'display_name': '視障者閱讀統計',
+						'permission': ['is_manager'],
+						'url': '/routing/mysite/statistics_read_self/',
 					},
 					{
 						type: 'item',

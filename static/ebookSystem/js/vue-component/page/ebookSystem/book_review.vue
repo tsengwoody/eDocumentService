@@ -10,7 +10,7 @@
 				<li
 					v-for="(value, key) in info"
 				>
-					{|{ key }|}:{|{ value }|}
+					{{ key }}:{{ value }}
 				</li>
 			</ul>
 
@@ -25,7 +25,7 @@
 					@click="
 						$refs.scan_book_editor.instance_set(item); 
 						openDialog('scan_book_modal', this);
-				">分段{|{ item.split('-')[1] }|}</button>
+				">分段{{ item.split('-')[1] }}</button>
 			</template>
 
 			<!--step 3-->

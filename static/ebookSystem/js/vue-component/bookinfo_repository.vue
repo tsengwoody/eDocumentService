@@ -17,7 +17,7 @@
 		</table-div>
 		<modal :id_modal="id" :size="'normal'" :ref="id">
 			<template slot="header">
-				<h4 class="modal-title">書籍 {|{ feedback_id }|} 錯誤內容回報</h4>
+				<h4 class="modal-title">書籍 {{ feedback_id }} 錯誤內容回報</h4>
 			</template>
 			<template slot="body">
 				<h5>回報內容:</h5>

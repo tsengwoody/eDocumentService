@@ -1,6 +1,6 @@
 ﻿<template>
 	<div>
-		<h3>{|{ org.name }|}</h3>
+		<h3>{{ org.name }}</h3>
 		<div class="tab-content">
 			<div id="book_unreview_list">
 				<table-div :header="book_header" :datas="book_datas">

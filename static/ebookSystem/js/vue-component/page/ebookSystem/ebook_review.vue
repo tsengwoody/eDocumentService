@@ -32,14 +32,14 @@
 							<th>增長字數</th>
 						</tr>
 						<tr>
-							<td>{|{ analysis.edit_distance }|}</td>
-							<td>{|{ analysis.len_block }|}</td>
-							<td>{|{ analysis.same_character }|}</td>
-							<td>{|{ analysis.delete_count }|}</td>
-							<td>{|{ analysis.insert_count }|}</td>
-							<td>{|{ analysis.src_count }|}</td>
-							<td>{|{ analysis.dst_count }|}</td>
-							<td>{|{ analysis.diff_count }|}</td>
+							<td>{{ analysis.edit_distance }}</td>
+							<td>{{ analysis.len_block }}</td>
+							<td>{{ analysis.same_character }}</td>
+							<td>{{ analysis.delete_count }}</td>
+							<td>{{ analysis.insert_count }}</td>
+							<td>{{ analysis.src_count }}</td>
+							<td>{{ analysis.dst_count }}</td>
+							<td>{{ analysis.diff_count }}</td>
 						</tr>
 					</table>
 				</div>

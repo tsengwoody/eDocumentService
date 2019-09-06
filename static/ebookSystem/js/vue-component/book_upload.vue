@@ -32,7 +32,7 @@
 					<label class="control-label col-sm-2"
 						v-bind:for="'id_' +key"
 					>
-						<font style="color:red">*</font>{|{ value.show }|}：
+						<font style="color:red">*</font>{{ value.show }}：
 					</label>
 					<div class="col-sm-3">
 						<input type="text" grp="changemode" class="form-control"
@@ -74,7 +74,7 @@
 							<option
 								v-for="item in org_categorys"
 								:value="item.id"
-							>{|{ item.name }|}</option>
+							>{{ item.name }}</option>
 						</select>
 					</div>
 				</template>
@@ -83,7 +83,7 @@
 						<div
 							v-for="item in org_categorys"
 							v-if="org_id==item.id"
-						>{|{ item.name }|}</div>
+						>{{ item.name }}</div>
 					</div>
 				</template>
 			</div> 
@@ -105,7 +105,7 @@
 							<option
 								v-for="category in item.categorys"
 								:value="category.id"
-							>{|{ category.name }|}</option>
+							>{{ category.name }}</option>
 						</select>
 					</template>
 				</div>

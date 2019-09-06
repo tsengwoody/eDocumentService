@@ -24,7 +24,7 @@
 				id="id_finish" 
 				name="finish"
 				style="display: none"
-			>{|{ current_editrecord.finish }|}</textarea>
+			>{{ current_editrecord.finish }}</textarea>
 			<editor 
 				autocomplete="off" 
 				id="id_edit" 

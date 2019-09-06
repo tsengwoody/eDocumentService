@@ -2,7 +2,7 @@
 	<div v-if="!iser(data)" :style="{ fontSize: fontSize + 'px' }">
 		<ul>
 			<li v-for="(value, key) in data">
-				{|{ key }|} : {|{ value }|}
+				{{ key }} : {{ value }}
 			</li>
 		</ul>
 	</div>

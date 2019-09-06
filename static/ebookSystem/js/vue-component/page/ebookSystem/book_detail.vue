@@ -46,7 +46,7 @@
 										<li class="list-group-item" v-for="(item, index) in book.ebook_set"><a 
 											v-on:click="read(index)"
 											href='#'
-										>{|{ item.bookname +item.part }|}</a></li>
+										>{{ item.bookname +item.part }}</a></li>
 
 									</ul>
 								</div>

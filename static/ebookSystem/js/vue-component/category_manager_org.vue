@@ -1,6 +1,6 @@
 ﻿<template>
 	<div :id="'category_manager' +org_id" class="container">
-		<h3>{|{ org.name }|}</h3>
+		<h3>{{ org.name }}</h3>
 		<div class="row">
 			<div class="col-sm-3 col-md-3">
 				<div class="panel-group">
@@ -22,7 +22,7 @@
 									<a 
 										@click="pointer=item"
 										href='#'
-									>{|{ index+1 }|}. {|{ item.name }|}</a>
+									>{{ index+1 }}. {{ item.name }}</a>
 
 									<span v-if="index > 0">
 										<i class="fa fa-pencil-square-o"
@@ -53,7 +53,7 @@
 					v-for="(item, index) in items"
 					v-if="pointer.id===item.id"
 				>
-					<h4>{|{ item.name }|}書籍列表</h4>
+					<h4>{{ item.name }}書籍列表</h4>
 					<table-div :datas="item.book_list" :header="bookinfo_columns">
 						<template slot="action" slot-scope="props">
 							<button
@@ -71,7 +71,7 @@
 		</div>
 		<modal :id_modal="'bcu' +org_id" :size="'normal'" :ref="'bcu' +org_id">
 			<template slot="header">
-				<h4 class="modal-title">書籍{|{ book_ISBN }|}類別變更</h4>
+				<h4 class="modal-title">書籍{{ book_ISBN }}類別變更</h4>
 			</template>
 			<template slot="body">
 				<div class="form-horizontal">
@@ -117,7 +117,7 @@
 		</modal>
 		<modal :id_modal="'cu' +org_id" :size="'normal'" :ref="'cu' +org_id">
 			<template slot="header">
-				<h4 class="modal-title">類別{|{ category_id }|}更名</h4>
+				<h4 class="modal-title">類別{{ category_id }}更名</h4>
 			</template>
 			<template slot="body">
 				<div class="form-horizontal">

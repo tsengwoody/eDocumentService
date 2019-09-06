@@ -3,7 +3,7 @@
 		<h2>讀者專區</h2>
 		<ul class="manager_school">
 			<template v-for="item in itemsShow">
-				<li><a :href="item.url" title="(開啟新視窗)" target="blank">{|{ item.display_name }|}</a></li>
+				<li><a :href="item.url" title="(開啟新視窗)" target="blank">{{ item.display_name }}</a></li>
 			</template>
 		</ul>
 	</div>

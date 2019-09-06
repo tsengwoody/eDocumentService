@@ -10,7 +10,7 @@
 				>
 					<li>
 						<a href="#" aria-label="文字放大" @click="changeFontSize">
-							文字大小 {|{ fontSize - 40 }|}%
+							文字大小 {{ fontSize - 40 }}%
 						</a>
 					</li>
 				</viewer>
@@ -19,7 +19,7 @@
 			<div class="col-sm-6">
 				<div id="textSection">
 					<div :style="{ fontSize: fontSize + '%', lineHeight: '1.8em' }">
-						{|{ content }|}
+						{{ content }}
 					</div>
 				</div>
 			</div>

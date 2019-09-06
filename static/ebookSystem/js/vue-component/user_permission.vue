@@ -1,12 +1,12 @@
 ﻿<template>
 	<div id="permissionDiv" class="row">
-		<h4>使用者名稱：{|{ username }|}</h4>
+		<h4>使用者名稱：{{ username }}</h4>
 		<div style="margin:20px;">
 			<div v-for="(value, key) in user_permission" style="margin-bottom: 15px;">
 				<label><input
 					type="checkbox"
 					v-model="user_permission[key]"
-				>{|{ permission_label[key] }|}</label>
+				>{{ permission_label[key] }}</label>
 			</div>
 			<button class="btn btn-default" @click="permission_update()">變更</button>
 		</div>

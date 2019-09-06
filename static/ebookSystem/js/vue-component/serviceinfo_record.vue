@@ -28,7 +28,7 @@
 									v-for="item in org_list"
 									:value="item.id"
 								>
-									{|{ item.name }|}
+									{{ item.name }}
 								</option>
 							</select>
 						</label>
