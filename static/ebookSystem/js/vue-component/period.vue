@@ -1,19 +1,26 @@
 ﻿<template>
-	<div class="dateCtnr">
-		<label :for="'begin' +id"><font-awesome-icon icon="hourglass-start" class="textAside" />開始日期</label>
-		<input
-			:id="'begin' +id"
-			type="text"
-			v-model="begin"
-			@input="out"
-		>
-		<label :for="'end' +id"><font-awesome-icon icon="hourglass-end" class="textAside" />結束日期</label>
-		<input
-			:id="'end' +id"
-			type="text"
-			v-model="end"
-			@input="out"
-		>
+	<div class="form-group">
+		<label class="control-label col-sm-2">起訖時間</label>
+
+		<div class="col-sm-3">
+			<el-date-picker
+				v-model="begin"
+				value-format="yyyy-MM-dd"   
+				placeholder="yyyy-MM-dd"
+				size=small
+				style="width: 100%;"
+			></el-date-picker>
+		</div>
+		
+		<div class="col-sm-3">
+			<el-date-picker
+				v-model="end"
+				value-format="yyyy-MM-dd"   
+				placeholder="yyyy-MM-dd"
+				size=small
+				style="width: 100%;"
+			></el-date-picker>
+		</div>
 	</div>
 </template>
 
@@ -29,7 +36,6 @@ module.exports = {
 	},
 	data() {
 		return {
-			id: -Math.floor(Math.random() * 100000000).toString(),
 			begin: '',
 			end: '',
 		};
@@ -48,14 +54,5 @@ module.exports = {
 </script>
 
 <style>
-	@import '../style/base.scss';
 
-	.dateCtnr {
-		display: grid;
-		grid-template-columns: auto auto;
-		justify-content: left;
-		justify-items: center;
-		grid-column-gap: $spaceS4;
-		grid-row-gap: $spaceS2;
-	}
 </style>

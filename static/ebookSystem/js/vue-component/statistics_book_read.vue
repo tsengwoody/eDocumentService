@@ -1,16 +1,27 @@
 ﻿<template>
 	<div>
 		<h3>{{ org.name }}</h3>
-		<period v-model="period"></period>
-		<formdrf
-			:model_info="model['search_value']"
-			:field="'search_value'"
-			:offset-class="'col-sm-offset-3'"
-			v-model="search_value"
-		></formdrf>
-		<button
-			@click="getData"
-		>查詢</button>
+		<div class="form-horizontal" style="margin-top: 1em;">
+			<period v-model="period"></period>
+		
+			<formdrf
+				:model_info="model['search_value']"
+				:field="'search_value'"
+				:label-class="'col-sm-2'"
+				v-model="search_value"
+			></formdrf>
+
+			<div class="form-group">
+				<label class="control-label col-sm-2 offset-sm-1"></label>
+				<div class="col-sm-3">	
+					<button
+						class="btn btn-default"
+						@click="getData"
+					>查詢</button>
+				</div>
+			</div>
+		</div>
+
 
 		<table-div
 			:header="instance_header"
