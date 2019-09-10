@@ -158,6 +158,14 @@
 		float: none;
 		margin-top: 1rem;
 	}
+
+
+	.slide-icons img {
+		height: 3rem;
+		margin-left: 1rem;
+	}
+
+	
 }
 
 @media (max-width: 700px) {
@@ -166,6 +174,22 @@
 		float: none;
 		margin-top: 0.5rem;
 		margin-right: 0;
+	}
+
+	.tool-box-area > .tool-box { 
+		width: 85px;
+	    height: 85px; 
+	}
+
+	.tool-box .tool-box__img {
+		height: 50px;
+	    width: 100%;
+	    margin-top: 0.2rem;
+	    margin-bottom: 0.3rem;
+	}
+
+	.slide-icons img {
+		height: 2.2rem;
 	}
 }
 
@@ -213,11 +237,6 @@ a:hover {
     bottom: 0.5rem;
 }
 
-.slide-icons img {
-	height: 3rem;
-	margin-left: 1rem;
-}
-
 label {
     font-weight: 500;
 }
@@ -238,5 +257,19 @@ div.introduction-area {
 	display: flex;
     justify-content: space-between;
 	padding-top: 20px;
+}
+
+
+// nav button style
+nav.navigation-clean-button {
+    background-color: #badc58;
+}
+
+.navbar-toggle { 
+	border: 1px solid #f2f2f2;
+}
+
+.navbar-toggle .icon-bar {
+    border: 1px solid #f2f2f2;
 }
 </style>
