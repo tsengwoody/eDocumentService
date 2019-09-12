@@ -152,20 +152,19 @@
 	margin: 0px 1rem;
 }
 
+@media (min-width: 700px) {
+	.slide-icons img {
+		height: 3rem;
+		margin-left: 1rem;
+	}
+}
+
 @media (max-width: 1024px) {
 	.tool-box-area {
 		width: 100%; 
 		float: none;
 		margin-top: 1rem;
 	}
-
-
-	.slide-icons img {
-		height: 3rem;
-		margin-left: 1rem;
-	}
-
-	
 }
 
 @media (max-width: 700px) {
