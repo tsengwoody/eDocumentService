@@ -3,6 +3,8 @@
 #import datetime
 import os
 
+import pandas as pd
+
 from django.db.models import Count, Sum
 from django.utils import timezone as datetime
 
@@ -141,30 +143,75 @@ class Statistics(APIView):
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	def serviceinfo(self, request):
-		res = {}
-		res['result'] = []
-
+		res = []
 		query = EditRecord.objects.all()
-		query = query.filter(editor__org=request.GET['org'])
+		if self.begin_time:
+			query = query.filter(get_date__gte=self.begin_time)
+		if self.end_time:
+			query = query.filter(get_date__lt=self.end_time)
+		if hasattr(self, 'org'):
+			query = query.filter(editor__org=self.org)
+
+		r = query.values('editor').annotate(count=Sum('service_hours'))
+		r = [{
+			'username': unicode(User.objects.get(id=i['editor'])),
+			'email': User.objects.get(id=i['editor']).email,
+			'phone': User.objects.get(id=i['editor']).phone,
+			'count': i['count'],
+		} for i in r if i['editor']]
+		res.extend(r)
+
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	def user_read(self, request):
+		res = []
+
+		# 借閱的資料
+		query = LibraryRecord.objects.all()
+		if self.begin_time:
+			query = query.filter(check_out_time__gte=self.begin_time)
+		if self.end_time:
+			query = query.filter(check_out_time__lt=self.end_time)
+		if hasattr(self, 'org'):
+			query = query.filter(owner__org=self.org)
+
+		library_result = query.values('owner').annotate(count=Count('owner'))
+		library_result = [{
+			'user': i['owner'],
+			'library': i['count'],
+		} for i in library_result if i['owner']]
+
+		# 下載的資料
+		query = GetBookRecord.objects.all()
 		if self.begin_time:
 			query = query.filter(get_time__gte=self.begin_time)
 		if self.end_time:
 			query = query.filter(get_time__lt=self.end_time)
+		if hasattr(self, 'org'):
+			query = query.filter(user__org=self.org)
 
-		download_count = query.count()
+		download_result = query.values('user').annotate(count=Count('user'))
+		download_result = [{
+			'user': i['user'],
+			'download': i['count'],
+		} for i in download_result if i['user']]
 
-		res['result'].append({
-			'groupfield': 'all',
-			'count': download_count,
-		})
-		r = query.values('editor').annotate(count=Sum('service_hours'))
-		r = [{
-			'username': User.objects.get(id=i['editor']).username,
-			'count': i['count'],
-		} for i in r if i['editor']]
-		res['result'].extend(r)
+		df1 = pd.DataFrame(library_result)
+		df2 = pd.DataFrame(download_result)
+		df = df1.set_index('user').join(df2.set_index('user'), how='outer')
+		df = df.fillna(0)
+		datas = df.reset_index().to_dict(orient='record')
+		for i in datas:
+			u = User.objects.get(id=i['user'])
+			res.append({
+				'user': unicode(u),
+				'join': u.date_joined,
+				'library': i['library'],
+				'download': i['download'],
+			})
 
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
 
 class Ddm(Resource):
 

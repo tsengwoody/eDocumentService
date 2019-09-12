@@ -1,7 +1,6 @@
 ﻿<template>
 	<div>
 		<h3>{{ org.name }}</h3>
-
 		<div class="form-horizontal" style="margin-top: 1em;">
 			<period v-model="period"></period>
 			<formdrf
@@ -41,16 +40,16 @@
 		},
 		data(){
 			return {
+				url: '/api/statistics/user_read/',
 				period: {},
 				search_value: '',
 				instance_datas: [],
 				instance_header: {
 					order: '項次',
-					username: '姓名',
-					join: '訴冊時間',
-					online: '閱讀次數',
-					checkout: '借閱次數',
-					download: '下載次數',
+					name: '姓名',
+					join: '註冊日',
+					library: '借閱',
+					download: '下載',
 				},
 				model: {
 					search_value: {
@@ -63,7 +62,38 @@
 		},
 		methods: {
 			getData(){
-				console.log('search')
+				let rdate = /^\d{4,4}-\d{2,2}-\d{2,2}$/;
+				if (!rdate.test(this.period.begin)){
+					alertmessage('error', '開始日期格式錯誤');
+					return -1;
+				}
+				if (!rdate.test(this.period.end)){
+					alertmessage('error', '結束日期格式錯誤');
+					return -1;
+				}
+
+				let params = {org_id: this.org.id, ...{
+					begin_time: this.period['begin'],
+					end_time: this.period['end'],
+				}}
+				this.instance_datas = [];
+				axios.get(this.url, {params: params})
+				.then(res => {
+					res.data.forEach((v, i) => {
+						this.instance_datas.push({
+							order: i,
+							name: v.user,
+							join: v.join,
+							library: v.library,
+							download: v.download,
+						})
+					})
+					alertmessage('success', '查詢完成，共取得 ' +this.instance_datas.length +' 筆資料')
+				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
+
 			},
 		},
 	}

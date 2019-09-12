@@ -1,5 +1,4 @@
 ﻿# coding: utf-8
-from django.contrib.auth import (login as auth_login, logout as auth_logout)
 from django.shortcuts import render
 
 import base64
@@ -38,10 +37,6 @@ def epub_view(request, path, template_name='mysite/epub_view.html'):
 	base64_path = base64.b64encode(path)
 	return render(request, template_name, locals())
 
-def dev(request, name, pk=None):
-	template_name='dev/{0}.html'.format(name.split('/')[0])
-	return render(request, template_name, locals())
-
 def home(request, template_name='routing.html'):
 	app = 'mysite'
 	page = 'home'
@@ -55,10 +50,6 @@ def generic(request, template_name='routing.html'):
 def school(request, template_name='routing.html'):
 	app = 'mysite'
 	page = 'school'
-	return render(request, template_name, locals())
-
-def logout_user(request, template_name='genericUser/logged_out.html'):
-	auth_logout(request)
 	return render(request, template_name, locals())
 
 def statistics(request, template_name='mysite/statistics.html'):

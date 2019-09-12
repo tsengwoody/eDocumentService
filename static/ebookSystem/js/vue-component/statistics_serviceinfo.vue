@@ -40,6 +40,7 @@
 		},
 		data(){
 			return {
+				url: '/api/statistics/serviceinfo/',
 				period: {},
 				search_value: '',
 				instance_datas: [],
@@ -61,7 +62,38 @@
 		},
 		methods: {
 			getData(){
-				console.log('search')
+				let rdate = /^\d{4,4}-\d{2,2}-\d{2,2}$/;
+				if (!rdate.test(this.period.begin)){
+					alertmessage('error', '開始日期格式錯誤');
+					return -1;
+				}
+				if (!rdate.test(this.period.end)){
+					alertmessage('error', '結束日期格式錯誤');
+					return -1;
+				}
+
+				let params = {org_id: this.org.id, ...{
+					begin_time: this.period['begin'],
+					end_time: this.period['end'],
+				}}
+				this.instance_datas = [];
+				axios.get(this.url, {params: params})
+				.then(res => {
+					res.data.forEach((v, i) => {
+						this.instance_datas.push({
+							order: i,
+							name: v.username,
+							email: v.email,
+							phone: v.phone,
+							sh: v.count,
+						})
+					})
+					alertmessage('success', '查詢完成，共取得 ' +this.instance_datas.length +' 筆資料')
+				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
+
 			},
 		},
 	}

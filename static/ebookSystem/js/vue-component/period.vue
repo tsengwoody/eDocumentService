@@ -3,23 +3,22 @@
 		<label class="control-label col-sm-2">起訖時間</label>
 
 		<div class="col-sm-3">
-			<el-date-picker
-				v-model="begin"
-				value-format="yyyy-MM-dd"   
-				placeholder="yyyy-MM-dd"
-				size=small
-				style="width: 100%;"
-			></el-date-picker>
+		<label :for="'begin'"><font-awesome-icon icon="hourglass-start" class="textAside" />開始日期</label>
+		<input
+			:id="'begin'"
+			type="text"
+			v-model="begin"
+			@input="out"
+		>
 		</div>
-		
 		<div class="col-sm-3">
-			<el-date-picker
-				v-model="end"
-				value-format="yyyy-MM-dd"   
-				placeholder="yyyy-MM-dd"
-				size=small
-				style="width: 100%;"
-			></el-date-picker>
+		<label :for="'end'"><font-awesome-icon icon="hourglass-end" class="textAside" />結束日期</label>
+		<input
+			:id="'end'"
+			type="text"
+			v-model="end"
+			@input="out"
+		>
 		</div>
 	</div>
 </template>
