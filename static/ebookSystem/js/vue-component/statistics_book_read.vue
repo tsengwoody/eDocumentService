@@ -3,14 +3,12 @@
 		<h3>{{ org.name }}</h3>
 		<div class="form-horizontal" style="margin-top: 1em;">
 			<period v-model="period"></period>
-		
 			<formdrf
 				:model_info="model['search_value']"
 				:field="'search_value'"
 				:label-class="'col-sm-2'"
 				v-model="search_value"
 			></formdrf>
-
 			<div class="form-group">
 				<label class="control-label col-sm-2 offset-sm-1"></label>
 				<div class="col-sm-3">	
@@ -21,7 +19,6 @@
 				</div>
 			</div>
 		</div>
-
 
 		<table-div
 			:header="instance_header"
@@ -43,6 +40,7 @@
 		},
 		data(){
 			return {
+				url: '/api/statistics/book_read/',
 				period: {},
 				search_value: '',
 				instance_datas: [],
@@ -52,10 +50,9 @@
 					author: '作者',
 					house: '出版社',
 					date: '出版日期',
-					upload_date: '上架時間',
-					online: '閱讀次數',
-					checkout: '借閱次數',
-					download: '下載次數',
+					upload_date: '上傳時間',
+					library: '借閱',
+					download: '下載',
 				},
 				model: {
 					search_value: {
@@ -68,7 +65,41 @@
 		},
 		methods: {
 			getData(){
-				console.log('search')
+				let rdate = /^\d{4,4}-\d{2,2}-\d{2,2}$/;
+				if (!rdate.test(this.period.begin)){
+					alertmessage('error', '開始日期格式錯誤');
+					return -1;
+				}
+				if (!rdate.test(this.period.end)){
+					alertmessage('error', '結束日期格式錯誤');
+					return -1;
+				}
+
+				let params = {org_id: this.org.id, ...{
+					begin_time: this.period['begin'],
+					end_time: this.period['end'],
+				}}
+				this.instance_datas = [];
+				axios.get(this.url, {params: params})
+				.then(res => {
+					res.data.forEach((v, i) => {
+						this.instance_datas.push({
+							order: i,
+							bookname: v.bookname,
+							author: v.author,
+							house: v.house,
+							date: v.date,
+							upload_date: v.upload_date,
+							library: v.library,
+							download: v.download,
+						})
+					})
+					alertmessage('success', '查詢完成，共取得 ' +this.instance_datas.length +' 筆資料')
+				})
+				.catch(res => {
+					alertmessage('error', o2j(res.response.data));
+				})
+
 			},
 		},
 	}

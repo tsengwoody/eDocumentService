@@ -212,6 +212,57 @@ class Statistics(APIView):
 
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
+	def book_read(self, request):
+		res = []
+
+		# 借閱的資料
+		query = LibraryRecord.objects.all()
+		if self.begin_time:
+			query = query.filter(check_out_time__gte=self.begin_time)
+		if self.end_time:
+			query = query.filter(check_out_time__lt=self.end_time)
+		if hasattr(self, 'org'):
+			query = query.filter(owner__org=self.org)
+
+		library_result = query.values('object').annotate(count=Count('object'))
+		library_result = [{
+			'book': i['object'],
+			'library': i['count'],
+		} for i in library_result if i['object']]
+
+		# 下載的資料
+		query = GetBookRecord.objects.all()
+		if self.begin_time:
+			query = query.filter(get_time__gte=self.begin_time)
+		if self.end_time:
+			query = query.filter(get_time__lt=self.end_time)
+		if hasattr(self, 'org'):
+			query = query.filter(user__org=self.org)
+
+		download_result = query.values('book').annotate(count=Count('book'))
+		download_result = [{
+			'book': i['book'],
+			'download': i['count'],
+		} for i in download_result if i['book']]
+
+		df1 = pd.DataFrame(library_result)
+		df2 = pd.DataFrame(download_result)
+		df = df1.set_index('book').join(df2.set_index('book'), how='outer')
+		df = df.fillna(0)
+		datas = df.reset_index().to_dict(orient='record')
+		for i in datas:
+			b = Book.objects.get(ISBN=i['book'])
+			res.append({
+				'bookname': b.book_info.bookname,
+				'author': b.book_info.author,
+				'house': b.book_info.house,
+				'date': b.book_info.date,
+				'upload_date': b.upload_date,
+				'library': i['library'],
+				'download': i['download'],
+			})
+
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 class Ddm(Resource):
 
