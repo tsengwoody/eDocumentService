@@ -42,6 +42,9 @@
 							v-bind:readonly="value.readonly"
 						>
 					</div>
+					<div class="col-sm-5">
+						{{ value.remark }}
+					</div>
 				</div>
 			</div>
 			<template v-if="format!='self'">
@@ -149,46 +152,55 @@
 					'ISBN': {
 						'value': '',
 						'show': 'ISBN',
+						remark: '請輸入 13 碼 ISBN',
 						'readonly': true,
 					},
 					'bookname': {
 						'value': '',
 						'show': '書名',
+						remark: '請輸入書名',
 						'readonly': true,
 					},
 					'author': {
 						'value': '',
 						'show': '作者',
+						remark: '請輸入作者',
 						'readonly': true,
 					},
 					'house': {
 						'value': '',
 						'show': '出版社',
+						remark: '請輸入出版社',
 						'readonly': true,
 					},
 					'date': {
 						'value': '',
 						'show': '出版日期',
+						remark: '請輸入出版日期',
 						'readonly': true,
 					},
 					'bookbinding': {
 						'value': '',
 						'show': '裝訂冊數',
+						remark: '請輸入裝訂冊數資訊，例：平裝',
 						'readonly': true,
 					},
 					'chinese_book_category': {
 						'value': '',
 						'show': '中文圖書分類',
+						remark: '請輸入中國圖書分類號前 3 碼，例：857 即為小說分類',
 						'readonly': true,
 					},
 					'order': {
 						'value': '',
 						'show': '版次',
+						remark: '請輸入版次資訊，例：初版、二版',
 						'readonly': true,
 					},
 					'source': {
 						'value': '',
 						'show': '來源',
+						remark: '系統自動填入無需填寫',
 						'readonly': true,
 					},
 				},
@@ -338,6 +350,9 @@
 					rest_aj_upload(this.url, transferData)
 					.done((data) => {
 						alertmessage('success', '成功更新資料(檔案)' +data['message'])
+						.done(() => {
+							location.reload();
+						})
 					})
 					.fail((data) => {
 						alertmessage('error', '失敗更新資料(檔案)' +data['message'])

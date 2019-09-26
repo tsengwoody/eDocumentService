@@ -86,7 +86,7 @@
 							{
 								type: 'item',
 								'display_name': '掃描檔上傳',
-								'permission': ['auth_guest'],
+								'permission': ['auth_guest', 'is_manager'],
 								'url': '/routing/ebookSystem/book_create/',
 							},
 							{

@@ -187,20 +187,21 @@
 
 			genericUserAPI.userRest.list()
 			.then(res => {
-				_.each(res.data, (v) => {
+				res.data.forEach(v => {
 					this.user_list.push({
 						'display_name': v.username,
 						'value': v.id,
+						is_guest: v.is_guest,
 					})
 				})
+				this.user_list.sort(compare('display_name', 'asc'))
+				this.user_list = this.user_list.filter(v => v.is_guest)
+				return genericUserAPI.disabilityCardRest.options()
 			})
-
-			genericUserAPI.disabilityCardRest.options()
 			.then(res => {
 				this.model_info = _.clone(res.data.actions.POST);
-				this.model_info.owner.choices = this.user_list
+				this.model_info.owner.choices = this.user_list;
 				this.model_info.identity_card_number.label = '身份證字號'
-				this.model_info.owner.label = '擁有者'
 				this.model_info.owner.label = '擁有者'
 				this.model_info.name.label = '姓名'
 				this.model_info.address.label = '地址'
