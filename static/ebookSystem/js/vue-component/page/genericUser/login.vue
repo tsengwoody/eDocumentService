@@ -63,8 +63,8 @@
 		methods: {
 			login(){
 				let session_login = genericUserAPI.userAction.login(this.username, this.password)
-				let token_login = token.obtain(this.username, this.password)
-				Promise.all([session_login, token_login,])
+				//let token_login = token.obtain(this.username, this.password)
+				Promise.all([session_login,])
 				.then(res => {
 					alertmessage('success', '成功登入平台')
 					.done(() => {

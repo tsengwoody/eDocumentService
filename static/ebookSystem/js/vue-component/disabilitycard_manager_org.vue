@@ -1,5 +1,5 @@
 ﻿<template>
-	<div :id="'disabilitycard_manager' +org_id">
+	<div :id="'disabilitycard_manager' +org.id">
 		<h3>{{ org.name }}</h3>
 		<div class="form-inline">
 			<div class="form-group">
@@ -24,13 +24,13 @@
 				<button class="btn btn-primary"
 					@click="
 						dm_bus.$emit('instance-set', props.item);
-						$refs['dm' +org_id].open('disabilitycard_manager' +org_id);
+						$refs['dm' +org.id].open('disabilitycard_manager' +org.id);
 				">
 					查閱編修
 				</button>
 			</template>
 		</table-div>
-		<modal :id_modal="'dm' +org_id" :ref="'dm' +org_id">
+		<modal :id_modal="'dm' +org.id" :ref="'dm' +org.id">
 			<template slot="header">
 				<h4 class="modal-title">身心障礙手冊登錄</h4>
 			</template>
@@ -47,7 +47,7 @@
 <script>
 
 	module.exports = {
-		props: ['org_id',],
+		props: ['org',],
 		components: {
 			'disabilitycard': components['disabilitycard'],
 			'modal': components['modal'],
@@ -55,7 +55,6 @@
 		},
 		data(){
 			return {
-				org: [],
 				dm_bus: new Vue(),
 				search_choices: {
 					'false': '未啟用',
@@ -71,27 +70,24 @@
 				search_disabilitycard_datas: [],
 			}
 		},
-		mounted(){
-
-			genericUserAPI.organizationRest.read(this.org_id)
-			.then(res => {
-				this.org = res.data
-			})
-			.catch(res => {
-				alertmessage('error', o2j(res.response.data));
-			})
-
+		computed: {
+			query(){
+				let temp = {};
+				if(this.search_filter==='all'){
+					temp = {'search': this.search_value}
+				}
+				else {
+					temp = {'search': this.search_value, 'is_active': this.search_filter}
+				}
+				if(!(this.org.id==='0')){
+					temp['org_id'] = this.org.id;
+				}
+				return temp;
+			},
 		},
 		methods: {
 			search(){
-				this.data = []
-				if(this.search_filter==='all'){
-					query = {'search': this.search_value, 'org_id': this.org_id}
-				}
-				else {
-					query = {'search': this.search_value, 'is_active': this.search_filter, 'org_id': this.org_id}
-				}
-				genericUserAPI.disabilityCardRest.filter(query)
+				genericUserAPI.disabilityCardRest.filter(this.query)
 				.then(res => {
 					let filter_data = []
 					_.each(res.data, (v) => {

@@ -158,7 +158,10 @@
 			])
 			.then(res => {
 				this.bannercontentlist = res[0].data;
-				this.announcementlist = res[1].data;
+				this.announcementlist = res[1].data.filter(v => {
+					return true;
+					//return (v.category!='校園公告') && (v.category!='校園管理')
+				});
 
 				setTimeout(() => {
 					this.showDivs(this.slideIndex);

@@ -1,5 +1,11 @@
 ﻿# coding: utf-8
 
+import sys
+if sys.version_info.major == 2:
+	unicode = unicode
+elif sys.version_info.major >= 3:
+	unicode = str
+
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view
 from rest_framework.decorators import action
@@ -61,11 +67,11 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	def download(self, request, pk=None):
 		res = {}
 		obj = self.get_object()
-		try:
-			file_path = obj.zip(request.user, request.POST['password'], request.POST['fileformat'])
-		except BaseException as e:
-			res['detail'] = u'準備文件失敗： {}'.format(unicode(e))
-			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		#try:
+		file_path = obj.zip(request.user, request.POST['password'], request.POST['fileformat'])
+		#except BaseException as e:
+			#res['detail'] = u'準備文件失敗： {}'.format(unicode(e))
+			#return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 		return self.get_resource(file_path)
 
@@ -85,10 +91,11 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		user_email_list = [ i.email for i in User.objects.filter(org=obj.org, is_manager=True) ]
 		subject = u'回報 - {0} {1}'.format(obj.ISBN, obj.book_info.bookname)
 		try:
-			body = request.data['content']
+			body = u'回報者帳號：{0}\r\n回報者電郵：{1}\r\n回報內容：{2}\r\n'.format(request.user.username, request.user.email, request.data['content'])
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[SERVICE], bcc=user_email_list)
 			email.send(fail_silently=False)
 		except BaseException as e:
+			res = unicode(e)
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
@@ -720,10 +727,6 @@ class EditRecordViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, MixedPerm
 		res['insert_count'] = res['dst_count'] -res['same_character']
 		res['diff_count'] = res['dst_count'] -res['src_count']
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
-
-class BookRecommendViewSet(viewsets.ModelViewSet):
-	queryset = BookRecommend.objects.all().order_by('-date')
-	serializer_class = BookRecommendSerializer
 
 class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = LibraryRecord.objects.all()

@@ -1,22 +1,21 @@
 """mysite URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-	https://docs.djangoproject.com/en/1.8/topics/http/urls/
+	https://docs.djangoproject.com/en/2.1/topics/http/urls/
 Examples:
 Function views
 	1. Add an import:  from my_app import views
-	2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
+	2. Add a URL to urlpatterns:  path('', views.home, name='home')
 Class-based views
 	1. Add an import:  from other_app.views import Home
-	2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
+	2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
-	1. Add an import:  from blog import urls as blog_urls
-	2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
+	1. Import the include() function: from django.urls import include, path
+	2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import include, url
 from django.contrib import admin
-from . import views
-from .settings import BASE_DIR
+from django.urls import path
+from django.conf.urls import include, url
 
 #============
 import mimetypes
@@ -69,19 +68,31 @@ def library_origin_epub(request, ISBN, token, document_root=None, show_indexes=F
 		response["Content-Encoding"] = encoding
 #	if token == cache.get('token.' +str(request.user.id)):
 	return response
+
 from . import apis
+from . import views
+from .settings import BASE_DIR
 from django.views.static import serve
 
+from rest_framework_simplejwt.views import (
+	TokenObtainPairView,
+	TokenRefreshView,
+	TokenVerifyView,
+)
+
 urlpatterns = [
+	url(r'^api/token/$', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+	url(r'^api/token/refresh/$', TokenRefreshView.as_view(), name='token_refresh'),
+	url(r'^api/token/verify/$', TokenVerifyView.as_view(), name='token_verify'),
+	path('ebookSystem/', include(('ebookSystem.urls','ebookSystem'), namespace='ebookSystem')),
+	path('genericUser/', include(('genericUser.urls','genericUser'), namespace='genericUser')),
+	path('admin/', admin.site.urls),
 	url(r'^file/(?P<path>.*)$', serve, {'document_root': BASE_DIR +'/file/'}),
 	url(r'^$', views.home, name='home'),
 	url(r'^generic/$', views.generic, name='home'),
 	url(r'^school/$', views.school, name='home'),
 	url(r'^library_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{32,32})/$', library_epub),
 	url(r'^library_origin_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{0,32})/$', library_origin_epub),
-	url(r'^admin/', include(admin.site.urls)),
-	url(r'^ebookSystem/', include('ebookSystem.urls', namespace="ebookSystem")),
-	url(r'^genericUser/', include('genericUser.urls', namespace="genericUser")),
 	url(r'^api/statistics/(?P<action>[\d\w]+)/$', apis.Statistics.as_view()),
 	url(r'^statistics_old/$', views.statistics, name='statistics'),
 	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),
@@ -91,8 +102,6 @@ urlpatterns = [
 	url(r'^api/ddm/(?P<action>[\d\w]+)/(?P<dir>[\d\w]+)/(?P<resource>.+)/$', apis.Ddm.as_view()),
 ]
 
-from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 urlpatterns = urlpatterns +[
-	url(r'^api-token-auth/', obtain_jwt_token),
-	url(r'^api-token-refresh/', refresh_jwt_token),
+	url(r'^file/(?P<path>.*)$', serve, {'document_root': BASE_DIR +'/static/'}),
 ]

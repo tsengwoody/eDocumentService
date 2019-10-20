@@ -1,5 +1,5 @@
 ﻿<template>
-	<div :id="'book_manager' +org_id" class="tab-content">
+	<div :id="'book_manager' +org.id" class="tab-content">
 		<h3>{{ org.name }}</h3>
 		<div id="book_manager_search">
 			<div class="form-inline" style="margin-bottom:20px;">
@@ -35,7 +35,7 @@
 				<button class="btn btn-default"
 					@click="
 						book_update = props.item;
-						$refs[id].open('book_manager' +org_id);
+						$refs[id].open('book_manager' +org.id);
 					">資料編輯</button>
 				</template>
 			</table-div>
@@ -87,7 +87,7 @@
 
 <script>
 	module.exports = {
-		props: ['org_id',],
+		props: ['org',],
 		components: {
 			'modal': components['modal'],
 			'table-div': components['table-div'],
@@ -118,15 +118,16 @@
 				book_datas: [],
 			}
 		},
+		computed: {
+			query(){
+				let temp = {'bookname': this.search_value, 'status': this.search_filter};
+				if(!(this.org.id==='0')){
+					temp['org_id'] = this.org.id;
+				}
+				return temp;
+			},
+		},
 		mounted(){
-			genericUserAPI.organizationRest.read(this.org_id)
-			.then(res => {
-				this.org = res.data
-			})
-			.catch(res => {
-				alertmessage('error', o2j(res.response.data));
-			})
-
 			genericUserAPI.userRest.filter({role: 'guest'})
 			.then(res => {
 				this.user_list = res.data;
@@ -137,7 +138,7 @@
 		},
 		methods: {
 			search(){
-				ebookSystemAPI.bookRest.filter({'bookname': this.search_value, 'status': this.search_filter, 'org_id': this.org_id})
+				ebookSystemAPI.bookRest.filter(this.query)
 				.then(res => {
 					this.book_datas = [];
 					_.each(res.data, (v) => {

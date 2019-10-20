@@ -1,5 +1,11 @@
 ﻿# coding: utf-8
 
+import sys
+if sys.version_info.major == 2:
+	unicode = unicode
+elif sys.version_info.major >= 3:
+	unicode = str
+
 import json
 import requests
 import urllib

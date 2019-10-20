@@ -1,4 +1,10 @@
 ﻿# coding: utf-8
+import sys
+if sys.version_info.major == 2:
+	unicode = unicode
+elif sys.version_info.major >= 3:
+	unicode = str
+
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
@@ -40,7 +46,7 @@ class User(AbstractUser):
 	)
 	education = models.CharField(max_length=30, choices=EDU)
 	online = models.DateTimeField(default = timezone.now)
-	org = models.ForeignKey('Organization', related_name='user_set', )
+	org = models.ForeignKey('Organization', on_delete=models.SET_NULL, blank=True, null=True, related_name='user_set')
 	status = models.IntegerField(default=0)
 	STATUS = {'inactive':0, 'active':1, 'review':2}
 	is_book = models.BooleanField(default=False)
@@ -86,7 +92,7 @@ class User(AbstractUser):
 		except:
 			return False
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.first_name +self.last_name
 
 
@@ -167,7 +173,7 @@ class User(AbstractUser):
 
 class DisabilityCard(models.Model):
 	identity_card_number = models.CharField(max_length=10, primary_key=True)
-	owner = models.ForeignKey(User, related_name='disabilitycard_set')
+	owner = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='disabilitycard_set')
 	name = models.CharField(max_length=10)
 	address = models.CharField(max_length=255)
 	identification_date = models.DateField()
@@ -186,48 +192,13 @@ class DisabilityCard(models.Model):
 	category = models.CharField(max_length=10, choices=CATEGORY)
 	is_active = models.BooleanField(default=False)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.identity_card_number
 
 	def __init__(self, *args, **kwargs):
 		super(DisabilityCard, self).__init__(*args, **kwargs)
 		self.front = BASE_DIR +'/file/genericUser/DisabilityCard/{0}/{0}_front.jpg'.format(self.identity_card_number)
 		self.back = BASE_DIR +'/file/genericUser/DisabilityCard/{0}/{0}_back.jpg'.format(self.identity_card_number)
-
-class Event(models.Model):
-	creater = models.ForeignKey(User, related_name='event_creater_set')
-	time = models.DateTimeField(auto_now_add=True)
-	reviewer = models.ForeignKey(User, related_name='event_reviewer_set', blank=True, null=True)
-	time_reply = models.DateTimeField(blank=True, null=True)
-	status = models.IntegerField(default=0)
-	message = models.CharField(max_length=100, blank=True, null=True)
-	content_type = models.ForeignKey(ContentType)
-	object_id = models.CharField(max_length=30)
-	action = GenericForeignKey('content_type', 'object_id')
-	STATUS = {'review':0, 'success':1, 'error':2}
-
-	def status_int2str(self):
-		for k, v in self.STATUS.iteritems():
-			if v == self.status:
-				return k
-		return 'unknown'
-
-	def get_url(self):
-		return ''
-
-	def event_category(self):
-		if isinstance(self.action, Book):
-			return u'上傳文件'
-
-	def response(self, status ,message, user):
-		self.time_reply = timezone.now()
-		self.reviewer = user
-		self.status = self.STATUS[status]
-		self.message = unicode(self.action) +message
-		self.save()
-
-	def __unicode__(self):
-		return self.creater.username
 
 class Organization(models.Model):
 	name = models.CharField(max_length=50)
@@ -242,17 +213,17 @@ class Organization(models.Model):
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.name
 
 class ServiceInfo(models.Model):
-	owner = models.ForeignKey(User, related_name='serviceinfo_set')
-	org = models.ForeignKey(Organization, blank=True, null=True, related_name='serviceinfo_set')
+	owner = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='serviceinfo_set')
+	org = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True, related_name='serviceinfo_set')
 	date = models.DateField()
 	service_hours = models.IntegerField(default=0)
 	is_exchange = models.BooleanField(default=False)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.owner.username +str(self.date)
 
 	@classmethod
@@ -312,7 +283,7 @@ class ServiceInfo(models.Model):
 		return character_count
 
 class Announcement(models.Model):
-	org = models.ForeignKey('Organization', related_name='announcement_set')
+	org = models.ForeignKey('Organization', on_delete=models.SET_NULL, blank=True, null=True, related_name='announcement_set')
 	title = models.CharField(max_length=100)
 	content = models.TextField()
 	datetime = models.DateField(default = timezone.now)
@@ -322,6 +293,7 @@ class Announcement(models.Model):
 		(u'新書推薦' , u'新書推薦'),
 		(u'志工快訊' , u'志工快訊'),
 		(u'校園公告' , u'校園公告'),
+		(u'校園管理' , u'校園管理'),
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
 
@@ -329,7 +301,7 @@ class Announcement(models.Model):
 		super(Announcement, self).__init__(*args, **kwargs)
 		self.path = BASE_DIR +'/file/genericUser/Announcement/{0}/'.format(self.id)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.title
 
 	def delete(self, *args, **kwargs):
@@ -351,7 +323,7 @@ class QAndA(models.Model):
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
 
-	def __unicode__(self):
+	def __str__(self):
 		return unicode(self.id)
 
 class BusinessContent(models.Model):
@@ -373,7 +345,7 @@ class BannerContent(models.Model):
 		super(BannerContent, self).__init__(*args, **kwargs)
 		self.cover_image = BASE_DIR +'/file/genericUser/BannerContent/{0}/cover/image.jpg'.format(self.id)
 
-	def __unicode__(self):
+	def __str__(self):
 		return unicode(self.id)
 
 	def delete(self, *args, **kwargs):

@@ -29,7 +29,8 @@ def convert_bool(s):
 		return False
 
 def convert_unicode(s):
-	return s.encode('utf8')
+	return s
+	#return s.encode('utf8')
 
 def boolean(s):
 	if s in ['True', 'true',]:

@@ -4,7 +4,8 @@ import os
 import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-from django.core.urlresolvers import reverse
+#from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import Client, RequestFactory
 from django.utils import timezone
 

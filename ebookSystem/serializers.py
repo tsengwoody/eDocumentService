@@ -92,11 +92,6 @@ class BookOrderSerializer(serializers.ModelSerializer):
 		model = BookOrder
 		fields = ('__all__')
 
-class BookRecommendSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = BookRecommend
-		fields = ('__all__')
-
 class LibraryRecordSerializer(serializers.ModelSerializer):
 	object = BookSerializer(read_only=True,)
 	class Meta:

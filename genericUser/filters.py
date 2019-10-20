@@ -30,8 +30,11 @@ class AnnouncementNewestFilter(filters.BaseFilterBackend):
 from django.db.models import F,Q
 class UserSelfOrManagerFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
-		owner_kwargs = {'id': request.user.id}
-		org_kwargs = {'org': request.user.org.id}
+		try:
+			owner_kwargs = {'id': request.user.id}
+			org_kwargs = {'org': request.user.org.id}
+		except:
+			return []
 		if request.user.has_perm('is_supermanager'):
 			return queryset
 		elif request.user.has_perm('is_manager'):

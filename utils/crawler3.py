@@ -8,6 +8,7 @@ import requests
 import urllib
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.firefox.options import Options
 options = Options()
 options.add_argument("--headless")
@@ -23,6 +24,11 @@ except:
 	from queue import Queue, Empty
 	unicode = str
 	from urllib.parse import urlencode
+
+def kill_firefox():
+	import subprocess
+	p=subprocess.Popen("killall firefox", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	(stdoutput,erroutput) = p.communicate()
 
 def worker_get_bookinfo_detail(function, urls, result, mutex, session):
 	while True:
@@ -54,30 +60,14 @@ def get_douban_bookinfo(ISBN):
 
 	soup = BeautifulSoup(browser.page_source, 'html5lib')
 	browser.quit()
+	kill_firefox()
 
 	session = requests.Session()
 	url_list = [i['href'] for i in soup.find_all("a", class_="title-text")]
 
 	bookinfo_list = []
-	result = Queue()
-	urls = Queue()
 	for url in url_list:
-		urls.put(url)
-
-	threads = []
-	mutex = Lock()
-	for t in range(8):
-		t = Thread(target=worker_get_bookinfo_detail, kwargs={'function':get_douban_bookinfo_detail, 'urls': urls, 'result': result, 'mutex':mutex, 'session': session})
-		t.start()
-		threads.append(t)
-	for t in threads:
-		t.join()
-
-	while True:
-		try:
-			item = result.get(block=False)
-		except:
-			break
+		item = get_douban_bookinfo_detail(url, session)
 		bookinfo_list.extend(item)
 
 	return bookinfo_list[0]
@@ -95,30 +85,14 @@ def get_douban_bookinfo_list(query_text):
 
 	soup = BeautifulSoup(browser.page_source, 'html5lib')
 	browser.quit()
+	kill_firefox()
 
 	session = requests.Session()
 	url_list = [i['href'] for i in soup.find_all("a", class_="title-text")]
 
 	bookinfo_list = []
-	result = Queue()
-	urls = Queue()
 	for url in url_list:
-		urls.put(url)
-
-	threads = []
-	mutex = Lock()
-	for t in range(8):
-		t = Thread(target=worker_get_bookinfo_detail, kwargs={'function':get_douban_bookinfo_detail, 'urls': urls, 'result': result, 'mutex':mutex, 'session': session})
-		t.start()
-		threads.append(t)
-	for t in threads:
-		t.join()
-
-	while True:
-		try:
-			item = result.get(block=False)
-		except:
-			break
+		item = get_douban_bookinfo_detail(url, session)
 		bookinfo_list.extend(item)
 
 	return bookinfo_list
@@ -196,136 +170,116 @@ def get_douban_bookinfo_detail(url, session):
 
 #=====NCL=====
 
-def load_post_data(src):
-	'''import pkgutil
-	data = pkgutil.get_data(__package__, src)
-	data = data.decode('utf-8')[1:]'''
-	src = os.path.join(os.path.dirname(os.path.abspath(__file__)), src)
-	with codecs.open(src, encoding='utf-8') as f:
-		data = f.read()
-	post_data = {}
-	for line in data.split('\r\n'):
-		lineSplit = line.split('=')
-		if len(lineSplit) == 2:
-			(key,value) = (lineSplit[0],lineSplit[1])
-			key = unicode(key).encode('utf-8')
-			value = unicode(value).encode('utf-8')
-			post_data[key] = value
-		if len(lineSplit) == 1:
-			key = lineSplit[0]
-			key = unicode(key).encode('utf-8')
-			post_data[key] = u''
-	return post_data
+FO_SearchField2Index = {
+	'Title': 0,
+	'Author': 1,
+	'PublisherShortTitle': 2,
+	'SubjHeading': 3,
+	'SerialTitle': 4,
+	'ClassNo': 5,
+	'ISBN': 6,
+	'Date_Sales': 7,
+	'PubMonth_Pre': 8,
+}
+
+FO_SchRe1ation2Index = {
+	'AND': 0,
+	'OR': 1,
+	'NOT': 2,
+}
 
 def get_ncl_bookinfo(ISBN):
-	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/H30_SearchBooks.php'
-	session = requests.Session()
-	response = session.get(url)
-	cookies_dict = session.cookies.get_dict()
-	for key in cookies_dict:
-		if key == 'PHPSESSID':
-			phpsessid = cookies_dict[key]
-	post_data_file = 'post_data.txt'
-	values = load_post_data(post_data_file)
-	values['FO_SearchField0'] = 'ISBN'
-	values['FO_SearchValue0'] = ISBN
-	response = session.post(url,data=values)
+	browser = webdriver.Firefox(options=options, service_log_path=LOG_DIR +'/ghostdriver.log')
+	url = 'http://isbn.ncl.edu.tw/NEW_ISBNNet/H30_SearchBooks.php'
+	browser.get(url)
+	select0 = Select(browser.find_element_by_name('FO_SearchField0'))
+	select0.select_by_index(FO_SearchField2Index['ISBN'])
+	input0 = browser.find_element_by_name('FO_SearchValue0')
+	input0.send_keys(ISBN)
+	search = browser.find_element_by_link_text('開始查詢')
+	search.click()
 
-	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/main_DisplayResults.php?PHPSESSID=' +phpsessid +'&Pact=DisplayAll'
-	#url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/main_DisplayRecord.php?PHPSESSID=' +phpsessid +'&Pact=DisplayAll'
-	response = session.get(url)
-	response.encoding = 'utf-8'
-	res = response.text
-	soup = BeautifulSoup(res, 'html5lib')
-	data_tags = soup.find_all('td', class_=u'資料列_1')
+	result_url = browser.current_url
+	result_page = browser.page_source
 
 	pattern = re.compile(r'找到 (\d{1,}) 筆')
-	record_count = pattern.search(res).group(1)
+	record_count = pattern.search(result_page).group(1)
 	record_count = int(record_count)
 
 	bookinfo_list = []
-	result = Queue()
-	urls = Queue()
-	for i in range(record_count):
-		url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/main_DisplayRecord.php?PHPSESSID=' +phpsessid +'&Pact=init&Pstart=' +str(i+1)
-		urls.put(url)
-
-	threads = []
-	mutex = Lock()
-	for t in range(8):
-		t = Thread(target=worker_get_bookinfo_detail, kwargs={'function':get_ncl_bookinfo_detail, 'urls': urls, 'result': result, 'mutex':mutex, 'session': session})
-		t.start()
-		threads.append(t)
-	for t in threads:
-		t.join()
-
-	while True:
-		try:
-			item = result.get(block=False)
-		except:
-			break
+	detail_urls = []
+	result_table = browser.find_element_by_class_name('table-searchbooks')
+	for i in range(1):
+		books_link = result_table.find_elements_by_tag_name('a')
+		detail_urls.append(books_link[i].get_attribute('href'))
+	for detail_url in detail_urls:
+		browser.get(detail_url)
+		book_page = browser.page_source
+		item = get_ncl_bookinfo_detail(book_page)
 		bookinfo_list.extend(item)
+
+	browser.quit()
+	kill_firefox()
 
 	return bookinfo_list[0]
 
 def get_ncl_bookinfo_list(query_dict):
-	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/H30_SearchBooks.php'
-	session = requests.Session()
-	response = session.get(url)
-	cookies_dict = session.cookies.get_dict()
-	for key in cookies_dict:
-		if key == 'PHPSESSID':
-			phpsessid = cookies_dict[key]
-	post_data_file = 'post_data.txt'
-	values = load_post_data(post_data_file)
-	values.update(query_dict)
-	response = session.post(url,data=values)
+	browser = webdriver.Firefox(options=options, service_log_path=LOG_DIR +'/ghostdriver.log')
+	url = 'http://isbn.ncl.edu.tw/NEW_ISBNNet/H30_SearchBooks.php'
+	browser.get(url)
+	select0 = Select(browser.find_element_by_name('FO_SearchField0'))
+	select0.select_by_index(FO_SearchField2Index[query_dict['FO_SearchField0']])
+	input0 = browser.find_element_by_name('FO_SearchValue0')
+	input0.send_keys(query_dict['FO_SearchValue0'])
 
-	url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/main_DisplayResults.php?PHPSESSID=' +phpsessid +'&Pact=DisplayAll'
-	#url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/main_DisplayRecord.php?PHPSESSID=' +phpsessid +'&Pact=DisplayAll'
-	response = session.get(url)
-	response.encoding = 'utf-8'
-	res = response.text
-	soup = BeautifulSoup(res, 'html5lib')
-	data_tags = soup.find_all('td', class_=u'資料列_1')
+	conjunction1 = Select(browser.find_element_by_name('FO_SchRe1ation1'))
+	conjunction1.select_by_index(FO_SchRe1ation2Index[query_dict['FO_SchRe1ation1']])
+	select1 = Select(browser.find_element_by_name('FO_SearchField1'))
+	select1.select_by_index(FO_SearchField2Index[query_dict['FO_SearchField1']])
+	input1 = browser.find_element_by_name('FO_SearchValue1')
+	input1.send_keys(query_dict['FO_SearchValue1'])
+
+	conjunction2 = Select(browser.find_element_by_name('FO_SchRe1ation2'))
+	conjunction2.select_by_index(FO_SchRe1ation2Index[query_dict['FO_SchRe1ation2']])
+	select2 = Select(browser.find_element_by_name('FO_SearchField2'))
+	select2.select_by_index(FO_SearchField2Index[query_dict['FO_SearchField2']])
+	input2 = browser.find_element_by_name('FO_SearchValue2')
+	input2.send_keys(query_dict['FO_SearchValue2'])
+
+	search = browser.find_element_by_link_text('開始查詢')
+	search.click()
+
+	result_url = browser.current_url
+	result_page = browser.page_source
 
 	pattern = re.compile(r'找到 (\d{1,}) 筆')
-	record_count = pattern.search(res).group(1)
+	record_count = pattern.search(result_page).group(1)
 	record_count = int(record_count)
+	record_count = 10 if record_count>10 else record_count
 
 	bookinfo_list = []
-	result = Queue()
-	urls = Queue()
+	detail_urls = []
+	result_table = browser.find_element_by_class_name('table-searchbooks')
 	for i in range(record_count):
-		url = 'http://isbn.ncl.edu.tw/NCL_ISBNNet/main_DisplayRecord.php?PHPSESSID=' +phpsessid +'&Pact=init&Pstart=' +str(i+1)
-		urls.put(url)
-
-	threads = []
-	mutex = Lock()
-	for t in range(8):
-		t = Thread(target=worker_get_bookinfo_detail, kwargs={'function':get_ncl_bookinfo_detail, 'urls': urls, 'result': result, 'mutex':mutex, 'session': session})
-		t.start()
-		threads.append(t)
-	for t in threads:
-		t.join()
-
-	while True:
-		try:
-			item = result.get(block=False)
-		except:
-			break
+		#detail_urls.append('http://isbn.ncl.edu.tw/NEW_ISBNNet/main_DisplayRecord.php?&Pact=init&Pstart={}'.format(i+1))
+		books_link = result_table.find_elements_by_tag_name('a')
+		detail_urls.append(books_link[i].get_attribute('href'))
+	for detail_url in detail_urls:
+		browser.get(detail_url)
+		book_page = browser.page_source
+		item = get_ncl_bookinfo_detail(book_page)
 		bookinfo_list.extend(item)
+
+	browser.quit()
+	kill_firefox()
 
 	return bookinfo_list
 
-def get_ncl_bookinfo_detail(url, session):
+def get_ncl_bookinfo_detail(res):
 	bookinfo_list = []
-	response = session.get(url)
-	response.encoding = 'utf-8'
-	res = response.text
 	soup = BeautifulSoup(res, 'html5lib')
-	data_tags = soup.find_all('td', class_=u'資料列_1')
-	advance_info = data_tags[14:]
+	data_tags = soup.find(class_=u'table-bookinforight').find_all('td')
+	advance_info = soup.find(class_=u'table-bookinfo').find_all('td')
 
 	for j in range(len(advance_info)):
 		try:
@@ -407,16 +361,22 @@ if __name__ == '__main__':
 	r = get_ncl_bookinfo(u'9789573321569')
 	e = time.time()
 	print(r['bookname'])
-	print(e-s)
+	print(e-s)'''
 
 	s = time.time()
 	r = get_ncl_bookinfo_list({
 		'FO_SearchValue0' :u'零之使魔',
 		'FO_SearchField0': 'Title',
+		'FO_SchRe1ation1': 'OR',
+		'FO_SearchValue1' : u'',
+		'FO_SearchField1': 'Author',
+		'FO_SchRe1ation2': 'OR',
+		'FO_SearchValue2' : u'',
+		'FO_SearchField2': 'ISBN',
 	})
 	e = time.time()
 	print(e-s)
-	print(r[0]['bookname'])'''
+	print(r[0]['bookname'])
 
 	s = time.time()
 	r = get_douban_bookinfo(u'9787801871527')

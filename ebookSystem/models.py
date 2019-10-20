@@ -1,4 +1,11 @@
 ﻿# coding: utf-8
+
+import sys
+if sys.version_info.major == 2:
+	unicode = unicode
+elif sys.version_info.major >= 3:
+	unicode = str
+
 from django.db import models
 from django.db.models import F,Q
 from django.utils import timezone
@@ -23,20 +30,20 @@ class BookInfo(models.Model):
 	order = models.CharField(max_length=255, blank=True, null=True)
 	source = models.CharField(max_length=255, blank=True, null=True)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.bookname
 
 class Book(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
-	book_info = models.OneToOneField(BookInfo, related_name='book')
+	book_info = models.OneToOneField(BookInfo, on_delete=models.SET_NULL, blank=True, null=True, related_name='book')
 	page_count = models.IntegerField(default = -1)
 	part_count = models.IntegerField(default = 1)
 	page_per_part = models.IntegerField(default=-1)
 	finish_date = models.DateField(blank=True, null=True)
 	priority = models.IntegerField(default=9)
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
-	org = models.ForeignKey(Organization, related_name='book_set', )
-	category = models.ForeignKey('Category', related_name='book_set', blank=True, null=True, on_delete=models.SET_NULL,)
+	org = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True, related_name='book_set')
+	category = models.ForeignKey('Category', related_name='book_set', blank=True, null=True, on_delete=models.SET_NULL)
 	owner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='own_book_set')
 	upload_date = models.DateField(default = timezone.now)
 	is_private = models.BooleanField(default=False)
@@ -53,7 +60,7 @@ class Book(models.Model):
 		super(Book, self).__init__(*args, **kwargs)
 		self.path = BASE_DIR +'/file/ebookSystem/document/{0}'.format(self.ISBN)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.book_info.bookname
 
 	def delete(self, *args, **kwargs):
@@ -380,7 +387,7 @@ class EBook(models.Model):
 		elif string in ['', '-edit', '-finish', '-final', ]:
 			return self.book.path +'/OCR/part{0}{1}.txt'.format(self.part, string)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.book.book_info.bookname+u'-part'+str(self.part)
 
 	def current_editrecord(self):
@@ -501,10 +508,10 @@ class EBook(models.Model):
 		return [finish_content, edit_content]
 
 class BookOrder(models.Model):
-	book = models.OneToOneField(Book, related_name='bookorder')
+	book = models.OneToOneField(Book, on_delete=models.CASCADE, related_name='bookorder')
 	order = models.IntegerField()
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.book.book_info.bookname
 
 	@classmethod
@@ -539,8 +546,8 @@ class BookOrder(models.Model):
 				BookOrder.objects.create(book=book, order=index)
 
 class GetBookRecord(models.Model):
-	user = models.ForeignKey(User, related_name='getbookrecord_set')
-	book = models.ForeignKey(Book, related_name='getbookrecord_set')
+	user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='getbookrecord_set')
+	book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='getbookrecord_set')
 	get_time = models.DateTimeField(default = timezone.now)
 	get_ip = models.GenericIPAddressField()
 	FORMAT = (
@@ -550,7 +557,7 @@ class GetBookRecord(models.Model):
 	)
 	format = models.CharField(max_length=10, choices=FORMAT)
 
-	def __unicode__(self):
+	def __str__(self):
 		return u'{0}-{1}'.format(self.book, self.user)
 
 class Library(models.Model):
@@ -561,7 +568,7 @@ class Library(models.Model):
 	class Meta:
 		abstract = True
 
-	def __unicode__(self):
+	def __str__(self):
 		return u'{0}-{1}'.format(self.object, self.owner)
 
 	def check_out(self):
@@ -591,8 +598,8 @@ class Library(models.Model):
 		return self.epub
 
 class LibraryRecord(Library):
-	owner = models.ForeignKey(User, related_name='libraryrecord_set')
-	object = models.ForeignKey(Book, related_name='libraryrecord_set')
+	owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='libraryrecord_set')
+	object = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='libraryrecord_set')
 
 	def __init__(self, *args, **kwargs):
 		super(Library, self).__init__(*args, **kwargs)
@@ -605,9 +612,6 @@ class Recommend(models.Model):
 
 	class Meta:
 		abstract = True
-
-class BookRecommend(models.Model):
-	object = models.ForeignKey(Book, related_name='bookrecommend_set')
 
 class EditRecord(models.Model):
 	part = models.ForeignKey(EBook, blank=True, null=True, on_delete=models.SET_NULL, related_name='editrecord_set')
@@ -628,7 +632,7 @@ class EditRecord(models.Model):
 	class Meta:
 		unique_together = (('part', 'number_of_times'),)
 
-	def __unicode__(self):
+	def __str__(self):
 		try:
 			return self.part.ISBN_part
 		except:
@@ -727,14 +731,14 @@ class EditLog(models.Model):
 	order = models.IntegerField()
 	edit_count = models.IntegerField()
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.edit_record.part.ISBN_part +'-{0}'.format(self.order)
 
 class Category(models.Model):
 	name = models.CharField(max_length=255)
-	org = models.ForeignKey(Organization, related_name='category_set', )
+	org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='category_set', )
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.name
 
 def add_watermark(self,text, fontname, fontsize, imagefile, output_dir):
@@ -763,7 +767,7 @@ class ISSNBookInfo(models.Model):
 	title = models.CharField(max_length=255)
 	house = models.CharField(max_length=255)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.title
 
 class ISSNBook(models.Model):
@@ -778,5 +782,5 @@ class ISSNBook(models.Model):
 		super(ISSNBook, self).__init__(*args, **kwargs)
 		self.epub_file = BASE_DIR +'/file/ebookSystem/ISSNBook/{0}/ebook/{0}.epub'.format(self.ISSN_volume)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.ISSN_book_info.title +unicode(self.volume)
