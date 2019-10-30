@@ -17,6 +17,7 @@
 					<option value="新書推薦">新書推薦</option>
 					<option value="志工快訊">志工快訊</option>
 					<option value="校園公告">校園公告</option>
+					<option value="校園公告">校園平台消息</option>
 				</select>
 			</div>
 		</div>

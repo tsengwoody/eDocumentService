@@ -8,7 +8,6 @@ elif sys.version_info.major >= 3:
 
 import json
 import requests
-import urllib
 
 from django.core.cache import cache
 from django.core.mail import EmailMessage
@@ -53,21 +52,21 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	def perform_update(self, serializer):
 
 		# 要分開先判斷是否與原始資料相同，再一併存檔
-		if self.request.data.has_key('email'):
+		if 'email' in self.request.data:
 			match_email = serializer.validated_data['email'] == serializer.instance.email
 			auth_email = match_email & serializer.instance.auth_email
-		if self.request.data.has_key('phone'):
+		if 'phone' in self.request.data:
 			match_phone = serializer.validated_data['phone'] == serializer.instance.phone
 			auth_phone = match_phone & serializer.instance.auth_phone
-		if self.request.data.has_key('org'):
+		if 'org' in self.request.data:
 			match_org = serializer.validated_data['org'] == serializer.instance.org
 			is_manager = match_org & serializer.instance.is_manager
 
-		if self.request.data.has_key('email'):
+		if 'email' in self.request.data:
 			serializer.save(auth_email=auth_email)
-		if self.request.data.has_key('phone'):
+		if 'phone' in self.request.data:
 			serializer.save(auth_phone=auth_phone)
-		if self.request.data.has_key('org'):
+		if 'org' in self.request.data:
 			serializer.save(is_manager=is_manager)
 
 		serializer.save()
@@ -213,7 +212,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		res = {}
 		obj = self.get_object()
 		if request.data['type'] == 'email' and request.data['action'] == 'generate':
-			if not cache.has_key(obj.email):
+			if obj.email not in cache:
 				import random
 				import string
 				vcode = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
@@ -227,26 +226,27 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			email.send(fail_silently=False)
 			res['detail'] = u'已寄送到您的電子信箱'
 		elif request.data['type'] == 'phone' and request.data['action'] == 'generate':
-			if not cache.has_key(request.user.phone):
+			if obj.phone not in cache:
 				import random
 				import string
 				vcode = ''.join(random.choice(string.digits) for _ in range(6))
 				cache.set(request.user.phone, {'vcode': vcode}, 600)
 			else:
 				vcode = cache.get(request.user.phone)['vcode']
+			import urllib.parse
 			data = u'親愛的{0}您的信箱驗證碼為：{1}，請在10分鐘內輸入。\n'.format(request.user.username, vcode)
 			url = 'https://api2.kotsms.com.tw/kotsmsapi-1.php?username={0}&password={1}&dstaddr={2}&smbody={3}'.format(
-				OTP_ACCOUNT, OTP_PASSWORD, request.user.phone, urllib.quote(data.encode('big5'))
+				OTP_ACCOUNT, OTP_PASSWORD, request.user.phone, urllib.parse.quote(data.encode('big5'))
 			)
 			session = requests.Session()
 			response = session.get(url)
-			if response.text.split('=')[1] > 0:
+			if int(response.text.split('=')[1]) > 0:
 				res['detail'] = u'已寄送到您的手機'
 			else:
 				res['detail'] = u'請確認手機號碼是否正確或聯絡系統管理員'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		elif request.data['type'] == 'email' and request.data['action'] == 'verify':
-			if not cache.has_key(obj.email):
+			if obj.email not in cache:
 				res['detail'] = u'驗證碼已過期，請重新產生驗證碼'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 			input_vcode = request.data['code']
@@ -259,7 +259,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				res['detail'] = u'信箱驗證碼不符'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		elif request.data['type'] == 'phone' and request.data['action'] == 'verify':
-			if not cache.has_key(obj.phone):
+			if obj.phone not in cache:
 				res['detail'] = u'驗證碼已過期，請重新產生驗證碼'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 			input_vcode = request.data['code']

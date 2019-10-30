@@ -269,7 +269,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				try:
 					through(uploadFilePath, final_file)
 					book = epub.read_epub(final_file)
-					book = add_bookinfo(
+					'''book = add_bookinfo(
 						book,
 						ISBN = newBookInfo.ISBN,
 						bookname = newBookInfo.bookname,
@@ -277,10 +277,11 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 						date = str(newBookInfo.date),
 						house = newBookInfo.house,
 						language = 'zh',
-					)
+					)'''
 					epub.write_epub(final_file, book, {})
 				except BaseException as e:
 					shutil.rmtree(uploadPath)
+					raise e
 					res['detail'] = u'建立文件失敗' +str(e)
 					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 

@@ -199,6 +199,19 @@ LOGGING = {
 	},
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
+import socket
+if socket.gethostname() == 'edspro':
+	EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+	EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 OTP_ACCOUNT = os.environ["eDocumentService_OTP_ACCOUNT"]
 OTP_PASSWORD = os.environ["eDocumentService_OTP_PASSWORD"]
 
