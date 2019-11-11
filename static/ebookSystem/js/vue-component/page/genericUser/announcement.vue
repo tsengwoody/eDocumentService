@@ -7,11 +7,17 @@
 				<div class="col-sm-11">
 					<div v-if="mode=='read'" class="panel panel-default" style="margin:0px; padding:5px 10px;">{{ announcement.category }}</div>
 					<template v-if="mode=='write'">
-						<select v-model="announcement.category" class="form-control">
-							<option value="">---------</option>
+						<select
+							v-if="user.org=='1'"
+							class="form-control"
+							v-model="announcement.category"
+						>
 							<option value="平台消息">平台消息</option>
+							<option value="天橋說書">天橋說書</option>
 							<option value="新書推薦">新書推薦</option>
 							<option value="志工快訊">志工快訊</option>
+							<option value="校園公告">校園公告</option>
+							<option value="校園平台消息">校園平台消息</option>
 						</select>
 					</template>
 				</div>

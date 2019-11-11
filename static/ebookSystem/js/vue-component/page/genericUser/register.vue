@@ -421,8 +421,8 @@ f. 當您在網站的行為，違反服務條款或可能損害或妨礙網站�
 			},
 			login(username, password){
 				let session_login = genericUserAPI.userAction.login(username, password)
-				let token_login = token.obtain(username, password)
-				Promise.all([session_login, token_login,])
+				//let token_login = token.obtain(username, password)
+				Promise.all([session_login,])
 				.then((s, t) => {
 					alertmessage('success', '成功登入平台')
 					.done(() => {

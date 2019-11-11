@@ -118,10 +118,10 @@
 
 				query = {'category': '校園公告', 'org_id': user.org,}
 
-				genericUserAPI.announcementRest.filter(query)
+				genericUserAPI.announcementRest.list()
 				.then((response) => {
 					let filter_data = []
-					_.each(response.data, (v) => {
+					_.each(response.data.filter(v => (v.category=='校園公告') || (v.category=='校園平台消息')), (v) => {
 						let temp_data = {
 							"id": v.id,
 							"title": v['title'],

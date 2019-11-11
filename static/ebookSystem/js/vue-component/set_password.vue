@@ -64,10 +64,12 @@
 					new_password2: this.new_password2,
 				})
 				.then(res => {
-					alertmessage('success', '成功修改密碼')
+					this.$root.$message.open({message: '成功修改密碼'})
+					//alertmessage('success', '成功修改密碼')
 				})
 				.catch(res => {
-					alertmessage('error', o2j(res.response.data));
+					this.$root.$message.open({message: o2j(res.response.data)})
+					//alertmessage('error', o2j(res.response.data));
 				})
 			},
 		},

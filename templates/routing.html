@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block content %}
 {% csrf_token %} 
 
@@ -9,6 +9,8 @@
 			<routerview></routerview>
 		</div>
 		<eds_footer></eds_footer>
+		<message></message>
+		<confirm></confirm>
 	</div>
 </div>
 
@@ -32,6 +34,8 @@
 			eds_nav: components['eds_nav'],
 			routerview: pages['{{ app }}/{{ page }}'],
 			eds_footer: components['eds_footer'],
+			message: components['message'],
+			confirm: components['confirm'],
 		},
 		data: {
 			mode: 'all',

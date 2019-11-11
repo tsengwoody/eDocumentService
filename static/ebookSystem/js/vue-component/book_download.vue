@@ -92,7 +92,8 @@ function post(path, params, method) {
 					post(url, {'fileformat': this.fileformat, 'password': this.password, 'csrfmiddlewaretoken': csrf}, 'post')
 				})
 				.catch(res => {
-					alertmessage('error', o2j(res.response.data));
+					this.$root.$message.open({status: 'error', message: o2j(res.response.data)})
+					//alertmessage('error', o2j(res.response.data));
 				})
 			},
 		},
