@@ -55,7 +55,6 @@ def html2epub(part_list, dst, **kwargs):
 			file_name='Text/part{0}.xhtml'.format(i+1),
 		)
 		c.content = unicode(c_soup)
-		print(c.content)
 		book.add_item(c)
 		c_list.append(c)
 		toc.append(
