@@ -3,7 +3,7 @@
 		<h2>書籍管理</h2>
 		<panel_group :data="tab_data" :title="'單位'">
 			<template slot="book_manager_org" slot-scope="props">
-				<book_manager_org :org_id="props.item">
+				<book_manager_org :org="props.item">
 				</book_manager_org>
 			</template>
 		</panel_group>
@@ -25,16 +25,26 @@
 			title: '書籍管理',
 		},
 		mounted(){
-			this.tab_data = []
 			genericUserAPI.organizationRest.list()
 			.then(res => {
+				this.tab_data = []
+				this.tab_data.push({
+					'order': 0,
+					'display_name': '全部',
+					'value': 'all',
+					'type': 'book_manager_org',
+					'data': {
+						id: '0',
+						name: '全部',
+					},
+				})
 				_.each(res.data, (v) => {
 					this.tab_data.push({
 						'order': v.id,
 						'display_name': v.name,
 						'value': v.id,
 						'type': 'book_manager_org',
-						'data': v.id,
+						'data': v,
 					})
 				})
 			})

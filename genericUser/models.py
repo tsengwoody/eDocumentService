@@ -322,6 +322,7 @@ class Announcement(models.Model):
 		(u'新書推薦' , u'新書推薦'),
 		(u'志工快訊' , u'志工快訊'),
 		(u'校園公告' , u'校園公告'),
+		(u'校園管理' , u'校園管理'),
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
 

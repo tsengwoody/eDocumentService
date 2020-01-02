@@ -85,10 +85,11 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		user_email_list = [ i.email for i in User.objects.filter(org=obj.org, is_manager=True) ]
 		subject = u'回報 - {0} {1}'.format(obj.ISBN, obj.book_info.bookname)
 		try:
-			body = request.data['content']
+			body = u'回報者帳號：{0}\r\n回報者電郵：{1}\r\n回報內容：{2}\r\n'.format(request.user.username, request.user.email, request.data['content'])
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[SERVICE], bcc=user_email_list)
 			email.send(fail_silently=False)
 		except BaseException as e:
+			res = unicode(e)
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
