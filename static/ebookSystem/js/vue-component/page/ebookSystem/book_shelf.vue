@@ -32,24 +32,10 @@
 				</table-div>
 			</div>
 		</div>
-		<modal :id_modal="'db'">
-			<template slot="header">
-				<h4 class="modal-title">取得書籍</h4>
-			</template>
-			<template slot="body">
-				<div class="text-center" style="color: red; margin-bottom: 1rem; font-size: 16px;">**強烈建議您，所下載書籍僅供個人閱讀使用，請勿任意轉傳，以免觸法，詳細規範請參照，本平台服務條款**</div>
-				<book_download
-					pk="0"
-					ref="db"
-				>
-				</book_download>
-			</template>
-
-			<template slot="footer">
-				<button class="btn btn-primary" @click=" $refs.db.object_get()">確定</button>
-			</template>
-
-		</modal>
+		<book_download
+			pk="0"
+			ref="db"
+		></book_download>
 	</div>
 </template>
 

@@ -1,38 +1,53 @@
 ﻿<template>
-	<div>
-			<form-drf 
-				:model_info="model_info.old_password"
-				:input-class="'col-sm-5'"
-				:field="'old_password'"
-				:offset-class="'col-sm-offset-3'"
-				v-model="old_password"
-				@keyup.enter.native="set_password(user.id)"
-			></form-drf>
-
-			<form-drf 
-				:model_info="model_info.new_password1"
-				:input-class="'col-sm-5'"
-				:field="'new_password1'"
-				:offset-class="'col-sm-offset-3'"
-				v-model="new_password1"
-				@keyup.enter.native="set_password(user.id)"
-			></form-drf>
-
-			<form-drf 
-				:model_info="model_info.new_password2"
-				:input-class="'col-sm-5'"
-				:field="'new_password2'"
-				:offset-class="'col-sm-offset-3'"
-				v-model="new_password2"
-				@keyup.enter.native="set_password(user.id)"
-			></form-drf>
-	</div>
+	<modal id_modal="spm" ref="spm" :size="'normal'">
+		<template slot="header">
+			<h4 class="modal-title">修改密碼</h4>
+		</template>   
+		<template slot="body">
+			<div class="form-horizontal">
+				<div>
+					<form-drf 
+						:model_info="model_info.old_password"
+						:input-class="'col-sm-5'"
+						:field="'old_password'"
+						:offset-class="'col-sm-offset-3'"
+						v-model="old_password"
+						@keyup.enter.native="set_password(user.id)"
+					></form-drf>
+		
+					<form-drf 
+						:model_info="model_info.new_password1"
+						:input-class="'col-sm-5'"
+						:field="'new_password1'"
+						:offset-class="'col-sm-offset-3'"
+						v-model="new_password1"
+						@keyup.enter.native="set_password(user.id)"
+					></form-drf>
+		
+					<form-drf 
+						:model_info="model_info.new_password2"
+						:input-class="'col-sm-5'"
+						:field="'new_password2'"
+						:offset-class="'col-sm-offset-3'"
+						v-model="new_password2"
+						@keyup.enter.native="set_password(user.id)"
+					></form-drf>
+				</div>
+			</div>
+		</template>
+		<template slot="footer">
+			<button class="btn btn-default"
+				@click="set_password(user.id)"
+			>送出</button>
+		</template>
+	</modal>
 </template>
 
 <script>
 
 	module.exports = {
 		components: {
+			'modal': components['modal'],
 			'form-drf': components['form'],
 		},
 		data(){
@@ -58,6 +73,7 @@
 		},
 		methods: {
 			set_password(pk){
+				this.$refs['spm'].close()
 				genericUserAPI.userAction.setPassword(pk, {
 					old_password: this.old_password,
 					new_password1: this.new_password1,

@@ -1,17 +1,28 @@
 ﻿<template>
-	<div class="form-horizontal">
-		<form-drf 
-			:model_info="model_info.fileformat"
-			:field="'fileformat'"
-			v-model="fileformat"
-		></form-drf>
+	<modal id_modal="db" ref="db">
+		<template slot="header">
+			<h4 class="modal-title">取得書籍</h4>
+		</template>
+		<template slot="body">
+			<div class="text-center" style="color: red; margin-bottom: 1rem; font-size: 16px;">**強烈建議您，所下載書籍僅供個人閱讀使用，請勿任意轉傳，以免觸法，詳細規範請參照，本平台服務條款**</div>
+			<div class="form-horizontal">
+				<form-drf 
+					:model_info="model_info.fileformat"
+					:field="'fileformat'"
+					v-model="fileformat"
+				></form-drf>
 
-		<form-drf 
-			:model_info="model_info.password"
-			:field="'password'"
-			v-model="password"
-		></form-drf>
-	</div>
+				<form-drf 
+					:model_info="model_info.password"
+					:field="'password'"
+					v-model="password"
+				></form-drf>
+			</div>
+		</template>
+		<template slot="footer">
+			<button class="btn btn-primary" @click="object_get()">確定</button>
+		</template>
+	</modal>
 </template>
 
 <script>
@@ -43,6 +54,7 @@ function post(path, params, method) {
 	module.exports = {
 		props: ['pk',],
 		components: {
+			'modal': components['modal'],
 			'form-drf': components['form'],
 		},
 		data(){
@@ -85,6 +97,7 @@ function post(path, params, method) {
 			},
 			object_get(){
 				let authenticate_url = '/genericUser/api/users/action/authenticate/'
+				this.$refs['db'].close()
 				genericUserAPI.userAction.authenticate(user.username, this.password)
 				.then(res => {
 					let url = '/ebookSystem/api/libraryrecords/' +this.pk +'/action/download/'

@@ -87,21 +87,8 @@
 			</template>
 		</modal>
 
-		<modal :id_modal="'spm'" :size="'normal'">
-			<template slot="header">
-				<h4 class="modal-title">修改密碼</h4>
-			</template>   
-			<template slot="body">
-				<div class="form-horizontal">
-					<set_password ref="spm"></set_password>
-				</div>
-			</template>
-			<template slot="footer">
-				<button class="btn btn-default"
-					@click="change_password"
-				>送出</button>
-			</template>
-		</modal>
+		<set_password></set_password>
+
 		<modal :id_modal="'dm'">
 			<template slot="header">
 				<h4 class="modal-title">身心障礙手冊登錄</h4>
@@ -282,10 +269,6 @@
 			this.percentageIndex = percentage.indexOf(fontClass);
 		},
 		methods: {
-			change_password() {
-				this.$refs.spm.set_password(user.id);
-				closeDialog(this.$refs.spm);
-			},
 			change_usermodel() {
 				this.$refs.usermodel.updateUserInfo(user.id);
 			},
