@@ -2,9 +2,10 @@
 	<div class="container">
 		<h2>招募志工</h2>
 		<div class="bs-callout bs-callout-danger">
-			<p class="text-danger">雲端千眼招募志工影片：讓我們一起Eye在雲端</p>
+			<!--<p class="text-danger">雲端千眼招募志工影片：讓我們一起Eye在雲端</p>-->
 			<!--<iframe width="560" height="315" src="https://www.youtube.com/embed/FxxPaULkGPA" frameborder="0" allowfullscreen></iframe>-->
-			<iframe width="560" height="315" src="https://youtu.be/Dnm6pUsdbuk" frameborder="0" allowfullscreen></iframe>
+			<p class="text-danger">雲端千眼招募志工影片：86,400分鐘=視障與書的距離</p>
+			<iframe width="560" height="315" src="https://www.youtube.com/embed/Dnm6pUsdbuk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 		</div>
 	
 	
