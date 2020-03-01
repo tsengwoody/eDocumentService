@@ -1,5 +1,6 @@
 ﻿<template>
 	<div :id="'book_manager' +org.id" class="tab-content">
+		{{ query }}
 		<h3>{{ org.name }}</h3>
 		<div id="book_manager_search">
 			<div class="form-inline" style="margin-bottom:20px;">
@@ -120,8 +121,11 @@
 		},
 		computed: {
 			query(){
-				let temp = {'bookname': this.search_value, 'status': this.search_filter};
-				if(!(this.org.id==='0')){
+				let temp = {'bookname': this.search_value};
+				if(!(this.search_filter=='all')){
+					temp['status'] = this.search_filter;
+				}
+				if(!(this.org.id==0)){
 					temp['org_id'] = this.org.id;
 				}
 				return temp;

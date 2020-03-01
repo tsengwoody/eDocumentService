@@ -75,6 +75,7 @@
 					page: '頁數/總頁數',
 					get_date: '領取日期',
 					deadline: '期限',
+					service_hours: '線上時數',
 					status: '狀態',
 					action: '動作',
 				},
@@ -166,6 +167,7 @@
 							page: v.edited_page+1 +'/50',
 							get_date: v.get_date,
 							deadline: v.deadline,
+							service_hours: v.service_hours,
 							status: v.status,
 							action: v,
 						})

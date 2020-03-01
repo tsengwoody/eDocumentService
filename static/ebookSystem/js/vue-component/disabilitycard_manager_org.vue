@@ -79,7 +79,7 @@
 				else {
 					temp = {'search': this.search_value, 'is_active': this.search_filter}
 				}
-				if(!(this.org.id==='0')){
+				if(!(this.org.id==0)){
 					temp['org_id'] = this.org.id;
 				}
 				return temp;

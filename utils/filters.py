@@ -86,7 +86,7 @@ def KeyMapAttrFilterFactory(key, type, attr):
 				}
 				return queryset.filter(**kwargs)
 			except BaseException as e:
-				return queryset
+				return []
 
 	return BaseFilter
 

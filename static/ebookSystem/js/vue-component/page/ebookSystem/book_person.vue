@@ -22,6 +22,23 @@
 			<template slot="bookinfo_repository_table" slot-scope="props">
 				<bookinfo_repository :datas="props.item.datas" :header="props.item.header"></bookinfo_repository>
 			</template>
+			<template slot="search" slot-scope="props">
+				<div class="form-inline" style="margin-bottom:20px;">
+					<div class="form-group">
+						<input
+							@keyup.enter="search()"
+							v-model="search_value"
+							class="form-control" type="text" placeholder="輸入欲查詢資訊"
+						>
+					</div>
+					<div class="form-group">
+						<button type="button" class="btn btn-primary" @click="search()">搜尋</button>
+						<span class="book_search_result">共查到 {{ data[3].data.length }} 筆資料</span>
+					</div>
+				</div>
+				<table-div :datas="props.item.datas" :header="props.item.header">
+				</table-div>
+			</template>
 		</tab>
 		<modal :id_modal="'spm'" ref="spm_instance">
 			<template slot="header">
@@ -84,6 +101,15 @@
 					"upload_date": "上傳日期",
 					"inactive_book_action": "動作",
 				},
+				search_book_header: {
+					"ISBN": "ISBN",
+					"bookname": "書名",
+					"page": "頁數/總頁數",
+					"finish_part_count": "已完成段數",
+					"service_hours": "時數",
+					"priority": "權重",
+				},
+				search_value: '',
 				data: [
 					{
 						'order': 0,
@@ -105,6 +131,13 @@
 						'value': 'inactive',
 						'type': 'table',
 						'data': '',
+					},
+					{
+						'order': 3,
+						'display_name': '其他查詢',
+						'value': 'search',
+						'type': 'search',
+						'data': [],
 					},
 				],
 			}
@@ -195,6 +228,27 @@
 					.catch(res => {
 						alertmessage('error', o2j(res.response.data));
 					})
+				})
+			},
+			search(){
+				let query = {bookname: this.search_value};
+				ebookSystemAPI.bookRest.filter(query)
+				.then(res => {
+					let filter_data = [];
+					_.each(res.data, (v) => {
+						filter_data.push({
+							"ISBN": v.book_info.ISBN,
+							"bookname": v.book_info.bookname,
+							"page": v.finish_page_count.toString() +'/' +v.page_count.toString(),
+							"finish_part_count": v.finish_part_count,
+							"service_hours": v.service_hours,
+							"priority": v.priority,
+						})
+					});
+					this.data[3].data = {};
+					this.data[3].data['header'] = this.search_book_header;
+					this.data[3].data['datas'] = filter_data;
+					alertmessage('success', '查詢完成，共取得 ' +this.data[3].data['datas'].length +' 筆資料')
 				})
 			},
 		},

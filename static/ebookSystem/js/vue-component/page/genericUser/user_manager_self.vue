@@ -20,7 +20,7 @@
 			title: '使用者管理',
 		},
 		mounted(){
-			genericUserAPI.organizationRest.read(user.id)
+			genericUserAPI.organizationRest.read(user.org)
 			.then(res => {
 				this.org = res.data;
 			})

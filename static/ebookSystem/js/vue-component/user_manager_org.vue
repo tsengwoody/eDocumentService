@@ -138,7 +138,7 @@
 				else {
 					temp = {'search': this.search_value, 'role': this.search_role}
 				}
-				if(!(this.org.id==='0')){
+				if(!(this.org.id==0)){
 					temp['org_id'] = this.org.id;
 				}
 				return temp;

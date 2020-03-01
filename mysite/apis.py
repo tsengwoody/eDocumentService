@@ -269,9 +269,29 @@ class Ddm(Resource):
 	def get(self, request, action=None, *args, **kwargs):
 		res = {}
 		if action:
-			if action == 'resource' and kwargs.has_key('resource'):
+			if action == 'resource' and 'resource' in kwargs:
 				return self.resource(request, kwargs['dir'], kwargs['resource'])
-			elif action == 'resource' and not kwargs.has_key('resource'):
+			elif action == 'resource' and not ('resource' in kwargs):
+				return self.category(request, kwargs['dir'])
+			else:
+				return getattr(self, action)(request)
+
+	def post(self, request, action=None, *args, **kwargs):
+		res = {}
+		if action:
+			if action == 'resource' and 'resource' in kwargs:
+				return self.resource(request, kwargs['dir'], kwargs['resource'])
+			elif action == 'resource' and not ('resource' in kwargs):
+				return self.category(request, kwargs['dir'])
+			else:
+				return getattr(self, action)(request)
+
+	def delete(self, request, action=None, *args, **kwargs):
+		res = {}
+		if action:
+			if action == 'resource' and 'resource' in kwargs:
+				return self.resource(request, kwargs['dir'], kwargs['resource'])
+			elif action == 'resource' and not ('resource' in kwargs):
 				return self.category(request, kwargs['dir'])
 			else:
 				return getattr(self, action)(request)
@@ -282,6 +302,8 @@ class Ddm(Resource):
 			return self.get_resource(fullpath)
 		if request.method == 'POST':
 			return self.post_resource(fullpath, request.FILES['object'])
+		if request.method == 'DELETE':
+			return self.delete_resource(fullpath)
 
 	def category(self, request, dir=None):
 		fullpath = os.path.join(BASE_DIR, 'file' ,'ddm', dir)

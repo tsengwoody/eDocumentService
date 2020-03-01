@@ -35,7 +35,7 @@ from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWOR
 class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, OrgFilter, UserRoleFilter, UserAuthFilter)
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, OrgFilter, UserRoleFilter, UserAuthFilter, KeyMapAttrFilterFactory(key='is_hot', type=convert_bool, attr='is_hot'))
 	ordering_fields = ('username',)
 	search_fields = ('username', 'email', 'first_name', 'last_name',)
 

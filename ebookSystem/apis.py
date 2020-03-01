@@ -67,11 +67,11 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	def download(self, request, pk=None):
 		res = {}
 		obj = self.get_object()
-		#try:
-		file_path = obj.zip(request.user, request.POST['password'], request.POST['fileformat'])
-		#except BaseException as e:
-			#res['detail'] = u'準備文件失敗： {}'.format(unicode(e))
-			#return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		try:
+			file_path = obj.zip(request.user, request.data['password'], request.data['fileformat'])
+		except BaseException as e:
+			res['detail'] = u'準備文件失敗： {}'.format(unicode(e))
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 		return self.get_resource(file_path)
 
@@ -790,11 +790,11 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		obj = self.get_object()
 		if request.method == 'POST':
 			from django.contrib.auth import authenticate
-			user = authenticate(username=request.user.username, password=request.POST['password'])
+			user = authenticate(username=request.user.username, password=request.data['password'])
 			if not user is None:
 				from utils.other import get_client_ip
 				get_ip = get_client_ip(request)
-				format = request.POST['fileformat']
+				format = request.data['fileformat']
 
 				'''from django.db import connection
 				with connection.cursor() as cursor:
