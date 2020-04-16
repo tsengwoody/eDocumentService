@@ -48,8 +48,8 @@ def worker_get_bookinfo_detail(function, urls, result, mutex, session):
 
 #=====douban=====
 def get_douban_bookinfo(ISBN):
-	#browser = webdriver.PhantomJS(service_log_path=LOG_DIR +'/ghostdriver.log')
-	browser = webdriver.Firefox(options=options, service_log_path=LOG_DIR +'/ghostdriver.log')
+	browser = webdriver.PhantomJS(service_log_path=LOG_DIR +'/ghostdriver.log')
+	# browser = webdriver.Firefox(options=options, service_log_path=LOG_DIR +'/ghostdriver.log')
 
 	url = u'https://book.douban.com/subject_search'
 	values = {}
@@ -73,8 +73,8 @@ def get_douban_bookinfo(ISBN):
 	return bookinfo_list[0]
 
 def get_douban_bookinfo_list(query_text):
-	#browser = webdriver.PhantomJS(service_log_path=LOG_DIR +'/ghostdriver.log')
-	browser = webdriver.Firefox(options=options, service_log_path=LOG_DIR +'/ghostdriver.log')
+	browser = webdriver.PhantomJS(service_log_path=LOG_DIR +'/ghostdriver.log')
+	# browser = webdriver.Firefox(options=options, service_log_path=LOG_DIR +'/ghostdriver.log')
 
 	url = u'https://book.douban.com/subject_search'
 	values = {}
@@ -189,7 +189,8 @@ FO_SchRe1ation2Index = {
 }
 
 def get_ncl_bookinfo(ISBN):
-	browser = webdriver.Firefox(options=options, service_log_path=LOG_DIR +'/ghostdriver.log')
+	browser = webdriver.PhantomJS(service_log_path=LOG_DIR +'/ghostdriver.log')
+	# browser = webdriver.Firefox(options=options, service_log_path=LOG_DIR +'/ghostdriver.log')
 	url = 'http://isbn.ncl.edu.tw/NEW_ISBNNet/H30_SearchBooks.php'
 	browser.get(url)
 	select0 = Select(browser.find_element_by_name('FO_SearchField0'))
@@ -224,7 +225,8 @@ def get_ncl_bookinfo(ISBN):
 	return bookinfo_list[0]
 
 def get_ncl_bookinfo_list(query_dict):
-	browser = webdriver.Firefox(options=options, service_log_path=LOG_DIR +'/ghostdriver.log')
+	browser = webdriver.PhantomJS(service_log_path=LOG_DIR +'/ghostdriver.log')
+	# browser = webdriver.Firefox(options=options, service_log_path=LOG_DIR +'/ghostdriver.log')
 	url = 'http://isbn.ncl.edu.tw/NEW_ISBNNet/H30_SearchBooks.php'
 	browser.get(url)
 	select0 = Select(browser.find_element_by_name('FO_SearchField0'))
@@ -360,7 +362,7 @@ if __name__ == '__main__':
 	'''s = time.time()
 	r = get_ncl_bookinfo(u'9789573321569')
 	e = time.time()
-	print(r['bookname'])
+	print(r)
 	print(e-s)'''
 
 	s = time.time()
@@ -376,7 +378,7 @@ if __name__ == '__main__':
 	})
 	e = time.time()
 	print(e-s)
-	print(r[0]['bookname'])
+	print(r[0])
 
 	s = time.time()
 	r = get_douban_bookinfo(u'9787801871527')

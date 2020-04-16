@@ -91,8 +91,8 @@ urlpatterns = [
 	url(r'^$', views.home, name='home'),
 	url(r'^generic/$', views.generic, name='home'),
 	url(r'^school/$', views.school, name='home'),
-	url(r'^library_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{32,32})/$', library_epub),
-	url(r'^library_origin_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{0,32})/$', library_origin_epub),
+	url(r'^library_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{2,32}).epub', library_epub),
+	url(r'^library_origin_epub/(?P<ISBN>[0-9]+)/(?P<token>[abcdef0-9]{2,32}).epub', library_origin_epub),
 	url(r'^api/statistics/(?P<action>[\d\w]+)/$', apis.Statistics.as_view()),
 	url(r'^statistics_old/$', views.statistics, name='statistics'),
 	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),
@@ -104,4 +104,8 @@ urlpatterns = [
 
 urlpatterns = urlpatterns +[
 	url(r'^file/(?P<path>.*)$', serve, {'document_root': BASE_DIR +'/static/'}),
+]
+
+urlpatterns = urlpatterns +[
+	url(r'^static/(?P<path>.*)$', serve, {'document_root': BASE_DIR +'/static/'}),
 ]

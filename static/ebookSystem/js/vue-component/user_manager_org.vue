@@ -3,13 +3,20 @@
 		<h3>{{ org.name }}</h3>
 		<div>
 			<div class="form-inline" style="margin-bottom:20px;">
-				<span>關鍵字查詢：</span>
+				<span>類別：</span>
 				<select v-model="search_role" class="form-control">
 					<option value="all">全部</option>
 					<option value="editor">志工</option>
 					<option value="guest">視障者</option>
 					<option value="unauth">視障者(未驗證)</option>
 				</select>
+				<span>關注：</span>
+				<select v-model="is_hot" class="form-control">
+					<option value="all">全部</option>
+					<option value="true">是</option>
+					<option value="false">否</option>
+				</select>
+				<span>關鍵字查詢：</span>
 				<input
 					@keyup.enter="user_refresh('search');"
 					v-model="search_value"
@@ -127,6 +134,7 @@
 				search_role: 'all', //all/editor/guest
 				search_value: '',
 				search_counts: null,
+				is_hot: 'all',
 			}
 		},
 		computed: {
@@ -137,6 +145,10 @@
 				}
 				else {
 					temp = {'search': this.search_value, 'role': this.search_role}
+				}
+
+				if(!(this.is_hot=='all')){
+					temp['is_hot'] = this.is_hot
 				}
 				if(!(this.org.id==0)){
 					temp['org_id'] = this.org.id;

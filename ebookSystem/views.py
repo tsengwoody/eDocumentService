@@ -34,7 +34,7 @@ def library_view(request, template_name='ebookSystem/library_view.html'):
 
 		token = uuid.uuid4().hex
 		cache.set('token.' +str(request.user.id), token, 100)
-		path = '/library_epub/' +str(lr.id) +'/' +token
+		path = '/library_epub/' +str(lr.id) +'/' +token + '.epub'
 		path = path.encode('ascii')
 		#path = '/ebookSystem/api/libraryrecords/{0}/resource/source/epub'.format(str(lr.id))
 		base64_path = base64.b64encode(path).decode('ascii')
@@ -66,7 +66,7 @@ def library_origin_view(request, template_name='ebookSystem/library_origin_view.
 
 		token = uuid.uuid4().hex
 		cache.set('token.' +str(request.user.id), token, 10)
-		path = '/library_origin_epub/' +book.ISBN +'/' +token
+		path = '/library_origin_epub/' +book.ISBN +'/' +token +'.epub'
 		path = path.encode('ascii')
 		base64_path = base64.b64encode(path).decode('ascii')
 	return render(request, template_name, locals())

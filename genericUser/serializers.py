@@ -18,6 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
 			'org',
 			'is_license',
 			'is_active',
+			'is_hot',
 			'is_editor',
 			'is_guest',
 			'is_manager',

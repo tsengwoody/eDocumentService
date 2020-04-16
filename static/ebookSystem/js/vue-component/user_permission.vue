@@ -19,6 +19,7 @@
 			return {
 				'username': '',
 				user_permission: {
+					'is_hot': '',
 					'is_active': '',
 					'is_manager': '',
 					'is_editor': '',
@@ -27,6 +28,7 @@
 					'auth_phone': '',
 				},
 				permission_label: {
+					'is_hot': '關注標記',
 					'is_active': '登錄權限',
 					'is_manager': '單位管理員權限',
 					'is_editor': '志工權限',

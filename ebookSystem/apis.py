@@ -49,11 +49,13 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		if not self.request.user.is_manager:
 			return ''
 		if dir == 'OCR':
-			if resource in ['epub', ]:
+			if resource in ['epub.epub', ]:
 				fullpath = obj.path +'/OCR/{0}.{1}'.format(obj.ISBN, resource)
 		elif dir == 'source':
 			if resource in ['epub', 'txt', 'zip', ]:
 				fullpath = obj.path +'/{0}.{1}'.format(obj.ISBN, resource)
+			elif resource in ['epub.epub']:
+				fullpath = obj.path +'/{0}.{1}'.format(obj.ISBN, 'epub')
 		else:
 			pass
 		return fullpath
@@ -464,10 +466,10 @@ class EBookViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, ResourceViewSe
 			if obj.status != 2:
 				res['detail'] = u'該段落非編輯狀態'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-			content = request.POST['edit']
-			origin_finish = request.POST['finish']
-			page = request.POST['page']
-			if request.POST['type'] == 'save':
+			content = request.data['edit']
+			origin_finish = request.data['finish']
+			page = request.data['page']
+			if request.data['type'] == 'save':
 				try:
 					finishContent, editContent = obj.split_content(content)
 					if finishContent == '' or editContent == '':
@@ -482,12 +484,12 @@ class EBookViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, ResourceViewSe
 				obj.save()
 				res['detail'] = u'您上次儲存時間為：{0}，請定時存檔喔~'.format(timezone.now())
 
-			elif request.POST['type'] == 'finish':
+			elif request.data['type'] == 'finish':
 				finishContent = origin_finish + content
 				obj.set_content(finish_content=finishContent, edit_content='')
 				obj.change_status(1, 'review')
 				res['detail'] = u'完成文件校對，將進入審核'
-			elif request.POST['type'] == 'load':
+			elif request.data['type'] == 'load':
 				obj.load_full_content()
 				res['detail'] = u'成功載入全部文件內容'
 

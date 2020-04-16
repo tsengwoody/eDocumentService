@@ -1,6 +1,5 @@
 ﻿<template>
 	<div :id="'book_manager' +org.id" class="tab-content">
-		{{ query }}
 		<h3>{{ org.name }}</h3>
 		<div id="book_manager_search">
 			<div class="form-inline" style="margin-bottom:20px;">
