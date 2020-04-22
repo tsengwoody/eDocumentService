@@ -8,7 +8,6 @@ import pandas as pd
 from django.db.models import Count, Sum
 from django.utils import timezone as datetime
 
-from rest_framework.decorators import list_route, detail_route
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions, status

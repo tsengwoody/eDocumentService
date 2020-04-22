@@ -22,10 +22,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
+from django_filters import rest_framework as dffilters
+
 from utils.resource import *
 from utils.apis import MixedPermissionModelViewSet
 from utils.filters import OwnerOrgManagerFilter
-from utils.filters import KeyMapAttrFilterFactory, convert_bool, convert_unicode
 from utils.permissions import RuleORPermissionFactory
 from .filters import *
 from .serializers import *
@@ -35,9 +36,10 @@ from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWOR
 class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, UserSelfOrManagerFilter, OrgFilter, UserRoleFilter, UserAuthFilter, KeyMapAttrFilterFactory(key='is_hot', type=convert_bool, attr='is_hot'))
-	ordering_fields = ('username',)
+	filter_backends = (filters.OrderingFilter, filters.SearchFilter, dffilters.DjangoFilterBackend, UserSelfOrManagerFilter, OrgFilter, UserRoleFilter, UserAuthFilter)
+	ordering_fields = ('username')
 	search_fields = ('username', 'email', 'first_name', 'last_name',)
+	filterset_fields = ('is_hot',)
 
 	def perform_create(self, serializer):
 		instance = serializer.save(
@@ -336,12 +338,12 @@ class AnnouncementViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	filter_backends = (
 		filters.OrderingFilter,
 		filters.SearchFilter,
-		AnnouncementNewestFilter, 
-		KeyMapAttrFilterFactory(key='category', type=convert_unicode, attr='category'),
-		KeyMapAttrFilterFactory(key = 'org_id', type = str, attr = 'org_id')
+		dffilters.DjangoFilterBackend,
+		AnnouncementNewestFilter,
 	)
 	ordering_fields = ('datetime',)
 	search_fields = ('category',)
+	filterset_fields = ('category', 'org_id')
 	permission_classes = (
 		RuleORPermissionFactory('list', [
 			'is_manager',
@@ -394,7 +396,8 @@ class BusinessContentViewSet(viewsets.ModelViewSet):
 class BannerContentViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = BannerContent.objects.all()
 	serializer_class = BannerContentSerializer
-	filter_backends = (KeyMapAttrFilterFactory(key='category', type=str, attr='category'), )
+	filter_backends = (dffilters.DjangoFilterBackend,)
+	filterset_fields = ('category',)
 	permission_classes = (
 		RuleORPermissionFactory('list', [
 			'is_manager',

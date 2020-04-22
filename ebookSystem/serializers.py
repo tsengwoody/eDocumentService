@@ -103,16 +103,3 @@ class CategorySerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Category
 		fields = ('__all__')
-
-#===== ISSN Book =====
-
-class ISSNBookSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = ISSNBook
-		fields = ('__all__')
-
-class ISSNBookInfoSerializer(serializers.ModelSerializer):
-	issnbook_set = ISSNBookSerializer(many=True, read_only=True)
-	class Meta:
-		model = ISSNBookInfo
-		fields = '__all__'

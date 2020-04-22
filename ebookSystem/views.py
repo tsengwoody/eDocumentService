@@ -33,7 +33,7 @@ def library_view(request, template_name='ebookSystem/library_view.html'):
 		lr = LibraryRecord.objects.get(id=request.GET['ISBN'])
 
 		token = uuid.uuid4().hex
-		cache.set('token.' +str(request.user.id), token, 100)
+		# cache.set('token.' +str(request.user.id), token, 100)
 		path = '/library_epub/' +str(lr.id) +'/' +token + '.epub'
 		path = path.encode('ascii')
 		#path = '/ebookSystem/api/libraryrecords/{0}/resource/source/epub'.format(str(lr.id))
@@ -65,7 +65,7 @@ def library_origin_view(request, template_name='ebookSystem/library_origin_view.
 				raise SystemError('epub create fail (not final):' +unicode(e))
 
 		token = uuid.uuid4().hex
-		cache.set('token.' +str(request.user.id), token, 10)
+		# cache.set('token.' +str(request.user.id), token, 10)
 		path = '/library_origin_epub/' +book.ISBN +'/' +token +'.epub'
 		path = path.encode('ascii')
 		base64_path = base64.b64encode(path).decode('ascii')

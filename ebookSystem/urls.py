@@ -1,3 +1,4 @@
+
 from django.urls import path
 from django.conf.urls import include, url
 
@@ -12,8 +13,6 @@ router.register(r'bookadds', apis.BookAddViewSet)
 router.register(r'ebooks', apis.EBookViewSet)
 router.register(r'bookinfos', apis.BookInfoViewSet)
 router.register(r'editrecords', apis.EditRecordViewSet)
-router.register(r'issnbookinfos', apis.ISSNBookInfoViewSet)
-router.register(r'issnbooks', apis.ISSNBookViewSet)
 router.register(r'libraryrecords', apis.LibraryRecordViewSet)
 router.register(r'categorys', apis.CategoryViewSet)
 router.register(r'bookorders', apis.BookOrderViewSet)

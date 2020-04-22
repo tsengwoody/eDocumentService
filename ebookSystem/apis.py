@@ -1,17 +1,6 @@
-﻿# coding: utf-8
-
-import sys
-if sys.version_info.major == 2:
-	unicode = unicode
-elif sys.version_info.major >= 3:
-	unicode = str
-
-from rest_framework import permissions, status
-from rest_framework.decorators import api_view
+﻿from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import mixins
-from rest_framework import generics
 from rest_framework import filters
 from rest_framework import viewsets
 from .filters import *
@@ -22,8 +11,6 @@ from utils.resource import *
 from utils.apis import MixedPermissionModelViewSet, ReadsModelViewSetMixin
 from utils.filters import OwnerOrgManagerFilter
 from utils.permissions import RuleORPermissionFactory
-
-import sys
 
 def kill_firefox():
 	import subprocess
@@ -45,7 +32,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	permission_classes = (permissions.IsAuthenticated,)
 
 	def get_fullpath(self, obj, dir, resource):
-		fullpath = None
+		fullpath = ''
 		if not self.request.user.is_manager:
 			return ''
 		if dir == 'OCR':
@@ -72,7 +59,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		try:
 			file_path = obj.zip(request.user, request.data['password'], request.data['fileformat'])
 		except BaseException as e:
-			res['detail'] = u'準備文件失敗： {}'.format(unicode(e))
+			res['detail'] = u'準備文件失敗： {}'.format(str(e))
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 		return self.get_resource(file_path)
@@ -97,7 +84,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[SERVICE], bcc=user_email_list)
 			email.send(fail_silently=False)
 		except BaseException as e:
-			res = unicode(e)
+			res = str(e)
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
@@ -171,7 +158,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				)
 			except BaseException as e:
 				shutil.rmtree(uploadPath)
-				res['detail'] = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面' +unicode(e)
+				res['detail'] = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面' + str(e)
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 			#建立book object
@@ -180,7 +167,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				newBook.set_page_count()
 			except BaseException as e:
 				shutil.rmtree(uploadPath)
-				res['detail'] = u'set_page_count error' +unicode(e)
+				res['detail'] = u'set_page_count error' +str(e)
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 			newBook.scaner = request.user
@@ -345,7 +332,7 @@ class EBookViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, ResourceViewSe
 			res['detail'] = u'無文件可校對，請聯絡管理者'
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		except BaseException as e:
-			res['detail'] = u'伺服器錯誤：{0}'.format(unicode(e))
+			res['detail'] = u'伺服器錯誤：{0}'.format(str(e))
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 		getPart = partialBook.ebook_set.filter(status=EBook.STATUS['active']).order_by('part')[0]
@@ -475,7 +462,7 @@ class EBookViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, ResourceViewSe
 					if finishContent == '' or editContent == '':
 						raise SystemError('save mark error')
 				except BaseException as e:
-					res['detail'] = u'標記位置錯誤或有多個標記' +unicode(e)
+					res['detail'] = u'標記位置錯誤或有多個標記' +str(e)
 					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 				finishContent = origin_finish + finishContent
@@ -520,7 +507,7 @@ class EBookViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, ResourceViewSe
 			if delta.seconds < 50:
 				raise SystemError('duration error')
 		except BaseException as e:
-			res['detail'] = u'您有其他編輯正進行' +unicode(e)
+			res['detail'] = u'您有其他編輯正進行' +str(e)
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 		self.request.user.online = timezone.now()
@@ -532,7 +519,7 @@ class EBookViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, ResourceViewSe
 		editRecord = obj.current_editrecord()
 
 		order = len(EditLog.objects.filter(edit_record=editRecord))
-		EditLog.objects.create(edit_record=editRecord, user=self.request.user, time=timezone.now(), order=order, edit_count=int(request.POST['online']))
+		EditLog.objects.create(edit_record=editRecord, user=self.request.user, time=timezone.now(), order=order, edit_count=int(request.data['online']))
 
 		res['service_hours'] = obj.service_hours
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
@@ -558,14 +545,17 @@ class EBookViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, ResourceViewSe
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	def get_fullpath(self, ebook, dir, resource):
-		fullpath = None
+		fullpath = ''
 		if dir == 'OCR':
 			if resource == 'origin':
 				fullpath = ebook.get_path()
 			else:
 				fullpath = ebook.get_path('-' +resource)
 		elif dir == 'source':
-			fullpath = os.path.join(ebook.book.path +u'/source', ebook.get_source_list()[int(resource)])
+			try:
+				fullpath = os.path.join(ebook.book.path +'/source', ebook.get_source_list()[int(resource)])
+			except KeyError:
+				pass
 		else:
 			pass
 		return fullpath
@@ -573,10 +563,7 @@ class EBookViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, ResourceViewSe
 
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
-if (sys.version_info > (2, 0) and sys.version_info < (3, 0)):
-	from utils.crawler2 import *
-elif (sys.version_info > (3, 0)):
-	from utils.crawler3 import *
+from utils.crawler3 import *
 
 class BookInfoViewSet(viewsets.ModelViewSet):
 	queryset = BookInfo.objects.filter(book__status__gte=Book.STATUS['finish']).order_by('-date')
@@ -599,7 +586,7 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 		except BaseException as e:
 			serializer = BookInfoSerializer(data=request.data)
 		if not serializer.is_valid():
-			res['detail'] = u'序列化驗證失敗' + unicode(serializer.errors)
+			res['detail'] = u'序列化驗證失敗' + str(serializer.errors)
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 		newBookInfo = serializer.save()
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
@@ -678,7 +665,7 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 			except BaseException as e:
 				res['bookinfo_list'] = []
 				#print('ncl', e)
-				#res['detail'] = u'查詢書籍錯誤。{0}'.format(unicode(e))
+				#res['detail'] = u'查詢書籍錯誤。{0}'.format(str(e))
 				#return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 		elif request.data['source'] == 'douban':
@@ -688,8 +675,8 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 					r['source'] = 'douban'
 			except BaseException as e:
 				res['bookinfo_list'] = []
-				#print('douban', unicode(e))
-				#res['detail'] = u'查詢書籍錯誤。{0}'.format(unicode(e))
+				#print('douban', str(e))
+				#res['detail'] = u'查詢書籍錯誤。{0}'.format(str(e))
 				#return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 		res['detail'] = u'成功取得資料'
@@ -738,9 +725,9 @@ class LibraryRecordViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	permission_classes = (permissions.IsAuthenticated, )
 
 	def get_fullpath(self, obj, dir, resource):
-		fullpath = None
+		fullpath = ''
 		if dir == 'source':
-			if resource in ['epub', 'txt', 'zip', ]:
+			if resource in ['epub', 'txt']:
 				fullpath = getattr(obj, resource, '')
 		return fullpath
 
@@ -824,40 +811,3 @@ class CategoryViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet):
 		'list': [permissions.AllowAny,],
 		'retrieve': [permissions.AllowAny,],
 	}
-
-#===== ISSN Book =====
-
-class ISSNBookInfoViewSet(viewsets.ModelViewSet):
-	queryset = ISSNBookInfo.objects.all()
-	serializer_class = ISSNBookInfoSerializer
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, )
-	search_fields = ('ISSN', 'title', )
-
-class ISSNBookViewSet(viewsets.ModelViewSet, ResourceViewSet):
-	queryset = ISSNBook.objects.all().order_by('-date')
-	serializer_class = ISSNBookSerializer
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, )
-	ordering_fields = ('volume',)
-	@action(
-		detail=False,
-		methods=['post'],
-		url_name='upload',
-		url_path='action/upload',
-	)
-	def upload(self, request, pk=None):
-		res = {}
-
-		if request.method == 'POST':
-			serializer = ISSNBookSerializer(data=request.data)
-			if not serializer.is_valid():
-				res['detail'] = u'序列化驗證失敗' + unicode(serializer.errors)
-				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-			instance = serializer.save()
-
-			try:
-				self.post_resource(instance.epub_file, request.FILES['fileObject'])
-			except:
-				instance.delete()
-
-			res['detail'] = u'成功建立並上傳文件'
-			return Response(data=res, status=status.HTTP_202_ACCEPTED)

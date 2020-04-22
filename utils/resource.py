@@ -14,7 +14,7 @@ import shutil
 from django.http import FileResponse
 from django.http import Http404
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -96,7 +96,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 class ResourceViewSet(Resource):
 
-	@list_route(
+	@action(
+		detail=False,
 		methods=['get', 'post'],
 		url_name='resource-list',
 		url_path='resource/(?P<dir>[\d\w]+)/(?P<resource>.+)',
@@ -114,7 +115,8 @@ class ResourceViewSet(Resource):
 			except OSError as e:
 				return Response(data={'detail' :unicode(e)}, status=status.HTTP_404_NOT_FOUND)
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['get', 'post', 'delete'],
 		url_name='resource',
 		url_path='resource/(?P<dir>[\d\w]+)/(?P<resource>.+)',
@@ -138,7 +140,8 @@ class ResourceViewSet(Resource):
 			except OSError as e:
 				return Response(data={'detail' :unicode(e)}, status=status.HTTP_404_NOT_FOUND)
 
-	@list_route(
+	@action(
+		detail=False,
 		methods=['get'],
 		url_name='category-list',
 		url_path='resource/(?P<dir>[\d\w]+)',
@@ -149,7 +152,8 @@ class ResourceViewSet(Resource):
 		except OSError as e:
 			return Response(data={'detail' :unicode(e)}, status=status.HTTP_404_NOT_FOUND)
 
-	@detail_route(
+	@action(
+		detail=True,
 		methods=['get'],
 		url_name='category',
 		url_path='resource/(?P<dir>[\d\w]+)',
