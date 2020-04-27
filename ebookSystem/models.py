@@ -356,6 +356,7 @@ class EBook(models.Model):
 				self.status = self.status +direction
 			elif self.status +direction == self.STATUS['edit']:
 				self.edited_page = 0
+				self.deadline = datetime.date.today() +datetime.timedelta(days=3)
 				self.load_full_content()
 				self.status = self.status +direction
 			else:
