@@ -47,22 +47,8 @@ def library_origin_view(request, template_name='ebookSystem/library_origin_view.
 			message = ''
 			return render(request, template_name, locals())
 		book = Book.objects.get(ISBN=request.GET['ISBN'])
-		if not book.status == book.STATUS['final']:
-			final_epub = book.path +'/OCR/{0}.epub'.format(book.ISBN)
-			try:
-				part_list = [ file.get_clean_file() for file in book.ebook_set.all() ]
-				from utils.epub import html2epub
-				info = {
-					'ISBN': book.book_info.ISBN,
-					'bookname': book.book_info.bookname,
-					'author': book.book_info.author,
-					'date': str(book.book_info.date),
-					'house': book.book_info.house,
-					'language': 'zh',
-				}
-				html2epub(part_list, final_epub, **info)
-			except BaseException as e:
-				raise SystemError('epub create fail (not final):' +unicode(e))
+		if not (book.status == 5 and book.source != 'self'):
+			book.realtime_epub_create()
 
 		token = uuid.uuid4().hex
 		# cache.set('token.' +str(request.user.id), token, 10)

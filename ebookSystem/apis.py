@@ -7,6 +7,8 @@ from .filters import *
 from .permissions import *
 from .serializers import *
 
+from django_filters import rest_framework as dffilters
+
 from utils.resource import *
 from utils.apis import MixedPermissionModelViewSet, ReadsModelViewSetMixin
 from utils.filters import OwnerOrgManagerFilter
@@ -46,6 +48,19 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		else:
 			pass
 		return fullpath
+
+	@action(
+		detail=True,
+		methods=['get'],
+		url_name='read',
+		url_path='action/read',
+	)
+	def read(self, request, pk=None):
+		obj = self.get_object()
+		if not (obj.status == 5 and obj.source != 'self'):
+			obj.realtime_epub_create()
+		epub_path = obj.path +'/OCR/{0}.epub'.format(obj.ISBN)
+		return self.get_resource(epub_path)
 
 	@action(
 		detail=True,
@@ -541,7 +556,15 @@ class EBookViewSet(viewsets.ModelViewSet, ReadsModelViewSetMixin, ResourceViewSe
 			res['detail'] = u'審核通過文件'
 		if request.data['result'] == 'error':
 			obj.change_status(-1, 'edit')
-			res['detail'] = u'審核退回文件'
+			res['detail'] = '審核退回文件'
+
+			from django.core.mail import EmailMessage
+			from mysite.settings import SERVICE
+			subject = '[通知] 審核退回校對文件 {}'.format(obj)
+			body = request.data['reason']
+			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[obj.editor.email])
+			email.send(fail_silently=False)
+
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	def get_fullpath(self, ebook, dir, resource):
@@ -811,3 +834,34 @@ class CategoryViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet):
 		'list': [permissions.AllowAny,],
 		'retrieve': [permissions.AllowAny,],
 	}
+
+class IndexCategoryFilter(dffilters.FilterSet):
+	uncategorized = dffilters.BooleanFilter(field_name='parent', lookup_expr='isnull')
+	class Meta:
+		model = IndexCategory
+		fields = ['uncategorized']
+
+class IndexCategoryViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet):
+	queryset = IndexCategory.objects.all()
+	serializer_class = IndexCategorySerializer
+	# filter_backends = (dffilters.DjangoFilterBackend)
+	# filterset_class = IndexCategoryFilter
+	permission_classes = (permissions.IsAuthenticated, )
+	permission_classes_by_action = {
+		'list': [permissions.AllowAny,],
+		'retrieve': [permissions.AllowAny,],
+	}
+
+	@action(
+		detail=False,
+		methods=['get'],
+		permission_classes=[permissions.AllowAny,],
+		url_name='structure',
+		url_path='action/structure',
+	)
+	def structure(self, request, pk=None):
+		roots = IndexCategory.objects.filter(parent=None)
+		data = []
+		for item in roots:
+			data.append(item.descendants)
+		return Response(data=data, status=status.HTTP_202_ACCEPTED)

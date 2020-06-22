@@ -103,3 +103,9 @@ class CategorySerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Category
 		fields = ('__all__')
+
+class IndexCategorySerializer(serializers.ModelSerializer):
+	descendants = serializers.ReadOnlyField()
+	class Meta:
+		model = IndexCategory
+		fields = ('__all__')

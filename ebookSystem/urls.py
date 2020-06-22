@@ -15,6 +15,7 @@ router.register(r'bookinfos', apis.BookInfoViewSet)
 router.register(r'editrecords', apis.EditRecordViewSet)
 router.register(r'libraryrecords', apis.LibraryRecordViewSet)
 router.register(r'categorys', apis.CategoryViewSet)
+router.register(r'indexcategorys', apis.IndexCategoryViewSet)
 router.register(r'bookorders', apis.BookOrderViewSet)
 
 urlpatterns = [

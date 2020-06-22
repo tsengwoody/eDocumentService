@@ -183,10 +183,6 @@
 			.done(function (data) {
 			let $org_select = $('#id_usermodel_org');
 			$org_select.empty();
-			$org_select.append($('<option>', {
-					value: '',
-					text: '其它',
-				}));
 
 			_.each(data,function(v,k){
 

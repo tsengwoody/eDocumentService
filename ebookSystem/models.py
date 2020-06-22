@@ -44,6 +44,7 @@ class Book(models.Model):
 	scaner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='scan_book_set')
 	org = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True, related_name='book_set')
 	category = models.ForeignKey('Category', related_name='book_set', blank=True, null=True, on_delete=models.SET_NULL)
+	index_category = models.ForeignKey('IndexCategory', related_name='book_set', blank=True, null=True, on_delete=models.SET_NULL)
 	owner = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL, related_name='own_book_set')
 	upload_date = models.DateField(default = timezone.now)
 	is_private = models.BooleanField(default=False)
@@ -139,6 +140,23 @@ class Book(models.Model):
 		except BaseException as e:
 			raise e
 
+	def realtime_epub_create(self):
+		final_epub = self.path +'/OCR/{0}.epub'.format(self.ISBN)
+		try:
+			part_list = [ file.get_clean_file() for file in self.ebook_set.all() ]
+			from utils.epub import html2epub
+			info = {
+				'ISBN': self.book_info.ISBN,
+				'bookname': self.book_info.bookname,
+				'author': self.book_info.author,
+				'date': str(self.book_info.date),
+				'house': self.book_info.house,
+				'language': 'zh',
+			}
+			html2epub(part_list, final_epub, **info)
+		except BaseException as e:
+			raise SystemError('epub create fail (not final):' +unicode(e))
+
 	def custom_epub_create(self, custom_epub, user):
 		self.check_status()
 		#準備epub文件
@@ -152,7 +170,7 @@ class Book(models.Model):
 			'house': self.book_info.house,
 			'language': 'zh',
 		}
-		if self.status == 5:
+		if self.status == 5 and self.source != 'self':
 			final_epub = self.path +'/OCR/{0}.epub'.format(self.ISBN)
 			try:
 				book = epub.read_epub(final_epub)
@@ -193,7 +211,7 @@ class Book(models.Model):
 			'house': self.book_info.house,
 			'language': 'zh',
 		}
-		if self.status == self.STATUS['final']:
+		if self.status == 5 and self.source != 'self':
 			final_txt = self.path +'/OCR/{0}.epub'.format(self.ISBN)
 			try:
 				epub2txt(final_txt, custom_txt)
@@ -741,6 +759,32 @@ class Category(models.Model):
 
 	def __str__(self):
 		return self.name
+
+class IndexCategory(models.Model):
+	parent = models.ForeignKey('IndexCategory', on_delete=models.CASCADE, related_name='child_set', blank=True, null=True)
+	name = models.CharField(max_length=255)
+
+	def __str__(self):
+		return self.name
+
+	@property
+	def descendants(self):
+		result = []
+		for child in self.child_set.all():
+			result.append(child.descendants)
+		path = []
+		node = self
+		while node:
+			path.append({'id': node.id, 'name': node.name})
+			node = node.parent
+		path.reverse()
+
+		return {
+			'id': self.id,
+			'name': self.name,
+			'path': path,
+			'childs': result,
+		}
 
 def add_watermark(self,text, fontname, fontsize, imagefile, output_dir):
 	img0 = Image.new("RGBA", (1,1))

@@ -72,7 +72,9 @@
 					})
 				})
 				.catch(res => {
-					alertmessage('error', '登錄平台失敗，請確認帳號或密碼是否正確。' +JSON.stringify(res))
+					this.username = '';
+					this.password = '';
+					alertmessage('error', '登錄平台失敗，請確認帳號或密碼是否正確。')
 				})
 
 			},
