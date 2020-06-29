@@ -33,6 +33,10 @@ class BookInfo(models.Model):
 	def __str__(self):
 		return self.bookname
 
+	@property
+	def index_category(self):
+		return self.book.index_category
+
 class Book(models.Model):
 	ISBN = models.CharField(max_length=20, primary_key=True)
 	book_info = models.OneToOneField(BookInfo, on_delete=models.SET_NULL, blank=True, null=True, related_name='book')
@@ -766,6 +770,22 @@ class IndexCategory(models.Model):
 
 	def __str__(self):
 		return self.name
+
+	@property
+	def books(self):
+		result = []
+		result.extend(self.book_set.all())
+		for child in self.child_set.all():
+			result.extend(child.books)
+		return result
+
+	@property
+	def descendants_id(self):
+		result = []
+		result.append(self.id)
+		for child in self.child_set.all():
+			result.extend(child.descendants_id)
+		return result
 
 	@property
 	def descendants(self):

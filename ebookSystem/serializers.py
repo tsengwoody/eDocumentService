@@ -1,7 +1,19 @@
 from rest_framework import serializers
 from .models import *
 
+class IndexCategorySerializer(serializers.ModelSerializer):
+	descendants = serializers.ReadOnlyField()
+	class Meta:
+		model = IndexCategory
+		fields = ('__all__')
+
+class IndexCategorySimpleSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = IndexCategory
+		fields = ('__all__')
+
 class BookInfoSerializer(serializers.ModelSerializer):
+	index_category = IndexCategorySimpleSerializer(read_only=True)
 	class Meta:
 		model = BookInfo
 		fields = '__all__'
@@ -38,7 +50,7 @@ class EBookSerializer(serializers.ModelSerializer):
 
 class BookSimpleSerializer(serializers.ModelSerializer):
 	book_info = BookInfoSerializer(read_only=True)
-
+	index_category_object = IndexCategorySimpleSerializer(read_only=True)
 	class Meta:
 		model = Book
 		fields = [
@@ -52,6 +64,7 @@ class BookSimpleSerializer(serializers.ModelSerializer):
 			'source',
 			'status',
 			'category',
+			'index_category',
 		]
 
 class BookSerializer(serializers.ModelSerializer):
@@ -102,10 +115,4 @@ class CategorySerializer(serializers.ModelSerializer):
 	book_set = BookSerializer(many=True, read_only=True)
 	class Meta:
 		model = Category
-		fields = ('__all__')
-
-class IndexCategorySerializer(serializers.ModelSerializer):
-	descendants = serializers.ReadOnlyField()
-	class Meta:
-		model = IndexCategory
 		fields = ('__all__')

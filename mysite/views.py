@@ -60,7 +60,7 @@ def statistics(request, template_name='mysite/statistics.html'):
 		from ebookSystem.models import Book
 		from genericUser.models import User
 
-		month_list = month_gen(count=5)
+		month_list = month_gen(count=6)
 		month_list.insert(0, datetime.datetime.today())
 		result = []
 		for month in month_list:

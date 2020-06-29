@@ -133,79 +133,84 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	def upload_self(self, request, pk=None):
 		res = {}
 
-		if request.method == 'POST':
-			try:
-				newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
-			except:
-				res['detail'] = u'書籍資訊不存在，請先行建立書籍資訊'
-				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		try:
+			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
+		except:
+			res['detail'] = u'書籍資訊不存在，請先行建立書籍資訊'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-			try:
-				book = Book.objects.get(ISBN=request.POST['ISBN'])
-				res['detail'] = u'文件已存在'
-				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-			except:
-				pass
+		try:
+			book = Book.objects.get(ISBN=request.POST['ISBN'])
+			res['detail'] = u'文件已存在'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		except:
+			pass
 
-			#上傳文件設定
-			uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
-			uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.zip')
-			self.post_resource(uploadFilePath, request.FILES['fileObject'])
+		#上傳文件設定
+		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
+		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.zip')
+		self.post_resource(uploadFilePath, request.FILES['fileObject'])
 
-			#壓縮文件測試
-			try:
-				from zipfile import ZipFile
-				with ZipFile(uploadFilePath, 'r') as uploadFile:
-					uploadFile.testzip()
-					uploadFile.extractall(uploadPath)
-			except:
-				shutil.rmtree(uploadPath)
-				res['detail'] = u'非正確ZIP文件'
-				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		#壓縮文件測試
+		try:
+			from zipfile import ZipFile
+			with ZipFile(uploadFilePath, 'r') as uploadFile:
+				uploadFile.testzip()
+				uploadFile.extractall(uploadPath)
+		except:
+			shutil.rmtree(uploadPath)
+			res['detail'] = u'非正確ZIP文件'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-			#資料夾檢查
-			from utils import validate
-			try:
-				validate.validate_folder(
-					os.path.join(uploadPath, 'OCR'),
-					os.path.join(uploadPath, 'source'),
-					50
-				)
-			except BaseException as e:
-				shutil.rmtree(uploadPath)
-				res['detail'] = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面' + str(e)
-				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		#資料夾檢查
+		from utils import validate
+		try:
+			validate.validate_folder(
+				os.path.join(uploadPath, 'OCR'),
+				os.path.join(uploadPath, 'source'),
+				50
+			)
+		except BaseException as e:
+			shutil.rmtree(uploadPath)
+			res['detail'] = u'上傳壓縮文件結構錯誤，詳細結構請參考說明頁面' + str(e)
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-			#建立book object
-			newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], page_per_part=50)
-			try:
-				newBook.set_page_count()
-			except BaseException as e:
-				shutil.rmtree(uploadPath)
-				res['detail'] = u'set_page_count error' +str(e)
-				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		#建立book object
+		newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'], page_per_part=50)
+		try:
+			newBook.set_page_count()
+		except BaseException as e:
+			shutil.rmtree(uploadPath)
+			res['detail'] = u'set_page_count error' +str(e)
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-			newBook.scaner = request.user
-			newBook.owner = request.user
-			newBook.source = 'self'
+		newBook.scaner = request.user
+		newBook.owner = request.user
+		newBook.source = 'self'
 
-			try:
-				newBook.org = Organization.objects.get(id=request.POST['org_id'])
-				newBook.category = Category.objects.get(id=request.POST['category_id'])
-			except:
-				newBook.org = request.user.org
+		try:
+			newBook.org = Organization.objects.get(id=request.POST['org_id'])
+		except:
+			newBook.org = request.user.org
+		try:
+			newBook.category = Category.objects.get(id=request.POST['category_id'])
+		except:
+			pass
+		try:
+			newBook.index_category = IndexCategory.objects.get(id=request.POST['index_category_id'])
+		except:
+			pass
+		newBook.save()
 
-			newBook.save()
+		try:
+			newBook.create_EBook()
+		except BaseException as e:
+			newBook.delete()
+			res['detail'] = u'建立分段失敗'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-			try:
-				newBook.create_EBook()
-			except BaseException as e:
-				newBook.delete()
-				res['detail'] = u'建立分段失敗'
-				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-
-			res['detail'] = u'成功建立並上傳文件'
-			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+		res['detail'] = u'成功建立並上傳文件'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	@action(
 		detail=False,
@@ -216,102 +221,100 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	def upload(self, request, pk=None):
 		res = {}
 
-		if request.method == 'POST':
-			try:
-				newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
-			except:
-				res['detail'] = u'書籍資訊不存在，請先行建立書籍資訊'
+		try:
+			newBookInfo = BookInfo.objects.get(ISBN=request.POST['ISBN'])
+		except:
+			res['detail'] = u'書籍資訊不存在，請先行建立書籍資訊'
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		#判斷是否上傳
+		source_priority = {
+			'self': 0,
+			'txt': 1,
+			'epub': 2,
+		}
+		try:
+			book = Book.objects.get(ISBN=request.POST['ISBN'])
+			if source_priority[request.POST['format']] < source_priority[book.source]:
+				res['detail'] = u'文件已存在'
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-
-			#判斷是否上傳
-			source_priority = {
-				'self': 0,
-				'txt': 1,
-				'epub': 2,
-			}
+		except:
+			pass
+		#上傳文件設定
+		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
+		uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.' +request.POST['format'])
+		self.post_resource(uploadFilePath, request.FILES['fileObject'])
+		#根據選擇上傳格式作業
+		final_file = os.path.join(uploadPath, 'OCR') + '/{0}.epub'.format(request.POST['ISBN'], )
+		if not os.path.exists(os.path.dirname(final_file)):
+			os.makedirs(os.path.dirname(final_file), 0o755)
+		#txt
+		if request.POST['format'] == 'txt':
+			from ebooklib import epub
+			from utils.epub import txt2epub
 			try:
-				book = Book.objects.get(ISBN=request.POST['ISBN'])
-				if source_priority[request.POST['format']] < source_priority[book.source]:
-					res['detail'] = u'文件已存在'
-					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-			except:
-				pass
-
-			#上傳文件設定
-			uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(request.POST['ISBN'])
-			uploadFilePath = os.path.join(uploadPath, request.POST['ISBN'] +'.' +request.POST['format'])
-			self.post_resource(uploadFilePath, request.FILES['fileObject'])
-
-			#根據選擇上傳格式作業
-			final_file = os.path.join(uploadPath, 'OCR') + '/{0}.epub'.format(request.POST['ISBN'], )
-			if not os.path.exists(os.path.dirname(final_file)):
-				os.makedirs(os.path.dirname(final_file), 0o755)
-
-			#txt
-			if request.POST['format'] == 'txt':
-				from ebooklib import epub
-				from utils.epub import txt2epub
-				try:
-					info = {
-						'ISBN': newBookInfo.ISBN,
-						'bookname': newBookInfo.bookname,
-						'author': newBookInfo.author,
-						'date': str(newBookInfo.date),
-						'house': newBookInfo.house,
-						'language': 'zh',
-					}
-					txt2epub(uploadFilePath, final_file, **info)
-				except BaseException as e:
-					shutil.rmtree(uploadPath)
-					res['detail'] = u'建立文件失敗' +str(e)
-					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-
-			#epub
-			if request.POST['format'] == 'epub':
-				from ebooklib import epub
-				from utils.epub import through, add_bookinfo
-				try:
-					through(uploadFilePath, final_file)
-					book = epub.read_epub(final_file)
-					'''book = add_bookinfo(
-						book,
-						ISBN = newBookInfo.ISBN,
-						bookname = newBookInfo.bookname,
-						author = newBookInfo.author,
-						date = str(newBookInfo.date),
-						house = newBookInfo.house,
-						language = 'zh',
-					)'''
-					epub.write_epub(final_file, book, {})
-				except BaseException as e:
-					shutil.rmtree(uploadPath)
-					raise e
-					res['detail'] = u'建立文件失敗' +str(e)
-					return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
-
-			#建立book object和ebook object
+				info = {
+					'ISBN': newBookInfo.ISBN,
+					'bookname': newBookInfo.bookname,
+					'author': newBookInfo.author,
+					'date': str(newBookInfo.date),
+					'house': newBookInfo.house,
+					'language': 'zh',
+				}
+				txt2epub(uploadFilePath, final_file, **info)
+			except BaseException as e:
+				shutil.rmtree(uploadPath)
+				res['detail'] = u'建立文件失敗' +str(e)
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		#epub
+		if request.POST['format'] == 'epub':
+			from ebooklib import epub
+			from utils.epub import through, add_bookinfo
 			try:
-				newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'])
-			except:
-				newBook = Book.objects.get(ISBN=request.POST['ISBN'])
+				through(uploadFilePath, final_file)
+				book = epub.read_epub(final_file)
+				'''book = add_bookinfo(
+					book,
+					ISBN = newBookInfo.ISBN,
+					bookname = newBookInfo.bookname,
+					author = newBookInfo.author,
+					date = str(newBookInfo.date),
+					house = newBookInfo.house,
+					language = 'zh',
+				)'''
+				epub.write_epub(final_file, book, {})
+			except BaseException as e:
+				shutil.rmtree(uploadPath)
+				raise e
+				res['detail'] = u'建立文件失敗' +str(e)
+				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		#建立book object和ebook object
+		try:
+			newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'])
+		except:
+			newBook = Book.objects.get(ISBN=request.POST['ISBN'])
+		newBook.scaner = request.user
+		newBook.owner = request.user
+		newBook.source = request.POST['format']
+		newBook.finish_date = timezone.now()
+		try:
+			newBook.org = Organization.objects.get(id=request.POST['org_id'])
+		except:
+			newBook.org = request.user.org
+		try:
+			newBook.category = Category.objects.get(id=request.POST['category_id'])
+		except:
+			pass
+		try:
+			newBook.index_category = IndexCategory.objects.get(id=request.POST['index_category_id'])
+		except:
+			pass
+		newBook.save()
+		newBook.ebook_set.all().delete()
+		ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN'] + '-1', begin_page=-1, end_page=-1)
+		ebook.change_status(5, 'final')
+		res['detail'] = u'成功建立並上傳文件'
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
-			newBook.scaner = request.user
-			newBook.owner = request.user
-			newBook.source = request.POST['format']
-			newBook.finish_date = timezone.now()
-			try:
-				newBook.org = Organization.objects.get(id=request.POST['org_id'])
-				newBook.category = Category.objects.get(id=request.POST['category_id'])
-			except:
-				newBook.org = request.user.org
-			newBook.save()
-
-			newBook.ebook_set.all().delete()
-			ebook = EBook.objects.create(book=newBook, part=1, ISBN_part=request.POST['ISBN'] + '-1', begin_page=-1, end_page=-1)
-			ebook.change_status(5, 'final')
-
-			res['detail'] = u'成功建立並上傳文件'
-			return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 class BookAddViewSet(BookViewSet):
 	serializer_class = BookAddSerializer
@@ -591,7 +594,8 @@ from utils.crawler3 import *
 class BookInfoViewSet(viewsets.ModelViewSet):
 	queryset = BookInfo.objects.filter(book__status__gte=Book.STATUS['finish']).order_by('-date')
 	serializer_class = BookInfoSerializer
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, CBCFilter, NewestFilter, HottestFilter, BookInfoOwnerFilter, BookInfoOrgFilter, BookInfoCategoryFilter,)
+	filter_backends = (dffilters.DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter, CBCFilter, ICFilter, NewestFilter, HottestFilter, BookInfoOwnerFilter, BookInfoOrgFilter, BookInfoCategoryFilter,)
+	# filterset_class = IndexCategoryFilter
 	ordering_fields = ('date',)
 	search_fields = ('ISBN', 'bookname', 'author', )
 
@@ -865,3 +869,16 @@ class IndexCategoryViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet):
 		for item in roots:
 			data.append(item.descendants)
 		return Response(data=data, status=status.HTTP_202_ACCEPTED)
+
+	@action(
+		detail=True,
+		methods=['get'],
+		permission_classes=[permissions.AllowAny,],
+		url_name='books',
+		url_path='action/books',
+	)
+	def books(self, request, pk=None):
+		obj = self.get_object()
+		book_infos = BookInfo.objects.filter(book__index_category_id__in=obj.descendants_id)
+		s = BookInfoSerializer(instance=book_infos, many=True)
+		return Response(data=s.data, status=status.HTTP_202_ACCEPTED)
