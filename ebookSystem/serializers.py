@@ -65,6 +65,7 @@ class BookSimpleSerializer(serializers.ModelSerializer):
 			'status',
 			'category',
 			'index_category',
+			'index_category_object',
 		]
 
 class BookSerializer(serializers.ModelSerializer):

@@ -39,7 +39,7 @@ class ICFilter(filters.BaseFilterBackend):
 			index_category = IndexCategory.objects.get(id=index_category_id)
 			return queryset.filter(book__index_category_id__in=index_category.descendants_id)
 		except BaseException as e:
-			return []
+			return queryset
 
 class CBCFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
@@ -51,7 +51,7 @@ class CBCFilter(filters.BaseFilterBackend):
 			CBC = chinese_book_category*100
 			return queryset.filter(chinese_book_category__gt=CBC-1, chinese_book_category__lt=CBC+100)
 		else:
-			return []
+			return queryset
 
 class NewestFilter(filters.BaseFilterBackend):
 

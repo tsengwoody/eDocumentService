@@ -38,6 +38,10 @@ def epub_view(request, path, template_name='mysite/epub_view.html'):
 	return render(request, template_name, locals())
 
 def home(request, template_name='routing.html'):
+	from django.contrib.auth import logout
+	from django.http import HttpResponse, HttpResponseRedirect
+	logout(request)
+	return HttpResponseRedirect('/front')
 	app = 'mysite'
 	page = 'home'
 	return render(request, template_name, locals())
