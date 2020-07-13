@@ -1,7 +1,10 @@
 ﻿# coding: utf-8
 
 from rest_framework import filters
+from django_filters import rest_framework as dffilters
 from utils.filters import convert_bool, convert_unicode, KeyMapAttrFilterFactory
+from .models import *
+
 
 # ['book_review_list', 'book_manager', 'book_person', 'ebook_review_list', 'service', ]
 StatusFilter = KeyMapAttrFilterFactory(key = 'status', type = int, attr = 'status')
@@ -39,22 +42,25 @@ class ICFilter(filters.BaseFilterBackend):
 			index_category = IndexCategory.objects.get(id=index_category_id)
 			return queryset.filter(book__index_category_id__in=index_category.descendants_id)
 		except BaseException as e:
-			return queryset
+			return queryset.none()
 
 class CBCFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
-		try:
-			chinese_book_category = int(request.query_params.get('chinese_book_category'))
-		except:
-			chinese_book_category = -1
-		if chinese_book_category >= 0 and chinese_book_category <10:
-			CBC = chinese_book_category*100
-			return queryset.filter(chinese_book_category__gt=CBC-1, chinese_book_category__lt=CBC+100)
+		value = request.query_params.get('chinese_book_category')
+		if value:
+			try:
+				chinese_book_category = int(value)
+			except:
+				chinese_book_category = -1
+			if chinese_book_category >= 0 and chinese_book_category <10:
+				CBC = chinese_book_category*100
+				return queryset.filter(chinese_book_category__gt=CBC-1, chinese_book_category__lt=CBC+100)
+			else:
+				return queryset.none()
 		else:
 			return queryset
 
 class NewestFilter(filters.BaseFilterBackend):
-
 	def filter_queryset(self, request, queryset, view):
 		newest = request.query_params.get('newest')
 		if newest:
@@ -90,3 +96,9 @@ class EditRecordServiceInfoFilter(filters.BaseFilterBackend):
 			return queryset.filter(serviceInfo=None)
 		else:
 			return queryset
+
+class IndexCategoryFilter(dffilters.FilterSet):
+	uncategorized = dffilters.BooleanFilter(field_name='parent', lookup_expr='isnull')
+	class Meta:
+		model = IndexCategory
+		fields = ['uncategorized']

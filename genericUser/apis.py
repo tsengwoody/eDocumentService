@@ -417,3 +417,27 @@ class BannerContentViewSet(viewsets.ModelViewSet, ResourceViewSet):
 			if resource == 'image':
 				fullpath = obj.cover_image
 		return fullpath
+
+class RecommendationSubjectViewSet(viewsets.ModelViewSet, ResourceViewSet):
+	queryset = RecommendationSubject.objects.all()
+	serializer_class = RecommendationSubjectSerializer
+	filter_backends = (dffilters.DjangoFilterBackend,)
+	permission_classes = (
+		RuleORPermissionFactory('list', [
+			'is_manager',
+			'__read__',
+		]),
+	)
+
+	def perform_create(self, serializer):
+		instance = serializer.save(
+			order = len(RecommendationSubject.objects.all()),
+		)
+		instance.save()
+
+	def get_fullpath(self, obj, dir, resource):
+		fullpath = None
+		if dir == 'cover':
+			if resource == 'image':
+				fullpath = obj.cover_image
+		return fullpath

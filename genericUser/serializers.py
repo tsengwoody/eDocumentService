@@ -75,3 +75,8 @@ class BannerContentSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = BannerContent
 		fields = ('__all__')
+
+class RecommendationSubjectSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = RecommendationSubject
+		fields = ('__all__')

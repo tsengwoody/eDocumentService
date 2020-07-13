@@ -347,7 +347,7 @@ class BannerContent(models.Model):
 		self.cover_image = BASE_DIR +'/file/genericUser/BannerContent/{0}/cover/image.jpg'.format(self.id)
 
 	def __str__(self):
-		return unicode(self.id)
+		return str(self.id)
 
 	def delete(self, *args, **kwargs):
 		try:
@@ -356,3 +356,26 @@ class BannerContent(models.Model):
 		except:
 			pass
 		super(BannerContent, self).delete(*args, **kwargs)
+
+class RecommendationSubject(models.Model):
+	title = models.CharField(max_length=100)
+	content = models.TextField()
+	order = models.IntegerField()
+	link_text = models.CharField(max_length=100)
+	link_url = models.CharField(max_length=255)
+	path = BASE_DIR +'/file/genericUser/RecommendationSubject/'
+
+	def __init__(self, *args, **kwargs):
+		super(RecommendationSubject, self).__init__(*args, **kwargs)
+		self.path = self.path +str(self.id)
+		self.cover_image = self.path + '/cover/image.jpg'
+
+	def __str__(self):
+		return str(self.id)
+
+	def delete(self, *args, **kwargs):
+		try:
+			shutil.rmtree(self.path)
+		except:
+			pass
+		super(RecommendationSubject, self).delete(*args, **kwargs)
