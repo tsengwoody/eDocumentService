@@ -1,10 +1,7 @@
 ﻿# coding: utf-8
 
 from rest_framework import filters
-from django_filters import rest_framework as dffilters
 from utils.filters import convert_bool, convert_unicode, KeyMapAttrFilterFactory
-from .models import *
-
 
 # ['book_review_list', 'book_manager', 'book_person', 'ebook_review_list', 'service', ]
 StatusFilter = KeyMapAttrFilterFactory(key = 'status', type = int, attr = 'status')
@@ -39,28 +36,28 @@ class ICFilter(filters.BaseFilterBackend):
 		from ebookSystem.models import IndexCategory
 		try:
 			index_category_id = int(request.query_params.get('index_category_id'))
-			index_category = IndexCategory.objects.get(id=index_category_id)
-			return queryset.filter(book__index_category_id__in=index_category.descendants_id)
+			if index_category_id == 0:
+				return queryset.filter(book__index_category=None)
+			else:
+				index_category = IndexCategory.objects.get(id=index_category_id)
+				return queryset.filter(book__index_category_id__in=index_category.descendants_id)
 		except BaseException as e:
-			return queryset.none()
+			return queryset
 
 class CBCFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
-		value = request.query_params.get('chinese_book_category')
-		if value:
-			try:
-				chinese_book_category = int(value)
-			except:
-				chinese_book_category = -1
-			if chinese_book_category >= 0 and chinese_book_category <10:
-				CBC = chinese_book_category*100
-				return queryset.filter(chinese_book_category__gt=CBC-1, chinese_book_category__lt=CBC+100)
-			else:
-				return queryset.none()
+		try:
+			chinese_book_category = int(request.query_params.get('chinese_book_category'))
+		except:
+			chinese_book_category = -1
+		if chinese_book_category >= 0 and chinese_book_category <10:
+			CBC = chinese_book_category*100
+			return queryset.filter(chinese_book_category__gt=CBC-1, chinese_book_category__lt=CBC+100)
 		else:
 			return queryset
 
 class NewestFilter(filters.BaseFilterBackend):
+
 	def filter_queryset(self, request, queryset, view):
 		newest = request.query_params.get('newest')
 		if newest:
@@ -96,9 +93,3 @@ class EditRecordServiceInfoFilter(filters.BaseFilterBackend):
 			return queryset.filter(serviceInfo=None)
 		else:
 			return queryset
-
-class IndexCategoryFilter(dffilters.FilterSet):
-	uncategorized = dffilters.BooleanFilter(field_name='parent', lookup_expr='isnull')
-	class Meta:
-		model = IndexCategory
-		fields = ['uncategorized']

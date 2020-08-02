@@ -595,6 +595,7 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 	queryset = BookInfo.objects.filter(book__status__gte=Book.STATUS['finish']).order_by('-date')
 	serializer_class = BookInfoSerializer
 	filter_backends = (dffilters.DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter, CBCFilter, ICFilter, NewestFilter, HottestFilter, BookInfoOwnerFilter, BookInfoOrgFilter, BookInfoCategoryFilter,)
+	# filterset_class = IndexCategoryFilter
 	ordering_fields = ('date',)
 	search_fields = ('ISBN', 'bookname', 'author', )
 
@@ -838,11 +839,17 @@ class CategoryViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet):
 		'retrieve': [permissions.AllowAny,],
 	}
 
+class IndexCategoryFilter(dffilters.FilterSet):
+	uncategorized = dffilters.BooleanFilter(field_name='parent', lookup_expr='isnull')
+	class Meta:
+		model = IndexCategory
+		fields = ['uncategorized']
+
 class IndexCategoryViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet):
 	queryset = IndexCategory.objects.all()
 	serializer_class = IndexCategorySerializer
-	filter_backends = (dffilters.DjangoFilterBackend,)
-	filterset_class = IndexCategoryFilter
+	# filter_backends = (dffilters.DjangoFilterBackend)
+	# filterset_class = IndexCategoryFilter
 	permission_classes = (permissions.IsAuthenticated, )
 	permission_classes_by_action = {
 		'list': [permissions.AllowAny,],
