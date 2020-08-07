@@ -4,10 +4,6 @@ from django.shortcuts import render
 from genericUser.models import *
 import json
 
-def generics(request, name, pk=None):
-	template_name='genericUser/{0}.html'.format(name.split('/')[0])
-	return render(request, template_name, {})
-
 def upload_progress(request):
 	"""
 	Return JSON object with information about the progress of an upload.

@@ -1,7 +1,6 @@
 from django.urls import path
 from django.conf.urls import include, url
 
-from . import views
 from . import apis
 from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
@@ -21,7 +20,5 @@ api_urlpatterns = copy.copy(router.urls)
 import rest_framework
 
 urlpatterns = [
-	url(r'^upload_progress/$', views.upload_progress, name='upload_progress'),
-	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),
 	path('api/', include((router.urls, 'genericUser'), 'api'),)
 ]

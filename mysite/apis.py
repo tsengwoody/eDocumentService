@@ -58,6 +58,36 @@ class Statistics(APIView):
 			#except BaseException as e:
 				#return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 
+	def summary(request, template_name='mysite/statistics.html'):
+		from utils.other import month_gen
+		from ebookSystem.models import Book
+		from genericUser.models import User
+
+		month_list = month_gen(count=6)
+		month_list.insert(0, datetime.datetime.today())
+		result = []
+		for month in month_list:
+			editor_count = User.objects.filter(is_editor=True, date_joined__lte=month, auth_email=True, auth_phone=True,).count()
+			guest_count = User.objects.filter(is_guest=True, date_joined__lte=month, auth_email=True, auth_phone=True,).count()
+			editor_count_30 = User.objects.filter(is_editor=True, date_joined__lte=month, last_login__gt=month -datetime.timedelta(days=30), auth_email=True, auth_phone=True,).count()
+			finish_count = Book.objects.filter(finish_date__lte=month, upload_date__lte=month, source='self').count()
+			txt_count = Book.objects.filter(upload_date__lte=month, source='txt').count()
+			epub_count = Book.objects.filter(upload_date__lte=month, source='epub').count()
+			book_count = Book.objects.filter(upload_date__lte=month).count()
+			scanbook_count = Book.objects.filter(upload_date__lte=month, source='self').count()
+			result.append({
+				'month': month,
+				'editor_count': editor_count,
+				'guest_count': guest_count,
+				'editor_count_30': editor_count_30,
+				'book_count': book_count,
+				'scanbook_count': scanbook_count,
+				'finish_count': finish_count,
+				'txt_count': txt_count,
+				'epub_count': epub_count,
+			})
+		return Response(data=result, status=status.HTTP_202_ACCEPTED)
+
 	def book_download(self, request):
 		res = {}
 		res['result'] = []

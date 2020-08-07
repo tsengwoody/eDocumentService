@@ -1,13 +1,8 @@
 ﻿# coding: utf-8
 
-import sys
-if sys.version_info.major == 2:
-	unicode = unicode
-elif sys.version_info.major >= 3:
-	unicode = str
-
 import json
 import requests
+import sys
 
 from django.core.cache import cache
 from django.core.mail import EmailMessage
@@ -175,7 +170,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				birthday = datetime.date(birthday[0], birthday[1], birthday[2])
 				user = User.objects.get(email=request.data['email'], birthday=birthday)
 			except BaseException as e:
-				res['message'] = u'無法取得使用者資料，請確認填寫的資料是否無誤' +unicode(e)
+				res['message'] = u'無法取得使用者資料，請確認填寫的資料是否無誤' +str(e)
 				return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 			subject = u'取得username郵件'
 			message = u'您的username為：{0}'.format(user.username)
@@ -221,7 +216,7 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				cache.set(obj.email, {'vcode': vcode}, 600)
 			else:
 				vcode = cache.get(obj.email)['vcode']
-			subject = u'[驗證] {0} 信箱驗證碼'.format(obj.username)
+			subject = '[驗證] {0} 信箱驗證碼'.format(obj.username)
 			t = get_template('email/email_validate.txt')
 			body = t.render(locals())
 			email = EmailMessage(subject=subject, body=body, from_email=SERVICE, to=[obj.email])

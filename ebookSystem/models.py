@@ -1,11 +1,4 @@
-﻿# coding: utf-8
-
-import sys
-if sys.version_info.major == 2:
-	unicode = unicode
-elif sys.version_info.major >= 3:
-	unicode = str
-
+﻿import sys
 from django.db import models
 from django.db.models import F,Q
 from django.utils import timezone
@@ -159,7 +152,7 @@ class Book(models.Model):
 			}
 			html2epub(part_list, final_epub, **info)
 		except BaseException as e:
-			raise SystemError('epub create fail (not final):' +unicode(e))
+			raise SystemError('epub create fail (not final):' +str(e))
 
 	def custom_epub_create(self, custom_epub, user):
 		self.check_status()
@@ -185,7 +178,7 @@ class Book(models.Model):
 				book.set_identifier(user.username)
 				epub.write_epub(custom_epub, book, {})
 			except BaseException as e:
-				raise SystemError('epub create fail:' +unicode(e))
+				raise SystemError('epub create fail:' +str(e))
 		else:
 			final_epub = self.path +'/temp/{0}.temp'.format(self.ISBN)
 			final_dir = os.path.dirname(final_epub)
@@ -198,7 +191,7 @@ class Book(models.Model):
 				book.set_identifier(user.username)
 				epub.write_epub(custom_epub, book, {})
 			except BaseException as e:
-				raise SystemError('epub create fail (not final):' +unicode(e))
+				raise SystemError('epub create fail (not final):' +str(e))
 
 		return custom_epub
 
@@ -220,7 +213,7 @@ class Book(models.Model):
 			try:
 				epub2txt(final_txt, custom_txt)
 			except BaseException as e:
-				raise SystemError('epub create fail:' +unicode(e))
+				raise SystemError('epub create fail:' +str(e))
 		else:
 			final_txt = self.path +'/temp/{0}.temp'.format(self.ISBN)
 			final_dir = os.path.dirname(final_txt)
@@ -230,10 +223,10 @@ class Book(models.Model):
 				part_list = [ file.get_clean_file() for file in self.ebook_set.all() ]
 				html2txt(part_list, custom_txt)
 			except BaseException as e:
-				raise SystemError('epub create fail (not final):' +unicode(e))
+				raise SystemError('epub create fail (not final):' +str(e))
 
 		with io.open(custom_txt, 'a', encoding='utf-8') as f:
-			f.write(unicode(user.id))
+			f.write(str(user.id))
 
 		return custom_txt
 
@@ -261,12 +254,12 @@ class Book(models.Model):
 			pyminizip.compress_multiple(zip_list, [], custom_zip, password, 5)
 			return custom_zip
 		except BaseException as e:
-			raise SystemError('zip create fail:' +unicode(e))
+			raise SystemError('zip create fail:' +str(e))
 			try:
 				os.remove(custom_zip)
 			except BaseException as e:
-				raise SystemError('zip create fail remove dirname' +unicode(e))
-			raise SystemError('zip create fail:' +unicode(e))
+				raise SystemError('zip create fail remove dirname' +str(e))
+			raise SystemError('zip create fail:' +str(e))
 
 	def collect_finish_page_count(self):
 		finish_page_count = 0
@@ -465,10 +458,10 @@ class EBook(models.Model):
 		img0 = Image.new("RGBA", (1,1))
 		draw0 = ImageDraw.Draw(img0)
 		font = ImageFont.truetype(fontname, fontsize)
-		t_width, t_height = draw0.textsize(unicode(text, 'UTF-8'), font=font)
+		t_width, t_height = draw0.textsize(str(text, 'UTF-8'), font=font)
 		img = Image.new("RGBA", (t_width, t_height), (255,0,0,0))
 		draw = ImageDraw.Draw(img)
-		draw.text((0,0),unicode(text, 'UTF-8'), font=font, fill=(0,255,255,128))
+		draw.text((0,0),str(text, 'UTF-8'), font=font, fill=(0,255,255,128))
 		img2 = Image.open(imagefile)
 		i_width, i_height = img2.size
 		px = (i_width - t_width) / 2
@@ -659,7 +652,7 @@ class EditRecord(models.Model):
 		try:
 			return self.part.ISBN_part
 		except:
-			return unicode(None)
+			return str(None)
 
 	def textimport(self):
 		self.edit = self.source_text()
@@ -810,10 +803,10 @@ def add_watermark(self,text, fontname, fontsize, imagefile, output_dir):
 	img0 = Image.new("RGBA", (1,1))
 	draw0 = ImageDraw.Draw(img0)
 	font = ImageFont.truetype(fontname, fontsize)
-	t_width, t_height = draw0.textsize(unicode(text, 'UTF-8'), font=font)
+	t_width, t_height = draw0.textsize(str(text, 'UTF-8'), font=font)
 	img = Image.new("RGBA", (t_width, t_height), (255,0,0,0))
 	draw = ImageDraw.Draw(img)
-	draw.text((0,0),unicode(text, 'UTF-8'), font=font, fill=(0,255,255,128))
+	draw.text((0,0),str(text, 'UTF-8'), font=font, fill=(0,255,255,128))
 	img2 = Image.open(imagefile)
 	i_width, i_height = img2.size
 	px = (i_width - t_width) / 2
@@ -848,4 +841,4 @@ class ISSNBook(models.Model):
 		self.epub_file = BASE_DIR +'/file/ebookSystem/ISSNBook/{0}/ebook/{0}.epub'.format(self.ISSN_volume)
 
 	def __str__(self):
-		return self.ISSN_book_info.title +unicode(self.volume)
+		return self.ISSN_book_info.title +str(self.volume)

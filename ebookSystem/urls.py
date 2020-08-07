@@ -2,7 +2,6 @@
 from django.urls import path
 from django.conf.urls import include, url
 
-from . import views
 from . import apis
 
 from rest_framework.routers import DefaultRouter
@@ -19,8 +18,5 @@ router.register(r'indexcategorys', apis.IndexCategoryViewSet)
 router.register(r'bookorders', apis.BookOrderViewSet)
 
 urlpatterns = [
-	url(r'^library_view$', views.library_view, name='library_view'),
-	url(r'^library_origin_view$', views.library_origin_view, name='library_origin_view'),
-	url(r'^generics/(?P<name>[\w\d/_\-]+)/$', views.generics, name='generics'),
 	path('api/', include((router.urls, 'ebookSystem'), 'api'),)
 ]
