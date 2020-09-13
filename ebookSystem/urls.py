@@ -1,9 +1,7 @@
-
 from django.urls import path
 from django.conf.urls import include, url
 
 from . import apis
-
 from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'booksimples', apis.BookSimpleViewSet)

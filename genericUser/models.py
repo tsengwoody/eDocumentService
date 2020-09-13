@@ -82,10 +82,10 @@ class User(AbstractUser):
 
 	def auth_guest(self):
 		base = self.is_license & self.auth_email & self.auth_phone
-		return base and self.is_guest and self.auth_disabilitycard()
-		# from django.utils import timezone
-		# d = timezone.datetime(2018,9,1,tzinfo=self.date_joined.tzinfo)
-		# return base and self.is_guest and (self.auth_disabilitycard() or self.date_joined<d)
+		# return base and self.is_guest # and self.auth_disabilitycard()
+		from django.utils import timezone
+		d = timezone.datetime(2018,9,1,tzinfo=self.date_joined.tzinfo)
+		return base and self.is_guest and (self.auth_disabilitycard() or self.date_joined<d)
 
 	def auth_disabilitycard(self):
 		base = self.is_license & self.auth_email & self.auth_phone
@@ -335,7 +335,7 @@ class BusinessContent(models.Model):
 class BannerContent(models.Model):
 	title = models.CharField(max_length=100, )
 	content = models.TextField()
-	order = models.IntegerField()
+	order = models.IntegerField(default=0)
 	url = models.CharField(max_length=255, blank=True, null=True)
 	CATEGORY = (
 		('all', 'all'),

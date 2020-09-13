@@ -3,13 +3,18 @@
 from rest_framework import filters
 
 # attr 為 owner 的名稱，亦即 owner 可不為 'owner'
-def PermissionFilterFactory(attr):
+def IsManageObjectPermissionFilterFactory(attr):
 	from django.db.models import F,Q
 	class OwnerOrgManagerPermissionFilter(filters.BaseFilterBackend):
 		def filter_queryset(self, request, queryset, view):
 			owner_id = attr +'_id'
 			owner_kwargs = {owner_id: request.user.id}
 			org_kwargs = {owner_id +'__org': request.user.org.id}
+			if attr == 'self':
+				owner_kwargs = {'id': request.user.id}
+				org_kwargs = {'org': request.user.org.id}
+			if not request.user.is_authenticated:
+				return []
 			if request.user.has_perm('is_supermanager'):
 				return queryset
 			elif request.user.has_perm('is_manager'):
@@ -138,4 +143,4 @@ def ItemsFilterFactory(key, attr):
 
 	return BaseFilter
 
-OwnerOrgManagerFilter = PermissionFilterFactory(attr='owner')
+OwnerOrgManagerFilter = IsManageObjectPermissionFilterFactory(attr='owner')

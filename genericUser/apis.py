@@ -22,6 +22,7 @@ from django_filters import rest_framework as dffilters
 from utils.resource import *
 from utils.apis import MixedPermissionModelViewSet
 from utils.filters import OwnerOrgManagerFilter
+from utils.filters import IsManageObjectPermissionFilterFactory
 from utils.permissions import RuleORPermissionFactory
 from .filters import *
 from .serializers import *
@@ -31,7 +32,15 @@ from mysite.settings import BASE_DIR, SERVICE, MANAGER, OTP_ACCOUNT, OTP_PASSWOR
 class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
-	filter_backends = (filters.OrderingFilter, filters.SearchFilter, dffilters.DjangoFilterBackend, UserSelfOrManagerFilter, OrgFilter, UserRoleFilter, UserAuthFilter)
+	filter_backends = (
+	filters.OrderingFilter,
+	filters.SearchFilter,
+	dffilters.DjangoFilterBackend,
+	IsManageObjectPermissionFilterFactory('self'),
+	OrgFilter,
+	UserRoleFilter,
+	UserAuthFilter,
+)
 	ordering_fields = ('username')
 	search_fields = ('username', 'email', 'first_name', 'last_name',)
 	filterset_fields = ('is_hot',)
@@ -279,9 +288,9 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	def set_password(self, request, pk=None):
 		obj = self.get_object()
 		from django.contrib.auth import authenticate, update_session_auth_hash
-		user = authenticate(username=obj.username, password=self.request.data['old_password'])
-		if user is not None and self.request.data['new_password1'] == self.request.data['new_password2']:
-			user.set_password(self.request.data['new_password1'])
+		user = authenticate(username=obj.username, password=self.request.data['oldPassword'])
+		if user is not None and self.request.data['newPassword1'] == self.request.data['newPassword2']:
+			user.set_password(self.request.data['newPassword1'])
 			user.save()
 			update_session_auth_hash(request, user)
 			return Response(data={'detail': u'變更密碼成功'}, status=status.HTTP_202_ACCEPTED)
@@ -334,7 +343,6 @@ class AnnouncementViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		filters.OrderingFilter,
 		filters.SearchFilter,
 		dffilters.DjangoFilterBackend,
-		AnnouncementNewestFilter,
 	)
 	ordering_fields = ('datetime',)
 	search_fields = ('category',)
@@ -400,11 +408,11 @@ class BannerContentViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		]),
 	)
 
-	def perform_create(self, serializer):
+	"""def perform_create(self, serializer):
 		instance = serializer.save(
 			order = len(BannerContent.objects.all()),
 		)
-		instance.save()
+		instance.save()"""
 
 	def get_fullpath(self, obj, dir, resource):
 		fullpath = None

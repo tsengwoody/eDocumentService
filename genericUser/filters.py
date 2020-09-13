@@ -18,47 +18,14 @@ DisabilityCardOrgFilter = KeyMapAttrFilterFactory(key = 'org_id', type = str, at
 
 QAndACategoryFilter = KeyMapAttrFilterFactory(key='category', type=str, attr='category')
 
-class AnnouncementNewestFilter(filters.BaseFilterBackend):
-
-	def filter_queryset(self, request, queryset, view):
-		newest = request.query_params.get('newest')
-		if newest:
-			return queryset.order_by('-datetime')[0:int(newest)]
-		else:
-			return queryset
-
-from django.db.models import F,Q
-class UserSelfOrManagerFilter(filters.BaseFilterBackend):
-	def filter_queryset(self, request, queryset, view):
-		try:
-			owner_kwargs = {'id': request.user.id}
-			org_kwargs = {'org': request.user.org.id}
-		except:
-			return []
-		if request.user.has_perm('is_supermanager'):
-			return queryset
-		elif request.user.has_perm('is_manager'):
-			return queryset.filter(
-				Q(**org_kwargs)
-				| Q(**owner_kwargs)
-			)
-		else:
-			return queryset.filter(**owner_kwargs)
-
 class UserAuthFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
 		auth = request.query_params.get('auth')
 		if auth:
 			if auth == 'false' or auth == 'False':
-				return queryset.filter(
-					Q(auth_email=False)
-					| Q(auth_phone=False)
-				).filter(is_editor=False)
+				return queryset.filter(is_guest=True).filter(disabilitycard_set=None)
 			elif auth == 'true' or auth == 'True':
-				return queryset.filter(
-					Q(auth_email=True)
-					& Q(auth_phone=True)
-				).filter(is_editor=False)
+				return queryset.filter(is_guest=True).exclude(disabilitycard_set=None)
 			else:
 				return queryset
 		else:
