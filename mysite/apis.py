@@ -69,7 +69,7 @@ class Statistics(APIView):
 		for month in month_list:
 			editor_count = User.objects.filter(is_editor=True, date_joined__lte=month, auth_email=True, auth_phone=True,).count()
 			guest_count = User.objects.filter(is_guest=True, date_joined__lte=month, auth_email=True, auth_phone=True,).count()
-			editor_count_30 = User.objects.filter(is_editor=True, date_joined__lte=month, last_login__gt=month -datetime.timedelta(days=30), auth_email=True, auth_phone=True,).count()
+			editor_count_30 = User.objects.filter(is_editor=True, date_joined__lte=month, online__gt=month -datetime.timedelta(days=30), auth_email=True, auth_phone=True,).count()
 			finish_count = Book.objects.filter(finish_date__lte=month, upload_date__lte=month, source='self').count()
 			txt_count = Book.objects.filter(upload_date__lte=month, source='txt').count()
 			epub_count = Book.objects.filter(upload_date__lte=month, source='epub').count()
@@ -169,6 +169,128 @@ class Statistics(APIView):
 		} for i in r if i['editor'] ]
 		res['result'].extend(r)
 
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	def book_download_pd(self, request):
+		from django.db.models.functions import TruncMonth
+		from django.db.models import Count
+
+		res = {}
+
+		query = GetBookRecord.objects.all()
+		if self.begin_time:
+			query = query.filter(get_time__gte=self.begin_time)
+		if self.end_time:
+			query = query.filter(get_time__lt=self.end_time)
+		if hasattr(self, 'org'):
+			query = query.filter(user__org=self.org)
+
+		file_format = request.GET.get('file_format', None)
+		if file_format:
+			query = query.filter(format=file_format)
+
+		groupby = query.annotate(month=TruncMonth('get_time')).values('month', 'book').annotate(count=Count('id'))
+		df = pd.DataFrame(groupby)
+		if df.empty:
+			res['result'] = list()
+			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+		df['month'] = df['month'].apply(lambda x: str(x)[0:10])
+		df_month = df.pivot(index='book', columns='month', values='count').reset_index()
+		groupby = query.values('book').annotate(count=Count('id'))
+		df_all = pd.DataFrame(groupby)
+		df = pd.merge(df_all, df_month, how='outer', left_on='book', right_on='book').fillna(0)
+		df_sum = df.sum()
+		df_sum['book'] = -1
+		df = df.append(df_sum, ignore_index=True)
+
+		books = BookInfo.objects.all().values('ISBN', 'bookname')
+		df_book = pd.DataFrame(books)
+		s = pd.Series({'ISBN': '-1', 'bookname': '全部'})
+		df_book = df_book.append(s, ignore_index=True)
+		df = pd.merge(df, df_book, how='left', left_on='book', right_on='ISBN').fillna('').drop('ISBN', axis=1)
+		df = df.rename(columns={'bookname': 'index', 'count': 'all', 'book': 'id'})
+
+		dicts = df.to_dict(orient='index')
+		res['result'] = list(dicts.values())
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	def user_download_pd(self, request):
+		from django.db.models.functions import TruncMonth
+		from django.db.models import Count
+
+		res = {}
+
+		query = GetBookRecord.objects.all()
+		if self.begin_time:
+			query = query.filter(get_time__gte=self.begin_time)
+		if self.end_time:
+			query = query.filter(get_time__lt=self.end_time)
+		if hasattr(self, 'org'):
+			query = query.filter(user__org=self.org)
+
+		groupby = query.annotate(month=TruncMonth('get_time')).values('month', 'user').annotate(count=Count('id'))
+		df = pd.DataFrame(groupby)
+		if df.empty:
+			res['result'] = list()
+			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+		df['month'] = df['month'].apply(lambda x: str(x)[0:10])
+		df_month = df.pivot(index='user', columns='month', values='count').reset_index()
+		groupby = query.values('user').annotate(count=Count('id'))
+		df_all = pd.DataFrame(groupby)
+		df = pd.merge(df_all, df_month, how='outer', left_on='user', right_on='user').fillna(0)
+		df_sum = df.sum()
+		df_sum['user'] = -1
+		df = df.append(df_sum, ignore_index=True)
+
+		from genericUser.models import User
+		users = User.objects.all().values('id', 'username')
+		df_user = pd.DataFrame(users)
+		s = pd.Series({'id': -1, 'username': '全部'})
+		df_user = df_user.append(s, ignore_index=True)
+		df = pd.merge(df, df_user, how='left', left_on='user', right_on='id').fillna('').drop('id', axis=1)
+		df = df.rename(columns={'username': 'index', 'count': 'all', 'user': 'id'})
+
+		dicts = df.to_dict(orient='index')
+		res['result'] = list(dicts.values())
+		return Response(data=res, status=status.HTTP_202_ACCEPTED)
+
+	def user_editrecord_pd(self, request):
+		from django.db.models.functions import TruncMonth
+		from django.db.models import Count
+
+		res = {}
+
+		query = EditRecord.objects.all()
+		if self.begin_time:
+			query = query.filter(get_date__gte=self.begin_time)
+		if self.end_time:
+			query = query.filter(get_date__lt=self.end_time)
+		if hasattr(self, 'org'):
+			query = query.filter(editor__org=self.org)
+		groupby = query.annotate(month=TruncMonth('get_date')).values('month', 'editor').annotate(count=Count('id'))
+		df = pd.DataFrame(groupby)
+		if df.empty:
+			res['result'] = list()
+			return Response(data=res, status=status.HTTP_202_ACCEPTED)
+		df['month'] = df['month'].apply(lambda x: str(x))
+		df_month = df.pivot(index='editor', columns='month', values='count').reset_index()
+		groupby = query.values('editor').annotate(count=Count('id'))
+		df_all = pd.DataFrame(groupby)
+		df = pd.merge(df_all, df_month, how='outer', left_on='editor', right_on='editor').fillna(0)
+		df_sum = df.sum()
+		df_sum['editor'] = -1
+		df = df.append(df_sum, ignore_index=True)
+
+		from genericUser.models import User
+		users = User.objects.all().values('id', 'username')
+		df_user = pd.DataFrame(users)
+		s = pd.Series({'id': -1, 'username': '全部'})
+		df_user = df_user.append(s, ignore_index=True)
+		df = pd.merge(df, df_user, how='left', left_on='editor', right_on='id').fillna('').drop('id', axis=1)
+		df = df.rename(columns={'username': 'index', 'count': 'all', 'editor': 'id'})
+
+		dicts = df.to_dict(orient='index')
+		res['result'] = list(dicts.values())
 		return Response(data=res, status=status.HTTP_202_ACCEPTED)
 
 	def serviceinfo(self, request):

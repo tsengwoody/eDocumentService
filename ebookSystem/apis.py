@@ -158,7 +158,10 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				uploadFile.testzip()
 				uploadFile.extractall(uploadPath)
 		except:
-			shutil.rmtree(uploadPath)
+			try:
+				shutil.rmtree(uploadPath)
+			except:
+				pass
 			res['detail'] = u'非正確ZIP文件'
 			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
 

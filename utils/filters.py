@@ -8,8 +8,11 @@ def IsManageObjectPermissionFilterFactory(attr):
 	class OwnerOrgManagerPermissionFilter(filters.BaseFilterBackend):
 		def filter_queryset(self, request, queryset, view):
 			owner_id = attr +'_id'
-			owner_kwargs = {owner_id: request.user.id}
-			org_kwargs = {owner_id +'__org': request.user.org.id}
+			try:
+				owner_kwargs = {owner_id: request.user.id}
+				org_kwargs = {owner_id +'__org': request.user.org.id}
+			except:
+				return []
 			if attr == 'self':
 				owner_kwargs = {'id': request.user.id}
 				org_kwargs = {'org': request.user.org.id}
