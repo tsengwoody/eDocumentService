@@ -16,17 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include, url
-
-from . import apis
-from . import views
-from .settings import BASE_DIR
-from django.views.static import serve
-
 from rest_framework_simplejwt.views import (
 	TokenObtainPairView,
 	TokenRefreshView,
 	TokenVerifyView,
 )
+from . import apis
 
 urlpatterns = [
 	path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -38,6 +33,4 @@ urlpatterns = [
 	path('api/statistics/<str:action>/', apis.Statistics.as_view()),
 	path('api/ddm/<str:action>/<str:dir>/', apis.Ddm.as_view()),
 	path('api/ddm/<str:action>/<str:dir>/<str:resource>/', apis.Ddm.as_view()),
-	path('', views.home, name='home'),
-	url(r'^routing/(?P<name>[\w\d/_\-]+)/$', views.routing, name='routing'),
 ]
