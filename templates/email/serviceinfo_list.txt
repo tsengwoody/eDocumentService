@@ -1,0 +1,5 @@
+﻿{{ user }}已送出服務時數申請
+申請人姓名：{{ user.first_name }}{{ user.last_name }}
+{{ exchange_serviceInfo.date.year }}年{{ exchange_serviceInfo.date.month }}月服務時數累計共{{ exchange_serviceInfo.get_service_hours }}分鐘
+聯絡電話為：{{ user.phone }}
+電子信箱為：{{ user.email }}。

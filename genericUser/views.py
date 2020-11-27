@@ -4,6 +4,7 @@ from django.shortcuts import render
 from genericUser.models import *
 import json
 
+
 def upload_progress(request):
 	"""
 	Return JSON object with information about the progress of an upload.
@@ -20,4 +21,6 @@ def upload_progress(request):
 		#		data = request.session.get('upload_progress_%s' % cache_key, None)
 		return HttpResponse(json.dumps(data), content_type="application/json")
 	else:
-		return HttpResponseServerError('Server Error: You must provide X-Progress-ID header or query param.')
+		return HttpResponseServerError(
+			'Server Error: You must provide X-Progress-ID header or query param.'
+		)

@@ -19,6 +19,7 @@ api_urlpatterns = copy.copy(router.urls)
 
 import rest_framework
 
-urlpatterns = [
-	path('api/', include((router.urls, 'genericUser'), 'api'),)
-]
+urlpatterns = [path(
+	'api/',
+	include((router.urls, 'genericUser'), 'api'),
+)]

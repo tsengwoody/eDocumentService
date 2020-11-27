@@ -29,56 +29,54 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
-    'corsheaders',
-    'django_filters',
-    'ebookSystem',
-    'genericUser',
-    #'rules',
-    'rules.apps.AutodiscoverRulesConfig',
+	'django.contrib.admin',
+	'django.contrib.auth',
+	'django.contrib.contenttypes',
+	'django.contrib.sessions',
+	'django.contrib.messages',
+	'django.contrib.staticfiles',
+	'rest_framework',
+	'corsheaders',
+	'django_filters',
+	'ebookSystem',
+	'genericUser',
+	#'rules',
+	'rules.apps.AutodiscoverRulesConfig',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'corsheaders.middleware.CorsMiddleware',
+	'django.middleware.security.SecurityMiddleware',
+	'django.contrib.sessions.middleware.SessionMiddleware',
+	'django.middleware.common.CommonMiddleware',
+	'django.middleware.csrf.CsrfViewMiddleware',
+	'django.contrib.auth.middleware.AuthenticationMiddleware',
+	'django.contrib.messages.middleware.MessageMiddleware',
+	'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
+	{
+	'BACKEND': 'django.template.backends.django.DjangoTemplates',
+	'DIRS': [os.path.join(BASE_DIR, 'templates')],
+	'APP_DIRS': True,
+	'OPTIONS': {
+	'context_processors': [
+	'django.template.context_processors.debug',
+	'django.template.context_processors.request',
+	'django.contrib.auth.context_processors.auth',
+	'django.contrib.messages.context_processors.messages',
+	],
+	},
+	},
 ]
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
@@ -87,19 +85,19 @@ DB_BACKEND = os.environ.get('eDocumentService_DB_BACKEND')
 if DB_BACKEND == 'mysql':
 	DATABASES = {
 		'default': {
-			'ENGINE': 'django.db.backends.mysql',
-			'NAME': os.environ.get('eDocumentService_DATABASE'),
-			'USER': os.environ.get('eDocumentService_DB_USER'),
-			'PASSWORD': os.environ.get('eDocumentService_DB_PASS'),
-			'HOST': os.environ.get('eDocumentService_DB_HOST'),
-			'PORT': os.environ.get('eDocumentService_DB_PORT'),
+		'ENGINE': 'django.db.backends.mysql',
+		'NAME': os.environ.get('eDocumentService_DATABASE'),
+		'USER': os.environ.get('eDocumentService_DB_USER'),
+		'PASSWORD': os.environ.get('eDocumentService_DB_PASS'),
+		'HOST': os.environ.get('eDocumentService_DB_HOST'),
+		'PORT': os.environ.get('eDocumentService_DB_PORT'),
 		}
 	}
 elif DB_BACKEND == 'sqlite3':
 	DATABASES = {
 		'default': {
-			'ENGINE': 'django.db.backends.sqlite3',
-			'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+		'ENGINE': 'django.db.backends.sqlite3',
+		'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 		}
 	}
 
@@ -107,20 +105,20 @@ elif DB_BACKEND == 'sqlite3':
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+	{
+	'NAME':
+	'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+	},
+	{
+	'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+	},
+	{
+	'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+	},
+	{
+	'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+	},
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
@@ -135,7 +133,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
@@ -147,20 +144,20 @@ STATICFILES_DIRS = [
 AUTH_USER_MODEL = 'genericUser.User'
 
 AUTHENTICATION_BACKENDS = (
-    'rules.permissions.ObjectPermissionBackend',
-    'django.contrib.auth.backends.ModelBackend',
+	'rules.permissions.ObjectPermissionBackend',
+	'django.contrib.auth.backends.ModelBackend',
 )
 
 REST_FRAMEWORK = {
 	#'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 	#'PAGE_SIZE': 10,
 	'DEFAULT_PERMISSION_CLASSES': (
-		#'rest_framework.permissions.IsAuthenticated',
+	#'rest_framework.permissions.IsAuthenticated',
 	),
 	'DEFAULT_AUTHENTICATION_CLASSES': (
-		'rest_framework_simplejwt.authentication.JWTAuthentication',
-		'rest_framework.authentication.SessionAuthentication',
-		'rest_framework.authentication.BasicAuthentication',
+	'rest_framework_simplejwt.authentication.JWTAuthentication',
+	'rest_framework.authentication.SessionAuthentication',
+	'rest_framework.authentication.BasicAuthentication',
 	),
 }
 
@@ -170,42 +167,56 @@ LOGGING = {
 	'version': 1,
 	'disable_existing_loggers': False,
 	'formatters': {
-		'verbose': {
-			'format': '%(message)s,%(levelname)s,%(asctime)s,%(module)s,%(process)d,%(thread)d',
-		},
+	'verbose': {
+	'format':
+	'%(message)s,%(levelname)s,%(asctime)s,%(module)s,%(process)d,%(thread)d',
+	},
 	},
 	'handlers': {
-		'file': {
-			'level': 'WARNING',
-			'formatter': 'verbose',
-			'class': 'logging.FileHandler',
-			'filename': os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'log') +'/djangoOS.log',
-		},
-		'rotating_file': {
-			'level': 'WARNING',
-			'formatter' : 'verbose',
-			'class' : 'logging.handlers.TimedRotatingFileHandler',
-			'filename': os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'log') +'/djangoOS_rotate.log',
-			'when' : 'midnight',
-			'interval' : 1,
-			'backupCount' : 365,
-		},
+	'file': {
+	'level':
+	'WARNING',
+	'formatter':
+	'verbose',
+	'class':
+	'logging.FileHandler',
+	'filename':
+	os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+	'log') + '/djangoOS.log',
+	},
+	'rotating_file': {
+	'level':
+	'WARNING',
+	'formatter':
+	'verbose',
+	'class':
+	'logging.handlers.TimedRotatingFileHandler',
+	'filename':
+	os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+	'log') + '/djangoOS_rotate.log',
+	'when':
+	'midnight',
+	'interval':
+	1,
+	'backupCount':
+	365,
+	},
 	},
 	'loggers': {
-		'django': {
-			'handlers': ['rotating_file'],
-			'level': 'WARNING',
-			#'level': 'DEBUG',
-			'propagate': True,
-		},
+	'django': {
+	'handlers': ['rotating_file'],
+	'level': 'WARNING',
+	#'level': 'DEBUG',
+	'propagate': True,
+	},
 	},
 }
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': os.environ.get('eDocumentService_MEMCACHED_SERVICE'),
-    }
+	'default': {
+	'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+	'LOCATION': os.environ.get('eDocumentService_MEMCACHED_SERVICE'),
+	}
 }
 
 import socket

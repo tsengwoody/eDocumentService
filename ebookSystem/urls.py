@@ -15,6 +15,7 @@ router.register(r'categorys', apis.CategoryViewSet)
 router.register(r'indexcategorys', apis.IndexCategoryViewSet)
 router.register(r'bookorders', apis.BookOrderViewSet)
 
-urlpatterns = [
-	path('api/', include((router.urls, 'ebookSystem'), 'api'),)
-]
+urlpatterns = [path(
+	'api/',
+	include((router.urls, 'ebookSystem'), 'api'),
+)]

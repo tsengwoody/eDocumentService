@@ -1,8 +1,11 @@
 from rest_framework import serializers
 from .models import *
 
+
 class UserSerializer(serializers.ModelSerializer):
-	disabilitycard_set = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+	disabilitycard_set = serializers.PrimaryKeyRelatedField(many=True,
+		read_only=True)
+
 	class Meta:
 		model = User
 		fields = [
@@ -31,21 +34,29 @@ class UserSerializer(serializers.ModelSerializer):
 			'disabilitycard_set',
 		]
 
+
 class DisabilityCardSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = DisabilityCard
 		fields = '__all__'
 
+
 from ebookSystem.models import EditRecord
 from ebookSystem.serializers import EditRecordSerializer
+
+
 class OrganizationSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Organization
 		fields = ('__all__')
 
+
 class ServiceInfoSerializer(serializers.ModelSerializer):
-	editrecord_set = serializers.PrimaryKeyRelatedField(many=True, queryset=EditRecord.objects.filter(serviceInfo=None))
-	editrecordinfo_set = EditRecordSerializer(many=True, read_only=True, source='editrecord_set')
+	editrecord_set = serializers.PrimaryKeyRelatedField(many=True,
+		queryset=EditRecord.objects.filter(serviceInfo=None))
+	editrecordinfo_set = EditRecordSerializer(many=True,
+		read_only=True,
+		source='editrecord_set')
 	userinfo = UserSerializer(read_only=True, source='owner')
 	orginfo = OrganizationSerializer(read_only=True, source='org')
 
@@ -53,11 +64,14 @@ class ServiceInfoSerializer(serializers.ModelSerializer):
 		model = ServiceInfo
 		fields = '__all__'
 
+
 class AnnouncementSerializer(serializers.ModelSerializer):
 	datetime = serializers.ReadOnlyField()
+
 	class Meta:
 		model = Announcement
 		fields = ('__all__')
+
 
 class QAndASerializer(serializers.ModelSerializer):
 	order = serializers.ReadOnlyField()
@@ -66,15 +80,18 @@ class QAndASerializer(serializers.ModelSerializer):
 		model = QAndA
 		fields = ('__all__')
 
+
 class BusinessContentSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = BusinessContent
 		fields = ('__all__')
 
+
 class BannerContentSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = BannerContent
 		fields = ('__all__')
+
 
 class RecommendationSubjectSerializer(serializers.ModelSerializer):
 	class Meta:

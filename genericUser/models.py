@@ -17,12 +17,13 @@ import os
 import shutil
 import datetime
 
+
 def generic_serialized(self):
 	serialize = {}
 	for field in self._meta.fields:
 		value = getattr(self, field.name)
 		if isinstance(value, models.Model):
-			id_ = field.name +'_id'
+			id_ = field.name + '_id'
 			field_id_value = getattr(self, id_)
 			value = '{0}/{1}'.format(value.__class__.__name__, field_id_value)
 		else:
@@ -33,22 +34,27 @@ def generic_serialized(self):
 		serialize.update({field.name: value})
 	return serialize
 
+
 class User(AbstractUser):
 	password_md5 = models.CharField(max_length=32)
 	phone = models.CharField(max_length=30)
 	birthday = models.DateField()
 	EDU = (
-	(u'國小' , u'國小'),
-	(u'國中' , u'國中'),
-		(u'高中' , u'高中'),
-		(u'學士' , u'學士'),
-		(u'碩士' , u'碩士'),
+		(u'國小', u'國小'),
+		(u'國中', u'國中'),
+		(u'高中', u'高中'),
+		(u'學士', u'學士'),
+		(u'碩士', u'碩士'),
 	)
 	education = models.CharField(max_length=30, choices=EDU)
-	online = models.DateTimeField(default = timezone.now)
-	org = models.ForeignKey('Organization', on_delete=models.SET_NULL, blank=True, null=True, related_name='user_set')
+	online = models.DateTimeField(default=timezone.now)
+	org = models.ForeignKey('Organization',
+		on_delete=models.SET_NULL,
+		blank=True,
+		null=True,
+		related_name='user_set')
 	status = models.IntegerField(default=0)
-	STATUS = {'inactive':0, 'active':1, 'review':2}
+	STATUS = {'inactive': 0, 'active': 1, 'review': 2}
 	is_book = models.BooleanField(default=False)
 	is_license = models.BooleanField(default=False)
 	is_editor = models.BooleanField(default=False)
@@ -61,14 +67,17 @@ class User(AbstractUser):
 
 	def __init__(self, *args, **kwargs):
 		super(User, self).__init__(*args, **kwargs)
-		self.disability_card_front = BASE_DIR +'/static/ebookSystem/disability_card/{0}/{0}_front.jpg'.format(self.username)
-		self.disability_card_back = BASE_DIR +'/static/ebookSystem/disability_card/{0}/{0}_back.jpg'.format(self.username)
-		self.has_disability_card = os.path.exists(BASE_DIR +'/static/ebookSystem/disability_card/{0}/'.format(self.username))
+		self.disability_card_front = BASE_DIR + '/static/ebookSystem/disability_card/{0}/{0}_front.jpg'.format(
+			self.username)
+		self.disability_card_back = BASE_DIR + '/static/ebookSystem/disability_card/{0}/{0}_back.jpg'.format(
+			self.username)
+		self.has_disability_card = os.path.exists(BASE_DIR +
+			'/static/ebookSystem/disability_card/{0}/'.format(self.username))
 
 	def set_password(self, password, *args, **kwargs):
 		super(User, self).set_password(password, *args, **kwargs)
 		from hashlib import md5
-		h=md5()
+		h = md5()
 		data = password.encode("utf-8")
 		h.update(data)
 		self.password_md5 = h.hexdigest()
@@ -84,8 +93,9 @@ class User(AbstractUser):
 		base = self.is_license & self.auth_email & self.auth_phone
 		# return base and self.is_guest # and self.auth_disabilitycard()
 		from django.utils import timezone
-		d = timezone.datetime(2018,9,1,tzinfo=self.date_joined.tzinfo)
-		return base and self.is_guest and (self.auth_disabilitycard() or self.date_joined<d)
+		d = timezone.datetime(2018, 9, 1, tzinfo=self.date_joined.tzinfo)
+		return base and self.is_guest and (self.auth_disabilitycard()
+			or self.date_joined < d)
 
 	def auth_disabilitycard(self):
 		base = self.is_license & self.auth_email & self.auth_phone
@@ -95,9 +105,7 @@ class User(AbstractUser):
 			return False
 
 	def __str__(self):
-		return self.first_name +self.last_name
-
-
+		return self.first_name + self.last_name
 
 	def serialized(self, action):
 		old_serialize = generic_serialized(self)
@@ -166,30 +174,38 @@ class User(AbstractUser):
 		return 'unknown'
 
 	def get_current_ServiceInfo(self):
-		month_day = datetime.date(year=datetime.date.today().year, month=datetime.date.today().month, day=1)
+		month_day = datetime.date(year=datetime.date.today().year,
+			month=datetime.date.today().month,
+			day=1)
 		try:
-			current_ServiceInfo = ServiceInfo.objects.get(date=month_day, user=self)
+			current_ServiceInfo = ServiceInfo.objects.get(date=month_day,
+				user=self)
 		except:
 			current_ServiceInfo = None
 		return current_ServiceInfo
 
+
 class DisabilityCard(models.Model):
 	identity_card_number = models.CharField(max_length=10, primary_key=True)
-	owner = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='disabilitycard_set')
+	owner = models.ForeignKey(User,
+		on_delete=models.SET_NULL,
+		blank=True,
+		null=True,
+		related_name='disabilitycard_set')
 	name = models.CharField(max_length=10)
 	address = models.CharField(max_length=255)
 	identification_date = models.DateField()
 	renew_date = models.DateField()
 	LEVEL = (
-	(u'mild', u'輕度'),
+		(u'mild', u'輕度'),
 		(u'moderate', u'中度'),
 		(u'severe', u'重度'),
-		(u'profound' , u'極重度'),
+		(u'profound', u'極重度'),
 	)
 	level = models.CharField(max_length=10, choices=LEVEL)
 	CATEGORY = (
-		(u'vi' , u'視障'),
-		(u'ld' , u'學障'),
+		(u'vi', u'視障'),
+		(u'ld', u'學障'),
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
 	is_active = models.BooleanField(default=False)
@@ -199,8 +215,11 @@ class DisabilityCard(models.Model):
 
 	def __init__(self, *args, **kwargs):
 		super(DisabilityCard, self).__init__(*args, **kwargs)
-		self.front = BASE_DIR +'/file/genericUser/DisabilityCard/{0}/{0}_front.jpg'.format(self.identity_card_number)
-		self.back = BASE_DIR +'/file/genericUser/DisabilityCard/{0}/{0}_back.jpg'.format(self.identity_card_number)
+		self.front = BASE_DIR + '/file/genericUser/DisabilityCard/{0}/{0}_front.jpg'.format(
+			self.identity_card_number)
+		self.back = BASE_DIR + '/file/genericUser/DisabilityCard/{0}/{0}_back.jpg'.format(
+			self.identity_card_number)
+
 
 class Organization(models.Model):
 	name = models.CharField(max_length=50)
@@ -209,41 +228,61 @@ class Organization(models.Model):
 	phone = models.CharField(max_length=30)
 	is_service_center = models.BooleanField(default=False)
 	CATEGORY = (
-		(u'一般' , u'一般'),
-		(u'企業' , u'企業'),
-		(u'校園' , u'校園'),
+		(u'一般', u'一般'),
+		(u'企業', u'企業'),
+		(u'校園', u'校園'),
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
 
 	def __str__(self):
 		return self.name
 
+
 class ServiceInfo(models.Model):
-	owner = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='serviceinfo_set')
-	org = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True, related_name='serviceinfo_set')
+	owner = models.ForeignKey(User,
+		on_delete=models.SET_NULL,
+		blank=True,
+		null=True,
+		related_name='serviceinfo_set')
+	org = models.ForeignKey(Organization,
+		on_delete=models.SET_NULL,
+		blank=True,
+		null=True,
+		related_name='serviceinfo_set')
 	date = models.DateField()
 	service_hours = models.IntegerField(default=0)
 	is_exchange = models.BooleanField(default=False)
 
 	def __str__(self):
-		return self.owner.username +str(self.date)
+		return self.owner.username + str(self.date)
 
 	@classmethod
 	def exchange_false_export(cls):
 		serviceinfos = cls.objects.filter(is_exchange=False)
-		export = '\t'.join([u'序號', u'帳號', u'姓名', u'起始日期', u'結束日期', u'合計時數',]) +'\r\n'
+		export = '\t'.join([
+			u'序號',
+			u'帳號',
+			u'姓名',
+			u'起始日期',
+			u'結束日期',
+			u'合計時數',
+		]) + '\r\n'
 		for serviceinfo in serviceinfos:
-			get_dates = [editrecord.get_date for editrecord in serviceinfo.editrecord_set.all()]
+			get_dates = [
+				editrecord.get_date
+				for editrecord in serviceinfo.editrecord_set.all()
+			]
 			export += '\t'.join([
 				unicode(serviceinfo.id),
 				serviceinfo.owner.username,
-				serviceinfo.owner.first_name +serviceinfo.owner.last_name,
+				serviceinfo.owner.first_name + serviceinfo.owner.last_name,
 				unicode(min(get_dates)),
 				unicode(max(get_dates)),
 				unicode(serviceinfo.service_hours),
 			]) + '\r\n'
 
-		path = os.path.join(BASE_DIR, 'file', 'temp', 'serviceinfois_exchange_false_export.txt')
+		path = os.path.join(BASE_DIR, 'file', 'temp',
+			'serviceinfois_exchange_false_export.txt')
 		dirname = os.path.dirname(path)
 		if not os.path.exists(dirname):
 			os.makedirs(dirname, 755)
@@ -256,20 +295,21 @@ class ServiceInfo(models.Model):
 	def get_stay_hours(self):
 		stay_hours = 0
 		for editRecord in self.editrecord_set.all():
-			stay_hours = stay_hours +editRecord.stay_hours
+			stay_hours = stay_hours + editRecord.stay_hours
 		return stay_hours
 
 	def get_service_hours(self):
 		service_hours = 0
 		for editRecord in self.editrecord_set.all():
-			service_hours = service_hours +editRecord.service_hours
+			service_hours = service_hours + editRecord.service_hours
 		return service_hours
 
 	def get_page_count(self):
 		page_count = 0
 		for editRecord in self.editrecord_set.all():
 			try:
-				page_count = page_count +(editRecord.part.end_page -editRecord.part.begin_page +1)
+				page_count = page_count + (editRecord.part.end_page -
+					editRecord.part.begin_page + 1)
 			except:
 				pass
 		return page_count
@@ -280,28 +320,34 @@ class ServiceInfo(models.Model):
 			try:
 				i = editRecord.part.get_character_count()
 			except:
-				i=0
-			character_count = character_count +i
+				i = 0
+			character_count = character_count + i
 		return character_count
 
+
 class Announcement(models.Model):
-	org = models.ForeignKey('Organization', on_delete=models.SET_NULL, blank=True, null=True, related_name='announcement_set')
+	org = models.ForeignKey('Organization',
+		on_delete=models.SET_NULL,
+		blank=True,
+		null=True,
+		related_name='announcement_set')
 	title = models.CharField(max_length=100)
 	content = models.TextField()
-	datetime = models.DateField(default = timezone.now)
+	datetime = models.DateField(default=timezone.now)
 	CATEGORY = (
-		(u'平台消息' , u'平台消息'),
-		(u'天橋說書' , u'天橋說書'),
-		(u'新書推薦' , u'新書推薦'),
-		(u'志工快訊' , u'志工快訊'),
-		(u'校園公告' , u'校園公告'),
-		(u'校園平台消息' , u'校園平台消息'),
+		(u'平台消息', u'平台消息'),
+		(u'天橋說書', u'天橋說書'),
+		(u'新書推薦', u'新書推薦'),
+		(u'志工快訊', u'志工快訊'),
+		(u'校園公告', u'校園公告'),
+		(u'校園平台消息', u'校園平台消息'),
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
 
 	def __init__(self, *args, **kwargs):
 		super(Announcement, self).__init__(*args, **kwargs)
-		self.path = BASE_DIR +'/file/genericUser/Announcement/{0}/'.format(self.id)
+		self.path = BASE_DIR + '/file/genericUser/Announcement/{0}/'.format(
+			self.id)
 
 	def __str__(self):
 		return self.title
@@ -313,12 +359,13 @@ class Announcement(models.Model):
 			pass
 		super(Announcement, self).delete(*args, **kwargs)
 
+
 class QAndA(models.Model):
 	question = models.TextField()
 	answer = models.TextField()
 	order = models.IntegerField()
 	CATEGORY = (
-		(u'platform' , u'平台'),
+		(u'platform', u'平台'),
 		(u'volunteer', u'志工'),
 		(u'vip', u'視障者'),
 		(u'tutorial', u'教學'),
@@ -328,9 +375,11 @@ class QAndA(models.Model):
 	def __str__(self):
 		return unicode(self.id)
 
+
 class BusinessContent(models.Model):
 	name = models.CharField(max_length=100, primary_key=True)
 	content = models.TextField()
+
 
 class BannerContent(models.Model):
 	title = models.CharField(max_length=100, )
@@ -345,7 +394,8 @@ class BannerContent(models.Model):
 
 	def __init__(self, *args, **kwargs):
 		super(BannerContent, self).__init__(*args, **kwargs)
-		self.cover_image = BASE_DIR +'/file/genericUser/BannerContent/{0}/cover/image.jpg'.format(self.id)
+		self.cover_image = BASE_DIR + '/file/genericUser/BannerContent/{0}/cover/image.jpg'.format(
+			self.id)
 
 	def __str__(self):
 		return str(self.id)
@@ -358,17 +408,18 @@ class BannerContent(models.Model):
 			pass
 		super(BannerContent, self).delete(*args, **kwargs)
 
+
 class RecommendationSubject(models.Model):
 	title = models.CharField(max_length=100)
 	content = models.TextField()
 	order = models.IntegerField()
 	link_text = models.CharField(max_length=100)
 	link_url = models.CharField(max_length=255)
-	path = BASE_DIR +'/file/genericUser/RecommendationSubject/'
+	path = BASE_DIR + '/file/genericUser/RecommendationSubject/'
 
 	def __init__(self, *args, **kwargs):
 		super(RecommendationSubject, self).__init__(*args, **kwargs)
-		self.path = self.path +str(self.id)
+		self.path = self.path + str(self.id)
 		self.cover_image = self.path + '/cover/image.jpg'
 
 	def __str__(self):

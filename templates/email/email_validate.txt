@@ -1,0 +1,1 @@
+﻿親愛的{{ request.user.username }}您的信箱驗證碼為：{{ vcode }}，請在10分鐘內輸入。

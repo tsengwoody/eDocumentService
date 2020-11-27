@@ -1,28 +1,38 @@
 from rest_framework import serializers
 from .models import *
 
+
 class IndexCategorySerializer(serializers.ModelSerializer):
 	descendants = serializers.ReadOnlyField()
+
 	class Meta:
 		model = IndexCategory
 		fields = ('__all__')
+
 
 class IndexCategorySimpleSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = IndexCategory
 		fields = ('__all__')
 
+
 class BookInfoSerializer(serializers.ModelSerializer):
 	index_category = IndexCategorySimpleSerializer(read_only=True)
+
 	class Meta:
 		model = BookInfo
 		fields = '__all__'
+
 
 class EditRecordSerializer(serializers.ModelSerializer):
 	#editor_name = serializers.ReadOnlyField(read_only=True)
 	class Meta:
 		model = EditRecord
-		exclude = ('edit', 'finish',)
+		exclude = (
+			'edit',
+			'finish',
+		)
+
 
 class EBookSerializer(serializers.ModelSerializer):
 	bookname = serializers.ReadOnlyField(source='book.book_info.bookname')
@@ -48,9 +58,11 @@ class EBookSerializer(serializers.ModelSerializer):
 			'service_hours',
 		]
 
+
 class BookSimpleSerializer(serializers.ModelSerializer):
 	book_info = BookInfoSerializer(read_only=True)
 	index_category_object = IndexCategorySimpleSerializer(read_only=True)
+
 	class Meta:
 		model = Book
 		fields = [
@@ -68,11 +80,14 @@ class BookSimpleSerializer(serializers.ModelSerializer):
 			'index_category_object',
 		]
 
+
 class BookSerializer(serializers.ModelSerializer):
 	ebook_set = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 	book_info = BookInfoSerializer(read_only=True)
-	finish_page_count = serializers.ReadOnlyField(source='collect_finish_page_count')
-	finish_part_count = serializers.ReadOnlyField(source='collect_finish_part_count')
+	finish_page_count = serializers.ReadOnlyField(
+		source='collect_finish_page_count')
+	finish_part_count = serializers.ReadOnlyField(
+		source='collect_finish_part_count')
 	service_hours = serializers.ReadOnlyField(source='collect_service_hours')
 
 	class Meta:
@@ -96,24 +111,31 @@ class BookSerializer(serializers.ModelSerializer):
 			'category',
 		]
 
+
 class BookAddSerializer(BookSerializer):
 	ebook_set = EBookSerializer(many=True, read_only=True)
+
 
 class BookOrderSerializer(serializers.ModelSerializer):
 	bookname = serializers.ReadOnlyField(source='book.book_info.bookname')
 	status = serializers.ReadOnlyField(source='book.status')
+
 	class Meta:
 		model = BookOrder
 		fields = ('__all__')
 
+
 class LibraryRecordSerializer(serializers.ModelSerializer):
-	object = BookSerializer(read_only=True,)
+	object = BookSerializer(read_only=True, )
+
 	class Meta:
 		model = LibraryRecord
 		fields = ('__all__')
 
+
 class CategorySerializer(serializers.ModelSerializer):
 	book_set = BookSerializer(many=True, read_only=True)
+
 	class Meta:
 		model = Category
 		fields = ('__all__')

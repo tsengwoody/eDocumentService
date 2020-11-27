@@ -24,11 +24,16 @@ from rest_framework_simplejwt.views import (
 from . import apis
 
 urlpatterns = [
-	path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-	path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+	path('api/token/', TokenObtainPairView.as_view(),
+	name='token_obtain_pair'),
+	path('api/token/refresh/',
+	TokenRefreshView.as_view(),
+	name='token_refresh'),
 	path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-	path('ebookSystem/', include(('ebookSystem.urls','ebookSystem'), namespace='ebookSystem')),
-	path('genericUser/', include(('genericUser.urls','genericUser'), namespace='genericUser')),
+	path('ebookSystem/',
+	include(('ebookSystem.urls', 'ebookSystem'), namespace='ebookSystem')),
+	path('genericUser/',
+	include(('genericUser.urls', 'genericUser'), namespace='genericUser')),
 	path('admin/', admin.site.urls),
 	path('api/statistics/<str:action>/', apis.Statistics.as_view()),
 	path('api/ddm/<str:action>/<str:dir>/', apis.Ddm.as_view()),
