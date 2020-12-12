@@ -259,30 +259,20 @@ class ServiceInfo(models.Model):
 	@classmethod
 	def exchange_false_export(cls):
 		serviceinfos = cls.objects.filter(is_exchange=False)
-		export = '\t'.join([
-			u'序號',
-			u'帳號',
-			u'姓名',
-			u'起始日期',
-			u'結束日期',
-			u'合計時數',
-		]) + '\r\n'
+		export = '\t'.join(['序號', '帳號', '姓名', '電郵', '起始日期', '結束日期', '合計時數',]) +'\r\n'
 		for serviceinfo in serviceinfos:
-			get_dates = [
-				editrecord.get_date
-				for editrecord in serviceinfo.editrecord_set.all()
-			]
+			get_dates = [editrecord.get_date for editrecord in serviceinfo.editrecord_set.all()]
 			export += '\t'.join([
-				unicode(serviceinfo.id),
+				str(serviceinfo.id),
 				serviceinfo.owner.username,
-				serviceinfo.owner.first_name + serviceinfo.owner.last_name,
-				unicode(min(get_dates)),
-				unicode(max(get_dates)),
-				unicode(serviceinfo.service_hours),
+				serviceinfo.owner.first_name +serviceinfo.owner.last_name,
+				serviceinfo.owner.email,
+				str(min(get_dates)),
+				str(max(get_dates)),
+				str(serviceinfo.service_hours),
 			]) + '\r\n'
 
-		path = os.path.join(BASE_DIR, 'file', 'temp',
-			'serviceinfois_exchange_false_export.txt')
+		path = os.path.join(BASE_DIR, 'file', 'temp', 'serviceinfois_exchange_false_export.txt')
 		dirname = os.path.dirname(path)
 		if not os.path.exists(dirname):
 			os.makedirs(dirname, 755)

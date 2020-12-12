@@ -61,7 +61,7 @@ class EBookSerializer(serializers.ModelSerializer):
 
 class BookSimpleSerializer(serializers.ModelSerializer):
 	book_info = BookInfoSerializer(read_only=True)
-	index_category_object = IndexCategorySimpleSerializer(read_only=True)
+	index_categorys_detail = IndexCategorySimpleSerializer(many=True, read_only=True, source='index_categorys')
 
 	class Meta:
 		model = Book
@@ -76,19 +76,21 @@ class BookSimpleSerializer(serializers.ModelSerializer):
 			'source',
 			'status',
 			'category',
-			'index_category',
-			'index_category_object',
+			'index_categorys',
+			'index_categorys_detail',
 		]
 
 
 class BookSerializer(serializers.ModelSerializer):
 	ebook_set = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 	book_info = BookInfoSerializer(read_only=True)
+	index_categorys_detail = IndexCategorySimpleSerializer(many=True, read_only=True, source='index_categorys')
 	finish_page_count = serializers.ReadOnlyField(
 		source='collect_finish_page_count')
 	finish_part_count = serializers.ReadOnlyField(
 		source='collect_finish_part_count')
 	service_hours = serializers.ReadOnlyField(source='collect_service_hours')
+	index_categorys = serializers.PrimaryKeyRelatedField(many=True, queryset=IndexCategory.objects.all())
 
 	class Meta:
 		model = Book
@@ -109,6 +111,8 @@ class BookSerializer(serializers.ModelSerializer):
 			'finish_part_count',
 			'service_hours',
 			'category',
+			'index_categorys',
+			'index_categorys_detail',
 		]
 
 

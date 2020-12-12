@@ -59,11 +59,10 @@ class Book(models.Model):
 		blank=True,
 		null=True,
 		on_delete=models.SET_NULL)
-	index_category = models.ForeignKey('IndexCategory',
-		related_name='book_set',
+	index_category = models.ForeignKey('IndexCategory', related_name='book_set', blank=True, null=True, on_delete=models.SET_NULL)
+	index_categorys = models.ManyToManyField('IndexCategory',
 		blank=True,
-		null=True,
-		on_delete=models.SET_NULL)
+		related_name="books")
 	owner = models.ForeignKey(User,
 		blank=True,
 		null=True,

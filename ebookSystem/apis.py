@@ -234,11 +234,11 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				id=request.POST['category_id'])
 		except:
 			pass
-		try:
+		"""try:
 			newBook.index_category = IndexCategory.objects.get(
 				id=request.POST['index_category_id'])
 		except:
-			pass
+			pass"""
 		newBook.save()
 
 		try:
@@ -280,6 +280,7 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 					status=status.HTTP_406_NOT_ACCEPTABLE)
 		except:
 			pass
+
 		#上傳文件設定
 		uploadPath = BASE_DIR + u'/file/ebookSystem/document/{0}'.format(
 			request.POST['ISBN'])
@@ -329,10 +330,10 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				epub.write_epub(final_file, book, {})
 			except BaseException as e:
 				shutil.rmtree(uploadPath)
-				raise e
 				res['detail'] = u'建立文件失敗' + str(e)
 				return Response(data=res,
 					status=status.HTTP_406_NOT_ACCEPTABLE)
+
 		#建立book object和ebook object
 		try:
 			newBook = Book(book_info=newBookInfo, ISBN=request.POST['ISBN'])
@@ -351,11 +352,11 @@ class BookViewSet(viewsets.ModelViewSet, ResourceViewSet):
 				id=request.POST['category_id'])
 		except:
 			pass
-		try:
+		"""try:
 			newBook.index_category = IndexCategory.objects.get(
 				id=request.POST['index_category_id'])
 		except:
-			pass
+			pass"""
 		newBook.save()
 		newBook.ebook_set.all().delete()
 		ebook = EBook.objects.create(book=newBook,
@@ -1023,12 +1024,44 @@ class IndexCategoryViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet):
 		permission_classes=[
 		permissions.AllowAny,
 		],
-		url_name='books',
+		url_name='indexbooks',
 		url_path='action/books',
 	)
-	def books(self, request, pk=None):
+	def indexbooks(self, request, pk=None):
 		obj = self.get_object()
-		book_infos = BookInfo.objects.filter(
-			book__index_category_id__in=obj.descendants_id)
+		from django.db import connection
+		with connection.cursor() as cursor:
+			ids=str(tuple(obj.descendants_id))
+			sql = "select distinct book_id from ebookSystem_book_index_categorys where indexcategory_id in {}".format(ids)
+			cursor.execute(sql)
+			result = cursor.fetchall()
+			results = [i[0] for i in result]
+		book_infos = BookInfo.objects.filter(ISBN__in=results)
 		s = BookInfoSerializer(instance=book_infos, many=True)
 		return Response(data=s.data, status=status.HTTP_202_ACCEPTED)
+
+	@action(
+		detail=False,
+		methods=['get'],
+		permission_classes=[
+		permissions.AllowAny,
+		],
+		url_name='noindexbooks',
+		url_path='action/books',
+	)
+	def noindexbooks(self, request, pk=None):
+		from django.db import connection
+		with connection.cursor() as cursor:
+			sql = "select distinct book_id from ebookSystem_book_index_categorys"
+			cursor.execute(sql)
+			indexed_books = cursor.fetchall()
+			indexed_books = set([i[0] for i in indexed_books])
+			sql = "select ISBN from ebookSystem_book"
+			cursor.execute(sql)
+			all_books = cursor.fetchall()
+			all_books = set([i[0] for i in all_books])
+		results = list(all_books - indexed_books)
+		book_infos = BookInfo.objects.filter(ISBN__in=results)
+		s = BookInfoSerializer(instance=book_infos, many=True)
+		return Response(data=s.data, status=status.HTTP_202_ACCEPTED)
+		# return Response(data=[], status=status.HTTP_202_ACCEPTED)
