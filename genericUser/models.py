@@ -337,16 +337,36 @@ class Announcement(models.Model):
 		('校園平台消息', '校園平台消息'),
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
+	
+
 
 	def __init__(self, *args, **kwargs):
+		
 		super(Announcement, self).__init__(*args, **kwargs)
 		self.path = BASE_DIR + '/file/genericUser/Announcement/{0}/'.format(
 			self.id)
+		self.content = self.clean_content;
+		
+
 
 	def __str__(self):
 		return self.title
+	@property
+	def clean_content(self):
+		from bs4 import BeautifulSoup;
+		soup = BeautifulSoup(self.content, 'lxml') 
+		
+		for i in soup.findAll(True):
+			if (len(i.get_text()) == 0  or "\xa0" in i):
+				i.extract();
+				
+		soup = str(soup).replace("<html>","").replace("</html>","").replace("<body>","").replace("</body>","").replace("\n","");
+		
+		return soup;
+		
 
 	def delete(self, *args, **kwargs):
+		
 		try:
 			shutil.rmtree(self.path)
 		except:
