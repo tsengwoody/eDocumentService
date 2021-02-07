@@ -44,6 +44,7 @@ class EBookSerializer(serializers.ModelSerializer):
 		model = EBook
 		fields = [
 			'bookname',
+			'editor',
 			'current_editrecord',
 			'editrecord_set',
 			'scan_image',
@@ -52,6 +53,8 @@ class EBookSerializer(serializers.ModelSerializer):
 			'part',
 			'edited_page',
 			'number_of_times',
+			'reject',
+			'delay',
 			'deadline',
 			'get_date',
 			'status',

@@ -92,6 +92,15 @@ class NewestFilter(filters.BaseFilterBackend):
 			return queryset
 
 
+class PublishFilter(filters.BaseFilterBackend):
+	def filter_queryset(self, request, queryset, view):
+		value = request.query_params.get('publish')
+		if value:
+			return queryset.order_by('-date')[0:int(value)]
+		else:
+			return queryset
+
+
 class HottestFilter(filters.BaseFilterBackend):
 	def filter_queryset(self, request, queryset, view):
 		hottest = request.query_params.get('hottest')

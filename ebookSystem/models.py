@@ -348,6 +348,8 @@ class EBook(models.Model):
 		null=True,
 		on_delete=models.SET_NULL,
 		related_name='edit_ebook_set')
+	reject = models.BooleanField(default=False)
+	delay = models.BooleanField(default=False)
 	deadline = models.DateField(blank=True, null=True)
 	get_date = models.DateField(blank=True, null=True)
 	service_hours = models.IntegerField(default=0)
@@ -411,6 +413,8 @@ class EBook(models.Model):
 				self.status = self.status + direction
 			elif self.status + direction == self.STATUS['edit']:
 				self.editor = kwargs['user']
+				self.reject = False
+				self.delay = False
 				self.get_date = datetime.date.today()
 				self.deadline = kwargs['deadline']
 				self.status = self.status + direction
@@ -434,11 +438,14 @@ class EBook(models.Model):
 		elif direction == -1:
 			if self.status + direction == self.STATUS['active']:
 				self.editor = None
+				self.reject = False
+				self.delay = False
 				self.get_date = None
 				self.deadline = None
 				self.status = self.status + direction
 			elif self.status + direction == self.STATUS['edit']:
 				self.edited_page = 0
+				self.reject = True
 				self.deadline = datetime.date.today() + datetime.timedelta(
 					days=3)
 				self.load_full_content()

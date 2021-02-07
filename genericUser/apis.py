@@ -441,6 +441,28 @@ class AnnouncementViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		fullpath = os.path.join(obj.path, dir, resource)
 		return fullpath
 
+	@action(
+		detail=False,
+		methods=['get'],
+		url_name='latest',
+		url_path='action/latest',
+	)
+	def latest(self, request, pk=None):
+		from datetime import datetime
+		from dateutil.relativedelta import relativedelta
+		year = datetime.today().year
+		month = datetime.today().month
+		begin_date = datetime(year, month, 1) + relativedelta(months=-12)
+		end_date = datetime.today()
+
+		query = Announcement.objects
+
+		category = request.query_params.get('category')
+		if category:
+			query = query.filter(category=category)
+		query = query.filter(datetime__gte=begin_date, datetime__lte=end_date).order_by("-datetime")
+		s = AnnouncementSerializer(instance=query, many=True)
+		return Response(data=s.data, status=status.HTTP_202_ACCEPTED)
 
 class QAndAViewSet(viewsets.ModelViewSet):
 	queryset = QAndA.objects.all()

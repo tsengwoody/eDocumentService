@@ -682,6 +682,7 @@ class BookInfoViewSet(viewsets.ModelViewSet):
 		CBCFilter,
 		ICFilter,
 		NewestFilter,
+		PublishFilter,
 		HottestFilter,
 		BookInfoOwnerFilter,
 		BookInfoOrgFilter,
@@ -1031,12 +1032,15 @@ class IndexCategoryViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet):
 		obj = self.get_object()
 		from django.db import connection
 		with connection.cursor() as cursor:
-			ids=str(tuple(obj.descendants_id))
+			ids = tuple(obj.descendants_id)
+			if len(ids) == 1:
+				ids = str(ids).replace(',', "")
+			ids = str(ids)
 			sql = "select distinct book_id from ebookSystem_book_index_categorys where indexcategory_id in {}".format(ids)
 			cursor.execute(sql)
 			result = cursor.fetchall()
 			results = [i[0] for i in result]
-		book_infos = BookInfo.objects.filter(ISBN__in=results)
+		book_infos = BookInfo.objects.filter(ISBN__in=results).order_by("-date")
 		s = BookInfoSerializer(instance=book_infos, many=True)
 		return Response(data=s.data, status=status.HTTP_202_ACCEPTED)
 
@@ -1061,7 +1065,6 @@ class IndexCategoryViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet):
 			all_books = cursor.fetchall()
 			all_books = set([i[0] for i in all_books])
 		results = list(all_books - indexed_books)
-		book_infos = BookInfo.objects.filter(ISBN__in=results)
+		book_infos = BookInfo.objects.filter(ISBN__in=results).order_by("-date")
 		s = BookInfoSerializer(instance=book_infos, many=True)
 		return Response(data=s.data, status=status.HTTP_202_ACCEPTED)
-		# return Response(data=[], status=status.HTTP_202_ACCEPTED)

@@ -94,13 +94,16 @@ class User(AbstractUser):
 		# return base and self.is_guest # and self.auth_disabilitycard()
 		from django.utils import timezone
 		d = timezone.datetime(2018, 9, 1, tzinfo=self.date_joined.tzinfo)
-		return base and self.is_guest and (self.auth_disabilitycard()
-			or self.date_joined < d)
+		return base and self.is_guest and (self.auth_disabilitycard())
+			# or self.date_joined < d)
 
 	def auth_disabilitycard(self):
+		from datetime import date
 		base = self.is_license & self.auth_email & self.auth_phone
 		try:
-			return base & self.disabilitycard_set.all()[0].is_active
+			expire = self.disabilitycard_set.all()[0].renew_date < date.today()
+			is_active = self.disabilitycard_set.all()[0].is_active
+			return base and is_active and (not expire)
 		except:
 			return False
 
@@ -325,12 +328,13 @@ class Announcement(models.Model):
 	content = models.TextField()
 	datetime = models.DateField(default=timezone.now)
 	CATEGORY = (
-		(u'平台消息', u'平台消息'),
-		(u'天橋說書', u'天橋說書'),
-		(u'新書推薦', u'新書推薦'),
-		(u'志工快訊', u'志工快訊'),
-		(u'校園公告', u'校園公告'),
-		(u'校園平台消息', u'校園平台消息'),
+		('平台消息', '平台消息'),
+		('天橋說書', '天橋說書'),
+		('新書推薦', '新書推薦'),
+		('志工快訊', '志工快訊'),
+		('每月書訊', '每月書訊'),
+		('校園公告', '校園公告'),
+		('校園平台消息', '校園平台消息'),
 	)
 	category = models.CharField(max_length=10, choices=CATEGORY)
 
