@@ -343,21 +343,18 @@ class Announcement(models.Model):
 			self.id)
 		self.content = self.clean_content;
 		
-
-
 	def __str__(self):
 		return self.title
 	@property
 	def clean_content(self):
 		from bs4 import BeautifulSoup;
-		soup = BeautifulSoup(self.content, 'lxml') 
+		soup = BeautifulSoup(self.content, 'html.parser') 
 		
 		for i in soup.findAll(True):
-			if (len(i.get_text()) == 0  or "\xa0" in i):
-				i.extract();
-				
-		soup = str(soup).replace("<html>","").replace("</html>","").replace("<body>","").replace("</body>","").replace("\n","");
-		
+			if(i.name == "br" or "<iframe" in str(i) or "<img" in str(i) ):
+        				continue;
+			if (len(i.get_text()) == 0  or "\xa0" in i ):
+				i.extract();	
 		return soup;
 		
 
