@@ -1,6 +1,6 @@
 ﻿# coding: utf-8
-import cgi
 import codecs
+import html
 import io
 import os
 import re
@@ -34,7 +34,7 @@ def add_base_url(src, id, encoding='utf-8'):
 
 #將txt純文字加入<p> tag
 def add_tag(source):
-	source_content_list = [ '<p>' +cgi.escape(line).strip() +'</p>' for line in source.splitlines() ]
+	source_content_list = [ '<p>' +html.escape(line).strip() +'</p>' for line in source.splitlines() ]
 	return ''.join(source_content_list)
 
 #將加入<p>文件加入<head>、<body> html的tag

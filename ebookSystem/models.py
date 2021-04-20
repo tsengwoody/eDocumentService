@@ -223,7 +223,7 @@ class Book(models.Model):
 			final_epub = self.path + '/temp/{0}.temp'.format(self.ISBN)
 			final_dir = os.path.dirname(final_epub)
 			if not os.path.exists(final_dir):
-				os.mkdir(final_dir)
+				os.makedirs(final_dir)
 			try:
 				part_list = [
 					file.get_clean_file()
@@ -261,7 +261,7 @@ class Book(models.Model):
 			final_txt = self.path + '/temp/{0}.temp'.format(self.ISBN)
 			final_dir = os.path.dirname(final_txt)
 			if not os.path.exists(final_dir):
-				os.mkdir(final_dir)
+				os.makedirs(final_dir)
 			try:
 				part_list = [
 					file.get_clean_file() for file in self.ebook_set.all()
@@ -284,7 +284,7 @@ class Book(models.Model):
 		custom_path = self.path + '/temp/{0}_{1}.{2}'.format(
 			self.ISBN, user.username, format)
 		if not os.path.exists(os.path.dirname(custom_path)):
-			os.mkdir(os.path.dirname(custom_path))
+			os.makedirs(os.path.dirname(custom_path))
 		if format == 'epub':
 			custom_path = self.custom_epub_create(custom_path, user)
 		elif format == 'txt':
@@ -589,7 +589,7 @@ class EBook(models.Model):
 		custom_zip = self.book.path + '/temp/{0}_{1}.zip'.format(
 			self.ISBN_part, user.username)
 		if not os.path.exists(os.path.dirname(custom_zip)):
-			os.mkdir(os.path.dirname(custom_zip))
+			os.makedirs(os.path.dirname(custom_zip))
 		zip_list = [self.get_clean_file()]
 		try:
 			pyminizip.compress_multiple(zip_list, custom_zip, password, 5)
@@ -710,7 +710,7 @@ class Library(models.Model):
 
 	def check_out(self):
 		if not os.path.exists(os.path.dirname(self.epub)):
-			os.mkdir(os.path.dirname(self.epub))
+			os.makedirs(os.path.dirname(self.epub))
 		path = self.object.custom_epub_create(self.epub, self.owner)
 		path = self.object.custom_txt_create(self.txt, self.owner)
 		from utils.epub import remove_blankline

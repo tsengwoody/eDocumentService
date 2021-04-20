@@ -362,6 +362,38 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		return Response(data={'detail': u'變更密碼失敗'},
 			status=status.HTTP_406_NOT_ACCEPTABLE)
 
+	@action(
+		detail=True,
+		methods=['get'],
+		url_name='editor-extra-info',
+		url_path='action/editor_extra_info',
+	)
+	def editor_extra_info(self, request, pk=None):
+		obj = self.get_object()
+		data = {
+			"username": obj.username,
+			"first_name": obj.first_name,
+			"last_name": obj.last_name,
+			"editrecord_count": obj.editrecord_count,
+		}
+		return Response(data=data, status=status.HTTP_202_ACCEPTED)
+
+	@action(
+		detail=True,
+		methods=['get'],
+		url_name='guest-extra-info',
+		url_path='action/guest_extra_info',
+	)
+	def guest_extra_info(self, request, pk=None):
+		obj = self.get_object()
+		data = {
+			"username": obj.username,
+			"first_name": obj.first_name,
+			"last_name": obj.last_name,
+			"expire_countdown": obj.expire_countdown.days if obj.expire_countdown else None,
+		}
+		return Response(data=data, status=status.HTTP_202_ACCEPTED)
+
 
 class DisabilityCardViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet,
 	ResourceViewSet):

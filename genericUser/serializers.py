@@ -34,7 +34,6 @@ class UserSerializer(serializers.ModelSerializer):
 			'disabilitycard_set',
 		]
 
-
 class DisabilityCardSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = DisabilityCard

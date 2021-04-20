@@ -37,14 +37,14 @@ def generic_serialized(self):
 
 class User(AbstractUser):
 	password_md5 = models.CharField(max_length=32)
-	phone = models.CharField(max_length=30)
+	phone = models.CharField(max_length=30, blank=True)
 	birthday = models.DateField()
 	EDU = (
-		(u'國小', u'國小'),
-		(u'國中', u'國中'),
-		(u'高中', u'高中'),
-		(u'學士', u'學士'),
-		(u'碩士', u'碩士'),
+		('國小', '國小'),
+		('國中', '國中'),
+		('高中', '高中'),
+		('學士', '學士'),
+		('碩士', '碩士'),
 	)
 	education = models.CharField(max_length=30, choices=EDU)
 	online = models.DateTimeField(default=timezone.now)
@@ -86,7 +86,7 @@ class User(AbstractUser):
 		return self.is_license & self.auth_email & self.auth_phone
 
 	def auth_editor(self):
-		base = self.is_license & self.auth_email & self.auth_phone
+		base = self.is_license & (self.auth_email | self.auth_phone)
 		return base & self.is_editor
 
 	def auth_guest(self):
@@ -98,14 +98,23 @@ class User(AbstractUser):
 			# or self.date_joined < d)
 
 	def auth_disabilitycard(self):
-		from datetime import date
+		from datetime import date, timedelta
 		base = self.is_license & self.auth_email & self.auth_phone
 		try:
-			expire = self.disabilitycard_set.all()[0].renew_date < date.today()
+			expire = self.disabilitycard_set.all()[0].renew_date < date.today() - timedelta(days=90)
 			is_active = self.disabilitycard_set.all()[0].is_active
 			return base and is_active and (not expire)
 		except:
 			return False
+
+	@property
+	def expire_countdown(self):
+		from datetime import date
+		try:
+			expire = self.disabilitycard_set.all()[0].renew_date - date.today()
+			return expire
+		except:
+			return None
 
 	def __str__(self):
 		return self.first_name + self.last_name
@@ -186,6 +195,15 @@ class User(AbstractUser):
 		except:
 			current_ServiceInfo = None
 		return current_ServiceInfo
+
+	@property
+	def editrecord_count(self):
+		from django.db import connection
+		with connection.cursor() as cursor:
+			sql = "select count(*) from ebookSystem_editrecord where editor_id={}".format(self.id)
+			cursor.execute(sql)
+			result = cursor.fetchall()
+		return result[0][0]
 
 
 class DisabilityCard(models.Model):
