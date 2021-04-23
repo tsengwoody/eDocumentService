@@ -25,7 +25,7 @@ mysite.env.set()
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-z1+tq%0yuenj#ng@9u#*x@4d4g28vl=pl_)zvtw7flzwfs$zyi'
+SECRET_KEY = os.environ["eDocumentService_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -237,13 +237,11 @@ else:
 OTP_ACCOUNT = os.environ["eDocumentService_OTP_ACCOUNT"]
 OTP_PASSWORD = os.environ["eDocumentService_OTP_PASSWORD"]
 
-DEFAULT_FROM_EMAIL = 'edocumentservice@gmail.com'
-MANAGER = ['edocumentservice@gmail.com']
-SERVICE = 'edocumentservice@gmail.com'
-
 EMAIL_HOST = os.environ["eDocumentService_EMAIL_HOST"]
 EMAIL_PORT = os.environ["eDocumentService_EMAIL_PORT"]
 EMAIL_HOST_USER = os.environ["eDocumentService_EMAIL_HOST_USER"]
 EMAIL_HOST_PASSWORD = os.environ["eDocumentService_EMAIL_HOST_PASSWORD"]
 EMAIL_USE_TLS = True
 SERVICE = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = 'incloud@forblind.org.tw'
+MANAGER = ['edocumentservice@gmail.com', 'meichen@forblind.org.tw']

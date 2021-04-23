@@ -86,16 +86,12 @@ class User(AbstractUser):
 		return self.is_license & self.auth_email & self.auth_phone
 
 	def auth_editor(self):
-		base = self.is_license & (self.auth_email | self.auth_phone)
+		base = self.is_license & (self.auth_email & self.auth_phone)
 		return base & self.is_editor
 
 	def auth_guest(self):
-		base = self.is_license & self.auth_email & self.auth_phone
-		# return base and self.is_guest # and self.auth_disabilitycard()
-		from django.utils import timezone
-		d = timezone.datetime(2018, 9, 1, tzinfo=self.date_joined.tzinfo)
+		base = self.is_license & (self.auth_email | self.auth_phone)
 		return base and self.is_guest and (self.auth_disabilitycard())
-			# or self.date_joined < d)
 
 	def auth_disabilitycard(self):
 		from datetime import date, timedelta

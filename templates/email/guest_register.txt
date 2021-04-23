@@ -1,0 +1,2 @@
+﻿帳號：{{ user.username }}
+姓名：{{ user.first_name }}{{ user.last_name }}

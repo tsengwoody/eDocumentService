@@ -61,6 +61,19 @@ class UserViewSet(viewsets.ModelViewSet, ResourceViewSet):
 		instance.set_password(self.request.data['password'])
 		instance.save()
 
+		if instance.is_guest:
+			from django.core.mail import EmailMessage
+			from mysite.settings import SERVICE, MANAGER
+			user = instance
+			subject = '[通知] 有新視障者註冊'
+			t = get_template('email/guest_register.txt')
+			body = t.render(locals())
+			email = EmailMessage(subject=subject,
+				body=body,
+				from_email=SERVICE,
+				to=MANAGER)
+			email.send(fail_silently=True)
+
 	def perform_update(self, serializer):
 
 		# 要分開先判斷是否與原始資料相同，再一併存檔
@@ -423,6 +436,25 @@ class DisabilityCardViewSet(MixedPermissionModelViewSet, viewsets.ModelViewSet,
 				fullpath = obj.back
 		return fullpath
 
+	@action(
+		detail=False,
+		methods=['post'],
+		url_name='create_update',
+		url_path='action/create_update',
+	)
+	def create_update(self, request, pk=None):
+		res = {}
+		try:
+			dc = DisabilityCard.objects.get(identity_card_number=request.data['identity_card_number'])
+			serializer = DisabilityCardSerializer(data=request.data, instance=dc)
+		except BaseException as e:
+			serializer = DisabilityCardSerializer(data=request.data)
+		if not serializer.is_valid():
+			res['detail'] = str(serializer.errors)
+			return Response(data=res, status=status.HTTP_406_NOT_ACCEPTABLE)
+		dc = serializer.save()
+		s = DisabilityCardSerializer(instance=dc)
+		return Response(data=s.data, status=status.HTTP_202_ACCEPTED)
 
 class ServiceInfoViewSet(viewsets.ModelViewSet, ResourceViewSet):
 	queryset = ServiceInfo.objects.all().order_by('-date')
